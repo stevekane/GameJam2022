@@ -1,12 +1,13 @@
 using UnityEngine;
 
 public class Player : MonoBehaviour {
-  public enum PlayerState { Moving, Rolling }
+  public enum PlayerState { Moving, Rolling, Spinning }
 
   public Controller Controller;
   public PlayerConfig Config;
   public PlayerState State = PlayerState.Moving;
   public Grapple Grapple;
+  public PlayerRenderer Renderer;
 
   Vector3 RollDirection;
   float RollSpeed;
@@ -26,13 +27,13 @@ public class Player : MonoBehaviour {
     var aimdirection = aimvector.normalized;
     var rotation = transform.rotation;
     var minMagnitude = Config.MinGrappleSquareMagnitude;
+    var tryRoll = Controller.Action2;
+    var tryHit = Controller.Action1;
+    var tryGrapple = aimvector.sqrMagnitude > minMagnitude;
+    var grappling = Grapple.State != Grapple.GrappleState.Ready;
+
     switch (State) {
       case PlayerState.Moving: {
-        var tryRoll = Controller.Action2;
-        var tryHit = Controller.Action1;
-        var tryGrapple = aimvector.sqrMagnitude > minMagnitude;
-        var grappling = Grapple.State != Grapple.GrappleState.Ready;
-
         if (grappling) {
           var towardsHook = (Grapple.Hook.transform.position - transform.position).normalized;
           if (towardsHook.sqrMagnitude > 0) {
@@ -56,20 +57,21 @@ public class Player : MonoBehaviour {
         } else if (tryGrapple) {
           if (Grapple.Fire(ref aimdirection)) {
             Debug.Log("Grapple");
-          } else {
           }
         }
       }
       break;
 
-      // TODO: you can perform various moves while rolling
-      // TODO: slight adjustments to trajectory while rolling
-      // TODO: change model while rolling
-      // TODO: falloff on speed as you approach end of roll?
       case PlayerState.Rolling: {
         if (moving) {
           var maxRadians = dt * Config.MaxRollRadiansPerSecond;
           RollDirection = Vector3.RotateTowards(RollDirection,movedirection,maxRadians,0).normalized;
+        }
+
+        if (tryGrapple) {
+          if (Grapple.Fire(ref aimdirection)) {
+            Debug.Log("Grapple While Rolling");
+          }
         }
 
         if (RollRemaining > dt) {
