@@ -1,42 +1,89 @@
 using UnityEngine;
 
 public class Player : MonoBehaviour {
-  public enum PlayerState { Moving }
+  public enum PlayerState { Moving, Rolling }
 
   public Controller Controller;
   public PlayerConfig Config;
   public PlayerState State = PlayerState.Moving;
   public Grapple Grapple;
 
+  Vector3 RollDirection;
+  float RollSpeed;
+  float RollDuration;
+  float RollRemaining;
+
   void Update() {
     var dt = Time.deltaTime;
+    var speed = Config.MoveSpeed;
+    var movex = Controller.MoveX;
+    var movez = Controller.MoveY;
+    var movedirection = new Vector3(movex,0,movez).normalized;
+    var moving = movedirection.sqrMagnitude > 0;
+    var aimx = Controller.AimX;
+    var aimy = Controller.AimY;
+    var aimvector = new Vector3(aimx,0,aimy);
+    var aimdirection = aimvector.normalized;
+    var rotation = transform.rotation;
+    var minMagnitude = Config.MinGrappleSquareMagnitude;
     switch (State) {
       case PlayerState.Moving: {
-        var speed = Config.MoveSpeed;
-        var movex = Controller.MoveX;
-        var movez = Controller.MoveY;
-        var movedirection = new Vector3(movex,0,movez).normalized;
-        var position = transform.position;
-        if (movedirection.sqrMagnitude > 0) {
-          transform.position = dt * speed * movedirection + position;
+        var tryRoll = Controller.Action2;
+        var tryHit = Controller.Action1;
+        var tryGrapple = aimvector.sqrMagnitude > minMagnitude;
+        var grappling = Grapple.State != Grapple.GrappleState.Ready;
+
+        if (grappling) {
+          var towardsHook = (Grapple.Hook.transform.position - transform.position).normalized;
+          if (towardsHook.sqrMagnitude > 0) {
+            rotation.SetLookRotation(towardsHook,Vector3.up);
+            transform.rotation = rotation;
+          }
         }
-        var aimx = Controller.AimX;
-        var aimy = Controller.AimY;
-        var aimdirection = new Vector3(aimx,0,aimy).normalized;
-        var rotation = transform.rotation;
-        if (aimdirection.sqrMagnitude > 0) {
-          rotation.SetLookRotation(aimdirection,Vector3.up);
-          transform.rotation = rotation;
+
+        if (moving) {
+          transform.position = dt * speed * movedirection + transform.position;
         }
-        var tryGrapple = Controller.Action1;
-        if (tryGrapple) {
-          if (Grapple.State == Grapple.GrappleState.Ready) {
-            Grapple.Hook.transform.SetParent(null,true);
-            Grapple.Trajectory = aimdirection;
-            Grapple.InFlightRemaining = Config.GrappleFlightDuration;
-            Grapple.State = Grapple.GrappleState.InFlight;
+
+        if (tryHit) {
+          Debug.Log("Hit");
+        } else if (tryRoll && moving) {
+          RollDirection = movedirection;
+          RollSpeed = Config.RollSpeed;
+          RollDuration = Config.RollDuration;
+          RollRemaining = RollDuration;
+          State = PlayerState.Rolling;
+        } else if (tryGrapple) {
+          if (Grapple.Fire(ref aimdirection)) {
+            Debug.Log("Grapple");
           } else {
           }
+        }
+      }
+      break;
+
+      // TODO: you can perform various moves while rolling
+      // TODO: slight adjustments to trajectory while rolling
+      // TODO: change model while rolling
+      // TODO: falloff on speed as you approach end of roll?
+      case PlayerState.Rolling: {
+        if (moving) {
+          var maxRadians = dt * Config.MaxRollRadiansPerSecond;
+          RollDirection = Vector3.RotateTowards(RollDirection,movedirection,maxRadians,0).normalized;
+        }
+
+        if (RollRemaining > dt) {
+          RollRemaining -= dt;
+          transform.position = dt * RollSpeed * RollDirection + transform.position;
+        } else if (RollRemaining > 0) {
+          transform.position = RollRemaining * RollSpeed * RollDirection + transform.position;
+          transform.position = (dt - RollRemaining) * speed * movedirection + transform.position;
+          RollRemaining = 0;
+          State = PlayerState.Moving;
+        } else {
+          transform.position = dt * speed * movedirection + transform.position;
+          RollRemaining = 0;
+          State = PlayerState.Moving;
         }
       }
       break;
