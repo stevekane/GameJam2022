@@ -1,12 +1,13 @@
 using UnityEngine;
 
 public class Player : MonoBehaviour {
-  public enum PlayerState { Moving, Rolling }
+  public enum PlayerState { Moving, Rolling, Spinning }
 
   public Controller Controller;
   public PlayerConfig Config;
   public PlayerState State = PlayerState.Moving;
   public Grapple Grapple;
+  public PlayerRenderer Renderer;
 
   Vector3 RollDirection;
   float RollSpeed;
@@ -63,7 +64,6 @@ public class Player : MonoBehaviour {
       break;
 
       // TODO: you can perform various moves while rolling
-      // TODO: slight adjustments to trajectory while rolling
       // TODO: change model while rolling
       // TODO: falloff on speed as you approach end of roll?
       case PlayerState.Rolling: {
