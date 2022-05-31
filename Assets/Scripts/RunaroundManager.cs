@@ -5,6 +5,6 @@ public class RunaroundManager : MonoBehaviour {
 
   public void Start() {
     Debug.Log(SceneManager);
-    Debug.Log(SceneManager.Boot);
+    Debug.Log(SceneManager.Game);
   }
 }
