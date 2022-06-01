@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MobShitter : Mob {
-  public enum MobShitterState { Idle, PreShoot }
+  public Bullet BulletPrefab;
+
+  enum MobShitterState { Idle, PreShoot }
   Animator Animator;
 
   MobShitterState State {
@@ -19,26 +21,24 @@ public class MobShitter : Mob {
   void Update() {
     var player = GameObject.FindObjectOfType<Player>();
     var playerDelta = (player.transform.position - transform.position);
-    var playerInRange = playerDelta.sqrMagnitude < 100; // TODO
+    var playerInRange = playerDelta.sqrMagnitude < 500; // TODO
 
     switch (State) {
     case MobShitterState.Idle:
-      if (playerInRange) {
-        Debug.Log("Player in range, gonna shoot");
+      if (playerInRange)
         State = MobShitterState.PreShoot;
-      }
       break;
     case MobShitterState.PreShoot:
-      if (!playerInRange) {
-        Debug.Log("Player left range");
+      if (!playerInRange)
         State = MobShitterState.Idle;
-      }
       break;
     }
   }
 
   public void Shoot() {
-    Debug.Log("PEW PEW");
+    var player = GameObject.FindObjectOfType<Player>();
+    var playerDir = (player.transform.position - transform.position).normalized;
+    Bullet.Fire(BulletPrefab, transform.position + Vector3.up*.5f + playerDir, playerDir);
     State = MobShitterState.Idle;
   }
 
