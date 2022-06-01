@@ -10,8 +10,8 @@ public class Mob : MonoBehaviour {
   void Update() {
     if (AI == null) {
       // TODO: this is dumb
-      if (Config.AI == MobAIType.Wander)
-        AI = new MobAIWander(this);
+      if (Config.AI == MobAIType.Wander) AI = new MobAIStationary(this);
+      else if (Config.AI == MobAIType.Wander) AI = new MobAIWander(this);
     } else {
       AI.Update();
     }
@@ -22,6 +22,15 @@ public class MobAI {
   public Mob Mob;
 
   virtual public void Update() { }
+}
+
+public class MobAIStationary : MobAI {
+  public MobAIStationary(Mob mob) {
+    Mob = mob;
+  }
+
+  override public void Update() {
+  }
 }
 
 public class MobAIWander : MobAI {
