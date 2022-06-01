@@ -343,11 +343,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38b5f85dc564c4f4fafa2b5115a61de1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Controller: {fileID: 1300316630603471075}
   Config: {fileID: 11400000, guid: 2f290fc38a79e004ea3196697e531c17, type: 2}
-  State: 0
+  Controller: {fileID: 1300316630603471075}
+  CharacterController: {fileID: 4633172607086991566}
   Grapple: {fileID: 1300316632050288995}
-  Renderer: {fileID: 0}
+  State: 0
 --- !u!143 &4633172607086991566
 CharacterController:
   m_ObjectHideFlags: 0
@@ -365,7 +365,7 @@ CharacterController:
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &1300316631732759985
 GameObject:
   m_ObjectHideFlags: 0

@@ -15,25 +15,25 @@ public class Grapple : MonoBehaviour {
   public float InFlightRemaining = 2;
 
   public bool Fire(Vector3 direction) {
-    switch (State) {
-      case GrappleState.Ready: {
-        Hook.transform.SetParent(null,true);
-        Trajectory = direction;
-        InFlightRemaining = Config.FlightDuration;
-        State = Grapple.GrappleState.InFlight;
-        return true;
-      }
-
-      default: {
-        return false;
-      }
+    if (State == GrappleState.Ready) {
+      Hook.transform.SetParent(null,true);
+      Trajectory = direction;
+      InFlightRemaining = Config.FlightDuration;
+      State = Grapple.GrappleState.InFlight;
+      return true;
+    } else {
+      return false;
     }
   }
 
   public bool Attach(GrappleTarget target) {
-    Hook.transform.SetParent(target.transform,true);
-    State = GrappleState.Attached;
-    return true;
+    if (State == GrappleState.InFlight) {
+      Hook.transform.SetParent(target.transform,true);
+      State = GrappleState.Attached;
+      return true;
+    } else {
+      return false;
+    }
   }
 
   public void ResetHook() {

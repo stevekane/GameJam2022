@@ -93,8 +93,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7851820737529576832}
   - component: {fileID: -4618627922490467572}
-  - component: {fileID: 7851820737529576837}
   - component: {fileID: 7851820737529576833}
+  - component: {fileID: 2153127714699461704}
   m_Layer: 0
   m_Name: Grapple Target
   m_TagString: Untagged
@@ -130,19 +130,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6365a0236d0707d49aa140cc4d63c141, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!135 &7851820737529576837
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7851820737529576836}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &7851820737529576833
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -159,3 +146,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!136 &2153127714699461704
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7851820737529576836}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 3
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}

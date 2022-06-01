@@ -3,10 +3,12 @@ using UnityEngine;
 public class Player : MonoBehaviour {
   public enum PlayerState { Moving, Rolling, Spinning }
 
-  public Controller Controller;
   public PlayerConfig Config;
-  public PlayerState State = PlayerState.Moving;
+
+  public Controller Controller;
+  public CharacterController CharacterController;
   public Grapple Grapple;
+  public PlayerState State = PlayerState.Moving;
 
   Vector3 RollDirection;
   float RollSpeed;
@@ -28,7 +30,7 @@ public class Player : MonoBehaviour {
     switch (State) {
       case PlayerState.Moving: {
         if (moving) {
-          transform.position = dt * speed * movedirection + transform.position;
+          CharacterController.Move(dt * speed * movedirection);
         }
 
         if (Grapple.State != Grapple.GrappleState.Ready) {
@@ -73,14 +75,14 @@ public class Player : MonoBehaviour {
 
         if (RollRemaining > dt) {
           RollRemaining -= dt;
-          transform.position = dt * RollSpeed * RollDirection + transform.position;
+          CharacterController.Move(dt * RollSpeed * RollDirection);
         } else if (RollRemaining > 0) {
-          transform.position = RollRemaining * RollSpeed * RollDirection + transform.position;
-          transform.position = (dt - RollRemaining) * speed * movedirection + transform.position;
+          CharacterController.Move(RollRemaining * RollSpeed * RollDirection);
+          CharacterController.Move((dt - RollRemaining) * speed * movedirection);
           RollRemaining = 0;
           State = PlayerState.Moving;
         } else {
-          transform.position = dt * speed * movedirection + transform.position;
+          CharacterController.Move(dt * speed * movedirection);
           RollRemaining = 0;
           State = PlayerState.Moving;
         }
