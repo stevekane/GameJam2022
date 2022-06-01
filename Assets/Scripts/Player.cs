@@ -7,7 +7,6 @@ public class Player : MonoBehaviour {
   public PlayerConfig Config;
   public PlayerState State = PlayerState.Moving;
   public Grapple Grapple;
-  public PlayerRenderer Renderer;
 
   Vector3 RollDirection;
   float RollSpeed;
@@ -16,25 +15,23 @@ public class Player : MonoBehaviour {
 
   void Update() {
     var dt = Time.deltaTime;
-    var speed = Config.MoveSpeed;
     var movex = Controller.MoveX;
     var movez = Controller.MoveY;
-    var movedirection = new Vector3(movex,0,movez).normalized;
+    var movevector = new Vector3(movex,0,movez);
+    var movedirection = movevector.normalized;
+    var speed = Config.MoveSpeed * Config.MovementCurve.Evaluate(movevector.magnitude);
     var moving = movedirection.sqrMagnitude > 0;
-    var aimx = Controller.AimX;
-    var aimy = Controller.AimY;
-    var aimvector = new Vector3(aimx,0,aimy);
-    var aimdirection = aimvector.normalized;
     var rotation = transform.rotation;
-    var minMagnitude = Config.MinGrappleSquareMagnitude;
     var tryRoll = Controller.Action2;
     var tryHit = Controller.Action1;
-    var tryGrapple = aimvector.sqrMagnitude > minMagnitude;
-    var grappling = Grapple.State != Grapple.GrappleState.Ready;
 
     switch (State) {
       case PlayerState.Moving: {
-        if (grappling) {
+        if (moving) {
+          transform.position = dt * speed * movedirection + transform.position;
+        }
+
+        if (Grapple.State != Grapple.GrappleState.Ready) {
           var towardsHook = (Grapple.Hook.transform.position - transform.position).normalized;
           if (towardsHook.sqrMagnitude > 0) {
             rotation.SetLookRotation(towardsHook,Vector3.up);
@@ -42,22 +39,24 @@ public class Player : MonoBehaviour {
           }
         }
 
-        if (moving) {
-          transform.position = dt * speed * movedirection + transform.position;
-        }
-
-        if (tryHit) {
+        if (Grapple.State == Grapple.GrappleState.Attached && Controller.Grapple.HasValue) {
+          var towardsHook = (Grapple.Hook.transform.position - transform.position).normalized;
+          if (Vector3.Dot(towardsHook,Controller.Grapple.Value) > 0) {
+            // TODO: Send Charge to the Grapple
+          } else {
+            // TODO: Send Pull to the Grapple
+            Grapple.ResetHook();
+          }
+        } else if (Controller.Grapple.HasValue) {
+          Grapple.Fire(Controller.Grapple.Value);
+        } else if (tryHit) {
           Debug.Log("Hit");
-        } else if (tryRoll && moving) {
+        } else if (tryRoll) {
           RollDirection = movedirection;
           RollSpeed = Config.RollSpeed;
           RollDuration = Config.RollDuration;
           RollRemaining = RollDuration;
           State = PlayerState.Rolling;
-        } else if (tryGrapple) {
-          if (Grapple.Fire(ref aimdirection)) {
-            Debug.Log("Grapple");
-          }
         }
       }
       break;
@@ -68,10 +67,8 @@ public class Player : MonoBehaviour {
           RollDirection = Vector3.RotateTowards(RollDirection,movedirection,maxRadians,0).normalized;
         }
 
-        if (tryGrapple) {
-          if (Grapple.Fire(ref aimdirection)) {
-            Debug.Log("Grapple While Rolling");
-          }
+        if (Controller.Grapple.HasValue) {
+          Grapple.Fire(Controller.Grapple.Value);
         }
 
         if (RollRemaining > dt) {

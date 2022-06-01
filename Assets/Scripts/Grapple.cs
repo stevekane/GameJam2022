@@ -14,7 +14,7 @@ public class Grapple : MonoBehaviour {
   public Vector3 Trajectory;
   public float InFlightRemaining = 2;
 
-  public bool Fire(ref Vector3 direction) {
+  public bool Fire(Vector3 direction) {
     switch (State) {
       case GrappleState.Ready: {
         Hook.transform.SetParent(null,true);
@@ -30,7 +30,13 @@ public class Grapple : MonoBehaviour {
     }
   }
 
-  void ResetHook() {
+  public bool Attach(GrappleTarget target) {
+    Hook.transform.SetParent(target.transform,true);
+    State = GrappleState.Attached;
+    return true;
+  }
+
+  public void ResetHook() {
     InFlightRemaining = 0;
     Hook.transform.SetParent(transform,true);
     Hook.transform.SetPositionAndRotation(transform.position,transform.rotation);

@@ -1,16 +1,51 @@
 using UnityEngine;
 
 public class InputController : Controller {
-  public float JoystickDeadzone = .1f;
-  public void Update() {
+  [SerializeField]
+  float JoystickDeadzone = .1f;
+  [SerializeField]
+  float GrappleThreshold = .5f;
+
+  bool GrappleReady = true;
+
+  void Update() {
+    var movex = Input.GetAxisRaw("MoveX");
+    var movey = Input.GetAxisRaw("MoveY");
+    var movevector = new Vector2(movex,movey);
     var aimx = Input.GetAxis("AimX");
     var aimy = Input.GetAxis("AimY");
-    var movex = Input.GetAxis("MoveX");
-    var movey = Input.GetAxis("MoveY");
-    AimX = Mathf.Abs(aimx) > JoystickDeadzone ? aimx : 0;
-    AimY = Mathf.Abs(aimy) > JoystickDeadzone ? aimy : 0;
-    MoveX = Mathf.Abs(movex) > JoystickDeadzone ? movex : 0;
-    MoveY = Mathf.Abs(movey) > JoystickDeadzone ? movey: 0;
+    var aimvector = new Vector2(aimx,aimy);
+
+    if (movevector.magnitude > JoystickDeadzone) {
+      MoveX = movex;
+      MoveY = movey;
+    } else {
+      MoveX = 0;
+      MoveY = 0;
+    }
+
+    // This snarled shit is needed to generate only "new" Grapple inputs
+    if (aimvector.magnitude > JoystickDeadzone) {
+      if (aimvector.magnitude > GrappleThreshold) {
+        if (GrappleReady) {
+          Grapple = new Vector3(aimvector.x,0,aimvector.y).normalized;
+          GrappleReady = false;
+        } else {
+          Grapple = null;
+          GrappleReady = false;
+        }
+      } else {
+        if (GrappleReady) {
+          Grapple = null;
+        } else {
+          Grapple = null;
+        }
+      }
+    } else {
+      Grapple = null;
+      GrappleReady = true;
+    }
+    
     Action1 = Input.GetButton("Action1");
     Action2 = Input.GetButton("Action2");
     Action3 = Input.GetButton("Action3");
