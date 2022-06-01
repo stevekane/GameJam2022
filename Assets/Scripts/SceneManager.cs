@@ -38,6 +38,6 @@ public class SceneManager : MonoBehaviour {
     var matchingDoor = room.GetComponentsInChildren<Door>().FirstOrDefault((Door d) => d.ConnectingRoom == oldRoomPrefab);
     Debug.Assert(matchingDoor != null);
     var player = GameObject.FindObjectOfType<Player>();
-    player.transform.SetPositionAndRotation(matchingDoor.transform.position - matchingDoor.transform.position.normalized*2, player.transform.rotation);
+    player.OnRoomEntered(room, matchingDoor);
   }
 }

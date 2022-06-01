@@ -4,6 +4,9 @@ public class Spinner : MonoBehaviour {
   public float DegreesPerSecond;
 
   void Update() {
-    transform.RotateAround(transform.position,Vector3.up,DegreesPerSecond * Time.deltaTime);
+    var origin = transform.position;
+    var axis = Vector3.up;
+    var degrees = DegreesPerSecond * Time.deltaTime;
+    transform.RotateAround(origin,axis,degrees);
   }
 }
