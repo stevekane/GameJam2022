@@ -34,33 +34,31 @@ public class EventDriver : MonoBehaviour {
   [Header("State")]
   public PlayState PlayState;
 
-  [Header("Play")]
-  public float GameTime;
-  public float DilatedTime;
-  public float Dilation;
-
-  [Header("PlayBack")]
-  public List<Action> History;
-  public int HistoryIndex;
-  public float ElapsedPlaybackTime;
-  public float ElapsedPlaybackSimulationTime;
-
   [Header("Simulation")]
   public GameObject Avatar;
+  public float Speed = 1f;
+  public GameObject Enemy;
+  public float RotationSpeed = Mathf.PI;
+  [Range(1,4)]
+  public float Dilation;
+
+  List<Action> History = new List<Action>((int)Math.Pow(2,16));
+  int HistoryIndex = 0;
+  float ElapsedPlaybackTime = 0;
+  float ElapsedPlaybackSimulationTime = 0;
 
   void RunSimulation(Action action) {
     var dt = action.dt;
-    var position = Avatar.transform.position + dt * new Vector3(action.Move.x,0,action.Move.y);
+    var position = Avatar.transform.position + Speed * dt * new Vector3(action.Move.x,0,action.Move.y);
     var aim = action.Aim.magnitude > 0 ? new Vector3(action.Aim.x,0,action.Aim.y) : Avatar.transform.forward;
     Avatar.transform.SetPositionAndRotation(position,Quaternion.LookRotation(aim,Vector3.up));
+    Enemy.transform.RotateAround(Enemy.transform.position,Vector3.up,dt * RotationSpeed);
   }
 
   [ContextMenu("Play")]
   void Start() {
     Avatar.transform.SetPositionAndRotation(Vector3.zero,Quaternion.LookRotation(Vector3.forward,Vector3.up));
-    GameTime = 1;
-    DilatedTime = 1;
-    Dilation = 1;
+    Dilation = 4;
     History.Clear();
     HistoryIndex = 0;
     PlayState = PlayState.Play;
@@ -69,8 +67,6 @@ public class EventDriver : MonoBehaviour {
   [ContextMenu("Play Back")]
   void PlayBack() {
     Avatar.transform.SetPositionAndRotation(Vector3.zero,Quaternion.LookRotation(Vector3.forward,Vector3.up));
-    GameTime = 1;
-    DilatedTime = 1;
     Dilation = 1;
     HistoryIndex = 0;
     ElapsedPlaybackTime = 0;
@@ -79,26 +75,31 @@ public class EventDriver : MonoBehaviour {
   }
 
   void Update() {
-    var dtReal = Time.deltaTime;
     switch (PlayState) {
       case PlayState.Play: {
+        var dtReal = Time.deltaTime;
+        var dtDilated = dtReal / Dilation;
+        var hit = Input.GetButton("Action1");
+        var pounce = Input.GetButton("Action2");
         var move = new Vector2(Input.GetAxisRaw("MoveX"),Input.GetAxisRaw("MoveY"));
         var aim = new Vector2(Input.GetAxisRaw("AimX"),Input.GetAxisRaw("AimY"));
+        move = move.magnitude > RadialDeadZone ? move : Vector2.zero;
+        aim = aim.magnitude > RadialDeadZone ? aim : Vector2.zero;
         var action = new Action {
-          dt = dtReal,
-          Hit = Input.GetButton("Action1"),
-          Pounce = Input.GetButton("Action2"),
-          Move = move.magnitude > RadialDeadZone ? move : Vector2.zero,
-          Aim = aim.magnitude > RadialDeadZone ? aim : Vector2.zero,
+          dt = dtDilated,
+          Hit = hit,
+          Pounce = pounce,
+          Move = move,
+          Aim = aim,
         };
-        History.Add(action);
         RunSimulation(action);
+        History.Add(action);
       }
       break;
 
       case PlayState.PlayBack: {
+        var dtReal = Time.deltaTime;
         ElapsedPlaybackTime += dtReal;
-        var actions = new List<Action>();
         for (int i = HistoryIndex; i < History.Count; i++) {
           var action = History[i];
           var elapsed = ElapsedPlaybackSimulationTime + action.dt;
@@ -109,7 +110,6 @@ public class EventDriver : MonoBehaviour {
           } else {
             break;
           }
-          ElapsedPlaybackSimulationTime += action.dt;
         }
       }
       break;
