@@ -52,7 +52,7 @@ public class InputController : Controller {
     Action4 = Input.GetButton("Action4");
 
     // MP's secret hacky testing section
-#if false
+#if true
     if (Action1) {
       var knockable = GameObject.FindObjectOfType<Knockable>();
       knockable.Knock(new Vector3(aimx, 0, aimy));
