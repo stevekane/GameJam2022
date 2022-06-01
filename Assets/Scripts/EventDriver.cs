@@ -2,22 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-/*
-GAME TIME - 1
-INPUT TIME - GAME TIME / DILATION
-
-PLAY CONTROLLER
-  Each timestep of real-time, capture the current inputs.
-  Drive the simulation with INPUT TIME.
-  Record the inputs in GAME TIME.
-
-REPLAY CONTROLLER
-  Each timestep of real-time, find inputs that have occured since last step.
-  Drive the simulation with the inputs found.
-*/
 [Serializable]
 public struct Action {
-  public float dt;
   public bool Hit;
   public bool Pounce;
   public Vector2 Move;
@@ -46,9 +32,10 @@ public class EventDriver : MonoBehaviour {
   int HistoryIndex = 0;
   float ElapsedPlaybackTime = 0;
   float ElapsedPlaybackSimulationTime = 0;
+  float FixedDeltaTime = 0.02f;
 
   void RunSimulation(Action action) {
-    var dt = action.dt;
+    var dt = Time.fixedDeltaTime;
     var position = Avatar.transform.position + Speed * dt * new Vector3(action.Move.x,0,action.Move.y);
     var aim = action.Aim.magnitude > 0 ? new Vector3(action.Aim.x,0,action.Aim.y) : Avatar.transform.forward;
     Avatar.transform.SetPositionAndRotation(position,Quaternion.LookRotation(aim,Vector3.up));
@@ -58,7 +45,8 @@ public class EventDriver : MonoBehaviour {
   [ContextMenu("Play")]
   void Start() {
     Avatar.transform.SetPositionAndRotation(Vector3.zero,Quaternion.LookRotation(Vector3.forward,Vector3.up));
-    Dilation = 4;
+    Time.fixedDeltaTime = 0.005f;
+    Time.timeScale = .25f;
     History.Clear();
     HistoryIndex = 0;
     PlayState = PlayState.Play;
@@ -67,18 +55,16 @@ public class EventDriver : MonoBehaviour {
   [ContextMenu("Play Back")]
   void PlayBack() {
     Avatar.transform.SetPositionAndRotation(Vector3.zero,Quaternion.LookRotation(Vector3.forward,Vector3.up));
-    Dilation = 1;
+    Time.timeScale = 1;
     HistoryIndex = 0;
     ElapsedPlaybackTime = 0;
     ElapsedPlaybackSimulationTime = 0;
     PlayState = PlayState.PlayBack;
   }
 
-  void Update() {
+  void FixedUpdate() {
     switch (PlayState) {
       case PlayState.Play: {
-        var dtReal = Time.deltaTime;
-        var dtDilated = dtReal / Dilation;
         var hit = Input.GetButton("Action1");
         var pounce = Input.GetButton("Action2");
         var move = new Vector2(Input.GetAxisRaw("MoveX"),Input.GetAxisRaw("MoveY"));
@@ -86,7 +72,6 @@ public class EventDriver : MonoBehaviour {
         move = move.magnitude > RadialDeadZone ? move : Vector2.zero;
         aim = aim.magnitude > RadialDeadZone ? aim : Vector2.zero;
         var action = new Action {
-          dt = dtDilated,
           Hit = hit,
           Pounce = pounce,
           Move = move,
@@ -98,18 +83,8 @@ public class EventDriver : MonoBehaviour {
       break;
 
       case PlayState.PlayBack: {
-        var dtReal = Time.deltaTime;
-        ElapsedPlaybackTime += dtReal;
-        for (int i = HistoryIndex; i < History.Count; i++) {
-          var action = History[i];
-          var elapsed = ElapsedPlaybackSimulationTime + action.dt;
-          if (elapsed <= ElapsedPlaybackTime) {
-            HistoryIndex = i+1;
-            ElapsedPlaybackSimulationTime = elapsed;
-            RunSimulation(action);
-          } else {
-            break;
-          }
+        if (HistoryIndex < History.Count) {
+          RunSimulation(History[HistoryIndex++]);
         }
       }
       break;
