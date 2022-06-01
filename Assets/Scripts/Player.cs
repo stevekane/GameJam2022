@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public class Player : MonoBehaviour {
-  public enum PlayerState { Moving, Rolling, Spinning }
+  public enum PlayerState { Moving, Rolling, Spinning, Zipping }
 
   public PlayerConfig Config;
 
@@ -14,6 +14,14 @@ public class Player : MonoBehaviour {
   float RollSpeed;
   float RollDuration;
   float RollRemaining;
+
+  Vector3 SpinDirection;
+  float SpinSpeed;
+  float SpinDuration;
+  float SpinRemaining;
+
+  PlayerState BufferedState = PlayerState.Moving;
+  int VaultCount = 1;
 
   void Update() {
     var dt = Time.deltaTime;
@@ -31,6 +39,7 @@ public class Player : MonoBehaviour {
       case PlayerState.Moving: {
         if (moving) {
           CharacterController.Move(dt * speed * movedirection);
+          CharacterController.Move(dt * Physics.gravity);
         }
 
         if (Grapple.State != Grapple.GrappleState.Ready) {
@@ -44,16 +53,20 @@ public class Player : MonoBehaviour {
         if (Grapple.State == Grapple.GrappleState.Attached && Controller.Grapple.HasValue) {
           var towardsHook = (Grapple.Hook.transform.position - transform.position).normalized;
           if (Vector3.Dot(towardsHook,Controller.Grapple.Value) > 0) {
-            // TODO: Send Charge to the Grapple
+            BufferedState = PlayerState.Moving;
+            State = PlayerState.Zipping;
           } else {
-            // TODO: Send Pull to the Grapple
-            Grapple.ResetHook();
+            Grapple.Detach();
           }
         } else if (Controller.Grapple.HasValue) {
           Grapple.Fire(Controller.Grapple.Value);
         } else if (tryHit) {
-          Debug.Log("Hit");
-        } else if (tryRoll) {
+          SpinDirection = movedirection;
+          SpinSpeed = Config.SpinSpeed;
+          SpinDuration = Config.SpinDuration;
+          SpinRemaining = SpinDuration;
+          State = PlayerState.Spinning;
+        } else if (tryRoll && moving) {
           RollDirection = movedirection;
           RollSpeed = Config.RollSpeed;
           RollDuration = Config.RollDuration;
@@ -76,14 +89,78 @@ public class Player : MonoBehaviour {
         if (RollRemaining > dt) {
           RollRemaining -= dt;
           CharacterController.Move(dt * RollSpeed * RollDirection);
+          CharacterController.Move(dt * Physics.gravity);
         } else if (RollRemaining > 0) {
           CharacterController.Move(RollRemaining * RollSpeed * RollDirection);
           CharacterController.Move((dt - RollRemaining) * speed * movedirection);
+          CharacterController.Move(dt * Physics.gravity);
           RollRemaining = 0;
           State = PlayerState.Moving;
         } else {
           CharacterController.Move(dt * speed * movedirection);
+          CharacterController.Move(dt * Physics.gravity);
           RollRemaining = 0;
+          State = PlayerState.Moving;
+        }
+      }
+      break;
+
+      case PlayerState.Spinning: {
+        if (moving) {
+          var maxRadians = dt * Config.MaxSpinRadiansPerSecond;
+          SpinDirection = Vector3.RotateTowards(SpinDirection,movedirection,maxRadians,0).normalized;
+        }
+
+        if (SpinRemaining > dt) {
+          SpinRemaining -= dt;
+          CharacterController.Move(dt * SpinSpeed * SpinDirection);
+          CharacterController.Move(dt * Physics.gravity);
+        } else if (SpinRemaining > 0) {
+          CharacterController.Move(SpinRemaining * SpinSpeed * SpinDirection);
+          CharacterController.Move((dt - SpinRemaining) * speed * movedirection);
+          CharacterController.Move(dt * Physics.gravity);
+          SpinRemaining = 0;
+          State = PlayerState.Moving;
+        } else {
+          CharacterController.Move(dt * speed * movedirection);
+          CharacterController.Move(dt * Physics.gravity);
+          SpinRemaining = 0;
+          State = PlayerState.Moving;
+        }
+      }
+      break;
+
+      case PlayerState.Zipping: {
+        if (Grapple.Target) {
+          var destination = Grapple.Hook.transform.position;
+          var current = transform.position;
+          destination.y = 0;
+          var delta = destination - current;
+          var distance = delta.magnitude;
+          var direction = delta.normalized;
+          if (direction.sqrMagnitude > 0) {
+            if (distance < Grapple.Config.MinZippingActionRadius)  {
+              Grapple.Detach();
+              State = BufferedState;
+            } else {
+              if (tryRoll && moving) {
+                RollDirection = movedirection;
+                RollSpeed = Config.RollSpeed * VaultCount * Config.RollVaultScaleFactor;
+                RollDuration = Config.RollDuration * VaultCount * Config.RollVaultScaleFactor;
+                RollRemaining = RollDuration;
+                BufferedState = PlayerState.Rolling;
+              } else if (tryHit) {
+                SpinDirection = movedirection;
+                SpinSpeed = Config.SpinSpeed;
+                SpinDuration = Config.SpinDuration;
+                SpinRemaining = SpinDuration;
+                BufferedState = PlayerState.Spinning;
+              }
+              CharacterController.Move(dt * Grapple.Config.ZipSpeed * direction);
+            }
+          }
+        } else {
+          Grapple.Detach();
           State = PlayerState.Moving;
         }
       }

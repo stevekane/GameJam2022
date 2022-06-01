@@ -1,25 +1,25 @@
 using UnityEngine;
 
 public class Grapple : MonoBehaviour {
-  public enum GrappleState { Ready, InFlight, Attached, ToYou, ToThem }
+  public enum GrappleState { Ready, InFlight, Attached }
 
-  [SerializeField]
-  GrappleConfig Config;
+  public GrappleConfig Config;
 
   public GrappleState State = GrappleState.Ready;
   public Player Player;
   public GrappleHook Hook;
   public Chain Chain;
 
+  public GrappleTarget Target;
   public Vector3 Trajectory;
   public float InFlightRemaining = 2;
 
   public bool Fire(Vector3 direction) {
     if (State == GrappleState.Ready) {
-      Hook.transform.SetParent(null,true);
       Trajectory = direction;
       InFlightRemaining = Config.FlightDuration;
-      State = Grapple.GrappleState.InFlight;
+      Hook.transform.SetParent(null,true);
+      State = GrappleState.InFlight;
       return true;
     } else {
       return false;
@@ -28,6 +28,9 @@ public class Grapple : MonoBehaviour {
 
   public bool Attach(GrappleTarget target) {
     if (State == GrappleState.InFlight) {
+      Target = target;
+      Target.Collider.enabled = false;
+      Target.MeshRenderer.material.color = Color.red;
       Hook.transform.SetParent(target.transform,true);
       State = GrappleState.Attached;
       return true;
@@ -36,30 +39,31 @@ public class Grapple : MonoBehaviour {
     }
   }
 
-  public void ResetHook() {
-    InFlightRemaining = 0;
-    Hook.transform.SetParent(transform,true);
-    Hook.transform.SetPositionAndRotation(transform.position,transform.rotation);
-    State = GrappleState.Ready;
-  }
-
-  void ExtendHook(float dt,float speed) {
-    Hook.transform.position = dt * speed * Trajectory + Hook.transform.position;
+  public bool Detach() {
+    if (State == GrappleState.Attached) {
+      Target.MeshRenderer.material.color = Color.green;
+      Target.Collider.enabled = true;
+      Target = null;
+      Hook.transform.SetParent(transform);
+      Hook.transform.SetPositionAndRotation(transform.position,transform.rotation);
+      State = GrappleState.Ready;
+      return true;
+    } else {
+      return false;
+    }
   }
 
   void Update() {
     var dt = Time.deltaTime;
     switch (State) {
-      case GrappleState.Ready: {
-      }
-      break;
-
       case GrappleState.InFlight: {
         InFlightRemaining -= dt;
         if (InFlightRemaining <= 0) {
-          ResetHook();
+          Hook.transform.SetParent(transform);
+          Hook.transform.SetPositionAndRotation(transform.position,transform.rotation);
+          State = GrappleState.Ready;
         } else {
-          ExtendHook(dt,Config.FlightSpeed);
+          Hook.transform.position = dt * Config.FlightSpeed * Trajectory + Hook.transform.position;
         }
       }
       break;
