@@ -43,18 +43,10 @@ public class MobShitter : Mob {
   }
 
   public override void TakeDamage() {
-    StartCoroutine(DestroySequence());
+    Animator.SetTrigger("Die");
   }
 
-  IEnumerator DestroySequence() {
-    const float duration = .5f;
-    float timer = 0f;
-    Vector3 scale = transform.localScale;
-    while (timer < duration) {
-      transform.localScale = scale * (1 - timer/duration);
-      yield return null;
-      timer += Time.deltaTime;
-    }
+  public void Die() {
     Destroy(gameObject);
   }
 }
