@@ -1,6 +1,7 @@
-using System.Collections;
+using System.Collections; 
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Mob : MonoBehaviour {
   public MobConfig Config;
@@ -26,35 +27,34 @@ public class MobAI {
 public class MobAIWander : MobAI {
   enum WanderState { Moving, Waiting };
   WanderState State = WanderState.Waiting;
+  NavMeshAgent Agent;
   double Timer;
-  Vector3 Target;
 
   public MobAIWander(Mob mob) {
     Mob = mob;
 
     State = WanderState.Waiting;
     Timer = 1;
+
+    Agent = Mob.GetComponent<NavMeshAgent>();
+    Agent.speed = Mob.Config.MoveSpeed;
   }
 
-  // TODO: NavMesh
   override public void Update() {
     Timer -= Time.deltaTime;
 
     switch (State) {
     case WanderState.Waiting:
       if (Timer <= 0) {
-        Target = new Vector3(Random.Range(-15, 15), 0, Random.Range(-15, 15));
-        Mob.transform.rotation.SetLookRotation(Target - Mob.transform.position, Vector3.up);
         State = WanderState.Moving;
+        Agent.SetDestination(new Vector3(Random.Range(-15, 15), 0, Random.Range(-15, 15)));
       }
       break;
     case WanderState.Moving:
-      Vector3 delta = Target - Mob.transform.position;
+      Vector3 delta = Agent.destination - Mob.transform.position;
       if (delta.sqrMagnitude < .1) {
         State = WanderState.Waiting;
         Timer = 1;
-      } else {
-        Mob.transform.position += Time.deltaTime * Mob.Config.MoveSpeed * delta.normalized;
       }
       break;
     }

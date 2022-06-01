@@ -52,7 +52,7 @@ public class Player : MonoBehaviour {
         } else if (Controller.Grapple.HasValue) {
           Grapple.Fire(Controller.Grapple.Value);
         } else if (tryHit) {
-          Debug.Log("Hit");
+          //Debug.Log("Hit");
         } else if (tryRoll) {
           RollDirection = movedirection;
           RollSpeed = Config.RollSpeed;
