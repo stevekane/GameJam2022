@@ -97,52 +97,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &1300316631475986288
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1300316631475986291}
-  - component: {fileID: 1300316631475986290}
-  m_Layer: 0
-  m_Name: Collider
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1300316631475986291
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1300316631475986288}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1300316631519711561}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &1300316631475986290
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1300316631475986288}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1300316631519711558
 GameObject:
   m_ObjectHideFlags: 0
@@ -156,6 +110,7 @@ GameObject:
   - component: {fileID: 5355783513985461428}
   - component: {fileID: 1983428080223646853}
   - component: {fileID: 6342778692030650106}
+  - component: {fileID: 1517578643254339290}
   m_Layer: 0
   m_Name: Mob
   m_TagString: Untagged
@@ -175,7 +130,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1300316631475986291}
   - {fileID: 1300316631732759984}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -192,7 +146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6e9a6a5cbad5b644aec5fa0c35ab06b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Config: {fileID: 11400000, guid: f2d9abc69ed07b4489f239b590ad1e0b, type: 2}
+  Config: {fileID: 0}
 --- !u!195 &5355783513985461428
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -244,6 +198,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!136 &1517578643254339290
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1300316631519711558}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &1300316631732759985
 GameObject:
   m_ObjectHideFlags: 0

@@ -50,13 +50,5 @@ public class InputController : Controller {
     Action2 = Input.GetButton("Action2");
     Action3 = Input.GetButton("Action3");
     Action4 = Input.GetButton("Action4");
-
-    // MP's secret hacky testing section
-#if true
-    if (Action1) {
-      var knockable = GameObject.FindObjectOfType<Knockable>();
-      knockable.Knock(new Vector3(aimx, 0, aimy));
-    }
-#endif
   }
 }

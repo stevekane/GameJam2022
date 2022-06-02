@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Knockable : MonoBehaviour {
-  public enum KnockableState { Waiting, Knocked }
-  public KnockableState State = KnockableState.Waiting;
+  public enum KnockableState { Idle, Knocked }
+  public KnockableState State = KnockableState.Idle;
 
   Mob Mob;
   Rigidbody Body;
@@ -16,6 +16,8 @@ public class Knockable : MonoBehaviour {
   }
 
   public void Knock(Vector3 impulse) {
+    if (State == KnockableState.Knocked)
+      return;  // Only knock it once.
     Body.isKinematic = false;
     Body.AddForce(impulse, ForceMode.Impulse);
     State = KnockableState.Knocked;
