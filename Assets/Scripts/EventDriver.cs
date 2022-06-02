@@ -20,45 +20,40 @@ public class EventDriver : MonoBehaviour {
   [Header("State")]
   public PlayState PlayState;
 
-  [Header("Simulation")]
-  public GameObject Avatar;
-  public float Speed = 1f;
-  public GameObject Enemy;
-  public float RotationSpeed = Mathf.PI;
-  [Range(1,4)]
-  public float Dilation;
+  [Header("Screen")]
+  public Screen ScreenPrefab;
+  public Screen Screen;
 
   List<Action> History = new List<Action>((int)Math.Pow(2,16));
   int HistoryIndex = 0;
-  float ElapsedPlaybackTime = 0;
-  float ElapsedPlaybackSimulationTime = 0;
-  float FixedDeltaTime = 0.02f;
 
-  void RunSimulation(Action action) {
-    var dt = Time.fixedDeltaTime;
-    var position = Avatar.transform.position + Speed * dt * new Vector3(action.Move.x,0,action.Move.y);
-    var aim = action.Aim.magnitude > 0 ? new Vector3(action.Aim.x,0,action.Aim.y) : Avatar.transform.forward;
-    Avatar.transform.SetPositionAndRotation(position,Quaternion.LookRotation(aim,Vector3.up));
-    Enemy.transform.RotateAround(Enemy.transform.position,Vector3.up,dt * RotationSpeed);
+  void Start() {
+    const float BASE_FIXED_DELTA_TIME = 0.02f;
+    Time.fixedDeltaTime = BASE_FIXED_DELTA_TIME * .1f;
+    Play();
   }
 
   [ContextMenu("Play")]
-  void Start() {
-    Avatar.transform.SetPositionAndRotation(Vector3.zero,Quaternion.LookRotation(Vector3.forward,Vector3.up));
-    Time.fixedDeltaTime = 0.005f;
-    Time.timeScale = .25f;
+  public void Play() {
+    if (Screen) {
+      Destroy(Screen.gameObject);
+    }
+    Screen = Instantiate(ScreenPrefab);
     History.Clear();
     HistoryIndex = 0;
+    Inputs.InPlayBack = false;
     PlayState = PlayState.Play;
   }
 
   [ContextMenu("Play Back")]
-  void PlayBack() {
-    Avatar.transform.SetPositionAndRotation(Vector3.zero,Quaternion.LookRotation(Vector3.forward,Vector3.up));
+  public void PlayBack() {
     Time.timeScale = 1;
+    if (Screen) {
+      Destroy(Screen.gameObject);
+    }
     HistoryIndex = 0;
-    ElapsedPlaybackTime = 0;
-    ElapsedPlaybackSimulationTime = 0;
+    Screen = Instantiate(ScreenPrefab);
+    Inputs.InPlayBack = true;
     PlayState = PlayState.PlayBack;
   }
 
@@ -77,14 +72,16 @@ public class EventDriver : MonoBehaviour {
           Move = move,
           Aim = aim,
         };
-        RunSimulation(action);
+        Inputs.Action = action;
+        Inputs.InPlayBack = false;
         History.Add(action);
       }
       break;
 
       case PlayState.PlayBack: {
+        Inputs.InPlayBack = true;
         if (HistoryIndex < History.Count) {
-          RunSimulation(History[HistoryIndex++]);
+          Inputs.Action = History[HistoryIndex++];
         }
       }
       break;
