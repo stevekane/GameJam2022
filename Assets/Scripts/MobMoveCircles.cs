@@ -1,8 +1,7 @@
 using UnityEngine;
 
 public class MobMoveCircles : MonoBehaviour {
-  public float MoveSpeed = 3f;
-  public float AngularSpeedDeg = 20f;
+  public MobConfig Config;
   Vector3 Tangent;
 
   private void Start() {
@@ -10,8 +9,8 @@ public class MobMoveCircles : MonoBehaviour {
   }
 
   void Update() {
-    transform.position += MoveSpeed * Time.deltaTime * Tangent;
-    Tangent = Quaternion.Euler(0, AngularSpeedDeg * Time.deltaTime, 0) * Tangent;
+    transform.position += Config.MoveSpeed * Time.deltaTime * Tangent;
+    Tangent = Quaternion.Euler(0, Config.TurnSpeedDeg * Time.deltaTime, 0) * Tangent;
   }
 
   public void OnDrawGizmos() {
