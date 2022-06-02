@@ -11,7 +11,8 @@ public class MobMoveSeek : MonoBehaviour {
   void Update() {
     var playerDelta = (Player.transform.position - transform.position);
     var playerInRange = playerDelta.sqrMagnitude < Config.SeekRadius*Config.SeekRadius;
-    if (playerInRange) {
+    var playerInShootRange = playerDelta.sqrMagnitude < Config.ShootRadius*Config.ShootRadius;
+    if (playerInRange && !playerInShootRange) {
       transform.position += Config.MoveSpeed * Time.deltaTime * playerDelta.normalized;
     }
   }
