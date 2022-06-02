@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MobMoveSeek : MonoBehaviour {
+public class MobMoveSeek : MobMove {
   MobConfig Config;
   Player Player;
 

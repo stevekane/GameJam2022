@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MobMovePatrol : MonoBehaviour {
+public class MobMovePatrol : MobMove {
   public Transform[] Waypoints;
   MobConfig Config;
   int Target = 0;
