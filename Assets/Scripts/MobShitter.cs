@@ -5,6 +5,7 @@ using UnityEngine;
 public class MobShitter : Mob {
   public Bullet BulletPrefab;
   public MobConfig Config;
+  Player Player;
 
   enum MobShitterState { Idle, Shoot }
   Animator Animator;
@@ -15,6 +16,7 @@ public class MobShitter : Mob {
   }
 
   void Start() {
+    Player = GameObject.FindObjectOfType<Player>();
     Animator = GetComponent<Animator>();
     State = MobShitterState.Idle;
   }
@@ -22,8 +24,7 @@ public class MobShitter : Mob {
   void Update() {
     switch (State) {
     case MobShitterState.Idle:
-      var player = GameObject.FindObjectOfType<Player>();
-      var playerDelta = (player.transform.position - transform.position);
+      var playerDelta = (Player.transform.position - transform.position);
       var playerInRange = playerDelta.sqrMagnitude < Config.ShootRadius*Config.ShootRadius;
       if (playerInRange) {
         State = MobShitterState.Shoot;
@@ -33,8 +34,7 @@ public class MobShitter : Mob {
   }
 
   public void Shoot() {
-    var player = GameObject.FindObjectOfType<Player>();
-    var playerDir = (player.transform.position - transform.position).normalized;
+    var playerDir = (Player.transform.position - transform.position).normalized;
     Bullet.Fire(BulletPrefab, transform.position + Vector3.up*.5f + playerDir, playerDir, Config.BulletSpeed);
   }
 
