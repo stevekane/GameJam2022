@@ -111,6 +111,12 @@ public class Player : MonoBehaviour {
           SpinDirection = Vector3.RotateTowards(SpinDirection,movedirection,maxRadians,0).normalized;
         }
 
+        var colliders = Physics.OverlapSphere(transform.position, 1);
+        for (int i = 0; i < colliders.Length; i++) {
+          if (colliders[i].TryGetComponent(out Knockable knockable))
+            knockable.Knock((colliders[i].transform.position - transform.position).normalized * 5);
+        }
+
         if (SpinRemaining > dt) {
           SpinRemaining -= dt;
           CharacterController.Move(dt * SpinSpeed * SpinDirection);
