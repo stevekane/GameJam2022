@@ -1,10 +1,11 @@
 using UnityEngine;
 
 public class MobMoveCircles : MonoBehaviour {
-  public MobConfig Config;
+  MobConfig Config;
   Vector3 Tangent;
 
-  private void Start() {
+  void Start() {
+    Config = GetComponent<Mob>().Config;
     Tangent = transform.right;
   }
 

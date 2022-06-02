@@ -1,9 +1,13 @@
 using UnityEngine;
 
 public class MobMovePatrol : MonoBehaviour {
-  public MobConfig Config;
   public Transform[] Waypoints;
+  MobConfig Config;
   int Target = 0;
+
+  void Start() {
+    Config = GetComponent<Mob>().Config;
+  }
 
   void Update() {
     var delta = Waypoints[Target].position - transform.position;

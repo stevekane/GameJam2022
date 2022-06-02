@@ -1,10 +1,11 @@
 using UnityEngine;
 
 public class MobMoveSeek : MonoBehaviour {
-  public MobConfig Config;
+  MobConfig Config;
   Player Player;
 
-  private void Start() {
+  void Start() {
+    Config = GetComponent<Mob>().Config;
     Player = GameObject.FindObjectOfType<Player>();
   }
 
@@ -19,6 +20,6 @@ public class MobMoveSeek : MonoBehaviour {
 
   public void OnDrawGizmos() {
     Gizmos.color = UnityEngine.Color.yellow;
-    Gizmos.DrawWireSphere(transform.position, Config.SeekRadius);
+    Gizmos.DrawWireSphere(transform.position, GetComponent<Mob>().Config.SeekRadius);
   }
 }

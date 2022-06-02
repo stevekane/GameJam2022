@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class MobShitter : Mob {
   public Bullet BulletPrefab;
-  public MobConfig Config;
   Player Player;
 
   enum MobShitterState { Idle, Shoot }
