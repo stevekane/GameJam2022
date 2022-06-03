@@ -135,6 +135,11 @@ public class Ape : MonoBehaviour {
         Move(Config.MoveSpeed * move,dt);
         LookAlong(move.magnitude > 0 ? move.normalized : transform.forward);
         if (aim.magnitude > 0) {
+          var colliders = Physics.OverlapSphere(transform.position,Config.SearchRadius,LayerMask.GetMask("Targets"));
+          // var best = FindClosest<Targetable>(PerchedOn.GetComponent<Targetable>(),colliders,aim.normalized,transform.position);
+          foreach (var c in colliders) {
+            Debug.DrawLine(transform.position + Vector3.up,c.transform.position);
+          }
           CharacterController.Move(dt * Config.MoveSpeed * move);
           Time.timeScale = tryDilate ? Mathf.Lerp(1,.1f,aim.magnitude) : 1;
           // if (action.Pounce && Target) {

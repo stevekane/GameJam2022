@@ -33,6 +33,10 @@ public class EventDriver : MonoBehaviour {
     Play();
   }
 
+  void OnDestroy() {
+    History.Clear();
+  }
+
   [ContextMenu("Play")]
   public void Play() {
     if (Screen) {
