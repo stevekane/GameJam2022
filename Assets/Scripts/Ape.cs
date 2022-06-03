@@ -5,7 +5,10 @@ public class Ape : MonoBehaviour {
 
   [SerializeField] CharacterController CharacterController;
   [SerializeField] PlayerConfig Config;
+  
+  [Header("User Interface")]
   [SerializeField] Selector Selector;
+  [SerializeField] Selector[] Selectors;
 
   [Header("Root States")]
   public ApeState State = ApeState.Moving;
@@ -41,12 +44,12 @@ public class Ape : MonoBehaviour {
     return a + b;
   }
 
-  T FindClosest<T>(T ignore, Collider[] colliders, Vector3 forward, Vector3 origin) where T : MonoBehaviour {
+  T FindClosest<T>(T ignore, MonoBehaviour[] components, Vector3 forward, Vector3 origin) where T : MonoBehaviour {
     T best = null;
     var bestScore = 0f;
-    for (int i = 0; i < colliders.Length; i++) {
-      var targetable = colliders[i].GetComponent<T>();
-      var score = Score(forward,origin,colliders[i].transform.position);
+    for (int i = 0; i < components.Length; i++) {
+      var targetable = components[i].GetComponent<T>();
+      var score = Score(forward,origin,components[i].transform.position);
       if (targetable && targetable != ignore && score > bestScore) {
         best = targetable;
         bestScore = score;
@@ -71,6 +74,42 @@ public class Ape : MonoBehaviour {
     transform.rotation = Quaternion.LookRotation(forward,Vector3.up);
   }
 
+  void Select(MonoBehaviour[] components) {
+    for (int i = 0; i < Selectors.Length; i++) {
+      if (i < components.Length) {
+        Selectors[i].Target = components[i].transform;
+        Selectors[i].gameObject.SetActive(true);
+      } else {
+        Selectors[i].Target = null;
+        Selectors[i].gameObject.SetActive(false);
+      }
+    }
+  }
+
+  void ClearSelected() {
+    for (int i = 0; i < Selectors.Length; i++) {
+      Selectors[i].Target = null;
+      Selectors[i].gameObject.SetActive(false);
+      Selectors[i].transform.position = transform.position;
+    }
+  }
+
+  void Highlight(MonoBehaviour component) {
+    if (component) {
+      Selector.Target = component.transform;
+      Selector.gameObject.SetActive(true);
+    } else {
+      Selector.Target = null;
+      Selector.gameObject.SetActive(false);
+    }
+  }
+
+  void ClearHighlighted() {
+    Selector.Target = null;
+    Selector.gameObject.SetActive(false);
+    Selector.transform.position = transform.position;
+  }
+
   void Start() {
     State = ApeState.Moving;
   }
@@ -80,11 +119,6 @@ public class Ape : MonoBehaviour {
     var action = Inputs.Action;
     var move = new Vector3(action.Move.x,0,action.Move.y);
     var aim = new Vector3(action.Aim.x,0,action.Aim.y);
-    var tryMove = move.magnitude > 0;
-    var tryAim = aim.magnitude > 0;
-    var tryDilate = tryAim && !Inputs.InPlayBack;
-    // var colliders = Physics.OverlapSphere(transform.position,Config.SearchRadius);
-    // var best = FindClosest<Targetable>(PerchedOn.GetComponent<Targetable>(),colliders,aim.normalized,transform.position);
 
     // Global rule across states
     if (transform.position.y <= -10) {
@@ -132,16 +166,21 @@ public class Ape : MonoBehaviour {
       break;
 
       case ApeState.Moving: {
-        Move(Config.MoveSpeed * move,dt);
-        LookAlong(move.magnitude > 0 ? move.normalized : transform.forward);
-        if (aim.magnitude > 0) {
-          var colliders = Physics.OverlapSphere(transform.position,Config.SearchRadius,LayerMask.GetMask("Targets"));
-          // var best = FindClosest<Targetable>(PerchedOn.GetComponent<Targetable>(),colliders,aim.normalized,transform.position);
-          foreach (var c in colliders) {
-            Debug.DrawLine(transform.position + Vector3.up,c.transform.position);
-          }
-          CharacterController.Move(dt * Config.MoveSpeed * move);
-          Time.timeScale = tryDilate ? Mathf.Lerp(1,.1f,aim.magnitude) : 1;
+        if (!CharacterController.isGrounded) {
+          Time.timeScale = 1;
+          Target = null;
+          Fall(dt);
+          ClearSelected();
+          ClearHighlighted();
+          State = ApeState.Falling;
+        } else if (aim.magnitude > 0) {
+          var targetables = FindObjectsOfType<Targetable>(false);
+          var best = FindClosest<Targetable>(null,targetables,aim.normalized,transform.position);
+          Time.timeScale = Inputs.InPlayBack ? 1 : Mathf.Lerp(1,.1f,aim.magnitude);
+          Move(Config.MoveSpeed * move,dt);
+          LookAlong(aim.normalized);
+          Select(targetables);
+          Highlight(best);
           // if (action.Pounce && Target) {
           //   CharacterController.Move(Target.transform.position - transform.position);
           //   Selector.gameObject.SetActive(false);
@@ -160,6 +199,12 @@ public class Ape : MonoBehaviour {
           //   transform.rotation = rotation;
           // }
         } else {
+          Time.timeScale = 1;
+          Target = null;
+          Move(Config.MoveSpeed * move,dt);
+          LookAlong(move.magnitude > 0 ? move.normalized : transform.forward);
+          ClearSelected();
+          ClearHighlighted();
           if (action.Pounce) {
             JumpTimeRemaining = Config.JumpDuration;
             JumpDirection = transform.forward;
@@ -195,7 +240,7 @@ public class Ape : MonoBehaviour {
 
       case ApeState.Perching: {
         if (aim.magnitude > 0) {
-          Time.timeScale = tryDilate ? Mathf.Lerp(1,.1f,aim.magnitude) : 1;
+          Time.timeScale = Inputs.InPlayBack ? 1 : Mathf.Lerp(1,.1f,aim.magnitude);
           // if (action.Pounce && Target) {
           //   CharacterController.Move(Target.transform.position - transform.position);
           //   Selector.gameObject.SetActive(false);
