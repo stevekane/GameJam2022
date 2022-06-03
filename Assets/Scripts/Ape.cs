@@ -10,6 +10,7 @@ public class Ape : MonoBehaviour {
   [SerializeField] LayerMask TargetLayerMask;
 
   public ApeState State;
+
   float BulletTimeMax = 6;
   float BulletTimeRemaining = 6;
   Transform Origin = null;
@@ -27,7 +28,7 @@ public class Ape : MonoBehaviour {
     return a + b;
   }
 
-  Transform FindClosestTarget(Transform ignore,Collider[] colliders, Vector3 forward, Vector3 origin) {
+  Transform FindClosestTarget(Transform ignore, Collider[] colliders, Vector3 forward, Vector3 origin) {
     Transform bestTransform = null;
     float bestScore = 0;
     for (int i = 0; i < colliders.Length; i++) {
