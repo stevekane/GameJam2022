@@ -5,8 +5,11 @@ public class PlayerConfig : ScriptableObject {
   public AnimationCurve MovementCurve;
   public AnimationCurve DistanceScore;
   public AnimationCurve AngleScore;
+  public float JumpDistance = 2f;
+  public float JumpDuration = .5f;
+  public float MoveSpeed = 20f;
+  public float AimingTimeMax = 6f;
   public float SearchRadius = 100f;
-  public float MoveSpeed = 10f;
   public float RollSpeed = 20f;
   public float RollDuration = .5f;
   public float SpinSpeed = 20f;
