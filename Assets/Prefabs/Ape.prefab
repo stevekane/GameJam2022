@@ -50,10 +50,15 @@ MonoBehaviour:
   CharacterController: {fileID: 321281530933574678}
   Config: {fileID: 11400000, guid: 2f290fc38a79e004ea3196697e531c17, type: 2}
   Selector: {fileID: 0}
-  TargetLayerMask:
-    serializedVersion: 2
-    m_Bits: 64
-  State: 0
+  State: 3
+  JumpDirection: {x: 0, y: 0, z: 0}
+  JumpTimeRemaining: 0
+  MoveDirection: {x: 0, y: 0, z: 0}
+  Held: {fileID: 0}
+  Target: {fileID: 0}
+  PerchedOn: {fileID: 0}
+  PounceTarget: {fileID: 0}
+  StompTarget: {fileID: 0}
 --- !u!143 &321281530933574678
 CharacterController:
   m_ObjectHideFlags: 0
