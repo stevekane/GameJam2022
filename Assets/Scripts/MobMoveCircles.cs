@@ -1,6 +1,8 @@
 using UnityEngine;
 
-public class MobMoveCircles : MonoBehaviour {
+public class MobMove : MonoBehaviour { }
+
+public class MobMoveCircles : MobMove {
   MobConfig Config;
   Vector3 Tangent;
 

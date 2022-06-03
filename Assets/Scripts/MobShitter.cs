@@ -42,6 +42,7 @@ public class MobShitter : Mob {
   }
 
   public override void TakeDamage() {
+    Destroy(GetComponent<MobMove>());
     Animator.SetTrigger("Die");
   }
 
