@@ -5,7 +5,11 @@ using UnityEngine;
 [Serializable]
 public struct Action {
   public bool Hit;
+  public bool HitDown;
+  public bool HitUp;
   public bool Pounce;
+  public bool PounceDown;
+  public bool PounceUp;
   public Vector2 Move;
   public Vector2 Aim;
 }
@@ -26,6 +30,10 @@ public class EventDriver : MonoBehaviour {
 
   List<Action> History = new List<Action>((int)Math.Pow(2,16));
   int HistoryIndex = 0;
+  bool HitDown;
+  bool HitUp;
+  bool PounceDown;
+  bool PounceUp;
 
   void Start() {
     const float BASE_FIXED_DELTA_TIME = 0.02f;
@@ -61,6 +69,27 @@ public class EventDriver : MonoBehaviour {
     PlayState = PlayState.PlayBack;
   }
 
+  /*
+  Input is changed in Unity's Update loop.
+  We want to consume it during Fixed Updates.
+
+  In Update we should just do the following:
+
+    Down = Down || Input.Down
+    Up = Up || Input.Up
+  
+  In FixedUpdate we use these states before resetting them.
+    Simulate(Up,Down)
+    Down = false
+    Up = false
+  */
+  void Update() {
+    HitDown = HitDown || Input.GetButtonDown("Action1");
+    HitUp = HitUp || Input.GetButtonUp("Action1");
+    PounceDown = PounceDown || Input.GetButtonDown("Action2");
+    PounceUp = PounceUp || Input.GetButtonUp("Action2");
+  }
+
   void FixedUpdate() {
     switch (PlayState) {
       case PlayState.Play: {
@@ -72,7 +101,11 @@ public class EventDriver : MonoBehaviour {
         aim = aim.magnitude > RadialDeadZone ? aim : Vector2.zero;
         var action = new Action {
           Hit = hit,
+          HitDown = HitDown,
+          HitUp = HitUp,
           Pounce = pounce,
+          PounceDown = PounceDown,
+          PounceUp = PounceUp,
           Move = move,
           Aim = aim,
         };
@@ -90,5 +123,9 @@ public class EventDriver : MonoBehaviour {
       }
       break;
     }
+    HitDown = false;
+    HitUp = false;
+    PounceDown = false;
+    PounceUp = false;
   }
 }
