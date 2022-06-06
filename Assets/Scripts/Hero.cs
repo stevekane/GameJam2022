@@ -11,6 +11,8 @@ public class Hero : MonoBehaviour {
 
   public ApeConfig Config;
   public CharacterController Controller;
+  // TODO: Vector3 PreviousPosition
+  // TODO: Vector3 CurrentPosition
   public Vector3 Velocity;
   public FlightStatus FlightStatus;
   public Targetable Target;
@@ -46,6 +48,10 @@ public class Hero : MonoBehaviour {
     return distance < Config.GrabRadius;
   }
 
+  /*
+  Blocked(Vector3 position) 
+  */
+
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
     var action = Inputs.Action;
@@ -67,10 +73,8 @@ public class Hero : MonoBehaviour {
     }
 
     if (grounded && !Perch && move.magnitude > 0) {
-      // TODO: This seems like bullshit...
       Velocity.x = move.x * MOVE_SPEED;
       Velocity.z = move.z * MOVE_SPEED;
-      transform.rotation.SetLookRotation(move.normalized);
     } else if ((grounded && move.magnitude == 0) || Perch) {
       Velocity.x = 0;
       Velocity.z = 0;
@@ -93,8 +97,6 @@ public class Hero : MonoBehaviour {
       ui.Select(Target);
       if (Target && action.PounceDown) {
         var vector = Target.transform.position - transform.position;
-        var distance = vector.magnitude;
-        var direction = vector.normalized;
         Velocity.x = vector.x * 2;
         Velocity.y = 15;
         Velocity.z = vector.z * 2;
@@ -110,7 +112,14 @@ public class Hero : MonoBehaviour {
       ui.Select(null);
     }
 
-    // Hug the target when perched otherwise move
+    if (FlightStatus != FlightStatus.Flying) {
+      if (aim.magnitude > 0) {
+        transform.rotation = Quaternion.LookRotation(aim.normalized);
+      } else if (move.magnitude > 0) {
+        transform.rotation = Quaternion.LookRotation(move.normalized);
+      }
+    }
+
     if (Perch) {
       var current = transform.position;
       var target = Perch.transform.position;
@@ -120,5 +129,9 @@ public class Hero : MonoBehaviour {
     } else {
       Controller.Move(dt * Velocity);
     }
+    
+    var displayAimMeter = FlightStatus != FlightStatus.Flying && AimingFramesRemaining < MAX_AIMING_FRAMES;
+    var aimMeterPosition = transform.position + Vector3.up;
+    ui.SetAimMeter(displayAimMeter,aimMeterPosition,AimingFramesRemaining,MAX_AIMING_FRAMES);
   }
 }

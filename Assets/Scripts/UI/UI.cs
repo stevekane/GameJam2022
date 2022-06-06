@@ -5,6 +5,7 @@ public class UI : MonoBehaviour {
   [SerializeField] float VerticalOffset = .5f;
   [SerializeField] Selector SelectorPrefab;
   [SerializeField] Selector HighlighterPrefab;
+  [SerializeField] AimMeter AimMeter;
   Selector Selector;
   Selector[] Highlighters;
 
@@ -42,6 +43,17 @@ public class UI : MonoBehaviour {
       var highlighter = Highlighters[n];
       highlighter.gameObject.SetActive(false);
       highlighter.transform.SetParent(transform,false);
+    }
+  }
+
+  public void SetAimMeter(bool display, Vector3 position, int value, int maxValue) {
+    if (display) {
+      AimMeter.gameObject.SetActive(true);
+      AimMeter.SetFill(maxValue,value);
+      AimMeter.transform.position = position;
+      AimMeter.transform.LookAt(position + Camera.main.transform.forward);
+    } else {
+      AimMeter.gameObject.SetActive(false);
     }
   }
 }
