@@ -1,6 +1,10 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum FlightStatus { None, Windup, Flying, Recovery }
+public struct BlockEvent { public Vector3 Position; }
+public struct BumpEvent { public Vector3 Position; public Vector3 Velocity; }
 
 public class Hero : MonoBehaviour {
   public float ASCEND_GRAVITY = -10f;
@@ -11,13 +15,15 @@ public class Hero : MonoBehaviour {
 
   public ApeConfig Config;
   public CharacterController Controller;
-  // TODO: Vector3 PreviousPosition
-  // TODO: Vector3 CurrentPosition
   public Vector3 Velocity;
   public FlightStatus FlightStatus;
   public Targetable Target;
   public Targetable Perch;
   public int AimingFramesRemaining;
+
+  List<Targetable> Contacts = new List<Targetable>(32);
+  List<BlockEvent> Blocks = new List<BlockEvent>(32);
+  List<BumpEvent> Bumps = new List<BumpEvent>(32);
 
   float Score(Vector3 forward, Vector3 origin, Vector3 target) {
     var delta = target - origin;
@@ -48,9 +54,28 @@ public class Hero : MonoBehaviour {
     return distance < Config.GrabRadius;
   }
 
-  /*
-  Blocked(Vector3 position) 
-  */
+  bool Contains<T>(T t, List<T> ts) where T : MonoBehaviour {
+    for (int i = 0; i < Contacts.Count; i++) {
+      if (ts[i] == t) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public void Block(Vector3 position) {
+    Blocks.Add(new BlockEvent { Position = position });
+  }
+
+  public void Bump(Vector3 position,Vector3 velocity) {
+    Bumps.Add(new BumpEvent { Position = position, Velocity = velocity });
+  }
+
+  void OnTriggerEnter(Collider other) {
+    if (other.TryGetComponent(out Targetable targetable)) {
+      Contacts.Add(targetable);
+    }
+  }
 
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
@@ -81,7 +106,8 @@ public class Hero : MonoBehaviour {
     }
 
     if (FlightStatus == FlightStatus.Flying) {
-      if (Target && Grabbable(Target)) {
+      if (Target && Contains(Target,Contacts)) {
+        Target?.PounceTo(this);
         FlightStatus = FlightStatus.None;
         Perch = Target;
       } else if (grounded) {
@@ -100,6 +126,7 @@ public class Hero : MonoBehaviour {
         Velocity.x = vector.x * 2;
         Velocity.y = 15;
         Velocity.z = vector.z * 2;
+        Perch?.PounceFrom(this);
         Perch = null;
         FlightStatus = FlightStatus.Flying;
       }
@@ -133,5 +160,9 @@ public class Hero : MonoBehaviour {
     var displayAimMeter = FlightStatus != FlightStatus.Flying && AimingFramesRemaining < MAX_AIMING_FRAMES;
     var aimMeterPosition = transform.position + Vector3.up;
     ui.SetAimMeter(displayAimMeter,aimMeterPosition,AimingFramesRemaining,MAX_AIMING_FRAMES);
+
+    Contacts.Clear();
+    Blocks.Clear();
+    Bumps.Clear();
   }
 }
