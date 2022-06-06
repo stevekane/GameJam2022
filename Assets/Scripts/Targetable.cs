@@ -4,13 +4,15 @@ using UnityEngine;
 public class Targetable : MonoBehaviour {
   public float Height;
 
-  [SerializeField] UnityEvent<Ape> OnPounceTo;
-  [SerializeField] UnityEvent<Ape> OnPounceFrom;
+  [SerializeField] UnityEvent<Hero> OnPounceTo;
+  [SerializeField] UnityEvent<Hero> OnPounceFrom;
 
-  public void PounceTo(Ape ape) {
-    OnPounceTo.Invoke(ape);
+  public void PounceTo(Hero hero) {
+    Debug.Log("Pounce To");
+    OnPounceTo.Invoke(hero);
   }
-  public void PounceFrom(Ape ape) {
-    OnPounceFrom.Invoke(ape);
+  public void PounceFrom(Hero hero) {
+    Debug.Log("Pounce From");
+    OnPounceFrom.Invoke(hero);
   }
 }
