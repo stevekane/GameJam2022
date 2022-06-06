@@ -40,6 +40,12 @@ public class Hero : MonoBehaviour {
     return best;
   }
 
+  bool Grabbable(Targetable targetable) {
+    var delta = targetable.transform.position - transform.position;
+    var distance = delta.magnitude;
+    return distance < Config.GrabRadius;
+  }
+
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
     var action = Inputs.Action;
@@ -49,56 +55,70 @@ public class Hero : MonoBehaviour {
     var ui = FindObjectOfType<UI>();
     var targetables = FindObjectsOfType<Targetable>(false);
 
-    // jump if grounded and not perched and not aiming and pounce just down
     if (grounded && !Perch && aim.magnitude == 0 && action.PounceDown) {
       Velocity.y = JUMP_VERTICAL_SPEED;
-    // fall when not flying and not perched
-    } else if (FlightStatus != FlightStatus.Flying && !Perch) {
+    } else if (!Perch) {
       var gravity = Velocity.y < 0 ? FALL_GRAVITY : ASCEND_GRAVITY;
       Velocity.y = Velocity.y + dt * gravity;
-    // experience gravity if grounded
     } else if (grounded) {
       Velocity.y = dt * FALL_GRAVITY;
-    // do not experience gravity
     } else {
       Velocity.y = 0;
     }
 
-    // run when grounded and not perched and moving
     if (grounded && !Perch && move.magnitude > 0) {
       // TODO: This seems like bullshit...
       Velocity.x = move.x * MOVE_SPEED;
       Velocity.z = move.z * MOVE_SPEED;
       transform.rotation.SetLookRotation(move.normalized);
-    // stop if on ground and not moving or perched
     } else if ((grounded && move.magnitude == 0) || Perch) {
       Velocity.x = 0;
       Velocity.z = 0;
     }
 
-    // target and dilate time only if not flying and aiming and aiming frames remain
+    if (FlightStatus == FlightStatus.Flying) {
+      if (Target && Grabbable(Target)) {
+        FlightStatus = FlightStatus.None;
+        Perch = Target;
+      } else if (grounded) {
+        FlightStatus = FlightStatus.None;
+      }
+    }
+
     if (FlightStatus != FlightStatus.Flying && aim.magnitude > 0 && AimingFramesRemaining > 0) {
       Target = FindClosest<Targetable>(null,targetables,aim.normalized,transform.position);
       Time.timeScale = Mathf.Lerp(1,.1f,aim.normalized.magnitude);
       AimingFramesRemaining = Mathf.Max(AimingFramesRemaining-1,0);
       ui.Highlight(targetables,targetables.Length);
       ui.Select(Target);
-      // pounce if target and pounce just down
       if (Target && action.PounceDown) {
-        Debug.Log("Pounce init");
+        var vector = Target.transform.position - transform.position;
+        var distance = vector.magnitude;
+        var direction = vector.normalized;
+        Velocity.x = vector.x * 2;
+        Velocity.y = 15;
+        Velocity.z = vector.z * 2;
+        Perch = null;
+        FlightStatus = FlightStatus.Flying;
       }
     } else {
-      // recharge if not aiming 
       if (aim.magnitude == 0) {
         AimingFramesRemaining = Mathf.Min(AimingFramesRemaining+1,MAX_AIMING_FRAMES);
       }
-      Target = null;
       Time.timeScale = 1;
       ui.Highlight(targetables,0);
       ui.Select(null);
     }
 
-    // move by velocity
-    Controller.Move(dt * Velocity);
+    // Hug the target when perched otherwise move
+    if (Perch) {
+      var current = transform.position;
+      var target = Perch.transform.position;
+      var t = Mathf.Exp(-.1f);
+      var next = Vector3.Lerp(target,current,t);
+      Controller.Move(next - current);
+    } else {
+      Controller.Move(dt * Velocity);
+    }
   }
 }
