@@ -10,6 +10,7 @@ public class ApeConfig : ScriptableObject {
   public int AimingFrames = 3000;
   public int FallFrames = 1500;
   public int JumpFrames = 250;
+  public float GrabRadius = 1f;
   public float JumpDistance = 2f;
   public float SearchRadius = 100f;
   public float MoveSpeed = 10f;

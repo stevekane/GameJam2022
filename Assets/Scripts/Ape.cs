@@ -24,7 +24,7 @@ public class Ape : MonoBehaviour {
   public float AimingFramesRemaining;
   public Holdable Held;
   public Targetable Target;
-  public Perchable PerchedOn;
+  public Targetable PerchedOn;
 
   float Score(Vector3 forward, Vector3 origin, Vector3 target) {
     var delta = target - origin;
@@ -138,6 +138,11 @@ public class Ape : MonoBehaviour {
     Target = target;
   }
 
+  void Perch(Targetable target) {
+    PerchedOn = target;
+    transform.SetParent(target.transform,true);
+  }
+
   void Die() {
     ActionVelocity = Vector3.zero;
     FallFramesRemaining = 0;
@@ -147,6 +152,10 @@ public class Ape : MonoBehaviour {
     Target = null;
     PerchedOn = null;
     State = ApeState.Dead;
+  }
+
+  bool Grabbable(Targetable targetable) {
+    return Vector3.Distance(targetable.transform.position,transform.position) < Config.GrabRadius;
   }
 
   void Start() {
@@ -226,84 +235,49 @@ public class Ape : MonoBehaviour {
       case ApeState.Pouncing: {
         switch (ActionState) {
           case ActionState.Windup: {
-            if (ActionFramesRemaining <= 0) {
+            if (ActionFramesRemaining > 0) {
+              ActionFramesRemaining--;
+            } else {
               ActionFramesRemaining = Config.PounceConfig.ActiveFrames;
               ActionState = ActionState.Active;
-            } else {
-              ActionFramesRemaining--;
             }
           };
           break;
 
           case ActionState.Active: {
-            if (ActionFramesRemaining <= 0) {
-              // TODO: Check if you have actually landed on the target
-              ActionFramesRemaining = Config.PounceConfig.RecoveryFrames;
-              ActionState = ActionState.Recovery;
-            } else {
+            if (ActionFramesRemaining > 0) {
               Glide(ActionVelocity,dt);
               ActionFramesRemaining--;
+            } else {
+              if (Target && Grabbable(Target)) {
+                Perch(PerchedOn);
+                ActionFramesRemaining = Config.PounceConfig.RecoveryFrames;
+                ActionState = ActionState.Recovery;
+              } else if (CharacterController.isGrounded) {
+                Target = null;
+                PerchedOn = null;
+                ActionFramesRemaining = Config.PounceConfig.RecoveryFrames;
+                ActionState = ActionState.Recovery;
+              } else {
+                Target = null;
+                PerchedOn = null;
+                Fall();
+              }
             }
           }
           break;
 
+          // If we lose our perch at any time then detach from it
           case ActionState.Recovery: {
-            // TODO: Check Target still exists
-            if (ActionFramesRemaining <= 0) {
-              if (Target.TryGetComponent(out Perchable perchable)) {
-                PerchedOn = perchable;
-                State = ApeState.Perching;
-              } else if (CharacterController.isGrounded) {
+            if (ActionFramesRemaining > 0) {
+              ActionFramesRemaining--;
+            } else {
+              PerchedOn = null;
+              if (CharacterController.isGrounded) {
                 State = ApeState.Moving;
               } else {
                 Fall();
               }
-            } else {
-              ActionFramesRemaining--;
-            }
-          }
-          break;
-        }
-      }
-      break;
-
-      case ApeState.Stomping: {
-        switch (ActionState) {
-          case ActionState.Windup: {
-            if (ActionFramesRemaining <= 0) {
-              ActionFramesRemaining = Config.StompConfig.ActiveFrames;
-              ActionState = ActionState.Active;
-            } else {
-              ActionFramesRemaining--;
-            }
-          };
-          break;
-
-          case ActionState.Active: {
-            if (ActionFramesRemaining <= 0) {
-              // TODO: Check if you have actually landed on the target
-              ActionFramesRemaining = Config.StompConfig.RecoveryFrames;
-              ActionState = ActionState.Recovery;
-            } else {
-              Glide(ActionVelocity,dt);
-              ActionFramesRemaining--;
-            }
-          }
-          break;
-
-          case ActionState.Recovery: {
-            // TODO: Check Target still exists
-            if (ActionFramesRemaining <= 0) {
-              if (Target.TryGetComponent(out Perchable perchable)) {
-                PerchedOn = perchable;
-                State = ApeState.Perching;
-              } else if (CharacterController.isGrounded) {
-                State = ApeState.Moving;
-              } else {
-                Fall();
-              }
-            } else {
-              ActionFramesRemaining--;
             }
           }
           break;

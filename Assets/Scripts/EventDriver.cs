@@ -38,7 +38,10 @@ public class EventDriver : MonoBehaviour {
   void Start() {
     const float BASE_FIXED_DELTA_TIME = 0.02f;
     Time.fixedDeltaTime = BASE_FIXED_DELTA_TIME * .1f;
-    Play();
+    History.Clear();
+    HistoryIndex = 0;
+    Inputs.InPlayBack = false;
+    PlayState = PlayState.Play;
   }
 
   void OnDestroy() {

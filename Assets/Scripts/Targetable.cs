@@ -1,18 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.Events;
 using UnityEngine;
 
-public class Targetable : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+public class Targetable : MonoBehaviour {
+  [SerializeField] UnityEvent<Ape> OnPounceTo;
+  [SerializeField] UnityEvent<Ape> OnPounceFrom;
+  public void PounceTo(Ape ape) {
+    OnPounceTo.Invoke(ape);
+  }
+  public void PounceFrom(Ape ape) {
+    OnPounceFrom.Invoke(ape);
+  }
 }
