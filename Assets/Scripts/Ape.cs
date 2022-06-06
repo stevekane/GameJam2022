@@ -1,39 +1,30 @@
 using UnityEngine;
 
-public class Ape : MonoBehaviour {
-  public enum ApeState { Dead, Falling, Jumping, Moving, Perching, Pouncing, Stomping }  
+public enum ApeState { Dead, Falling, Jumping, Moving, Perching, Pouncing, Stomping }  
+public enum ActionState { Windup, Active, Recovery }
 
+public class Ape : MonoBehaviour {
+  [Header("Configuration")]
+  [SerializeField] ApeConfig Config;
+
+  [Header("Components")]
   [SerializeField] CharacterController CharacterController;
-  [SerializeField] PlayerConfig Config;
   
   [Header("User Interface")]
   [SerializeField] Selector Selector;
   [SerializeField] Selector[] Selectors;
 
-  [Header("Root States")]
+  [Header("State")]
   public ApeState State = ApeState.Moving;
-
-  [Header("Jumping")]
-  public Vector3 JumpDirection;
-  public float JumpTimeRemaining;
-
-  [Header("Holding")]
+  public ActionState ActionState = ActionState.Windup;
+  public Vector3 ActionVelocity;
+  public float ActionFramesRemaining;
+  public float FallFramesRemaining;
+  public float JumpFramesRemaining;
+  public float AimingFramesRemaining;
   public Holdable Held;
-
-  [Header("Aiming")]
-  float AimingTimeRemaining;
-
-  [Header("Targeting")]
   public Targetable Target;
-
-  [Header("Perching")]
-  public Perchable PerchedOn;
-
-  [Header("Pouncing")]
-  public Targetable PounceTarget;
-
-  [Header("Stomping")]
-  public Targetable StompTarget;
+  public Targetable PerchedOn;
 
   float Score(Vector3 forward, Vector3 origin, Vector3 target) {
     var delta = target - origin;
@@ -58,26 +49,10 @@ public class Ape : MonoBehaviour {
     return best;
   }
 
-  void Glide(Vector3 magnitude, float dt) {
-    CharacterController.Move(magnitude * dt);
-  }
-
-  void Move(Vector3 magnitude, float dt) {
-    CharacterController.Move((magnitude + Physics.gravity) * dt);
-  }
-
-  void Fall(float dt) {
-    CharacterController.Move(Physics.gravity * dt);
-  }
-
-  void LookAlong(Vector3 forward) {
-    transform.rotation = Quaternion.LookRotation(forward,Vector3.up);
-  }
-
   void Select(MonoBehaviour[] components) {
     for (int i = 0; i < Selectors.Length; i++) {
       if (i < components.Length) {
-        Selectors[i].Target = components[i].transform;
+        Selectors[i].Target = components[i].GetComponent<Targetable>();
         Selectors[i].gameObject.SetActive(true);
       } else {
         Selectors[i].Target = null;
@@ -96,7 +71,7 @@ public class Ape : MonoBehaviour {
 
   void Highlight(MonoBehaviour component) {
     if (component) {
-      Selector.Target = component.transform;
+      Selector.Target = component.GetComponent<Targetable>();
       Selector.gameObject.SetActive(true);
     } else {
       Selector.Target = null;
@@ -110,6 +85,79 @@ public class Ape : MonoBehaviour {
     Selector.transform.position = transform.position;
   }
 
+  void ScaleTime(float timeScale) {
+    Time.timeScale = Inputs.InPlayBack ? 1 : timeScale;
+  }
+
+  void Glide(Vector3 magnitude, float dt) {
+    CharacterController.Move(magnitude * dt);
+  }
+
+  void Move(Vector3 magnitude, float dt) {
+    CharacterController.Move((magnitude + Physics.gravity) * dt);
+  }
+
+  void Drop(float dt) {
+    CharacterController.Move(Physics.gravity * dt);
+  }
+
+  void LookAlong(Vector3 forward) {
+    transform.rotation = Quaternion.LookRotation(forward,Vector3.up);
+  }
+
+  void Fall() {
+    FallFramesRemaining = Config.FallFrames;
+    State = ApeState.Falling;
+  }
+
+  void Jump(Vector3 direction) {
+    var vector = transform.forward * Config.JumpDistance;
+    var time = Config.JumpFrames * Time.fixedDeltaTime;
+    ActionVelocity = vector / time;
+    JumpFramesRemaining = Config.JumpFrames;
+    State = ApeState.Jumping;
+  }
+
+  void Pounce(Targetable target) {
+    var vector = target.transform.position - transform.position;
+    var time = Config.PounceConfig.ActiveFrames * Time.fixedDeltaTime;
+    ActionVelocity = vector / time;
+    ActionState = ActionState.Windup;
+    ActionFramesRemaining = Config.PounceConfig.WindupFrames;
+    State = ApeState.Pouncing;
+    Target = target;
+  }
+
+  void Stomp(Targetable target) {
+    var vector = target.transform.position - transform.position;
+    var time = Config.StompConfig.ActiveFrames * Time.fixedDeltaTime;
+    ActionVelocity = vector / time;
+    ActionState = ActionState.Windup;
+    ActionFramesRemaining = Config.StompConfig.WindupFrames;
+    State = ApeState.Stomping;
+    Target = target;
+  }
+
+  void Perch(Targetable target) {
+    PerchedOn = target;
+    transform.SetParent(target.transform,true);
+  }
+
+  void Die() {
+    ActionVelocity = Vector3.zero;
+    FallFramesRemaining = 0;
+    JumpFramesRemaining = 0;
+    AimingFramesRemaining = 0;
+    Held = null;
+    Target = null;
+    PerchedOn = null;
+    State = ApeState.Dead;
+  }
+
+  bool Grabbable(Targetable targetable) {
+    return Vector3.Distance(targetable.transform.position,transform.position) < Config.GrabRadius;
+  }
+
   void Start() {
     State = ApeState.Moving;
   }
@@ -120,146 +168,143 @@ public class Ape : MonoBehaviour {
     var move = new Vector3(action.Move.x,0,action.Move.y);
     var aim = new Vector3(action.Aim.x,0,action.Aim.y);
 
-    // Global rule across states
-    if (transform.position.y <= -10) {
-      // TODO: if (Held) Held.Drop()
-      Held = null;
-      Target = null;
-      PerchedOn = null;
-      PounceTarget = null;
-      StompTarget = null;
-      State = ApeState.Dead;
-    }
-
-    /*
-    TODO: Global rule for dying holdables
-    if (Held.Dead)  {
-      Held = null;
-    }
-    */
+    // Regeneration of Aiming Resource
+    AimingFramesRemaining = aim.magnitude <= 0 
+      ? Mathf.Min(AimingFramesRemaining+1,Config.AimingFrames)
+      : AimingFramesRemaining-1;
 
     switch (State) {
       case ApeState.Falling: {
-        Fall(dt);
         if (CharacterController.isGrounded) {
           State = ApeState.Moving;
+        } else if (FallFramesRemaining > 0) {
+          FallFramesRemaining--; 
+          Drop(dt);
+        } else {
+          Die();
         }
-      }      
+      }
       break;
 
       case ApeState.Jumping: {
-        var jumpSpeed = Config.JumpDistance / Config.JumpDuration;
-        if (JumpTimeRemaining > dt) {
-          JumpTimeRemaining -= dt;
-          Glide(jumpSpeed * JumpDirection,dt);
+        if (JumpFramesRemaining > 0) {
+          JumpFramesRemaining--;
+          Glide(ActionVelocity,dt);
+        } else if (CharacterController.isGrounded) {
+          State = ApeState.Moving;
         } else {
-          JumpTimeRemaining = 0;
-          Glide(jumpSpeed * JumpDirection,JumpTimeRemaining);
-          Fall(dt - JumpTimeRemaining);
-          if (CharacterController.isGrounded) {
-            State = ApeState.Moving;
-          } else {
-            State = ApeState.Falling;
-          }
+          Fall();
         }
       }
       break;
 
       case ApeState.Moving: {
         if (!CharacterController.isGrounded) {
-          Time.timeScale = 1;
-          Target = null;
-          Fall(dt);
           ClearSelected();
           ClearHighlighted();
-          State = ApeState.Falling;
+          ScaleTime(1);
+          Drop(dt);
+          Fall();
         } else if (aim.magnitude > 0) {
           var targetables = FindObjectsOfType<Targetable>(false);
           var best = FindClosest<Targetable>(null,targetables,aim.normalized,transform.position);
-          Time.timeScale = Inputs.InPlayBack ? 1 : Mathf.Lerp(1,.1f,aim.magnitude);
-          Move(Config.MoveSpeed * move,dt);
-          LookAlong(aim.normalized);
           Select(targetables);
           Highlight(best);
-          // if (action.Pounce && Target) {
-          //   CharacterController.Move(Target.transform.position - transform.position);
-          //   Selector.gameObject.SetActive(false);
-          //   Selector.Target = null;
-          //   State = ApeState.Pouncing;
-          // } else if (!tryAim) {
-          //   Selector.gameObject.SetActive(false);
-          //   Selector.Target = null;
-          //   State = ApeState.Moving;
-          // } else {
-          //   Selector.gameObject.SetActive(best);
-          //   Selector.Target = best.transform;
-          //   Target = best;
-          //   var rotation = transform.rotation;
-          //   rotation.SetLookRotation(aim);
-          //   transform.rotation = rotation;
-          // }
-        } else {
-          Time.timeScale = 1;
-          Target = null;
+          ScaleTime(Mathf.Lerp(1,.1f,aim.magnitude));
+          LookAlong(aim.normalized);
           Move(Config.MoveSpeed * move,dt);
-          LookAlong(move.magnitude > 0 ? move.normalized : transform.forward);
+          if (action.PounceDown && best) {
+            ClearSelected();
+            ClearHighlighted();
+            ScaleTime(1);
+            Pounce(best);
+          }
+        } else {
           ClearSelected();
           ClearHighlighted();
-          if (action.Pounce) {
-            JumpTimeRemaining = Config.JumpDuration;
-            JumpDirection = transform.forward;
-            State = ApeState.Jumping;
+          ScaleTime(1);
+          LookAlong(move.magnitude > Config.AimThreshold ? move.normalized : transform.forward);
+          Move(move.magnitude > Config.MoveThreshold ? Config.MoveSpeed * move : Vector3.zero,dt);
+          if (action.PounceDown) {
+            Jump(transform.forward);
           }
         }
       }
       break;
 
       case ApeState.Pouncing: {
-        if (Target.TryGetComponent(out Perchable perchable)) {
-          // TODO: perchable.PounceOn(this);
-          PerchedOn = perchable;
-          State = ApeState.Perching;
-        } else {
-          Debug.Log("Fell no perch available!");
-          State = ApeState.Falling;
-        }
-      }
-      break;
+        switch (ActionState) {
+          case ActionState.Windup: {
+            if (ActionFramesRemaining > 0) {
+              ActionFramesRemaining--;
+            } else {
+              ActionFramesRemaining = Config.PounceConfig.ActiveFrames;
+              ActionState = ActionState.Active;
+            }
+          };
+          break;
 
-      case ApeState.Stomping: {
-        if (Target.TryGetComponent(out Perchable perchable)) {
-          // TODO: perchable.StompOn(this);
-          PerchedOn = perchable;
-          State = ApeState.Perching;
-        } else {
-          Debug.Log("Fell no perch available!");
-          State = ApeState.Falling;
+          case ActionState.Active: {
+            if (ActionFramesRemaining > 0) {
+              Glide(ActionVelocity,dt);
+              ActionFramesRemaining--;
+            } else {
+              if (Target && Grabbable(Target)) {
+                Perch(PerchedOn);
+                ActionFramesRemaining = Config.PounceConfig.RecoveryFrames;
+                ActionState = ActionState.Recovery;
+              } else if (CharacterController.isGrounded) {
+                Target = null;
+                PerchedOn = null;
+                ActionFramesRemaining = Config.PounceConfig.RecoveryFrames;
+                ActionState = ActionState.Recovery;
+              } else {
+                Target = null;
+                PerchedOn = null;
+                Fall();
+              }
+            }
+          }
+          break;
+
+          // If we lose our perch at any time then detach from it
+          case ActionState.Recovery: {
+            if (ActionFramesRemaining > 0) {
+              ActionFramesRemaining--;
+            } else {
+              PerchedOn = null;
+              if (CharacterController.isGrounded) {
+                State = ApeState.Moving;
+              } else {
+                Fall();
+              }
+            }
+          }
+          break;
         }
       }
       break;
 
       case ApeState.Perching: {
         if (aim.magnitude > 0) {
-          Time.timeScale = Inputs.InPlayBack ? 1 : Mathf.Lerp(1,.1f,aim.magnitude);
-          // if (action.Pounce && Target) {
-          //   CharacterController.Move(Target.transform.position - transform.position);
-          //   Selector.gameObject.SetActive(false);
-          //   Selector.Target = null;
-          //   State = ApeState.Pouncing;
-          // } else if (action.Hit && Target) {
-          //   Debug.Log("Wack Wack Wack Wack!!!!!!!!!!");
-          // } else if (!tryAim) {
-          //   Selector.gameObject.SetActive(false);
-          //   Selector.Target = null;
-          //   State = ApeState.Perching;
-          // } else {
-          //   Selector.gameObject.SetActive(best);
-          //   Selector.Target = best.transform;
-          //   Target = best;
-          //   var rotation = transform.rotation;
-          //   rotation.SetLookRotation(aim);
-          //   transform.rotation = rotation;
-          // }
+          var targetables = FindObjectsOfType<Targetable>(false);
+          var current = PerchedOn.GetComponent<Targetable>();
+          var best = FindClosest<Targetable>(current,targetables,aim.normalized,transform.position);
+          ScaleTime(Mathf.Lerp(1,.1f,aim.magnitude));
+          LookAlong(aim.normalized);
+          Select(targetables);
+          Highlight(best);
+          if (action.PounceDown && best) {
+            ClearSelected();
+            ClearHighlighted();
+            ScaleTime(1);
+            Pounce(best);
+          }
+        } else {
+          ClearSelected();
+          ClearHighlighted();
+          ScaleTime(1);
+          LookAlong(move.magnitude > 0 ? move.normalized : transform.forward);
         }
       }
       break;
