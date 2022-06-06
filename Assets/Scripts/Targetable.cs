@@ -8,9 +8,9 @@ public class Targetable : MonoBehaviour {
   [SerializeField] UnityEvent<Ape> OnPounceFrom;
 
   public void PounceTo(Ape ape) {
-    OnPounceTo.Invoke(ape);
+    OnPounceTo?.Invoke(ape);
   }
   public void PounceFrom(Ape ape) {
-    OnPounceFrom.Invoke(ape);
+    OnPounceFrom?.Invoke(ape);
   }
 }

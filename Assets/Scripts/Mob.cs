@@ -10,11 +10,15 @@ public class Mob : MonoBehaviour {
   }
 
   public enum ThingHitMeType { Mob, Explosion };
-  public virtual void ThingHitMe(ThingHitMeType thing, Vector3 thingPos) {
+  public virtual void ThingHitMe(GameObject thing, ThingHitMeType type, Vector3 thingPos) {
     TakeDamage();
   }
 
   public virtual void TakeDamage() {
     Destroy(gameObject);  // TODO: unify death anim stuff
+  }
+
+  public void OnPounceFrom(Ape ape) {
+    TakeDamage();
   }
 }

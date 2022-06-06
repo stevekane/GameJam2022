@@ -112,6 +112,7 @@ GameObject:
   - component: {fileID: 1517578643254339290}
   - component: {fileID: 6897075593057562495}
   - component: {fileID: 8873007052148189967}
+  - component: {fileID: 7820281601275089246}
   m_Layer: 0
   m_Name: Mob
   m_TagString: Untagged
@@ -224,6 +225,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0772a526f9647954bbed367cc93b3204, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7820281601275089246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1300316631519711558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cdd2dec502ee1841b8e4e88f90e9a3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Height: 1
+  OnPounceTo:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPounceFrom:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2294951553186072225}
+        m_TargetAssemblyTypeName: Mob, Assembly-CSharp
+        m_MethodName: OnPounceFrom
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: Ape, Assembly-CSharp
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1300316631732759985
 GameObject:
   m_ObjectHideFlags: 0

@@ -15,7 +15,31 @@ public class MobBumper : Mob {
     }
   }
 
-  public override void ThingHitMe(ThingHitMeType thing, Vector3 thingPos) {
-    TakeDamage(); // TODO: angle
+  public override void ThingHitMe(GameObject thing, ThingHitMeType type, Vector3 contactPos) {
+    if (IsOnBumperSide(contactPos)) {
+      // TODO: proper direction
+      Vector3 dir = (transform.position - contactPos).normalized;
+      var body = thing.GetComponent<Rigidbody>();
+      body.velocity = new Vector3(0, 0, 0);
+      body.AddForce(dir * 5f, ForceMode.Impulse);
+    } else {
+      TakeDamage();
+    }
+  }
+
+  public void ABC() {
+  }
+  public void ABC2(Ape a) {
+  }
+
+  public void OnPounceTo(Ape ape) {
+    if (IsOnBumperSide(ape.transform.position))
+      return;
+//      ape.Bump();
+  }
+  // TODO: OnPounceFrom = long jump?
+
+  bool IsOnBumperSide(Vector3 pos) {
+    return false;
   }
 }

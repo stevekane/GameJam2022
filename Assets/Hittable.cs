@@ -9,12 +9,12 @@ public class Hittable : MonoBehaviour {
 
     if (collision.gameObject.TryGetComponent(out Throwable thrown)) {
       Debug.Log($"Something hit me: {collision.gameObject}");
-      GetComponent<Mob>()?.ThingHitMe(Mob.ThingHitMeType.Mob, collision.gameObject.transform.position);
+      GetComponent<Mob>()?.ThingHitMe(collision.gameObject, Mob.ThingHitMeType.Mob, collision.gameObject.transform.position);
     }
   }
 
   public void ExplosionHitMe(Explosion explosion) {
     Debug.Log($"Explosion hit me: {explosion}");
-    GetComponent<Mob>()?.ThingHitMe(Mob.ThingHitMeType.Explosion, explosion.transform.position);
+    GetComponent<Mob>()?.ThingHitMe(explosion.gameObject, Mob.ThingHitMeType.Explosion, explosion.transform.position);
   }
 }
