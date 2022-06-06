@@ -52,7 +52,7 @@ public class Ape : MonoBehaviour {
   void Select(MonoBehaviour[] components) {
     for (int i = 0; i < Selectors.Length; i++) {
       if (i < components.Length) {
-        Selectors[i].Target = components[i].transform;
+        Selectors[i].Target = components[i].GetComponent<Targetable>();
         Selectors[i].gameObject.SetActive(true);
       } else {
         Selectors[i].Target = null;
@@ -71,7 +71,7 @@ public class Ape : MonoBehaviour {
 
   void Highlight(MonoBehaviour component) {
     if (component) {
-      Selector.Target = component.transform;
+      Selector.Target = component.GetComponent<Targetable>();
       Selector.gameObject.SetActive(true);
     } else {
       Selector.Target = null;
