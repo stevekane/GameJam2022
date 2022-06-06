@@ -11,16 +11,14 @@ public class MobFuel : Mob {
   }
 
   public override void TakeDamage() {
-    // TODO: need instant explode too
-    Destroy(GetComponent<MobMove>());
-    Animator.SetTrigger("PreExplode");
+    Explode();
+    // TODO: Do we still need the blinky-explode sequence?
+    //Destroy(GetComponent<MobMove>());
+    //Animator.SetTrigger("PreExplode");
   }
 
   public void Explode() {
     Instantiate(ExplosionPrefab, transform.position, Quaternion.identity);
-    //var particles = explosion.GetComponent<ParticleSystem>();
-    //particles.Play();
     Destroy(gameObject);
-    // damage nearby
   }
 }
