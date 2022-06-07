@@ -25,10 +25,10 @@ public class Hero : MonoBehaviour {
   List<BumpEvent> Bumps = new List<BumpEvent>(32);
 
   float Score(Vector3 forward, Vector3 origin, Vector3 target) {
-    var delta = target - origin;
+    var delta = target-origin;
     var distance = delta.magnitude;
     var dot = distance > 0 ? Vector3.Dot(delta.normalized,forward) : 1;
-    var a = Config.DistanceScore.Evaluate(1 - distance / Config.SearchRadius);
+    var a = Config.DistanceScore.Evaluate(1-distance/Config.SearchRadius);
     var b = Config.AngleScore.Evaluate(Mathf.Lerp(0,1,Mathf.InverseLerp(-1,1,dot)));
     return a + b;
   }
@@ -47,20 +47,11 @@ public class Hero : MonoBehaviour {
     return best;
   }
 
-  bool Contains<T>(T t, List<T> ts) where T : MonoBehaviour {
-    for (int i = 0; i < ts.Count; i++) {
-      if (ts[i] == t) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   public void Block(Vector3 position) {
     Blocks.Add(new BlockEvent { Position = position });
   }
 
-  public void Bump(Vector3 position,Vector3 velocity) {
+  public void Bump(Vector3 position, Vector3 velocity) {
     Bumps.Add(new BumpEvent { Position = position, Velocity = velocity });
   }
 
@@ -76,28 +67,31 @@ public class Hero : MonoBehaviour {
     var grounded = Controller.isGrounded;
     var ui = FindObjectOfType<UI>();
     var targetables = FindObjectsOfType<Targetable>(false);
+    var moving = move.magnitude > 0;
+    var aiming = aim.magnitude > 0;
+    var flying = FlightStatus == FlightStatus.Flying;
 
-    if (grounded && !Perch && aim.magnitude == 0 && action.PounceDown) {
+    if (grounded && !Perch && aiming && action.PounceDown) {
       Velocity.y = JUMP_VERTICAL_SPEED;
-    } else if (!Perch) {
-      var gravity = Velocity.y < 0 ? FALL_GRAVITY : ASCEND_GRAVITY;
-      Velocity.y = Velocity.y + dt * gravity;
     } else if (grounded) {
-      Velocity.y = dt * FALL_GRAVITY;
-    } else {
+      Velocity.y = dt*FALL_GRAVITY;
+    } else if (Perch) {
       Velocity.y = 0;
+    } else {
+      var gravity = Velocity.y < 0 ? FALL_GRAVITY : ASCEND_GRAVITY;
+      Velocity.y = Velocity.y+dt*gravity;
     }
 
-    if (grounded && !Perch && move.magnitude > 0) {
-      Velocity.x = move.x * MOVE_SPEED;
-      Velocity.z = move.z * MOVE_SPEED;
-    } else if ((grounded && move.magnitude == 0) || Perch) {
+    if (grounded && !Perch) {
+      Velocity.x = move.x*MOVE_SPEED;
+      Velocity.z = move.z*MOVE_SPEED;
+    } else if (Perch) {
       Velocity.x = 0;
       Velocity.z = 0;
     }
 
-    if (FlightStatus == FlightStatus.Flying) {
-      if (Target && Contains(Target,Contacts)) {
+    if (flying) {
+      if (Target && Contacts.Contains(Target)) {
         Target?.PounceTo(this);
         FlightStatus = FlightStatus.None;
         Perch = Target;
@@ -106,23 +100,23 @@ public class Hero : MonoBehaviour {
       }
     }
 
-    if (FlightStatus != FlightStatus.Flying && aim.magnitude > 0 && AimingFramesRemaining > 0) {
-      Target = FindClosest<Targetable>(null,targetables,aim.normalized,transform.position);
+    if (!flying && aiming && AimingFramesRemaining > 0) {
+      Target = FindClosest<Targetable>(Perch,targetables,aim.normalized,transform.position);
       Time.timeScale = Mathf.Lerp(1,.1f,aim.normalized.magnitude);
       AimingFramesRemaining = Mathf.Max(AimingFramesRemaining-1,0);
       ui.Highlight(targetables,targetables.Length);
       ui.Select(Target);
       if (Target && action.PounceDown) {
         var vector = Target.transform.position - transform.position;
-        Velocity.x = vector.x * 2;
+        Velocity.x = vector.x*2;
         Velocity.y = 15;
-        Velocity.z = vector.z * 2;
+        Velocity.z = vector.z*2;
         Perch?.PounceFrom(this);
         Perch = null;
         FlightStatus = FlightStatus.Flying;
       }
     } else {
-      if (aim.magnitude == 0) {
+      if (!aiming) {
         AimingFramesRemaining = Mathf.Min(AimingFramesRemaining+1,MAX_AIMING_FRAMES);
       }
       Time.timeScale = 1;
@@ -130,8 +124,8 @@ public class Hero : MonoBehaviour {
       ui.Select(null);
     }
 
-    if (FlightStatus != FlightStatus.Flying) {
-      if (aim.magnitude > 0) {
+    if (!flying) {
+      if (aiming) {
         transform.rotation = Quaternion.LookRotation(aim.normalized);
       } else if (move.magnitude > 0) {
         transform.rotation = Quaternion.LookRotation(move.normalized);
@@ -143,13 +137,13 @@ public class Hero : MonoBehaviour {
       var target = Perch.transform.position;
       var t = Mathf.Exp(-.1f);
       var next = Vector3.Lerp(target,current,t);
-      Controller.Move(next - current);
+      Controller.Move(next-current);
     } else {
-      Controller.Move(dt * Velocity);
+      Controller.Move(dt*Velocity);
     }
     
-    var displayAimMeter = FlightStatus != FlightStatus.Flying && AimingFramesRemaining < MAX_AIMING_FRAMES;
-    var aimMeterPosition = transform.position + Vector3.up;
+    var displayAimMeter = !flying && AimingFramesRemaining < MAX_AIMING_FRAMES;
+    var aimMeterPosition = transform.position+Vector3.up;
     ui.SetAimMeter(displayAimMeter,aimMeterPosition,AimingFramesRemaining,MAX_AIMING_FRAMES);
 
     Contacts.Clear();
