@@ -3,9 +3,19 @@ using UnityEngine.Events;
 
 public class Mob : MonoBehaviour {
   public MobConfig Config;
+  internal Animator Animator;
+
+  void Start() {
+    Animator = GetComponent<Animator>();
+  }
 
   public virtual void TakeDamage() {
-    Destroy(gameObject, .1f);  // TODO: unify death anim stuff
+    Destroy(GetComponent<MobMove>());
+    Animator.SetTrigger("Die");
+  }
+
+  public virtual void Die() {
+    Destroy(gameObject, .1f);
   }
 
   // Throwable

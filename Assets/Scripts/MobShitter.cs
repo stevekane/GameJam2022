@@ -7,7 +7,6 @@ public class MobShitter : Mob {
   Player Player;
 
   enum MobShitterState { Idle, Shoot }
-  Animator Animator;
 
   MobShitterState State {
     get { return (MobShitterState)Animator.GetInteger("State"); }
@@ -15,8 +14,8 @@ public class MobShitter : Mob {
   }
 
   void Start() {
-    Player = GameObject.FindObjectOfType<Player>();
     Animator = GetComponent<Animator>();
+    Player = GameObject.FindObjectOfType<Player>();
     State = MobShitterState.Idle;
   }
 
@@ -40,16 +39,6 @@ public class MobShitter : Mob {
   public void ShootCooldown() {
     State = MobShitterState.Idle;
   }
-
-  public override void TakeDamage() {
-    Destroy(GetComponent<MobMove>());
-    Animator.SetTrigger("Die");
-  }
-
-  public void Die() {
-    Destroy(gameObject);
-  }
-
 
   public void OnDrawGizmos() {
     Gizmos.color = UnityEngine.Color.red;
