@@ -27,15 +27,10 @@ public class MobBumper : Mob {
     }
   }
 
-  public void ABC() {
-  }
-  public void ABC2(Ape a) {
-  }
-
-  public void OnPounceTo(Ape ape) {
-    if (IsOnBumperSide(ape.transform.position))
+  public override void OnPounceTo(Hero player) {
+    if (IsOnBumperSide(player.transform.position))
       return;
-//      ape.Bump();
+//      player.Bump();
   }
   // TODO: OnPounceFrom = long jump?
 

@@ -19,6 +19,6 @@ public class MobFuel : Mob {
 
   public void Explode() {
     Instantiate(ExplosionPrefab, transform.position, Quaternion.identity);
-    Destroy(gameObject);
+    Destroy(gameObject, .1f);
   }
 }

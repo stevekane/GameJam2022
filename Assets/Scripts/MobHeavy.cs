@@ -19,8 +19,8 @@ public class MobHeavy : Mob {
     }
   }
 
-  public void OnPounceTo(Ape ape) {
-    if (IsOnShieldSide(ape.transform.position))
+  public override void OnPounceTo(Hero player) {
+    if (IsOnShieldSide(player.transform.position))
       return;
     //      ape.Blocked();
   }
