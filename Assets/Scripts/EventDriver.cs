@@ -24,9 +24,9 @@ public class EventDriver : MonoBehaviour {
   [Header("State")]
   public PlayState PlayState;
 
-  [Header("Screen")]
-  public Screen ScreenPrefab;
-  public Screen Screen;
+  [Header("Room")]
+  public Room RoomPrefab;
+  public Room Room;
 
   List<Action> History = new List<Action>((int)Math.Pow(2,16));
   int HistoryIndex = 0;
@@ -50,10 +50,10 @@ public class EventDriver : MonoBehaviour {
 
   [ContextMenu("Play")]
   public void Play() {
-    if (Screen) {
-      Destroy(Screen.gameObject);
+    if (Room) {
+      Destroy(Room.gameObject);
     }
-    Screen = Instantiate(ScreenPrefab);
+    Room = Instantiate(RoomPrefab);
     History.Clear();
     HistoryIndex = 0;
     Inputs.InPlayBack = false;
@@ -63,11 +63,11 @@ public class EventDriver : MonoBehaviour {
   [ContextMenu("Play Back")]
   public void PlayBack() {
     Time.timeScale = 1;
-    if (Screen) {
-      Destroy(Screen.gameObject);
+    if (Room) {
+      Destroy(Room.gameObject);
     }
     HistoryIndex = 0;
-    Screen = Instantiate(ScreenPrefab);
+    Room = Instantiate(RoomPrefab);
     Inputs.InPlayBack = true;
     PlayState = PlayState.PlayBack;
   }

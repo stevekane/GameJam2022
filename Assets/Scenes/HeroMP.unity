@@ -333,26 +333,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 640284548}
-  - component: {fileID: 640284547}
+  - component: {fileID: 640284549}
   m_Layer: 0
-  m_Name: Screen
+  m_Name: Room
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &640284547
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 640284546}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da80b8118eeb1de4b98d3e5197236f5d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &640284548
 Transform:
   m_ObjectHideFlags: 0
@@ -379,6 +367,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &640284549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 640284546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8139b66ddf32f7d4aa0848be620c7e61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &713857931
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -469,8 +469,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RadialDeadZone: 0.2
   PlayState: 0
-  ScreenPrefab: {fileID: 640284547}
-  Screen: {fileID: 640284547}
+  RoomPrefab: {fileID: 640284549}
+  Room: {fileID: 640284549}
 --- !u!4 &723377968
 Transform:
   m_ObjectHideFlags: 0
@@ -777,7 +777,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh104538
+  m_Name: pb_Mesh33550
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
