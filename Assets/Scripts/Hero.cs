@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -48,14 +47,8 @@ public class Hero : MonoBehaviour {
     return best;
   }
 
-  bool Grabbable(Targetable targetable) {
-    var delta = targetable.transform.position - transform.position;
-    var distance = delta.magnitude;
-    return distance < Config.GrabRadius;
-  }
-
   bool Contains<T>(T t, List<T> ts) where T : MonoBehaviour {
-    for (int i = 0; i < Contacts.Count; i++) {
+    for (int i = 0; i < ts.Count; i++) {
       if (ts[i] == t) {
         return true;
       }
@@ -71,10 +64,8 @@ public class Hero : MonoBehaviour {
     Bumps.Add(new BumpEvent { Position = position, Velocity = velocity });
   }
 
-  void OnTriggerEnter(Collider other) {
-    if (other.TryGetComponent(out Targetable targetable)) {
-      Contacts.Add(targetable);
-    }
+  public void Contact(Targetable targetable) {
+    Contacts.Add(targetable);
   }
 
   void FixedUpdate() {
