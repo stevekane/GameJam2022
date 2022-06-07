@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MobBumper : Mob {
+  [System.Flags]
+  public enum BumperSide {
+    Front = 1<<1,
+    Left = 1<<2,
+    Back = 1<<3,
+    Right = 1<<4,
+  }
+  public BumperSide ActiveBumpers;
+
   public override void MeHitThing(GameObject thing, MeHitThingType type, Vector3 contactPos) {
     if (type == MeHitThingType.Wall || type == MeHitThingType.Shield) {
       // TODO: need surface normal
