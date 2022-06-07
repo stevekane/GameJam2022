@@ -11,14 +11,15 @@ public class MobBumper : Mob {
     Left = 0x8,
   }
   public BumperSide ActiveBumpers;
+  [Tooltip("Order must be the same as ActiveBumpers")]
+  public List<GameObject> Bumpers;
 
   public void Start() {
     base.Start();
-    var bumpers = GetComponentsInChildren<MobBumperArm>();
-    Debug.Assert(bumpers.Length == 4);
+    Debug.Assert(Bumpers.Count == 4);
     for (int i = 0; i < 4; i++) {
       if (((int)ActiveBumpers & (1<<i)) == 0) {
-        bumpers[i].gameObject.SetActive(false);
+        Bumpers[i].gameObject.SetActive(false);
       }
     }
   }
