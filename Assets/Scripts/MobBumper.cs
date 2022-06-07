@@ -55,10 +55,13 @@ public class MobBumper : Mob {
 
   // Return true if `pos` is on a side with an active bumper.
   bool IsOnBumperSide(Vector3 pos) {
-    Vector3 dir = (pos - transform.position).normalized;
-    float angle = Mathf.Atan2(transform.forward.x, transform.forward.z) - Mathf.Atan2(dir.x, dir.z);
-    int side = (int)AngleToSide(angle);
+    int side = (int)AngleToSide(PosToAngle(pos));
     return (((int)ActiveBumpers & side) != 0);
+  }
+
+  float PosToAngle(Vector3 pos) {
+    Vector3 dir = (pos - transform.position).normalized;
+    return Mathf.Atan2(transform.forward.x, transform.forward.z) - Mathf.Atan2(dir.x, dir.z);
   }
 
   // Given angle [-pi, pi], return BumperSide that corresponds to that angle (relative to forward).
