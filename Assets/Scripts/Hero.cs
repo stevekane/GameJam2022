@@ -9,7 +9,7 @@ public class Hero : MonoBehaviour {
   public float ASCEND_GRAVITY = -10f;
   public float FALL_GRAVITY = -30f;
   public float JUMP_VERTICAL_SPEED = 15f;
-  public float MOVE_SPEED = 5f;
+  public float MOVE_SPEED = 45f;
   public int MAX_AIMING_FRAMES = 300;
 
   public ApeConfig Config;
