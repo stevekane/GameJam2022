@@ -9,7 +9,7 @@ public class UI : MonoBehaviour {
   Selector Selector;
   Selector[] Highlighters;
 
-  void Start() {
+  void Awake() {
     Selector = Instantiate(SelectorPrefab,transform);
     Highlighters = new Selector[MaxInstances];
     for (var i = 0; i < MaxInstances; i++) {
