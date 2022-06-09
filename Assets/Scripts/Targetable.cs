@@ -1,8 +1,8 @@
-using UnityEngine.Events;
 using UnityEngine;
 
 public class Targetable : MonoBehaviour {
-  public float Height;
+  public float Height = 1;
+  public float Radius = 1;
 
   public void PounceTo(Hero hero) {
     Debug.Log("Pounce To");
