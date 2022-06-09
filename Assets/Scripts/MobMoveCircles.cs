@@ -11,7 +11,7 @@ public class MobMoveCircles : MobMove {
     Tangent = transform.right;
   }
 
-  void Update() {
+  void FixedUpdate() {
     transform.position += Config.MoveSpeed * Time.deltaTime * Tangent;
     Tangent = Quaternion.Euler(0, Config.TurnSpeedDeg * Time.deltaTime, 0) * Tangent;
   }

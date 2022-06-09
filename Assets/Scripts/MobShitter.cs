@@ -19,7 +19,7 @@ public class MobShitter : Mob {
     State = MobShitterState.Idle;
   }
 
-  void Update() {
+  void FixedUpdate() {
     switch (State) {
     case MobShitterState.Idle:
       var playerDelta = (Player.transform.position - transform.position);

@@ -9,7 +9,7 @@ public class MobMovePatrol : MobMove {
     Config = GetComponent<Mob>().Config;
   }
 
-  void Update() {
+  void FixedUpdate() {
     var delta = Waypoints[Target].position - transform.position;
     if (delta.sqrMagnitude < .1) {
       Target = (Target + 1) % Waypoints.Length;  // TODO: pause?

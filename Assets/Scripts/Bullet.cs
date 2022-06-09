@@ -10,7 +10,7 @@ public class Bullet : MonoBehaviour {
     bullet.Speed = speed;
   }
 
-  void Update() {
+  void FixedUpdate() {
     transform.position += Speed * Time.deltaTime * Direction;
   }
 
