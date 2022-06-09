@@ -38,7 +38,13 @@ public class EventDriver : MonoBehaviour {
   void Start() {
     const float BASE_FIXED_DELTA_TIME = 0.02f;
     Time.fixedDeltaTime = BASE_FIXED_DELTA_TIME * .1f;
-    Play();
+    if (!Room && RoomPrefab) {
+      Room = Instantiate(RoomPrefab);
+    }
+    PlayState = PlayState.Play;
+    History.Clear();
+    HistoryIndex = 0;
+    Inputs.InPlayBack = false;
   }
 
   void OnDestroy() {
@@ -54,7 +60,6 @@ public class EventDriver : MonoBehaviour {
     History.Clear();
     HistoryIndex = 0;
     Inputs.InPlayBack = false;
-    PlayState = PlayState.Play;
   }
 
   [ContextMenu("Play Back")]
