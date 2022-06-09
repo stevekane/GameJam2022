@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MobShitter : Mob {
@@ -40,7 +38,7 @@ public class MobShitter : Mob {
     State = MobShitterState.Idle;
   }
 
-  public void OnDrawGizmos() {
+  public void OnDrawGizmosSelected() {
     Gizmos.color = UnityEngine.Color.red;
     Gizmos.DrawWireSphere(transform.position, Config.ShootRadius);
   }

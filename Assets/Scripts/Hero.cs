@@ -132,11 +132,10 @@ public class Hero : MonoBehaviour {
     } else if (Perching && Aiming && Target && action.HitDown) {
       var delta = Target.transform.position-transform.position;
       var direction = delta.normalized;
-      // TODO: Not really in love w/ this implementation...
       if (Perch.TryGetComponent(out Throwable throwable)) {
         throwable.Throw(THROW_SPEED*direction);
+        Perch = null;
       }
-      Perch = null;
       Target = null;
       Targets = new Targetable[0];
       transform.rotation = Quaternion.LookRotation(new Vector3(action.Aim.x,0,action.Aim.y));

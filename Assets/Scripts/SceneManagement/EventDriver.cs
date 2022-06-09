@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [Serializable]
 public struct Action {
@@ -70,6 +71,22 @@ public class EventDriver : MonoBehaviour {
     }
     HistoryIndex = 0;
     Room = Instantiate(RoomPrefab);
+    Inputs.InPlayBack = true;
+    PlayState = PlayState.PlayBack;
+  }
+
+  public void RestartScene() {
+    Time.timeScale = 1;
+    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    History.Clear();
+    HistoryIndex = 0;
+    Inputs.InPlayBack = false;
+  }
+
+  public void PlaybackScene() {
+    Time.timeScale = 1;
+    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    HistoryIndex = 0;
     Inputs.InPlayBack = true;
     PlayState = PlayState.PlayBack;
   }
