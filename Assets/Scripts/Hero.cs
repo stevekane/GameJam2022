@@ -6,6 +6,9 @@ public struct BlockEvent { public Vector3 Position; }
 public struct BumpEvent { public Vector3 Position; public Vector3 Velocity; }
 
 public class Hero : MonoBehaviour {
+  public AnimationCurve DistanceScore;
+  public AnimationCurve AngleScore;
+  public float SearchRadius;
   public float GRAVITY = -10f;
   public float JUMP_VERTICAL_SPEED = 15f;
   public float JUMP_ANGLE = 30; // 30 degrees from horizontal
@@ -18,7 +21,6 @@ public class Hero : MonoBehaviour {
   public float PERCH_ATTRACTION_EPSILON = -.1f; // used in framerate-independent exponential lerp
   public int MAX_AIMING_FRAMES = 300;
 
-  public ApeConfig Config;
   public CharacterController Controller;
   public UI UI;
   public Vector3 Velocity;
@@ -35,8 +37,8 @@ public class Hero : MonoBehaviour {
     var delta = target-origin;
     var distance = delta.magnitude;
     var dot = distance > 0 ? Vector3.Dot(delta.normalized,forward) : 1;
-    var a = Config.DistanceScore.Evaluate(1-distance/Config.SearchRadius);
-    var b = Config.AngleScore.Evaluate(Mathf.Lerp(0,1,Mathf.InverseLerp(-1,1,dot)));
+    var a = DistanceScore.Evaluate(1-distance/SearchRadius);
+    var b = AngleScore.Evaluate(Mathf.Lerp(0,1,Mathf.InverseLerp(-1,1,dot)));
     return a + b;
   }
 
