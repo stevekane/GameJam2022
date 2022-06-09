@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public class UI : MonoBehaviour {
-  [SerializeField] int MaxInstances = 32;
+  [SerializeField] int MaxInstances = 128;
   [SerializeField] float VerticalOffset = .5f;
   [SerializeField] Selector SelectorPrefab;
   [SerializeField] Selector HighlighterPrefab;
