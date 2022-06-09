@@ -5,7 +5,7 @@ public class Mob : MonoBehaviour {
   public MobConfig Config;
   internal Animator Animator;
 
-  void Start() {
+  public void Start() {
     Animator = GetComponent<Animator>();
   }
 
@@ -33,7 +33,6 @@ public class Mob : MonoBehaviour {
   // Targetable
   public virtual void OnPounceTo(Hero hero) { }
   public virtual void OnPounceFrom(Hero hero) {
-    Debug.Log($"PouncedFrom: {this} taking damage");
     TakeDamage();
   }
 }

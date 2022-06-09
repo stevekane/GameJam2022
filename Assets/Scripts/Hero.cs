@@ -10,7 +10,6 @@ public class Hero : MonoBehaviour {
   public float JUMP_VERTICAL_SPEED = 15f;
   public float JUMP_ANGLE = 30; // 30 degrees from horizontal
   public float POUNCE_SPEED = 2f;
-  public float MOVE_SPEED = 5f;
   public float GRABBING_DISTANCE = 3f;
   public float TARGETING_DISTANCE = 1000f;
   public float TARGETING_RADIANS = Mathf.PI/2;
