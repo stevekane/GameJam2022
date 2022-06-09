@@ -17,6 +17,28 @@ public class UI : MonoBehaviour {
     }
   }
 
+  void LateUpdate() {
+    if (AimMeter.Target) {
+      var position = AimMeter.Target.transform.position;
+      position.y = position.y + AimMeter.Height;
+      AimMeter.transform.position = position;
+      AimMeter.transform.LookAt(position + Camera.main.transform.forward);
+    }
+    if (Selector.Target) {
+      var position = Selector.Target.transform.position;
+      position.y = position.y + Selector.Target.Height + VerticalOffset;
+      Selector.transform.position = position;
+    }
+    for (int i = 0; i < Highlighters.Length; i++) {
+      var highlighter = Highlighters[i];
+      var target = highlighter.Target;
+      if (target) {
+        var position = target.transform.position;
+        position.y = position.y + target.Height + VerticalOffset;
+        Highlighters[i].transform.position = position;
+      }
+    }
+  }
   public void Select(Targetable target) {
     if (target) {
       Selector.gameObject.SetActive(true);
@@ -35,25 +57,24 @@ public class UI : MonoBehaviour {
       var position = target.transform.position;
       position.y = position.y + target.Height + VerticalOffset;
       highlighter.gameObject.SetActive(true);
-      highlighter.transform.SetParent(target.transform,false);
-      highlighter.transform.position = position;
+      highlighter.Target = target;
       i++;
     }
     for (int n = i; n < Highlighters.Length; n++) {
       var highlighter = Highlighters[n];
       highlighter.gameObject.SetActive(false);
-      highlighter.transform.SetParent(transform,false);
+      highlighter.Target = null;
     }
   }
 
-  public void SetAimMeter(bool display, Vector3 position, int value, int maxValue) {
+  public void SetAimMeter(Transform target, bool display, int value, int maxValue) {
     if (display) {
       AimMeter.gameObject.SetActive(true);
+      AimMeter.Target = target;
       AimMeter.SetFill(maxValue,value);
-      AimMeter.transform.position = position;
-      AimMeter.transform.LookAt(position + Camera.main.transform.forward);
     } else {
       AimMeter.gameObject.SetActive(false);
+      AimMeter.Target = null;
     }
   }
 }

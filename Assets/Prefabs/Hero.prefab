@@ -34,7 +34,7 @@ Transform:
   - {fileID: 4611691242644101307}
   - {fileID: 4568189014920548578}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4102725152112460096
 MonoBehaviour:
@@ -48,18 +48,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c6eef93b3b6d954d98e0b1561d402e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ASCEND_GRAVITY: -45
-  FALL_GRAVITY: -90
+  GRAVITY: -45
   JUMP_VERTICAL_SPEED: 15
+  JUMP_ANGLE: 30
+  POUNCE_SPEED: 2
   MOVE_SPEED: 10
+  GRABBING_DISTANCE: 3
+  TARGETING_DISTANCE: 1000
+  TARGETING_RADIANS: 1.5707964
+  PERCH_ATTRACTION_EPSILON: -0.1
   MAX_AIMING_FRAMES: 300
   Config: {fileID: 11400000, guid: 8873c008d53f0af4da5607c093bc2a39, type: 2}
   Controller: {fileID: 4102725152112460099}
+  UI: {fileID: 0}
   Velocity: {x: 0, y: 0, z: 0}
-  FlightStatus: 0
-  Target: {fileID: 0}
   Perch: {fileID: 0}
-  AimingFramesRemaining: 0
+  Target: {fileID: 0}
+  Targets: []
+  AimingFramesRemaining: 300
 --- !u!143 &4102725152112460099
 CharacterController:
   m_ObjectHideFlags: 0
@@ -76,7 +82,7 @@ CharacterController:
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
+  m_MinMoveDistance: 0
   m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &1604618934501359742
 MonoBehaviour:
