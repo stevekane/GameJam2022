@@ -7,6 +7,6 @@ public class MobFuel : Mob {
 
   public override void Die() {
     Instantiate(ExplosionPrefab, transform.position, Quaternion.identity);
-    Destroy(gameObject, .1f);
+    Destroy(gameObject, .01f);
   }
 }

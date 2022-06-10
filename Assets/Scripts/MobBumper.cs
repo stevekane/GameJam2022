@@ -37,7 +37,7 @@ public class MobBumper : Mob {
   }
 
   public override void ThingHitMe(GameObject thing, ThingHitMeType type, Vector3 contactPos) {
-    if (IsOnBumperSide(contactPos)) {
+    if (type != ThingHitMeType.Explosion && IsOnBumperSide(contactPos)) {
       // TODO: proper direction
       Vector3 dir = (transform.position - contactPos).normalized;
       var body = thing.GetComponent<Rigidbody>();
