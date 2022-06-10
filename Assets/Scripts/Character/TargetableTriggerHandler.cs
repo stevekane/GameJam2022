@@ -4,8 +4,14 @@ public class TargetableTriggerHandler : MonoBehaviour {
   public Hero Hero;
 
   void OnTriggerEnter(Collider other) {
-    if (other.TryGetComponent(out Targetable targetable)) {
-      Hero.Contact(targetable);
-    }
+    Hero.Enter(other.gameObject);
+  }
+
+  void OnTriggerStay(Collider other) {
+    Hero.Stay(other.gameObject);
+  }
+
+  void OnTriggerExit(Collider other) {
+    Hero.Exit(other.gameObject);
   }
 }

@@ -26,7 +26,9 @@ public class Hero : MonoBehaviour {
   public float AirTime;
   public int AimingFramesRemaining;
 
-  List<Targetable> Contacts = new List<Targetable>(32);
+  List<GameObject> Entered = new List<GameObject>(32);
+  List<GameObject> Stayed = new List<GameObject>(32);
+  List<GameObject> Exited = new List<GameObject>(32);
   List<BlockEvent> Blocks = new List<BlockEvent>(32);
   List<BumpEvent> Bumps = new List<BumpEvent>(32);
 
@@ -72,6 +74,15 @@ public class Hero : MonoBehaviour {
       .ToArray();
   }
 
+  T GetFirst<T>(List<GameObject> gameObjects) where T : MonoBehaviour {
+    foreach (var go in gameObjects) {
+      if (go.TryGetComponent(out T t)) {
+        return t;
+      }
+    }
+    return null;
+  }
+
   bool Perching { get => Perch; }
   bool Falling { get => !Controller.isGrounded; }
   bool Grounded { get => Controller.isGrounded; }
@@ -86,8 +97,16 @@ public class Hero : MonoBehaviour {
     Bumps.Add(new BumpEvent { Position = position, Velocity = velocity });
   }
 
-  public void Contact(Targetable targetable) {
-    Contacts.Add(targetable);
+  public void Enter(GameObject gameObject) {
+    Entered.Add(gameObject);
+  }
+
+  public void Stay(GameObject gameObject) {
+    Stayed.Add(gameObject);
+  }
+
+  public void Exit(GameObject gameObject) {
+    Exited.Add(gameObject);
   }
 
   Quaternion TryLookWith(Vector2 v2, Quaternion q0) {
@@ -151,7 +170,7 @@ public class Hero : MonoBehaviour {
       Perch = null;
       Targets = new Targetable[0];
       transform.rotation = Quaternion.LookRotation(new Vector3(action.Aim.x,0,action.Aim.y));
-    // Throw ACTION
+    // Perching Throw ACTION
     } else if (Perching && Aiming && Target && action.HitDown) {
       var delta = Target.transform.position-transform.position;
       var direction = delta.normalized;
@@ -162,6 +181,23 @@ public class Hero : MonoBehaviour {
       Target = null;
       Targets = new Targetable[0];
       transform.rotation = Quaternion.LookRotation(new Vector3(action.Aim.x,0,action.Aim.y));
+    // Throw ACTION
+    } else if (Grounded && Held && action.HitDown) {
+      Velocity = new Vector3(action.Move.x*MOVE_SPEED,dt*GRAVITY,action.Move.y*MOVE_SPEED);
+      Held.Throw(THROW_SPEED*transform.forward);
+      Held = null;
+      Perch = null;
+      Targets = new Targetable[0];
+      Target = null;
+      transform.rotation = TryLookWith(action.Move,transform.rotation);
+    // Hold ACTION
+    } else if (Grounded && Stayed.Count > 0 && action.HitDown) {
+      Velocity = new Vector3(action.Move.x*MOVE_SPEED,dt*GRAVITY,action.Move.y*MOVE_SPEED);
+      Held = GetFirst<Throwable>(Stayed);
+      Perch = null;
+      Targets = new Targetable[0];
+      Target = null;
+      transform.rotation = TryLookWith(action.Move,transform.rotation);
     } else if (Perching && Aiming) {
       Velocity = PullTowards(transform.position,Perch.transform.position,PERCH_ATTRACTION_EPSILON,dt);
       Targets = FindTargets(TargetingConfig.MAX_SEARCH_DISTANCE,Mathf.Deg2Rad*TargetingConfig.MAX_SEARCH_ANGLE);
@@ -203,10 +239,10 @@ public class Hero : MonoBehaviour {
       Target = null;
       transform.rotation = TryLookWith(action.Move,transform.rotation);
     // Perch ACTION
-    } else if (Falling && Contacts.Count > 0) {
+    } else if (Falling && Entered.Count > 0) {
       Velocity = Vector3.zero;
-      Perch = Contacts.Contains(Target) ? Target : Contacts[0];
-      Perch.PounceTo(this);
+      Perch = GetFirst<Targetable>(Entered);
+      Perch?.PounceTo(this);
       Targets = new Targetable[0];
       Target = null;
       transform.rotation = transform.rotation;
@@ -226,6 +262,12 @@ public class Hero : MonoBehaviour {
       transform.rotation = TryLookWith(action.Move,transform.rotation);
     }
 
+    if (Held) {
+      var target = transform.position+2*Vector3.up;
+      var current = Held.transform.position;
+      var next = Vector3.Lerp(target,current,Mathf.Exp(-.4f));
+      Held.transform.position = next;
+    }
     AimingFramesRemaining = action.Aim.magnitude > 0
       ? Mathf.Max(AimingFramesRemaining-1,0)
       : Mathf.Min(AimingFramesRemaining+1,TargetingConfig.MAX_TARGETING_FRAMES);
@@ -237,7 +279,9 @@ public class Hero : MonoBehaviour {
     UI.SetAimMeter(transform,displayMeter,AimingFramesRemaining,maxTargeting);
     UI.Select(Target);
     UI.Highlight(Targets,Targets.Length);
-    Contacts.Clear();
+    Entered.Clear();
+    Stayed.Clear();
+    Exited.Clear();
     Blocks.Clear();
     Bumps.Clear();
   }

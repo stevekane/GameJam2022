@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Throwable : MonoBehaviour {
@@ -20,6 +18,7 @@ public class Throwable : MonoBehaviour {
   public void Throw(Vector3 impulse) {
     if (State == ThrowableState.Airborne)
       return;  // Only throw it once.
+    Destroy(GetComponent<Targetable>());
     Destroy(GetComponent<Hittable>()); // We will handle collisions from now on.
     Body.isKinematic = false;
     Body.AddForce(impulse, ForceMode.Impulse);
