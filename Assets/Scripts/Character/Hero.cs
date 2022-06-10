@@ -6,27 +6,24 @@ public struct BlockEvent { public Vector3 Position; }
 public struct BumpEvent { public Vector3 Position; public Vector3 Velocity; }
 
 public class Hero : MonoBehaviour {
-  public AnimationCurve DistanceScore;
-  public AnimationCurve AngleScore;
-  public float SearchRadius;
   public float GRAVITY = -10f;
-  public float JUMP_VERTICAL_SPEED = 15f;
-  public float JUMP_ANGLE = 30; // 30 degrees from horizontal
   public float MOVE_SPEED = 45;
   public float POUNCE_SPEED = 2f;
   public float GRABBING_DISTANCE = 3f;
-  public float TARGETING_DISTANCE = 1000f;
-  public float TARGETING_RADIANS = Mathf.PI/2;
   public float THROW_SPEED = 50f;
   public float PERCH_ATTRACTION_EPSILON = -.1f; // used in framerate-independent exponential lerp
-  public int MAX_AIMING_FRAMES = 300;
 
-  public CharacterController Controller;
+  public JumpConfig JumpConfig;
+  public TargetingConfig TargetingConfig;
+
   public UI UI;
+  public CharacterController Controller;
   public Vector3 Velocity;
+  public Throwable Held;
   public Targetable Perch;
   public Targetable Target;
   public Targetable[] Targets;
+  public float AirTime;
   public int AimingFramesRemaining;
 
   List<Targetable> Contacts = new List<Targetable>(32);
@@ -37,8 +34,8 @@ public class Hero : MonoBehaviour {
     var delta = target-origin;
     var distance = delta.magnitude;
     var dot = distance > 0 ? Vector3.Dot(delta.normalized,forward) : 1;
-    var a = DistanceScore.Evaluate(1-distance/SearchRadius);
-    var b = AngleScore.Evaluate(Mathf.Lerp(0,1,Mathf.InverseLerp(-1,1,dot)));
+    var a = TargetingConfig.DISTANCE_SCORE.Evaluate(1-distance/TargetingConfig.MAX_SEARCH_DISTANCE);
+    var b = TargetingConfig.ANGLE_SCORE.Evaluate(Mathf.Lerp(0,1,Mathf.InverseLerp(-1,1,dot)));
     return a + b;
   }
 
@@ -70,6 +67,7 @@ public class Hero : MonoBehaviour {
     var forward = transform.forward;
     var includeInactive = false;
     return FindObjectsOfType<Targetable>(includeInactive)
+      .Where(t => Vector3.Distance(t.transform.position,transform.position) <= maxDistance)
       .Where(t => Within(origin,t.transform.position,forward,maxRadians))
       .ToArray();
   }
@@ -114,6 +112,31 @@ public class Hero : MonoBehaviour {
     return velocity;
   }
 
+  Vector3 FallAcceleration(Vector3 desiredMove) { 
+    float normalizedTime = AirTime/JumpConfig.MAX_STEERING_TIME;
+    float power = JumpConfig.MAX_STEERING_FACTOR*JumpConfig.STEERING_STRENGTH.Evaluate(normalizedTime);
+    Vector3 steering = power*desiredMove;
+    Vector3 gravity = GRAVITY*Vector3.up;
+    return gravity+steering;
+  }
+
+  /*
+  --Jump steering
+
+  There are three ways to windup holding a holdable:
+    1. Be close enough to it to pick it up
+    2. Be close enough to target it and pull it to you
+    3. Be perched on top of it
+  
+  In all cases, once you are holding onto it, you will be able
+  to throw it with the throw button.
+
+  Pickup if near
+  Targeted ranged pull+pickup
+  Homing on the ranged pull
+  Homing on the pounce
+  OnContact OnStay and OnLeave
+  */
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
     var action = Inputs.Action;
@@ -123,7 +146,7 @@ public class Hero : MonoBehaviour {
       var delta = Target.transform.position-transform.position;
       var direction = delta.normalized;
       var distance = delta.magnitude;
-      Velocity = JumpVelocity(direction,distance,JUMP_ANGLE);
+      Velocity = JumpVelocity(direction,distance,JumpConfig.JUMP_ANGLE);
       Perch?.PounceFrom(this);
       Perch = null;
       Targets = new Targetable[0];
@@ -141,14 +164,14 @@ public class Hero : MonoBehaviour {
       transform.rotation = Quaternion.LookRotation(new Vector3(action.Aim.x,0,action.Aim.y));
     } else if (Perching && Aiming) {
       Velocity = PullTowards(transform.position,Perch.transform.position,PERCH_ATTRACTION_EPSILON,dt);
-      Targets = FindTargets(TARGETING_DISTANCE,TARGETING_RADIANS);
+      Targets = FindTargets(TargetingConfig.MAX_SEARCH_DISTANCE,Mathf.Deg2Rad*TargetingConfig.MAX_SEARCH_ANGLE);
       Target = Best(null,Targets);
       transform.rotation = Quaternion.LookRotation(new Vector3(action.Aim.x,0,action.Aim.y));
     // Dismount ACTION
     } else if (Perching && action.PounceDown) {
       var aimRotation = TryLookWith(action.Move,transform.rotation);
       var direction = aimRotation*Vector3.forward;
-      Velocity = JumpVelocity(direction,Perch.Radius,JUMP_ANGLE);
+      Velocity = JumpVelocity(direction,Perch.Radius,JumpConfig.JUMP_ANGLE);
       Perch = null;
       Targets = new Targetable[0];
       Target = null;
@@ -160,7 +183,9 @@ public class Hero : MonoBehaviour {
       transform.rotation = TryLookWith(action.Move,transform.rotation);
     // Jump ACTION
     } else if (Grounded && action.PounceDown) {
-      Velocity = new Vector3(action.Move.x*MOVE_SPEED,JUMP_VERTICAL_SPEED,action.Move.y*MOVE_SPEED);
+      var boost = JumpConfig.JUMP_BOOST;
+      var upward = JumpConfig.JUMP_Y_VELOCITY;
+      Velocity = new Vector3(action.Move.x*MOVE_SPEED*boost,upward,action.Move.y*MOVE_SPEED*boost);
       Perch = null;
       Targets = new Targetable[0];
       Target = null;
@@ -168,7 +193,7 @@ public class Hero : MonoBehaviour {
     } else if (Grounded && Aiming) {
       Velocity = new Vector3(action.Move.x*MOVE_SPEED,dt*GRAVITY,action.Move.y*MOVE_SPEED);
       Perch = null;
-      Targets = FindTargets(TARGETING_DISTANCE,TARGETING_RADIANS);
+      Targets = FindTargets(TargetingConfig.MAX_SEARCH_DISTANCE,Mathf.Deg2Rad*TargetingConfig.MAX_SEARCH_ANGLE);
       Target = Best(null,Targets);
       transform.rotation = Quaternion.LookRotation(new Vector3(action.Aim.x,0,action.Aim.y));
     } else if (Grounded) {
@@ -186,29 +211,32 @@ public class Hero : MonoBehaviour {
       Target = null;
       transform.rotation = transform.rotation;
     } else if (Falling && Aiming) {
-      Velocity = Velocity+dt*GRAVITY*Vector3.up;
+      var move = new Vector3(action.Move.x,0,action.Move.y);
+      Velocity = Velocity+dt*FallAcceleration(move);
       Perch = null;
-      Targets = FindTargets(TARGETING_DISTANCE,TARGETING_RADIANS);
+      Targets = FindTargets(TargetingConfig.MAX_SEARCH_DISTANCE,Mathf.Deg2Rad*TargetingConfig.MAX_SEARCH_ANGLE);
       Target = Best(null,Targets);
       transform.rotation = Quaternion.LookRotation(new Vector3(action.Aim.x,0,action.Aim.y));
     } else if (Falling) {
-      Velocity = Velocity+dt*GRAVITY*Vector3.up;
+      var move = new Vector3(action.Move.x,0,action.Move.y);
+      Velocity = Velocity+dt*FallAcceleration(move);
       Perch = null;
       Targets = new Targetable[0];
       Target = null;
       transform.rotation = TryLookWith(action.Move,transform.rotation);
     }
-    
-    if (action.Aim.magnitude > 0) {
-      AimingFramesRemaining = Mathf.Max(AimingFramesRemaining-1,0);
-    } else {
-      AimingFramesRemaining = Mathf.Min(AimingFramesRemaining+1,MAX_AIMING_FRAMES);
-    }
+
+    AimingFramesRemaining = action.Aim.magnitude > 0
+      ? Mathf.Max(AimingFramesRemaining-1,0)
+      : Mathf.Min(AimingFramesRemaining+1,TargetingConfig.MAX_TARGETING_FRAMES);
+    AirTime = Falling ? AirTime+dt : 0;
     Controller.Move(Velocity*dt);
+    Time.timeScale = Aiming ? .1f : 1;
+    var maxTargeting = TargetingConfig.MAX_TARGETING_FRAMES;
+    var displayMeter = AimingFramesRemaining < maxTargeting;
+    UI.SetAimMeter(transform,displayMeter,AimingFramesRemaining,maxTargeting);
     UI.Select(Target);
     UI.Highlight(Targets,Targets.Length);
-    UI.SetAimMeter(transform,AimingFramesRemaining < MAX_AIMING_FRAMES,AimingFramesRemaining,MAX_AIMING_FRAMES);
-    Time.timeScale = Aiming ? .1f : 1;
     Contacts.Clear();
     Blocks.Clear();
     Bumps.Clear();
