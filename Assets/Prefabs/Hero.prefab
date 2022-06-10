@@ -48,72 +48,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c6eef93b3b6d954d98e0b1561d402e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DistanceScore:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0.3
-      outSlope: 0.3
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0.3
-      inSlope: 0.3
-      outSlope: 0.3
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  AngleScore:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  SearchRadius: 100
   GRAVITY: -45
-  JUMP_VERTICAL_SPEED: 15
-  JUMP_ANGLE: 30
   MOVE_SPEED: 10
   POUNCE_SPEED: 2
   GRABBING_DISTANCE: 3
-  TARGETING_DISTANCE: 1000
-  TARGETING_RADIANS: 1.5707964
   THROW_SPEED: 50
   PERCH_ATTRACTION_EPSILON: -0.1
-  MAX_AIMING_FRAMES: 300
-  Controller: {fileID: 4102725152112460099}
+  JumpConfig: {fileID: 11400000, guid: b2726990b739e3946a511ef492198e27, type: 2}
+  TargetingConfig: {fileID: 11400000, guid: 0efd853de7380fc409741fe076884d50, type: 2}
   UI: {fileID: 0}
+  Controller: {fileID: 4102725152112460099}
   Velocity: {x: 0, y: 0, z: 0}
+  Held: {fileID: 0}
   Perch: {fileID: 0}
   Target: {fileID: 0}
   Targets: []
+  AirTime: 0
   AimingFramesRemaining: 300
 --- !u!143 &4102725152112460099
 CharacterController:
