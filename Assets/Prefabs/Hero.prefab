@@ -49,17 +49,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GRAVITY: -45
-  MOVE_SPEED: 10
   POUNCE_SPEED: 2
   GRABBING_DISTANCE: 3
   THROW_SPEED: 50
   PERCH_ATTRACTION_EPSILON: -0.1
+  MoveConfig: {fileID: 11400000, guid: 6c634445e672ba3488330fc5b90e175e, type: 2}
   JumpConfig: {fileID: 11400000, guid: b2726990b739e3946a511ef492198e27, type: 2}
   TargetingConfig: {fileID: 11400000, guid: 0efd853de7380fc409741fe076884d50, type: 2}
   UI: {fileID: 0}
   Controller: {fileID: 4102725152112460099}
   Velocity: {x: 0, y: 0, z: 0}
-  Held: {fileID: 0}
+  ArmState: 0
+  ArmFramesRemaining: 0
+  ArmTarget: {fileID: 0}
   Perch: {fileID: 0}
   Target: {fileID: 0}
   Targets: []

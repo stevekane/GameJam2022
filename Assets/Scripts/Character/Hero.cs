@@ -2,24 +2,29 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
+// TODO: These don't need to be public if they are not used publicly below
 public struct BlockEvent { public Vector3 Position; }
 public struct BumpEvent { public Vector3 Position; public Vector3 Velocity; }
+public enum ArmState { Free, Reaching, Pulling, Holding }
 
 public class Hero : MonoBehaviour {
   public float GRAVITY = -10f;
-  public float MOVE_SPEED = 45;
+  public float FALL_GRAVITY_FACTOR = 3;
   public float POUNCE_SPEED = 2f;
   public float GRABBING_DISTANCE = 3f;
   public float THROW_SPEED = 50f;
   public float PERCH_ATTRACTION_EPSILON = -.1f; // used in framerate-independent exponential lerp
 
+  public MoveConfig MoveConfig;
   public JumpConfig JumpConfig;
   public TargetingConfig TargetingConfig;
 
   public UI UI;
   public CharacterController Controller;
   public Vector3 Velocity;
-  public Throwable Held;
+  public ArmState ArmState;
+  public float ArmFramesRemaining;
+  public Throwable ArmTarget;
   public Targetable Perch;
   public Targetable Target;
   public Targetable[] Targets;
@@ -64,6 +69,9 @@ public class Hero : MonoBehaviour {
     return best;
   }
 
+  // TODO: This is dog-slow due to allocation. Probably some way to replace
+  // this with a simple cached global system for Targetables or some similarly
+  // annoying solution.
   Targetable[] FindTargets(float maxDistance,float maxRadians) {
     var origin = transform.position;
     var forward = transform.forward;
@@ -83,6 +91,10 @@ public class Hero : MonoBehaviour {
     return null;
   }
 
+  bool Free { get => ArmState == ArmState.Free; }
+  bool Reaching { get => ArmState == ArmState.Reaching; }
+  bool Pulling { get => ArmState == ArmState.Pulling; }
+  bool Holding { get => ArmState == ArmState.Holding; }
   bool Perching { get => Perch; }
   bool Falling { get => !Controller.isGrounded; }
   bool Grounded { get => Controller.isGrounded; }
@@ -131,16 +143,28 @@ public class Hero : MonoBehaviour {
     return velocity;
   }
 
-  Vector3 FallAcceleration(Vector3 desiredMove) { 
-    float normalizedTime = AirTime/JumpConfig.MAX_STEERING_TIME;
-    float power = JumpConfig.MAX_STEERING_FACTOR*JumpConfig.STEERING_STRENGTH.Evaluate(normalizedTime);
-    Vector3 steering = power*desiredMove;
-    Vector3 gravity = GRAVITY*Vector3.up;
-    return gravity+steering;
+  Vector3 MoveVelocity(Vector3 desiredMove, float dt) {
+    var currentVelocity = new Vector3(Velocity.x,0,Velocity.z);
+    var desiredVelocity = desiredMove*MoveConfig.MOVE_SPEED;
+    var acceleration = desiredVelocity-currentVelocity;
+    var direction = acceleration.normalized;
+    var magnitude = Mathf.Min(MoveConfig.MAX_ACCELERATION_MAGNITUDE,acceleration.magnitude);
+    var gravity = GRAVITY*Vector3.up;
+    return currentVelocity+magnitude*direction+dt*gravity;
+  }
+
+  Vector3 FallAcceleration(Vector3 desiredMove, float dt) { 
+    var normalizedTime = AirTime/JumpConfig.MAX_STEERING_TIME;
+    var power = JumpConfig.MAX_STEERING_FACTOR*JumpConfig.STEERING_STRENGTH.Evaluate(normalizedTime);
+    var gravityFactor = Velocity.y < 0 ? FALL_GRAVITY_FACTOR : 1;
+    var gravity = gravityFactor*GRAVITY*Vector3.up;
+    var steering = power*desiredMove;
+    return dt*(gravity+steering);
   }
 
   /*
   --Jump steering
+  --Pickup if near
 
   There are three ways to windup holding a holdable:
     1. Be close enough to it to pick it up
@@ -150,7 +174,17 @@ public class Hero : MonoBehaviour {
   In all cases, once you are holding onto it, you will be able
   to throw it with the throw button.
 
-  Pickup if near
+  Pulling is a 3-phase operation
+    Reaching
+      GOTO pulling when reach target
+    Pulling
+      GOTO 
+
+  ArmState = Free | Reaching(Holdable) | Pulling(Holdable) | Holding(Holdable)
+  LegState = Falling | Grounded | Perched(Targetable)
+
+  Free arms can begin Reaching when Aiming ∧ HasTarget
+
   Targeted ranged pull+pickup
   Homing on the ranged pull
   Homing on the pounce
@@ -182,18 +216,21 @@ public class Hero : MonoBehaviour {
       Targets = new Targetable[0];
       transform.rotation = Quaternion.LookRotation(new Vector3(action.Aim.x,0,action.Aim.y));
     // Throw ACTION
-    } else if (Grounded && Held && action.HitDown) {
-      Velocity = new Vector3(action.Move.x*MOVE_SPEED,dt*GRAVITY,action.Move.y*MOVE_SPEED);
-      Held.Throw(THROW_SPEED*transform.forward);
-      Held = null;
+    } else if (Grounded && Holding && ArmTarget && action.HitDown) {
+      var move = new Vector3(action.Move.x,0,action.Move.y);
+      Velocity = MoveVelocity(move,dt);
+      ArmTarget.Throw(THROW_SPEED*transform.forward);
+      ArmTarget = null;
       Perch = null;
       Targets = new Targetable[0];
       Target = null;
       transform.rotation = TryLookWith(action.Move,transform.rotation);
     // Hold ACTION
     } else if (Grounded && Stayed.Count > 0 && action.HitDown) {
-      Velocity = new Vector3(action.Move.x*MOVE_SPEED,dt*GRAVITY,action.Move.y*MOVE_SPEED);
-      Held = GetFirst<Throwable>(Stayed);
+      var move = new Vector3(action.Move.x,0,action.Move.y);
+      Velocity = MoveVelocity(move,dt);
+      ArmTarget = GetFirst<Throwable>(Stayed);
+      ArmState = ArmState.Holding;
       Perch = null;
       Targets = new Targetable[0];
       Target = null;
@@ -221,19 +258,22 @@ public class Hero : MonoBehaviour {
     } else if (Grounded && action.PounceDown) {
       var boost = JumpConfig.JUMP_BOOST;
       var upward = JumpConfig.JUMP_Y_VELOCITY;
-      Velocity = new Vector3(action.Move.x*MOVE_SPEED*boost,upward,action.Move.y*MOVE_SPEED*boost);
+      var speed = MoveConfig.MOVE_SPEED;
+      Velocity = new Vector3(action.Move.x*speed*boost,upward,action.Move.y*speed*boost);
       Perch = null;
       Targets = new Targetable[0];
       Target = null;
       transform.rotation = TryLookWith(action.Move,transform.rotation);
     } else if (Grounded && Aiming) {
-      Velocity = new Vector3(action.Move.x*MOVE_SPEED,dt*GRAVITY,action.Move.y*MOVE_SPEED);
+      var move = new Vector3(action.Move.x,0,action.Move.y);
+      Velocity = MoveVelocity(move,dt);
       Perch = null;
       Targets = FindTargets(TargetingConfig.MAX_SEARCH_DISTANCE,Mathf.Deg2Rad*TargetingConfig.MAX_SEARCH_ANGLE);
       Target = Best(null,Targets);
       transform.rotation = Quaternion.LookRotation(new Vector3(action.Aim.x,0,action.Aim.y));
     } else if (Grounded) {
-      Velocity = new Vector3(action.Move.x*MOVE_SPEED,dt*GRAVITY,action.Move.y*MOVE_SPEED);
+      var move = new Vector3(action.Move.x,0,action.Move.y);
+      Velocity = MoveVelocity(move,dt);
       Perch = null;
       Targets = new Targetable[0];
       Target = null;
@@ -248,25 +288,25 @@ public class Hero : MonoBehaviour {
       transform.rotation = transform.rotation;
     } else if (Falling && Aiming) {
       var move = new Vector3(action.Move.x,0,action.Move.y);
-      Velocity = Velocity+dt*FallAcceleration(move);
+      Velocity = Velocity+FallAcceleration(move,dt);
       Perch = null;
       Targets = FindTargets(TargetingConfig.MAX_SEARCH_DISTANCE,Mathf.Deg2Rad*TargetingConfig.MAX_SEARCH_ANGLE);
       Target = Best(null,Targets);
       transform.rotation = Quaternion.LookRotation(new Vector3(action.Aim.x,0,action.Aim.y));
     } else if (Falling) {
       var move = new Vector3(action.Move.x,0,action.Move.y);
-      Velocity = Velocity+dt*FallAcceleration(move);
+      Velocity = Velocity+FallAcceleration(move,dt);
       Perch = null;
       Targets = new Targetable[0];
       Target = null;
       transform.rotation = TryLookWith(action.Move,transform.rotation);
     }
 
-    if (Held) {
+    if (Holding && ArmTarget) {
       var target = transform.position+2*Vector3.up;
-      var current = Held.transform.position;
+      var current = ArmTarget.transform.position;
       var next = Vector3.Lerp(target,current,Mathf.Exp(-.4f));
-      Held.transform.position = next;
+      ArmTarget.transform.position = next;
     }
     AimingFramesRemaining = action.Aim.magnitude > 0
       ? Mathf.Max(AimingFramesRemaining-1,0)
