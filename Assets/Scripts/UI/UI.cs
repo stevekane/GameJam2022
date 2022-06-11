@@ -1,8 +1,9 @@
 using UnityEngine;
 
 public class UI : MonoBehaviour {
-  [SerializeField] int MaxInstances = 128;
+  [SerializeField] int MaxInstances = 32;
   [SerializeField] float VerticalOffset = .5f;
+  [SerializeField] float HighlightVerticalOffset = 4f;
   [SerializeField] Selector SelectorPrefab;
   [SerializeField] Selector HighlighterPrefab;
   [SerializeField] AimMeter AimMeter;
@@ -34,7 +35,7 @@ public class UI : MonoBehaviour {
       var target = highlighter.Target;
       if (target) {
         var position = target.transform.position;
-        position.y = position.y + target.Height + VerticalOffset;
+        position.y = position.y + HighlightVerticalOffset;
         Highlighters[i].transform.position = position;
       }
     }
@@ -54,8 +55,6 @@ public class UI : MonoBehaviour {
     for (int n = 0; n < count; n++) {
       var highlighter = Highlighters[n];
       var target = targets[n];
-      var position = target.transform.position;
-      position.y = position.y + target.Height + VerticalOffset;
       highlighter.gameObject.SetActive(true);
       highlighter.Target = target;
       i++;

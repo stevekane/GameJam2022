@@ -9,9 +9,43 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a718337ec8ba55346afe69af818acab7, type: 3}
-  m_Name: TargetingConfig
+  m_Script: {fileID: 11500000, guid: c3db0958c3fa62a4b93b56a7756a81a3, type: 3}
+  m_Name: HeroConfig
   m_EditorClassIdentifier: 
+  MOVE_SPEED: 10
+  MAX_XZ_ACCELERATION: 0.2
+  JUMP_Y_VELOCITY: 15
+  JUMP_XZ_MULTIPLIER: 1.5
+  POUNCE_XZ_MULTIPLER: 3
+  STEERING_STRENGTH:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  MAX_STEERING_TIME: 0.2
+  MAX_STEERING_MULTIPLIER: 15
+  GRAVITY: -40
+  FALL_GRAVITY_MULTIPLIER: 3
+  PERCH_ATTRACTION_EPSILON: -0.1
   DISTANCE_SCORE:
     serializedVersion: 2
     m_Curve:
@@ -61,5 +95,9 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   MAX_TARGETING_FRAMES: 300
-  MAX_SEARCH_DISTANCE: 10
-  MAX_SEARCH_ANGLE: 90
+  MAX_TARGETING_DISTANCE: 10
+  MAX_TARGETING_ANGLE: 90
+  HOLD_ATTRACTION_EPSILON: -0.1
+  MAX_REACHING_FRAMES: 20
+  MAX_PULLING_FRAMES: 15
+  THROW_SPEED: 50
