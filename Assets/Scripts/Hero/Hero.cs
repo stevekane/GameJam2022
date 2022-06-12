@@ -42,7 +42,7 @@ public class Hero : MonoBehaviour {
     var dot = distance > 0 ? Vector3.Dot(delta.normalized,forward) : 1;
     var a = Config.DISTANCE_SCORE.Evaluate(1-distance/Config.MAX_TARGETING_DISTANCE);
     var b = Config.ANGLE_SCORE.Evaluate(Mathf.Lerp(0,1,Mathf.InverseLerp(-1,1,dot)));
-    return a + b;
+    return a+b;
   }
 
   bool Within(Vector3 origin, Vector3 target, Vector3 forward, float radians) {
@@ -58,8 +58,6 @@ public class Hero : MonoBehaviour {
     for (int i = 0; i < targets.Length; i++) {
       var targetable = targets[i];
       var score = Score(transform.forward,transform.position,targetable.transform.position);
-      var delta = targetable.transform.position-transform.position;
-      var distance = delta.magnitude;
       if (targetable != ignore && score > bestScore) {
         best = targetable;
         bestScore = score;
@@ -68,10 +66,7 @@ public class Hero : MonoBehaviour {
     return best;
   }
 
-  // TODO: This is dog-slow due to allocation. Probably some way to replace
-  // this with a simple cached global system for Targetables or some similarly
-  // annoying solution.
-  Targetable[] FindTargets(float maxDistance,float maxRadians) {
+  Targetable[] FindTargets(float maxDistance, float maxRadians) {
     var origin = transform.position;
     var forward = transform.forward;
     var includeInactive = false;
@@ -103,7 +98,7 @@ public class Hero : MonoBehaviour {
   bool Falling { get => !Controller.isGrounded && !LegTarget; }
   bool Grounded { get => Controller.isGrounded && !LegTarget; }
   bool Moving { get => Inputs.Action.Move.magnitude > 0; }
-  bool Aiming { get => Inputs.Action.Aim.magnitude > 0 && AimingFramesRemaining > 0; }
+  bool Aiming { get => Inputs.Action.Aim.magnitude > 0; }
 
   public void Block(Vector3 position) {
     Blocks.Add(new BlockEvent { Position = position });
@@ -123,10 +118,6 @@ public class Hero : MonoBehaviour {
 
   public void Exit(GameObject gameObject) {
     Exited.Add(gameObject);
-  }
-
-  Quaternion TryLookWith(Vector2 v2, Quaternion q0) {
-    return v2.magnitude > 0 ? Quaternion.LookRotation(new Vector3(v2.x,0,v2.y)) : q0;
   }
 
   Vector3 MoveAcceleration(Vector3 desiredMove, float dt) {
@@ -149,6 +140,7 @@ public class Hero : MonoBehaviour {
   }
 
   void Perch(Targetable targetable) {
+    AirTime = 0;
     LegTarget = targetable;
     LegTarget?.PounceTo(this);
     Velocity = Vector3.zero;
@@ -214,29 +206,23 @@ public class Hero : MonoBehaviour {
     Targets = FindTargets(targetingDistance,targetingRadians);
     Target = Best(LegTarget,Targets);
 
-    /*
-    Implement Throw
-    Implement Power Throw?
-    Implement Reach / Pull with placeholder graphics
-    */
-
     // TODO: Should there be two transitions: Arms and Legs instead of a single disjunction
     if (Falling && TryGetFirst(Entered,out Targetable targetable)) {
       Perch(targetable);
     } else if (Aiming && Target && action.PounceDown) {
       Pounce(Target.transform.position);
-    } else if (Aiming && Free && Target && action.HitDown && Target.TryGetComponent(out Throwable distantThrowable)) {
-      Reach(distantThrowable);
     } else if ((Grounded || Perching) && !Aiming && action.PounceDown) {
       Jump(action.MoveXZ);
+    } else if (Holding && action.HitDown) {
+      Throw(transform.forward,Config.THROW_SPEED);
+    } else if (Aiming && Free && action.HitDown && Target && Target.TryGetComponent(out Throwable distantThrowable)) {
+      Reach(distantThrowable);
     } else if (Grounded && !Aiming && action.HitDown && TryGetFirst(Stayed,out Throwable throwable)) {
       Hold(throwable);
     } else if (Reaching && ArmFramesRemaining <= 0) {
       Pull(ArmTarget);
     } else if (Pulling && ArmFramesRemaining <= 0) {
       Hold(ArmTarget);
-    } else if (Grounded) {
-      Walk(action.MoveXZ);
     }
 
     if (LegTarget) {
@@ -282,13 +268,13 @@ public class Hero : MonoBehaviour {
     if (action.Aim.magnitude > 0) {
       UI.Select(Target);
       UI.Highlight(Targets,Targets.Length);
+      Time.timeScale = AimingFramesRemaining <= 0 ? 1 : .1f;
       AimingFramesRemaining = Mathf.Max(0,AimingFramesRemaining-1);
-      Time.timeScale = .1f;
     } else {
-      AimingFramesRemaining = Mathf.Min(AimingFramesRemaining+1,Config.MAX_TARGETING_FRAMES);
-      Time.timeScale = 1;
       UI.Select(null);
       UI.Highlight(Targets,0);
+      Time.timeScale = 1;
+      AimingFramesRemaining = Mathf.Min(AimingFramesRemaining+1,Config.MAX_TARGETING_FRAMES);
     }
 
     {

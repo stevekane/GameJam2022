@@ -49,6 +49,7 @@ public class HeroConfig : ScriptableObject {
 
   [Header("Holding")]
   [Tooltip("Rate to pull held target to player (exponential lerp)")]
+  [Range(-10,-.1f)]
   public float HOLD_ATTRACTION_EPSILON = -.1f;
   [Tooltip("Number of frames to reach for a throwable")]
   public int MAX_REACHING_FRAMES = 40;
