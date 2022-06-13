@@ -6,6 +6,8 @@ public class HeroConfig : ScriptableObject {
   public float MOVE_SPEED = 45f;
   [Tooltip("Maximum amount of instant acceleration possible while on ground")]
   public float MAX_XZ_ACCELERATION = .2f;
+  [Tooltip("Scale animation play speed by this factor")]
+  public float MOVE_ANIMATION_MULTIPLIER = 1f;
 
   [Header("Jumping")]
   [Tooltip("Initial upward velocity when jumping")]

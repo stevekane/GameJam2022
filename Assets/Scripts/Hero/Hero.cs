@@ -208,40 +208,6 @@ public class Hero : MonoBehaviour {
     var targetingDistance = Config.MAX_TARGETING_DISTANCE;
     var targetingRadians = Config.MAX_TARGETING_ANGLE*Mathf.Deg2Rad;
 
-    // TODO: Delete or move for Gizmos
-    // DEBUG to get data for Animator straight
-    // {
-    //   UI.Select(Target);
-    //   UI.Highlight(Targets,Targets.Length);
-    //   UI.SetAimMeter(transform,false,300,300);
-    //   var move = action.MoveXZ;
-    //   var aim = action.AimXZ;
-    //   if (move.magnitude != 0 && aim.magnitude != 0) {
-    //     var u = Vector3.up*2.5f;
-    //     var p = transform.position;
-    //     var aimRight = new Vector3(aim.z,0,-aim.x);
-    //     var f = Vector3.Dot(move,aim);
-    //     var r = Vector3.Dot(move,aimRight);
-    //     var a = new Vector3(r,0,f);
-    //     Animator.SetFloat("Forward",a.z);
-    //     Animator.SetFloat("Right",a.x);
-    //     transform.forward = aim;
-    //   } else if (move.magnitude != 0) {
-    //     Animator.SetFloat("Forward",1);
-    //     Animator.SetFloat("Right",0);
-    //     transform.forward = move;
-    //   } else if (aim.magnitude != 0) {
-    //     transform.forward = aim;
-    //     Animator.SetFloat("Forward",0);
-    //     Animator.SetFloat("Right",0);
-    //   } else {
-    //     Animator.SetFloat("Forward",0);
-    //     Animator.SetFloat("Right",0);
-    //   }
-    //   return;
-    // }
-
-
     Targets = FindTargets(targetingDistance,targetingRadians);
     Target = Best(LegTarget,Targets);
 
@@ -302,6 +268,19 @@ public class Hero : MonoBehaviour {
       ArmFramesRemaining = Mathf.Max(0,ArmFramesRemaining-1);
     } else if (Pulling) {
       ArmFramesRemaining = Mathf.Max(0,ArmFramesRemaining-1);
+    }
+
+    {
+      var forward = transform.forward;
+      var right = transform.right;
+      var velocityxz = new Vector3(Velocity.x,0,Velocity.z);
+      var speed = velocityxz.magnitude;
+      var f = Vector3.Dot(velocityxz,forward);
+      var r = Vector3.Dot(velocityxz,right);
+      var a = new Vector3(r,0,f);
+      Animator.SetFloat("Forward",a.z);
+      Animator.SetFloat("Right",a.x);
+      Animator.SetFloat("Speed",speed*Config.MOVE_ANIMATION_MULTIPLIER);
     }
 
     if (action.Aim.magnitude > 0) {
