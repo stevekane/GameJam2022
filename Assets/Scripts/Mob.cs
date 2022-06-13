@@ -32,7 +32,5 @@ public class Mob : MonoBehaviour {
 
   // Targetable
   public virtual void OnPounceTo(Hero hero) { }
-  public virtual void OnPounceFrom(Hero hero) {
-    TakeDamage();
-  }
+  public virtual void OnPounceFrom(Hero hero) { }
 }
