@@ -13,6 +13,8 @@ public struct Action {
   public bool PounceUp;
   public Vector2 Move;
   public Vector2 Aim;
+  public Vector3 MoveXZ { get => new Vector3(Move.x,0,Move.y); }
+  public Vector3 AimXZ { get => new Vector3(Aim.x,0,Aim.y); }
 }
 
 [Serializable]
