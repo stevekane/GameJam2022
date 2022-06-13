@@ -123,14 +123,16 @@ public class Hero : MonoBehaviour {
     Exited.Add(gameObject);
   }
 
-  Vector3 MoveAcceleration(Vector3 desiredMove, float dt) {
+  // TODO: Review this... it seems that acceleration should be dV/dt
+  // this implies that the acceleration we are computing should be
+  // divided by dt before being compared to max acceleration
+  Vector3 MoveAcceleration(Vector3 desiredMove) {
     var currentVelocity = new Vector3(Velocity.x,0,Velocity.z);
     var desiredVelocity = desiredMove*Config.MOVE_SPEED;
     var acceleration = desiredVelocity-currentVelocity;
     var direction = acceleration.normalized;
     var magnitude = Mathf.Min(Config.MAX_XZ_ACCELERATION,acceleration.magnitude);
-    var gravity = Config.GRAVITY*Vector3.up;
-    return magnitude*direction+dt*gravity;
+    return magnitude*direction;
   }
 
   Vector3 FallAcceleration(Vector3 desiredMove, float dt) { 
@@ -202,7 +204,6 @@ public class Hero : MonoBehaviour {
   }
 
   void FixedUpdate() {
-
     var dt = Time.fixedDeltaTime;
     var action = Inputs.Action;
     var targetingDistance = Config.MAX_TARGETING_DISTANCE;
@@ -231,19 +232,24 @@ public class Hero : MonoBehaviour {
     }
 
     if (LegTarget) {
-      var target = LegTarget.transform.position;
+      var target = LegTarget.transform.position+LegTarget.Height*Vector3.up;
       var current = transform.position;
       var interpolant = Mathf.Exp(Config.PERCH_ATTRACTION_EPSILON);
       var next = Vector3.Lerp(target,current,interpolant);
       Velocity = next-current;
       Controller.Move(Velocity);
+      Animator.SetInteger("LegState",2);
     } else if (Grounded) {
-      Velocity += MoveAcceleration(action.MoveXZ,dt);
+      Velocity += MoveAcceleration(action.MoveXZ);
+      Velocity.y = Velocity.y > 0 ? Velocity.y : -1;
       Controller.Move(dt*Velocity);
+      Animator.SetInteger("LegState",0);
     } else {
       AirTime += dt;
       Velocity += FallAcceleration(action.MoveXZ,dt);
       Controller.Move(dt*Velocity);
+      Animator.SetFloat("VerticalSpeed",Velocity.y);
+      Animator.SetInteger("LegState",1);
     } 
 
     if (Aiming) {
@@ -270,6 +276,7 @@ public class Hero : MonoBehaviour {
       ArmFramesRemaining = Mathf.Max(0,ArmFramesRemaining-1);
     }
 
+    // Animator stuff for legs
     {
       var forward = transform.forward;
       var right = transform.right;
@@ -280,13 +287,22 @@ public class Hero : MonoBehaviour {
       var a = new Vector3(r,0,f);
       Animator.SetFloat("Forward",a.z);
       Animator.SetFloat("Right",a.x);
-      Animator.SetFloat("Speed",speed*Config.MOVE_ANIMATION_MULTIPLIER);
+      // TODO: This is multplied by animation playback speed in the grounded states.
+      // It is sensible to scale playback in all "movement" states but idle states
+      // probably should either be split away to a separate state of the machine
+      // with a fixed playback speed or this block of code is required to set
+      // playback speed to 1 when there is no motion.
+      if (speed == 0) {
+        Animator.SetFloat("Speed",1);
+      } else {
+        Animator.SetFloat("Speed",speed*Config.MOVE_ANIMATION_MULTIPLIER);
+      }
     }
 
     if (action.Aim.magnitude > 0) {
       UI.Select(Target);
       UI.Highlight(Targets,Targets.Length);
-      Time.timeScale = AimingFramesRemaining <= 0 ? 1 : .1f;
+      Time.timeScale = AimingFramesRemaining > 0 && Config.USE_BULLET_TIME ? .1f : 1;
       AimingFramesRemaining = Mathf.Max(0,AimingFramesRemaining-1);
     } else {
       UI.Select(null);
@@ -300,6 +316,7 @@ public class Hero : MonoBehaviour {
       var displayMeter = AimingFramesRemaining < maxTargetingFrames;
       UI.SetAimMeter(transform,displayMeter,AimingFramesRemaining,maxTargetingFrames);
     }
+
     Entered.Clear();
     Stayed.Clear();
     Exited.Clear();

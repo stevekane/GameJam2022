@@ -2,11 +2,15 @@ using UnityEngine;
 
 [CreateAssetMenu(fileName = "HeroConfig", menuName = "Hero/Config")]
 public class HeroConfig : ScriptableObject {
+  [Header("Bullet Time")]  
+  public bool USE_BULLET_TIME = true;
+
   [Header("Moving")]
   public float MOVE_SPEED = 45f;
   [Tooltip("Maximum amount of instant acceleration possible while on ground")]
   public float MAX_XZ_ACCELERATION = .2f;
   [Tooltip("Scale animation play speed by this factor")]
+  [Range(0,10)]
   public float MOVE_ANIMATION_MULTIPLIER = 1f;
 
   [Header("Jumping")]
