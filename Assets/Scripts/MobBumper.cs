@@ -48,10 +48,21 @@ public class MobBumper : Mob {
     }
   }
 
-  public override void OnPounceTo(Hero player) {
-    if (IsOnBumperSide(player.transform.position))
-      player.Bump(player.transform.position, (player.transform.position - transform.position).normalized * 10f);
+  public void OnTriggerEnter(Collider other) {
+    if (other.gameObject.TryGetComponent(out PlayerTrigger ptrigger) && IsOnBumperSide(other.gameObject.transform.position)) {
+      var player = ptrigger.Hero;
+      var delta = (player.transform.position - transform.position).normalized;
+      var movingTowards = Vector3.Dot(player.Velocity, delta) < 0f;
+      if (movingTowards) {
+        player.Bump(player.transform.position, delta * 10f);
+      }
+    }
   }
+
+  //public override void OnPounceTo(Hero player) {
+  //  if (IsOnBumperSide(player.transform.position))
+  //    player.Bump(player.transform.position, (player.transform.position - transform.position).normalized * 10f);
+  //}
   // TODO: OnPounceFrom = long jump?
 
   // Return true if `pos` is on a side with an active bumper.

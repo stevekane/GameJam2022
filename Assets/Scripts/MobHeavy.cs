@@ -26,10 +26,25 @@ public class MobHeavy : Mob {
     }
   }
 
-  public override void OnPounceTo(Hero player) {
-    if (IsOnShieldSide(player.transform.position))
-      player.Block(player.transform.position);
+  void OnTriggerEnter(Collider other) {
+    if (other.gameObject.TryGetComponent(out PlayerTrigger ptrigger) && IsOnShieldSide(other.gameObject.transform.position)) {
+      var player = ptrigger.Hero;
+      var delta = (player.transform.position - transform.position).normalized;
+      var movingTowards = Vector3.Dot(player.Velocity, delta) < 0f;
+      if (movingTowards) {
+        player.Block(player.transform.position, delta*1f);
+      }
+    }
   }
+
+  void OnTriggerStay(Collider other) {
+    OnTriggerEnter(other);
+  }
+
+  //public override void OnPounceTo(Hero player) {
+  //  if (IsOnShieldSide(player.transform.position))
+  //    player.Block(player.transform.position);
+  //}
 
   // Cheesy Debug code
 #if false
