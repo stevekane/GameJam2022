@@ -14,6 +14,7 @@ public class Hero : MonoBehaviour {
   [Header("Components")]
   [SerializeField] UI UI;
   [SerializeField] CharacterController Controller;
+  [SerializeField] Animator Animator;
   
   [Header("Targeting State")]
   public Targetable Target;
@@ -55,9 +56,11 @@ public class Hero : MonoBehaviour {
   Targetable Best(Targetable ignore, Targetable[] targets) {
     Targetable best = null;
     var bestScore = 0f;
-    for (int i = 0; i < targets.Length; i++) {
-      var targetable = targets[i];
-      var score = Score(transform.forward,transform.position,targetable.transform.position);
+    var forward = transform.forward;
+    var origin = transform.position;
+    foreach (var targetable in targets) {
+      var target = targetable.transform.position;
+      var score = Score(forward,origin,target);
       if (targetable != ignore && score > bestScore) {
         best = targetable;
         bestScore = score;
@@ -71,7 +74,7 @@ public class Hero : MonoBehaviour {
     var forward = transform.forward;
     var includeInactive = false;
     return FindObjectsOfType<Targetable>(includeInactive)
-      .Where(t => Vector3.Distance(t.transform.position,transform.position) <= maxDistance)
+      .Where(t => Vector3.Distance(origin,t.transform.position) <= maxDistance)
       .Where(t => Within(origin,t.transform.position,forward,maxRadians))
       .ToArray();
   }
@@ -132,10 +135,11 @@ public class Hero : MonoBehaviour {
 
   Vector3 FallAcceleration(Vector3 desiredMove, float dt) { 
     var normalizedTime = AirTime/Config.MAX_STEERING_TIME;
-    var power = Config.MAX_STEERING_MULTIPLIER*Config.STEERING_STRENGTH.Evaluate(normalizedTime);
+    var multiplier = Config.MAX_STEERING_MULTIPLIER;
+    var strength = Config.STEERING_STRENGTH.Evaluate(normalizedTime);
     var gravityFactor = Velocity.y < 0 ? Config.FALL_GRAVITY_MULTIPLIER: 1;
     var gravity = gravityFactor*Config.GRAVITY*Vector3.up;
-    var steering = power*desiredMove;
+    var steering = multiplier*strength*desiredMove;
     return dt*(gravity+steering);
   }
 
@@ -198,10 +202,45 @@ public class Hero : MonoBehaviour {
   }
 
   void FixedUpdate() {
+
     var dt = Time.fixedDeltaTime;
     var action = Inputs.Action;
     var targetingDistance = Config.MAX_TARGETING_DISTANCE;
     var targetingRadians = Config.MAX_TARGETING_ANGLE*Mathf.Deg2Rad;
+
+    // TODO: Delete or move for Gizmos
+    // DEBUG to get data for Animator straight
+    // {
+    //   UI.Select(Target);
+    //   UI.Highlight(Targets,Targets.Length);
+    //   UI.SetAimMeter(transform,false,300,300);
+    //   var move = action.MoveXZ;
+    //   var aim = action.AimXZ;
+    //   if (move.magnitude != 0 && aim.magnitude != 0) {
+    //     var u = Vector3.up*2.5f;
+    //     var p = transform.position;
+    //     var aimRight = new Vector3(aim.z,0,-aim.x);
+    //     var f = Vector3.Dot(move,aim);
+    //     var r = Vector3.Dot(move,aimRight);
+    //     var a = new Vector3(r,0,f);
+    //     Animator.SetFloat("Forward",a.z);
+    //     Animator.SetFloat("Right",a.x);
+    //     transform.forward = aim;
+    //   } else if (move.magnitude != 0) {
+    //     Animator.SetFloat("Forward",1);
+    //     Animator.SetFloat("Right",0);
+    //     transform.forward = move;
+    //   } else if (aim.magnitude != 0) {
+    //     transform.forward = aim;
+    //     Animator.SetFloat("Forward",0);
+    //     Animator.SetFloat("Right",0);
+    //   } else {
+    //     Animator.SetFloat("Forward",0);
+    //     Animator.SetFloat("Right",0);
+    //   }
+    //   return;
+    // }
+
 
     Targets = FindTargets(targetingDistance,targetingRadians);
     Target = Best(LegTarget,Targets);
@@ -282,7 +321,6 @@ public class Hero : MonoBehaviour {
       var displayMeter = AimingFramesRemaining < maxTargetingFrames;
       UI.SetAimMeter(transform,displayMeter,AimingFramesRemaining,maxTargetingFrames);
     }
-
     Entered.Clear();
     Stayed.Clear();
     Exited.Clear();
