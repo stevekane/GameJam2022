@@ -39,6 +39,10 @@ public class Hero : MonoBehaviour {
   public Targetable LastPerch;
   public float AirTime;
 
+  [Header("Status Effects")]
+  public float BumpTimeRemaining;
+  public Vector3 BumpVelocity;
+
   List<GameObject> Entered = new List<GameObject>(32);
   List<GameObject> Stayed = new List<GameObject>(32);
   List<GameObject> Exited = new List<GameObject>(32);
@@ -241,13 +245,17 @@ public class Hero : MonoBehaviour {
       Hold(ArmTarget);
     }
 
-    // TODO: These should happen over multiple frames.
     if (Bumps.Count > 0) {
-      Velocity = Bumps[0].Velocity;
       LegTarget = null;
+      BumpTimeRemaining = Config.BUMP_DURATION;
+      BumpVelocity = Bumps[0].Velocity;
     } else if (Blocks.Count > 0) {
-      Velocity = Blocks[0].Velocity;
       LegTarget = null;
+      Velocity = Blocks[0].Velocity;
+    }
+    if (BumpTimeRemaining > 0) {
+      BumpTimeRemaining -= dt;
+      Velocity = BumpVelocity;
     }
 
     if (LegTarget) {
