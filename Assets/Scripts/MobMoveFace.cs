@@ -3,11 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public static class Vector3Extensions {
-  public static Vector3 XZ(this Vector3 v) {
-    return new Vector3(v.x, 0, v.z);
-  }
-}
 public class MobMoveFace : MobMove {
   MobConfig Config;
   Player Player;

@@ -41,11 +41,6 @@ public class MobHeavy : Mob {
     OnTriggerEnter(other);
   }
 
-  //public override void OnPounceTo(Hero player) {
-  //  if (IsOnShieldSide(player.transform.position))
-  //    player.Block(player.transform.position);
-  //}
-
   // Cheesy Debug code
 #if false
   private void FixedUpdate() {

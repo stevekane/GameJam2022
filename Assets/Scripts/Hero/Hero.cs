@@ -239,6 +239,7 @@ public class Hero : MonoBehaviour {
       Hold(ArmTarget);
     }
 
+    // TODO: These should happen over multiple frames.
     if (Bumps.Count > 0) {
       Velocity = Bumps[0].Velocity;
       LegTarget = null;

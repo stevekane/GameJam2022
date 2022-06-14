@@ -59,10 +59,6 @@ public class MobBumper : Mob {
     }
   }
 
-  //public override void OnPounceTo(Hero player) {
-  //  if (IsOnBumperSide(player.transform.position))
-  //    player.Bump(player.transform.position, (player.transform.position - transform.position).normalized * 10f);
-  //}
   // TODO: OnPounceFrom = long jump?
 
   // Return true if `pos` is on a side with an active bumper.
