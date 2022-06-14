@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TargetableTriggerHandler : MonoBehaviour {
+public class PlayerTrigger : MonoBehaviour {
   public Hero Hero;
 
   void OnTriggerEnter(Collider other) {

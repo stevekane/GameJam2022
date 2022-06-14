@@ -3,9 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // TODO: These don't need to be public if they are not used publicly below
-public struct BlockEvent { public Vector3 Position; }
+public struct BlockEvent { public Vector3 Position; public Vector3 Velocity; }
 public struct BumpEvent { public Vector3 Position; public Vector3 Velocity; }
 public enum ArmState { Free, Reaching, Pulling, Holding }
+
+public static class PhysicsLayers {
+  public static readonly int PlayerGrounded = 8;
+  public static readonly int PlayerAirborne = 9;
+  public static readonly int MobGrounded = 10;
+  public static readonly int MobAirborne = 11;
+}
 
 public class Hero : MonoBehaviour {
   [Header("Configuration")]
@@ -15,7 +22,7 @@ public class Hero : MonoBehaviour {
   [SerializeField] UI UI;
   [SerializeField] CharacterController Controller;
   [SerializeField] Animator Animator;
-  
+
   [Header("Targeting State")]
   public Targetable Target;
   public Targetable[] Targets;
@@ -103,8 +110,8 @@ public class Hero : MonoBehaviour {
   bool Moving { get => Inputs.Action.Move.magnitude > 0; }
   bool Aiming { get => Inputs.Action.Aim.magnitude > 0; }
 
-  public void Block(Vector3 position) {
-    Blocks.Add(new BlockEvent { Position = position });
+  public void Block(Vector3 position, Vector3 velocity) {
+    Blocks.Add(new BlockEvent { Position = position, Velocity = velocity });
   }
 
   public void Bump(Vector3 position, Vector3 velocity) {
@@ -195,6 +202,7 @@ public class Hero : MonoBehaviour {
   void Hold(Throwable throwable) {
     ArmState = ArmState.Holding;
     ArmTarget = throwable;
+    ArmTarget.Hold();
   }
 
   void Throw(Vector3 direction, float speed) {
@@ -229,6 +237,15 @@ public class Hero : MonoBehaviour {
       Pull(ArmTarget);
     } else if (Pulling && ArmFramesRemaining <= 0) {
       Hold(ArmTarget);
+    }
+
+    // TODO: These should happen over multiple frames.
+    if (Bumps.Count > 0) {
+      Velocity = Bumps[0].Velocity;
+      LegTarget = null;
+    } else if (Blocks.Count > 0) {
+      Velocity = Blocks[0].Velocity;
+      LegTarget = null;
     }
 
     if (LegTarget) {
@@ -322,5 +339,11 @@ public class Hero : MonoBehaviour {
     Exited.Clear();
     Blocks.Clear();
     Bumps.Clear();
+
+    if (Grounded) {
+      gameObject.layer = PhysicsLayers.PlayerGrounded;
+    } else {
+      gameObject.layer = PhysicsLayers.PlayerAirborne;
+    }
   }
 }

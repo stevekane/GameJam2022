@@ -13,13 +13,15 @@ public class Throwable : MonoBehaviour {
     Body.isKinematic = true;
   }
 
-  // TODO: public bool CanGrab() { return Mob.CanGrab(); } ?
+  public void Hold() {
+    gameObject.layer = PhysicsLayers.MobAirborne;
+  }
 
   public void Throw(Vector3 impulse) {
     if (State == ThrowableState.Airborne)
       return;  // Only throw it once.
     Destroy(GetComponent<Targetable>());
-    Destroy(GetComponent<Hittable>()); // We will handle collisions from now on.
+    gameObject.layer = PhysicsLayers.MobAirborne;
     Body.isKinematic = false;
     Body.AddForce(impulse, ForceMode.Impulse);
     State = ThrowableState.Airborne;
@@ -27,7 +29,7 @@ public class Throwable : MonoBehaviour {
 
   void OnCollisionEnter(Collision collision) {
     if (collision.gameObject.tag == "Ground")
-      return;
+      return;  // TODO: handle this via layers?
     if (State == ThrowableState.Airborne) {
       Debug.Log($"Throwable hit someone: {collision.gameObject}");
       Mob?.MeHitThing(collision.gameObject, 0, collision.gameObject.transform.position);
