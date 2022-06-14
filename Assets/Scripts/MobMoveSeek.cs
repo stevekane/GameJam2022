@@ -10,7 +10,7 @@ public class MobMoveSeek : MobMove {
   }
 
   void FixedUpdate() {
-    var playerDelta = (Player.transform.position - transform.position);
+    var playerDelta = (Player.transform.position - transform.position).XZ();
     var playerInRange = playerDelta.sqrMagnitude < Config.SeekRadius*Config.SeekRadius;
     var playerInShootRange = playerDelta.sqrMagnitude < Config.ShootRadius*Config.ShootRadius;
     if (playerInRange && !playerInShootRange) {

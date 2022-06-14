@@ -17,7 +17,7 @@ public class MobHeavy : Mob {
         return;
       }
       // TODO: proper direction
-      Vector3 dir = (transform.position - contactPos).normalized;
+      Vector3 dir = (transform.position - contactPos).XZ().normalized;
       var body = thing.GetComponent<Rigidbody>();
       body.velocity = new Vector3(0, 0, 0);
       body.AddForce(dir * 5f, ForceMode.Impulse);
@@ -29,7 +29,7 @@ public class MobHeavy : Mob {
   void OnTriggerEnter(Collider other) {
     if (other.gameObject.TryGetComponent(out PlayerTrigger ptrigger) && IsOnShieldSide(other.gameObject.transform.position)) {
       var player = ptrigger.Hero;
-      var delta = (player.transform.position - transform.position).normalized;
+      var delta = (player.transform.position - transform.position).XZ().normalized;
       var movingTowards = Vector3.Dot(player.Velocity, delta) < 0f;
       if (movingTowards) {
         player.Block(player.transform.position, delta*1f);
@@ -61,7 +61,7 @@ public class MobHeavy : Mob {
   }
 
   float PosToAngle(Vector3 pos) {
-    Vector3 dir = (pos - transform.position).normalized;
+    Vector3 dir = (pos - transform.position).XZ().normalized;
     return Mathf.Atan2(transform.forward.x, transform.forward.z) - Mathf.Atan2(dir.x, dir.z);
   }
 

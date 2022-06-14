@@ -11,7 +11,7 @@ public class MobShitter : Mob {
     set { Animator.SetInteger("State", (int)value); }
   }
 
-  public void Start() {
+  public new void Start() {
     base.Start();
     Player = GameObject.FindObjectOfType<Player>();
     State = MobShitterState.Idle;

@@ -14,7 +14,7 @@ public class MobBumper : Mob {
   [Tooltip("Order must be the same as ActiveBumpers")]
   public List<GameObject> Bumpers;
 
-  public void Start() {
+  public new void Start() {
     base.Start();
     Debug.Assert(Bumpers.Count == 4);
     for (int i = 0; i < 4; i++) {
@@ -27,7 +27,7 @@ public class MobBumper : Mob {
   public override void MeHitThing(GameObject thing, MeHitThingType type, Vector3 contactPos) {
     if (type == MeHitThingType.Wall || type == MeHitThingType.Shield) {
       // TODO: need surface normal
-      Vector3 dir = (transform.position - contactPos).normalized;
+      Vector3 dir = (transform.position - contactPos).XZ().normalized;
       var body = GetComponent<Rigidbody>();
       body.velocity = new Vector3(0, 0, 0);
       body.AddForce(dir * 5f, ForceMode.Impulse);
@@ -39,7 +39,7 @@ public class MobBumper : Mob {
   public override void ThingHitMe(GameObject thing, ThingHitMeType type, Vector3 contactPos) {
     if (type != ThingHitMeType.Explosion && IsOnBumperSide(contactPos)) {
       // TODO: proper direction
-      Vector3 dir = (transform.position - contactPos).normalized;
+      Vector3 dir = (transform.position - contactPos).XZ().normalized;
       var body = thing.GetComponent<Rigidbody>();
       body.velocity = new Vector3(0, 0, 0);
       body.AddForce(dir * 5f, ForceMode.Impulse);
@@ -51,7 +51,7 @@ public class MobBumper : Mob {
   public void OnTriggerEnter(Collider other) {
     if (other.gameObject.TryGetComponent(out PlayerTrigger ptrigger) && IsOnBumperSide(other.gameObject.transform.position)) {
       var player = ptrigger.Hero;
-      var delta = (player.transform.position - transform.position).normalized;
+      var delta = (player.transform.position - transform.position).XZ().normalized;
       var movingTowards = Vector3.Dot(player.Velocity, delta) < 0f;
       if (movingTowards) {
         player.Bump(player.transform.position, delta * 10f);
@@ -72,7 +72,7 @@ public class MobBumper : Mob {
   }
 
   float PosToAngle(Vector3 pos) {
-    Vector3 dir = (pos - transform.position).normalized;
+    Vector3 dir = (pos - transform.position).XZ().normalized;
     return Mathf.Atan2(transform.forward.x, transform.forward.z) - Mathf.Atan2(dir.x, dir.z);
   }
 
