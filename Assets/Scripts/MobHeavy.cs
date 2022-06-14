@@ -27,11 +27,10 @@ public class MobHeavy : Mob {
   }
 
   void OnTriggerEnter(Collider other) {
-    if (other.gameObject.TryGetComponent(out PlayerTrigger ptrigger) && IsOnShieldSide(other.gameObject.transform.position)) {
+    if (other.gameObject.TryGetComponent(out PlayerTrigger ptrigger) && IsOnShieldSide(ptrigger.transform.position)) {
       var player = ptrigger.Hero;
-      var delta = (player.transform.position - transform.position).XZ().normalized;
-      var movingTowards = Vector3.Dot(player.Velocity, delta) < 0f;
-      if (movingTowards) {
+      if (player.LastPerch?.gameObject != gameObject) {
+        var delta = (player.transform.position - transform.position).XZ().normalized;
         player.Block(player.transform.position, delta*1f);
       }
     }

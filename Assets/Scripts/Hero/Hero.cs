@@ -36,6 +36,7 @@ public class Hero : MonoBehaviour {
   [Header("Leg State")]
   public Vector3 Velocity;
   public Targetable LegTarget;
+  public Targetable LastPerch;
   public float AirTime;
 
   List<GameObject> Entered = new List<GameObject>(32);
@@ -155,6 +156,7 @@ public class Hero : MonoBehaviour {
   void Perch(Targetable targetable) {
     AirTime = 0;
     LegTarget = targetable;
+    LastPerch = LegTarget;
     LegTarget?.PounceTo(this);
     Velocity = Vector3.zero;
   }
@@ -261,13 +263,14 @@ public class Hero : MonoBehaviour {
       Velocity.y = Velocity.y > 0 ? Velocity.y : -1;
       Controller.Move(dt*Velocity);
       Animator.SetInteger("LegState",0);
+      LastPerch = null;
     } else {
       AirTime += dt;
       Velocity += FallAcceleration(action.MoveXZ,dt);
       Controller.Move(dt*Velocity);
       Animator.SetFloat("VerticalSpeed",Velocity.y);
       Animator.SetInteger("LegState",1);
-    } 
+    }
 
     if (Aiming) {
       transform.forward = action.AimXZ;
