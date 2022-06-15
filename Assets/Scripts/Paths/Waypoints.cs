@@ -3,6 +3,8 @@ using UnityEngine;
 public class Waypoints : Path {
   [SerializeField] 
   Color Color;
+  [SerializeField]
+  float TurnFraction;
   Waypoint[] Points;
   float TotalDistance;
   float[] Distances;
@@ -23,8 +25,13 @@ public class Waypoints : Path {
         var delta = p1-p0;
         var f = Mathf.InverseLerp(d0,d1,interpolant);
         var position = p0+f*delta;
-        var rotation = Quaternion.Slerp(r0,r1,f);
-        return new PathData(position,rotation);
+        if (f <= TurnFraction) {
+          return new PathData(position,r0);
+        } else {
+          var fraction = Mathf.InverseLerp(TurnFraction,1,f);
+          var rotation = Quaternion.Slerp(r0,r1,fraction);
+          return new PathData(position,rotation);
+        }
       }
     }
     return new PathData(Vector3.zero,Quaternion.identity);

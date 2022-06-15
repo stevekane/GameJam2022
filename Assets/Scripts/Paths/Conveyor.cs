@@ -26,7 +26,7 @@ public class Conveyor : MonoBehaviour {
   void OnDrawGizmos() {
     Buckets = GetComponentsInChildren<Bucket>(false);
     if (!Application.isPlaying) {
-      foreach (var bucket in GetComponentsInChildren<Bucket>(false)) {
+      foreach (var bucket in Buckets) {
         var pathData = Path.ToWorldSpace(bucket.Distance);
         bucket.transform.position = pathData.Position;
         Gizmos.DrawWireSphere(pathData.Position,.25f);
