@@ -7,9 +7,12 @@ public class CirclePath : Path {
   float Radius = 1f;
   [SerializeField]
 
-  public override Vector3 ToWorldSpace(float interpolant) {
-    var rotation = Quaternion.AngleAxis(interpolant*360,transform.up);
-    return rotation*transform.forward*Radius;
+  public override PathData ToWorldSpace(float interpolant) {
+    var axialRotation = Quaternion.AngleAxis(interpolant*360,transform.up);
+    var position = axialRotation*transform.forward*Radius;
+    var tangent = axialRotation*transform.right;
+    var rotation = Quaternion.LookRotation(tangent,transform.up);
+    return new PathData(position,rotation);
   }
 
   void OnDrawGizmos() {

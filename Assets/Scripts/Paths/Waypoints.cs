@@ -8,20 +8,26 @@ public class Waypoints : Path {
   float[] Distances;
   float[] NormalizedDistances;
 
-  public override Vector3 ToWorldSpace(float interpolant) {
+  public override PathData ToWorldSpace(float interpolant) {
     for (int i = 1; i < NormalizedDistances.Length; i++) {
       var d0 = NormalizedDistances[i-1];
       var d1 = NormalizedDistances[i];
       var onSegment = interpolant >= d0 && interpolant <= d1;
       if (onSegment) {
-        var p0 = Points[i-1].transform.position;
-        var p1 = Points[i].transform.position;
+        var t0 = Points[i-1].transform;
+        var t1 = Points[i].transform;
+        var p0 = t0.position;
+        var p1 = t1.position;
+        var r0 = t0.rotation;
+        var r1 = t1.rotation;
         var delta = p1-p0;
         var f = Mathf.InverseLerp(d0,d1,interpolant);
-        return p0+f*delta;
+        var position = p0+f*delta;
+        var rotation = Quaternion.Slerp(r0,r1,f);
+        return new PathData(position,rotation);
       }
     }
-    return Vector3.zero;
+    return new PathData(Vector3.zero,Quaternion.identity);
   }
 
   void UpdateDistances() {

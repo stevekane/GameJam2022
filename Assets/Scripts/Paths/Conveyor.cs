@@ -15,10 +15,11 @@ public class Conveyor : MonoBehaviour {
     } else {
       FramesRemaining = FramesPerCycle;
     }
-    var interpolant = (float)FramesRemaining/(float)FramesPerCycle;
+    var interpolant = 1f-(float)FramesRemaining/(float)FramesPerCycle;
     foreach (var bucket in Buckets) {
       var distance = interpolant+bucket.Distance;
-      bucket.transform.position = Path.ToWorldSpace(distance%1f);
+      var pathdata = Path.ToWorldSpace(distance%1f);
+      bucket.transform.SetPositionAndRotation(pathdata.Position,pathdata.Rotation);
     }
   }
 
@@ -26,9 +27,9 @@ public class Conveyor : MonoBehaviour {
     Buckets = GetComponentsInChildren<Bucket>(false);
     if (!Application.isPlaying) {
       foreach (var bucket in GetComponentsInChildren<Bucket>(false)) {
-        var position = Path.ToWorldSpace(bucket.Distance);
-        bucket.transform.position = position;
-        Gizmos.DrawWireSphere(position,.25f);
+        var pathData = Path.ToWorldSpace(bucket.Distance);
+        bucket.transform.position = pathData.Position;
+        Gizmos.DrawWireSphere(pathData.Position,.25f);
       }
     }
   }
