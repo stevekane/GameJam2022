@@ -49,11 +49,10 @@ public class MobBumper : Mob {
   }
 
   public void OnTriggerEnter(Collider other) {
-    if (other.gameObject.TryGetComponent(out PlayerTrigger ptrigger) && IsOnBumperSide(other.gameObject.transform.position)) {
+    if (other.gameObject.TryGetComponent(out PlayerTrigger ptrigger) && IsOnBumperSide(ptrigger.transform.position)) {
       var player = ptrigger.Hero;
-      var delta = (player.transform.position - transform.position).XZ().normalized;
-      var movingTowards = Vector3.Dot(player.Velocity, delta) < 0f;
-      if (movingTowards) {
+      if (player.LastPerch?.gameObject != gameObject) {
+        var delta = (player.transform.position - transform.position).XZ().normalized;
         player.Bump(player.transform.position, delta * 10f);
       }
     }

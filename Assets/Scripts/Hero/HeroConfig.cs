@@ -65,4 +65,8 @@ public class HeroConfig : ScriptableObject {
   [Header("Throwing")]
   [Tooltip("Speed of thrown objects")]
   public float THROW_SPEED = 50f;
+
+  [Header("Status Effects")]
+  [Tooltip("Time in seconds of a bumper's bump effect")]
+  public float BUMP_DURATION = .25f;
 }
