@@ -22,6 +22,7 @@ public class Hero : MonoBehaviour {
   [SerializeField] UI UI;
   [SerializeField] CharacterController Controller;
   [SerializeField] Animator Animator;
+  [SerializeField] Grabber Grabber;
 
   [Header("Targeting State")]
   public Targetable Target;
@@ -31,7 +32,7 @@ public class Hero : MonoBehaviour {
   [Header("Arm State")]
   public ArmState ArmState;
   public Throwable ArmTarget;
-  public float ArmFramesRemaining;
+  public int ArmFramesRemaining;
 
   [Header("Leg State")]
   public Vector3 Velocity;
@@ -297,19 +298,24 @@ public class Hero : MonoBehaviour {
       var current = ArmTarget.transform.position;
       var interpolant = Mathf.Exp(Config.HOLD_ATTRACTION_EPSILON);
       var next = Vector3.Lerp(target,current,interpolant);
+      Grabber.Store(Grabber.transform.position);
+      ArmFramesRemaining = 0;
       ArmTarget.transform.position = next;
     } else if (Reaching) {
+      Grabber.Reach(Grabber.transform,ArmTarget.transform,ArmFramesRemaining,Config.MAX_REACHING_FRAMES);
       ArmFramesRemaining = Mathf.Max(0,ArmFramesRemaining-1);
     } else if (Pulling) {
+      Grabber.Store(Grabber.transform.position);
       ArmFramesRemaining = Mathf.Max(0,ArmFramesRemaining-1);
+    } else {
+      Grabber.Store(Grabber.transform.position);
+      ArmFramesRemaining = 0;
     }
 
-    // Animator stuff for legs
     {
       var forward = transform.forward;
       var right = transform.right;
       var velocityxz = new Vector3(Velocity.x,0,Velocity.z);
-      var speed = velocityxz.magnitude;
       var f = Vector3.Dot(velocityxz,forward);
       var r = Vector3.Dot(velocityxz,right);
       var a = new Vector3(r,0,f);
@@ -320,11 +326,9 @@ public class Hero : MonoBehaviour {
       // probably should either be split away to a separate state of the machine
       // with a fixed playback speed or this block of code is required to set
       // playback speed to 1 when there is no motion.
-      if (speed == 0) {
-        Animator.SetFloat("Speed",1);
-      } else {
-        Animator.SetFloat("Speed",speed*Config.MOVE_ANIMATION_MULTIPLIER);
-      }
+      var speed = velocityxz.magnitude;
+      speed = speed == 0 ? 1f : speed*Config.MOVE_ANIMATION_MULTIPLIER;
+      Animator.SetFloat("Speed",speed);
     }
 
     if (action.Aim.magnitude > 0) {

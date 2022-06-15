@@ -15,6 +15,9 @@ public class Throwable : MonoBehaviour {
 
   public void Hold() {
     gameObject.layer = PhysicsLayers.MobAirborne;
+    if (TryGetComponent(out MobMove move)) {
+      move.enabled = false;
+    }
   }
 
   public void Throw(Vector3 impulse) {
