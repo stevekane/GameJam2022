@@ -1,26 +1,32 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Conveyor : MonoBehaviour {
   [SerializeField]
   int FramesPerCycle = 1000;  
   [SerializeField]
   Path Path;
+  [SerializeField]
+  BucketAction BucketAction;
 
   Bucket[] Buckets;
   int FramesRemaining;
 
   void FixedUpdate() {
-    if (FramesRemaining > 0) {
-      FramesRemaining = FramesRemaining-1;
-    } else {
-      FramesRemaining = FramesPerCycle;
-    }
-    var interpolant = 1f-(float)FramesRemaining/(float)FramesPerCycle;
+    var currentFrames = FramesRemaining;
+    var nextFrames = FramesRemaining > 0 ? FramesRemaining-1 : FramesPerCycle;
+    var currentFraction = 1f-(float)currentFrames/(float)FramesPerCycle;
+    var nextFraction = 1f-(float)nextFrames/(float)FramesPerCycle;
     foreach (var bucket in Buckets) {
-      var distance = interpolant+bucket.Distance;
-      var pathdata = Path.ToWorldSpace(distance%1f);
+      var currentDistance = (currentFraction+bucket.Distance)%1f;
+      var nextDistance = (nextFraction+bucket.Distance)%1f;
+      var pathdata = Path.ToWorldSpace(currentDistance);
+      if (nextDistance < currentDistance) {
+        BucketAction?.Invoke(bucket);
+      }
       bucket.transform.SetPositionAndRotation(pathdata.Position,pathdata.Rotation);
     }
+    FramesRemaining = nextFrames;
   }
 
   void OnDrawGizmos() {
