@@ -51,7 +51,7 @@ public class MobHeavy : Mob {
 #endif
 
   bool IsOnShieldSide(Vector3 pos) {
-    return IsAngleOnShieldSide(PosToAngle(pos));
+    return Shield && IsAngleOnShieldSide(PosToAngle(pos));
   }
 
   float PosToAngle(Vector3 pos) {
