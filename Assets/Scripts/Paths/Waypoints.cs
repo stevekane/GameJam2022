@@ -34,7 +34,7 @@ public class Waypoints : Path {
         }
       }
     }
-    return new PathData(Vector3.zero,Quaternion.identity);
+    return new PathData(Points[0].transform.position,Points[0].transform.rotation);
   }
 
   void UpdateDistances() {
