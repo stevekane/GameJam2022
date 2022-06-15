@@ -3,8 +3,15 @@ using UnityEngine;
 public class MobMovePatrol : MobMove {
   public Transform Target;
 
+  Rigidbody Rigidbody;
+
+  void Start() {
+    Rigidbody = GetComponent<Rigidbody>();
+  }
+
   void FixedUpdate() {
-    transform.SetPositionAndRotation(Target.position,Target.rotation);
+    Rigidbody.MovePosition(Target.position);
+    Rigidbody.MoveRotation(Target.rotation);
   }
 
   public void OnDrawGizmos() {
