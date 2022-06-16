@@ -46,6 +46,7 @@ public class PrefabConveyor : MonoBehaviour {
     for (int i = 0; i < Count; i++) {
       var bucket = PrefabUtility.InstantiatePrefab(BucketPrefab) as Bucket;
       var mob = PrefabUtility.InstantiatePrefab(MobPrefab) as Mob;
+      mob = mob ? mob : Instantiate(MobPrefab);
       var patrol = GetOrCreateComponent<MobMovePatrol>(mob.gameObject);
       var distance = (float)i/(float)Count;
       var pathdata = conveyor.Path.ToWorldSpace(distance);
