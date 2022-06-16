@@ -31,6 +31,9 @@ public class EventDriver : MonoBehaviour {
   public Room RoomPrefab;
   public Room Room;
 
+  Camera Camera;
+  Player Player;
+
   List<Action> History = new List<Action>((int)Math.Pow(2,16));
   int HistoryIndex = 0;
   bool HitDown;
@@ -48,6 +51,8 @@ public class EventDriver : MonoBehaviour {
     History.Clear();
     HistoryIndex = 0;
     Inputs.InPlayBack = false;
+    Player = FindObjectOfType<Player>();
+    Camera = FindObjectOfType<Camera>();
   }
 
   void OnDestroy() {
@@ -114,13 +119,26 @@ public class EventDriver : MonoBehaviour {
     PounceUp = PounceUp || Input.GetButtonUp("Action2");
   }
 
+  Vector2 GetKeyboardMove() {
+    float right = (Input.GetKey(KeyCode.D) ? 1 : 0) - (Input.GetKey(KeyCode.A) ? 1 : 0);
+    float up = (Input.GetKey(KeyCode.W) ? 1 : 0) - (Input.GetKey(KeyCode.S) ? 1 : 0);
+    return new Vector2(right, up);
+  }
+
+  Vector2 GetMouseAim() {
+    var playerPos = Camera.WorldToScreenPoint(Player.transform.position);
+    var playerPos2 = new Vector2(playerPos.x, playerPos.y);
+    var mousePos2 = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+    return Input.GetMouseButton(1) ? (mousePos2 - playerPos2).normalized : new Vector2(0,0);
+  }
+
   void FixedUpdate() {
     switch (PlayState) {
       case PlayState.Play: {
         var hit = Input.GetButton("Action1");
         var pounce = Input.GetButton("Action2");
-        var move = new Vector2(Input.GetAxisRaw("MoveX"),Input.GetAxisRaw("MoveY"));
-        var aim = new Vector2(Input.GetAxisRaw("AimX"),Input.GetAxisRaw("AimY"));
+        var move = new Vector2(Input.GetAxisRaw("MoveX"),Input.GetAxisRaw("MoveY")) + GetKeyboardMove();
+        var aim = new Vector2(Input.GetAxisRaw("AimX"),Input.GetAxisRaw("AimY")) + GetMouseAim();
         move = move.magnitude > RadialDeadZone ? move : Vector2.zero;
         aim = aim.magnitude > RadialDeadZone ? aim : Vector2.zero;
         var action = new Action {
