@@ -43,6 +43,7 @@ public class Hero : MonoBehaviour {
   [Header("Status Effects")]
   public float BumpTimeRemaining;
   public Vector3 BumpVelocity;
+  public float StunTimeRemaining;
 
   List<GameObject> Entered = new List<GameObject>(32);
   List<GameObject> Stayed = new List<GameObject>(32);
@@ -106,6 +107,7 @@ public class Hero : MonoBehaviour {
     return t;
   }
 
+  bool Stunned { get => StunTimeRemaining > 0; }
   bool Free { get => ArmState == ArmState.Free; }
   bool Reaching { get => ArmState == ArmState.Reaching; }
   bool Pulling { get => ArmState == ArmState.Pulling; }
@@ -122,6 +124,10 @@ public class Hero : MonoBehaviour {
 
   public void Bump(Vector3 position, Vector3 velocity) {
     Bumps.Add(new BumpEvent { Position = position, Velocity = velocity });
+  }
+
+  public void Stun(float duration) {
+    StunTimeRemaining = duration;
   }
 
   public void Enter(GameObject gameObject) {
@@ -228,7 +234,10 @@ public class Hero : MonoBehaviour {
     Target = Best(LegTarget,Targets);
 
     // TODO: Should there be two transitions: Arms and Legs instead of a single disjunction
-    if (Falling && TryGetFirst(Entered,out Targetable targetable)) {
+    if (Stunned) {
+      StunTimeRemaining -= dt;
+      return;
+    } else if (Falling && TryGetFirst(Entered,out Targetable targetable)) {
       Perch(targetable);
     } else if (Aiming && Target && action.PounceDown) {
       Pounce(Target.transform.position);
