@@ -115,8 +115,8 @@ public class EventDriver : MonoBehaviour {
   void Update() {
     HitDown = HitDown || Input.GetButtonDown("Action1");
     HitUp = HitUp || Input.GetButtonUp("Action1");
-    PounceDown = PounceDown || Input.GetButtonDown("Action2");
-    PounceUp = PounceUp || Input.GetButtonUp("Action2");
+    PounceDown = PounceDown || Input.GetButtonDown("Action2") || Input.GetKeyDown(KeyCode.Space);
+    PounceUp = PounceUp || Input.GetButtonUp("Action2") || Input.GetKeyUp(KeyCode.Space);
   }
 
   Vector2 GetKeyboardMove() {
@@ -136,7 +136,7 @@ public class EventDriver : MonoBehaviour {
     switch (PlayState) {
       case PlayState.Play: {
         var hit = Input.GetButton("Action1");
-        var pounce = Input.GetButton("Action2");
+        var pounce = Input.GetButton("Action2") || Input.GetKey(KeyCode.Space);
         var move = new Vector2(Input.GetAxisRaw("MoveX"),Input.GetAxisRaw("MoveY")) + GetKeyboardMove();
         var aim = new Vector2(Input.GetAxisRaw("AimX"),Input.GetAxisRaw("AimY")) + GetMouseAim();
         move = move.magnitude > RadialDeadZone ? move : Vector2.zero;
