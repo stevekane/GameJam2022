@@ -1,15 +1,17 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Conveyor : MonoBehaviour {
-  [SerializeField]
-  int FramesPerCycle = 1000;  
-  [SerializeField]
-  Path Path;
-  [SerializeField]
-  BucketAction BucketAction;
+  public int FramesPerCycle = 1000;  
+  public Path Path;
+  public List<Bucket> Buckets;
 
-  Bucket[] Buckets;
+  BucketAction BucketAction;
   int FramesRemaining;
+
+  void Awake() {
+    BucketAction = GetComponent<BucketAction>();
+  }
 
   void FixedUpdate() {
     var currentFrames = FramesRemaining;
@@ -29,7 +31,6 @@ public class Conveyor : MonoBehaviour {
   }
 
   void OnDrawGizmos() {
-    Buckets = GetComponentsInChildren<Bucket>(false);
     if (!Application.isPlaying) {
       foreach (var bucket in Buckets) {
         var pathData = Path.ToWorldSpace(bucket.Distance);

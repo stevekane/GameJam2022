@@ -9,7 +9,7 @@ public class CirclePath : Path {
 
   public override PathData ToWorldSpace(float interpolant) {
     var axialRotation = Quaternion.AngleAxis(interpolant*360,transform.up);
-    var position = axialRotation*transform.forward*Radius;
+    var position = transform.position+axialRotation*transform.forward*Radius;
     var tangent = axialRotation*transform.right;
     var rotation = Quaternion.LookRotation(tangent,transform.up);
     return new PathData(position,rotation);
