@@ -18,6 +18,9 @@ public class Bullet : MonoBehaviour {
   }
 
   void OnCollisionEnter(Collision collision) {
+    if (collision.gameObject.tag == "Ground")
+      return;
+
     var player = collision.gameObject.GetComponentInParent<Hero>();
     if (player) {
       player.Stun(.25f);
