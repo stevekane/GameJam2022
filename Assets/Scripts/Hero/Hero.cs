@@ -4,7 +4,6 @@ using UnityEngine;
 
 // TODO: These don't need to be public if they are not used publicly below
 public struct BlockEvent { public Vector3 Position; public Vector3 Velocity; }
-public struct BumpEvent { public Vector3 Position; public Vector3 Velocity; }
 public enum ArmState { Free, Reaching, Pulling, Holding }
 
 public static class PhysicsLayers {
@@ -49,7 +48,6 @@ public class Hero : MonoBehaviour {
   List<GameObject> Stayed = new List<GameObject>(32);
   List<GameObject> Exited = new List<GameObject>(32);
   List<BlockEvent> Blocks = new List<BlockEvent>(32);
-  List<BumpEvent> Bumps = new List<BumpEvent>(32);
 
   float Score(Vector3 forward, Vector3 origin, Vector3 target) {
     var delta = target-origin;
@@ -108,6 +106,7 @@ public class Hero : MonoBehaviour {
   }
 
   bool Stunned { get => StunTimeRemaining > 0; }
+  bool Bumped { get => BumpTimeRemaining > 0; }
   bool Free { get => ArmState == ArmState.Free; }
   bool Reaching { get => ArmState == ArmState.Reaching; }
   bool Pulling { get => ArmState == ArmState.Pulling; }
@@ -123,7 +122,8 @@ public class Hero : MonoBehaviour {
   }
 
   public void Bump(Vector3 position, Vector3 velocity) {
-    Bumps.Add(new BumpEvent { Position = position, Velocity = velocity });
+    BumpTimeRemaining = Config.BUMP_DURATION;
+    BumpVelocity = velocity;
   }
 
   public void Stun(float duration) {
@@ -237,7 +237,7 @@ public class Hero : MonoBehaviour {
     if (Stunned) {
       StunTimeRemaining -= dt;
       return;
-    } else if (Falling && TryGetFirst(Entered,out Targetable targetable)) {
+    } else if (Falling && !Bumped && TryGetFirst(Entered,out Targetable targetable)) {
       Perch(targetable);
     } else if (Aiming && Target && action.PounceDown) {
       Pounce(Target.transform.position);
@@ -255,15 +255,12 @@ public class Hero : MonoBehaviour {
       Hold(ArmTarget);
     }
 
-    if (Bumps.Count > 0) {
-      LegTarget = null;
-      BumpTimeRemaining = Config.BUMP_DURATION;
-      BumpVelocity = Bumps[0].Velocity;
-    } else if (Blocks.Count > 0) {
+    if (Blocks.Count > 0) {
       LegTarget = null;
       Velocity = Blocks[0].Velocity;
     }
     if (BumpTimeRemaining > 0) {
+      LegTarget = null;
       BumpTimeRemaining -= dt;
       Velocity = BumpVelocity;
     }
@@ -362,7 +359,6 @@ public class Hero : MonoBehaviour {
     Stayed.Clear();
     Exited.Clear();
     Blocks.Clear();
-    Bumps.Clear();
 
     if (Grounded) {
       gameObject.layer = PhysicsLayers.PlayerGrounded;
