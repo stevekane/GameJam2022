@@ -24,64 +24,28 @@ public class Waypoints : Path {
     return null;
   }
 
-  int? PreviousIndexWithUniquePosition(int n) {
-    var p0 = Points[n].transform.position;
-    var previousIndex = n;
-    for (int i = 0; i < Points.Length; i++) {
-      previousIndex = previousIndex <= 0 ? Points.Length-1 : previousIndex-1;
-      var pprevious = Points[previousIndex].transform.position;
-      if (p0 != pprevious) {
-        return previousIndex;
-      }
-    }
-    return null;
-  }
-
   public override PathData ToWorldSpace(float interpolant) {
     for (int i = 1; i < NormalizedDistances.Length; i++) {
       var d0 = NormalizedDistances[i-1];
       var d1 = NormalizedDistances[i];
       var onSegment = interpolant >= d0 && interpolant <= d1;
       if (onSegment) {
-        var t0 = Points[i-1].transform;
-        var t1 = Points[i].transform;
-        var p0 = t0.position;
-        var p1 = t1.position;
-        var iPrevious = PreviousIndexWithUniquePosition(i);
+        var p0 = Points[i-1].transform.position;
+        var p1 = Points[i].transform.position;
         var iNext = NextIndexWithUniquePosition(i);
         var delta = p1-p0;
         var f = Mathf.InverseLerp(d0,d1,interpolant);
         var position = p0+f*delta;
-        if (f <= TurnFraction) {
-          if (iPrevious.HasValue) {
-            var pp = Points[iPrevious.Value].transform.position;
-            var f0 = (p1-pp).XZ().normalized;
-            var r0 = Quaternion.LookRotation(f0,Vector3.up);
-            return new PathData(position,r0);
-          } else {
-            return new PathData(position,Quaternion.identity);
-          }
+        if (f <= TurnFraction || !iNext.HasValue) {
+          var r0 = Quaternion.LookRotation((p1-p0).XZ().normalized, Vector3.up);
+          return new PathData(position, r0);
         } else {
-          if (iPrevious.HasValue) {
-            if (iNext.HasValue) {
-              var pp = Points[iPrevious.Value].transform.position;
-              var pn = Points[iNext.Value].transform.position;
-              var fp = (p1-pp).XZ().normalized;
-              var fn = (pn-p1).XZ().normalized;
-              var rp = Quaternion.LookRotation(fp,Vector3.up);
-              var rn = Quaternion.LookRotation(fn,Vector3.up);
-              var fraction = Mathf.InverseLerp(TurnFraction,1,f);
-              var rotation = Quaternion.Slerp(rp,rn,fraction);
-              return new PathData(position,rotation);
-            } else {
-              var pp = Points[iPrevious.Value].transform.position;
-              var f0 = (p1-pp).XZ().normalized;
-              var r0 = Quaternion.LookRotation(f0,Vector3.up);
-              return new PathData(position,r0);
-            }
-          } else {
-            return new PathData(position,Quaternion.identity);
-          }
+          var p2 = Points[iNext.Value].transform.position;
+          var r0 = Quaternion.LookRotation((p1-p0).XZ().normalized, Vector3.up);
+          var r1 = Quaternion.LookRotation((p2-p1).XZ().normalized, Vector3.up);
+          var fraction = Mathf.InverseLerp(TurnFraction, 1, f);
+          var rotation = Quaternion.Slerp(r0, r1, fraction);
+          return new PathData(position, rotation);
         }
       }
     }
