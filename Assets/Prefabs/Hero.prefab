@@ -183,7 +183,7 @@ Transform:
   - {fileID: 5118022689695392599}
   - {fileID: 4611691242644101307}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4102725152112460096
 MonoBehaviour:
@@ -214,6 +214,7 @@ MonoBehaviour:
   AirTime: 0
   BumpTimeRemaining: 0
   BumpVelocity: {x: 0, y: 0, z: 0}
+  StunTimeRemaining: 0
 --- !u!143 &4102725152112460099
 CharacterController:
   m_ObjectHideFlags: 0
@@ -360,6 +361,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: warrok_w_kurniawan
       objectReference: {fileID: 0}
+    - target: {fileID: 3103283877742750325, guid: 89a2e351fb965d4419b358613fdcb198, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 0c20eaebedf90a746b4d3a18fedcb111, type: 2}
     - target: {fileID: 5866666021909216657, guid: 89a2e351fb965d4419b358613fdcb198, type: 3}
       propertyPath: m_Controller
       value: 

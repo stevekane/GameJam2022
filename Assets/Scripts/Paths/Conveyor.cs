@@ -30,13 +30,13 @@ public class Conveyor : MonoBehaviour {
     FramesRemaining = nextFrames;
   }
 
-  // void OnDrawGizmos() {
-  //   if (!Application.isPlaying) {
-  //     foreach (var bucket in Buckets) {
-  //       var pathData = Path.ToWorldSpace(bucket.Distance);
-  //       bucket.transform.position = pathData.Position;
-  //       Gizmos.DrawWireSphere(pathData.Position,.25f);
-  //     }
-  //   }
-  // }
+  void OnDrawGizmos() {
+    if (!Application.isPlaying) {
+      foreach (var bucket in Buckets) {
+        var pathData = Path.ToWorldSpace(bucket.Distance);
+        bucket.transform.position = pathData.Position;
+        Gizmos.DrawWireSphere(pathData.Position,.25f);
+      }
+    }
+  }
 }

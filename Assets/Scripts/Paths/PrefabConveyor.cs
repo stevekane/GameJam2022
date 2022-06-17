@@ -61,6 +61,7 @@ public class PrefabConveyor : MonoBehaviour {
   }
 }
 
+[CanEditMultipleObjects]
 [CustomEditor(typeof(PrefabConveyor))]
 public class PrefabConveyorEditor : Editor {
   public override void OnInspectorGUI() {
