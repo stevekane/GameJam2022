@@ -24,6 +24,22 @@ public class Waypoints : Path {
     return null;
   }
 
+  public static PathData SegmentToWorldSpace(float interpolant, Vector3 p0, Vector3 p1, Vector3? p2, float d0, float d1, float turnFraction) {
+    var delta = p1-p0;
+    var f = Mathf.InverseLerp(d0, d1, interpolant);
+    var position = p0+f*delta;
+    if (f <= turnFraction || !p2.HasValue) {
+      var r0 = Quaternion.LookRotation((p1-p0).XZ().normalized, Vector3.up);
+      return new PathData(position, r0);
+    } else {
+      var r0 = Quaternion.LookRotation((p1-p0).XZ().normalized, Vector3.up);
+      var r1 = Quaternion.LookRotation((p2.Value-p1).XZ().normalized, Vector3.up);
+      var fraction = Mathf.InverseLerp(turnFraction, 1, f);
+      var rotation = Quaternion.Slerp(r0, r1, fraction);
+      return new PathData(position, rotation);
+    }
+  }
+
   public override PathData ToWorldSpace(float interpolant) {
     for (int i = 1; i < NormalizedDistances.Length; i++) {
       var d0 = NormalizedDistances[i-1];
@@ -33,20 +49,8 @@ public class Waypoints : Path {
         var p0 = Points[i-1].transform.position;
         var p1 = Points[i].transform.position;
         var iNext = NextIndexWithUniquePosition(i);
-        var delta = p1-p0;
-        var f = Mathf.InverseLerp(d0,d1,interpolant);
-        var position = p0+f*delta;
-        if (f <= TurnFraction || !iNext.HasValue) {
-          var r0 = Quaternion.LookRotation((p1-p0).XZ().normalized, Vector3.up);
-          return new PathData(position, r0);
-        } else {
-          var p2 = Points[iNext.Value].transform.position;
-          var r0 = Quaternion.LookRotation((p1-p0).XZ().normalized, Vector3.up);
-          var r1 = Quaternion.LookRotation((p2-p1).XZ().normalized, Vector3.up);
-          var fraction = Mathf.InverseLerp(TurnFraction, 1, f);
-          var rotation = Quaternion.Slerp(r0, r1, fraction);
-          return new PathData(position, rotation);
-        }
+        Vector3? p2 = iNext.HasValue ? Points[iNext.Value].transform.position : null;
+        return SegmentToWorldSpace(interpolant, p0, p1, p2, d0, d1, TurnFraction);
       }
     }
     return new PathData(Points[0].transform.position,Points[0].transform.rotation);

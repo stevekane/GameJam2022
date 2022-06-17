@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class RectanglePath : Path {
@@ -9,31 +11,21 @@ public class RectanglePath : Path {
   [SerializeField]
   [Range(0,100)]
   float Height = 5;
-  
+
   public override PathData ToWorldSpace(float interpolant) {
     var pathLength = 2*Width+2*Height;
-    var top = Width/pathLength;
-    var right = top+Height/pathLength;
-    var bottom = right+Width/pathLength;
-    var left = bottom+Height/pathLength;
+    var uld = Width/pathLength;
+    var urd = uld+Height/pathLength;
+    var lrd = urd+Width/pathLength;
     var ul = transform.position-transform.right*Width/2+transform.forward*Height/2;
     var ur = transform.position+transform.right*Width/2+transform.forward*Height/2;
     var lr = transform.position+transform.right*Width/2-transform.forward*Height/2;
     var ll = transform.position-transform.right*Width/2-transform.forward*Height/2;
+    var normalizedDistances = new List<float> { 0, uld, urd, lrd, 1};
+    var points = new Vector3[] {ul, ur, lr, ll};
     interpolant = interpolant%1f;
-    if (interpolant < top) {
-      var i = Mathf.InverseLerp(0,top,interpolant);
-      return new PathData(ul+transform.right*i*Width, Quaternion.LookRotation(transform.right));
-    } else if (interpolant < right) {
-      var i = Mathf.InverseLerp(top,right,interpolant);
-      return new PathData(ur-transform.forward*i*Height, Quaternion.LookRotation(-transform.forward));
-    } else if (interpolant < bottom) {
-      var i = Mathf.InverseLerp(right,bottom,interpolant);
-      return new PathData(lr-transform.right*i*Width, Quaternion.LookRotation(-transform.right));
-    } else {
-      var i = Mathf.InverseLerp(bottom,left,interpolant);
-      return new PathData(ll+transform.forward*i*Height, Quaternion.LookRotation(transform.forward));
-    }
+    int i = normalizedDistances.FindLastIndex((float t) => interpolant >= t);
+    return Waypoints.SegmentToWorldSpace(interpolant, points[i], points[(i+1)%4], points[(i+2)%4], normalizedDistances[i], normalizedDistances[i+1], 0.9f);
   }
 
   void OnDrawGizmos() {
