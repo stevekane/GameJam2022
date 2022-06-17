@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   USE_BULLET_TIME: 1
   MOVE_SPEED: 10
-  MAX_XZ_ACCELERATION: 0.25
-  MOVE_ANIMATION_MULTIPLIER: 0.125
-  JUMP_Y_VELOCITY: 10
-  JUMP_XZ_MULTIPLIER: 2
+  MAX_XZ_ACCELERATION: 1
+  MOVE_ANIMATION_MULTIPLIER: 0.2
+  JUMP_Y_VELOCITY: 13
+  JUMP_XZ_MULTIPLIER: 1.25
   POUNCE_XZ_MULTIPLER: 2.5
   STEERING_STRENGTH:
     serializedVersion: 2
@@ -25,8 +25,8 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 0
-      outSlope: 0
+      inSlope: 2
+      outSlope: 2
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -34,8 +34,8 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 2
-      outSlope: 2
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -43,8 +43,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  MAX_STEERING_TIME: 0.2
-  MAX_STEERING_MULTIPLIER: 15
+  MAX_STEERING_TIME: 0.1
+  MAX_STEERING_MULTIPLIER: 40
   GRAVITY: -40
   FALL_GRAVITY_MULTIPLIER: 3
   PERCH_ATTRACTION_EPSILON: -0.1

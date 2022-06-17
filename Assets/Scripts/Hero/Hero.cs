@@ -158,9 +158,15 @@ public class Hero : MonoBehaviour {
     var normalizedTime = AirTime/Config.MAX_STEERING_TIME;
     var multiplier = Config.MAX_STEERING_MULTIPLIER;
     var strength = Config.STEERING_STRENGTH.Evaluate(normalizedTime);
+    var forward = Velocity.XZ().normalized;
+    var right = new Vector3(forward.z,0,-forward.x);
+    var aSteer = Vector3.Project(desiredMove,right);
+    var aSlow = Vector3.Project(desiredMove,-forward);
+    var dot = Vector3.Dot(forward,aSlow);
+    aSlow = dot > 0 ? Vector3.zero : aSlow;
+    var steering = multiplier*strength*(aSteer+aSlow);
     var gravityFactor = Velocity.y < 0 ? Config.FALL_GRAVITY_MULTIPLIER: 1;
     var gravity = gravityFactor*Config.GRAVITY*Vector3.up;
-    var steering = multiplier*strength*desiredMove;
     return dt*(gravity+steering);
   }
 
