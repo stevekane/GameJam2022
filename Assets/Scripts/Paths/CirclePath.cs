@@ -4,6 +4,7 @@ public class CirclePath : Path {
   [SerializeField]
   Color Color = Color.green;
   [SerializeField]
+  [Range(0,100)]
   float Radius = 1f;
   [SerializeField]
 
