@@ -160,6 +160,7 @@ GameObject:
   - component: {fileID: 4102725152112460096}
   - component: {fileID: 4102725152112460099}
   - component: {fileID: 1604618934501359742}
+  - component: {fileID: 7508363702064596809}
   m_Layer: 8
   m_Name: Hero
   m_TagString: Untagged
@@ -179,9 +180,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4611691242644101307}
   - {fileID: 8696207422598767898}
   - {fileID: 2637076205955894386}
-  - {fileID: 4611691242644101307}
   m_Father: {fileID: 0}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -200,7 +201,7 @@ MonoBehaviour:
   Config: {fileID: 11400000, guid: 1a8a917e4cbe2904da17667533536c7d, type: 2}
   UI: {fileID: 0}
   Controller: {fileID: 4102725152112460099}
-  Animator: {fileID: 8248600015612614152}
+  Animator: {fileID: 0}
   Grabber: {fileID: 5640303072316059443}
   Target: {fileID: 0}
   Targets: []
@@ -212,6 +213,7 @@ MonoBehaviour:
   LegTarget: {fileID: 0}
   LastPerch: {fileID: 0}
   AirTime: 0
+  JumpType: 0
   BumpTimeRemaining: 0
   BumpVelocity: {x: 0, y: 0, z: 0}
   StunTimeRemaining: 0
@@ -245,6 +247,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38b5f85dc564c4f4fafa2b5115a61de1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!95 &7508363702064596809
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4102725152112460109}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: a0540c76f511c6d4e890000c66ae3f06, type: 3}
+  m_Controller: {fileID: 9100000, guid: 82c6701f04f74de4dbb7ff620268a3e5, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 1
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &6972142920220521848
 GameObject:
   m_ObjectHideFlags: 0
@@ -369,16 +391,12 @@ PrefabInstance:
       propertyPath: m_ApplyRootMotion
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5866666021909216657, guid: a0540c76f511c6d4e890000c66ae3f06, type: 3}
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: a0540c76f511c6d4e890000c66ae3f06, type: 3}
 --- !u!4 &2637076205955894386 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a0540c76f511c6d4e890000c66ae3f06, type: 3}
-  m_PrefabInstance: {fileID: 2527222713779465113}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &8248600015612614152 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: a0540c76f511c6d4e890000c66ae3f06, type: 3}
   m_PrefabInstance: {fileID: 2527222713779465113}
   m_PrefabAsset: {fileID: 0}

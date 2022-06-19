@@ -349,11 +349,13 @@ public class Hero : MonoBehaviour {
       UI.Highlight(Targets,Targets.Length);
       Time.timeScale = AimingFramesRemaining > 0 && Config.USE_BULLET_TIME ? .1f : 1;
       AimingFramesRemaining = Mathf.Max(0,AimingFramesRemaining-1);
+      Animator.SetFloat("Aim",1);
     } else {
       UI.Select(null);
       UI.Highlight(Targets,0);
       Time.timeScale = 1;
       AimingFramesRemaining = Mathf.Min(AimingFramesRemaining+1,Config.MAX_TARGETING_FRAMES);
+      Animator.SetFloat("Aim",0);
     }
 
     {
