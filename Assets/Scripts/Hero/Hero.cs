@@ -293,16 +293,22 @@ public class Hero : MonoBehaviour {
       Animator.SetInteger("LegState",1);
     }
 
-    if (Aiming) {
-      transform.forward = action.AimXZ;
-    } else if (Reaching || Pulling) {
-      var targetXZ = ArmTarget.transform.position;
-      var currentXZ = transform.position;
-      targetXZ.y = 0;
-      currentXZ.y = 0;
-      transform.rotation = Quaternion.LookRotation(targetXZ-currentXZ);
-    } else if ((Free || Holding) && Moving) {
-      transform.forward = action.MoveXZ;
+    if (Grounded || Perching) {
+      if (Aiming) {
+        transform.forward = action.AimXZ;
+      } else if (Reaching || Pulling) {
+        var targetXZ = ArmTarget.transform.position;
+        var currentXZ = transform.position;
+        targetXZ.y = 0;
+        currentXZ.y = 0;
+        transform.rotation = Quaternion.LookRotation(targetXZ-currentXZ);
+      } else if ((Free || Holding) && Moving) {
+        transform.forward = action.MoveXZ;
+      }
+    } else {
+      if (Velocity.XZ().magnitude > 0) {
+        transform.forward = Velocity.XZ().normalized;
+      }
     }
 
     if (Holding) {
@@ -333,14 +339,6 @@ public class Hero : MonoBehaviour {
       var a = new Vector3(r,0,f);
       Animator.SetFloat("Forward",a.z);
       Animator.SetFloat("Right",a.x);
-      // TODO: This is multplied by animation playback speed in the grounded states.
-      // It is sensible to scale playback in all "movement" states but idle states
-      // probably should either be split away to a separate state of the machine
-      // with a fixed playback speed or this block of code is required to set
-      // playback speed to 1 when there is no motion.
-      var speed = velocityxz.magnitude;
-      speed = speed == 0 ? 1f : speed*Config.MOVE_ANIMATION_MULTIPLIER;
-      Animator.SetFloat("Speed",speed);
     }
 
     if (action.Aim.magnitude > 0) {
