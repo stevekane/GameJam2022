@@ -38,6 +38,7 @@ public class Hero : MonoBehaviour {
   public Targetable LegTarget;
   public Targetable LastPerch;
   public float AirTime;
+  public int JumpType = 0;
 
   [Header("Status Effects")]
   public float BumpTimeRemaining;
@@ -186,6 +187,7 @@ public class Hero : MonoBehaviour {
     LegTarget?.PounceFrom(this);
     LegTarget = null;
     Velocity = new Vector3(move.x*speed*boost,upward,move.z*speed*boost);
+    JumpType = JumpType == 0 ? 1 : 0;
   }
 
   void Pounce(Vector3 destination) {
@@ -291,6 +293,7 @@ public class Hero : MonoBehaviour {
       Controller.Move(dt*Velocity);
       Animator.SetFloat("VerticalSpeed",Velocity.y);
       Animator.SetInteger("LegState",1);
+      Animator.SetFloat("JumpType",(float)JumpType);
     }
 
     if (Grounded || Perching) {
