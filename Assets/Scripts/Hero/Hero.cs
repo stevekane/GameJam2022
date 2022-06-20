@@ -305,6 +305,9 @@ public class Hero : MonoBehaviour {
       Animator.SetInteger("LegState",2);
     } else if (Pouncing) {
       PounceFramesRemaining = Mathf.Max(0,PounceFramesRemaining-1);
+      if (Target) {
+        Velocity = (Target.transform.position - transform.position).normalized * Velocity.magnitude;
+      }
       Controller.Move(dt*Velocity);
       Animator.SetInteger("LegState",1);
     } else if (Grounded) {
