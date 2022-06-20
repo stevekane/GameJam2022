@@ -293,7 +293,6 @@ public class Hero : MonoBehaviour {
     if (BumpTimeRemaining > 0) {
       LegTarget = null;
       BumpTimeRemaining -= dt;
-      Velocity = BumpVelocity;
     }
     if (StunTimeRemaining > 0) {
       StunTimeRemaining -= dt;
@@ -303,12 +302,19 @@ public class Hero : MonoBehaviour {
       var target = LegTarget.transform.position+LegTarget.Height*Vector3.up;
       var current = transform.position;
       var interpolant = Mathf.Exp(Config.PERCH_ATTRACTION_EPSILON);
-      var next = Vector3.Lerp(target,current,interpolant);
+      var next = Vector3.Lerp(target, current, interpolant);
       Velocity = next-current;
       Controller.Move(Velocity);
-      Animator.SetInteger("LegState",2);
-    } else if (Stunned) {
-      Animator.SetInteger("LegState",0); // TODO: How to cancel jump anim?
+      Animator.SetInteger("LegState", 2);
+    } else if (Stunned || Bumped) {
+      // This is hacky as fuck but hopefully temporary.
+      Velocity = Bumped ? BumpVelocity : Vector3.zero;
+      if (Falling) {
+        AirTime += dt;
+        Velocity.y += FallAcceleration(Vector3.zero, dt).y;
+      }
+      Controller.Move(dt*Velocity);
+      Animator.SetInteger("LegState", 0);
     } else if (Pouncing) {
       PounceFramesRemaining = Mathf.Max(0,PounceFramesRemaining-1);
       if (Target) {

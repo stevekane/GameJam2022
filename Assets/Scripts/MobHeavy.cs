@@ -3,7 +3,43 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MobHeavy : Mob {
+  public Bullet BulletPrefab;
   public GameObject Shield;
+
+  enum StateType { Idle, Shoot }
+
+  Player Player;
+  StateType State {
+    get { return (StateType)Animator.GetInteger("State"); }
+    set { Animator.SetInteger("State", (int)value); }
+  }
+
+  public new void Start() {
+    base.Start();
+    Player = GameObject.FindObjectOfType<Player>();
+    State = StateType.Idle;
+  }
+
+  void FixedUpdate() {
+    switch (State) {
+    case StateType.Idle:
+      var playerDelta = (Player.transform.position - transform.position);
+      var playerInRange = playerDelta.sqrMagnitude < Config.ShootRadius*Config.ShootRadius;
+      if (playerInRange && IsOnShieldSide(Player.transform.position)) {
+        State = StateType.Shoot;
+      }
+      break;
+    }
+  }
+
+  public void Shoot() {
+    var playerDir = (Player.transform.position - transform.position).XZ().normalized;
+    Bullet.Fire(BulletPrefab, transform.position + Vector3.up*.5f + playerDir, playerDir, Config.BulletSpeed);
+  }
+
+  public void ShootCooldown() {
+    State = StateType.Idle;
+  }
 
   public override void MeHitThing(GameObject thing, MeHitThingType type, Vector3 contactPos) {
     Debug.Assert(false); // Heavy can't be thrown.

@@ -12,9 +12,8 @@ public class Bullet : MonoBehaviour {
     body = GetComponent<Rigidbody>();
   }
 
-  public static void Fire(Bullet prefab, Vector3 position, Vector3 direction, BulletType type, float speed = 5) {
+  public static void Fire(Bullet prefab, Vector3 position, Vector3 direction, float speed = 5) {
     var bullet = Instantiate(prefab, position, Quaternion.FromToRotation(Vector3.forward, direction));
-    bullet.Type = type;
     bullet.Direction = direction;
     bullet.Speed = speed;
   }
@@ -29,7 +28,12 @@ public class Bullet : MonoBehaviour {
 
     var player = collider.gameObject.GetComponentInParent<Hero>();
     if (player) {
-      player.Stun(.25f);
+      if (Type == BulletType.NET) {
+        player.Bump(player.transform.position, transform.forward.XZ().normalized * 15f);
+        player.Stun(1.25f);
+      } else {
+        player.Stun(.25f);
+      }
     }
     Destroy(gameObject, .01f);
   }
