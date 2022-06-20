@@ -52,7 +52,7 @@ public class Hero : MonoBehaviour {
   List<BlockEvent> Blocks = new List<BlockEvent>(32);
 
   float Score(Vector3 forward, Vector3 origin, Vector3 target) {
-    var delta = target-origin;
+    var delta = target.XZ()-origin.XZ();
     var distance = delta.magnitude;
     var dot = distance > 0 ? Vector3.Dot(delta.normalized,forward) : 1;
     var a = Config.DISTANCE_SCORE.Evaluate(1-distance/Config.MAX_TARGETING_DISTANCE);
@@ -88,7 +88,7 @@ public class Hero : MonoBehaviour {
     var forward = transform.forward;
     var includeInactive = false;
     return FindObjectsOfType<Targetable>(includeInactive)
-      .Where(t => Vector3.Distance(origin,t.transform.position) <= maxDistance)
+      .Where(t => Vector3.Distance(origin.XZ(),t.transform.position.XZ()) <= maxDistance)
       .Where(t => Within(origin,t.transform.position,forward,maxRadians))
       .ToArray();
   }
@@ -241,33 +241,6 @@ public class Hero : MonoBehaviour {
     Targets = FindTargets(targetingDistance,targetingRadians);
     Target = Best(LegTarget,Targets);
 
-    /*
-    Grounded
-      Actions: Jump | Hold | Throw
-      Physics: Fall
-      Interactions: Stun | Bump
-    Perched
-      Actions: Jump | Throw
-      Physics: ∅
-      Interaction: Stun | Bump
-    AirDashing
-      Actions: ∅
-      Physics: ∅
-      Interaction: ∅
-    Falling: 
-      Actions: Aim | Pounce | Reach
-      Physics: Land
-      Interaction: Stun | Bump
-
-    Free:
-      Interactions: Stun | Bump
-    Reaching
-      Interactions: ∅
-    Holding: Stun | Bump
-    Pulling:
-      Interactions: ∅
-    */
-
     if (Falling && !Bumped && TryGetFirst(Entered,out Targetable targetable)) {
       Perch(targetable);
     } else if (Falling && Aiming && Target && !Stunned && action.PounceDown) {
@@ -388,7 +361,7 @@ public class Hero : MonoBehaviour {
     if (Falling && !Pouncing && !Stunned && Free && action.Aim.magnitude > 0) {
       UI.Select(Target);
       UI.Highlight(Targets,Targets.Length);
-      Time.timeScale = AimingFramesRemaining > 0 && Config.USE_BULLET_TIME ? .1f : 1;
+      Time.timeScale = AimingFramesRemaining > 0 && Config.USE_BULLET_TIME ? .5f : 1;
       AimingFramesRemaining = Mathf.Max(0,AimingFramesRemaining-1);
       Animator.SetFloat("Aim",1);
     } else {
