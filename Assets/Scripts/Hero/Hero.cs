@@ -131,6 +131,7 @@ public class Hero : MonoBehaviour {
 
   public void Stun(float duration) {
     StunTimeRemaining = duration;
+    Velocity = new Vector3(0, 0, 0);
   }
 
   public void Enter(GameObject gameObject) {
@@ -269,15 +270,15 @@ public class Hero : MonoBehaviour {
 
     if (Falling && !Bumped && TryGetFirst(Entered,out Targetable targetable)) {
       Perch(targetable);
-    } else if (Falling && Aiming && Target && action.PounceDown) {
+    } else if (Falling && Aiming && Target && !Stunned && action.PounceDown) {
       Pounce(Target.transform.position);
-    } else if ((Grounded || Perching) && !Aiming && action.PounceDown) {
+    } else if ((Grounded || Perching) && !Aiming && !Stunned && action.PounceDown) {
       Jump(action.MoveXZ);
-    } else if (Holding && action.HitDown) {
+    } else if (Holding && !Stunned && action.HitDown) {
       Throw(transform.forward,Config.THROW_SPEED);
-    } else if (Aiming && Free && action.HitDown && Target && Target.TryGetComponent(out Throwable distantThrowable)) {
+    } else if (Aiming && Free && !Stunned && action.HitDown && Target && Target.TryGetComponent(out Throwable distantThrowable)) {
       Reach(distantThrowable);
-    } else if (Grounded && !Aiming && action.HitDown && TryGetFirst(Stayed,out Throwable throwable)) {
+    } else if (Grounded && !Aiming && !Stunned && action.HitDown && TryGetFirst(Stayed,out Throwable throwable)) {
       Hold(throwable);
     } else if (Reaching && ArmFramesRemaining <= 0) {
       Pull(ArmTarget);
@@ -294,6 +295,9 @@ public class Hero : MonoBehaviour {
       BumpTimeRemaining -= dt;
       Velocity = BumpVelocity;
     }
+    if (StunTimeRemaining > 0) {
+      StunTimeRemaining -= dt;
+    }
 
     if (LegTarget) {
       var target = LegTarget.transform.position+LegTarget.Height*Vector3.up;
@@ -303,6 +307,8 @@ public class Hero : MonoBehaviour {
       Velocity = next-current;
       Controller.Move(Velocity);
       Animator.SetInteger("LegState",2);
+    } else if (Stunned) {
+      Animator.SetInteger("LegState",0); // TODO: How to cancel jump anim?
     } else if (Pouncing) {
       PounceFramesRemaining = Mathf.Max(0,PounceFramesRemaining-1);
       if (Target) {
@@ -325,7 +331,7 @@ public class Hero : MonoBehaviour {
       Animator.SetFloat("JumpType",(float)JumpType);
     }
 
-    if (Grounded || Perching) {
+    if ((Grounded || Perching) && !Stunned) {
       if (Aiming) {
         transform.forward = action.AimXZ;
       } else if (Reaching || Pulling) {
@@ -373,7 +379,7 @@ public class Hero : MonoBehaviour {
       Animator.SetFloat("Right",a.x);
     }
 
-    if (Falling && !Pouncing && Free && action.Aim.magnitude > 0) {
+    if (Falling && !Pouncing && !Stunned && Free && action.Aim.magnitude > 0) {
       UI.Select(Target);
       UI.Highlight(Targets,Targets.Length);
       Time.timeScale = AimingFramesRemaining > 0 && Config.USE_BULLET_TIME ? .1f : 1;
