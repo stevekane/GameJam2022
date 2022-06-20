@@ -6,25 +6,35 @@ public class Bullet : MonoBehaviour {
   public Vector3 Direction;
   public float Speed = 5;
 
-  public static void Fire(Bullet prefab, Vector3 position, Vector3 direction, BulletType type, float speed = 5) {
+  Rigidbody body;
+
+  public void Awake() {
+    body = GetComponent<Rigidbody>();
+  }
+
+  public static void Fire(Bullet prefab, Vector3 position, Vector3 direction, float speed = 5) {
     var bullet = Instantiate(prefab, position, Quaternion.FromToRotation(Vector3.forward, direction));
-    bullet.Type = type;
     bullet.Direction = direction;
     bullet.Speed = speed;
   }
 
   void FixedUpdate() {
-    transform.position += Speed * Time.deltaTime * Direction;
+    body.MovePosition(transform.position + Speed * Time.deltaTime * Direction);
   }
 
-  void OnCollisionEnter(Collision collision) {
-    if (collision.gameObject.tag == "Ground")
+  void OnTriggerEnter(Collider collider) {
+    if (collider.gameObject.tag == "Ground")
       return;
 
-    var player = collision.gameObject.GetComponentInParent<Hero>();
+    var player = collider.gameObject.GetComponentInParent<Hero>();
     if (player) {
-      player.Stun(.25f);
+      if (Type == BulletType.NET) {
+        player.Bump(player.transform.position, transform.forward.XZ().normalized * 15f);
+        player.Stun(1.25f);
+      } else {
+        player.Stun(.25f);
+      }
     }
-    Destroy(gameObject);
+    Destroy(gameObject, .01f);
   }
 }
