@@ -40,6 +40,7 @@ public class Hero : MonoBehaviour {
   public int PounceFramesRemaining;
   public float AirTime;
   public int JumpType = 0;
+  public Vector3 LastGroundPosition;
 
   [Header("Status Effects")]
   public float BumpTimeRemaining;
@@ -356,6 +357,14 @@ public class Hero : MonoBehaviour {
       var a = new Vector3(r,0,f);
       Animator.SetFloat("Forward",a.z);
       Animator.SetFloat("Right",a.x);
+    }
+
+    // Reset after falling.
+    if (Grounded) {
+      LastGroundPosition = transform.position;
+    } else if (transform.position.y < -100f) {
+      transform.position = LastGroundPosition;
+      Velocity = Vector3.zero;
     }
 
     if (Falling && !Pouncing && !Stunned && Free && action.Aim.magnitude > 0) {
