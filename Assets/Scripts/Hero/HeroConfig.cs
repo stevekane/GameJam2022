@@ -17,6 +17,8 @@ public class HeroConfig : ScriptableObject {
   public float JUMP_XZ_MULTIPLIER = 2f;
   [Tooltip("Multiplier applied to normal jump when pouncing")]
   public float POUNCE_XZ_MULTIPLER = 2f;
+  [Tooltip("Max frames for a pounce")]
+  public int MAX_POUNCE_FRAMES = 300;
 
   [Header("Falling")]
   [Tooltip("Amount of air steering as a function of air-time")]

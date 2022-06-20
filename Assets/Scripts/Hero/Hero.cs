@@ -34,9 +34,10 @@ public class Hero : MonoBehaviour {
   public int ArmFramesRemaining;
 
   [Header("Leg State")]
-  public Vector3 Velocity;
   public Targetable LegTarget;
   public Targetable LastPerch;
+  public Vector3 Velocity;
+  public int PounceFramesRemaining;
   public float AirTime;
   public int JumpType = 0;
 
@@ -115,6 +116,7 @@ public class Hero : MonoBehaviour {
   bool Perching { get => LegTarget; }
   bool Falling { get => !Controller.isGrounded && !LegTarget; }
   bool Grounded { get => Controller.isGrounded && !LegTarget; }
+  bool Pouncing { get => !Perching && PounceFramesRemaining > 0; }
   bool Moving { get => Inputs.Action.Move.magnitude > 0; }
   bool Aiming { get => Inputs.Action.Aim.magnitude > 0; }
 
@@ -192,15 +194,12 @@ public class Hero : MonoBehaviour {
 
   void Pounce(Vector3 destination) {
     var delta = destination-transform.position;
-    var distance = delta.magnitude;
-    var move = delta.normalized;
-    var boost = distance;
-    var speed = Config.MOVE_SPEED;
-    var upward = Config.JUMP_Y_VELOCITY/2;
+    var duration = (float)Config.MAX_POUNCE_FRAMES*Time.fixedDeltaTime;
     AirTime = 0;
+    PounceFramesRemaining = Config.MAX_POUNCE_FRAMES;
     LegTarget?.PounceFrom(this);
     LegTarget = null;
-    Velocity = new Vector3(move.x*speed*boost,upward,move.z*speed*boost);
+    Velocity = delta/duration;
   }
 
   void Walk(Vector3 move) {
@@ -241,13 +240,36 @@ public class Hero : MonoBehaviour {
     Targets = FindTargets(targetingDistance,targetingRadians);
     Target = Best(LegTarget,Targets);
 
-    // TODO: Should there be two transitions: Arms and Legs instead of a single disjunction
-    if (Stunned) {
-      StunTimeRemaining -= dt;
-      return;
-    } else if (Falling && !Bumped && TryGetFirst(Entered,out Targetable targetable)) {
+    /*
+    Grounded
+      Actions: Jump | Hold | Throw
+      Physics: Fall
+      Interactions: Stun | Bump
+    Perched
+      Actions: Jump | Throw
+      Physics: ∅
+      Interaction: Stun | Bump
+    AirDashing
+      Actions: ∅
+      Physics: ∅
+      Interaction: ∅
+    Falling: 
+      Actions: Aim | Pounce | Reach
+      Physics: Land
+      Interaction: Stun | Bump
+
+    Free:
+      Interactions: Stun | Bump
+    Reaching
+      Interactions: ∅
+    Holding: Stun | Bump
+    Pulling:
+      Interactions: ∅
+    */
+
+    if (Falling && !Bumped && TryGetFirst(Entered,out Targetable targetable)) {
       Perch(targetable);
-    } else if (Aiming && Target && action.PounceDown) {
+    } else if (Falling && Aiming && Target && action.PounceDown) {
       Pounce(Target.transform.position);
     } else if ((Grounded || Perching) && !Aiming && action.PounceDown) {
       Jump(action.MoveXZ);
@@ -281,6 +303,10 @@ public class Hero : MonoBehaviour {
       Velocity = next-current;
       Controller.Move(Velocity);
       Animator.SetInteger("LegState",2);
+    } else if (Pouncing) {
+      PounceFramesRemaining = Mathf.Max(0,PounceFramesRemaining-1);
+      Controller.Move(dt*Velocity);
+      Animator.SetInteger("LegState",1);
     } else if (Grounded) {
       Velocity += MoveAcceleration(action.MoveXZ);
       Velocity.y = Velocity.y > 0 ? Velocity.y : -1;
@@ -344,7 +370,7 @@ public class Hero : MonoBehaviour {
       Animator.SetFloat("Right",a.x);
     }
 
-    if (action.Aim.magnitude > 0) {
+    if (Falling && !Pouncing && Free && action.Aim.magnitude > 0) {
       UI.Select(Target);
       UI.Highlight(Targets,Targets.Length);
       Time.timeScale = AimingFramesRemaining > 0 && Config.USE_BULLET_TIME ? .1f : 1;
@@ -369,7 +395,7 @@ public class Hero : MonoBehaviour {
     Exited.Clear();
     Blocks.Clear();
 
-    if (Grounded) {
+    if (Grounded && !Pouncing) {
       gameObject.layer = PhysicsLayers.PlayerGrounded;
     } else {
       gameObject.layer = PhysicsLayers.PlayerAirborne;
