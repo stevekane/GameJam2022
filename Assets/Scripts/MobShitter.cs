@@ -30,7 +30,7 @@ public class MobShitter : Mob {
   }
 
   public void Shoot() {
-    var playerDir = (Player.transform.position - transform.position).normalized;
+    var playerDir = (Player.transform.position - transform.position).XZ().normalized;
     Bullet.Fire(BulletPrefab, transform.position + Vector3.up*.5f + playerDir, playerDir, Bullet.BulletType.STUN, Config.BulletSpeed);
   }
 
