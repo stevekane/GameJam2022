@@ -386,7 +386,9 @@ public class Hero : MonoBehaviour {
     if (Grounded) {
       LastGroundPosition = transform.position;
     } else if (transform.position.y < -100f) {
+      Controller.enabled = false;
       transform.position = LastGroundPosition;
+      Controller.enabled = true;
       Velocity = Vector3.zero;
     }
 
