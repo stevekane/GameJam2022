@@ -2,40 +2,43 @@ using UnityEngine;
 
 public class MobShitter : Mob {
   public Bullet BulletPrefab;
-  Player Player;
+  Hero Player;
+  float TimeRemaining;
 
-  enum MobShitterState { Idle, Shoot }
-
-  MobShitterState State {
-    get { return (MobShitterState)Animator.GetInteger("State"); }
-    set { Animator.SetInteger("State", (int)value); }
-  }
+  enum StateType { Idle, Shoot, Cooldown }
+  StateType State = StateType.Idle;
 
   public new void Start() {
     base.Start();
-    Player = GameObject.FindObjectOfType<Player>();
-    State = MobShitterState.Idle;
+    Player = GameObject.FindObjectOfType<Hero>();
   }
 
   void FixedUpdate() {
     switch (State) {
-    case MobShitterState.Idle:
+    case StateType.Idle:
       var playerDelta = (Player.transform.position - transform.position);
       var playerInRange = playerDelta.sqrMagnitude < Config.ShootRadius*Config.ShootRadius;
       if (playerInRange) {
-        State = MobShitterState.Shoot;
+        State = StateType.Shoot;
       }
       break;
+    case StateType.Cooldown:
+      TimeRemaining -= Time.fixedDeltaTime;
+      if (TimeRemaining < 0f)
+        State = StateType.Idle;
+      break;
     }
+    if (Player.LegTarget?.gameObject == gameObject)
+      State = StateType.Idle;
+
+    Animator.SetInteger("State", State == StateType.Shoot ? 1 : 0);
   }
 
   public void Shoot() {
     var playerDir = (Player.transform.position - transform.position).XZ().normalized;
-    Bullet.Fire(BulletPrefab, transform.position + Vector3.up*.5f + playerDir, playerDir, Config.BulletSpeed);
-  }
-
-  public void ShootCooldown() {
-    State = MobShitterState.Idle;
+    Bullet.Fire(BulletPrefab, transform.position + Vector3.up*.5f + playerDir, playerDir, Bullet.BulletType.STUN, Config.BulletSpeed);
+    TimeRemaining = Config.ShootCooldown;
+    State = StateType.Cooldown;
   }
 
   public void OnDrawGizmosSelected() {

@@ -6,18 +6,15 @@ public class MobHeavy : Mob {
   public Bullet BulletPrefab;
   public GameObject Shield;
 
-  enum StateType { Idle, Shoot }
+  Hero Player;
+  float TimeRemaining;
 
-  Player Player;
-  StateType State {
-    get { return (StateType)Animator.GetInteger("State"); }
-    set { Animator.SetInteger("State", (int)value); }
-  }
+  enum StateType { Idle, Shoot, Cooldown }
+  StateType State = StateType.Idle;
 
   public new void Start() {
     base.Start();
-    Player = GameObject.FindObjectOfType<Player>();
-    State = StateType.Idle;
+    Player = GameObject.FindObjectOfType<Hero>();
   }
 
   void FixedUpdate() {
@@ -25,20 +22,27 @@ public class MobHeavy : Mob {
     case StateType.Idle:
       var playerDelta = (Player.transform.position - transform.position);
       var playerInRange = playerDelta.sqrMagnitude < Config.ShootRadius*Config.ShootRadius;
-      if (playerInRange && IsOnShieldSide(Player.transform.position)) {
+      if (playerInRange) {
         State = StateType.Shoot;
       }
       break;
+    case StateType.Cooldown:
+      TimeRemaining -= Time.fixedDeltaTime;
+      if (TimeRemaining < 0f)
+        State = StateType.Idle;
+      break;
     }
+    if (Player.LegTarget?.gameObject == gameObject)
+      State = StateType.Idle;
+
+    Animator.SetInteger("State", State == StateType.Shoot ? 1 : 0);
   }
 
   public void Shoot() {
     var playerDir = (Player.transform.position - transform.position).XZ().normalized;
-    Bullet.Fire(BulletPrefab, transform.position + Vector3.up*.5f + playerDir, playerDir, Config.BulletSpeed);
-  }
-
-  public void ShootCooldown() {
-    State = StateType.Idle;
+    Bullet.Fire(BulletPrefab, transform.position + Vector3.up*.5f + playerDir, playerDir, Bullet.BulletType.STUN, Config.BulletSpeed);
+    TimeRemaining = Config.ShootCooldown;
+    State = StateType.Cooldown;
   }
 
   public override void MeHitThing(GameObject thing, MeHitThingType type, Vector3 contactPos) {
