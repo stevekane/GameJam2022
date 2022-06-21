@@ -125,14 +125,13 @@ public class Hero : MonoBehaviour {
     Blocks.Add(new BlockEvent { Position = position, Velocity = velocity });
   }
 
-  public void Bump(Vector3 position, Vector3 velocity) {
-    BumpTimeRemaining = Config.BUMP_DURATION;
+  public void Bump(Vector3 position, Vector3 velocity, float bumpDuration) {
+    BumpTimeRemaining = bumpDuration;
     BumpVelocity = velocity;
   }
 
   public void Stun(float duration) {
     StunTimeRemaining = duration;
-    Velocity = new Vector3(0, 0, 0);
   }
 
   public void Enter(GameObject gameObject) {
@@ -282,10 +281,11 @@ public class Hero : MonoBehaviour {
       Animator.SetInteger("LegState", 2);
     } else if (Stunned || Bumped) {
       // This is hacky as fuck but hopefully temporary.
+      float vy = Velocity.y;
       Velocity = Bumped ? BumpVelocity : Vector3.zero;
       if (Falling) {
         AirTime += dt;
-        Velocity.y += FallAcceleration(Vector3.zero, dt).y;
+        Velocity.y = vy + FallAcceleration(Vector3.zero, dt).y;
       }
       Controller.Move(dt*Velocity);
       Animator.SetInteger("LegState", 0);
