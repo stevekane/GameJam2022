@@ -131,8 +131,9 @@ public class Hero : MonoBehaviour {
   }
 
   public void Stun(float duration) {
-    StunTimeRemaining = duration;
-    Velocity = new Vector3(0, 0, 0);
+    StunTimeRemaining = 0;
+    // StunTimeRemaining = duration;
+    // Velocity = new Vector3(0, 0, 0);
   }
 
   public void Enter(GameObject gameObject) {
@@ -188,11 +189,22 @@ public class Hero : MonoBehaviour {
     var speed = Config.MOVE_SPEED;
     var upward = Config.JUMP_Y_VELOCITY;
     AirTime = 0;
+    Velocity = new Vector3(move.x*speed*boost,upward,move.z*speed*boost);
+    JumpType = 0;
+  }
+
+  void Leap(Vector3 move) {
+    var boost = Config.JUMP_XZ_MULTIPLIER;
+    var speed = Config.MOVE_SPEED;
+    var upward = Config.JUMP_Y_VELOCITY;
+    var direction = move.magnitude > 0 ? move.normalized : transform.forward;
+    AirTime = 0;
     LegTarget?.PounceFrom(this);
     LegTarget = null;
-    Velocity = new Vector3(move.x*speed*boost,upward,move.z*speed*boost);
-    JumpType = JumpType == 0 ? 1 : 0;
+    Velocity = new Vector3(direction.x*speed*boost,upward,direction.z*speed*boost);
+    JumpType = 1;
   }
+
 
   void Pounce(Vector3 destination) {
     var delta = destination-transform.position;
@@ -246,8 +258,10 @@ public class Hero : MonoBehaviour {
       Perch(targetable);
     } else if (Falling && Aiming && Target && !Stunned && action.PounceDown) {
       Pounce(Target.transform.position);
-    } else if ((Grounded || Perching) && !Aiming && !Stunned && action.PounceDown) {
+    } else if (Grounded && !Aiming && !Stunned && action.PounceDown) {
       Jump(action.MoveXZ);
+    } else if (Perching && !Aiming && !Stunned && action.PounceDown) {
+      Leap(action.MoveXZ);
     } else if (Holding && !Stunned && action.HitDown) {
       Throw(transform.forward,Config.THROW_SPEED);
     } else if (Aiming && Free && !Stunned && action.HitDown && Target && Target.TryGetComponent(out Throwable distantThrowable)) {
