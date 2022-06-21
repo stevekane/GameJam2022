@@ -42,6 +42,13 @@ public class EventDriver : MonoBehaviour {
   bool PounceUp;
 
   void Start() {
+    var objs = FindObjectsOfType<EventDriver>();
+    if (objs.Length > 1) {
+      Destroy(gameObject);
+      return;
+    }
+    DontDestroyOnLoad(this.gameObject);
+
     const float BASE_FIXED_DELTA_TIME = 0.02f;
     Time.fixedDeltaTime = BASE_FIXED_DELTA_TIME * .1f;
     if (!Room && RoomPrefab) {
@@ -85,6 +92,7 @@ public class EventDriver : MonoBehaviour {
   public void RestartScene() {
     Time.timeScale = 1;
     SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    //SceneManager.MoveGameObjectToScene(this.gameObject, scene);
     History.Clear();
     HistoryIndex = 0;
     Inputs.InPlayBack = false;
