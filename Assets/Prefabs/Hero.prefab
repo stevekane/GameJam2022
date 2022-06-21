@@ -203,17 +203,22 @@ MonoBehaviour:
   Controller: {fileID: 4102725152112460099}
   Animator: {fileID: 7508363702064596809}
   Grabber: {fileID: 5640303072316059443}
+  TargetableMobLayerMask:
+    serializedVersion: 2
+    m_Bits: 1025
   Target: {fileID: 0}
   Targets: []
   AimingFramesRemaining: 300
   ArmState: 0
   ArmTarget: {fileID: 0}
   ArmFramesRemaining: 0
-  Velocity: {x: 0, y: 0, z: 0}
   LegTarget: {fileID: 0}
   LastPerch: {fileID: 0}
+  Velocity: {x: 0, y: 0, z: 0}
+  PounceFramesRemaining: 0
   AirTime: 0
   JumpType: 0
+  LastGroundPosition: {x: 0, y: 0, z: 0}
   BumpTimeRemaining: 0
   BumpVelocity: {x: 0, y: 0, z: 0}
   StunTimeRemaining: 0
@@ -382,6 +387,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: a0540c76f511c6d4e890000c66ae3f06, type: 3}
       propertyPath: m_Name
       value: xbot
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a0540c76f511c6d4e890000c66ae3f06, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: a0540c76f511c6d4e890000c66ae3f06, type: 3}
       propertyPath: m_Controller

@@ -24,6 +24,7 @@ public class Hero : MonoBehaviour {
   [SerializeField] Grabber Grabber;
 
   [Header("Targeting State")]
+  public LayerMask TargetableMobLayerMask;
   public Targetable Target;
   public Targetable[] Targets;
   public int AimingFramesRemaining;
@@ -89,8 +90,16 @@ public class Hero : MonoBehaviour {
     var forward = transform.forward;
     var includeInactive = false;
     return FindObjectsOfType<Targetable>(includeInactive)
-      .Where(t => Vector3.Distance(origin.XZ(),t.transform.position.XZ()) <= maxDistance)
-      .Where(t => Within(origin,t.transform.position,forward,maxRadians))
+      .Where(t => {
+        var delta = t.transform.position-origin;
+        var distance = delta.magnitude;
+        var direction = delta.normalized;
+        var didHit = Physics.Raycast(origin,direction,out RaycastHit hit,distance,TargetableMobLayerMask);
+        var inPlanarRange = Vector3.Distance(origin.XZ(),t.transform.position.XZ()) <= maxDistance;
+        var withinView = Within(origin,t.transform.position,forward,maxRadians);
+        var hitTarget = hit.collider && hit.collider.gameObject == t.gameObject;
+        return hitTarget && inPlanarRange && withinView;
+      })
       .ToArray();
   }
 
@@ -132,7 +141,6 @@ public class Hero : MonoBehaviour {
 
   public void Stun(float duration) {
     StunTimeRemaining = 0;
-    // Velocity = new Vector3(0, 0, 0);
   }
 
   public void Enter(GameObject gameObject) {
@@ -181,6 +189,7 @@ public class Hero : MonoBehaviour {
     LastPerch = LegTarget;
     LegTarget?.PounceTo(this);
     Velocity = Vector3.zero;
+    PounceFramesRemaining = 0;
   }
 
   void Jump(Vector3 move) {
@@ -255,7 +264,7 @@ public class Hero : MonoBehaviour {
 
     if (Falling && !Bumped && TryGetFirst(Entered,out Targetable targetable)) {
       Perch(targetable);
-    } else if (Falling && Aiming && Target && !Stunned && action.PounceDown) {
+    } else if (Aiming && Target && !Stunned && action.PounceDown) {
       Pounce(Target.transform.position);
     } else if (Grounded && !Aiming && !Stunned && action.PounceDown) {
       Jump(action.MoveXZ);
@@ -381,10 +390,14 @@ public class Hero : MonoBehaviour {
       Velocity = Vector3.zero;
     }
 
-    if (Falling && !Pouncing && !Stunned && Free && action.Aim.magnitude > 0) {
+    if (!Pouncing && !Stunned && Free && action.Aim.magnitude > 0) {
       UI.Select(Target);
       UI.Highlight(Targets,Targets.Length);
-      Time.timeScale = AimingFramesRemaining > 0 && Config.USE_BULLET_TIME ? .5f : 1;
+      if (AimingFramesRemaining > 0 && !Inputs.InPlayBack) {
+        Time.timeScale = .25f;
+      } else {
+        Time.timeScale = 1;
+      }
       AimingFramesRemaining = Mathf.Max(0,AimingFramesRemaining-1);
       Animator.SetFloat("Aim",1);
     } else {
