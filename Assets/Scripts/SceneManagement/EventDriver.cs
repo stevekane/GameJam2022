@@ -169,6 +169,8 @@ public class EventDriver : MonoBehaviour {
         Inputs.InPlayBack = true;
         if (HistoryIndex < History.Count) {
           Inputs.Action = History[HistoryIndex++];
+        } else {
+          Inputs.Action = new Action();
         }
       }
       break;
