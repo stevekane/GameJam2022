@@ -23,8 +23,14 @@ public class MobHeavy : Mob {
       var playerDelta = (Player.transform.position - transform.position);
       var playerInRange = playerDelta.sqrMagnitude < Config.ShootRadius*Config.ShootRadius;
       if (playerInRange) {
+        TimeRemaining = 55f/60f;
         State = StateType.Shoot;
       }
+      break;
+    case StateType.Shoot:
+      TimeRemaining -= Time.fixedDeltaTime;
+      if (TimeRemaining < 0f)
+        Shoot();
       break;
     case StateType.Cooldown:
       TimeRemaining -= Time.fixedDeltaTime;
