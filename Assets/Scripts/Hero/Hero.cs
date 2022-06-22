@@ -41,6 +41,7 @@ public class Hero : MonoBehaviour {
   public Targetable LegTarget;
   public Targetable LastPerch;
   public Vector3 Velocity;
+  public int FootstepFramesRemaining;
   public int PounceFramesRemaining;
   public float AirTime;
   public int JumpType = 0;
@@ -324,6 +325,14 @@ public class Hero : MonoBehaviour {
       Controller.Move(dt*Velocity);
       Animator.SetInteger("LegState",1);
     } else if (Grounded) {
+      if (FootstepFramesRemaining <= 0) {
+        FootstepFramesRemaining = Config.FramesPerFootstep;
+        if (Moving) {
+          FootstepAudioSource.PlayOneShot(Config.RunningAudioClip);
+        }
+      } else {
+        FootstepFramesRemaining = Mathf.Max(0,FootstepFramesRemaining-1);
+      }
       Velocity += MoveAcceleration(action.MoveXZ);
       Velocity.y = Velocity.y > 0 ? Velocity.y : -1;
       Controller.Move(dt*Velocity);

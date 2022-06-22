@@ -6,9 +6,12 @@ public class HeroConfig : ScriptableObject {
   public bool USE_BULLET_TIME = true;
 
   [Header("Moving")]
+  [Tooltip("Max movement speed")]
   public float MOVE_SPEED = 45f;
   [Tooltip("Maximum amount of instant acceleration possible while on ground")]
   public float MAX_XZ_ACCELERATION = .2f;
+  [Tooltip("Frames between footstep sounds")]
+  public int FramesPerFootstep = 250;
 
   [Header("Jumping")]
   [Tooltip("Initial upward velocity when jumping")]
