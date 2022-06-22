@@ -26,7 +26,7 @@ public class Throwable : MonoBehaviour {
     Destroy(GetComponent<Targetable>());
     gameObject.layer = PhysicsLayers.MobAirborne;
     Body.isKinematic = false;
-    Body.AddForce(impulse, ForceMode.Impulse);
+    Body.AddForce(impulse.XZ(), ForceMode.Impulse);
     State = ThrowableState.Airborne;
   }
 
