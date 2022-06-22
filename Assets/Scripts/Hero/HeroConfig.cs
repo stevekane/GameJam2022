@@ -68,4 +68,14 @@ public class HeroConfig : ScriptableObject {
   [Header("Status Effects")]
   [Tooltip("Time in seconds of a bumper's bump effect")]
   public float BUMP_DURATION = .25f;
+
+  [Header("Audio")]
+  public AudioClip RunningAudioClip;
+  public AudioClip JumpAudioClip;
+  public AudioClip PounceAudioClip;
+  public AudioClip LandAudioClip;
+  public AudioClip PerchAudioClip;
+  public AudioClip LeapAudioClip;
+  public AudioClip HoldAudioClip;
+  public AudioClip ThrowAudioClip;
 }

@@ -49,6 +49,7 @@ public class MobHeavy : Mob {
     Bullet.Fire(BulletPrefab, transform.position + Vector3.up*.5f + playerDir, playerDir, Bullet.BulletType.STUN, Config.BulletSpeed);
     TimeRemaining = Config.ShootCooldown;
     State = StateType.Cooldown;
+    AttackAudioSource.PlayOneShot(Config.AttackAudioClip);
   }
 
   public override void MeHitThing(GameObject thing, MeHitThingType type, Vector3 contactPos) {

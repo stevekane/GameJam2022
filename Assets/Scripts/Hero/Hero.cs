@@ -22,6 +22,9 @@ public class Hero : MonoBehaviour {
   [SerializeField] CharacterController Controller;
   [SerializeField] Animator Animator;
   [SerializeField] Grabber Grabber;
+  [SerializeField] AudioSource FootstepAudioSource;
+  [SerializeField] AudioSource LegAudioSource;
+  [SerializeField] AudioSource ArmAudioSource;
 
   [Header("Targeting State")]
   public LayerMask TargetableMobLayerMask;
@@ -190,6 +193,7 @@ public class Hero : MonoBehaviour {
     LegTarget?.PounceTo(this);
     Velocity = Vector3.zero;
     PounceFramesRemaining = 0;
+    LegAudioSource.PlayOneShot(Config.PerchAudioClip);
   }
 
   void Jump(Vector3 move) {
@@ -199,6 +203,7 @@ public class Hero : MonoBehaviour {
     AirTime = 0;
     Velocity = new Vector3(move.x*speed*boost,upward,move.z*speed*boost);
     JumpType = 0;
+    LegAudioSource.PlayOneShot(Config.JumpAudioClip);
   }
 
   void Leap(Vector3 move) {
@@ -211,6 +216,7 @@ public class Hero : MonoBehaviour {
     LegTarget = null;
     Velocity = new Vector3(direction.x*speed*boost,upward,direction.z*speed*boost);
     JumpType = 1;
+    LegAudioSource.PlayOneShot(Config.LeapAudioClip);
   }
 
 
@@ -222,11 +228,7 @@ public class Hero : MonoBehaviour {
     LegTarget?.PounceFrom(this);
     LegTarget = null;
     Velocity = delta/duration;
-  }
-
-  void Walk(Vector3 move) {
-    LegTarget = null;
-    Velocity = Config.MOVE_SPEED*move;
+    LegAudioSource.PlayOneShot(Config.PounceAudioClip);
   }
 
   void Reach(Throwable throwable) {
@@ -245,12 +247,14 @@ public class Hero : MonoBehaviour {
     ArmState = ArmState.Holding;
     ArmTarget = throwable;
     ArmTarget.Hold();
+    ArmAudioSource.PlayOneShot(Config.HoldAudioClip);
   }
 
   void Throw(Vector3 direction, float speed) {
     ArmTarget?.Throw(speed*direction);
     ArmTarget = null;
     ArmState = ArmState.Free;
+    ArmAudioSource.PlayOneShot(Config.ThrowAudioClip);
   }
 
   void FixedUpdate() {
@@ -326,9 +330,15 @@ public class Hero : MonoBehaviour {
       Animator.SetInteger("LegState",0);
       LastPerch = null;
     } else {
+      var wasGrounded = Grounded;
       AirTime += dt;
       Velocity += FallAcceleration(action.MoveXZ,dt);
       Controller.Move(dt*Velocity);
+      var isGrounded = Grounded;
+      if (!wasGrounded && isGrounded) {
+        AirTime = 0;
+        LegAudioSource.PlayOneShot(Config.LandAudioClip);
+      }
       Animator.SetFloat("VerticalSpeed",Velocity.y);
       Animator.SetInteger("LegState",1);
       Animator.SetFloat("JumpType",(float)JumpType);
@@ -385,7 +395,7 @@ public class Hero : MonoBehaviour {
     // Reset after falling.
     if (Grounded) {
       LastGroundPosition = transform.position;
-    } else if (transform.position.y < -100f) {
+    } else if (AirTime > 2f) {
       Controller.enabled = false;
       transform.position = LastGroundPosition;
       Controller.enabled = true;

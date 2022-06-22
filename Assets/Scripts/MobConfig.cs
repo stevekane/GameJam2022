@@ -8,4 +8,5 @@ public class MobConfig : ScriptableObject {
   public float TurnSpeedDeg = 20f;
   public float ShootRadius = 10f;
   public float SeekRadius = 20f;
+  public AudioClip AttackAudioClip;
 }

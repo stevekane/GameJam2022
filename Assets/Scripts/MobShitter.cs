@@ -45,6 +45,7 @@ public class MobShitter : Mob {
     Bullet.Fire(BulletPrefab, transform.position + Vector3.up*.5f + playerDir, playerDir, Bullet.BulletType.STUN, Config.BulletSpeed);
     TimeRemaining = Config.ShootCooldown;
     State = StateType.Cooldown;
+    AttackAudioSource.PlayOneShot(Config.AttackAudioClip);
   }
 
   public void OnDrawGizmosSelected() {

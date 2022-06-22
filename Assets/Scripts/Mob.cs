@@ -1,12 +1,12 @@
 using UnityEngine;
-using UnityEngine.Events;
 
 public class Mob : MonoBehaviour {
+  [SerializeField] internal AudioSource AttackAudioSource;
+  [SerializeField] internal Animator Animator;
+
   public MobConfig Config;
-  internal Animator Animator;
 
   public void Start() {
-    Animator = GetComponent<Animator>();
   }
 
   public virtual void TakeDamage() {
