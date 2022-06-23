@@ -13,6 +13,12 @@ public class HeroConfig : ScriptableObject {
   [Tooltip("Frames between footstep sounds")]
   public int FramesPerFootstep = 250;
 
+  [Header("Dashing")]
+  [Tooltip("Max dash speed")]
+  public float DASH_SPEED = 100f;
+  [Tooltip("Duration of dash")]
+  public int MAX_DASH_FRAMES = 200;
+
   [Header("Jumping")]
   [Tooltip("Initial upward velocity when jumping")]
   public float JUMP_Y_VELOCITY = 15f;
@@ -76,6 +82,7 @@ public class HeroConfig : ScriptableObject {
   public AudioClip RunningAudioClip;
   public AudioClip JumpAudioClip;
   public AudioClip PounceAudioClip;
+  public AudioClip DashAudioClip;
   public AudioClip LandAudioClip;
   public AudioClip PerchAudioClip;
   public AudioClip LeapAudioClip;

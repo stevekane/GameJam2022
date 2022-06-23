@@ -41,8 +41,10 @@ public class Hero : MonoBehaviour {
   public Targetable LegTarget;
   public Targetable LastPerch;
   public Vector3 Velocity;
+  public Vector3 DashVelocity;
   public int FootstepFramesRemaining;
   public int PounceFramesRemaining;
+  public int DashFramesRemaining;
   public float AirTime;
   public int JumpType = 0;
   public Vector3 LastGroundPosition;
@@ -130,9 +132,10 @@ public class Hero : MonoBehaviour {
   bool Perching { get => LegTarget; }
   bool Falling { get => !Controller.isGrounded && !LegTarget; }
   bool Grounded { get => Controller.isGrounded && !LegTarget; }
+  bool Dashing { get => DashFramesRemaining > 0; }
   bool Pouncing { get => !Perching && PounceFramesRemaining > 0; }
-  bool Moving { get => Inputs.Action.Move.magnitude > 0; }
-  bool Aiming { get => Inputs.Action.Aim.magnitude > 0; }
+  bool Moving { get => Inputs.Action.Move.XZ.magnitude > 0; }
+  bool Aiming { get => Inputs.Action.Aim.XZ.magnitude > 0; }
 
   public void Block(Vector3 position, Vector3 velocity) {
     Blocks.Add(new BlockEvent { Position = position, Velocity = velocity });
@@ -232,6 +235,12 @@ public class Hero : MonoBehaviour {
     LegAudioSource.PlayOneShot(Config.PounceAudioClip);
   }
 
+  void Dash(Vector3 direction) {
+    Velocity = direction*Config.DASH_SPEED;
+    DashFramesRemaining = Config.MAX_DASH_FRAMES;
+    LegAudioSource.PlayOneShot(Config.DashAudioClip);
+  }
+
   void Reach(Throwable throwable) {
     ArmTarget = throwable;
     ArmState = ArmState.Reaching;
@@ -267,19 +276,21 @@ public class Hero : MonoBehaviour {
     Targets = FindTargets(targetingDistance,targetingRadians);
     Target = Best(LegTarget,Targets);
 
-    if (Falling && !Bumped && TryGetFirst(Entered,out Targetable targetable)) {
+    if (Grounded && !Dashing && action.Dash.JustDown) {
+      Dash(transform.forward);
+    } else if (Falling && !Bumped && TryGetFirst(Entered,out Targetable targetable)) {
       Perch(targetable);
-    } else if (Aiming && Target && !Stunned && action.PounceDown) {
+    } else if (Aiming && Target && !Stunned && action.Jump.JustDown) {
       Pounce(Target.transform.position);
-    } else if (Grounded && !Aiming && !Stunned && action.PounceDown) {
-      Jump(action.MoveXZ);
-    } else if (Perching && !Aiming && !Stunned && action.PounceDown) {
-      Leap(action.MoveXZ);
-    } else if (Holding && !Stunned && action.HitDown) {
+    } else if (Grounded && !Aiming && !Stunned && action.Jump.JustDown) {
+      Jump(action.Move.XZ);
+    } else if (Perching && !Aiming && !Stunned && action.Jump.JustDown) {
+      Leap(action.Move.XZ);
+    } else if (Holding && !Stunned && action.Hit.JustDown) {
       Throw(transform.forward,Config.THROW_SPEED);
-    } else if (Aiming && Free && !Stunned && action.HitDown && Target && Target.TryGetComponent(out Throwable distantThrowable)) {
+    } else if (Aiming && Free && !Stunned && action.Hit.JustDown && Target && Target.TryGetComponent(out Throwable distantThrowable)) {
       Reach(distantThrowable);
-    } else if (Grounded && !Aiming && !Stunned && action.HitDown && TryGetFirst(Stayed,out Throwable throwable)) {
+    } else if (Grounded && !Aiming && !Stunned && action.Hit.JustDown && TryGetFirst(Stayed,out Throwable throwable)) {
       Hold(throwable);
     } else if (Reaching && ArmFramesRemaining <= 0) {
       Pull(ArmTarget);
@@ -324,6 +335,9 @@ public class Hero : MonoBehaviour {
       }
       Controller.Move(dt*Velocity);
       Animator.SetInteger("LegState",1);
+    } else if (Dashing) {
+      DashFramesRemaining = Mathf.Max(0,DashFramesRemaining-1);
+      Controller.Move(dt*Velocity);
     } else if (Grounded) {
       if (FootstepFramesRemaining <= 0) {
         FootstepFramesRemaining = Config.FramesPerFootstep;
@@ -333,7 +347,7 @@ public class Hero : MonoBehaviour {
       } else {
         FootstepFramesRemaining = Mathf.Max(0,FootstepFramesRemaining-1);
       }
-      Velocity += MoveAcceleration(action.MoveXZ);
+      Velocity += MoveAcceleration(action.Move.XZ);
       Velocity.y = Velocity.y > 0 ? Velocity.y : -1;
       Controller.Move(dt*Velocity);
       Animator.SetInteger("LegState",0);
@@ -341,7 +355,7 @@ public class Hero : MonoBehaviour {
     } else {
       var wasGrounded = Grounded;
       AirTime += dt;
-      Velocity += FallAcceleration(action.MoveXZ,dt);
+      Velocity += FallAcceleration(action.Move.XZ,dt);
       Controller.Move(dt*Velocity);
       var isGrounded = Grounded;
       if (!wasGrounded && isGrounded) {
@@ -355,7 +369,7 @@ public class Hero : MonoBehaviour {
 
     if ((Grounded || Perching) && !Stunned) {
       if (Aiming) {
-        transform.forward = action.AimXZ;
+        transform.forward = action.Aim.XZ;
       } else if (Reaching || Pulling) {
         var targetXZ = ArmTarget.transform.position;
         var currentXZ = transform.position;
@@ -363,7 +377,7 @@ public class Hero : MonoBehaviour {
         currentXZ.y = 0;
         transform.rotation = Quaternion.LookRotation(targetXZ-currentXZ);
       } else if ((Free || Holding) && Moving) {
-        transform.forward = action.MoveXZ;
+        transform.forward = action.Move.XZ;
       }
     } else {
       if (Velocity.XZ().magnitude > 0) {
@@ -411,7 +425,7 @@ public class Hero : MonoBehaviour {
       Velocity = Vector3.zero;
     }
 
-    if (!Pouncing && !Stunned && Free && action.Aim.magnitude > 0) {
+    if (!Pouncing && !Stunned && Free && action.Aim.XZ.magnitude > 0) {
       UI.Select(Target);
       UI.Highlight(Targets,Targets.Length);
       if (AimingFramesRemaining > 0 && !Inputs.InPlayBack) {

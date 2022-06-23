@@ -4,17 +4,80 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 [Serializable]
-public struct Action {
-  public bool Hit;
-  public bool HitDown;
-  public bool HitUp;
-  public bool Pounce;
-  public bool PounceDown;
-  public bool PounceUp;
-  public Vector2 Move;
-  public Vector2 Aim;
-  public Vector3 MoveXZ { get => new Vector3(Move.x,0,Move.y); }
-  public Vector3 AimXZ { get => new Vector3(Aim.x,0,Aim.y); }
+public struct ButtonState {
+  public bool Down;
+  public bool JustDown;
+  public bool JustUp;
+  public ButtonState(bool down, bool justDown, bool justUp) {
+    Down = down;
+    JustDown = justDown;
+    JustUp = justUp;
+  }
+  public void UpdateFromInput(string name) {
+    Down = Down || Input.GetButton(name);
+    JustDown = JustDown || Input.GetButtonDown(name);
+    JustUp = JustUp || Input.GetButtonUp(name);
+  }
+  public void Reset() {
+    Down = false;
+    JustDown = false;
+    JustUp = false;
+  }
+  public static ButtonState FromInput(string name) {
+    return new ButtonState(Input.GetButton(name),Input.GetButtonDown(name),Input.GetButtonUp(name));
+  }
+}
+
+[Serializable]
+public struct StickState {
+  public Vector2 RawXY;
+  public Vector2 XY;
+  public Vector3 RawXZ;
+  public Vector3 XZ;
+  public StickState(float deadZone, Vector2 raw) {
+    RawXY = raw;
+    RawXZ = new Vector3(raw.x,0,raw.y);
+    if (raw.magnitude > deadZone) {
+      XY = raw;
+      XZ = RawXZ;
+    } else {
+      XY = Vector2.zero;
+      XZ = Vector3.zero;
+    }
+  }
+  public static StickState FromInput(float deadZone, string xname, string yname) {
+    return new StickState(deadZone,new Vector2(Input.GetAxisRaw(xname), Input.GetAxisRaw(yname)));
+  }
+}
+
+[Serializable]
+public readonly struct Action {
+  public readonly ButtonState Hit;
+  public readonly ButtonState Jump;
+  public readonly ButtonState Light;
+  public readonly ButtonState Heavy;
+  public readonly ButtonState Dash;
+  public readonly ButtonState Throw;
+  public readonly StickState Move;
+  public readonly StickState Aim;
+  public Action(
+    ButtonState hitState, 
+    ButtonState jumpState, 
+    ButtonState lightState, 
+    ButtonState heavyState, 
+    ButtonState dashState, 
+    ButtonState throwState,
+    StickState move,
+    StickState aim) {
+      Hit = hitState;
+      Jump = jumpState;
+      Light = lightState;
+      Heavy = heavyState;
+      Dash = dashState;
+      Throw = throwState;
+      Move = move;
+      Aim = aim;
+    }
 }
 
 [Serializable]
@@ -36,10 +99,15 @@ public class EventDriver : MonoBehaviour {
 
   List<Action> History = new List<Action>((int)Math.Pow(2,16));
   int HistoryIndex = 0;
-  bool HitDown;
-  bool HitUp;
-  bool PounceDown;
-  bool PounceUp;
+
+  ButtonState Hit;
+  ButtonState Jump;
+  ButtonState Light;
+  ButtonState Heavy;
+  ButtonState Dash;
+  ButtonState Throw;
+  StickState Move;
+  StickState Aim;
 
   void Start() {
     var objs = FindObjectsOfType<EventDriver>();
@@ -106,62 +174,31 @@ public class EventDriver : MonoBehaviour {
     PlayState = PlayState.PlayBack;
   }
 
-  /*
-  Input is changed in Unity's Update loop.
-  We want to consume it during Fixed Updates.
-
-  In Update we should just do the following:
-
-    Down = Down || Input.Down
-    Up = Up || Input.Up
-  
-  In FixedUpdate we use these states before resetting them.
-    Simulate(Up,Down)
-    Down = false
-    Up = false
-  */
+  // Cache/accumulate input changes in Update. Feed them into simulation on FixedUpdate.
   void Update() {
-    HitDown = HitDown || Input.GetButtonDown("Action1");
-    HitUp = HitUp || Input.GetButtonUp("Action1");
-    PounceDown = PounceDown || Input.GetButtonDown("Action2") || Input.GetKeyDown(KeyCode.Space);
-    PounceUp = PounceUp || Input.GetButtonUp("Action2") || Input.GetKeyUp(KeyCode.Space);
-  }
-
-  Vector2 GetKeyboardMove() {
-    float right = (Input.GetKey(KeyCode.D) ? 1 : 0) - (Input.GetKey(KeyCode.A) ? 1 : 0);
-    float up = (Input.GetKey(KeyCode.W) ? 1 : 0) - (Input.GetKey(KeyCode.S) ? 1 : 0);
-    return new Vector2(right, up);
-  }
-
-  Vector2 GetMouseAim() {
-    var playerPos = Camera.WorldToScreenPoint(Player.transform.position);
-    var playerPos2 = new Vector2(playerPos.x, playerPos.y);
-    var mousePos2 = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-    return Input.GetMouseButton(1) ? (mousePos2 - playerPos2).normalized : new Vector2(0,0);
+    Hit.UpdateFromInput("Hit");
+    Jump.UpdateFromInput("Jump");
+    Light.UpdateFromInput("Light");
+    Heavy.UpdateFromInput("Heavy");
+    Dash.UpdateFromInput("Dash");
+    Throw.UpdateFromInput("Throw");
+    Move = StickState.FromInput(RadialDeadZone,"MoveX","MoveY");
+    Aim = StickState.FromInput(RadialDeadZone,"AimX","AimY");
   }
 
   void FixedUpdate() {
     switch (PlayState) {
       case PlayState.Play: {
-        var hit = Input.GetButton("Action1");
-        var pounce = Input.GetButton("Action2") || Input.GetKey(KeyCode.Space);
-        var move = new Vector2(Input.GetAxisRaw("MoveX"),Input.GetAxisRaw("MoveY")) + GetKeyboardMove();
-        var aim = new Vector2(Input.GetAxisRaw("AimX"),Input.GetAxisRaw("AimY")) + GetMouseAim();
-        move = move.magnitude > RadialDeadZone ? move : Vector2.zero;
-        aim = aim.magnitude > RadialDeadZone ? aim : Vector2.zero;
-        var action = new Action {
-          Hit = hit,
-          HitDown = HitDown,
-          HitUp = HitUp,
-          Pounce = pounce,
-          PounceDown = PounceDown,
-          PounceUp = PounceUp,
-          Move = move,
-          Aim = aim,
-        };
-        Inputs.Action = action;
+        var action = new Action(Hit,Jump,Light,Heavy,Dash,Throw,Move,Aim);
         Inputs.InPlayBack = false;
+        Inputs.Action = action;
         History.Add(action);
+        Hit.Reset();
+        Jump.Reset();
+        Light.Reset();
+        Heavy.Reset();
+        Dash.Reset();
+        Throw.Reset();
       }
       break;
 
@@ -175,9 +212,5 @@ public class EventDriver : MonoBehaviour {
       }
       break;
     }
-    HitDown = false;
-    HitUp = false;
-    PounceDown = false;
-    PounceUp = false;
   }
 }
