@@ -90,10 +90,6 @@ public class EventDriver : MonoBehaviour {
   [Header("State")]
   public PlayState PlayState;
 
-  [Header("Room")]
-  public Room RoomPrefab;
-  public Room Room;
-
   Camera Camera;
   Player Player;
 
@@ -119,9 +115,6 @@ public class EventDriver : MonoBehaviour {
 
     const float BASE_FIXED_DELTA_TIME = 0.02f;
     Time.fixedDeltaTime = BASE_FIXED_DELTA_TIME * .1f;
-    if (!Room && RoomPrefab) {
-      Room = Instantiate(RoomPrefab);
-    }
     PlayState = PlayState.Play;
     History.Clear();
     HistoryIndex = 0;
@@ -132,29 +125,6 @@ public class EventDriver : MonoBehaviour {
 
   void OnDestroy() {
     History.Clear();
-  }
-
-  [ContextMenu("Play")]
-  public void Play() {
-    if (Room) {
-      Destroy(Room.gameObject);
-    }
-    Room = Instantiate(RoomPrefab);
-    History.Clear();
-    HistoryIndex = 0;
-    Inputs.InPlayBack = false;
-  }
-
-  [ContextMenu("Play Back")]
-  public void PlayBack() {
-    Time.timeScale = 1;
-    if (Room) {
-      Destroy(Room.gameObject);
-    }
-    HistoryIndex = 0;
-    Room = Instantiate(RoomPrefab);
-    Inputs.InPlayBack = true;
-    PlayState = PlayState.PlayBack;
   }
 
   public void RestartScene() {
