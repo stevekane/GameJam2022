@@ -2,7 +2,6 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
-// TODO: These don't need to be public if they are not used publicly below
 public struct BlockEvent { public Vector3 Position; public Vector3 Velocity; }
 public enum ArmState { Free, Reaching, Pulling, Holding }
 
@@ -50,8 +49,8 @@ public class Hero : MonoBehaviour {
   public Vector3 LastGroundPosition;
 
   [Header("Status Effects")]
-  public float BumpTimeRemaining;
   public Vector3 BumpVelocity;
+  public float BumpTimeRemaining;
   public float StunTimeRemaining;
 
   List<GameObject> Entered = new List<GameObject>(32);
@@ -94,8 +93,7 @@ public class Hero : MonoBehaviour {
   Targetable[] FindTargets(float maxDistance, float maxRadians) {
     var origin = transform.position;
     var forward = transform.forward;
-    var includeInactive = false;
-    return FindObjectsOfType<Targetable>(includeInactive)
+    return FindObjectsOfType<Targetable>(includeInactive:false)
       .Where(t => {
         var delta = t.transform.position-origin;
         var distance = delta.magnitude;
