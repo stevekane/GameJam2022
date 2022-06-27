@@ -113,8 +113,7 @@ public class EventDriver : MonoBehaviour {
     }
     DontDestroyOnLoad(this.gameObject);
 
-    const float BASE_FIXED_DELTA_TIME = 0.02f;
-    Time.fixedDeltaTime = BASE_FIXED_DELTA_TIME * .1f;
+    Time.fixedDeltaTime = 1f / Timeval.FramesPerSecond;
     PlayState = PlayState.Play;
     History.Clear();
     HistoryIndex = 0;
