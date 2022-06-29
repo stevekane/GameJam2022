@@ -8,7 +8,7 @@ public class RotateRelativeToCamera : MonoBehaviour {
   AnimationCurve RotationByOrientation;
 
   void LateUpdate() {
-    var camera = Camera.main;
+    var camera = MainCamera.Instance;
     var worldRotationAxis = Vector3.right;
     var worldForwardXZ = Vector3.forward.XZ();
     var parentForwardXZ = transform.parent.forward.XZ();

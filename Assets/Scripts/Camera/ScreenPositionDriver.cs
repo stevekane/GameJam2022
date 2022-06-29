@@ -1,20 +1,19 @@
 using Cinemachine;
 using UnityEngine;
 
-[ExecuteInEditMode]
-public class ScreenPositionDriver : MonoBehaviour {
+public class ScreenPositionDriver : CinemachineExtension {
   [SerializeField] 
-  [Range(-100f,0f)]
-  float ScreenInterpolationEpsilon = -.1f;
+  CameraConfig Config;
   CinemachineVirtualCamera TargetCamera;
   CinemachineFramingTransposer Transposer;
 
-  void Awake() {
-    TargetCamera = GetComponent<CinemachineVirtualCamera>();
+  protected override void ConnectToVcam(bool connect) {
+    base.ConnectToVcam(connect);
+    TargetCamera = VirtualCamera as CinemachineVirtualCamera;
     Transposer = TargetCamera.GetCinemachineComponent<CinemachineFramingTransposer>();
   }
 
-  void LateUpdate() {
+  protected override void PostPipelineStageCallback(CinemachineVirtualCameraBase vcam, CinemachineCore.Stage stage, ref CameraState state, float dt) {
     if (!TargetCamera || !TargetCamera.Follow || !Transposer)
       return;
 
@@ -25,7 +24,7 @@ public class ScreenPositionDriver : MonoBehaviour {
     var currentScreenY = Transposer.m_ScreenY;
     var targetScreenX = Mathf.Lerp(1,0,Mathf.InverseLerp(-1,1,x));
     var targetScreenY = Mathf.Lerp(0,1,Mathf.InverseLerp(-1,1,y));
-    var interpolant = Mathf.Exp(ScreenInterpolationEpsilon*Time.fixedDeltaTime);
+    var interpolant = Mathf.Exp(Config.LOOK_AHEAD_EPSILON*Time.fixedDeltaTime);
     Transposer.m_ScreenX = Mathf.Lerp(targetScreenX,currentScreenX,interpolant);
     Transposer.m_ScreenY = Mathf.Lerp(targetScreenY,currentScreenY,interpolant);
   }

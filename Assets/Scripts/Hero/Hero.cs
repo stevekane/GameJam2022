@@ -4,6 +4,7 @@ using UnityEngine;
 
 public struct BlockEvent { public Vector3 Position; public Vector3 Velocity; }
 public enum ArmState { Free, Reaching, Pulling, Holding }
+public enum AttackState { None, Windup, Active, Contact, Recovery }
 
 public static class PhysicsLayers {
   public static readonly int PlayerGrounded = 8;
@@ -21,15 +22,22 @@ public class Hero : MonoBehaviour {
   [SerializeField] CharacterController Controller;
   [SerializeField] Animator Animator;
   [SerializeField] Grabber Grabber;
+  [SerializeField] GameObject HitBox;
   [SerializeField] AudioSource FootstepAudioSource;
   [SerializeField] AudioSource LegAudioSource;
   [SerializeField] AudioSource ArmAudioSource;
+  [SerializeField] Attack[] Attacks;
 
   [Header("Targeting State")]
   public LayerMask TargetableMobLayerMask;
   public Targetable Target;
   public Targetable[] Targets;
   public int AimingFramesRemaining;
+
+  [Header("Attack State")]
+  public Attack Attack;
+  public AttackState AttackState;
+  public int AttackFramesRemaining;
 
   [Header("Arm State")]
   public ArmState ArmState;
@@ -53,6 +61,7 @@ public class Hero : MonoBehaviour {
   public float BumpTimeRemaining;
   public float StunTimeRemaining;
 
+  List<Hurtbox> Hits = new List<Hurtbox>(32);
   List<GameObject> Entered = new List<GameObject>(32);
   List<GameObject> Stayed = new List<GameObject>(32);
   List<GameObject> Exited = new List<GameObject>(32);
@@ -134,6 +143,10 @@ public class Hero : MonoBehaviour {
   bool Pouncing { get => !Perching && PounceFramesRemaining > 0; }
   bool Moving { get => Inputs.Action.Move.XZ.magnitude > 0; }
   bool Aiming { get => Inputs.Action.Aim.XZ.magnitude > 0; }
+
+  public void Hit(Hurtbox hurtbox) {
+    Hits.Add(hurtbox);
+  }
 
   public void Block(Vector3 position, Vector3 velocity) {
     Blocks.Add(new BlockEvent { Position = position, Velocity = velocity });
@@ -262,7 +275,14 @@ public class Hero : MonoBehaviour {
     ArmTarget?.Throw(speed*direction);
     ArmTarget = null;
     ArmState = ArmState.Free;
-    ArmAudioSource.PlayOneShot(Config.ThrowAudioClip);
+    ArmAudioSource.PlayOptionalOneShot(Config.ThrowAudioClip);
+  }
+
+  void StartAttack(Attack attack) {
+    Attack = attack;
+    AttackFramesRemaining = attack.Config.Windup.Frames; 
+    AttackState = AttackState.Windup;
+    ArmAudioSource.PlayOptionalOneShot(Attack.Config.WindupAudioClip);
   }
 
   void FixedUpdate() {
@@ -294,6 +314,85 @@ public class Hero : MonoBehaviour {
       Pull(ArmTarget);
     } else if (Pulling && ArmFramesRemaining <= 0) {
       Hold(ArmTarget);
+    } else if (Grounded && !Dashing && AttackState == AttackState.None && action.Heavy.JustDown) {
+      StartAttack(Attacks[1]);
+    } else if (Grounded && !Dashing && AttackState == AttackState.None && action.Light.JustDown) {
+      StartAttack(Attacks[0]);
+    }
+
+    // These are attack transitions
+    if (AttackState == AttackState.Windup && AttackFramesRemaining <= 0) {
+      AttackState = AttackState.Active;
+      AttackFramesRemaining = Attack.Config.Active.Frames;
+    } else if (AttackState == AttackState.Active && Hits.Count > 0) {
+      AttackState = AttackState.Contact;
+      AttackFramesRemaining = Attack.Config.Contact.Frames;
+      ArmAudioSource.PlayOptionalOneShot(Attack.Config.ActiveAudioClip);
+      CameraShaker.Instance.Shake(Attack.Config.HitCameraShakeIntensity);
+      var effectPosition = Hits[0].transform.position+Vector3.up; 
+      var effect = Instantiate(Attack.Config.HitEffect,effectPosition,transform.rotation);
+      effect.transform.localScale = new Vector3(10,10,10);
+      effect.transform.LookAt(MainCamera.Instance.transform.position);
+      Destroy(effect,3);
+    } else if (AttackState == AttackState.Active && AttackFramesRemaining <= 0) {
+      AttackState = AttackState.Recovery;
+      AttackFramesRemaining = Attack.Config.Recovery.Frames;
+      ArmAudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
+    } else if (AttackState == AttackState.Contact && AttackFramesRemaining <= 0) {
+      AttackState = AttackState.Recovery;
+      AttackFramesRemaining = Attack.Config.Recovery.Frames;
+      ArmAudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
+    } else if (AttackState == AttackState.Recovery && AttackFramesRemaining <= 0) {
+      AttackState = AttackState.None;
+      AttackFramesRemaining = 0;
+    }
+
+    // Actions in given attack state
+    switch (AttackState) {
+      case AttackState.None: {
+        AttackFramesRemaining = 0; 
+        HitBox.SetActive(false);
+        Animator.SetInteger("AttackState",(int)AttackState);
+        Animator.SetInteger("AttackIndex",0);
+        Animator.SetFloat("AttackSpeed",1);
+      }
+      break;
+
+      case AttackState.Windup: {
+        AttackFramesRemaining--; 
+        HitBox.SetActive(false);
+        Animator.SetInteger("AttackState",(int)AttackState);
+        Animator.SetInteger("AttackIndex",Attack.Config.Index);
+        Animator.SetFloat("AttackSpeed",Attack.Config.WindupAnimationSpeed);
+      }
+      break;
+
+      case AttackState.Active: {
+        AttackFramesRemaining--; 
+        HitBox.SetActive(true);
+        Animator.SetInteger("AttackState",(int)AttackState);
+        Animator.SetInteger("AttackIndex",Attack.Config.Index);
+        Animator.SetFloat("AttackSpeed",Attack.Config.ActiveAnimationSpeed);
+      }
+      break;
+
+      case AttackState.Contact: {
+        AttackFramesRemaining--; 
+        HitBox.SetActive(false);
+        Animator.SetInteger("AttackState",(int)AttackState);
+        Animator.SetInteger("AttackIndex",Attack.Config.Index);
+        Animator.SetFloat("AttackSpeed",0); // TODO: Could/should this be a param on Attack?
+      }
+      break;
+
+      case AttackState.Recovery: {
+        AttackFramesRemaining--; 
+        HitBox.SetActive(false);
+        Animator.SetInteger("AttackState",(int)AttackState);
+        Animator.SetInteger("AttackIndex",Attack.Config.Index);
+        Animator.SetFloat("AttackSpeed",Attack.Config.RecoveryAnimationSpeed);
+      }
+      break;
     }
 
     if (Blocks.Count > 0) {
@@ -426,17 +525,17 @@ public class Hero : MonoBehaviour {
     if (!Pouncing && !Stunned && Free && action.Aim.XZ.magnitude > 0) {
       UI.Select(Target);
       UI.Highlight(Targets,Targets.Length);
-      if (AimingFramesRemaining > 0 && !Inputs.InPlayBack) {
-        Time.timeScale = .25f;
-      } else {
-        Time.timeScale = 1;
-      }
+      // if (AimingFramesRemaining > 0 && !Inputs.InPlayBack) {
+      //   Time.timeScale = .25f;
+      // } else {
+      //   Time.timeScale = 1;
+      // }
       AimingFramesRemaining = Mathf.Max(0,AimingFramesRemaining-1);
       Animator.SetFloat("Aim",1);
     } else {
       UI.Select(null);
       UI.Highlight(Targets,0);
-      Time.timeScale = 1;
+      // Time.timeScale = 1;
       AimingFramesRemaining = Mathf.Min(AimingFramesRemaining+1,Config.MAX_TARGETING_FRAMES);
       Animator.SetFloat("Aim",0);
     }
@@ -447,6 +546,7 @@ public class Hero : MonoBehaviour {
       UI.SetAimMeter(transform,displayMeter,AimingFramesRemaining,maxTargetingFrames);
     }
 
+    Hits.Clear();
     Entered.Clear();
     Stayed.Clear();
     Exited.Clear();
