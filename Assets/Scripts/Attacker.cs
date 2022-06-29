@@ -38,13 +38,13 @@ public class Attacker : MonoBehaviour {
       case States.Recovery: State = States.Idle; break;
       }
     }
-
-    if (State == States.Active) {
-      var c = LightAttack.GetComponent<BoxCollider>();
-    }
   }
 
   public void OnHit(GameObject target) {
-    target.GetComponent<Mob>()?.TakeDamage();
+    // TODO: Why is OnTriggerEnter called twice for one event?
+    if (target.TryGetComponent(out Damage damage)) {
+      Vector3 dir = (target.transform.position - transform.position).XZ().normalized;
+      damage.TakeDamage(dir, 10f, Damage.StrengthLight);
+    }
   }
 }
