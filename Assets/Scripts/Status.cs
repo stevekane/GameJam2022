@@ -2,27 +2,31 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class StatusEffect {
+public abstract class StatusEffect {
   public enum Types { None, Knockback }
   public Types Type;
-  public int Remaining;
 
-  public virtual void Update(StatusEffect e) {
-    Remaining = Mathf.Max(e.Remaining, Remaining);
-  }
+  public abstract void Reset(StatusEffect e);
+  public abstract bool Apply(Rigidbody body);
 }
 
 public class KnockbackEffect : StatusEffect {
+  static readonly float DRAG = 5f;
+  static readonly float DONE_SPEED = .25f;
+
   public Vector3 Velocity;
-  public KnockbackEffect(Vector3 velocity, Timeval duration) {
-    this.Type = Types.Knockback;
-    this.Velocity = velocity;
-    this.Remaining = duration.Frames;
+  public KnockbackEffect(Vector3 velocity) {
+    Type = Types.Knockback;
+    Velocity = velocity;
   }
 
-  public override void Update(StatusEffect e) {
-    base.Update(e);
-    this.Velocity += ((KnockbackEffect)e).Velocity;
+  public override void Reset(StatusEffect e) {
+    Velocity += ((KnockbackEffect)e).Velocity;
+  }
+  public override bool Apply(Rigidbody body) {
+    Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * DRAG);
+    body.MovePosition(body.position + Velocity*Time.fixedDeltaTime);
+    return Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED;
   }
 }
 
@@ -31,26 +35,25 @@ public class Status : MonoBehaviour {
   public StatusEffect CurrentEffect { get { return Active.Count > 0 ? Active[0] : null; } }
   public StatusEffect.Types Current { get { return CurrentEffect != null ? CurrentEffect.Type : StatusEffect.Types.None; } }
 
+  Rigidbody Body;
+
   public void Add(StatusEffect effect) {
     var count = Active.Count;
     var existing = Active.FirstOrDefault((e) => e.Type == effect.Type);
     if (existing != null) {
-      existing.Update(effect);
+      existing.Reset(effect);
     } else {
       Active.Add(effect);
     }
   }
 
-  private void FixedUpdate() {
-    Active.ForEach((e) => { e.Remaining--; });
-    Active.RemoveAll((e) => e.Remaining <= 0);
+  private void Awake() {
+    Body = GetComponent<Rigidbody>();
+  }
 
-    switch (Current) {
-    case StatusEffect.Types.Knockback:
-      var k = (KnockbackEffect)CurrentEffect;
-      transform.position += k.Velocity * Time.fixedDeltaTime;
-      k.Velocity *= .99f;
-      break;
+  private void FixedUpdate() {
+    if (CurrentEffect != null && CurrentEffect.Apply(Body)) {
+      Active.RemoveAt(0);
     }
   }
 }
