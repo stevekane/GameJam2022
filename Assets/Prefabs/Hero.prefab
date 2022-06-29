@@ -319,6 +319,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 912778195731948833}
+  - component: {fileID: 2578572211518139727}
   m_Layer: 8
   m_Name: Attacks
   m_TagString: Untagged
@@ -343,6 +344,19 @@ Transform:
   m_Father: {fileID: 4102725152112460098}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2578572211518139727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3335561826620584317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12e8843d6958d99489b475fb6195665e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  State: 0
 --- !u!1 &3930514479255101891
 GameObject:
   m_ObjectHideFlags: 0
@@ -528,8 +542,8 @@ MonoBehaviour:
   UI: {fileID: 0}
   Controller: {fileID: 4102725152112460099}
   Animator: {fileID: 7508363702064596809}
+  Attacker: {fileID: 2578572211518139727}
   Grabber: {fileID: 5640303072316059443}
-  HitBox: {fileID: 5440527228459520631}
   FootstepAudioSource: {fileID: 5678751747484202716}
   LegAudioSource: {fileID: 3911948467034089528}
   ArmAudioSource: {fileID: 7005934936953075945}
@@ -657,7 +671,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Config: {fileID: 11400000, guid: ca42107d4d2ac30479384e5e3495991a, type: 2}
-  hitbox: {fileID: 2645486132763867338}
+  HitBox: {fileID: 2645486132763867338}
 --- !u!1 &5355421211096193743
 GameObject:
   m_ObjectHideFlags: 0
@@ -704,7 +718,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Config: {fileID: 11400000, guid: 5e172d941cdea22479f88e06124680b4, type: 2}
-  hitbox: {fileID: 6611447115438102098}
+  HitBox: {fileID: 6611447115438102098}
 --- !u!1 &5440527228459520631
 GameObject:
   m_ObjectHideFlags: 0

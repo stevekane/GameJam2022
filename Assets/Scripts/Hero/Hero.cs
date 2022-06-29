@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public struct BlockEvent { public Vector3 Position; public Vector3 Velocity; }
-public enum ArmState { Free, Reaching, Pulling, Holding }
 public enum AttackState { None, Windup, Active, Contact, Recovery }
+public enum ArmState { Free, Reaching, Pulling, Holding, Attacking }
 
 public static class PhysicsLayers {
   public static readonly int PlayerGrounded = 8;
@@ -21,8 +21,8 @@ public class Hero : MonoBehaviour {
   [SerializeField] UI UI;
   [SerializeField] CharacterController Controller;
   [SerializeField] Animator Animator;
+  [SerializeField] Attacker Attacker;
   [SerializeField] Grabber Grabber;
-  [SerializeField] GameObject HitBox;
   [SerializeField] AudioSource FootstepAudioSource;
   [SerializeField] AudioSource LegAudioSource;
   [SerializeField] AudioSource ArmAudioSource;
@@ -136,6 +136,7 @@ public class Hero : MonoBehaviour {
   bool Reaching { get => ArmState == ArmState.Reaching; }
   bool Pulling { get => ArmState == ArmState.Pulling; }
   bool Holding { get => ArmState == ArmState.Holding; }
+  bool Attacking { get => Attacker.IsAttacking; }
   bool Perching { get => LegTarget; }
   bool Falling { get => !Controller.isGrounded && !LegTarget; }
   bool Grounded { get => Controller.isGrounded && !LegTarget; }
@@ -296,7 +297,9 @@ public class Hero : MonoBehaviour {
 
     if (Grounded && !Dashing && action.Dash.JustDown) {
       Dash(transform.forward);
-    } else if (Falling && !Bumped && TryGetFirst(Entered,out Targetable targetable)) {
+    } else if (Free && !Attacking && !Stunned && action.Light.JustDown) {
+      Attacker.StartAttack(Attacks[0]);
+    } else if (Falling && !Bumped && TryGetFirst(Entered, out Targetable targetable)) {
       Perch(targetable);
     } else if (Aiming && Target && !Stunned && action.Jump.JustDown) {
       Pounce(Target.transform.position);
@@ -305,10 +308,10 @@ public class Hero : MonoBehaviour {
     } else if (Perching && !Aiming && !Stunned && action.Jump.JustDown) {
       Leap(action.Move.XZ);
     } else if (Holding && !Stunned && action.Hit.JustDown) {
-      Throw(transform.forward,Config.THROW_SPEED);
+      Throw(transform.forward, Config.THROW_SPEED);
     } else if (Aiming && Free && !Stunned && action.Hit.JustDown && Target && Target.TryGetComponent(out Throwable distantThrowable)) {
       Reach(distantThrowable);
-    } else if (Grounded && !Aiming && !Stunned && action.Hit.JustDown && TryGetFirst(Stayed,out Throwable throwable)) {
+    } else if (Grounded && !Aiming && !Stunned && action.Hit.JustDown && TryGetFirst(Stayed, out Throwable throwable)) {
       Hold(throwable);
     } else if (Reaching && ArmFramesRemaining <= 0) {
       Pull(ArmTarget);
@@ -347,11 +350,17 @@ public class Hero : MonoBehaviour {
       AttackFramesRemaining = 0;
     }
 
+    // Kind of a stupid way to turn off hitboxes...
+    foreach (var attack in Attacks) {
+      if (attack != Attack) {
+        attack.HitBox.gameObject.SetActive(false);
+      }
+    }
+
     // Actions in given attack state
     switch (AttackState) {
       case AttackState.None: {
         AttackFramesRemaining = 0; 
-        HitBox.SetActive(false);
         Animator.SetInteger("AttackState",(int)AttackState);
         Animator.SetInteger("AttackIndex",0);
         Animator.SetFloat("AttackSpeed",1);
@@ -360,7 +369,7 @@ public class Hero : MonoBehaviour {
 
       case AttackState.Windup: {
         AttackFramesRemaining--; 
-        HitBox.SetActive(false);
+        Attack.HitBox.gameObject.SetActive(false);
         Animator.SetInteger("AttackState",(int)AttackState);
         Animator.SetInteger("AttackIndex",Attack.Config.Index);
         Animator.SetFloat("AttackSpeed",Attack.Config.WindupAnimationSpeed);
@@ -369,7 +378,7 @@ public class Hero : MonoBehaviour {
 
       case AttackState.Active: {
         AttackFramesRemaining--; 
-        HitBox.SetActive(true);
+        Attack.HitBox.gameObject.SetActive(true);
         Animator.SetInteger("AttackState",(int)AttackState);
         Animator.SetInteger("AttackIndex",Attack.Config.Index);
         Animator.SetFloat("AttackSpeed",Attack.Config.ActiveAnimationSpeed);
@@ -378,7 +387,7 @@ public class Hero : MonoBehaviour {
 
       case AttackState.Contact: {
         AttackFramesRemaining--; 
-        HitBox.SetActive(false);
+        Attack.HitBox.gameObject.SetActive(false);
         Animator.SetInteger("AttackState",(int)AttackState);
         Animator.SetInteger("AttackIndex",Attack.Config.Index);
         Animator.SetFloat("AttackSpeed",0); // TODO: Could/should this be a param on Attack?
@@ -387,7 +396,7 @@ public class Hero : MonoBehaviour {
 
       case AttackState.Recovery: {
         AttackFramesRemaining--; 
-        HitBox.SetActive(false);
+        Attack.HitBox.gameObject.SetActive(false);
         Animator.SetInteger("AttackState",(int)AttackState);
         Animator.SetInteger("AttackIndex",Attack.Config.Index);
         Animator.SetFloat("AttackSpeed",Attack.Config.RecoveryAnimationSpeed);
@@ -482,7 +491,9 @@ public class Hero : MonoBehaviour {
       }
     }
 
-    if (Holding) {
+    if (Attacking) {
+      // Handled by Attacker
+    } else if (Holding) {
       var target = transform.position+2*Vector3.up;
       var current = ArmTarget.transform.position;
       var interpolant = Mathf.Exp(Config.HOLD_ATTRACTION_EPSILON);

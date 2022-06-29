@@ -12,14 +12,6 @@ public class PrefabConveyor : MonoBehaviour {
   [Range(0,64)]
   int Count;
 
-  T GetOrCreateComponent<T>(GameObject go) where T : MonoBehaviour {
-    if (go.TryGetComponent(out T t)) {
-      return t;
-    } else {
-      return go.AddComponent<T>();
-    }
-  }
-
   public void Run() {
     if (DynamicContentRoot == transform) {
       Debug.LogError("Do NOT use transform as dynamic content root. Create a child object.");
@@ -47,7 +39,7 @@ public class PrefabConveyor : MonoBehaviour {
       var bucket = PrefabUtility.InstantiatePrefab(BucketPrefab) as Bucket;
       var mob = PrefabUtility.InstantiatePrefab(MobPrefab) as Mob;
       mob = mob ? mob : Instantiate(MobPrefab);
-      var patrol = GetOrCreateComponent<MobMovePatrol>(mob.gameObject);
+      var patrol = mob.GetOrCreateComponent<MobMovePatrol>();
       var distance = (float)i/(float)Count;
       var pathdata = conveyor.Path.ToWorldSpace(distance);
       patrol.Target = bucket.transform;
