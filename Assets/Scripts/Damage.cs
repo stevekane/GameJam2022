@@ -1,12 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Damage : MonoBehaviour {
-  public static float StrengthLight = 1f;
-  public static float StrengthHeavy = 2.5f;
-  public static float StrengthSmash = 5f;
-
   public float Points = 0;
   Status Status;
 

@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.Events;
 
 public class Hitbox : MonoBehaviour {
+  public Collider Collider;
+
   [SerializeField]
   UnityEvent<Hurtbox> OnHit;
 

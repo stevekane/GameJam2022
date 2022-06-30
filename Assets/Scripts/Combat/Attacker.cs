@@ -1,44 +1,85 @@
+using System.Collections.Generic;
 using UnityEngine;
 
+public enum AttackState { None, Windup, Active, Contact, Recovery }
+
 public class Attacker : MonoBehaviour {
-  public enum States { Idle, Windup, Active, Recovery }
-  public States State;
+  [SerializeField] Animator Animator;
+  [SerializeField] Attack[] Attacks;
 
-  public bool IsAttacking { get { return State != States.Idle; } }
+  public bool IsAttacking { get { return State != AttackState.None; } }
 
+  List<Hurtbox> Hits = new List<Hurtbox>(32);
+  AttackState State;
   Attack Attack;
   int FramesRemaining = 0;
 
-  public void StartAttack(Attack attack) {
-    Attack = attack;
-    State = States.Windup;
-    FramesRemaining = attack.Config.Windup.Frames;
+  public void Hit(Hurtbox hurtbox) {
+    Hits.Add(hurtbox);
   }
 
-  void FixedUpdate() {
-    // if (IsAttacking && --FramesRemaining <= 0) {
-    //   switch (State) {
-    //   case States.Windup:
-    //     LightAttack.SetActive(true);
-    //     LightAttack.GetComponent<ParticleSystem>().Play();
-    //     State = States.Active;
-    //     FramesRemaining = LightConfig.ActiveTime.Frames;
-    //     break;
-    //   case States.Active:
-    //     State = States.Recovery;
-    //     FramesRemaining = LightConfig.RecoveryTime.Frames;
-    //     LightAttack.SetActive(false);
-    //     break;
-    //   case States.Recovery: State = States.Idle; break;
-    //   }
-    // }
+  public void SpawnEffect(GameObject prefab, Vector3 position, Quaternion rotation) {
+    var effect = Instantiate(Attack.Config.HitEffect,position,rotation);
+    effect.transform.localScale = new Vector3(10,10,10);
+    effect.transform.LookAt(MainCamera.Instance.transform.position);
+    Destroy(effect,3);
   }
 
-  public void OnHit(GameObject target) {
-    // TODO: Why is OnTriggerEnter called twice for one event?
-    if (target.TryGetComponent(out Damage damage)) {
-      Vector3 dir = (target.transform.position - transform.position).XZ().normalized;
-      damage.TakeDamage(dir, 10f, Damage.StrengthLight);
+  public void StartAttack(int index) {
+    Attack = Attacks[index];
+    State = AttackState.Windup;
+    FramesRemaining = Attack.Config.Windup.Frames;
+  }
+
+  public void Step(float dt) {
+    if (State == AttackState.Windup && FramesRemaining <= 0) {
+      State = AttackState.Active;
+      FramesRemaining = Attack.Config.Active.Frames;
+    } else if (State == AttackState.Active && Hits.Count > 0) {
+      State = AttackState.Contact;
+      FramesRemaining = Attack.Config.Contact.Frames;
+      Attack.AudioSource.PlayOptionalOneShot(Attack.Config.HitAudioClip);
+      CameraShaker.Instance.Shake(Attack.Config.HitCameraShakeIntensity);
+      foreach (var hit in Hits) {
+        var delta = hit.transform.position-transform.position;
+        var direction = delta.XZ().normalized;
+        hit.Damage?.TakeDamage(direction,Attack.Config.Points,Attack.Config.Strength);
+        SpawnEffect(Attack.Config.HitEffect,hit.transform.position,Quaternion.identity);
+      }
+    } else if (State == AttackState.Active && FramesRemaining <= 0) {
+      State = AttackState.Recovery;
+      FramesRemaining = Attack.Config.Recovery.Frames;
+      Attack.AudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
+    } else if (State == AttackState.Contact && FramesRemaining <= 0) {
+      State = AttackState.Recovery;
+      FramesRemaining = Attack.Config.Recovery.Frames;
+      Attack.AudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
+    } else if (State == AttackState.Recovery && FramesRemaining <= 0) {
+      Attack = null;
+      State = AttackState.None;
+      FramesRemaining = 0;
     }
+
+    foreach (var attack in Attacks) {
+      if (attack != Attack) {
+        attack.HitBox.Collider.enabled = false;
+      }
+    }
+
+    FramesRemaining = Mathf.Max(0,FramesRemaining-1);
+    Animator.SetInteger("AttackState",(int)State);
+    Animator.SetInteger("AttackIndex",Attack ? Attack.Config.Index : 0);
+    if (Attack) {
+      Attack.HitBox.Collider.enabled = State == AttackState.Active;
+    }
+    switch (State) {
+      case AttackState.None:     Animator.SetFloat("AttackSpeed",1); break;
+      case AttackState.Windup:   Animator.SetFloat("AttackSpeed",Attack.Config.WindupAnimationSpeed); break;
+      case AttackState.Active:   Animator.SetFloat("AttackSpeed",Attack.Config.ActiveAnimationSpeed); break;
+      case AttackState.Contact:  Animator.SetFloat("AttackSpeed",0); break;
+      case AttackState.Recovery: Animator.SetFloat("AttackSpeed",Attack.Config.RecoveryAnimationSpeed); break;
+    }
+
+    Hits.Clear();
   }
 }

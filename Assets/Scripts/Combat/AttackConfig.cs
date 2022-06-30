@@ -14,11 +14,9 @@ public class AttackConfig : ScriptableObject {
   public float WindupAnimationSpeed = 1;
   public float ActiveAnimationSpeed = 1;
   public float RecoveryAnimationSpeed = 1;
-  public AttackWeight Weight;
-  [Range(0,10)]
   public float HitCameraShakeIntensity = 1;
-  [Range(0,10)]
-  public float HitTimeScale = 1f;
+  public float Points = 1;
+  public float Strength = 1;
   public AudioClip WindupAudioClip;
   public AudioClip ActiveAudioClip;
   public AudioClip RecoveryAudioClip;

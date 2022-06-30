@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public struct BlockEvent { public Vector3 Position; public Vector3 Velocity; }
-public enum AttackState { None, Windup, Active, Contact, Recovery }
 public enum ArmState { Free, Reaching, Pulling, Holding, Attacking }
 
 public static class PhysicsLayers {
@@ -26,18 +25,12 @@ public class Hero : MonoBehaviour {
   [SerializeField] AudioSource FootstepAudioSource;
   [SerializeField] AudioSource LegAudioSource;
   [SerializeField] AudioSource ArmAudioSource;
-  [SerializeField] Attack[] Attacks;
 
   [Header("Targeting State")]
   public LayerMask TargetableMobLayerMask;
   public Targetable Target;
   public Targetable[] Targets;
   public int AimingFramesRemaining;
-
-  [Header("Attack State")]
-  public Attack Attack;
-  public AttackState AttackState;
-  public int AttackFramesRemaining;
 
   [Header("Arm State")]
   public ArmState ArmState;
@@ -61,7 +54,6 @@ public class Hero : MonoBehaviour {
   public float BumpTimeRemaining;
   public float StunTimeRemaining;
 
-  List<Hurtbox> Hits = new List<Hurtbox>(32);
   List<GameObject> Entered = new List<GameObject>(32);
   List<GameObject> Stayed = new List<GameObject>(32);
   List<GameObject> Exited = new List<GameObject>(32);
@@ -136,7 +128,6 @@ public class Hero : MonoBehaviour {
   bool Reaching { get => ArmState == ArmState.Reaching; }
   bool Pulling { get => ArmState == ArmState.Pulling; }
   bool Holding { get => ArmState == ArmState.Holding; }
-  bool Attacking { get => Attacker.IsAttacking; }
   bool Perching { get => LegTarget; }
   bool Falling { get => !Controller.isGrounded && !LegTarget; }
   bool Grounded { get => Controller.isGrounded && !LegTarget; }
@@ -144,10 +135,6 @@ public class Hero : MonoBehaviour {
   bool Pouncing { get => !Perching && PounceFramesRemaining > 0; }
   bool Moving { get => Inputs.Action.Move.XZ.magnitude > 0; }
   bool Aiming { get => Inputs.Action.Aim.XZ.magnitude > 0; }
-
-  public void Hit(Hurtbox hurtbox) {
-    Hits.Add(hurtbox);
-  }
 
   public void Block(Vector3 position, Vector3 velocity) {
     Blocks.Add(new BlockEvent { Position = position, Velocity = velocity });
@@ -235,7 +222,6 @@ public class Hero : MonoBehaviour {
     LegAudioSource.PlayOneShot(Config.LeapAudioClip);
   }
 
-
   void Pounce(Vector3 destination) {
     var delta = destination-transform.position;
     var duration = (float)Config.MAX_POUNCE_FRAMES*Time.fixedDeltaTime;
@@ -269,7 +255,7 @@ public class Hero : MonoBehaviour {
     ArmState = ArmState.Holding;
     ArmTarget = throwable;
     ArmTarget.Hold();
-    ArmAudioSource.PlayOneShot(Config.HoldAudioClip);
+    ArmAudioSource.PlayOptionalOneShot(Config.HoldAudioClip);
   }
 
   void Throw(Vector3 direction, float speed) {
@@ -277,13 +263,6 @@ public class Hero : MonoBehaviour {
     ArmTarget = null;
     ArmState = ArmState.Free;
     ArmAudioSource.PlayOptionalOneShot(Config.ThrowAudioClip);
-  }
-
-  void StartAttack(Attack attack) {
-    Attack = attack;
-    AttackFramesRemaining = attack.Config.Windup.Frames; 
-    AttackState = AttackState.Windup;
-    ArmAudioSource.PlayOptionalOneShot(Attack.Config.WindupAudioClip);
   }
 
   void FixedUpdate() {
@@ -297,8 +276,10 @@ public class Hero : MonoBehaviour {
 
     if (Grounded && !Dashing && action.Dash.JustDown) {
       Dash(transform.forward);
-    } else if (Free && !Attacking && !Stunned && action.Light.JustDown) {
-      Attacker.StartAttack(Attacks[0]);
+    } else if (Free && !Attacker.IsAttacking && !Stunned && !Dashing && action.Light.JustDown) {
+      Attacker.StartAttack(0);
+    } else if (Free && !Attacker.IsAttacking && !Stunned && !Dashing && action.Heavy.JustDown) {
+      Attacker.StartAttack(1);
     } else if (Falling && !Bumped && TryGetFirst(Entered, out Targetable targetable)) {
       Perch(targetable);
     } else if (Aiming && Target && !Stunned && action.Jump.JustDown) {
@@ -317,92 +298,9 @@ public class Hero : MonoBehaviour {
       Pull(ArmTarget);
     } else if (Pulling && ArmFramesRemaining <= 0) {
       Hold(ArmTarget);
-    } else if (Grounded && !Dashing && AttackState == AttackState.None && action.Heavy.JustDown) {
-      StartAttack(Attacks[1]);
-    } else if (Grounded && !Dashing && AttackState == AttackState.None && action.Light.JustDown) {
-      StartAttack(Attacks[0]);
     }
 
-    // These are attack transitions
-    if (AttackState == AttackState.Windup && AttackFramesRemaining <= 0) {
-      AttackState = AttackState.Active;
-      AttackFramesRemaining = Attack.Config.Active.Frames;
-    } else if (AttackState == AttackState.Active && Hits.Count > 0) {
-      AttackState = AttackState.Contact;
-      AttackFramesRemaining = Attack.Config.Contact.Frames;
-      ArmAudioSource.PlayOptionalOneShot(Attack.Config.ActiveAudioClip);
-      CameraShaker.Instance.Shake(Attack.Config.HitCameraShakeIntensity);
-      var effectPosition = Hits[0].transform.position+Vector3.up; 
-      var effect = Instantiate(Attack.Config.HitEffect,effectPosition,transform.rotation);
-      effect.transform.localScale = new Vector3(10,10,10);
-      effect.transform.LookAt(MainCamera.Instance.transform.position);
-      Destroy(effect,3);
-    } else if (AttackState == AttackState.Active && AttackFramesRemaining <= 0) {
-      AttackState = AttackState.Recovery;
-      AttackFramesRemaining = Attack.Config.Recovery.Frames;
-      ArmAudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
-    } else if (AttackState == AttackState.Contact && AttackFramesRemaining <= 0) {
-      AttackState = AttackState.Recovery;
-      AttackFramesRemaining = Attack.Config.Recovery.Frames;
-      ArmAudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
-    } else if (AttackState == AttackState.Recovery && AttackFramesRemaining <= 0) {
-      AttackState = AttackState.None;
-      AttackFramesRemaining = 0;
-    }
-
-    // Kind of a stupid way to turn off hitboxes...
-    foreach (var attack in Attacks) {
-      if (attack != Attack) {
-        attack.HitBox.gameObject.SetActive(false);
-      }
-    }
-
-    // Actions in given attack state
-    switch (AttackState) {
-      case AttackState.None: {
-        AttackFramesRemaining = 0; 
-        Animator.SetInteger("AttackState",(int)AttackState);
-        Animator.SetInteger("AttackIndex",0);
-        Animator.SetFloat("AttackSpeed",1);
-      }
-      break;
-
-      case AttackState.Windup: {
-        AttackFramesRemaining--; 
-        Attack.HitBox.gameObject.SetActive(false);
-        Animator.SetInteger("AttackState",(int)AttackState);
-        Animator.SetInteger("AttackIndex",Attack.Config.Index);
-        Animator.SetFloat("AttackSpeed",Attack.Config.WindupAnimationSpeed);
-      }
-      break;
-
-      case AttackState.Active: {
-        AttackFramesRemaining--; 
-        Attack.HitBox.gameObject.SetActive(true);
-        Animator.SetInteger("AttackState",(int)AttackState);
-        Animator.SetInteger("AttackIndex",Attack.Config.Index);
-        Animator.SetFloat("AttackSpeed",Attack.Config.ActiveAnimationSpeed);
-      }
-      break;
-
-      case AttackState.Contact: {
-        AttackFramesRemaining--; 
-        Attack.HitBox.gameObject.SetActive(false);
-        Animator.SetInteger("AttackState",(int)AttackState);
-        Animator.SetInteger("AttackIndex",Attack.Config.Index);
-        Animator.SetFloat("AttackSpeed",0); // TODO: Could/should this be a param on Attack?
-      }
-      break;
-
-      case AttackState.Recovery: {
-        AttackFramesRemaining--; 
-        Attack.HitBox.gameObject.SetActive(false);
-        Animator.SetInteger("AttackState",(int)AttackState);
-        Animator.SetInteger("AttackIndex",Attack.Config.Index);
-        Animator.SetFloat("AttackSpeed",Attack.Config.RecoveryAnimationSpeed);
-      }
-      break;
-    }
+    Attacker.Step(dt);
 
     if (Blocks.Count > 0) {
       LegTarget = null;
@@ -491,7 +389,7 @@ public class Hero : MonoBehaviour {
       }
     }
 
-    if (Attacking) {
+    if (Attacker.IsAttacking) {
       // Handled by Attacker
     } else if (Holding) {
       var target = transform.position+2*Vector3.up;
@@ -536,17 +434,11 @@ public class Hero : MonoBehaviour {
     if (!Pouncing && !Stunned && Free && action.Aim.XZ.magnitude > 0) {
       UI.Select(Target);
       UI.Highlight(Targets,Targets.Length);
-      // if (AimingFramesRemaining > 0 && !Inputs.InPlayBack) {
-      //   Time.timeScale = .25f;
-      // } else {
-      //   Time.timeScale = 1;
-      // }
       AimingFramesRemaining = Mathf.Max(0,AimingFramesRemaining-1);
       Animator.SetFloat("Aim",1);
     } else {
       UI.Select(null);
       UI.Highlight(Targets,0);
-      // Time.timeScale = 1;
       AimingFramesRemaining = Mathf.Min(AimingFramesRemaining+1,Config.MAX_TARGETING_FRAMES);
       Animator.SetFloat("Aim",0);
     }
@@ -557,7 +449,6 @@ public class Hero : MonoBehaviour {
       UI.SetAimMeter(transform,displayMeter,AimingFramesRemaining,maxTargetingFrames);
     }
 
-    Hits.Clear();
     Entered.Clear();
     Stayed.Clear();
     Exited.Clear();
