@@ -8,6 +8,28 @@ public class Attacker : MonoBehaviour {
   [SerializeField] Attack[] Attacks;
 
   public bool IsAttacking { get { return State != AttackState.None; } }
+  public float MoveFactor { 
+    get { 
+      switch (State) {
+        case AttackState.Windup: return Attack.Config.WindupMoveFactor;
+        case AttackState.Active: return Attack.Config.ActiveMoveFactor;
+        case AttackState.Contact: return Attack.Config.ContactMoveFactor;
+        case AttackState.Recovery: return Attack.Config.RecoveryMoveFactor;
+        default: return 1;
+      }
+    }
+  }
+  public float RotationSpeed { 
+    get { 
+      switch (State) {
+        case AttackState.Windup: return Attack.Config.WindupRotationDegreesPerSecond;
+        case AttackState.Active: return Attack.Config.ActiveRotationDegreesPerSecond;
+        case AttackState.Contact: return Attack.Config.ContactRotationDegreesPerSecond;
+        case AttackState.Recovery: return Attack.Config.RecoveryRotationDegreesPerSecond;
+        default: return 360;
+      }
+    }
+  }
 
   List<Hurtbox> Hits = new List<Hurtbox>(32);
   AttackState State;
@@ -29,12 +51,14 @@ public class Attacker : MonoBehaviour {
     Attack = Attacks[index];
     State = AttackState.Windup;
     FramesRemaining = Attack.Config.Windup.Frames;
+    Attack.AudioSource.PlayOptionalOneShot(Attack.Config.WindupAudioClip);
   }
 
   public void Step(float dt) {
     if (State == AttackState.Windup && FramesRemaining <= 0) {
       State = AttackState.Active;
       FramesRemaining = Attack.Config.Active.Frames;
+      Attack.AudioSource.PlayOptionalOneShot(Attack.Config.ActiveAudioClip);
     } else if (State == AttackState.Active && Hits.Count > 0) {
       State = AttackState.Contact;
       FramesRemaining = Attack.Config.Contact.Frames;
@@ -56,7 +80,7 @@ public class Attacker : MonoBehaviour {
     } else if (State == AttackState.Contact && FramesRemaining <= 0) {
       State = AttackState.Recovery;
       FramesRemaining = Attack.Config.Recovery.Frames;
-      Attack.AudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
+      Attack.AudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);;
     } else if (State == AttackState.Recovery && FramesRemaining <= 0) {
       Attack = null;
       State = AttackState.None;

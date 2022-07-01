@@ -164,9 +164,9 @@ public class Hero : MonoBehaviour {
   // TODO: Review this... it seems that acceleration should be dV/dt
   // this implies that the acceleration we are computing should be
   // divided by dt before being compared to max acceleration
-  Vector3 MoveAcceleration(Vector3 desiredMove) {
+  Vector3 MoveAcceleration(Vector3 desiredMove,float speed) {
     var currentVelocity = new Vector3(Velocity.x,0,Velocity.z);
-    var desiredVelocity = desiredMove*Config.MOVE_SPEED;
+    var desiredVelocity = desiredMove*speed;
     var acceleration = desiredVelocity-currentVelocity;
     var direction = acceleration.normalized;
     var magnitude = Mathf.Min(Config.MAX_XZ_ACCELERATION,acceleration.magnitude);
@@ -280,6 +280,8 @@ public class Hero : MonoBehaviour {
       Attacker.StartAttack(0);
     } else if (Free && !Attacker.IsAttacking && !Stunned && !Dashing && action.Heavy.JustDown) {
       Attacker.StartAttack(1);
+    } else if (Free && !Attacker.IsAttacking && !Stunned && !Dashing && action.Throw.JustDown) {
+      Attacker.StartAttack(2);
     } else if (Falling && !Bumped && TryGetFirst(Entered, out Targetable targetable)) {
       Perch(targetable);
     } else if (Aiming && Target && !Stunned && action.Jump.JustDown) {
@@ -321,9 +323,13 @@ public class Hero : MonoBehaviour {
       var next = Vector3.Lerp(target, current, interpolant);
       Velocity = next-current;
       Controller.Move(Velocity);
-      Animator.SetInteger("LegState", 2);
+      Animator.SetInteger("LegState",2);
     } else if (Attacker.IsAttacking) {
       // No movement during attack
+      Velocity += MoveAcceleration(action.Move.XZ,Config.MOVE_SPEED*Attacker.MoveFactor);
+      Velocity.y = Velocity.y > 0 ? Velocity.y : -1;
+      Controller.Move(dt*Velocity);
+      Animator.SetInteger("LegState",0);
     } else if (Stunned || Bumped) {
       // This is hacky as fuck but hopefully temporary.
       float vy = Velocity.y;
@@ -333,7 +339,7 @@ public class Hero : MonoBehaviour {
         Velocity.y = vy + FallAcceleration(Vector3.zero, dt).y;
       }
       Controller.Move(dt*Velocity);
-      Animator.SetInteger("LegState", 0);
+      Animator.SetInteger("LegState",0);
     } else if (Pouncing) {
       PounceFramesRemaining = Mathf.Max(0,PounceFramesRemaining-1);
       if (Target) {
@@ -353,7 +359,7 @@ public class Hero : MonoBehaviour {
       } else {
         FootstepFramesRemaining = Mathf.Max(0,FootstepFramesRemaining-1);
       }
-      Velocity += MoveAcceleration(action.Move.XZ);
+      Velocity += MoveAcceleration(action.Move.XZ,Config.MOVE_SPEED);
       Velocity.y = Velocity.y > 0 ? Velocity.y : -1;
       Controller.Move(dt*Velocity);
       Animator.SetInteger("LegState",0);
@@ -386,8 +392,9 @@ public class Hero : MonoBehaviour {
         transform.forward = action.Move.XZ;
       }
     } else {
-      if (Velocity.XZ().magnitude > 0) {
-        transform.forward = Velocity.XZ().normalized;
+      var forward = Velocity.XZ().normalized;
+      if (forward.magnitude > 0) {
+        transform.forward = forward;
       }
     }
 
