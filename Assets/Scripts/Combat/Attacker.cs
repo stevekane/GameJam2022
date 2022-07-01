@@ -43,7 +43,10 @@ public class Attacker : MonoBehaviour {
       foreach (var hit in Hits) {
         var delta = hit.transform.position-transform.position;
         var direction = delta.XZ().normalized;
-        hit.Damage?.TakeDamage(direction,Attack.Config.Points,Attack.Config.Strength);
+        var hitStopFrames = Attack.Config.Contact.Frames;
+        var points = Attack.Config.Points;
+        var strength = Attack.Config.Strength;
+        hit.Damage?.TakeDamage(direction,hitStopFrames,points,strength);
         SpawnEffect(Attack.Config.HitEffect,hit.transform.position,Quaternion.identity);
       }
     } else if (State == AttackState.Active && FramesRemaining <= 0) {
@@ -68,7 +71,7 @@ public class Attacker : MonoBehaviour {
 
     FramesRemaining = Mathf.Max(0,FramesRemaining-1);
     Animator.SetInteger("AttackState",(int)State);
-    Animator.SetInteger("AttackIndex",Attack ? Attack.Config.Index : 0);
+    Animator.SetFloat("AttackIndex",Attack ? Attack.Config.Index : 0);
     if (Attack) {
       Attack.HitBox.Collider.enabled = State == AttackState.Active;
     }

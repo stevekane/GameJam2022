@@ -322,6 +322,8 @@ public class Hero : MonoBehaviour {
       Velocity = next-current;
       Controller.Move(Velocity);
       Animator.SetInteger("LegState", 2);
+    } else if (Attacker.IsAttacking) {
+      // No movement during attack
     } else if (Stunned || Bumped) {
       // This is hacky as fuck but hopefully temporary.
       float vy = Velocity.y;
@@ -371,7 +373,7 @@ public class Hero : MonoBehaviour {
       Animator.SetFloat("JumpType",(float)JumpType);
     }
 
-    if ((Grounded || Perching) && !Stunned) {
+    if ((Grounded || Perching) && !Stunned && !Attacker.IsAttacking) {
       if (Aiming) {
         transform.forward = action.Aim.XZ;
       } else if (Reaching || Pulling) {
