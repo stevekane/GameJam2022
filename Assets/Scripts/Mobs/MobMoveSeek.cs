@@ -9,12 +9,12 @@ public class MobMoveSeek : MobMove {
     Player = GameObject.FindObjectOfType<Player>();
   }
 
-  void FixedUpdate() {
+  public override void Step(float dt) {
     var playerDelta = (Player.transform.position - transform.position).XZ();
     var playerInRange = playerDelta.sqrMagnitude < Config.SeekRadius*Config.SeekRadius;
     var playerInShootRange = playerDelta.sqrMagnitude < Config.ShootRadius*Config.ShootRadius;
     if (playerInRange && !playerInShootRange) {
-      transform.position += Config.MoveSpeed * Time.deltaTime * playerDelta.normalized;
+      transform.position += Config.MoveSpeed * dt * playerDelta.normalized;
     }
   }
 

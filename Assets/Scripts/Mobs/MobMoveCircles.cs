@@ -1,6 +1,17 @@
 using UnityEngine;
 
-public class MobMove : MonoBehaviour { }
+public class MobMove : MonoBehaviour {
+  Status Status;
+
+  private void Awake() {
+    Status = GetComponent<Status>();
+  }
+  private void FixedUpdate() {
+    if (Status.Current == StatusEffect.Types.None)
+      Step(Time.fixedDeltaTime);
+  }
+  public virtual void Step(float dt) { }
+}
 
 public class MobMoveCircles : MobMove {
   MobConfig Config;
@@ -11,9 +22,9 @@ public class MobMoveCircles : MobMove {
     Tangent = transform.right;
   }
 
-  void FixedUpdate() {
+  public override void Step(float dt) {
     transform.position += Config.MoveSpeed * Time.deltaTime * Tangent;
-    Tangent = Quaternion.Euler(0, Config.TurnSpeedDeg * Time.deltaTime, 0) * Tangent;
+    Tangent = Quaternion.Euler(0, Config.TurnSpeedDeg * dt, 0) * Tangent;
   }
 
   public void OnDrawGizmos() {
