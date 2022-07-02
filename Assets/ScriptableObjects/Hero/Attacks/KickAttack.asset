@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1214f38f4ba527438b104d74508e541, type: 3}
   m_Name: KickAttack
   m_EditorClassIdentifier: 
-  Index: 2
   Windup:
     Millis: 348
   Active:
@@ -21,12 +20,21 @@ MonoBehaviour:
     Millis: 300
   Recovery:
     Millis: 120
-  Stun:
-    Millis: 500
+  WindupMoveFactor: 0.5
+  ActiveMoveFactor: 1
+  ContactMoveFactor: 0
+  RecoveryMoveFactor: 0.5
+  WindupRotationDegreesPerSecond: 0
+  ActiveRotationDegreesPerSecond: 0
+  ContactRotationDegreesPerSecond: 0
+  RecoveryRotationDegreesPerSecond: 0
+  Index: 2
   WindupAnimationSpeed: 2
   ActiveAnimationSpeed: 7
+  ContactAnimationSpeed: 0
   RecoveryAnimationSpeed: 2
   HitCameraShakeIntensity: 7
+  KnockBackType: 1
   Points: 10
   Strength: 5
   WindupAudioClip: {fileID: 8300000, guid: d250961814f6e4747b37862908046d6b, type: 3}

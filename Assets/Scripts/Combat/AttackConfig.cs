@@ -1,6 +1,8 @@
+using System;
 using UnityEngine;
 
-public enum AttackWeight { Light, Heavy }
+[Serializable]
+public enum KnockBackType { Delta, Forward }
 
 [CreateAssetMenu(fileName = "AttackConfig", menuName = "Attack/Config")]
 public class AttackConfig : ScriptableObject {
@@ -9,7 +11,6 @@ public class AttackConfig : ScriptableObject {
   public Timeval Active;
   public Timeval Contact;
   public Timeval Recovery;
-  public Timeval Stun;
   [Header("Control")]
   [Range(0,1)]
   public float WindupMoveFactor;
@@ -30,12 +31,21 @@ public class AttackConfig : ScriptableObject {
   [Header("Animation")]
   [Tooltip("Used to signal to animators what attack this is")]
   public int Index;
+  [Range(0,10)]
   public float WindupAnimationSpeed = 1;
+  [Range(0,10)]
   public float ActiveAnimationSpeed = 1;
+  [Range(0,10)]
+  public float ContactAnimationSpeed = 0;
+  [Range(0,10)]
   public float RecoveryAnimationSpeed = 1;
+  [Range(0,10)]
   public float HitCameraShakeIntensity = 1;
   [Header("Damage")]
+  public KnockBackType KnockBackType;
+  [Range(0,100)]
   public float Points = 1;
+  [Range(0,100)]
   public float Strength = 1;
   [Header("Audio")]
   public AudioClip WindupAudioClip;

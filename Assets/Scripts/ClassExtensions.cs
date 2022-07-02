@@ -5,6 +5,11 @@ public static class VectorExtensions {
   public static Vector3 XZ(this Vector3 v) {
     return new Vector3(v.x, 0, v.z);
   }
+
+  public static bool TryGetDirection(this Vector3 origin, Vector3 target, out Vector3 direction) {
+    direction = (target-origin).normalized;
+    return direction.sqrMagnitude > 0;
+  }
 }
 
 public static class MonoExtensions {

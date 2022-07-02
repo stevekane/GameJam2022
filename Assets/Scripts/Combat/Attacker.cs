@@ -36,6 +36,26 @@ public class Attacker : MonoBehaviour {
   Attack Attack;
   int FramesRemaining = 0;
 
+  Vector3 KnockbackVector(Transform attacker, Transform target, KnockBackType type) {
+    switch (type) {
+      case KnockBackType.Delta: {
+        var delta = target.position-attacker.position;
+        var direction = delta.XZ().normalized;
+        if (direction.magnitude > 0) {
+          return direction;
+        } else {
+          return attacker.forward; 
+        }
+      }
+      case KnockBackType.Forward: {
+        return attacker.forward;
+      }
+      default: {
+        return attacker.forward;
+      }
+    }
+  }
+
   public void Hit(Hurtbox hurtbox) {
     Hits.Add(hurtbox);
   }
@@ -65,8 +85,7 @@ public class Attacker : MonoBehaviour {
       Attack.AudioSource.PlayOptionalOneShot(Attack.Config.HitAudioClip);
       CameraShaker.Instance.Shake(Attack.Config.HitCameraShakeIntensity);
       foreach (var hit in Hits) {
-        var delta = hit.transform.position-transform.position;
-        var direction = delta.XZ().normalized;
+        var direction = KnockbackVector(transform,hit.transform,Attack.Config.KnockBackType);
         var hitStopFrames = Attack.Config.Contact.Frames;
         var points = Attack.Config.Points;
         var strength = Attack.Config.Strength;

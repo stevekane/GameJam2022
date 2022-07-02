@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1214f38f4ba527438b104d74508e541, type: 3}
   m_Name: LightAttack
   m_EditorClassIdentifier: 
-  Index: 0
   Windup:
     Millis: 120
   Active:
@@ -21,12 +20,21 @@ MonoBehaviour:
     Millis: 200
   Recovery:
     Millis: 32
-  Stun:
-    Millis: 1
+  WindupMoveFactor: 0
+  ActiveMoveFactor: 0
+  ContactMoveFactor: 0
+  RecoveryMoveFactor: 0
+  WindupRotationDegreesPerSecond: 0
+  ActiveRotationDegreesPerSecond: 0
+  ContactRotationDegreesPerSecond: 0
+  RecoveryRotationDegreesPerSecond: 0
+  Index: 0
   WindupAnimationSpeed: 4
   ActiveAnimationSpeed: 4
+  ContactAnimationSpeed: 0
   RecoveryAnimationSpeed: 6
   HitCameraShakeIntensity: 5
+  KnockBackType: 1
   Points: 3
   Strength: 1.5
   WindupAudioClip: {fileID: 0}
