@@ -7,6 +7,11 @@ public class Attacker : MonoBehaviour {
   [SerializeField] Animator Animator;
   [SerializeField] Attack[] Attacks;
 
+  List<Hurtbox> Hits = new List<Hurtbox>(32);
+  AttackState State;
+  Attack Attack;
+  int FramesRemaining = 0;
+
   public bool IsAttacking { get { return State != AttackState.None; } }
   public float MoveFactor { 
     get { 
@@ -31,28 +36,29 @@ public class Attacker : MonoBehaviour {
     }
   }
 
-  List<Hurtbox> Hits = new List<Hurtbox>(32);
-  AttackState State;
-  Attack Attack;
-  int FramesRemaining = 0;
+  float AttackSpeed(Attack a, AttackState s) {
+    switch (s) {
+      case AttackState.None: return 1;
+      case AttackState.Windup: return a.Config.WindupAnimationSpeed;
+      case AttackState.Active: return a.Config.ActiveAnimationSpeed;
+      case AttackState.Contact: return a.Config.ContactAnimationSpeed;
+      case AttackState.Recovery: return a.Config.RecoveryAnimationSpeed;
+      default: return 1;
+    }
+  }
 
   Vector3 KnockbackVector(Transform attacker, Transform target, KnockBackType type) {
+    var p0 = attacker.position.XZ();
+    var p1 = target.position.XZ();
     switch (type) {
-      case KnockBackType.Delta: {
-        var delta = target.position-attacker.position;
-        var direction = delta.XZ().normalized;
-        if (direction.magnitude > 0) {
-          return direction;
-        } else {
-          return attacker.forward; 
-        }
-      }
-      case KnockBackType.Forward: {
-        return attacker.forward;
-      }
-      default: {
-        return attacker.forward;
-      }
+      case KnockBackType.Delta: return p0.TryGetDirection(p1).OrDefault(attacker.forward);
+      case KnockBackType.Forward: return attacker.forward;
+      case KnockBackType.Back: return -attacker.forward;
+      case KnockBackType.Right: return attacker.right;
+      case KnockBackType.Left: return -attacker.right;
+      case KnockBackType.Up: return attacker.up;
+      case KnockBackType.Down: return -attacker.up;
+      default: return attacker.forward;
     }
   }
 
@@ -107,25 +113,13 @@ public class Attacker : MonoBehaviour {
     }
 
     foreach (var attack in Attacks) {
-      if (attack != Attack) {
-        attack.HitBox.Collider.enabled = false;
-      }
+      attack.HitBox.Collider.enabled = attack == Attack && State == AttackState.Active;
     }
 
     FramesRemaining = Mathf.Max(0,FramesRemaining-1);
     Animator.SetInteger("AttackState",(int)State);
     Animator.SetFloat("AttackIndex",Attack ? Attack.Config.Index : 0);
-    if (Attack) {
-      Attack.HitBox.Collider.enabled = State == AttackState.Active;
-    }
-    switch (State) {
-      case AttackState.None:     Animator.SetFloat("AttackSpeed",1); break;
-      case AttackState.Windup:   Animator.SetFloat("AttackSpeed",Attack.Config.WindupAnimationSpeed); break;
-      case AttackState.Active:   Animator.SetFloat("AttackSpeed",Attack.Config.ActiveAnimationSpeed); break;
-      case AttackState.Contact:  Animator.SetFloat("AttackSpeed",0); break;
-      case AttackState.Recovery: Animator.SetFloat("AttackSpeed",Attack.Config.RecoveryAnimationSpeed); break;
-    }
-
+    Animator.SetFloat("AttackSpeed",AttackSpeed(Attack,State));
     Hits.Clear();
   }
 }

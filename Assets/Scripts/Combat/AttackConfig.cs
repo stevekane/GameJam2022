@@ -2,7 +2,15 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public enum KnockBackType { Delta, Forward }
+public enum KnockBackType { 
+  Delta, 
+  Forward,
+  Back,
+  Right,
+  Left,
+  Up,
+  Down
+}
 
 [CreateAssetMenu(fileName = "AttackConfig", menuName = "Attack/Config")]
 public class AttackConfig : ScriptableObject {

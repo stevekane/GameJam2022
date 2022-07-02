@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public static class VectorExtensions {
@@ -6,9 +7,20 @@ public static class VectorExtensions {
     return new Vector3(v.x, 0, v.z);
   }
 
+  public static Vector3? TryGetDirection(this Vector3 origin, Vector3 target) {
+    var direction = (target-origin).normalized;
+    return direction.magnitude > 0 ? direction : null;
+  }
+
   public static bool TryGetDirection(this Vector3 origin, Vector3 target, out Vector3 direction) {
     direction = (target-origin).normalized;
     return direction.sqrMagnitude > 0;
+  }
+}
+
+public static class NullableExtensions {
+  public static T OrDefault<T>(this Nullable<T> nullable, T defaultValue) where T : struct {
+    return nullable.HasValue ? nullable.Value : defaultValue;
   }
 }
 
