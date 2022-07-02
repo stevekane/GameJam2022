@@ -41,7 +41,7 @@ public class Attacker : MonoBehaviour {
     State = AttackState.Windup;
     FramesRemaining = Attack.Config.Windup.Frames;
     Attack.AudioSource.PlayOptionalOneShot(Attack.Config.WindupAudioClip);
-    TrySpawnEffect(Attack.Config.WindupEffect,transform.position,Quaternion.identity);
+    TrySpawnEffect(Attack.Config.WindupEffect,transform.position);
   }
 
   public void Hit(Hurtbox hurtbox) {
@@ -53,21 +53,23 @@ public class Attacker : MonoBehaviour {
       State = AttackState.Active;
       FramesRemaining = Attack.Config.Active.Frames;
       Attack.AudioSource.PlayOptionalOneShot(Attack.Config.ActiveAudioClip);
-      TrySpawnEffect(Attack.Config.ActiveEffect,transform.position,Quaternion.identity);
+      TrySpawnEffect(Attack.Config.ActiveEffect,transform.position);
     } else if (State == AttackState.Active && Hits.Count > 0) {
       State = AttackState.Contact;
       FramesRemaining = Attack.Config.Contact.Frames;
       Attack.AudioSource.PlayOptionalOneShot(Attack.Config.HitAudioClip);
-      CameraShaker.Instance.Shake(Attack.Config.HitCameraShakeIntensity);
       Hits.ForEach(OnHit);
+      CameraShaker.Instance.Shake(Attack.Config.HitCameraShakeIntensity);
     } else if (State == AttackState.Active && FramesRemaining <= 0) {
       State = AttackState.Recovery;
       FramesRemaining = Attack.Config.Recovery.Frames;
       Attack.AudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
+      TrySpawnEffect(Attack.Config.RecoveryEffect,transform.position);
     } else if (State == AttackState.Contact && FramesRemaining <= 0) {
       State = AttackState.Recovery;
       FramesRemaining = Attack.Config.Recovery.Frames;
-      Attack.AudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);;
+      Attack.AudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
+      TrySpawnEffect(Attack.Config.RecoveryEffect,transform.position);
     } else if (State == AttackState.Recovery && FramesRemaining <= 0) {
       Attack = null;
       State = AttackState.None;
@@ -88,7 +90,7 @@ public class Attacker : MonoBehaviour {
     var points = Attack.Config.Points;
     var strength = Attack.Config.Strength;
     hit.Damage?.TakeDamage(direction,hitStopFrames,points,strength);
-    TrySpawnEffect(Attack.Config.ContactEffect,hit.transform.position,Quaternion.identity);
+    TrySpawnEffect(Attack.Config.ContactEffect,hit.transform.position);
   }
 
   float AttackSpeed(Attack a, AttackState s) {
@@ -117,8 +119,9 @@ public class Attacker : MonoBehaviour {
     }
   }
 
-  bool TrySpawnEffect(GameObject prefab, Vector3 position, Quaternion rotation) {
+  bool TrySpawnEffect(GameObject prefab, Vector3 position) {
     if (prefab) {
+      var rotation = Quaternion.identity;
       var effect = Instantiate(prefab,position,rotation);
       effect.transform.localScale = new Vector3(10,10,10);
       effect.transform.LookAt(MainCamera.Instance.transform.position);
