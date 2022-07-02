@@ -36,6 +36,61 @@ public class Attacker : MonoBehaviour {
     }
   }
 
+  public void StartAttack(int index) {
+    Attack = Attacks[index];
+    State = AttackState.Windup;
+    FramesRemaining = Attack.Config.Windup.Frames;
+    Attack.AudioSource.PlayOptionalOneShot(Attack.Config.WindupAudioClip);
+    TrySpawnEffect(Attack.Config.WindupEffect,transform.position,Quaternion.identity);
+  }
+
+  public void Hit(Hurtbox hurtbox) {
+    Hits.Add(hurtbox);
+  }
+
+  public void Step(float dt) {
+    if (State == AttackState.Windup && FramesRemaining <= 0) {
+      State = AttackState.Active;
+      FramesRemaining = Attack.Config.Active.Frames;
+      Attack.AudioSource.PlayOptionalOneShot(Attack.Config.ActiveAudioClip);
+      TrySpawnEffect(Attack.Config.ActiveEffect,transform.position,Quaternion.identity);
+    } else if (State == AttackState.Active && Hits.Count > 0) {
+      State = AttackState.Contact;
+      FramesRemaining = Attack.Config.Contact.Frames;
+      Attack.AudioSource.PlayOptionalOneShot(Attack.Config.HitAudioClip);
+      CameraShaker.Instance.Shake(Attack.Config.HitCameraShakeIntensity);
+      Hits.ForEach(OnHit);
+    } else if (State == AttackState.Active && FramesRemaining <= 0) {
+      State = AttackState.Recovery;
+      FramesRemaining = Attack.Config.Recovery.Frames;
+      Attack.AudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
+    } else if (State == AttackState.Contact && FramesRemaining <= 0) {
+      State = AttackState.Recovery;
+      FramesRemaining = Attack.Config.Recovery.Frames;
+      Attack.AudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);;
+    } else if (State == AttackState.Recovery && FramesRemaining <= 0) {
+      Attack = null;
+      State = AttackState.None;
+      FramesRemaining = 0;
+    }
+
+    Attacks.ForEach(a => a.HitBox.Collider.enabled = a == Attack && State == AttackState.Active);
+    FramesRemaining = Mathf.Max(0,FramesRemaining-1);
+    Animator.SetInteger("AttackState",(int)State);
+    Animator.SetFloat("AttackIndex",Attack ? Attack.Config.Index : 0);
+    Animator.SetFloat("AttackSpeed",AttackSpeed(Attack,State));
+    Hits.Clear();
+  }
+
+  void OnHit(Hurtbox hit) {
+    var direction = KnockbackVector(transform,hit.transform,Attack.Config.KnockBackType);
+    var hitStopFrames = Attack.Config.Contact.Frames;
+    var points = Attack.Config.Points;
+    var strength = Attack.Config.Strength;
+    hit.Damage?.TakeDamage(direction,hitStopFrames,points,strength);
+    TrySpawnEffect(Attack.Config.ContactEffect,hit.transform.position,Quaternion.identity);
+  }
+
   float AttackSpeed(Attack a, AttackState s) {
     switch (s) {
       case AttackState.None: return 1;
@@ -62,64 +117,15 @@ public class Attacker : MonoBehaviour {
     }
   }
 
-  public void Hit(Hurtbox hurtbox) {
-    Hits.Add(hurtbox);
-  }
-
-  public void SpawnEffect(GameObject prefab, Vector3 position, Quaternion rotation) {
-    var effect = Instantiate(Attack.Config.HitEffect,position,rotation);
-    effect.transform.localScale = new Vector3(10,10,10);
-    effect.transform.LookAt(MainCamera.Instance.transform.position);
-    Destroy(effect,3);
-  }
-
-  public void StartAttack(int index) {
-    Attack = Attacks[index];
-    State = AttackState.Windup;
-    FramesRemaining = Attack.Config.Windup.Frames;
-    Attack.AudioSource.PlayOptionalOneShot(Attack.Config.WindupAudioClip);
-  }
-
-  public void Step(float dt) {
-    if (State == AttackState.Windup && FramesRemaining <= 0) {
-      State = AttackState.Active;
-      FramesRemaining = Attack.Config.Active.Frames;
-      Attack.AudioSource.PlayOptionalOneShot(Attack.Config.ActiveAudioClip);
-    } else if (State == AttackState.Active && Hits.Count > 0) {
-      State = AttackState.Contact;
-      FramesRemaining = Attack.Config.Contact.Frames;
-      Attack.AudioSource.PlayOptionalOneShot(Attack.Config.HitAudioClip);
-      CameraShaker.Instance.Shake(Attack.Config.HitCameraShakeIntensity);
-      foreach (var hit in Hits) {
-        var direction = KnockbackVector(transform,hit.transform,Attack.Config.KnockBackType);
-        var hitStopFrames = Attack.Config.Contact.Frames;
-        var points = Attack.Config.Points;
-        var strength = Attack.Config.Strength;
-        hit.Damage?.TakeDamage(direction,hitStopFrames,points,strength);
-        SpawnEffect(Attack.Config.HitEffect,hit.transform.position,Quaternion.identity);
-      }
-    } else if (State == AttackState.Active && FramesRemaining <= 0) {
-      State = AttackState.Recovery;
-      FramesRemaining = Attack.Config.Recovery.Frames;
-      Attack.AudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
-    } else if (State == AttackState.Contact && FramesRemaining <= 0) {
-      State = AttackState.Recovery;
-      FramesRemaining = Attack.Config.Recovery.Frames;
-      Attack.AudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);;
-    } else if (State == AttackState.Recovery && FramesRemaining <= 0) {
-      Attack = null;
-      State = AttackState.None;
-      FramesRemaining = 0;
+  bool TrySpawnEffect(GameObject prefab, Vector3 position, Quaternion rotation) {
+    if (prefab) {
+      var effect = Instantiate(prefab,position,rotation);
+      effect.transform.localScale = new Vector3(10,10,10);
+      effect.transform.LookAt(MainCamera.Instance.transform.position);
+      Destroy(effect,3);
+      return true;
+    } else {
+      return false;
     }
-
-    foreach (var attack in Attacks) {
-      attack.HitBox.Collider.enabled = attack == Attack && State == AttackState.Active;
-    }
-
-    FramesRemaining = Mathf.Max(0,FramesRemaining-1);
-    Animator.SetInteger("AttackState",(int)State);
-    Animator.SetFloat("AttackIndex",Attack ? Attack.Config.Index : 0);
-    Animator.SetFloat("AttackSpeed",AttackSpeed(Attack,State));
-    Hits.Clear();
   }
 }

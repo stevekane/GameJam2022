@@ -19,7 +19,8 @@ public class AttackConfig : ScriptableObject {
   public Timeval Active;
   public Timeval Contact;
   public Timeval Recovery;
-  [Header("Control")]
+
+  [Header("Movement")]
   [Range(0,1)]
   public float WindupMoveFactor;
   [Range(0,1)]
@@ -28,6 +29,8 @@ public class AttackConfig : ScriptableObject {
   public float ContactMoveFactor;
   [Range(0,1)]
   public float RecoveryMoveFactor;
+  [Header("Rotation")]
+
   [Range(0,360)]
   public float WindupRotationDegreesPerSecond;
   [Range(0,360)]
@@ -36,6 +39,7 @@ public class AttackConfig : ScriptableObject {
   public float ContactRotationDegreesPerSecond;
   [Range(0,360)]
   public float RecoveryRotationDegreesPerSecond;
+
   [Header("Animation")]
   [Tooltip("Used to signal to animators what attack this is")]
   public int Index;
@@ -47,20 +51,27 @@ public class AttackConfig : ScriptableObject {
   public float ContactAnimationSpeed = 0;
   [Range(0,10)]
   public float RecoveryAnimationSpeed = 1;
+  
+  [Header("Camera")]
   [Range(0,10)]
   public float HitCameraShakeIntensity = 1;
+
   [Header("Damage")]
   public KnockBackType KnockBackType;
   [Range(0,100)]
   public float Points = 1;
   [Range(0,100)]
   public float Strength = 1;
+
   [Header("Audio")]
   public AudioClip WindupAudioClip;
   public AudioClip ActiveAudioClip;
   public AudioClip RecoveryAudioClip;
   public AudioClip HitAudioClip;
+
   [Header("VFX")]
+  public GameObject WindupEffect;
   public GameObject ActiveEffect;
-  public GameObject HitEffect;
+  public GameObject ContactEffect;
+  public GameObject RecoveryEffect;
 }

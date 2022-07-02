@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class VectorExtensions {
@@ -42,6 +43,20 @@ public static class AudioSourceExtensions {
       return true;
     } else {
       return false;
+    }
+  }
+}
+
+public static class ArrayLikeExtensions {
+  public static void ForEach<T>(this List<T> xs, Action<T> p) {
+    foreach (var x in xs) {
+      p(x);
+    }
+  }
+
+  public static void ForEach<T>(this T[] xs, Action<T> p) {
+    foreach (var x in xs) {
+      p(x);
     }
   }
 }
