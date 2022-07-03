@@ -11,8 +11,13 @@ public class Timeval {
   public static Timeval FromMillis(int millis) {
     return new Timeval { Millis = millis };
   }
-  public int Frames { set { Millis = value * 1000 / FramesPerSecond; } get { return Millis * FramesPerSecond / 1000; } }
-  public float Seconds { get { return Millis * .0001f; } }
+  public int Frames { 
+    set { Millis = value * 1000 / FramesPerSecond; } 
+    get { return Millis * FramesPerSecond / 1000; } 
+  }
+  public float Seconds { 
+    get { return Millis * .0001f; } 
+  }
 }
 
 [CustomPropertyDrawer(typeof(Timeval))]

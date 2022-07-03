@@ -3,6 +3,37 @@ using UnityEngine;
 
 public enum AttackState { None, Windup, Active, Contact, Recovery }
 
+/*
+Notes on the workflow for tweaking attacks:
+
+An attack consists of three primary phases: windup active recovery.
+
+An optional phase called contact also exists and is used when the hit is successful.
+
+The process of setting up an animation to be an attack requires several things:
+
+Determine how many frames of the animation are associated with each phase of the attack.
+
+  In this process, the "frames" are relative to the exported/imported framerate of that
+  animation. This may vary from animation to animation so it is important to know what
+  that framerate actually is. We COULD know this by convention for example if we import
+  all animations at 30 fps. 
+
+  In this case, we then can know that there are f/fps seconds per frame which in the case
+  of 30 fps is 1/30 or ~32ms.
+
+  In order to prevent this from getting super confusing, it would be best if we could denote
+  the start/end frames for each phase of the attack in the units of FRAMES for the associated
+  animation.
+
+  Our run-time framerate is not necessarily the same as our animation framerate (in fact
+  almost certainly it is different) so we then must convert the animation framerate to some
+  duration in run-time frames.
+
+  We can do this conversion at run-time if we know both the framerate of the animation
+  and the framerate at run-time.
+*/
+
 public class Attacker : MonoBehaviour {
   [SerializeField] Animator Animator;
   [SerializeField] Attack[] Attacks;
