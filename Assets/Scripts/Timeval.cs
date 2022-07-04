@@ -52,7 +52,6 @@ public class TimevalDrawer : PropertyDrawer {
 
     if (EditorGUI.EndChangeCheck()) {
       timeval = Timeval.FromTicks(newTicks, newTps);
-      Debug.Log($"Millis change {millisProp.floatValue} => {timeval.Millis}");
       millisProp.floatValue = timeval.Millis;
       tpsProp.intValue = timeval.TicksPerSecond;
     }
