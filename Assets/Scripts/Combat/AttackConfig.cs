@@ -14,6 +14,9 @@ public enum KnockBackType {
 
 [CreateAssetMenu(fileName = "AttackConfig", menuName = "Attack/Config")]
 public class AttackConfig : ScriptableObject {
+  [Header("Animation Clip")]  
+  public AnimationClip Clip;
+
   [Header("Frame data")]
   public Timeval Windup;
   public Timeval Active;
