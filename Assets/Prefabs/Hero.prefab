@@ -320,6 +320,7 @@ GameObject:
   m_Component:
   - component: {fileID: 912778195731948833}
   - component: {fileID: 2578572211518139727}
+  - component: {fileID: 9219124919590088777}
   m_Layer: 8
   m_Name: Attacks
   m_TagString: Untagged
@@ -357,11 +358,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12e8843d6958d99489b475fb6195665e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Pushable: {fileID: 7527747095931960904}
+  Vibrator: {fileID: 9219124919590088777}
   Animator: {fileID: 7508363702064596809}
   Attacks:
   - {fileID: 4385581414564159433}
   - {fileID: 5229471093014981233}
   - {fileID: 6893966553562771999}
+--- !u!114 &9219124919590088777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3335561826620584317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d0cba5e795e3e24f94847040ed69f07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Target: {fileID: 896825602309527846}
 --- !u!1 &3930514479255101891
 GameObject:
   m_ObjectHideFlags: 0
@@ -500,6 +516,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4102725152112460098}
   - component: {fileID: 4102725152112460096}
+  - component: {fileID: 7527747095931960904}
+  - component: {fileID: 6278674678144464738}
   - component: {fileID: 4102725152112460099}
   - component: {fileID: 1604618934501359742}
   - component: {fileID: 7508363702064596809}
@@ -574,6 +592,30 @@ MonoBehaviour:
   BumpVelocity: {x: 0, y: 0, z: 0}
   BumpTimeRemaining: 0
   StunTimeRemaining: 0
+--- !u!114 &7527747095931960904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4102725152112460109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51e89ae769fd6604abc8451d3c8d5757, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6278674678144464738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4102725152112460109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b25f034a0a2d6547bb601e0fe361f46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!143 &4102725152112460099
 CharacterController:
   m_ObjectHideFlags: 0
@@ -804,7 +846,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.2
+  m_Volume: 0.05
   m_Pitch: 1
   Loop: 0
   Mute: 0

@@ -9,7 +9,9 @@ public class HeroConfig : ScriptableObject {
   [Tooltip("Max movement speed")]
   public float MOVE_SPEED = 45f;
   [Tooltip("Maximum amount of instant acceleration possible while on ground")]
-  public float MAX_XZ_ACCELERATION = .2f;
+  public float MAX_GROUNDED_XZ_ACCELERATION = .2f;
+  [Tooltip("Maximum amount of instant acceleration possible while on ground and slipping")]
+  public float MAX_SLIPPING_XZ_ACCELERATION = .2f;
   [Tooltip("Frames between footstep sounds")]
   public int FramesPerFootstep = 250;
 

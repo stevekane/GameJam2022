@@ -4,43 +4,33 @@ using UnityEngine;
 public enum AttackState { None, Windup, Active, Contact, Recovery }
 
 /*
-Notes on the workflow for tweaking attacks:
+I'd like to have a "smart targeting" system for attacks.
 
-An attack consists of three primary phases: windup active recovery.
+The goal is to help convert raw inputs into player intention in such a way 
+that they have the feeling of selecting new things to attack by pointing at them
+but also that when they behave "as though they are trying to perform a combo"
+that they should become "stuck" to the target they have most recently engaged.
 
-An optional phase called contact also exists and is used when the hit is successful.
+TARGET SELECTION
 
-The process of setting up an animation to be an attack requires several things:
-
-Determine how many frames of the animation are associated with each phase of the attack.
-
-  In this process, the "frames" are relative to the exported/imported framerate of that
-  animation. This may vary from animation to animation so it is important to know what
-  that framerate actually is. We COULD know this by convention for example if we import
-  all animations at 30 fps. 
-
-  In this case, we then can know that there are f/fps seconds per frame which in the case
-  of 30 fps is 1/30 or ~32ms.
-
-  In order to prevent this from getting super confusing, it would be best if we could denote
-  the start/end frames for each phase of the attack in the units of FRAMES for the associated
-  animation.
-
-  Our run-time framerate is not necessarily the same as our animation framerate (in fact
-  almost certainly it is different) so we then must convert the animation framerate to some
-  duration in run-time frames.
-
-  We can do this conversion at run-time if we know both the framerate of the animation
-  and the framerate at run-time.
+AIM ASSIST
+  Map raw player intended direction to adjusted direction.
+    "Point at best target"
+  Map raw player movement to adjusted movement.
+    "Don't run through a target if already well in-range"
 */
 
 public class Attacker : MonoBehaviour {
+  [SerializeField] Pushable Pushable;
+  [SerializeField] Vibrator Vibrator;
   [SerializeField] Animator Animator;
   [SerializeField] Attack[] Attacks;
 
   List<Hurtbox> Hits = new List<Hurtbox>(32);
   AttackState State;
   Attack Attack;
+  Vector3 TotalKnockbackVector;
+  float TotalKnockBackStrength;
   int FramesRemaining = 0;
 
   public bool IsAttacking { get { return State != AttackState.None; } }
@@ -89,8 +79,11 @@ public class Attacker : MonoBehaviour {
       State = AttackState.Contact;
       FramesRemaining = Attack.Config.Contact.Frames;
       Attack.AudioSource.PlayOptionalOneShot(Attack.Config.HitAudioClip);
-      Hits.ForEach(OnHit);
+      Vibrator.Vibrate(transform.forward,Attack.Config.Contact.Frames,.15f);
       CameraShaker.Instance.Shake(Attack.Config.HitCameraShakeIntensity);
+      Hits.ForEach(OnHit);
+      TotalKnockBackStrength = Attack.Config.Strength;
+      TotalKnockbackVector = -Hits.Sum(hit => KnockbackVector(transform,hit.transform,Attack.Config.KnockBackType));
     } else if (State == AttackState.Active && FramesRemaining <= 0) {
       State = AttackState.Recovery;
       FramesRemaining = Attack.Config.Recovery.Frames;
@@ -100,6 +93,7 @@ public class Attacker : MonoBehaviour {
       State = AttackState.Recovery;
       FramesRemaining = Attack.Config.Recovery.Frames;
       Attack.AudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
+      Pushable.Push(TotalKnockBackStrength*TotalKnockbackVector.normalized);
       TrySpawnEffect(Attack.Config.RecoveryEffect,transform.position);
     } else if (State == AttackState.Recovery && FramesRemaining <= 0) {
       Attack = null;
@@ -114,6 +108,22 @@ public class Attacker : MonoBehaviour {
     Animator.SetFloat("AttackSpeed",AttackSpeed(Attack,State));
     Hits.Clear();
   }
+
+  /*
+  HitStop(duration)
+    animator playback speed slowed
+    vibration begins
+  HurtStop(duration)
+    animator playback speed begins ramp to 0
+    vibration begins
+  DealDamage(amount)
+  SpawnEffects(effects)
+  PlaySounds(sounds)
+  EndHitStop
+    Knockback
+  EndHurtStop
+    Knockback
+  */
 
   void OnHit(Hurtbox hit) {
     var direction = KnockbackVector(transform,hit.transform,Attack.Config.KnockBackType);

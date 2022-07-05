@@ -136,6 +136,29 @@ public class Hero : MonoBehaviour {
   bool Moving { get => Inputs.Action.Move.XZ.magnitude > 0; }
   bool Aiming { get => Inputs.Action.Aim.XZ.magnitude > 0; }
 
+  /*
+  A question, what IS pushback?
+
+  Pushback is an "external force" or more specifically an external impulse applied to your
+  character. The normal way you would "resist" the action of this impulse would be some kind
+  of counter-force such as ground friction, air-resistance, or just encountering an immovable
+  obstacle such as a wall.
+
+  When you are pushed back, you could ALSO model this as slipping.
+
+  When you are NOT slipping, you are easily able to control your own velocity.
+  When you are slipping, you are not so easily able to control your own velocity.
+
+  Thus, slipping or pushback could be experienced over a duration or until your
+  XZ-speed falls below some threshold and you regain your footing.
+  */
+
+  public void Push(Vector3 velocity) {
+    // TODO: This is pretty clearly garbage and needs to be updated
+    // Cannot just take this effect willy-nilly like this
+    Velocity += velocity;
+  }
+
   public void Block(Vector3 position, Vector3 velocity) {
     Blocks.Add(new BlockEvent { Position = position, Velocity = velocity });
   }
@@ -169,8 +192,14 @@ public class Hero : MonoBehaviour {
     var desiredVelocity = desiredMove*speed;
     var acceleration = desiredVelocity-currentVelocity;
     var direction = acceleration.normalized;
-    var magnitude = Mathf.Min(Config.MAX_XZ_ACCELERATION,acceleration.magnitude);
-    return magnitude*direction;
+    var isSlipping = currentVelocity.magnitude > speed;
+    if (isSlipping) {
+      var magnitude = Mathf.Min(Config.MAX_SLIPPING_XZ_ACCELERATION,acceleration.magnitude);
+      return magnitude*direction;
+    } else {
+      var magnitude = Mathf.Min(Config.MAX_GROUNDED_XZ_ACCELERATION,acceleration.magnitude);
+      return magnitude*direction;
+    }
   }
 
   Vector3 FallAcceleration(Vector3 desiredMove, float dt) { 
@@ -390,11 +419,6 @@ public class Hero : MonoBehaviour {
         transform.rotation = Quaternion.LookRotation(targetXZ-currentXZ);
       } else if ((Free || Holding) && Moving) {
         transform.forward = action.Move.XZ;
-      }
-    } else {
-      var forward = Velocity.XZ().normalized;
-      if (forward.magnitude > 0) {
-        transform.forward = forward;
       }
     }
 
