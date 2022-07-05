@@ -3,23 +3,6 @@ using UnityEngine;
 
 public enum AttackState { None, Windup, Active, Contact, Recovery }
 
-/*
-I'd like to have a "smart targeting" system for attacks.
-
-The goal is to help convert raw inputs into player intention in such a way 
-that they have the feeling of selecting new things to attack by pointing at them
-but also that when they behave "as though they are trying to perform a combo"
-that they should become "stuck" to the target they have most recently engaged.
-
-TARGET SELECTION
-
-AIM ASSIST
-  Map raw player intended direction to adjusted direction.
-    "Point at best target"
-  Map raw player movement to adjusted movement.
-    "Don't run through a target if already well in-range"
-*/
-
 public class Attacker : MonoBehaviour {
   [SerializeField] Pushable Pushable;
   [SerializeField] Vibrator Vibrator;
@@ -39,8 +22,8 @@ public class Attacker : MonoBehaviour {
       switch (State) {
         case AttackState.Windup: return Attack.Config.WindupMoveFactor;
         case AttackState.Active: return Attack.Config.ActiveMoveFactor;
-        case AttackState.Contact: return Attack.Config.ContactMoveFactor;
         case AttackState.Recovery: return Attack.Config.RecoveryMoveFactor;
+        case AttackState.Contact: return 0;
         default: return 1;
       }
     }
@@ -50,8 +33,8 @@ public class Attacker : MonoBehaviour {
       switch (State) {
         case AttackState.Windup: return Attack.Config.WindupRotationDegreesPerSecond;
         case AttackState.Active: return Attack.Config.ActiveRotationDegreesPerSecond;
-        case AttackState.Contact: return Attack.Config.ContactRotationDegreesPerSecond;
         case AttackState.Recovery: return Attack.Config.RecoveryRotationDegreesPerSecond;
+        case AttackState.Contact: return 0;
         default: return 360;
       }
     }
@@ -60,7 +43,7 @@ public class Attacker : MonoBehaviour {
   public void StartAttack(int index) {
     Attack = Attacks[index];
     State = AttackState.Windup;
-    FramesRemaining = Attack.Config.Windup.Frames;
+    FramesRemaining = Attack.Config.Windup.Frames.ScaleBy(1/Attack.Config.WindupAnimationSpeed);
     Attack.AudioSource.PlayOptionalOneShot(Attack.Config.WindupAudioClip);
     TrySpawnEffect(Attack.Config.WindupEffect,transform.position);
   }
@@ -72,7 +55,7 @@ public class Attacker : MonoBehaviour {
   public void Step(float dt) {
     if (State == AttackState.Windup && FramesRemaining <= 0) {
       State = AttackState.Active;
-      FramesRemaining = Attack.Config.Active.Frames;
+      FramesRemaining = Attack.Config.Active.Frames.ScaleBy(1/Attack.Config.ActiveAnimationSpeed);
       Attack.AudioSource.PlayOptionalOneShot(Attack.Config.ActiveAudioClip);
       TrySpawnEffect(Attack.Config.ActiveEffect,transform.position);
     } else if (State == AttackState.Active && Hits.Count > 0) {
@@ -86,12 +69,12 @@ public class Attacker : MonoBehaviour {
       TotalKnockbackVector = -Hits.Sum(hit => KnockbackVector(transform,hit.transform,Attack.Config.KnockBackType));
     } else if (State == AttackState.Active && FramesRemaining <= 0) {
       State = AttackState.Recovery;
-      FramesRemaining = Attack.Config.Recovery.Frames;
+      FramesRemaining = Attack.Config.Recovery.Frames.ScaleBy(1/Attack.Config.RecoveryAnimationSpeed);
       Attack.AudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
       TrySpawnEffect(Attack.Config.RecoveryEffect,transform.position);
     } else if (State == AttackState.Contact && FramesRemaining <= 0) {
       State = AttackState.Recovery;
-      FramesRemaining = Attack.Config.Recovery.Frames;
+      FramesRemaining = Attack.Config.Recovery.Frames.ScaleBy(1/Attack.Config.RecoveryAnimationSpeed);
       Attack.AudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
       Pushable.Push(TotalKnockBackStrength*TotalKnockbackVector.normalized);
       TrySpawnEffect(Attack.Config.RecoveryEffect,transform.position);
@@ -109,22 +92,6 @@ public class Attacker : MonoBehaviour {
     Hits.Clear();
   }
 
-  /*
-  HitStop(duration)
-    animator playback speed slowed
-    vibration begins
-  HurtStop(duration)
-    animator playback speed begins ramp to 0
-    vibration begins
-  DealDamage(amount)
-  SpawnEffects(effects)
-  PlaySounds(sounds)
-  EndHitStop
-    Knockback
-  EndHurtStop
-    Knockback
-  */
-
   void OnHit(Hurtbox hit) {
     var direction = KnockbackVector(transform,hit.transform,Attack.Config.KnockBackType);
     var hitStopFrames = Attack.Config.Contact.Frames;
@@ -139,8 +106,8 @@ public class Attacker : MonoBehaviour {
       case AttackState.None: return 1;
       case AttackState.Windup: return a.Config.WindupAnimationSpeed;
       case AttackState.Active: return a.Config.ActiveAnimationSpeed;
-      case AttackState.Contact: return a.Config.ContactAnimationSpeed;
       case AttackState.Recovery: return a.Config.RecoveryAnimationSpeed;
+      case AttackState.Contact: return 0; 
       default: return 1;
     }
   }

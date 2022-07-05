@@ -25,6 +25,12 @@ public static class NullableExtensions {
   }
 }
 
+public static class IntExtensions {
+  public static int ScaleBy(this int i, float f) {
+    return (int)((float)i*f);
+  }
+}
+
 public static class MonoExtensions {
   // Returns the (first matching) requested component on this object, creating it first if necessary.
   public static T GetOrCreateComponent<T>(this MonoBehaviour self) where T : MonoBehaviour {

@@ -29,8 +29,6 @@ public class AttackConfig : ScriptableObject {
   [Range(0,1)]
   public float ActiveMoveFactor;
   [Range(0,1)]
-  public float ContactMoveFactor;
-  [Range(0,1)]
   public float RecoveryMoveFactor;
   [Header("Rotation")]
 
@@ -38,8 +36,6 @@ public class AttackConfig : ScriptableObject {
   public float WindupRotationDegreesPerSecond;
   [Range(0,360)]
   public float ActiveRotationDegreesPerSecond;
-  [Range(0,360)]
-  public float ContactRotationDegreesPerSecond;
   [Range(0,360)]
   public float RecoveryRotationDegreesPerSecond;
 
@@ -51,10 +47,8 @@ public class AttackConfig : ScriptableObject {
   [Range(0,10)]
   public float ActiveAnimationSpeed = 1;
   [Range(0,10)]
-  public float ContactAnimationSpeed = 0;
-  [Range(0,10)]
   public float RecoveryAnimationSpeed = 1;
-  
+
   [Header("Camera")]
   [Range(0,10)]
   public float HitCameraShakeIntensity = 1;
