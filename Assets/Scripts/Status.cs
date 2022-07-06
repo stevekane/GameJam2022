@@ -12,7 +12,7 @@ public abstract class StatusEffect {
 
 public class KnockbackEffect : StatusEffect {
   static readonly float DRAG = 5f;
-  static readonly float DONE_SPEED = .25f;
+  static readonly float DONE_SPEED = 5f;
 
   public Vector3 Velocity;
   public KnockbackEffect(Vector3 velocity) {

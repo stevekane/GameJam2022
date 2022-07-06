@@ -21,6 +21,7 @@ public class Hero : MonoBehaviour {
   [SerializeField] CharacterController Controller;
   [SerializeField] Animator Animator;
   [SerializeField] Attacker Attacker;
+  [SerializeField] Status Status;
   [SerializeField] Grabber Grabber;
   [SerializeField] AudioSource FootstepAudioSource;
   [SerializeField] AudioSource LegAudioSource;
@@ -52,7 +53,6 @@ public class Hero : MonoBehaviour {
   [Header("Status Effects")]
   public Vector3 BumpVelocity;
   public float BumpTimeRemaining;
-  public float StunTimeRemaining;
 
   List<GameObject> Entered = new List<GameObject>(32);
   List<GameObject> Stayed = new List<GameObject>(32);
@@ -122,7 +122,7 @@ public class Hero : MonoBehaviour {
     return t;
   }
 
-  bool Stunned { get => StunTimeRemaining > 0; }
+  bool Stunned { get => Status.CurrentEffect != null; }
   bool Bumped { get => BumpTimeRemaining > 0; }
   bool Free { get => ArmState == ArmState.Free; }
   bool Reaching { get => ArmState == ArmState.Reaching; }
@@ -169,7 +169,6 @@ public class Hero : MonoBehaviour {
   }
 
   public void Stun(float duration) {
-    StunTimeRemaining = 0;
   }
 
   public void Enter(GameObject gameObject) {
@@ -340,9 +339,6 @@ public class Hero : MonoBehaviour {
     if (BumpTimeRemaining > 0) {
       LegTarget = null;
       BumpTimeRemaining -= dt;
-    }
-    if (StunTimeRemaining > 0) {
-      StunTimeRemaining -= dt;
     }
 
     if (LegTarget) {
