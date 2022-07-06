@@ -187,7 +187,7 @@ public class Hero : MonoBehaviour {
   // this implies that the acceleration we are computing should be
   // divided by dt before being compared to max acceleration
   Vector3 MoveAcceleration(Vector3 desiredMove, float speed) {
-    var currentVelocity = new Vector3(Velocity.x, 0, Velocity.z);
+    var currentVelocity = Velocity.XZ();
     var desiredVelocity = desiredMove*speed;
     var acceleration = desiredVelocity-currentVelocity;
     var direction = acceleration.normalized;
@@ -408,10 +408,8 @@ public class Hero : MonoBehaviour {
       if (Aiming) {
         transform.forward = action.Aim.XZ;
       } else if (Reaching || Pulling) {
-        var targetXZ = ArmTarget.transform.position;
-        var currentXZ = transform.position;
-        targetXZ.y = 0;
-        currentXZ.y = 0;
+        var targetXZ = ArmTarget.transform.position.XZ();
+        var currentXZ = transform.position.XZ();
         transform.rotation = Quaternion.LookRotation(targetXZ-currentXZ);
       } else if ((Free || Holding) && Moving) {
         transform.forward = action.Move.XZ;
@@ -442,9 +440,8 @@ public class Hero : MonoBehaviour {
     {
       var forward = transform.forward;
       var right = transform.right;
-      var velocityxz = new Vector3(Velocity.x, 0, Velocity.z);
-      var f = Vector3.Dot(velocityxz, forward);
-      var r = Vector3.Dot(velocityxz, right);
+      var f = Vector3.Dot(Velocity.XZ(), forward);
+      var r = Vector3.Dot(Velocity.XZ(), right);
       var a = new Vector3(r, 0, f);
       Animator.SetFloat("Forward", a.z);
       Animator.SetFloat("Right", a.x);
