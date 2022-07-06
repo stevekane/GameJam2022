@@ -50,14 +50,9 @@ public class Hero : MonoBehaviour {
   public int JumpType = 0;
   public Vector3 LastGroundPosition;
 
-  [Header("Status Effects")]
-  public Vector3 BumpVelocity;
-  public float BumpTimeRemaining;
-
   List<GameObject> Entered = new List<GameObject>(32);
   List<GameObject> Stayed = new List<GameObject>(32);
   List<GameObject> Exited = new List<GameObject>(32);
-  List<BlockEvent> Blocks = new List<BlockEvent>(32);
 
   float Score(Vector3 forward, Vector3 origin, Vector3 target) {
     var delta = target.XZ()-origin.XZ();
@@ -122,8 +117,7 @@ public class Hero : MonoBehaviour {
     return t;
   }
 
-  bool Stunned { get => Status.CurrentEffect != null; }
-  bool Bumped { get => BumpTimeRemaining > 0; }
+  bool Stunned { get => !Status.CanMove; }
   bool Free { get => ArmState == ArmState.Free; }
   bool Reaching { get => ArmState == ArmState.Reaching; }
   bool Pulling { get => ArmState == ArmState.Pulling; }
@@ -157,18 +151,6 @@ public class Hero : MonoBehaviour {
     // TODO: This is pretty clearly garbage and needs to be updated
     // Cannot just take this effect willy-nilly like this
     Velocity += velocity;
-  }
-
-  public void Block(Vector3 position, Vector3 velocity) {
-    Blocks.Add(new BlockEvent { Position = position, Velocity = velocity });
-  }
-
-  public void Bump(Vector3 position, Vector3 velocity, float bumpDuration) {
-    BumpTimeRemaining = bumpDuration;
-    BumpVelocity = velocity;
-  }
-
-  public void Stun(float duration) {
   }
 
   public void Enter(GameObject gameObject) {
@@ -310,7 +292,7 @@ public class Hero : MonoBehaviour {
       Attacker.StartAttack(1);
     } else if (Free && !Attacker.IsAttacking && !Stunned && !Dashing && action.Throw.JustDown) {
       Attacker.StartAttack(2);
-    } else if (Falling && !Bumped && TryGetFirst(Entered, out Targetable targetable)) {
+    } else if (Falling && TryGetFirst(Entered, out Targetable targetable)) {
       Perch(targetable);
     } else if (Aiming && Target && !Stunned && action.Jump.JustDown) {
       Pounce(Target.transform.position);
@@ -332,15 +314,6 @@ public class Hero : MonoBehaviour {
 
     Attacker.Step(dt);
 
-    if (Blocks.Count > 0) {
-      LegTarget = null;
-      Velocity = Blocks[0].Velocity;
-    }
-    if (BumpTimeRemaining > 0) {
-      LegTarget = null;
-      BumpTimeRemaining -= dt;
-    }
-
     if (LegTarget) {
       var target = LegTarget.transform.position+LegTarget.Height*Vector3.up;
       var current = transform.position;
@@ -355,10 +328,10 @@ public class Hero : MonoBehaviour {
       Velocity.y = Velocity.y > 0 ? Velocity.y : -1;
       Controller.Move(dt*Velocity);
       Animator.SetInteger("LegState", 0);
-    } else if (Stunned || Bumped) {
+    } else if (Stunned) {
       // This is hacky as fuck but hopefully temporary.
       float vy = Velocity.y;
-      Velocity = Bumped ? BumpVelocity : Vector3.zero;
+      Velocity = Vector3.zero;
       if (Falling) {
         AirTime += dt;
         Velocity.y = vy + FallAcceleration(Vector3.zero, dt).y;
@@ -478,7 +451,6 @@ public class Hero : MonoBehaviour {
     Entered.Clear();
     Stayed.Clear();
     Exited.Clear();
-    Blocks.Clear();
 
     if (Grounded && !Pouncing) {
       gameObject.layer = PhysicsLayers.PlayerGrounded;

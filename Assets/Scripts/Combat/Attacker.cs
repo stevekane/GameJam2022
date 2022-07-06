@@ -127,7 +127,7 @@ public class Attacker : MonoBehaviour {
     };
   }
 
-  bool TrySpawnEffect(GameObject prefab, Vector3 position) {
+  public static bool TrySpawnEffect(GameObject prefab, Vector3 position) {
     if (prefab) {
       var rotation = Quaternion.identity;
       var effect = Instantiate(prefab, position, rotation);

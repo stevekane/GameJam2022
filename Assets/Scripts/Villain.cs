@@ -7,7 +7,8 @@ public class Villain : MonoBehaviour {
   Animator Animator;
   Transform Target;
   int AttackCheckFrames = 1000;
-  public float AttackRange = 3f;
+  public Timeval AttackDelay;
+  public float AttackRange = 2f;
   public float MoveSpeed = 3f;
 
   private void Awake() {
@@ -19,12 +20,8 @@ public class Villain : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    //if (Status?.CurrentEffect != null) {
-    //  return;
-    //}
-
-    if (!Attacker.IsAttacking && --AttackCheckFrames <= 0) {
-      AttackCheckFrames = 100;
+    if (Status.CanAttack && !Attacker.IsAttacking && --AttackCheckFrames <= 0) {
+      AttackCheckFrames = AttackDelay.Frames;
       if (IsTargetInRange(AttackRange) && MaybeChooseAttack(out int which)) {
         Attacker.StartAttack(which);
       }
@@ -33,7 +30,7 @@ public class Villain : MonoBehaviour {
 
     Vector3 dir = (Target.position - transform.position).XZ().normalized;
     float speed = 0;
-    if (!IsTargetInRange(2f)) {
+    if (Status.CanMove && !IsTargetInRange(AttackRange * .8f)) {
       speed = MoveSpeed;
     }
 

@@ -44,7 +44,7 @@ public static class MonoExtensions {
 
 public static class AudioSourceExtensions {
   public static bool PlayOptionalOneShot(this AudioSource source, AudioClip clip) {
-    if (clip) {
+    if (clip && source) {
       source.PlayOneShot(clip);
       return true;
     } else {

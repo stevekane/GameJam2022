@@ -7,7 +7,7 @@ public class MobMove : MonoBehaviour {
     Status = GetComponent<Status>();
   }
   private void FixedUpdate() {
-    if (Status.Current == StatusEffect.Types.None)
+    if (Status.CanMove)
       Step(Time.fixedDeltaTime);
   }
   public virtual void Step(float dt) { }

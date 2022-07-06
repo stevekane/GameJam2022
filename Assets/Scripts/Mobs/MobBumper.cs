@@ -52,7 +52,7 @@ public class MobBumper : Mob {
       var player = ptrigger.Hero;
       if (player.LastPerch?.gameObject != gameObject) {
         var delta = (player.transform.position - transform.position).XZ().normalized;
-        player.Bump(player.transform.position, delta * 10f, .25f);
+        //player.Bump(player.transform.position, delta * 10f, .25f);
       }
     }
   }

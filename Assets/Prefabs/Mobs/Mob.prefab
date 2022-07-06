@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 7443725842749207899}
   - component: {fileID: 5792134184045244964}
   - component: {fileID: 8414190359469847989}
+  - component: {fileID: 8466675217918761687}
   m_Layer: 10
   m_Name: Mob
   m_TagString: Untagged
@@ -172,6 +173,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b25f034a0a2d6547bb601e0fe361f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BounceConfig: {fileID: 11400000, guid: 30ba547ba8990824d8f5f5d84f724237, type: 2}
+  AudioSource: {fileID: 6169561321594596479}
+  CanMove: 1
+  CanAttack: 1
+  IsAirborne: 0
+--- !u!114 &8466675217918761687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1300316631519711558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d0cba5e795e3e24f94847040ed69f07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Target: {fileID: 1300316631732759984}
 --- !u!1 &1300316631732759985
 GameObject:
   m_ObjectHideFlags: 0
@@ -500,6 +519,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb42c6ec885f27c40ab661cb732d00b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collider: {fileID: 0}
 --- !u!1 &5540587194467341188
 GameObject:
   m_ObjectHideFlags: 0

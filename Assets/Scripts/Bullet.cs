@@ -30,10 +30,10 @@ public class Bullet : MonoBehaviour {
     var player = collider.gameObject.GetComponentInParent<Hero>();
     if (player) {
       if (Type == BulletType.NET) {
-        player.Bump(player.transform.position, transform.forward.XZ().normalized * 15f, .3f);
-        player.Stun(.5f);
+        //player.Bump(player.transform.position, transform.forward.XZ().normalized * 15f, .3f);
+        //player.Stun(.5f);
       } else {
-        player.Bump(player.transform.position, transform.forward.XZ().normalized * 15f, .05f);
+        //player.Bump(player.transform.position, transform.forward.XZ().normalized * 15f, .05f);
       }
     }
     Destroy(gameObject, .01f);

@@ -172,7 +172,6 @@ GameObject:
   m_Component:
   - component: {fileID: 912778195731948833}
   - component: {fileID: 2578572211518139727}
-  - component: {fileID: 8825918571985644967}
   m_Layer: 10
   m_Name: Attacks
   m_TagString: Untagged
@@ -211,25 +210,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Pushable: {fileID: 7114433140782870703}
-  Vibrator: {fileID: 8825918571985644967}
+  Vibrator: {fileID: 2863687662438770135}
   Animator: {fileID: 7508363702064596809}
   Attacks:
   - {fileID: 4385581414564159433}
   - {fileID: 5229471093014981233}
   - {fileID: 6893966553562771999}
---- !u!114 &8825918571985644967
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3335561826620584317}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d0cba5e795e3e24f94847040ed69f07, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Target: {fileID: 896825602309527846}
 --- !u!1 &3930514479255101891
 GameObject:
   m_ObjectHideFlags: 0
@@ -403,7 +389,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 3, y: 3, z: 2}
+  m_Size: {x: 2, y: 3, z: 1.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &3726384578785018885
 Rigidbody:
@@ -433,6 +419,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb42c6ec885f27c40ab661cb732d00b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collider: {fileID: 0}
 --- !u!1 &4102725152112460109
 GameObject:
   m_ObjectHideFlags: 0
@@ -448,6 +435,7 @@ GameObject:
   - component: {fileID: 5646299127220675759}
   - component: {fileID: 7114433140782870703}
   - component: {fileID: 9062133124759138023}
+  - component: {fileID: 2863687662438770135}
   m_Layer: 10
   m_Name: Villain
   m_TagString: Untagged
@@ -538,6 +526,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63366de3397b0894a8d063db7a359d55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AttackDelay:
+    Millis: 333.33334
+    TicksPerSecond: 30
   AttackRange: 3
   MoveSpeed: 3
 --- !u!114 &7114433140782870703
@@ -564,6 +555,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b25f034a0a2d6547bb601e0fe361f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BounceConfig: {fileID: 11400000, guid: 30ba547ba8990824d8f5f5d84f724237, type: 2}
+  AudioSource: {fileID: 3911948467034089528}
+  CanMove: 1
+  CanAttack: 1
+  IsAirborne: 0
+--- !u!114 &2863687662438770135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4102725152112460109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d0cba5e795e3e24f94847040ed69f07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Target: {fileID: 896825602309527846}
 --- !u!1 &6086008439409332628
 GameObject:
   m_ObjectHideFlags: 0
@@ -591,7 +600,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6086008439409332628}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -622,7 +631,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 3, y: 3, z: 2}
+  m_Size: {x: 2, y: 3, z: 1.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &3137893465381826949
 Rigidbody:

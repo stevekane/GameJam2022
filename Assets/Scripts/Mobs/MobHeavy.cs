@@ -76,7 +76,7 @@ public class MobHeavy : Mob {
       var player = ptrigger.Hero;
       if (player.LastPerch?.gameObject != gameObject) {
         var delta = (player.transform.position - transform.position).XZ().normalized;
-        player.Block(player.transform.position, delta*1f);
+        //player.Block(player.transform.position, delta*1f);
       }
     }
   }
