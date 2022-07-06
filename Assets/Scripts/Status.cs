@@ -7,7 +7,7 @@ public abstract class StatusEffect {
   public Types Type;
 
   public abstract void Reset(StatusEffect e);
-  public abstract bool Apply(Rigidbody body);
+  public abstract bool Apply(Status status);
 }
 
 public class KnockbackEffect : StatusEffect {
@@ -23,9 +23,9 @@ public class KnockbackEffect : StatusEffect {
   public override void Reset(StatusEffect e) {
     Velocity += ((KnockbackEffect)e).Velocity;
   }
-  public override bool Apply(Rigidbody body) {
+  public override bool Apply(Status status) {
     Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * DRAG);
-    body.MovePosition(body.position + Velocity*Time.fixedDeltaTime);
+    status.Move(Velocity*Time.fixedDeltaTime);
     return Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED;
   }
 }
@@ -34,8 +34,7 @@ public class Status : MonoBehaviour {
   public List<StatusEffect> Active = new List<StatusEffect>();
   public StatusEffect CurrentEffect { get { return Active.Count > 0 ? Active[0] : null; } }
   public StatusEffect.Types Current { get { return CurrentEffect != null ? CurrentEffect.Type : StatusEffect.Types.None; } }
-
-  Rigidbody Body;
+  CharacterController Controller;
 
   public void Add(StatusEffect effect) {
     var count = Active.Count;
@@ -48,12 +47,20 @@ public class Status : MonoBehaviour {
   }
 
   private void Awake() {
-    Body = GetComponent<Rigidbody>();
+    Controller = GetComponent<CharacterController>();
   }
 
   private void FixedUpdate() {
-    if (CurrentEffect != null && CurrentEffect.Apply(Body)) {
+    if (CurrentEffect != null && CurrentEffect.Apply(this)) {
       Active.RemoveAt(0);
+    }
+  }
+
+  internal void Move(Vector3 delta) {
+    if (Controller) {
+      Controller.Move(delta);
+    } else {
+      transform.position += delta;
     }
   }
 }
