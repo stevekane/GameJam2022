@@ -23,14 +23,13 @@ public class AnimationClipPreviewTestEditor : Editor {
     var frame = (int)(clip.frameRate * time);
     GUILayout.Label($"Frame: {frame}");
     time = EditorGUILayout.Slider(time, 0, clip.length);
-    var previewRect = GUILayoutUtility.GetRect(256, 256);
     AnimationMode.StartAnimationMode();
     AnimationMode.BeginSampling();
     AnimationMode.SampleAnimationClip(preview.gameObject, clip, time);
     AnimationMode.EndSampling();
     AnimationMode.StopAnimationMode();
     clipEditor.OnPreviewSettings();
-    clipEditor.OnInteractivePreviewGUI(previewRect, EditorStyles.whiteLabel);
+    clipEditor.OnInteractivePreviewGUI(GUILayoutUtility.GetRect(256,256), EditorStyles.whiteLabel);
     clipEditor.ReloadPreviewInstances();
     EditorGUILayout.EndVertical();
   }
