@@ -1,15 +1,15 @@
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 public class PrefabConveyor : MonoBehaviour {
-  [SerializeField]  
+  [SerializeField]
   Mob MobPrefab;
   [SerializeField]
   Bucket BucketPrefab;
   [SerializeField]
   Transform DynamicContentRoot;
   [SerializeField]
-  [Range(0,64)]
+  [Range(0, 64)]
   int Count;
 
   public void Run() {
@@ -43,11 +43,11 @@ public class PrefabConveyor : MonoBehaviour {
       var distance = (float)i/(float)Count;
       var pathdata = conveyor.Path.ToWorldSpace(distance);
       patrol.Target = bucket.transform;
-      mob.transform.SetParent(DynamicContentRoot,false);
-      mob.transform.SetPositionAndRotation(pathdata.Position,pathdata.Rotation);
+      mob.transform.SetParent(DynamicContentRoot, false);
+      mob.transform.SetPositionAndRotation(pathdata.Position, pathdata.Rotation);
       bucket.Distance = distance;
-      bucket.transform.SetParent(DynamicContentRoot,false);
-      bucket.transform.SetPositionAndRotation(pathdata.Position,pathdata.Rotation);
+      bucket.transform.SetParent(DynamicContentRoot, false);
+      bucket.transform.SetPositionAndRotation(pathdata.Position, pathdata.Rotation);
       conveyor.Buckets.Add(bucket);
     }
   }

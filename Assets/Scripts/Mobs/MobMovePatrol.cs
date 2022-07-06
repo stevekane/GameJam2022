@@ -16,6 +16,6 @@ public class MobMovePatrol : MobMove {
 
   public void OnDrawGizmos() {
     if (Target)
-      Gizmos.DrawLine(Target.position,transform.position);
+      Gizmos.DrawLine(Target.position, transform.position);
   }
 }

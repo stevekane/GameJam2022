@@ -20,7 +20,7 @@ public class Damage : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    HitStopFramesRemaining = Mathf.Max(0,HitStopFramesRemaining-1);
+    HitStopFramesRemaining = Mathf.Max(0, HitStopFramesRemaining-1);
     if (HitStopFramesRemaining <= 0 && KnockbackEffect != null) {
       Status.Add(KnockbackEffect);
       KnockbackEffect = null;

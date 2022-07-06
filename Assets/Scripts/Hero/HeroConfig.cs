@@ -2,7 +2,7 @@ using UnityEngine;
 
 [CreateAssetMenu(fileName = "HeroConfig", menuName = "Hero/Config")]
 public class HeroConfig : ScriptableObject {
-  [Header("Bullet Time")]  
+  [Header("Bullet Time")]
   public bool USE_BULLET_TIME = true;
 
   [Header("Moving")]
@@ -45,7 +45,7 @@ public class HeroConfig : ScriptableObject {
 
   [Header("Perching")]
   [Tooltip("Rate to pull player to perch (exponential lerp)")]
-  [Range(-10,-.1f)]
+  [Range(-10, -.1f)]
   public float PERCH_ATTRACTION_EPSILON = -.1f;
 
   [Header("Targeting")]
@@ -53,19 +53,19 @@ public class HeroConfig : ScriptableObject {
   public AnimationCurve DISTANCE_SCORE;
   [Tooltip("Weight of angle between forward and totarget in scoring algorithm")]
   public AnimationCurve ANGLE_SCORE;
-  [Range(0,3000)]
+  [Range(0, 3000)]
   [Tooltip("Maximum frames of targeting")]
   public int MAX_TARGETING_FRAMES = 300;
-  [Range(0,100)] 
+  [Range(0, 100)]
   [Tooltip("Maximum distance for targeting")]
   public float MAX_TARGETING_DISTANCE = 10f;
-  [Range(0,180)] 
+  [Range(0, 180)]
   [Tooltip("Maximum angle in front of player for targeting")]
   public float MAX_TARGETING_ANGLE = 90;
 
   [Header("Holding")]
   [Tooltip("Rate to pull held target to player (exponential lerp)")]
-  [Range(-10,-.1f)]
+  [Range(-10, -.1f)]
   public float HOLD_ATTRACTION_EPSILON = -.1f;
   [Tooltip("Number of frames to reach for a throwable")]
   public int MAX_REACHING_FRAMES = 40;

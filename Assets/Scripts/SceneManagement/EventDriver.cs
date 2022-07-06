@@ -24,7 +24,7 @@ public struct ButtonState {
     JustUp = false;
   }
   public static ButtonState FromInput(string name) {
-    return new ButtonState(Input.GetButton(name),Input.GetButtonDown(name),Input.GetButtonUp(name));
+    return new ButtonState(Input.GetButton(name), Input.GetButtonDown(name), Input.GetButtonUp(name));
   }
 }
 
@@ -36,7 +36,7 @@ public struct StickState {
   public Vector3 XZ;
   public StickState(float deadZone, Vector2 raw) {
     RawXY = raw;
-    RawXZ = new Vector3(raw.x,0,raw.y);
+    RawXZ = new Vector3(raw.x, 0, raw.y);
     if (raw.magnitude > deadZone) {
       XY = raw;
       XZ = RawXZ;
@@ -46,7 +46,7 @@ public struct StickState {
     }
   }
   public static StickState FromInput(float deadZone, string xname, string yname) {
-    return new StickState(deadZone,new Vector2(Input.GetAxisRaw(xname), Input.GetAxisRaw(yname)));
+    return new StickState(deadZone, new Vector2(Input.GetAxisRaw(xname), Input.GetAxisRaw(yname)));
   }
 }
 
@@ -61,23 +61,23 @@ public readonly struct Action {
   public readonly StickState Move;
   public readonly StickState Aim;
   public Action(
-    ButtonState hitState, 
-    ButtonState jumpState, 
-    ButtonState lightState, 
-    ButtonState heavyState, 
-    ButtonState dashState, 
+    ButtonState hitState,
+    ButtonState jumpState,
+    ButtonState lightState,
+    ButtonState heavyState,
+    ButtonState dashState,
     ButtonState throwState,
     StickState move,
     StickState aim) {
-      Hit = hitState;
-      Jump = jumpState;
-      Light = lightState;
-      Heavy = heavyState;
-      Dash = dashState;
-      Throw = throwState;
-      Move = move;
-      Aim = aim;
-    }
+    Hit = hitState;
+    Jump = jumpState;
+    Light = lightState;
+    Heavy = heavyState;
+    Dash = dashState;
+    Throw = throwState;
+    Move = move;
+    Aim = aim;
+  }
 }
 
 [Serializable]
@@ -93,7 +93,7 @@ public class EventDriver : MonoBehaviour {
   Camera Camera;
   Player Player;
 
-  List<Action> History = new List<Action>((int)Math.Pow(2,16));
+  List<Action> History = new List<Action>((int)Math.Pow(2, 16));
   int HistoryIndex = 0;
 
   ButtonState Hit;
@@ -151,14 +151,14 @@ public class EventDriver : MonoBehaviour {
     Heavy.UpdateFromInput("Heavy");
     Dash.UpdateFromInput("Dash");
     Throw.UpdateFromInput("Throw");
-    Move = StickState.FromInput(RadialDeadZone,"MoveX","MoveY");
-    Aim = StickState.FromInput(RadialDeadZone,"AimX","AimY");
+    Move = StickState.FromInput(RadialDeadZone, "MoveX", "MoveY");
+    Aim = StickState.FromInput(RadialDeadZone, "AimX", "AimY");
   }
 
   void FixedUpdate() {
     switch (PlayState) {
-      case PlayState.Play: {
-        var action = new Action(Hit,Jump,Light,Heavy,Dash,Throw,Move,Aim);
+    case PlayState.Play: {
+        var action = new Action(Hit, Jump, Light, Heavy, Dash, Throw, Move, Aim);
         Inputs.InPlayBack = false;
         Inputs.Action = action;
         History.Add(action);
@@ -171,7 +171,7 @@ public class EventDriver : MonoBehaviour {
       }
       break;
 
-      case PlayState.PlayBack: {
+    case PlayState.PlayBack: {
         Inputs.InPlayBack = true;
         if (HistoryIndex < History.Count) {
           Inputs.Action = History[HistoryIndex++];

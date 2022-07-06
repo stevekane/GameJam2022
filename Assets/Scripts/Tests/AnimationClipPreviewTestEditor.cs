@@ -1,5 +1,5 @@
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 [CustomEditor(typeof(AnimationClipPreviewTest))]
 public class AnimationClipPreviewTestEditor : Editor {
@@ -19,20 +19,20 @@ public class AnimationClipPreviewTestEditor : Editor {
       clipEditor.HasPreviewGUI();
     }
     base.OnInspectorGUI();
-    frame = GUILayout.HorizontalSlider(frame,0,clip.length);
+    frame = GUILayout.HorizontalSlider(frame, 0, clip.length);
     // TODO: FUCK THIS FUCKING STUPID FUCKING CODE
     // If this box has almost ANY height besides this magical value 48
     // then the code does not work properly. 
     // I got this magic value from using GUILayoutUtility.GetRect(246,256)
     // What the fuck is going on here? I hope everyone that worked on this is gone
-    var previewRect = new Rect(18,48,256,256);
+    var previewRect = new Rect(18, 48, 256, 256);
     AnimationMode.StartAnimationMode();
     AnimationMode.BeginSampling();
-    AnimationMode.SampleAnimationClip(preview.gameObject,clip,frame);
+    AnimationMode.SampleAnimationClip(preview.gameObject, clip, frame);
     AnimationMode.EndSampling();
     AnimationMode.StopAnimationMode();
     clipEditor.OnPreviewSettings();
-    clipEditor.OnInteractivePreviewGUI(previewRect,EditorStyles.whiteLabel);
+    clipEditor.OnInteractivePreviewGUI(previewRect, EditorStyles.whiteLabel);
     clipEditor.ReloadPreviewInstances();
   }
 }

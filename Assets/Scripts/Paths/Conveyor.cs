@@ -25,7 +25,7 @@ public class Conveyor : MonoBehaviour {
       if (nextDistance < currentDistance) {
         BucketAction?.Invoke(bucket);
       }
-      bucket.transform.SetPositionAndRotation(pathdata.Position,pathdata.Rotation);
+      bucket.transform.SetPositionAndRotation(pathdata.Position, pathdata.Rotation);
     }
     FramesRemaining = nextFrames;
   }
@@ -35,7 +35,7 @@ public class Conveyor : MonoBehaviour {
       foreach (var bucket in Buckets) {
         var pathData = Path.ToWorldSpace(bucket.Distance);
         bucket.transform.position = pathData.Position;
-        Gizmos.DrawWireSphere(pathData.Position,.25f);
+        Gizmos.DrawWireSphere(pathData.Position, .25f);
       }
     }
   }

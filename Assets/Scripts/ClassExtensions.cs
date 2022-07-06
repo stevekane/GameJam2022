@@ -66,7 +66,7 @@ public static class ArrayLikeExtensions {
     }
   }
 
-  public static int Sum<T>(this T[] xs, Func<T,int> f) {
+  public static int Sum<T>(this T[] xs, Func<T, int> f) {
     var sum = 0;
     foreach (var x in xs) {
       sum += f(x);
@@ -74,7 +74,7 @@ public static class ArrayLikeExtensions {
     return sum;
   }
 
-  public static float Sum<T>(this T[] xs, Func<T,float> f) {
+  public static float Sum<T>(this T[] xs, Func<T, float> f) {
     var sum = 0f;
     foreach (var x in xs) {
       sum += f(x);
@@ -82,7 +82,7 @@ public static class ArrayLikeExtensions {
     return sum;
   }
 
-  public static Vector3 Sum<T>(this T[] xs, Func<T,Vector3> f) {
+  public static Vector3 Sum<T>(this T[] xs, Func<T, Vector3> f) {
     var sum = Vector3.zero;
     foreach (var x in xs) {
       sum += f(x);
@@ -90,7 +90,7 @@ public static class ArrayLikeExtensions {
     return sum;
   }
 
-  public static int Sum<T>(this List<T> xs, Func<T,int> f) {
+  public static int Sum<T>(this List<T> xs, Func<T, int> f) {
     var sum = 0;
     foreach (var x in xs) {
       sum += f(x);
@@ -98,7 +98,7 @@ public static class ArrayLikeExtensions {
     return sum;
   }
 
-  public static float Sum<T>(this List<T> xs, Func<T,float> f) {
+  public static float Sum<T>(this List<T> xs, Func<T, float> f) {
     var sum = 0f;
     foreach (var x in xs) {
       sum += f(x);
@@ -106,7 +106,7 @@ public static class ArrayLikeExtensions {
     return sum;
   }
 
-  public static Vector3 Sum<T>(this List<T> xs, Func<T,Vector3> f) {
+  public static Vector3 Sum<T>(this List<T> xs, Func<T, Vector3> f) {
     var sum = Vector3.zero;
     foreach (var x in xs) {
       sum += f(x);

@@ -16,15 +16,15 @@ public class Timeval {
     return new Timeval { Millis = (float)ticks * 1000f / ticksPerSecond, TicksPerSecond = ticksPerSecond };
   }
   public int Frames {
-    set { Millis = value * 1000f / FramesPerSecond; } 
-    get { return Mathf.RoundToInt(Millis * FramesPerSecond / 1000f); } 
+    set { Millis = value * 1000f / FramesPerSecond; }
+    get { return Mathf.RoundToInt(Millis * FramesPerSecond / 1000f); }
   }
   public int Ticks {
     set { Millis = value * 1000f / TicksPerSecond; }
     get { return Mathf.RoundToInt(Millis * TicksPerSecond / 1000f); }
   }
-  public float Seconds { 
-    get { return Millis * .0001f; } 
+  public float Seconds {
+    get { return Millis * .0001f; }
   }
 }
 

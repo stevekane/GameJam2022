@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class DestroyNotifier : MonoBehaviour {
   //public UnityEvent</*GameObject*/> DestroyEvent;

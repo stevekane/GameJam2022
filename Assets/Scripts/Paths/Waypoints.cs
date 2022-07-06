@@ -1,10 +1,10 @@
 using UnityEngine;
 
 public class Waypoints : Path {
-  [SerializeField] 
+  [SerializeField]
   Color Color;
   [SerializeField]
-  [Range(0,1)]
+  [Range(0, 1)]
   float TurnFraction;
   Waypoint[] Points;
   float TotalDistance;
@@ -53,7 +53,7 @@ public class Waypoints : Path {
         return SegmentToWorldSpace(interpolant, p0, p1, p2, d0, d1, TurnFraction);
       }
     }
-    return new PathData(Points[0].transform.position,Points[0].transform.rotation);
+    return new PathData(Points[0].transform.position, Points[0].transform.rotation);
   }
 
   void UpdateDistances() {
@@ -61,7 +61,7 @@ public class Waypoints : Path {
     for (int i = 1; i < Points.Length; i++) {
       var start = Points[i-1].transform.position;
       var end = Points[i].transform.position;
-      Distances[i] = Vector3.Distance(start,end);
+      Distances[i] = Vector3.Distance(start, end);
     }
   }
 
@@ -93,7 +93,7 @@ public class Waypoints : Path {
     UpdateTotalDistance();
     UpdateNormalizedDistances();
   }
-    
+
   void OnDrawGizmos() {
     Points = GetComponentsInChildren<Waypoint>(false);
     Distances = new float[Points.Length];
@@ -105,7 +105,7 @@ public class Waypoints : Path {
     for (int i = 0; i < Points.Length-1; i++) {
       var start = Points[i].transform.position;
       var end = Points[i+1].transform.position;
-      Gizmos.DrawLine(start,end);
+      Gizmos.DrawLine(start, end);
     }
   }
 }

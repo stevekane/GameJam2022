@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public class Vibrator : MonoBehaviour {
-  [SerializeField] 
+  [SerializeField]
   Transform Target;
 
   Vector3 Axis;

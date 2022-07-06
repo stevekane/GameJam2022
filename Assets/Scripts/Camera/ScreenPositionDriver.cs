@@ -2,7 +2,7 @@ using Cinemachine;
 using UnityEngine;
 
 public class ScreenPositionDriver : CinemachineExtension {
-  [SerializeField] 
+  [SerializeField]
   CameraConfig Config;
   CinemachineVirtualCamera TargetCamera;
   CinemachineFramingTransposer Transposer;
@@ -18,14 +18,14 @@ public class ScreenPositionDriver : CinemachineExtension {
       return;
 
     var forwardxz = TargetCamera.Follow.transform.forward.XZ();
-    var y = Vector3.Dot(forwardxz,Vector3.forward);
-    var x = Vector3.Dot(forwardxz,Vector3.right);
+    var y = Vector3.Dot(forwardxz, Vector3.forward);
+    var x = Vector3.Dot(forwardxz, Vector3.right);
     var currentScreenX = Transposer.m_ScreenX;
     var currentScreenY = Transposer.m_ScreenY;
-    var targetScreenX = Mathf.Lerp(1,0,Mathf.InverseLerp(-1,1,x));
-    var targetScreenY = Mathf.Lerp(0,1,Mathf.InverseLerp(-1,1,y));
+    var targetScreenX = Mathf.Lerp(1, 0, Mathf.InverseLerp(-1, 1, x));
+    var targetScreenY = Mathf.Lerp(0, 1, Mathf.InverseLerp(-1, 1, y));
     var interpolant = Mathf.Exp(Config.LOOK_AHEAD_EPSILON*Time.fixedDeltaTime);
-    Transposer.m_ScreenX = Mathf.Lerp(targetScreenX,currentScreenX,interpolant);
-    Transposer.m_ScreenY = Mathf.Lerp(targetScreenY,currentScreenY,interpolant);
+    Transposer.m_ScreenX = Mathf.Lerp(targetScreenX, currentScreenX, interpolant);
+    Transposer.m_ScreenY = Mathf.Lerp(targetScreenY, currentScreenY, interpolant);
   }
 }

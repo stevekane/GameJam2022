@@ -7,6 +7,6 @@ public class Spinner : MonoBehaviour {
     var origin = transform.position;
     var axis = Vector3.up;
     var degrees = DegreesPerSecond * Time.fixedDeltaTime;
-    transform.RotateAround(origin,axis,degrees);
+    transform.RotateAround(origin, axis, degrees);
   }
 }

@@ -11,10 +11,10 @@ public class UI : MonoBehaviour {
   Selector[] Highlighters;
 
   void Awake() {
-    Selector = Instantiate(SelectorPrefab,transform);
+    Selector = Instantiate(SelectorPrefab, transform);
     Highlighters = new Selector[MaxInstances];
     for (var i = 0; i < MaxInstances; i++) {
-      Highlighters[i] = Instantiate(HighlighterPrefab,transform);
+      Highlighters[i] = Instantiate(HighlighterPrefab, transform);
     }
   }
 
@@ -70,7 +70,7 @@ public class UI : MonoBehaviour {
     if (display) {
       AimMeter.gameObject.SetActive(true);
       AimMeter.Target = target;
-      AimMeter.SetFill(maxValue,value);
+      AimMeter.SetFill(maxValue, value);
     } else {
       AimMeter.gameObject.SetActive(false);
       AimMeter.Target = null;

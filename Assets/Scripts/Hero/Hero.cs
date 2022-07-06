@@ -1,5 +1,5 @@
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public struct BlockEvent { public Vector3 Position; public Vector3 Velocity; }
@@ -62,16 +62,16 @@ public class Hero : MonoBehaviour {
   float Score(Vector3 forward, Vector3 origin, Vector3 target) {
     var delta = target.XZ()-origin.XZ();
     var distance = delta.magnitude;
-    var dot = distance > 0 ? Vector3.Dot(delta.normalized,forward) : 1;
+    var dot = distance > 0 ? Vector3.Dot(delta.normalized, forward) : 1;
     var a = Config.DISTANCE_SCORE.Evaluate(1-distance/Config.MAX_TARGETING_DISTANCE);
-    var b = Config.ANGLE_SCORE.Evaluate(Mathf.Lerp(0,1,Mathf.InverseLerp(-1,1,dot)));
+    var b = Config.ANGLE_SCORE.Evaluate(Mathf.Lerp(0, 1, Mathf.InverseLerp(-1, 1, dot)));
     return a+b;
   }
 
   bool Within(Vector3 origin, Vector3 target, Vector3 forward, float radians) {
     var delta = target-origin;
     var direction = delta.normalized;
-    var dot = Vector3.Dot(direction,forward);
+    var dot = Vector3.Dot(direction, forward);
     return dot >= Mathf.Cos(radians);
   }
 
@@ -82,7 +82,7 @@ public class Hero : MonoBehaviour {
     var origin = transform.position;
     foreach (var targetable in targets) {
       var target = targetable.transform.position;
-      var score = Score(forward,origin,target);
+      var score = Score(forward, origin, target);
       if (targetable != ignore && score > bestScore) {
         best = targetable;
         bestScore = score;
@@ -94,14 +94,14 @@ public class Hero : MonoBehaviour {
   Targetable[] FindTargets(float maxDistance, float maxRadians) {
     var origin = transform.position;
     var forward = transform.forward;
-    return FindObjectsOfType<Targetable>(includeInactive:false)
+    return FindObjectsOfType<Targetable>(includeInactive: false)
       .Where(t => {
         var delta = t.transform.position-origin;
         var distance = delta.magnitude;
         var direction = delta.normalized;
-        var didHit = Physics.Raycast(origin,direction,out RaycastHit hit,distance,TargetableMobLayerMask);
-        var inPlanarRange = Vector3.Distance(origin.XZ(),t.transform.position.XZ()) <= maxDistance;
-        var withinView = Within(origin,t.transform.position,forward,maxRadians);
+        var didHit = Physics.Raycast(origin, direction, out RaycastHit hit, distance, TargetableMobLayerMask);
+        var inPlanarRange = Vector3.Distance(origin.XZ(), t.transform.position.XZ()) <= maxDistance;
+        var withinView = Within(origin, t.transform.position, forward, maxRadians);
         var hitTarget = hit.collider && hit.collider.gameObject == t.gameObject;
         return hitTarget && inPlanarRange && withinView;
       })
@@ -186,33 +186,33 @@ public class Hero : MonoBehaviour {
   // TODO: Review this... it seems that acceleration should be dV/dt
   // this implies that the acceleration we are computing should be
   // divided by dt before being compared to max acceleration
-  Vector3 MoveAcceleration(Vector3 desiredMove,float speed) {
-    var currentVelocity = new Vector3(Velocity.x,0,Velocity.z);
+  Vector3 MoveAcceleration(Vector3 desiredMove, float speed) {
+    var currentVelocity = new Vector3(Velocity.x, 0, Velocity.z);
     var desiredVelocity = desiredMove*speed;
     var acceleration = desiredVelocity-currentVelocity;
     var direction = acceleration.normalized;
     var isSlipping = currentVelocity.magnitude > speed;
     if (isSlipping) {
-      var magnitude = Mathf.Min(Config.MAX_SLIPPING_XZ_ACCELERATION,acceleration.magnitude);
+      var magnitude = Mathf.Min(Config.MAX_SLIPPING_XZ_ACCELERATION, acceleration.magnitude);
       return magnitude*direction;
     } else {
-      var magnitude = Mathf.Min(Config.MAX_GROUNDED_XZ_ACCELERATION,acceleration.magnitude);
+      var magnitude = Mathf.Min(Config.MAX_GROUNDED_XZ_ACCELERATION, acceleration.magnitude);
       return magnitude*direction;
     }
   }
 
-  Vector3 FallAcceleration(Vector3 desiredMove, float dt) { 
+  Vector3 FallAcceleration(Vector3 desiredMove, float dt) {
     var normalizedTime = AirTime/Config.MAX_STEERING_TIME;
     var multiplier = Config.MAX_STEERING_MULTIPLIER;
     var strength = Config.STEERING_STRENGTH.Evaluate(normalizedTime);
     var forward = Velocity.XZ().normalized;
-    var right = new Vector3(forward.z,0,-forward.x);
-    var aSteer = Vector3.Project(desiredMove,right);
-    var aSlow = Vector3.Project(desiredMove,-forward);
-    var dot = Vector3.Dot(forward,aSlow);
+    var right = new Vector3(forward.z, 0, -forward.x);
+    var aSteer = Vector3.Project(desiredMove, right);
+    var aSlow = Vector3.Project(desiredMove, -forward);
+    var dot = Vector3.Dot(forward, aSlow);
     aSlow = dot > 0 ? Vector3.zero : aSlow;
     var steering = multiplier*strength*(aSteer+aSlow);
-    var gravityFactor = Velocity.y < 0 ? Config.FALL_GRAVITY_MULTIPLIER: 1;
+    var gravityFactor = Velocity.y < 0 ? Config.FALL_GRAVITY_MULTIPLIER : 1;
     var gravity = gravityFactor*Config.GRAVITY*Vector3.up;
     return dt*(gravity+steering);
   }
@@ -232,7 +232,7 @@ public class Hero : MonoBehaviour {
     var speed = Config.MOVE_SPEED;
     var upward = Config.JUMP_Y_VELOCITY;
     AirTime = 0;
-    Velocity = new Vector3(move.x*speed*boost,upward,move.z*speed*boost);
+    Velocity = new Vector3(move.x*speed*boost, upward, move.z*speed*boost);
     JumpType = 0;
     LegAudioSource.PlayOneShot(Config.JumpAudioClip);
   }
@@ -245,7 +245,7 @@ public class Hero : MonoBehaviour {
     AirTime = 0;
     LegTarget?.PounceFrom(this);
     LegTarget = null;
-    Velocity = new Vector3(direction.x*speed*boost,upward,direction.z*speed*boost);
+    Velocity = new Vector3(direction.x*speed*boost, upward, direction.z*speed*boost);
     JumpType = 1;
     LegAudioSource.PlayOneShot(Config.LeapAudioClip);
   }
@@ -299,8 +299,8 @@ public class Hero : MonoBehaviour {
     var targetingDistance = Config.MAX_TARGETING_DISTANCE;
     var targetingRadians = Config.MAX_TARGETING_ANGLE*Mathf.Deg2Rad;
 
-    Targets = FindTargets(targetingDistance,targetingRadians);
-    Target = Best(LegTarget,Targets);
+    Targets = FindTargets(targetingDistance, targetingRadians);
+    Target = Best(LegTarget, Targets);
 
     if (Grounded && !Dashing && action.Dash.JustDown) {
       Dash(transform.forward);
@@ -348,13 +348,13 @@ public class Hero : MonoBehaviour {
       var next = Vector3.Lerp(target, current, interpolant);
       Velocity = next-current;
       Controller.Move(Velocity);
-      Animator.SetInteger("LegState",2);
+      Animator.SetInteger("LegState", 2);
     } else if (Attacker.IsAttacking) {
       // No movement during attack
-      Velocity += MoveAcceleration(action.Move.XZ,Config.MOVE_SPEED*Attacker.MoveFactor);
+      Velocity += MoveAcceleration(action.Move.XZ, Config.MOVE_SPEED*Attacker.MoveFactor);
       Velocity.y = Velocity.y > 0 ? Velocity.y : -1;
       Controller.Move(dt*Velocity);
-      Animator.SetInteger("LegState",0);
+      Animator.SetInteger("LegState", 0);
     } else if (Stunned || Bumped) {
       // This is hacky as fuck but hopefully temporary.
       float vy = Velocity.y;
@@ -364,16 +364,16 @@ public class Hero : MonoBehaviour {
         Velocity.y = vy + FallAcceleration(Vector3.zero, dt).y;
       }
       Controller.Move(dt*Velocity);
-      Animator.SetInteger("LegState",0);
+      Animator.SetInteger("LegState", 0);
     } else if (Pouncing) {
-      PounceFramesRemaining = Mathf.Max(0,PounceFramesRemaining-1);
+      PounceFramesRemaining = Mathf.Max(0, PounceFramesRemaining-1);
       if (Target) {
         Velocity = (Target.transform.position - transform.position).normalized * Velocity.magnitude;
       }
       Controller.Move(dt*Velocity);
-      Animator.SetInteger("LegState",1);
+      Animator.SetInteger("LegState", 1);
     } else if (Dashing) {
-      DashFramesRemaining = Mathf.Max(0,DashFramesRemaining-1);
+      DashFramesRemaining = Mathf.Max(0, DashFramesRemaining-1);
       Controller.Move(dt*Velocity);
     } else if (Grounded) {
       if (FootstepFramesRemaining <= 0) {
@@ -382,26 +382,26 @@ public class Hero : MonoBehaviour {
           FootstepAudioSource.PlayOneShot(Config.RunningAudioClip);
         }
       } else {
-        FootstepFramesRemaining = Mathf.Max(0,FootstepFramesRemaining-1);
+        FootstepFramesRemaining = Mathf.Max(0, FootstepFramesRemaining-1);
       }
-      Velocity += MoveAcceleration(action.Move.XZ,Config.MOVE_SPEED);
+      Velocity += MoveAcceleration(action.Move.XZ, Config.MOVE_SPEED);
       Velocity.y = Velocity.y > 0 ? Velocity.y : -1;
       Controller.Move(dt*Velocity);
-      Animator.SetInteger("LegState",0);
+      Animator.SetInteger("LegState", 0);
       LastPerch = null;
     } else {
       var wasGrounded = Grounded;
       AirTime += dt;
-      Velocity += FallAcceleration(action.Move.XZ,dt);
+      Velocity += FallAcceleration(action.Move.XZ, dt);
       Controller.Move(dt*Velocity);
       var isGrounded = Grounded;
       if (!wasGrounded && isGrounded) {
         AirTime = 0;
         LegAudioSource.PlayOneShot(Config.LandAudioClip);
       }
-      Animator.SetFloat("VerticalSpeed",Velocity.y);
-      Animator.SetInteger("LegState",1);
-      Animator.SetFloat("JumpType",(float)JumpType);
+      Animator.SetFloat("VerticalSpeed", Velocity.y);
+      Animator.SetInteger("LegState", 1);
+      Animator.SetFloat("JumpType", (float)JumpType);
     }
 
     if ((Grounded || Perching) && !Stunned && !Attacker.IsAttacking) {
@@ -424,16 +424,16 @@ public class Hero : MonoBehaviour {
       var target = transform.position+2*Vector3.up;
       var current = ArmTarget.transform.position;
       var interpolant = Mathf.Exp(Config.HOLD_ATTRACTION_EPSILON);
-      var next = Vector3.Lerp(target,current,interpolant);
+      var next = Vector3.Lerp(target, current, interpolant);
       Grabber.Store(Grabber.transform.position);
       ArmFramesRemaining = 0;
       ArmTarget.transform.position = next;
     } else if (Reaching) {
-      Grabber.Reach(Grabber.transform,ArmTarget.transform,ArmFramesRemaining,Config.MAX_REACHING_FRAMES);
-      ArmFramesRemaining = Mathf.Max(0,ArmFramesRemaining-1);
+      Grabber.Reach(Grabber.transform, ArmTarget.transform, ArmFramesRemaining, Config.MAX_REACHING_FRAMES);
+      ArmFramesRemaining = Mathf.Max(0, ArmFramesRemaining-1);
     } else if (Pulling) {
       Grabber.Store(Grabber.transform.position);
-      ArmFramesRemaining = Mathf.Max(0,ArmFramesRemaining-1);
+      ArmFramesRemaining = Mathf.Max(0, ArmFramesRemaining-1);
     } else {
       Grabber.Store(Grabber.transform.position);
       ArmFramesRemaining = 0;
@@ -442,12 +442,12 @@ public class Hero : MonoBehaviour {
     {
       var forward = transform.forward;
       var right = transform.right;
-      var velocityxz = new Vector3(Velocity.x,0,Velocity.z);
-      var f = Vector3.Dot(velocityxz,forward);
-      var r = Vector3.Dot(velocityxz,right);
-      var a = new Vector3(r,0,f);
-      Animator.SetFloat("Forward",a.z);
-      Animator.SetFloat("Right",a.x);
+      var velocityxz = new Vector3(Velocity.x, 0, Velocity.z);
+      var f = Vector3.Dot(velocityxz, forward);
+      var r = Vector3.Dot(velocityxz, right);
+      var a = new Vector3(r, 0, f);
+      Animator.SetFloat("Forward", a.z);
+      Animator.SetFloat("Right", a.x);
     }
 
     // Reset after falling.
@@ -462,20 +462,20 @@ public class Hero : MonoBehaviour {
 
     if (!Pouncing && !Stunned && Free && action.Aim.XZ.magnitude > 0) {
       UI.Select(Target);
-      UI.Highlight(Targets,Targets.Length);
-      AimingFramesRemaining = Mathf.Max(0,AimingFramesRemaining-1);
-      Animator.SetFloat("Aim",1);
+      UI.Highlight(Targets, Targets.Length);
+      AimingFramesRemaining = Mathf.Max(0, AimingFramesRemaining-1);
+      Animator.SetFloat("Aim", 1);
     } else {
       UI.Select(null);
-      UI.Highlight(Targets,0);
-      AimingFramesRemaining = Mathf.Min(AimingFramesRemaining+1,Config.MAX_TARGETING_FRAMES);
-      Animator.SetFloat("Aim",0);
+      UI.Highlight(Targets, 0);
+      AimingFramesRemaining = Mathf.Min(AimingFramesRemaining+1, Config.MAX_TARGETING_FRAMES);
+      Animator.SetFloat("Aim", 0);
     }
 
     {
       var maxTargetingFrames = Config.MAX_TARGETING_FRAMES;
       var displayMeter = AimingFramesRemaining < maxTargetingFrames;
-      UI.SetAimMeter(transform,displayMeter,AimingFramesRemaining,maxTargetingFrames);
+      UI.SetAimMeter(transform, displayMeter, AimingFramesRemaining, maxTargetingFrames);
     }
 
     Entered.Clear();

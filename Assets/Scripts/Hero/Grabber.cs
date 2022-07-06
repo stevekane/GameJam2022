@@ -14,7 +14,7 @@ public class Grabber : MonoBehaviour {
 
   public void Store(Vector3 position) {
     LineRenderer.positionCount = 1;
-    LineRenderer.SetPosition(0,position);
+    LineRenderer.SetPosition(0, position);
   }
 
   public void Reach(Transform origin, Transform target, int frame, int frames) {
@@ -28,17 +28,17 @@ public class Grabber : MonoBehaviour {
     if (targetTransform && originTransform) {
       {
         var flightFraction = (float)flightFrame/(float)flightFrames;
-        var nextPosition = PositionAt(originTransform,targetTransform,flightFraction);
+        var nextPosition = PositionAt(originTransform, targetTransform, flightFraction);
         LineRenderer.positionCount = LineRenderer.positionCount+1;
-        LineRenderer.SetPosition(LineRenderer.positionCount-1,nextPosition);
+        LineRenderer.SetPosition(LineRenderer.positionCount-1, nextPosition);
       }
       for (int i = 0; i < LineRenderer.positionCount; i++) {
         var flightFraction = (float)i/(float)flightFrames;
         var indexFraction = 1f-(float)i/(float)LineRenderer.positionCount;
-        var desiredPosition = PositionAt(originTransform,targetTransform,flightFraction);
+        var desiredPosition = PositionAt(originTransform, targetTransform, flightFraction);
         var currentPosition = LineRenderer.GetPosition(i);
-        var newPosition = Vector3.Lerp(currentPosition,desiredPosition,indexFraction);
-        LineRenderer.SetPosition(i,newPosition);
+        var newPosition = Vector3.Lerp(currentPosition, desiredPosition, indexFraction);
+        LineRenderer.SetPosition(i, newPosition);
       }
     }
     originTransform = null;

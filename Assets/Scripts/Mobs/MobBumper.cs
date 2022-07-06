@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -81,7 +80,7 @@ public class MobBumper : Mob {
       return BumperSide.Left;
     else if (angle < 3/4f)
       return BumperSide.Back;
-    else 
+    else
       return BumperSide.Right;
   }
 }
