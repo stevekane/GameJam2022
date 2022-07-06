@@ -13,9 +13,6 @@ public class Damage : MonoBehaviour {
     KnockbackEffect = new KnockbackEffect(dir*power);
     HitStopFramesRemaining = hitStopFrames;
     Points += points;
-
-    if (Points > 20)
-      Destroy(gameObject);
   }
 
   void Awake() {

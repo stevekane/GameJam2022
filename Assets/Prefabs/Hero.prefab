@@ -521,6 +521,7 @@ GameObject:
   - component: {fileID: 4102725152112460099}
   - component: {fileID: 1604618934501359742}
   - component: {fileID: 7508363702064596809}
+  - component: {fileID: 6344329105371781203}
   m_Layer: 8
   m_Name: Hero
   m_TagString: Untagged
@@ -547,7 +548,7 @@ Transform:
   - {fileID: 896825602309527846}
   - {fileID: 912778195731948833}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4102725152112460096
 MonoBehaviour:
@@ -666,6 +667,19 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &6344329105371781203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4102725152112460109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 589031cb649129f4595d6562a2fa54c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Points: 0
 --- !u!1 &6086008439409332628
 GameObject:
   m_ObjectHideFlags: 0
@@ -712,7 +726,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ce0c9e24a5611d40b8628b31748e2d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Damage: {fileID: 0}
+  Damage: {fileID: 6344329105371781203}
 --- !u!65 &3538716256439489216
 BoxCollider:
   m_ObjectHideFlags: 0
