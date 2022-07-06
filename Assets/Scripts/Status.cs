@@ -35,6 +35,7 @@ public class Status : MonoBehaviour {
   public StatusEffect CurrentEffect { get { return Active.Count > 0 ? Active[0] : null; } }
   public StatusEffect.Types Current { get { return CurrentEffect != null ? CurrentEffect.Type : StatusEffect.Types.None; } }
   CharacterController Controller;
+  Bouncebox Bouncebox;
 
   public void Add(StatusEffect effect) {
     var count = Active.Count;
@@ -48,12 +49,15 @@ public class Status : MonoBehaviour {
 
   private void Awake() {
     Controller = GetComponent<CharacterController>();
+    Bouncebox = GetComponentInChildren<Bouncebox>();
+    Bouncebox.OnHit = BouncedInto;
   }
 
   private void FixedUpdate() {
     if (CurrentEffect != null && CurrentEffect.Apply(this)) {
       Active.RemoveAt(0);
     }
+    Bouncebox.Collider.enabled = Current == StatusEffect.Types.Knockback;
   }
 
   internal void Move(Vector3 delta) {
@@ -61,6 +65,16 @@ public class Status : MonoBehaviour {
       Controller.Move(delta);
     } else {
       transform.position += delta;
+    }
+  }
+
+  void BouncedInto(Collider other) {
+    if (other.gameObject.tag == "Ground") return;
+
+    var k = CurrentEffect as KnockbackEffect;
+    if (k != null && Physics.Raycast(transform.position, k.Velocity.normalized, out var hit)) {
+      var bounceVel = Vector3.Reflect(k.Velocity, hit.normal.XZ());
+      k.Velocity = bounceVel;
     }
   }
 }
