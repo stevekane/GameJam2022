@@ -1,12 +1,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum AttackState { None, Windup, Active, Contact, Recovery }
+enum AttackState { None, Windup, Active, Contact, Recovery }
 
 public class Attacker : MonoBehaviour {
+  public static bool TrySpawnEffect(GameObject prefab, Vector3 position) {
+    if (prefab) {
+      var rotation = Quaternion.identity;
+      var effect = Instantiate(prefab, position, rotation);
+      effect.transform.localScale = new Vector3(10, 10, 10);
+      effect.transform.LookAt(MainCamera.Instance.transform.position);
+      Destroy(effect, 3);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   [SerializeField] Pushable Pushable;
   [SerializeField] Vibrator Vibrator;
-  [SerializeField] Animator Animator;
   [SerializeField] Attack[] Attacks;
 
   List<Hurtbox> Hits = new List<Hurtbox>(32);
@@ -16,7 +28,31 @@ public class Attacker : MonoBehaviour {
   float TotalKnockBackStrength;
   int FramesRemaining = 0;
 
-  public bool IsAttacking { get { return State != AttackState.None; } }
+  public bool IsAttacking { 
+    get { 
+      return State != AttackState.None; 
+    } 
+  }
+
+  public int AttackIndex {
+    get {
+      return Attack ? Attack.Config.Index : -1;
+    }
+  }
+
+  public float AttackSpeed {
+    get {
+      return State switch {
+        AttackState.None => 1f,
+        AttackState.Windup => Attack.Config.WindupAnimationSpeed,
+        AttackState.Active => Attack.Config.ActiveAnimationSpeed,
+        AttackState.Recovery => Attack.Config.RecoveryAnimationSpeed,
+        AttackState.Contact => 0f,
+        _ => 1f,
+      };
+    }
+  }
+
   public float MoveFactor {
     get {
       return State switch {
@@ -28,6 +64,7 @@ public class Attacker : MonoBehaviour {
       };
     }
   }
+
   public float RotationSpeed {
     get {
       return State switch {
@@ -40,12 +77,16 @@ public class Attacker : MonoBehaviour {
     }
   }
 
-  public void StartAttack(int index) {
-    Attack = Attacks[index];
+  public void StartAttack(Attack attack) {
+    Attack = attack;
     State = AttackState.Windup;
     FramesRemaining = Attack.Config.Windup.Frames.ScaleBy(1 / Attack.Config.WindupAnimationSpeed);
     Attack.AudioSource.PlayOptionalOneShot(Attack.Config.WindupAudioClip);
     TrySpawnEffect(Attack.Config.WindupEffect, transform.position);
+  }
+
+  public void StartAttack(int index) {
+    StartAttack(Attacks[index]);
   }
 
   public void Hit(Hurtbox hurtbox) {
@@ -85,10 +126,7 @@ public class Attacker : MonoBehaviour {
     }
 
     Attacks.ForEach(a => a.HitBox.Collider.enabled = a == Attack && State == AttackState.Active);
-    FramesRemaining = Mathf.Max(0, FramesRemaining - 1);
-    Animator.SetInteger("AttackState", (int)State);
-    Animator.SetFloat("AttackIndex", Attack ? Attack.Config.Index : 0);
-    Animator.SetFloat("AttackSpeed", AttackSpeed(Attack, State));
+    FramesRemaining = State == AttackState.None ? 0 : FramesRemaining-1;
     Hits.Clear();
   }
 
@@ -101,22 +139,11 @@ public class Attacker : MonoBehaviour {
     TrySpawnEffect(Attack.Config.ContactEffect, hit.transform.position);
   }
 
-  float AttackSpeed(Attack a, AttackState s) {
-    return s switch {
-      AttackState.None => 1,
-      AttackState.Windup => a.Config.WindupAnimationSpeed,
-      AttackState.Active => a.Config.ActiveAnimationSpeed,
-      AttackState.Recovery => a.Config.RecoveryAnimationSpeed,
-      AttackState.Contact => 0,
-      _ => 1,
-    };
-  }
-
   Vector3 KnockbackVector(Transform attacker, Transform target, KnockBackType type) {
     var p0 = attacker.position.XZ();
     var p1 = target.position.XZ();
     return type switch {
-      KnockBackType.Delta => p0.TryGetDirection(p1).OrDefault(attacker.forward),
+      KnockBackType.Delta => p0.TryGetDirection(p1) ?? attacker.forward,
       KnockBackType.Forward => attacker.forward,
       KnockBackType.Back => -attacker.forward,
       KnockBackType.Right => attacker.right,
@@ -125,18 +152,5 @@ public class Attacker : MonoBehaviour {
       KnockBackType.Down => -attacker.up,
       _ => attacker.forward,
     };
-  }
-
-  public static bool TrySpawnEffect(GameObject prefab, Vector3 position) {
-    if (prefab) {
-      var rotation = Quaternion.identity;
-      var effect = Instantiate(prefab, position, rotation);
-      effect.transform.localScale = new Vector3(10, 10, 10);
-      effect.transform.LookAt(MainCamera.Instance.transform.position);
-      Destroy(effect, 3);
-      return true;
-    } else {
-      return false;
-    }
   }
 }

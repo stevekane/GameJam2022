@@ -10,40 +10,45 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d1214f38f4ba527438b104d74508e541, type: 3}
-  m_Name: KickAttack
+  m_Name: SlowSwipe
   m_EditorClassIdentifier: 
-  Clip: {fileID: 7400000, guid: 0774a8321ec8ff242a55de21f37f4e90, type: 2}
+  Clip: {fileID: 7400000, guid: 77df85f12c9f4fc49a1e327bb344c8b5, type: 2}
+  Chargeable: 1
+  Charge:
+    Millis: 233.33333
+    TicksPerSecond: 30
   Windup:
-    Millis: 533.3333
+    Millis: 466.66666
     TicksPerSecond: 30
   Active:
-    Millis: 100
+    Millis: 66.666664
     TicksPerSecond: 30
   Contact:
-    Millis: 266.66666
+    Millis: 133.33333
     TicksPerSecond: 30
   Recovery:
-    Millis: 533.3333
+    Millis: 666.6667
     TicksPerSecond: 30
   WindupMoveFactor: 0.5
-  ActiveMoveFactor: 1
+  ChargingMoveFactor: 0
+  ActiveMoveFactor: 0.5
   RecoveryMoveFactor: 0.5
   WindupRotationDegreesPerSecond: 0
   ActiveRotationDegreesPerSecond: 0
   RecoveryRotationDegreesPerSecond: 0
-  Index: 2
-  WindupAnimationSpeed: 2
+  Index: 0
+  WindupAnimationSpeed: 1
   ActiveAnimationSpeed: 1
-  RecoveryAnimationSpeed: 2
-  HitCameraShakeIntensity: 7
+  RecoveryAnimationSpeed: 1
+  HitCameraShakeIntensity: 5
   KnockBackType: 1
-  Points: 10
-  Strength: 25
-  WindupAudioClip: {fileID: 8300000, guid: d250961814f6e4747b37862908046d6b, type: 3}
-  ActiveAudioClip: {fileID: 8300000, guid: 70c8c80c739dc744c92ad158212b921b, type: 3}
+  Points: 3
+  Strength: 8
+  WindupAudioClip: {fileID: 0}
+  ActiveAudioClip: {fileID: 8300000, guid: 59a8d87d6c8dcd34eafdf8184887203d, type: 3}
   RecoveryAudioClip: {fileID: 0}
-  HitAudioClip: {fileID: 8300000, guid: 1fa3f172003f3fa4a801c8a7aaed236d, type: 3}
+  HitAudioClip: {fileID: 8300000, guid: bf6d0fc332bf08041bfde4741cb7230a, type: 3}
   WindupEffect: {fileID: 0}
   ActiveEffect: {fileID: 0}
-  ContactEffect: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
+  ContactEffect: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
   RecoveryEffect: {fileID: 0}

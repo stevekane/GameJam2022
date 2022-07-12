@@ -1,0 +1,143 @@
+Let's take apart the features of combat:
+
+"Attack can be charged by holding a button down to increase the range,
+size of the hitbox, and strength of the attack."
+
+Attacks can be charged
+Charging can be done by holding a button
+Attacks have a visual range
+Attacks have a hitbox
+Attacks have a strength
+
+QUESTIONS:
+  1. Is a charge part of an attack or a pre-cursor to the attack?
+  2. Is charging always done by holding a button?
+  3. Is charging ended when the button is releaseed?
+  4. Are these visual effect sizes always dynamic?
+  5. What is the shape of the hitbox?
+  6. Does the hitbox animate during the attack?
+  7. What is the effect of strength in an attack?
+
+"Basic attack on input and release <.2 seconds. Alternating punches which
+apply hitstun and volatility but no knockback."
+
+There is a basic Attack
+Basic Attack is triggered when a button is held for less than .2 seconds.
+Basic Attack applies hitstun
+Basic Attack applies volatility
+Basic Attack does not apply knockback
+Basic Attack alternates between left and right hand attacks for each successive attack
+
+QUESTIONS:
+  1. What is hitstun?
+  2. What does volatility do?
+  3. What is knockback?
+  4. Does alternation between swipes occur regardless of time between attacks?
+  5. Can I do this forever to a target?
+
+"Medium Attack on charge from .02-2 seconds. Applies knockback and more volatility."
+
+There is a medium attack
+Medium attack is triggered when key held for .2-2 seconds
+Medium attack applies knockback
+Medium attack applies volatility
+
+QUESTIONS:
+  1. Is the charging phase a precursor to various attacks?
+  2. Is there a visual/audio indication when you enter the medium attack charging?
+  4. Does medium attack apply hitstun?
+  5. What does the medium attack look like?
+
+"Heavy attack on charge of 2 seconds and up. Applies even more knockback and volatility."
+
+There is a Heavy Attack
+Heavy attack is triggered when key held for .2-2 seconds
+Heavy attack applies knockback
+Heavy attack applies volatility
+
+QUESTIONS:
+  1. Is there a visual state change when you enter heavy attack charging?
+  3. Does heavy attack apply hitstun?
+  4. What does heavy attack look like?
+
+SUMMARY THOUGHTS ABOUT POSSIBLE MODELS
+
+Base
+  Hitstun -> Hitstunned
+  
+  HitStunned
+    HitstunFrames > HitstunDuration -> Base
+
+  Charging(Light,BasicSequence) 
+    Hitstun -> HitStunned
+    KeyRelease -> Windup(Basic)
+    Chargetime > LightChargeMax -> Charging(Medium)
+
+      Windup(Light)
+        Hitstun -> HitStunned
+        Frames > LightWindup -> Active(Light)
+        
+      Active(Light)
+        Hit -> Contact(Light)
+        Frames > LightActive -> Recovery(Light)
+        
+          Contact(Light)
+            ContactFrames > LightContact -> Active(Light)
+
+      Recovery(Light)
+        Hitstun -> HitStunned
+        Frames > LightRecovery -> Base
+    
+  Charging(Medium)
+    Hitstun -> HitStunned
+    KeyRelease -> Windup(Medium)
+    ChargeTime > MediumChargeMax -> Charging(Heavy)
+
+      Windup(Medium)
+        Frames > MediumWindup -> Active(Medium)
+        
+      Active(Medium)
+        Hit -> Contact(Medium)
+        Frames > MediumActive -> Recovery(Medium)
+        
+          Contact(Medium)
+            ContactFrames > MediumContact -> Active(Medium)
+
+      Recovery(Medium)
+        Hitstun -> HitStunned
+        Frames > MediumRecovery -> Base
+
+  Charging(Heavy)
+    KeyRelease -> Windup(Heavy)
+    ChargeTime > HeavyChargeMax -> Windup(Heavy)
+
+      Windup(Heavy)
+        Frames > HeavyWindup -> Active(Heavy)
+        
+      Active(Heavy)
+        Hit -> Contact(Heavy)
+        Frames > HeavyActive -> Recovery(Heavy)
+        
+          Contact(Heavy)
+            ContactFrames > HeavyContact -> Active(Heavy)
+
+      Recovery(Heavy)
+        Frames > HeavyRecovery -> Base
+
+There seem to be a few data structures here:
+
+  CharacterState
+    Commands from its controller
+    Physical Contact
+    Status Effects
+      HitStun
+      Knockback
+      Wallbounce
+
+  CharacterActionState : CharacterState
+    Bool CanCancel
+    Bool CanHitstun 
+    Bool CanKnockback
+    Bool CanDamage
+  
+  ChargingState : CharacterActionState

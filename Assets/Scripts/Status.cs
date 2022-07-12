@@ -130,5 +130,4 @@ public class Status : MonoBehaviour {
 
     Bouncebox.Collider.enabled = IsAirborne;
   }
-
 }

@@ -7,20 +7,29 @@ public class Vibrator : MonoBehaviour {
   Vector3 Axis;
   Vector3 LocalPosition;
   float Amplitude;
-  int TotalFrames;
   int FramesRemaining;
+  int Sign = 1;
+
   public void Vibrate(Vector3 axis, int frames, float amplitude) {
-    LocalPosition = FramesRemaining > 0 ? LocalPosition : Target.transform.localPosition;
     Axis = axis;
     Amplitude = amplitude;
-    TotalFrames = frames;
-    FramesRemaining = frames;
+    FramesRemaining = Mathf.Max(FramesRemaining,frames);
+  }
+
+  public void VibrateThisFrame(Vector3 axis, float amplitude) {
+    Axis = axis;
+    Amplitude = amplitude;
+    FramesRemaining++;
+  }
+
+  void Start() {
+    LocalPosition = Target.transform.localPosition;
   }
 
   void FixedUpdate() {
     if (FramesRemaining > 0) {
-      var sign = FramesRemaining%2 == 0 ? 1 : -1;
-      Target.transform.localPosition = LocalPosition+sign*Amplitude*Axis;
+      Sign = Sign == -1 ? 1 : -1;
+      Target.transform.localPosition = LocalPosition+Sign*Amplitude*Axis;
       FramesRemaining--;
     } else {
       Target.transform.localPosition = LocalPosition;

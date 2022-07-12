@@ -17,6 +17,10 @@ public static class VectorExtensions {
     direction = (target-origin).normalized;
     return direction.sqrMagnitude > 0;
   }
+
+  public static Vector3? TryGetDirection(this Vector3 vector) {
+    return vector.sqrMagnitude > 0 ? vector : null;
+  }
 }
 
 public static class NullableExtensions {
@@ -66,5 +70,29 @@ public static class ArrayLikeExtensions {
       sum += f(x);
     }
     return sum;
+  }
+
+  public static bool TryGetIndex<T>(this T[] xs, int i, out T t) {
+    var inBounds = i >= 0 && i < xs.Length;
+    if (i >= 0 && i < xs.Length) {
+      t = xs[i];
+      return true;
+    } else {
+      t = default(T);
+      return false;
+    }
+  }
+
+  public static bool HasIndex<T>(this T[] xs, int i) {
+    return i >= 0 && i < xs.Length;
+  }
+
+  public static int IndexOf<T>(this T[] xs, T t) {
+    for (int i = 0; i < xs.Length; i++) {
+      if (ReferenceEquals(xs[i],t)) {
+        return i;
+      }
+    }
+    return -1;
   }
 }

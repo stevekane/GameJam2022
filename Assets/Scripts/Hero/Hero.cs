@@ -377,6 +377,10 @@ public class Hero : MonoBehaviour {
       Animator.SetFloat("JumpType", (float)JumpType);
     }
 
+    Animator.SetBool("Attacking", Attacker.IsAttacking);
+    Animator.SetFloat("AttackIndex", Attacker.AttackIndex);
+    Animator.SetFloat("AttackSpeed", Attacker.AttackSpeed);
+
     if ((Grounded || Perching) && !Stunned && !Attacker.IsAttacking) {
       if (Aiming) {
         transform.forward = action.Aim.XZ;

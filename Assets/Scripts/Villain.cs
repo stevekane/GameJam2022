@@ -37,6 +37,9 @@ public class Villain : MonoBehaviour {
     {
       transform.forward = dir;
       Controller.Move(dir * speed * Time.fixedDeltaTime);
+      Animator.SetBool("Attacking", Attacker.IsAttacking);
+      Animator.SetFloat("AttackIndex", Attacker.AttackIndex);
+      Animator.SetFloat("AttackSpeed", Attacker.AttackSpeed);
       Animator.SetInteger("LegState", 0);
       Animator.SetFloat("Forward", speed);
       Animator.SetFloat("Right", 0.0f);

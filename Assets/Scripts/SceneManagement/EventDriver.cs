@@ -158,6 +158,13 @@ public class EventDriver : MonoBehaviour {
   void FixedUpdate() {
     switch (PlayState) {
     case PlayState.Play: {
+        // Record the current values the down status of buttons right before consumption
+        Hit.Down = Input.GetButton("Hit");
+        Jump.Down = Input.GetButton("Jump");
+        Light.Down = Input.GetButton("Light");
+        Heavy.Down = Input.GetButton("Heavy");
+        Dash.Down = Input.GetButton("Dash");
+        Throw.Down = Input.GetButton("Throw");
         var action = new Action(Hit, Jump, Light, Heavy, Dash, Throw, Move, Aim);
         Inputs.InPlayBack = false;
         Inputs.Action = action;
