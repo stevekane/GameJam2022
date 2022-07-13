@@ -20,8 +20,8 @@ public class VoidLord : MonoBehaviour {
 
   public static Quaternion RotationFromInputs(VoidLord voidLord, Action action, float dt) {
     var desiredForward = 
-      action.Aim.XZ.TryGetDirection() ??
-      action.Move.XZ.TryGetDirection() ?? 
+      action.Right.XZ.TryGetDirection() ??
+      action.Left.XZ.TryGetDirection() ?? 
       voidLord.transform.forward; 
     var currentRotation = voidLord.transform.rotation;
     var desiredRotation = Quaternion.LookRotation(desiredForward);
@@ -30,7 +30,7 @@ public class VoidLord : MonoBehaviour {
   }
 
   public static Vector3 VelocityFromMove(Action action, float speed) {
-    return speed*action.Move.XZ;
+    return speed*action.Left.XZ;
   }
 
   public void Push(Vector3 velocity) {

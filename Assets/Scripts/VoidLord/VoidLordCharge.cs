@@ -14,8 +14,8 @@ public class VoidLordCharge : VoidLordState {
   int Duration;
 
   bool ShouldRelease(VoidLord voidLord, Action action) => ChargeAttack switch {
-    ChargeAttack.Melee => !action.Light.Down,
-    ChargeAttack.Ranged => !action.Heavy.Down,
+    ChargeAttack.Melee => !action.West.Down,
+    ChargeAttack.Ranged => !action.East.Down,
     _ => false
   };
 

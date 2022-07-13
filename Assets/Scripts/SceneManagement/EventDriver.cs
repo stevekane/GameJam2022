@@ -52,31 +52,37 @@ public struct StickState {
 
 [Serializable]
 public readonly struct Action {
-  public readonly ButtonState Hit;
-  public readonly ButtonState Jump;
-  public readonly ButtonState Light;
-  public readonly ButtonState Heavy;
-  public readonly ButtonState Dash;
-  public readonly ButtonState Throw;
-  public readonly StickState Move;
-  public readonly StickState Aim;
+  public readonly ButtonState North;
+  public readonly ButtonState East;
+  public readonly ButtonState South;
+  public readonly ButtonState West;
+  public readonly ButtonState L1;
+  public readonly ButtonState L2;
+  public readonly ButtonState R1;
+  public readonly ButtonState R2;
+  public readonly StickState Left;
+  public readonly StickState Right;
   public Action(
-    ButtonState hitState,
-    ButtonState jumpState,
-    ButtonState lightState,
-    ButtonState heavyState,
-    ButtonState dashState,
-    ButtonState throwState,
-    StickState move,
-    StickState aim) {
-    Hit = hitState;
-    Jump = jumpState;
-    Light = lightState;
-    Heavy = heavyState;
-    Dash = dashState;
-    Throw = throwState;
-    Move = move;
-    Aim = aim;
+    ButtonState north,
+    ButtonState east,
+    ButtonState south,
+    ButtonState west,
+    ButtonState l1,
+    ButtonState l2,
+    ButtonState r1,
+    ButtonState r2,
+    StickState left,
+    StickState right) {
+      North = north;
+      East = east;
+      South = south;
+      West = west;
+      L1 = l1;
+      L2 = l2;
+      R1 = r1;
+      R2 = r2;
+      Left = left;
+      Right = right;
   }
 }
 
@@ -96,14 +102,16 @@ public class EventDriver : MonoBehaviour {
   List<Action> History = new List<Action>((int)Math.Pow(2, 16));
   int HistoryIndex = 0;
 
-  ButtonState Hit;
-  ButtonState Jump;
-  ButtonState Light;
-  ButtonState Heavy;
-  ButtonState Dash;
-  ButtonState Throw;
-  StickState Move;
-  StickState Aim;
+  ButtonState North;
+  ButtonState East;
+  ButtonState South;
+  ButtonState West;
+  ButtonState L1;
+  ButtonState L2;
+  ButtonState R1;
+  ButtonState R2;
+  StickState Left;
+  StickState Right;
 
   void Start() {
     var objs = FindObjectsOfType<EventDriver>();
@@ -145,36 +153,42 @@ public class EventDriver : MonoBehaviour {
 
   // Cache/accumulate input changes in Update. Feed them into simulation on FixedUpdate.
   void Update() {
-    Hit.UpdateFromInput("Hit");
-    Jump.UpdateFromInput("Jump");
-    Light.UpdateFromInput("Light");
-    Heavy.UpdateFromInput("Heavy");
-    Dash.UpdateFromInput("Dash");
-    Throw.UpdateFromInput("Throw");
-    Move = StickState.FromInput(RadialDeadZone, "MoveX", "MoveY");
-    Aim = StickState.FromInput(RadialDeadZone, "AimX", "AimY");
+    North.UpdateFromInput("North");
+    East.UpdateFromInput("East");
+    South.UpdateFromInput("South");
+    West.UpdateFromInput("West");
+    L1.UpdateFromInput("L1");
+    L2.UpdateFromInput("L2");
+    R1.UpdateFromInput("R1");
+    R2.UpdateFromInput("R2");
+    Left = StickState.FromInput(RadialDeadZone, "LeftX", "LeftY");
+    Right = StickState.FromInput(RadialDeadZone, "RightX", "RightY");
   }
 
   void FixedUpdate() {
     switch (PlayState) {
     case PlayState.Play: {
         // Record the current values the down status of buttons right before consumption
-        Hit.Down = Input.GetButton("Hit");
-        Jump.Down = Input.GetButton("Jump");
-        Light.Down = Input.GetButton("Light");
-        Heavy.Down = Input.GetButton("Heavy");
-        Dash.Down = Input.GetButton("Dash");
-        Throw.Down = Input.GetButton("Throw");
-        var action = new Action(Hit, Jump, Light, Heavy, Dash, Throw, Move, Aim);
+        North.Down = Input.GetButton("North");
+        East.Down = Input.GetButton("East");
+        South.Down = Input.GetButton("South");
+        West.Down = Input.GetButton("West");
+        L1.Down = Input.GetButton("L1");
+        L2.Down = Input.GetButton("L2");
+        R1.Down = Input.GetButton("R1");
+        R2.Down = Input.GetButton("R2");
+        var action = new Action(North, East, South, West, L1, L2, R1, R2, Left, Right);
         Inputs.InPlayBack = false;
         Inputs.Action = action;
         History.Add(action);
-        Hit.Reset();
-        Jump.Reset();
-        Light.Reset();
-        Heavy.Reset();
-        Dash.Reset();
-        Throw.Reset();
+        North.Reset();
+        East.Reset();
+        South.Reset();
+        West.Reset();
+        L1.Reset();
+        L2.Reset();
+        R1.Reset();
+        R2.Reset();
       }
       break;
 

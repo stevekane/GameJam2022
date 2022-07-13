@@ -4,10 +4,7 @@ enum Motion { Base, Dashing }
 
 public class Vapor : MonoBehaviour {
   public static Quaternion RotationFromInputs(Transform t, float speed, Action action, float dt) {
-    var desiredForward = 
-      action.Aim.XZ.TryGetDirection() ??
-      action.Move.XZ.TryGetDirection() ?? 
-      t.forward; 
+    var desiredForward = action.Right.XZ.TryGetDirection() ?? t.forward;
     var currentRotation = t.rotation;
     var desiredRotation = Quaternion.LookRotation(desiredForward);
     var degrees = dt*speed;
@@ -16,14 +13,14 @@ public class Vapor : MonoBehaviour {
 
   public static Vector3 HeadingFromInputs(Transform t, Action action) {
     var heading = 
-      action.Move.XZ.TryGetDirection() ??
-      action.Aim.XZ.TryGetDirection() ??
+      action.Left.XZ.TryGetDirection() ??
+      action.Right.XZ.TryGetDirection() ??
       t.forward;
     return heading;
   }
 
   public static Vector3 VelocityFromMove(Action action, float speed) {
-    return speed*action.Move.XZ;
+    return speed*action.Left.XZ;
   }
 
   [SerializeField] float MOVE_SPEED;
@@ -45,15 +42,15 @@ public class Vapor : MonoBehaviour {
     var dt = Time.fixedDeltaTime;
     var action = Inputs.Action;
     
-    if (action.Jump.JustDown) {
+    if (action.L2.JustDown) {
       Cannon.DepressTrigger();
-    } else if (action.Jump.Down) {
+    } else if (action.L2.Down) {
       Cannon.HoldTrigger();
-    } else if (action.Jump.JustUp) {
+    } else if (action.L2.JustUp) {
       Cannon.ReleaseTrigger();
     }
 
-    if (action.Hit.JustDown && Motion == Motion.Base) {
+    if (action.R2.JustDown && Motion == Motion.Base) {
       DashHeading = HeadingFromInputs(transform, action);
       DashFramesRemaining = DashDuration.Frames;
       Motion = Motion.Dashing;

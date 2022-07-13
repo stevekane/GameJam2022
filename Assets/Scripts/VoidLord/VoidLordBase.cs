@@ -4,9 +4,9 @@ public class VoidLordBase : VoidLordState {
   [SerializeField] VoidLordCharge MeleeCharge; 
   [SerializeField] VoidLordCharge RangedCharge; 
 
-  bool ShouldChargeMelee(VoidLord voidLord, Action action) => action.Light.Down;
+  bool ShouldChargeMelee(VoidLord voidLord, Action action) => action.West.Down;
 
-  bool ShouldChargeRanged(VoidLord voidLord, Action action) => action.Heavy.Down;
+  bool ShouldChargeRanged(VoidLord voidLord, Action action) => action.East.Down;
 
   public override void Step(VoidLord voidLord, Action action, float dt) {
     voidLord.transform.rotation = VoidLord.RotationFromInputs(voidLord, action, dt);

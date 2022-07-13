@@ -128,8 +128,8 @@ public class Hero : MonoBehaviour {
   bool Grounded { get => Controller.isGrounded && !LegTarget; }
   bool Dashing { get => DashFramesRemaining > 0; }
   bool Pouncing { get => !Perching && PounceFramesRemaining > 0; }
-  bool Moving { get => Inputs.Action.Move.XZ.magnitude > 0; }
-  bool Aiming { get => Inputs.Action.Aim.XZ.magnitude > 0; }
+  bool Moving { get => Inputs.Action.Left.XZ.magnitude > 0; }
+  bool Aiming { get => Inputs.Action.Right.XZ.magnitude > 0; }
 
   public void Enter(GameObject gameObject) {
     Entered.Add(gameObject);
@@ -259,27 +259,27 @@ public class Hero : MonoBehaviour {
     Targets = FindTargets(targetingDistance, targetingRadians);
     Target = Best(LegTarget, Targets);
 
-    if (Grounded && !Dashing && action.Dash.JustDown) {
+    if (Grounded && !Dashing && action.South.JustDown) {
       Dash(transform.forward);
-    } else if (Free && !Attacker.IsAttacking && !Stunned && !Dashing && action.Light.JustDown) {
+    } else if (Free && !Attacker.IsAttacking && !Stunned && !Dashing && action.West.JustDown) {
       Attacker.StartAttack(0);
-    } else if (Free && !Attacker.IsAttacking && !Stunned && !Dashing && action.Heavy.JustDown) {
+    } else if (Free && !Attacker.IsAttacking && !Stunned && !Dashing && action.East.JustDown) {
       Attacker.StartAttack(1);
-    } else if (Free && !Attacker.IsAttacking && !Stunned && !Dashing && action.Throw.JustDown) {
+    } else if (Free && !Attacker.IsAttacking && !Stunned && !Dashing && action.North.JustDown) {
       Attacker.StartAttack(2);
     } else if (Falling && TryGetFirst(Entered, out Targetable targetable)) {
       Perch(targetable);
-    } else if (Aiming && Target && !Stunned && action.Jump.JustDown) {
+    } else if (Aiming && Target && !Stunned && action.R1.JustDown) {
       Pounce(Target.transform.position);
-    } else if (Grounded && !Aiming && !Stunned && action.Jump.JustDown) {
-      Jump(action.Move.XZ);
-    } else if (Perching && !Aiming && !Stunned && action.Jump.JustDown) {
-      Leap(action.Move.XZ);
-    } else if (Holding && !Stunned && action.Hit.JustDown) {
+    } else if (Grounded && !Aiming && !Stunned && action.R2.JustDown) {
+      Jump(action.Left.XZ);
+    } else if (Perching && !Aiming && !Stunned && action.R2.JustDown) {
+      Leap(action.Left.XZ);
+    } else if (Holding && !Stunned && action.R1.JustDown) {
       Throw(transform.forward, Config.THROW_SPEED);
-    } else if (Aiming && Free && !Stunned && action.Hit.JustDown && Target && Target.TryGetComponent(out Throwable distantThrowable)) {
+    } else if (Aiming && Free && !Stunned && action.R1.JustDown && Target && Target.TryGetComponent(out Throwable distantThrowable)) {
       Reach(distantThrowable);
-    } else if (Grounded && !Aiming && !Stunned && action.Hit.JustDown && TryGetFirst(Stayed, out Throwable throwable)) {
+    } else if (Grounded && !Aiming && !Stunned && action.R1.JustDown && TryGetFirst(Stayed, out Throwable throwable)) {
       Hold(throwable);
     } else if (Reaching && ArmFramesRemaining <= 0) {
       Pull(ArmTarget);
@@ -299,7 +299,7 @@ public class Hero : MonoBehaviour {
       Animator.SetInteger("LegState", 2);
     } else if (Attacker.IsAttacking) {
       // No movement during attack
-      Velocity += MoveAcceleration(action.Move.XZ, Config.MOVE_SPEED*Attacker.MoveFactor);
+      Velocity += MoveAcceleration(action.Left.XZ, Config.MOVE_SPEED*Attacker.MoveFactor);
       Velocity.y = Velocity.y > 0 ? Velocity.y : -1;
       Velocity += Pushable.Impulse;
       Controller.Move(dt*Velocity);
@@ -334,7 +334,7 @@ public class Hero : MonoBehaviour {
       } else {
         FootstepFramesRemaining = Mathf.Max(0, FootstepFramesRemaining-1);
       }
-      Velocity += MoveAcceleration(action.Move.XZ, Config.MOVE_SPEED);
+      Velocity += MoveAcceleration(action.Left.XZ, Config.MOVE_SPEED);
       Velocity.y = Velocity.y > 0 ? Velocity.y : -1;
       Velocity += Pushable.Impulse;
       Controller.Move(dt*Velocity);
@@ -343,7 +343,7 @@ public class Hero : MonoBehaviour {
     } else {
       var wasGrounded = Grounded;
       AirTime += dt;
-      Velocity += FallAcceleration(action.Move.XZ, dt);
+      Velocity += FallAcceleration(action.Left.XZ, dt);
       Velocity += Pushable.Impulse;
       Controller.Move(dt*Velocity);
       var isGrounded = Grounded;
@@ -362,13 +362,13 @@ public class Hero : MonoBehaviour {
 
     if ((Grounded || Perching) && !Stunned && !Attacker.IsAttacking) {
       if (Aiming) {
-        transform.forward = action.Aim.XZ;
+        transform.forward = action.Right.XZ;
       } else if (Reaching || Pulling) {
         var targetXZ = ArmTarget.transform.position.XZ();
         var currentXZ = transform.position.XZ();
         transform.rotation = Quaternion.LookRotation(targetXZ-currentXZ);
       } else if ((Free || Holding) && Moving) {
-        transform.forward = action.Move.XZ;
+        transform.forward = action.Left.XZ;
       }
     }
 
@@ -413,7 +413,7 @@ public class Hero : MonoBehaviour {
       Velocity = Vector3.zero;
     }
 
-    if (!Pouncing && !Stunned && Free && action.Aim.XZ.magnitude > 0) {
+    if (!Pouncing && !Stunned && Free && action.Right.XZ.magnitude > 0) {
       UI.Select(Target);
       UI.Highlight(Targets, Targets.Length);
       AimingFramesRemaining = Mathf.Max(0, AimingFramesRemaining-1);

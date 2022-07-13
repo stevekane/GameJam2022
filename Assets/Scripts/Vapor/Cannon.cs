@@ -88,6 +88,10 @@ public class Cannon : MonoBehaviour {
             hurtbox.Damage?.TakeDamage(BeamOrigin.forward, BeamHitStop.Frames, 10, 0);
           }
         }
+        var durationFraction = (float)Frames/(float)BeamDuration.Frames;
+        var width = Mathf.Sin(Mathf.PI*durationFraction);
+        beam.startWidth = width; 
+        beam.endWidth = width;
         beam.SetPosition(1, new Vector3(0, 0, BeamRange));
       }
     }
