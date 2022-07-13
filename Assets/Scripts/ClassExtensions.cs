@@ -44,6 +44,12 @@ public static class MonoExtensions {
       return self.gameObject.AddComponent<T>();
     }
   }
+
+  public static bool IsInFrontOf(this Vector3 p, Transform t) {
+    var delta = p-t.position;
+    var dot = Vector3.Dot(delta.normalized, t.forward);
+    return dot >= 0;
+  }
 }
 
 public static class AudioSourceExtensions {

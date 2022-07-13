@@ -27,8 +27,9 @@ public class Vapor : MonoBehaviour {
   }
 
   [SerializeField] float MOVE_SPEED;
-  [SerializeField] float TURN_SPEED;
   [SerializeField] float DASH_SPEED;
+  [SerializeField] float TURN_SPEED;
+  [SerializeField] float FIRING_TURN_SPEED;
   [SerializeField] Timeval DashDuration;
   [SerializeField] Attacker Attacker;
   [SerializeField] Cannon Cannon;
@@ -67,6 +68,8 @@ public class Vapor : MonoBehaviour {
       DashFramesRemaining--;
       Controller.Move(dt*DASH_SPEED*DashHeading);
     }
-    transform.rotation = RotationFromInputs(transform, TURN_SPEED, action, dt);
+    
+    var turnSpeed = Cannon.IsFiring ? FIRING_TURN_SPEED : TURN_SPEED;
+    transform.rotation = RotationFromInputs(transform, turnSpeed, action, dt);
   }
 }
