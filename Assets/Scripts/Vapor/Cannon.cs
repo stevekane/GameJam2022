@@ -43,12 +43,14 @@ public class Cannon : MonoBehaviour {
         var hitCount = Physics.OverlapSphereNonAlloc(transform.position, BurstRange, BurstHits);
         for (var i = 0; i < hitCount; i++) {
           var hit = BurstHits[i];
-          if (hit.TryGetComponent(out Hurtbox hurtbox)) {
+          var toHit = hit.transform.position-transform.position;
+          var dot = Vector3.Dot(toHit.normalized, transform.forward);
+          if (dot >= 0 && hit.TryGetComponent(out Hurtbox hurtbox)) {
             var delta = hit.transform.position-transform.position;
             var direction = delta.XZ().normalized;
             hurtbox.Damage?.TakeDamage(direction, BurstHitStop.Frames, 0, 20);
             var effect = Instantiate(BurstVFXPrefab, transform.position, transform.rotation);
-            effect.transform.localScale = 2*new Vector3(BurstRange, BurstRange, BurstRange);
+            effect.transform.localScale = 2*new Vector3(BurstRange, .5f, BurstRange);
             Destroy(effect, 3f);
           }
         }
