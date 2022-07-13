@@ -10,10 +10,11 @@ public class Cannon : MonoBehaviour {
   [SerializeField] Timeval BeamDuration = Timeval.FromMillis(3000);
   [SerializeField] Timeval BeamCooldown = Timeval.FromMillis(6000);
   [SerializeField] Timeval BeamHitStop = Timeval.FromMillis(250);
+  [SerializeField] float BeamRange = 1000;
+  [SerializeField] float BeamDPS = 100;
   [SerializeField] Timeval BurstHitStop = Timeval.FromMillis(250);
   [SerializeField] Timeval BurstCooldown = Timeval.FromMillis(1000);
   [SerializeField] float BurstRange = 5;
-  [SerializeField] float BeamRange = 1000;
 
   [SerializeField] GameObject BurstVFXPrefab;
   [SerializeField] Transform BeamOrigin;
@@ -46,7 +47,7 @@ public class Cannon : MonoBehaviour {
   public void ReleaseTrigger() {
     if (State == CannonState.Charging) {
       if (Frames < BeamThreshold.Frames) {
-        var hitCount = Physics.OverlapSphereNonAlloc(transform.position, BurstRange, BurstHits);
+        var hitCount = Physics.OverlapSphereNonAlloc(transform.position, BurstRange, BurstHits, HitLayerMask);
         for (var i = 0; i < hitCount; i++) {
           var hit = BurstHits[i];
           if (hit.transform.position.IsInFrontOf(transform) && hit.TryGetComponent(out Hurtbox hurtbox)) {
@@ -70,6 +71,8 @@ public class Cannon : MonoBehaviour {
   }
 
   void FixedUpdate() {
+    var dt = Time.fixedDeltaTime;    
+
     Frames = State switch {
       CannonState.Ready => 0,
       CannonState.Charging => Frames+1,
@@ -81,18 +84,21 @@ public class Cannon : MonoBehaviour {
 
     if (State == CannonState.Firing) {
       foreach (var beam in Beams) {
-        var hitCount = Physics.RaycastNonAlloc(beam.transform.position, BeamOrigin.forward, BeamHits, BeamRange);
+        var hitCount = Physics.RaycastNonAlloc(beam.transform.position, BeamOrigin.forward, BeamHits, BeamRange, HitLayerMask);
+        var distance = BeamRange;
         for (var j = 0; j < hitCount; j++) {
           var hit = BeamHits[j];
           if (hit.collider.TryGetComponent(out Hurtbox hurtbox)) {
-            hurtbox.Damage?.TakeDamage(BeamOrigin.forward, BeamHitStop.Frames, 10, 0);
+            hurtbox.Damage?.TakeDamage(BeamOrigin.forward, BeamHitStop.Frames, dt*BeamDPS, 0);
+          } else {
+            distance = Mathf.Min(distance, hit.distance);
           }
         }
         var durationFraction = (float)Frames/(float)BeamDuration.Frames;
         var width = Mathf.Sin(Mathf.PI*durationFraction);
         beam.startWidth = width; 
         beam.endWidth = width;
-        beam.SetPosition(1, new Vector3(0, 0, BeamRange));
+        beam.SetPosition(1, new Vector3(0, 0, distance));
       }
     }
 
