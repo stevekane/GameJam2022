@@ -46,6 +46,7 @@ public class VoidLord : MonoBehaviour {
   public CharacterController Controller;
   public Animator Animator;
   public Status Status;
+  public Attacker Attacker;
   public Vector3 Velocity;
   public VoidLordState State;
 

@@ -4,6 +4,7 @@ public class Villain : MonoBehaviour {
   CharacterController Controller;
   Attacker Attacker;
   Status Status;
+  Pushable Pushable;
   Animator Animator;
   Transform Target;
   int AttackCheckFrames = 1000;
@@ -15,6 +16,7 @@ public class Villain : MonoBehaviour {
     Controller = GetComponent<CharacterController>();
     Attacker = GetComponentInChildren<Attacker>();
     Status = GetComponent<Status>();
+    Pushable = GetComponent<Pushable>();
     Animator = GetComponent<Animator>();
     Target = FindObjectOfType<Player>()?.transform;
   }

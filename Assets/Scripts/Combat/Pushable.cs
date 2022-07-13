@@ -1,5 +1,13 @@
 using UnityEngine;
 
-public abstract class Pushable : MonoBehaviour {
-  public abstract void Push(Vector3 velocity);
+public class Pushable : MonoBehaviour {
+  public Vector3 Impulse;
+
+  public void Push(Vector3 velocity) {
+    Impulse += velocity;
+  }
+
+  void FixedUpdate() {
+    Impulse = Vector3.zero;
+  }
 }

@@ -22,6 +22,7 @@ public class Hero : MonoBehaviour {
   [SerializeField] Animator Animator;
   [SerializeField] Attacker Attacker;
   [SerializeField] Status Status;
+  [SerializeField] Pushable Pushable;
   [SerializeField] Grabber Grabber;
   [SerializeField] AudioSource FootstepAudioSource;
   [SerializeField] AudioSource LegAudioSource;
@@ -130,29 +131,6 @@ public class Hero : MonoBehaviour {
   bool Moving { get => Inputs.Action.Move.XZ.magnitude > 0; }
   bool Aiming { get => Inputs.Action.Aim.XZ.magnitude > 0; }
 
-  /*
-  A question, what IS pushback?
-
-  Pushback is an "external force" or more specifically an external impulse applied to your
-  character. The normal way you would "resist" the action of this impulse would be some kind
-  of counter-force such as ground friction, air-resistance, or just encountering an immovable
-  obstacle such as a wall.
-
-  When you are pushed back, you could ALSO model this as slipping.
-
-  When you are NOT slipping, you are easily able to control your own velocity.
-  When you are slipping, you are not so easily able to control your own velocity.
-
-  Thus, slipping or pushback could be experienced over a duration or until your
-  XZ-speed falls below some threshold and you regain your footing.
-  */
-
-  public void Push(Vector3 velocity) {
-    // TODO: This is pretty clearly garbage and needs to be updated
-    // Cannot just take this effect willy-nilly like this
-    Velocity += velocity;
-  }
-
   public void Enter(GameObject gameObject) {
     Entered.Add(gameObject);
   }
@@ -165,9 +143,6 @@ public class Hero : MonoBehaviour {
     Exited.Add(gameObject);
   }
 
-  // TODO: Review this... it seems that acceleration should be dV/dt
-  // this implies that the acceleration we are computing should be
-  // divided by dt before being compared to max acceleration
   Vector3 MoveAcceleration(Vector3 desiredMove, float speed) {
     var currentVelocity = Velocity.XZ();
     var desiredVelocity = desiredMove*speed;
@@ -326,6 +301,7 @@ public class Hero : MonoBehaviour {
       // No movement during attack
       Velocity += MoveAcceleration(action.Move.XZ, Config.MOVE_SPEED*Attacker.MoveFactor);
       Velocity.y = Velocity.y > 0 ? Velocity.y : -1;
+      Velocity += Pushable.Impulse;
       Controller.Move(dt*Velocity);
       Animator.SetInteger("LegState", 0);
     } else if (Stunned) {
@@ -336,6 +312,7 @@ public class Hero : MonoBehaviour {
         AirTime += dt;
         Velocity.y = vy + FallAcceleration(Vector3.zero, dt).y;
       }
+      Velocity += Pushable.Impulse;
       Controller.Move(dt*Velocity);
       Animator.SetInteger("LegState", 0);
     } else if (Pouncing) {
@@ -359,6 +336,7 @@ public class Hero : MonoBehaviour {
       }
       Velocity += MoveAcceleration(action.Move.XZ, Config.MOVE_SPEED);
       Velocity.y = Velocity.y > 0 ? Velocity.y : -1;
+      Velocity += Pushable.Impulse;
       Controller.Move(dt*Velocity);
       Animator.SetInteger("LegState", 0);
       LastPerch = null;
@@ -366,6 +344,7 @@ public class Hero : MonoBehaviour {
       var wasGrounded = Grounded;
       AirTime += dt;
       Velocity += FallAcceleration(action.Move.XZ, dt);
+      Velocity += Pushable.Impulse;
       Controller.Move(dt*Velocity);
       var isGrounded = Grounded;
       if (!wasGrounded && isGrounded) {
