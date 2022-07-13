@@ -49,7 +49,7 @@ public class Cannon : MonoBehaviour {
             hurtbox.Damage?.TakeDamage(direction, BurstHitStop.Frames, 0, 20);
             var effect = Instantiate(BurstVFXPrefab, transform.position, transform.rotation);
             effect.transform.localScale = 2*new Vector3(BurstRange, BurstRange, BurstRange);
-            Destroy(effect, .25f);
+            Destroy(effect, 3f);
           }
         }
         State = CannonState.Cooldown;

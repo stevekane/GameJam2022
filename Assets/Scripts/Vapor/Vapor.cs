@@ -1,5 +1,7 @@
 using UnityEngine;
 
+enum Motion { Base, Dashing }
+
 public class Vapor : MonoBehaviour {
   public static float MOVE_SPEED = 15f;
   public static float TURN_SPEED = 720f;
@@ -8,6 +10,8 @@ public class Vapor : MonoBehaviour {
   [SerializeField] Cannon Cannon;
   [SerializeField] Pushable Pushable;
   [SerializeField] CharacterController Controller;
+
+  Motion Motion;
 
   public static Quaternion RotationFromInputs(Transform t, float speed, Action action, float dt) {
     var desiredForward = 
