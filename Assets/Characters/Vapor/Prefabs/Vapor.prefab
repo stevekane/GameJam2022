@@ -501,6 +501,7 @@ MonoBehaviour:
   - {fileID: 1094939034538663479}
   - {fileID: 2367959653046050394}
   - {fileID: 8455619902670000658}
+  ChargeFrameMultiplier: 3
 --- !u!1 &5571416123534508706
 GameObject:
   m_ObjectHideFlags: 0
@@ -939,9 +940,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MOVE_SPEED: 25
+  FIRING_MOVE_SPEED: 5
   DASH_SPEED: 55
   TURN_SPEED: 1080
   FIRING_TURN_SPEED: 45
+  ATTACKING_TURN_SPEED: 0
+  FIRING_PUSHBACK_SPEED: 15
   DashDuration:
     Millis: 266.66666
     TicksPerSecond: 30

@@ -24,10 +24,12 @@ public class Vapor : MonoBehaviour {
   }
 
   [SerializeField] float MOVE_SPEED;
+  [SerializeField] float FIRING_MOVE_SPEED;
   [SerializeField] float DASH_SPEED;
   [SerializeField] float TURN_SPEED;
   [SerializeField] float FIRING_TURN_SPEED;
   [SerializeField] float ATTACKING_TURN_SPEED;
+  [SerializeField] float FIRING_PUSHBACK_SPEED;
   [SerializeField] Timeval DashDuration;
   [SerializeField] Attacker Attacker;
   [SerializeField] Cannon Cannon;
@@ -71,14 +73,21 @@ public class Vapor : MonoBehaviour {
       Attacker.ReleaseChargeAttack();
     }
 
+    if (Cannon.IsFiring) {
+      Pushable.Push(FIRING_PUSHBACK_SPEED*-transform.forward);
+    }
+
     Attacker.Step(dt);
     Animator.SetBool("Attacking", Attacker.IsAttacking);
     Animator.SetInteger("AttackIndex", Attacker.AttackIndex);
     Animator.SetFloat("AttackSpeed", Attacker.AttackSpeed);
 
     if (Motion == Motion.Base) {
-      var moveFactor = Attacker.IsAttacking ? Attacker.MoveFactor : 1;
-      var moveSpeed = moveFactor*MOVE_SPEED;
+      var moveSpeed = MOVE_SPEED switch {
+        _ when Attacker.IsAttacking => Attacker.MoveFactor*MOVE_SPEED,
+        _ when Cannon.IsFiring => FIRING_MOVE_SPEED,
+        _ => MOVE_SPEED
+      };
       Velocity = VelocityFromMove(action, moveSpeed)+Pushable.Impulse;
       Controller.Move(dt*Velocity);
     } else if (Motion == Motion.Dashing) {
