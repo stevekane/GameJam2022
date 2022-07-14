@@ -20,6 +20,7 @@ public class Attacker : MonoBehaviour {
   [SerializeField] Pushable Pushable;
   [SerializeField] Vibrator Vibrator;
   [SerializeField] Attack[] Attacks;
+  [SerializeField] int ChargeFrameMultiplier = 3;
 
   List<Hurtbox> Hits = new List<Hurtbox>(32);
   AttackState State;
@@ -27,6 +28,7 @@ public class Attacker : MonoBehaviour {
   Vector3 TotalKnockbackVector;
   float TotalKnockBackStrength;
   int FramesRemaining = 0;
+  bool IsCharging;
 
   public bool IsAttacking { 
     get { 
@@ -44,7 +46,7 @@ public class Attacker : MonoBehaviour {
     get {
       return State switch {
         AttackState.None => 1f,
-        AttackState.Windup => Attack.Config.WindupAnimationSpeed,
+        AttackState.Windup => (IsCharging ? (1f/(float)ChargeFrameMultiplier) : 1) * Attack.Config.WindupAnimationSpeed,
         AttackState.Active => Attack.Config.ActiveAnimationSpeed,
         AttackState.Recovery => Attack.Config.RecoveryAnimationSpeed,
         AttackState.Contact => 0f,
@@ -80,13 +82,34 @@ public class Attacker : MonoBehaviour {
   public void StartAttack(Attack attack) {
     Attack = attack;
     State = AttackState.Windup;
-    FramesRemaining = Attack.Config.Windup.Frames.ScaleBy(1 / Attack.Config.WindupAnimationSpeed);
+    IsCharging = false;
+    FramesRemaining = Attack.Config.Windup.Frames.ScaleBy(1/Attack.Config.WindupAnimationSpeed);
     Attack.AudioSource.PlayOptionalOneShot(Attack.Config.WindupAudioClip);
     TrySpawnEffect(Attack.Config.WindupEffect, transform.position);
   }
 
+  public void StartChargeAttack(Attack attack) {
+    Attack = attack;
+    State = AttackState.Windup;
+    IsCharging = true;
+    FramesRemaining = ChargeFrameMultiplier*Attack.Config.Windup.Frames.ScaleBy(1/Attack.Config.WindupAnimationSpeed);
+    Attack.AudioSource.PlayOptionalOneShot(Attack.Config.WindupAudioClip);
+    TrySpawnEffect(Attack.Config.WindupEffect, transform.position);
+  }
+
+  public void ReleaseChargeAttack() {
+    if (State == AttackState.Windup) {
+      FramesRemaining = FramesRemaining/ChargeFrameMultiplier;
+      IsCharging = false;
+    }
+  }
+
   public void StartAttack(int index) {
     StartAttack(Attacks[index]);
+  }
+
+  public void StartChargeAttack(int index) {
+    StartChargeAttack(Attacks[index]);
   }
 
   public void Hit(Hurtbox hurtbox) {

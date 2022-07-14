@@ -63,9 +63,11 @@ public class Vapor : MonoBehaviour {
     if (action.R1.JustDown && !Attacker.IsAttacking) {
       Attacker.StartAttack(0+PunchCycleIndex);
       PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
-    } else if (action.R2.JustDown) {
-      Attacker.StartAttack(2+PunchCycleIndex);
+    } else if (action.R2.JustDown && !Attacker.IsAttacking) {
+      Attacker.StartChargeAttack(2+PunchCycleIndex);
       PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
+    } else if (action.R2.JustUp && Attacker.IsAttacking) {
+      Attacker.ReleaseChargeAttack();
     }
 
     Attacker.Step(dt);
