@@ -61,14 +61,16 @@ public class Vapor : MonoBehaviour {
     }
 
     if (action.R1.JustDown && !Attacker.IsAttacking) {
-      Attacker.StartAttack(PunchCycleIndex);
+      Attacker.StartAttack(0+PunchCycleIndex);
+      PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
+    } else if (action.R2.JustDown) {
+      Attacker.StartAttack(2+PunchCycleIndex);
       PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
     }
 
     Attacker.Step(dt);
     Animator.SetBool("Attacking", Attacker.IsAttacking);
     Animator.SetInteger("AttackIndex", Attacker.AttackIndex);
-    Animator.SetInteger("AttackSequenceIndex", PunchCycleIndex);
     Animator.SetFloat("AttackSpeed", Attacker.AttackSpeed);
 
     if (Motion == Motion.Base) {
