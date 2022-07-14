@@ -52,7 +52,7 @@ public class Vapor : MonoBehaviour {
       Cannon.ReleaseTrigger();
     }
 
-    if (action.R2.JustDown && Motion == Motion.Base) {
+    if (action.L1.JustDown && Motion == Motion.Base) {
       DashHeading = HeadingFromInputs(transform, action);
       DashFramesRemaining = DashDuration.Frames;
       Motion = Motion.Dashing;
@@ -61,8 +61,8 @@ public class Vapor : MonoBehaviour {
     }
 
     if (action.R1.JustDown && !Attacker.IsAttacking) {
+      Attacker.StartAttack(PunchCycleIndex);
       PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
-      Attacker.StartAttack(0);
     }
 
     Attacker.Step(dt);
