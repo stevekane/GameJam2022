@@ -36,6 +36,7 @@ public class Vapor : MonoBehaviour {
   [SerializeField] Pushable Pushable;
   [SerializeField] CharacterController Controller;
   [SerializeField] Animator Animator;
+  [SerializeField] ParticleSystem JetParticles;
 
   Motion Motion;
   Vector3 Velocity;
@@ -50,6 +51,7 @@ public class Vapor : MonoBehaviour {
     if (action.L1.JustDown && Motion == Motion.Base) {
       DashHeading = HeadingFromInputs(transform, action);
       DashFramesRemaining = DashDuration.Frames;
+      JetParticles.transform.forward = -DashHeading;
       Motion = Motion.Dashing;
     } else if (Motion == Motion.Dashing && DashFramesRemaining <= 0) {
       Motion = Motion.Base;
@@ -78,6 +80,7 @@ public class Vapor : MonoBehaviour {
     }
 
     Attacker.Step(dt);
+    Animator.SetBool("Dashing", Motion == Motion.Dashing);
     Animator.SetBool("Attacking", Attacker.IsAttacking);
     Animator.SetInteger("AttackIndex", Attacker.AttackIndex);
     Animator.SetFloat("AttackSpeed", Attacker.AttackSpeed);
@@ -88,7 +91,7 @@ public class Vapor : MonoBehaviour {
         _ when Cannon.IsFiring => FIRING_MOVE_SPEED,
         _ => MOVE_SPEED
       };
-      Velocity = VelocityFromMove(action, moveSpeed)+Pushable.Impulse;
+      Velocity = VelocityFromMove(action, moveSpeed)+Pushable.Impulse+dt*Physics.gravity;
       Controller.Move(dt*Velocity);
     } else if (Motion == Motion.Dashing) {
       DashFramesRemaining--;

@@ -954,6 +954,7 @@ MonoBehaviour:
   Pushable: {fileID: 5571416124093621158}
   Controller: {fileID: 5571416124093621160}
   Animator: {fileID: 7727835182619467870}
+  JetParticles: {fileID: 4585268613483689328}
 --- !u!114 &5571416124093621156
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1806,6 +1807,30 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.y
       value: 90
       objectReference: {fileID: 0}
+    - target: {fileID: 3219098484687486882, guid: a7409de0be636c047a443c1504e7c758, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3252762029406966290, guid: a7409de0be636c047a443c1504e7c758, type: 3}
+      propertyPath: m_Name
+      value: Orbiting Particles
+      objectReference: {fileID: 0}
+    - target: {fileID: 5916313919117295232, guid: a7409de0be636c047a443c1504e7c758, type: 3}
+      propertyPath: ExternalForcesModule.influenceFilter
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5916313919117295232, guid: a7409de0be636c047a443c1504e7c758, type: 3}
+      propertyPath: ExternalForcesModule.influenceList.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5916313919117295232, guid: a7409de0be636c047a443c1504e7c758, type: 3}
+      propertyPath: ExternalForcesModule.influenceList.Array.data[0]
+      value: 
+      objectReference: {fileID: 5084150875832147387}
+    - target: {fileID: 7111551553495288622, guid: a7409de0be636c047a443c1504e7c758, type: 3}
+      propertyPath: prewarm
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8886774217921706565, guid: a7409de0be636c047a443c1504e7c758, type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
@@ -1821,6 +1846,16 @@ PrefabInstance:
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: a7409de0be636c047a443c1504e7c758, type: 3}
+--- !u!198 &4585268613483689328 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 7111551553495288622, guid: a7409de0be636c047a443c1504e7c758, type: 3}
+  m_PrefabInstance: {fileID: 6706822978845785694}
+  m_PrefabAsset: {fileID: 0}
+--- !u!330 &5084150875832147387 stripped
+ParticleSystemForceField:
+  m_CorrespondingSourceObject: {fileID: 1989997023401665509, guid: a7409de0be636c047a443c1504e7c758, type: 3}
+  m_PrefabInstance: {fileID: 6706822978845785694}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5571416123647958240 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1171725924373897918, guid: a7409de0be636c047a443c1504e7c758, type: 3}
