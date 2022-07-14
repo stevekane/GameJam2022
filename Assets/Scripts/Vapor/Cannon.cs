@@ -77,7 +77,8 @@ public class Cannon : MonoBehaviour {
       CannonState.Ready => 0,
       CannonState.Charging => Frames+1,
       CannonState.Firing => Frames-1,
-      CannonState.Cooldown => Frames-1
+      CannonState.Cooldown => Frames-1,
+      _ => 0
     };
 
     Beams.ForEach(beam => beam.enabled = State == CannonState.Firing);

@@ -17,10 +17,6 @@ public class AttackConfig : ScriptableObject {
   [Header("Animation Clip")]
   public AnimationClip Clip;
 
-  [Header("Charging")]
-  public bool Chargeable;
-  public Timeval Charge;
-
   [Header("Frame data")]
   public Timeval Windup;
   public Timeval Active;
@@ -30,8 +26,6 @@ public class AttackConfig : ScriptableObject {
   [Header("Movement")]
   [Range(0, 1)]
   public float WindupMoveFactor;
-  [Range(0, 1)]
-  public float ChargingMoveFactor;
   [Range(0, 1)]
   public float ActiveMoveFactor;
   [Range(0, 1)]

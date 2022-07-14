@@ -27,6 +27,7 @@ public class Vapor : MonoBehaviour {
   [SerializeField] float DASH_SPEED;
   [SerializeField] float TURN_SPEED;
   [SerializeField] float FIRING_TURN_SPEED;
+  [SerializeField] float ATTACKING_TURN_SPEED;
   [SerializeField] Timeval DashDuration;
   [SerializeField] Attacker Attacker;
   [SerializeField] Cannon Cannon;
@@ -44,20 +45,20 @@ public class Vapor : MonoBehaviour {
     var dt = Time.fixedDeltaTime;
     var action = Inputs.Action;
     
-    if (action.L2.JustDown) {
-      Cannon.DepressTrigger();
-    } else if (action.L2.Down) {
-      Cannon.HoldTrigger();
-    } else if (action.L2.JustUp) {
-      Cannon.ReleaseTrigger();
-    }
-
     if (action.L1.JustDown && Motion == Motion.Base) {
       DashHeading = HeadingFromInputs(transform, action);
       DashFramesRemaining = DashDuration.Frames;
       Motion = Motion.Dashing;
     } else if (Motion == Motion.Dashing && DashFramesRemaining <= 0) {
       Motion = Motion.Base;
+    }
+
+    if (action.L2.JustDown) {
+      Cannon.DepressTrigger();
+    } else if (action.L2.Down) {
+      Cannon.HoldTrigger();
+    } else if (action.L2.JustUp) {
+      Cannon.ReleaseTrigger();
     }
 
     if (action.R1.JustDown && !Attacker.IsAttacking) {
@@ -76,14 +77,20 @@ public class Vapor : MonoBehaviour {
     Animator.SetFloat("AttackSpeed", Attacker.AttackSpeed);
 
     if (Motion == Motion.Base) {
-      Velocity = VelocityFromMove(action, MOVE_SPEED)+Pushable.Impulse;
+      var moveFactor = Attacker.IsAttacking ? Attacker.MoveFactor : 1;
+      var moveSpeed = moveFactor*MOVE_SPEED;
+      Velocity = VelocityFromMove(action, moveSpeed)+Pushable.Impulse;
       Controller.Move(dt*Velocity);
     } else if (Motion == Motion.Dashing) {
       DashFramesRemaining--;
       Controller.Move(dt*DASH_SPEED*DashHeading);
     }
     
-    var turnSpeed = Cannon.IsFiring ? FIRING_TURN_SPEED : TURN_SPEED;
+    var turnSpeed = TURN_SPEED switch {
+      _ when Attacker.IsAttacking => ATTACKING_TURN_SPEED,
+      _ when Cannon.IsFiring => FIRING_TURN_SPEED,
+      _ => TURN_SPEED
+    };
     transform.rotation = RotationFromInputs(transform, turnSpeed, action, dt);
   }
 }
