@@ -30,30 +30,30 @@ public class Vapor : MonoBehaviour {
   [SerializeField] float FIRING_TURN_SPEED;
   [SerializeField] float ATTACKING_TURN_SPEED;
   [SerializeField] float FIRING_PUSHBACK_SPEED;
-  [SerializeField] Timeval DashDuration;
   [SerializeField] Attacker Attacker;
   [SerializeField] Cannon Cannon;
   [SerializeField] Pushable Pushable;
   [SerializeField] CharacterController Controller;
   [SerializeField] Animator Animator;
-  [SerializeField] ParticleSystem JetParticles;
+  [SerializeField] ParticleSystem ChargeParticles;
+  [SerializeField] AudioSource ChargeAudioSource;
+  [SerializeField] float ChargeAudioClipStartingTime;
 
   Motion Motion;
   Vector3 Velocity;
-  Vector3 DashHeading;
-  float DashFramesRemaining;
   int PunchCycleIndex;
 
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
     var action = Inputs.Action;
     
-    if (action.L1.JustDown && Motion == Motion.Base) {
-      DashHeading = HeadingFromInputs(transform, action);
-      DashFramesRemaining = DashDuration.Frames;
-      JetParticles.transform.forward = -DashHeading;
+    if (Motion == Motion.Base && action.L1.JustDown) {
+      ChargeAudioSource.Stop();
+      ChargeAudioSource.time = ChargeAudioClipStartingTime;
+      ChargeAudioSource.Play();
       Motion = Motion.Dashing;
-    } else if (Motion == Motion.Dashing && DashFramesRemaining <= 0) {
+    } else if (Motion == Motion.Dashing && action.L1.JustUp) {
+      ChargeAudioSource.Stop();
       Motion = Motion.Base;
     }
 
@@ -91,11 +91,13 @@ public class Vapor : MonoBehaviour {
         _ when Cannon.IsFiring => FIRING_MOVE_SPEED,
         _ => MOVE_SPEED
       };
-      Velocity = VelocityFromMove(action, moveSpeed)+Pushable.Impulse+dt*Physics.gravity;
+      var moveVelocity = VelocityFromMove(action, moveSpeed);
+      Velocity = moveVelocity+Pushable.Impulse+dt*Physics.gravity;
       Controller.Move(dt*Velocity);
     } else if (Motion == Motion.Dashing) {
-      DashFramesRemaining--;
-      Controller.Move(dt*DASH_SPEED*DashHeading);
+      var moveVelocity = VelocityFromMove(action, DASH_SPEED);
+      ChargeParticles.transform.forward = -moveVelocity.TryGetDirection() ?? -transform.forward;
+      Controller.Move(dt*moveVelocity);
     }
     
     var turnSpeed = TURN_SPEED switch {

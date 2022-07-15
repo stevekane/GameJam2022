@@ -1568,7 +1568,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 7567535479611962608, guid: dc92808aec40452478417d6d52548c07, type: 3}
       propertyPath: field of view
-      value: 60
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 7567535479611962609, guid: dc92808aec40452478417d6d52548c07, type: 3}
       propertyPath: m_RootOrder
@@ -1576,15 +1576,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7567535479611962609, guid: dc92808aec40452478417d6d52548c07, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 6.800314
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7567535479611962609, guid: dc92808aec40452478417d6d52548c07, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 30.000006
+      value: 30.000008
       objectReference: {fileID: 0}
     - target: {fileID: 7567535479611962609, guid: dc92808aec40452478417d6d52548c07, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 7.267484
+      value: 2.2500017
       objectReference: {fileID: 0}
     - target: {fileID: 7567535479611962609, guid: dc92808aec40452478417d6d52548c07, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1779,7 +1779,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh29340
+  m_Name: pb_Mesh35948
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -2406,12 +2406,28 @@ PrefabInstance:
       value: 6.409511e-17
       objectReference: {fileID: 0}
     - target: {fileID: 7775614649029596951, guid: e49299597d4035747bb85947974510bb, type: 3}
+      propertyPath: m_BiasX
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7775614649029596951, guid: e49299597d4035747bb85947974510bb, type: 3}
+      propertyPath: m_BiasY
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7775614649029596951, guid: e49299597d4035747bb85947974510bb, type: 3}
       propertyPath: m_ScreenX
-      value: 0.2660855
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 7775614649029596951, guid: e49299597d4035747bb85947974510bb, type: 3}
       propertyPath: m_ScreenY
-      value: 0.9345266
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7775614649029596951, guid: e49299597d4035747bb85947974510bb, type: 3}
+      propertyPath: m_DeadZoneWidth
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7775614649029596951, guid: e49299597d4035747bb85947974510bb, type: 3}
+      propertyPath: m_DeadZoneHeight
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 7775614649085704515, guid: e49299597d4035747bb85947974510bb, type: 3}
       propertyPath: m_RootOrder
@@ -2419,15 +2435,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7775614649085704515, guid: e49299597d4035747bb85947974510bb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 6.800314
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7775614649085704515, guid: e49299597d4035747bb85947974510bb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 30.000006
+      value: 30.000008
       objectReference: {fileID: 0}
     - target: {fileID: 7775614649085704515, guid: e49299597d4035747bb85947974510bb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 7.267484
+      value: 2.2500017
       objectReference: {fileID: 0}
     - target: {fileID: 7775614649085704515, guid: e49299597d4035747bb85947974510bb, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2467,11 +2483,11 @@ PrefabInstance:
       objectReference: {fileID: 1899292709}
     - target: {fileID: 7775614649085704516, guid: e49299597d4035747bb85947974510bb, type: 3}
       propertyPath: m_Lens.FieldOfView
-      value: 60
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 7775614649085704516, guid: e49299597d4035747bb85947974510bb, type: 3}
       propertyPath: m_Lens.m_SensorSize.x
-      value: 1.7772278
+      value: 1.777667
       objectReference: {fileID: 0}
     - target: {fileID: 7775614649085704517, guid: e49299597d4035747bb85947974510bb, type: 3}
       propertyPath: m_Name
@@ -2481,7 +2497,8 @@ PrefabInstance:
       propertyPath: m_BoundingVolume
       value: 
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 577752655554973060, guid: e49299597d4035747bb85947974510bb, type: 3}
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: e49299597d4035747bb85947974510bb, type: 3}
 --- !u!4 &1899292709 stripped
