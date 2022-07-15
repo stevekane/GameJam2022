@@ -1,12 +1,13 @@
 using UnityEngine;
 
 public class Waypoints : Path {
+  public Waypoint[] Points;
+
   [SerializeField]
   Color Color;
   [SerializeField]
   [Range(0, 1)]
   float TurnFraction;
-  Waypoint[] Points;
   float TotalDistance;
   float[] Distances;
   float[] NormalizedDistances;

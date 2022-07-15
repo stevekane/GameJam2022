@@ -1,6 +1,6 @@
 using UnityEngine;
 
-enum Motion { Base, Dashing }
+enum Motion { Base, Dashing, WireRiding }
 
 public class Vapor : MonoBehaviour {
   public static Quaternion RotationFromInputs(Transform t, float speed, Action action, float dt) {
@@ -23,6 +23,9 @@ public class Vapor : MonoBehaviour {
     return speed*action.Left.XZ;
   }
 
+  [SerializeField] Timeval WireRide;
+  [SerializeField] Vector3 WireRideOffset;
+  [SerializeField] float GRAVITY;
   [SerializeField] float MOVE_SPEED;
   [SerializeField] float FIRING_MOVE_SPEED;
   [SerializeField] float DASH_SPEED;
@@ -39,9 +42,15 @@ public class Vapor : MonoBehaviour {
   [SerializeField] AudioSource ChargeAudioSource;
   [SerializeField] float ChargeAudioClipStartingTime;
 
+  Wire Wire;
+  int WireFramesTraveled;
   Motion Motion;
   Vector3 Velocity;
   int PunchCycleIndex;
+
+  public void RideWire(Wire wire) {
+    Wire = wire;
+  }
 
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
@@ -55,6 +64,18 @@ public class Vapor : MonoBehaviour {
     } else if (Motion == Motion.Dashing && action.L1.JustUp) {
       ChargeAudioSource.Stop();
       Motion = Motion.Base;
+    } else if (Motion == Motion.Dashing && Wire) {
+      Motion = Motion.WireRiding;
+      WireFramesTraveled = 0;
+    } else if (Motion == Motion.WireRiding && WireFramesTraveled >= WireRide.Frames) {
+      if (action.L1.Down) {
+        Motion = Motion.Dashing; 
+        Wire = null;
+      } else {
+        ChargeAudioSource.Stop();
+        Motion = Motion.Base;
+        Wire = null;
+      }
     }
 
     if (action.L2.JustDown) {
@@ -81,6 +102,7 @@ public class Vapor : MonoBehaviour {
 
     Attacker.Step(dt);
     Animator.SetBool("Dashing", Motion == Motion.Dashing);
+    Animator.SetBool("WireRiding", Motion == Motion.WireRiding);
     Animator.SetBool("Attacking", Attacker.IsAttacking);
     Animator.SetInteger("AttackIndex", Attacker.AttackIndex);
     Animator.SetFloat("AttackSpeed", Attacker.AttackSpeed);
@@ -92,12 +114,27 @@ public class Vapor : MonoBehaviour {
         _ => MOVE_SPEED
       };
       var moveVelocity = VelocityFromMove(action, moveSpeed);
-      Velocity = moveVelocity+Pushable.Impulse+dt*Physics.gravity;
+      var pushVelocity = Pushable.Impulse;
+      var gravity = dt*GRAVITY;
+      Velocity.x = moveVelocity.x;
+      Velocity.z = moveVelocity.z;
+      Velocity += pushVelocity;
+      Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
       Controller.Move(dt*Velocity);
     } else if (Motion == Motion.Dashing) {
       var moveVelocity = VelocityFromMove(action, DASH_SPEED);
+      Velocity.x = moveVelocity.x;
+      Velocity.z = moveVelocity.z;
+      Velocity.y = 0;
       ChargeParticles.transform.forward = -moveVelocity.TryGetDirection() ?? -transform.forward;
-      Controller.Move(dt*moveVelocity);
+      Controller.Move(dt*Velocity);
+    } else if (Motion == Motion.WireRiding) {
+      var distance = 1f-(float)WireFramesTraveled/(float)WireRide.Frames;
+      var wirePathData = Wire.Waypoints.ToWorldSpace(distance);
+      var delta = wirePathData.Position-(transform.position-WireRideOffset);
+      Velocity = delta/dt;
+      Controller.Move(delta);
+      WireFramesTraveled++;
     }
     
     var turnSpeed = TURN_SPEED switch {
