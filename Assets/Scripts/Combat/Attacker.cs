@@ -112,6 +112,11 @@ public class Attacker : MonoBehaviour {
     StartChargeAttack(Attacks[index]);
   }
 
+  public void CancelAttack() {
+    State = AttackState.None;
+    FramesRemaining = 0;
+  }
+
   public void Hit(Hurtbox hurtbox) {
     Hits.Add(hurtbox);
   }

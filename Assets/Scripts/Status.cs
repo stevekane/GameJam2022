@@ -28,6 +28,7 @@ public class KnockbackEffect : StatusEffect {
     status.CanMove = false;
     status.CanAttack = false;
     status.IsAirborne = true;
+    status.Attacker?.CancelAttack();
     Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * DRAG);
     status.Move(Velocity*Time.fixedDeltaTime);
     if (Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED)
@@ -51,6 +52,7 @@ public class DelayedEffect : StatusEffect {
     // This isn't quite right... maybe something like [StunEffect(12 frames), DelayedEffect(12 frames, Knockback))] ?
     status.CanMove = false;
     status.CanAttack = false;
+    status.Attacker?.CancelAttack();
     if (--WaitFrames <= 0) {
       status.Remove(this);
       status.Add(Effect);
@@ -60,9 +62,10 @@ public class DelayedEffect : StatusEffect {
 
 public class Status : MonoBehaviour {
   public List<StatusEffect> Active = new();
-  CharacterController Controller;
-  Bouncebox Bouncebox;
-  Vibrator Vibrator;
+  internal CharacterController Controller;
+  internal Bouncebox Bouncebox;
+  internal Vibrator Vibrator;
+  internal Attacker Attacker;
   public AttackConfig BounceConfig;
   public AudioSource AudioSource;
 
@@ -112,6 +115,7 @@ public class Status : MonoBehaviour {
   private void Awake() {
     Controller = GetComponent<CharacterController>();
     Vibrator = GetComponent<Vibrator>();
+    Attacker = GetComponentInChildren<Attacker>();
     Bouncebox = GetComponentInChildren<Bouncebox>();
     Bouncebox.OnHit = BouncedInto;
   }
