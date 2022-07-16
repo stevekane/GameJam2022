@@ -40,6 +40,7 @@ public class Vapor : MonoBehaviour {
   [SerializeField] Animator Animator;
   [SerializeField] ParticleSystem ChargeParticles;
   [SerializeField] AudioSource ChargeAudioSource;
+  [SerializeField] Status Status;
   [SerializeField] float ChargeAudioClipStartingTime;
 
   Wire Wire;
@@ -55,8 +56,8 @@ public class Vapor : MonoBehaviour {
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
     var action = Inputs.Action;
-    
-    if (Motion == Motion.Base && action.L1.JustDown) {
+
+    if (Status.CanMove && Motion == Motion.Base && action.L1.JustDown) {
       ChargeAudioSource.Stop();
       ChargeAudioSource.time = ChargeAudioClipStartingTime;
       ChargeAudioSource.Play();
@@ -78,26 +79,28 @@ public class Vapor : MonoBehaviour {
       }
     }
 
-    if (action.L2.JustDown) {
-      Cannon.DepressTrigger();
-    } else if (action.L2.Down) {
-      Cannon.HoldTrigger();
-    } else if (action.L2.JustUp) {
-      Cannon.ReleaseTrigger();
-    }
+    if (Status.CanAttack) {
+      if (action.L2.JustDown) {
+        Cannon.DepressTrigger();
+      } else if (Status.CanAttack && action.L2.Down) {
+        Cannon.HoldTrigger();
+      } else if (action.L2.JustUp) {
+        Cannon.ReleaseTrigger();
+      }
 
-    if (action.R1.JustDown && !Attacker.IsAttacking) {
-      Attacker.StartAttack(0+PunchCycleIndex);
-      PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
-    } else if (action.R2.JustDown && !Attacker.IsAttacking) {
-      Attacker.StartChargeAttack(2+PunchCycleIndex);
-      PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
-    } else if (action.R2.JustUp && Attacker.IsAttacking) {
-      Attacker.ReleaseChargeAttack();
-    }
+      if (action.R1.JustDown && !Attacker.IsAttacking) {
+        Attacker.StartAttack(0+PunchCycleIndex);
+        PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
+      } else if (action.R2.JustDown && !Attacker.IsAttacking) {
+        Attacker.StartChargeAttack(2+PunchCycleIndex);
+        PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
+      } else if (action.R2.JustUp && Attacker.IsAttacking) {
+        Attacker.ReleaseChargeAttack();
+      }
 
-    if (Cannon.IsFiring) {
-      Pushable.Push(FIRING_PUSHBACK_SPEED*-transform.forward);
+      if (Cannon.IsFiring) {
+        Pushable.Push(FIRING_PUSHBACK_SPEED*-transform.forward);
+      }
     }
 
     Attacker.Step(dt);
@@ -109,6 +112,7 @@ public class Vapor : MonoBehaviour {
 
     if (Motion == Motion.Base) {
       var moveSpeed = MOVE_SPEED switch {
+        _ when !Status.CanMove => 0,
         _ when Attacker.IsAttacking => Attacker.MoveFactor*MOVE_SPEED,
         _ when Cannon.IsFiring => FIRING_MOVE_SPEED,
         _ => MOVE_SPEED
