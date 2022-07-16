@@ -12,6 +12,7 @@ public abstract class StatusEffect {
 
 public class KnockbackEffect : StatusEffect {
   static readonly float DRAG = 5f;
+  static readonly float AIRBORNE_SPEED = 100f;
   static readonly float DONE_SPEED = 5f;
   public override Types Type { get => Types.Knockback; }
 
@@ -25,37 +26,41 @@ public class KnockbackEffect : StatusEffect {
     return true;
   }
   public override void Apply(Status status) {
-    status.CanMove = false;
-    status.CanAttack = false;
-    status.IsAirborne = true;
-    status.Attacker?.CancelAttack();
     Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * DRAG);
     status.Move(Velocity*Time.fixedDeltaTime);
+    status.IsAirborne = Velocity.sqrMagnitude >= AIRBORNE_SPEED*AIRBORNE_SPEED;
+    status.CanMove = !status.IsAirborne;
+    status.CanAttack = !status.IsAirborne;
     if (Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED)
       status.Remove(this);
   }
 }
 
-public class DelayedEffect : StatusEffect {
-  public int WaitFrames;
-  public StatusEffect Effect;
+// TODO: Move to Damage.cs?
+public class HitStunEffect : StatusEffect {
+  public int Frames, HitStopFrames;
+  public StatusEffect PostEffect;
   public override Types Type { get => Types.None; }
 
-  public DelayedEffect(int wait, StatusEffect effect) {
-    WaitFrames = wait;
-    Effect = effect;
+  public HitStunEffect(int hitStopFrames, StatusEffect postEffect) {
+    Frames = 0;
+    HitStopFrames = hitStopFrames;
+    PostEffect = postEffect;
   }
   public override bool Reset(StatusEffect e) {
-    return false;
+    var h = (HitStunEffect)e;
+    h.HitStopFrames = Mathf.Max(HitStopFrames, h.HitStopFrames);
+    h.PostEffect.Reset(h.PostEffect);
+    return true;
   }
   public override void Apply(Status status) {
-    // This isn't quite right... maybe something like [StunEffect(12 frames), DelayedEffect(12 frames, Knockback))] ?
     status.CanMove = false;
     status.CanAttack = false;
-    status.Attacker?.CancelAttack();
-    if (--WaitFrames <= 0) {
+    if (Frames++ == 0) {
+      status.Attacker?.CancelAttack();
+    } else if (Frames >= HitStopFrames) {
       status.Remove(this);
-      status.Add(Effect);
+      status.Add(PostEffect);
     }
   }
 }
@@ -108,7 +113,7 @@ public class Status : MonoBehaviour {
       Attacker.TrySpawnEffect(BounceConfig.ContactEffect, hit.point);
       var bounceVel = Vector3.Reflect(k.Velocity, hit.normal.XZ());
       Remove(k);
-      Add(new DelayedEffect(BounceConfig.Contact.Frames, new KnockbackEffect(bounceVel)));
+      Add(new HitStunEffect(BounceConfig.Contact.Frames, new KnockbackEffect(bounceVel)));
     }
   }
 

@@ -9,7 +9,7 @@ public class Damage : MonoBehaviour {
   public void TakeDamage(Vector3 dir, int hitStopFrames, float points, float strength) {
     // TODO: velocity and duration are arbitrary
     var power = 5f * strength * Mathf.Pow((Points+100f) / 100f, 2f);
-    Status.Add(new DelayedEffect(hitStopFrames, new KnockbackEffect(dir*power)));
+    Status.Add(new HitStunEffect(hitStopFrames, new KnockbackEffect(dir*power)));
     Vibrator?.Vibrate(transform.forward, hitStopFrames, .15f);
     Points += points;
   }
