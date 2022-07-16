@@ -2,7 +2,7 @@ using UnityEngine;
 
 enum Motion { Base, Dashing, WireRiding }
 
-public class Vapor : MonoBehaviour {
+public class Vapor : MonoBehaviour, IWireRider {
   public static Quaternion RotationFromInputs(Transform t, float speed, Action action, float dt) {
     var desiredForward = action.Right.XZ.TryGetDirection() ?? t.forward;
     var currentRotation = t.rotation;

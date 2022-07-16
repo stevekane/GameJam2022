@@ -5,8 +5,8 @@ public class Wire : MonoBehaviour {
   public Waypoints Waypoints;
   public LineRenderer LineRenderer;
 
-  public void OnContactEnd(WireEndpoint end, Vapor vapor) {
-    vapor.RideWire(this);
+  public void OnContactEnd(WireEndpoint end, IWireRider rider) {
+    rider.RideWire(this);
   }
 
   void Update() {

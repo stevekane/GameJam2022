@@ -5,8 +5,8 @@ public class WireEndpoint : MonoBehaviour {
   [SerializeField] Wire Wire;
 
   public void OnTriggerEnter(Collider c) {
-    if (c.TryGetComponent(out Vapor vapor)) {
-      Wire.OnContactEnd(this, vapor);
+    if (c.TryGetComponent(out IWireRider rider)) {
+      Wire.OnContactEnd(this, rider);
     }
   }
 }
