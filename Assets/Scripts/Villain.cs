@@ -42,6 +42,7 @@ public class Villain : MonoBehaviour {
       Animator.SetBool("Attacking", Attacker.IsAttacking);
       Animator.SetFloat("AttackIndex", Attacker.AttackIndex);
       Animator.SetFloat("AttackSpeed", Attacker.AttackSpeed);
+      Animator.SetBool("HitFlinch", Status.IsHitstun);
       Animator.SetInteger("LegState", 0);
       Animator.SetFloat("Forward", speed);
       Animator.SetFloat("Right", 0.0f);

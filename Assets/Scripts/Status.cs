@@ -56,6 +56,7 @@ public class HitStunEffect : StatusEffect {
   public override void Apply(Status status) {
     status.CanMove = false;
     status.CanAttack = false;
+    status.IsHitstun = true;
     if (Frames++ == 0) {
       status.Attacker?.CancelAttack();
     } else if (Frames >= HitStopFrames) {
@@ -77,6 +78,7 @@ public class Status : MonoBehaviour {
   public bool CanMove = true;
   public bool CanAttack = true;
   public bool IsAirborne = false;
+  public bool IsHitstun = false;
 
   List<StatusEffect> Added = new();
   public void Add(StatusEffect effect) {
@@ -129,6 +131,7 @@ public class Status : MonoBehaviour {
     CanMove = true;
     CanAttack = true;
     IsAirborne = false;
+    IsHitstun = false;
 
     Added.ForEach(e => Active.Add(e));
     Added.Clear();
