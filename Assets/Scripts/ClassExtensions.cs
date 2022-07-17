@@ -50,6 +50,14 @@ public static class MonoExtensions {
     var dot = Vector3.Dot(delta.normalized, t.forward);
     return dot >= 0;
   }
+
+  public static bool IsVisibleFrom(this Transform t, Vector3 p, LayerMask layerMask) {
+    var delta = t.position-p; 
+    var direction = delta.normalized;
+    var distance = delta.magnitude;
+    var didHit = Physics.Raycast(p, direction, out RaycastHit hit, distance, layerMask);
+    return didHit && hit.transform == t;
+  }
 }
 
 public static class AudioSourceExtensions {
