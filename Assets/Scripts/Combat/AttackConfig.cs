@@ -17,11 +17,17 @@ public class AttackConfig : ScriptableObject {
   [Header("Animation Clip")]
   public AnimationClip Clip;
 
-  [Header("Frame data")]
+  [Header("Authoring frame data")]
   public Timeval Windup;
   public Timeval Active;
   public Timeval Contact;
   public Timeval Recovery;
+
+  [Header("Runtime frame data")]
+  public Timeval WindupDurationRuntime;
+  public Timeval ActiveDurationRuntime;
+  public Timeval ContactDurationRuntime;
+  public Timeval RecoveryDurationRuntime;
 
   [Header("Movement")]
   [Range(0, 1)]

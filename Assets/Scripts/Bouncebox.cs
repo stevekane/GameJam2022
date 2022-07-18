@@ -8,6 +8,7 @@ public class Bouncebox : MonoBehaviour {
   private void Awake() {
     Collider = GetComponent<Collider>();
   }
+
   private void OnTriggerEnter(Collider other) {
     OnHit?.Invoke(other);
   }

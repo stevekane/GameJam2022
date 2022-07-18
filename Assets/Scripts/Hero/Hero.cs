@@ -17,7 +17,6 @@ public class Hero : MonoBehaviour {
   [SerializeField] HeroConfig Config;
 
   [Header("Components")]
-  [SerializeField] UI UI;
   [SerializeField] CharacterController Controller;
   [SerializeField] Animator Animator;
   [SerializeField] Attacker Attacker;
@@ -414,13 +413,9 @@ public class Hero : MonoBehaviour {
     }
 
     if (!Pouncing && !Stunned && Free && action.Right.XZ.magnitude > 0) {
-      UI.Select(Target);
-      UI.Highlight(Targets, Targets.Length);
       AimingFramesRemaining = Mathf.Max(0, AimingFramesRemaining-1);
       Animator.SetFloat("Aim", 1);
     } else {
-      UI.Select(null);
-      UI.Highlight(Targets, 0);
       AimingFramesRemaining = Mathf.Min(AimingFramesRemaining+1, Config.MAX_TARGETING_FRAMES);
       Animator.SetFloat("Aim", 0);
     }
@@ -428,7 +423,6 @@ public class Hero : MonoBehaviour {
     {
       var maxTargetingFrames = Config.MAX_TARGETING_FRAMES;
       var displayMeter = AimingFramesRemaining < maxTargetingFrames;
-      UI.SetAimMeter(transform, displayMeter, AimingFramesRemaining, maxTargetingFrames);
     }
 
     Entered.Clear();
