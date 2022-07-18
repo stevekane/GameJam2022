@@ -3,6 +3,21 @@ using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
 public class Attack : MonoBehaviour {
+  public static Vector3 KnockbackVector(Transform attacker, Transform target, KnockBackType type) {
+    var p0 = attacker.position.XZ();
+    var p1 = target.position.XZ();
+    return type switch {
+      KnockBackType.Delta => p0.TryGetDirection(p1) ?? attacker.forward,
+      KnockBackType.Forward => attacker.forward,
+      KnockBackType.Back => -attacker.forward,
+      KnockBackType.Right => attacker.right,
+      KnockBackType.Left => -attacker.right,
+      KnockBackType.Up => attacker.up,
+      KnockBackType.Down => -attacker.up,
+      _ => attacker.forward,
+    };
+  }
+  
   public enum State { 
     Ready, 
     Windup, 
@@ -36,7 +51,7 @@ public class Attack : MonoBehaviour {
 
   public Attacker Attacker { get; set; }
   public AttackConfig Config;
-  
+
   void OnTriggerEnter(Collider other) {
     if (other.TryGetComponent(out Hurtbox hurtbox)) {
       Attacker?.Hit(hurtbox);

@@ -3,23 +3,14 @@ using UnityEngine;
 enum AttackState { None, Windup, Active, Contact, Recovery }
 
 public class Attacker : MonoBehaviour {
-  public static bool TrySpawnEffect(GameObject prefab, Vector3 position) {
-    if (prefab) {
-      var rotation = Quaternion.LookRotation(MainCamera.Instance.transform.position);
-      var effect = Instantiate(prefab, position, rotation);
-      Destroy(effect, 3);
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  [SerializeField] Pushable Pushable;
-  [SerializeField] Vibrator Vibrator;
-  [SerializeField] AudioSource AudioSource;
-  [SerializeField] int ChargeFrameMultiplier = 3;
-
+  Status Status;
+  Damage Damage;
+  Pushable Pushable;
+  Vibrator Vibrator;
+  AudioSource AudioSource;
   Attack[] Attacks;
+  Defender Defender;
+
   AttackState State;
   Attack Attack;
   Vector3 TotalKnockbackVector;
@@ -28,7 +19,13 @@ public class Attacker : MonoBehaviour {
   bool IsCharging;
 
   void Awake() {
-    Attacks = GetComponentsInChildren<Attack>(includeInactive: false);
+    Status = GetComponent<Status>();
+    Damage = GetComponent<Damage>();
+    Pushable = GetComponent<Pushable>();
+    Vibrator = GetComponent<Vibrator>();
+    AudioSource = GetComponent<AudioSource>();
+    Defender = GetComponent<Defender>();
+    Attacks = GetComponentsInChildren<Attack>();
     Attacks.ForEach(a => a.Attacker = this);
   }
 
@@ -52,7 +49,7 @@ public class Attacker : MonoBehaviour {
     get {
       return State switch {
         AttackState.None => 1f,
-        AttackState.Windup => (IsCharging ? (1f/(float)ChargeFrameMultiplier) : 1) * Attack.Config.WindupAnimationSpeed,
+        AttackState.Windup => (IsCharging ? (1f/(float)Attack.Config.ChargeDurationMultiplier) : 1) * Attack.Config.WindupAnimationSpeed,
         AttackState.Active => Attack.Config.ActiveAnimationSpeed,
         AttackState.Recovery => Attack.Config.RecoveryAnimationSpeed,
         AttackState.Contact => 0f,
@@ -90,22 +87,22 @@ public class Attacker : MonoBehaviour {
     State = AttackState.Windup;
     IsCharging = false;
     FramesRemaining = Attack.Config.Windup.Frames.ScaleBy(1/Attack.Config.WindupAnimationSpeed);
-    AudioSource.PlayOptionalOneShot(Attack.Config.WindupAudioClip);
-    TrySpawnEffect(Attack.Config.WindupEffect, transform.position);
+    AudioSource?.PlayOptionalOneShot(Attack.Config.WindupAudioClip);
+    VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Attack.Config.WindupEffect, transform.position);
   }
 
   public void StartChargeAttack(Attack attack) {
     Attack = attack;
     State = AttackState.Windup;
     IsCharging = true;
-    FramesRemaining = ChargeFrameMultiplier*Attack.Config.Windup.Frames.ScaleBy(1/Attack.Config.WindupAnimationSpeed);
-    AudioSource.PlayOptionalOneShot(Attack.Config.WindupAudioClip);
-    TrySpawnEffect(Attack.Config.WindupEffect, transform.position);
+    FramesRemaining = Attack.Config.ChargeDurationMultiplier*Attack.Config.Windup.Frames.ScaleBy(1/Attack.Config.WindupAnimationSpeed);
+    AudioSource?.PlayOptionalOneShot(Attack.Config.WindupAudioClip);
+    VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Attack.Config.WindupEffect, transform.position);
   }
 
   public void ReleaseChargeAttack() {
     if (State == AttackState.Windup) {
-      FramesRemaining = FramesRemaining/ChargeFrameMultiplier;
+      FramesRemaining = FramesRemaining/Attack.Config.ChargeDurationMultiplier;
       IsCharging = false;
     }
   }
@@ -125,41 +122,43 @@ public class Attacker : MonoBehaviour {
 
   public void Hit(Hurtbox hurtbox) {
     if (State == AttackState.Active || State == AttackState.Contact) {
-      var direction = KnockbackVector(transform, hurtbox.transform, Attack.Config.KnockBackType);
+      var direction = Attack.KnockbackVector(transform, hurtbox.transform, Attack.Config.KnockBackType);
       var hitStopFrames = Attack.Config.Contact.Frames;
       var points = Attack.Config.Points;
       var strength = Attack.Config.Strength;
-      var contact = hurtbox.Damage?.TakeDamage(direction, hitStopFrames, points, strength);
+      var contact = hurtbox.Defender.ResolveAttack(this, Attack);
       // TODO: Use contact to determine what effects / reaction should be
       State = AttackState.Contact;
       FramesRemaining = Attack.Config.Contact.Frames;
       TotalKnockBackStrength = Attack.Config.Strength;
-      TotalKnockbackVector += KnockbackVector(transform, hurtbox.transform, Attack.Config.KnockBackType);
+      TotalKnockbackVector += Attack.KnockbackVector(transform, hurtbox.transform, Attack.Config.KnockBackType);
 
-      TrySpawnEffect(Attack.Config.ContactEffect, hurtbox.transform.position);
-      AudioSource.PlayOptionalOneShot(Attack.Config.HitAudioClip);
-      Vibrator.Vibrate(transform.forward, Attack.Config.Contact.Frames, .15f);
-      CameraShaker.Instance.Shake(Attack.Config.HitCameraShakeIntensity);
+      AudioSource?.PlayOptionalOneShot(Attack.Config.HitAudioClip);
+      Vibrator?.Vibrate(transform.forward, Attack.Config.Contact.Frames, .15f);
+      VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Attack.Config.ContactEffect, hurtbox.transform.position);
+      CameraShaker.Instance?.Shake(Attack.Config.HitCameraShakeIntensity);
     }
   }
 
-  public void Step(float dt) {
+  void FixedUpdate() {
+    var dt = Time.fixedDeltaTime;
+
     if (State == AttackState.Windup && FramesRemaining <= 0) {
       State = AttackState.Active;
       FramesRemaining = Attack.Config.Active.Frames.ScaleBy(1 / Attack.Config.ActiveAnimationSpeed);
-      AudioSource.PlayOptionalOneShot(Attack.Config.ActiveAudioClip);
-      TrySpawnEffect(Attack.Config.ActiveEffect, transform.position);
+      AudioSource?.PlayOptionalOneShot(Attack.Config.ActiveAudioClip);
+      VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Attack.Config.ActiveEffect, transform.position);
     } else if (State == AttackState.Active && FramesRemaining <= 0) {
       State = AttackState.Recovery;
       FramesRemaining = Attack.Config.Recovery.Frames.ScaleBy(1 / Attack.Config.RecoveryAnimationSpeed);
-      AudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
-      TrySpawnEffect(Attack.Config.RecoveryEffect, transform.position);
+      AudioSource?.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
+      VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Attack.Config.RecoveryEffect, transform.position);
     } else if (State == AttackState.Contact && FramesRemaining <= 0) {
       State = AttackState.Recovery;
       FramesRemaining = Attack.Config.Recovery.Frames.ScaleBy(1 / Attack.Config.RecoveryAnimationSpeed);
-      AudioSource.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
-      Pushable.Push(TotalKnockBackStrength * TotalKnockbackVector.normalized);
-      TrySpawnEffect(Attack.Config.RecoveryEffect, transform.position);
+      AudioSource?.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
+      Pushable?.Push(TotalKnockBackStrength * TotalKnockbackVector.normalized);
+      VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Attack.Config.RecoveryEffect, transform.position);
     } else if (State == AttackState.Recovery && FramesRemaining <= 0) {
       Attack = null;
       State = AttackState.None;
@@ -170,20 +169,5 @@ public class Attacker : MonoBehaviour {
     FramesRemaining = State == AttackState.None ? 0 : FramesRemaining-1;
     TotalKnockBackStrength = 0;
     TotalKnockbackVector = Vector3.zero;
-  }
-
-  Vector3 KnockbackVector(Transform attacker, Transform target, KnockBackType type) {
-    var p0 = attacker.position.XZ();
-    var p1 = target.position.XZ();
-    return type switch {
-      KnockBackType.Delta => p0.TryGetDirection(p1) ?? attacker.forward,
-      KnockBackType.Forward => attacker.forward,
-      KnockBackType.Back => -attacker.forward,
-      KnockBackType.Right => attacker.right,
-      KnockBackType.Left => -attacker.right,
-      KnockBackType.Up => attacker.up,
-      KnockBackType.Down => -attacker.up,
-      _ => attacker.forward,
-    };
   }
 }

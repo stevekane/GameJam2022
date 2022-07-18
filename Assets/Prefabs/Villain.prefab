@@ -171,7 +171,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 912778195731948833}
-  - component: {fileID: 2578572211518139727}
   m_Layer: 10
   m_Name: Attacks
   m_TagString: Untagged
@@ -197,22 +196,6 @@ Transform:
   m_Father: {fileID: 4102725152112460098}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2578572211518139727
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3335561826620584317}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12e8843d6958d99489b475fb6195665e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Pushable: {fileID: 2220714967211251836}
-  Vibrator: {fileID: 2863687662438770135}
-  AudioSource: {fileID: 7005934936953075945}
-  ChargeFrameMultiplier: 3
 --- !u!1 &3930514479255101891
 GameObject:
   m_ObjectHideFlags: 0
@@ -427,6 +410,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4102725152112460098}
   - component: {fileID: 5646299127220675759}
+  - component: {fileID: 2869054995375658877}
+  - component: {fileID: 1967981786631772996}
   - component: {fileID: 2416818781926122258}
   - component: {fileID: 9062133124759138023}
   - component: {fileID: 2220714967211251836}
@@ -477,6 +462,30 @@ MonoBehaviour:
     TicksPerSecond: 30
   AttackRange: 3
   MoveSpeed: 12
+--- !u!114 &2869054995375658877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4102725152112460109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12e8843d6958d99489b475fb6195665e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1967981786631772996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4102725152112460109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c806621753f76840a91b87e3c0d2fc3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &2416818781926122258
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -489,7 +498,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 589031cb649129f4595d6562a2fa54c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Points: 0
 --- !u!114 &9062133124759138023
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -618,7 +626,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ce0c9e24a5611d40b8628b31748e2d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Damage: {fileID: 2416818781926122258}
 --- !u!65 &3538716256439489216
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1712,10 +1719,6 @@ PrefabInstance:
       propertyPath: Config
       value: 
       objectReference: {fileID: 11400000, guid: 5e172d941cdea22479f88e06124680b4, type: 2}
-    - target: {fileID: 4368481157815176916, guid: d9e9b4d7a0880a7459e0dda501d19249, type: 3}
-      propertyPath: OnHit.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 2578572211518139727}
     - target: {fileID: 4992029599749696119, guid: d9e9b4d7a0880a7459e0dda501d19249, type: 3}
       propertyPath: m_Name
       value: LightAttack
@@ -1792,10 +1795,6 @@ PrefabInstance:
       propertyPath: Collider
       value: 
       objectReference: {fileID: 3818905018075363522}
-    - target: {fileID: 4368481157815176916, guid: d9e9b4d7a0880a7459e0dda501d19249, type: 3}
-      propertyPath: OnHit.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 2578572211518139727}
     - target: {fileID: 4992029599749696119, guid: d9e9b4d7a0880a7459e0dda501d19249, type: 3}
       propertyPath: m_Name
       value: KickAttack
@@ -1885,10 +1884,6 @@ PrefabInstance:
       propertyPath: Collider
       value: 
       objectReference: {fileID: 8607835277535801386}
-    - target: {fileID: 4368481157815176916, guid: d9e9b4d7a0880a7459e0dda501d19249, type: 3}
-      propertyPath: OnHit.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 2578572211518139727}
     - target: {fileID: 4992029599749696119, guid: d9e9b4d7a0880a7459e0dda501d19249, type: 3}
       propertyPath: m_Name
       value: HeavyAttack

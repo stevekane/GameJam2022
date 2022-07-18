@@ -173,38 +173,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7df551a1d3ab7e2489677c30f1fce8bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Windup:
-    AuthoringDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    RuntimeDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    MoveSpeed: 1
-    TurnSpeed: 360
-  Active:
-    AuthoringDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    RuntimeDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    MoveSpeed: 1
-    TurnSpeed: 360
-  Recovery:
-    AuthoringDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    RuntimeDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    MoveSpeed: 1
-    TurnSpeed: 360
-  ContactRuntimeDuration:
-    Millis: 4
-    TicksPerSecond: 30
   Config: {fileID: 11400000, guid: 1ffe122b42164ec41a9f875f7076e519, type: 2}
-  HitBox: {fileID: 0}
 --- !u!65 &3741317903704437167
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -263,38 +232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7df551a1d3ab7e2489677c30f1fce8bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Windup:
-    AuthoringDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    RuntimeDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    MoveSpeed: 1
-    TurnSpeed: 360
-  Active:
-    AuthoringDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    RuntimeDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    MoveSpeed: 1
-    TurnSpeed: 360
-  Recovery:
-    AuthoringDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    RuntimeDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    MoveSpeed: 1
-    TurnSpeed: 360
-  ContactRuntimeDuration:
-    Millis: 4
-    TicksPerSecond: 30
   Config: {fileID: 11400000, guid: 8dd869ec3a42eb34584c25f46604ed47, type: 2}
-  HitBox: {fileID: 0}
 --- !u!65 &7056676672454585593
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -490,9 +428,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5571416123097895009}
-  - component: {fileID: 5571416123097895038}
   m_Layer: 0
-  m_Name: Attacker
+  m_Name: Attacks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -517,22 +454,6 @@ Transform:
   m_Father: {fileID: 5571416124093621163}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5571416123097895038
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571416123097895008}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12e8843d6958d99489b475fb6195665e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Pushable: {fileID: 5571416124093621158}
-  Vibrator: {fileID: 5571416124093621161}
-  AudioSource: {fileID: 7876475982382266638}
-  ChargeFrameMultiplier: 3
 --- !u!1 &5571416123534508706
 GameObject:
   m_ObjectHideFlags: 0
@@ -923,6 +844,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5571416124093621163}
   - component: {fileID: 5571416124093621162}
+  - component: {fileID: 9024792362766122840}
+  - component: {fileID: 5758432820797294223}
   - component: {fileID: 5571416124093621156}
   - component: {fileID: 5571416124093621157}
   - component: {fileID: 5571416124093621158}
@@ -930,6 +853,7 @@ GameObject:
   - component: {fileID: 5571416124093621159}
   - component: {fileID: 5571416124093621160}
   - component: {fileID: 7727835182619467870}
+  - component: {fileID: 4599928758009979224}
   m_Layer: 10
   m_Name: Vapor
   m_TagString: Untagged
@@ -945,8 +869,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5571416124093621165}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2, y: 0, z: 2.25}
-  m_LocalScale: {x: 0.7, y: 0.75, z: 0.75}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5571416124901615632}
@@ -971,10 +895,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06198d9f10cf25449b07aa0962ce6860, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WireRide:
-    Millis: 666.6667
-    TicksPerSecond: 30
-  WireRideOffset: {x: 0, y: 0, z: 0}
   GRAVITY: -200
   MOVE_SPEED: 20
   FIRING_MOVE_SPEED: 5
@@ -983,15 +903,36 @@ MonoBehaviour:
   FIRING_TURN_SPEED: 45
   ATTACKING_TURN_SPEED: 0
   FIRING_PUSHBACK_SPEED: 15
-  Attacker: {fileID: 5571416123097895038}
-  Cannon: {fileID: 5571416123818496551}
-  Pushable: {fileID: 5571416124093621158}
-  Controller: {fileID: 5571416124093621160}
-  Animator: {fileID: 7727835182619467870}
+  WireRide:
+    Millis: 666.6667
+    TicksPerSecond: 30
   ChargeParticles: {fileID: 4585268613483689328}
-  ChargeAudioSource: {fileID: 9013877039046457929}
-  Status: {fileID: 5571416124093621157}
+  ChargeAudioClip: {fileID: 8300000, guid: 0eda13886c86ca145936c7017a0dafa5, type: 3}
   ChargeAudioClipStartingTime: 0.25
+--- !u!114 &9024792362766122840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12e8843d6958d99489b475fb6195665e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5758432820797294223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c806621753f76840a91b87e3c0d2fc3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &5571416124093621156
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1004,7 +945,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 589031cb649129f4595d6562a2fa54c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Points: 0
 --- !u!114 &5571416124093621157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1099,6 +1039,102 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!82 &4599928758009979224
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 0.35
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0
@@ -1440,7 +1476,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ce0c9e24a5611d40b8628b31748e2d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Damage: {fileID: 5571416124093621156}
 --- !u!65 &5571416124901615662
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1625,38 +1660,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7df551a1d3ab7e2489677c30f1fce8bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Windup:
-    AuthoringDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    RuntimeDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    MoveSpeed: 1
-    TurnSpeed: 360
-  Active:
-    AuthoringDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    RuntimeDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    MoveSpeed: 1
-    TurnSpeed: 360
-  Recovery:
-    AuthoringDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    RuntimeDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    MoveSpeed: 1
-    TurnSpeed: 360
-  ContactRuntimeDuration:
-    Millis: 4
-    TicksPerSecond: 30
   Config: {fileID: 11400000, guid: f70c6d1a6b97f3e48ad2f0fe87ed6b9a, type: 2}
-  HitBox: {fileID: 0}
 --- !u!65 &985012342642136553
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1715,38 +1719,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7df551a1d3ab7e2489677c30f1fce8bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Windup:
-    AuthoringDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    RuntimeDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    MoveSpeed: 1
-    TurnSpeed: 360
-  Active:
-    AuthoringDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    RuntimeDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    MoveSpeed: 1
-    TurnSpeed: 360
-  Recovery:
-    AuthoringDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    RuntimeDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    MoveSpeed: 1
-    TurnSpeed: 360
-  ContactRuntimeDuration:
-    Millis: 4
-    TicksPerSecond: 30
   Config: {fileID: 11400000, guid: 6cd24d8e38c66bc4d95a6bcccb8a231e, type: 2}
-  HitBox: {fileID: 0}
 --- !u!65 &6471702437748426824
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -3,7 +3,7 @@ using UnityEngine;
 enum Motion { Base, Dashing, WireRiding }
 
 public class Vapor : MonoBehaviour, IWireRider {
-  public static Quaternion RotationFromInputs(Transform t, float speed, Action action, float dt) {
+  static Quaternion RotationFromInputs(Transform t, float speed, Action action, float dt) {
     var desiredForward = action.Right.XZ.TryGetDirection() ?? t.forward;
     var currentRotation = t.rotation;
     var desiredRotation = Quaternion.LookRotation(desiredForward);
@@ -11,7 +11,7 @@ public class Vapor : MonoBehaviour, IWireRider {
     return Quaternion.RotateTowards(currentRotation, desiredRotation, degrees);
   }
 
-  public static Vector3 HeadingFromInputs(Transform t, Action action) {
+  static Vector3 HeadingFromInputs(Transform t, Action action) {
     var heading = 
       action.Left.XZ.TryGetDirection() ??
       action.Right.XZ.TryGetDirection() ??
@@ -19,12 +19,10 @@ public class Vapor : MonoBehaviour, IWireRider {
     return heading;
   }
 
-  public static Vector3 VelocityFromMove(Action action, float speed) {
+  static Vector3 VelocityFromMove(Action action, float speed) {
     return speed*action.Left.XZ;
   }
 
-  [SerializeField] Timeval WireRide;
-  [SerializeField] Vector3 WireRideOffset;
   [SerializeField] float GRAVITY;
   [SerializeField] float MOVE_SPEED;
   [SerializeField] float FIRING_MOVE_SPEED;
@@ -33,15 +31,19 @@ public class Vapor : MonoBehaviour, IWireRider {
   [SerializeField] float FIRING_TURN_SPEED;
   [SerializeField] float ATTACKING_TURN_SPEED;
   [SerializeField] float FIRING_PUSHBACK_SPEED;
-  [SerializeField] Attacker Attacker;
-  [SerializeField] Cannon Cannon;
-  [SerializeField] Pushable Pushable;
-  [SerializeField] CharacterController Controller;
-  [SerializeField] Animator Animator;
+  [SerializeField] Timeval WireRide;
   [SerializeField] ParticleSystem ChargeParticles;
-  [SerializeField] AudioSource ChargeAudioSource;
-  [SerializeField] Status Status;
+  [SerializeField] AudioClip ChargeAudioClip;
   [SerializeField] float ChargeAudioClipStartingTime;
+
+  Attacker Attacker;
+  Defender Defender;
+  Cannon Cannon;
+  Pushable Pushable;
+  Status Status;
+  CharacterController Controller;
+  Animator Animator;
+  AudioSource AudioSource;
 
   Wire Wire;
   int WireFramesTraveled;
@@ -53,17 +55,29 @@ public class Vapor : MonoBehaviour, IWireRider {
     Wire = wire;
   }
 
+  void Awake() {
+    Attacker = GetComponent<Attacker>();
+    Defender = GetComponent<Defender>();
+    Cannon = GetComponentInChildren<Cannon>();
+    Pushable = GetComponent<Pushable>();
+    Status = GetComponent<Status>();
+    Controller = GetComponent<CharacterController>();
+    Animator = GetComponent<Animator>();
+    AudioSource = GetComponent<AudioSource>();
+  }
+
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
     var action = Inputs.Action;
 
     if (Status.CanMove && Motion == Motion.Base && action.L1.JustDown) {
-      ChargeAudioSource.Stop();
-      ChargeAudioSource.time = ChargeAudioClipStartingTime;
-      ChargeAudioSource.Play();
+      AudioSource.Stop();
+      AudioSource.clip = ChargeAudioClip;
+      AudioSource.time = ChargeAudioClipStartingTime;
+      AudioSource.Play();
       Motion = Motion.Dashing;
     } else if (Motion == Motion.Dashing && action.L1.JustUp) {
-      ChargeAudioSource.Stop();
+      AudioSource.Stop();
       Motion = Motion.Base;
     } else if (Motion == Motion.Dashing && Wire) {
       Motion = Motion.WireRiding;
@@ -73,7 +87,7 @@ public class Vapor : MonoBehaviour, IWireRider {
         Motion = Motion.Dashing; 
         Wire = null;
       } else {
-        ChargeAudioSource.Stop();
+        AudioSource.Stop();
         Motion = Motion.Base;
         Wire = null;
       }
@@ -103,7 +117,6 @@ public class Vapor : MonoBehaviour, IWireRider {
       }
     }
 
-    Attacker.Step(dt);
     Animator.SetBool("Dashing", Motion == Motion.Dashing);
     Animator.SetBool("WireRiding", Motion == Motion.WireRiding);
     Animator.SetBool("Attacking", Attacker.IsAttacking);
@@ -135,7 +148,7 @@ public class Vapor : MonoBehaviour, IWireRider {
     } else if (Motion == Motion.WireRiding) {
       var distance = 1f-(float)WireFramesTraveled/(float)WireRide.Frames;
       var wirePathData = Wire.Waypoints.ToWorldSpace(distance);
-      var delta = wirePathData.Position-(transform.position-WireRideOffset);
+      var delta = wirePathData.Position-(transform.position);
       Velocity = delta/dt;
       Controller.Move(delta);
       WireFramesTraveled++;

@@ -50,11 +50,13 @@ public class Cannon : MonoBehaviour {
         var hitCount = Physics.OverlapSphereNonAlloc(transform.position, BurstRange, BurstHits, HitLayerMask);
         for (var i = 0; i < hitCount; i++) {
           var hit = BurstHits[i];
+          // TODO: Decide if hurtbox should be involved here or not...
           if (hit.transform.position.IsInFrontOf(transform) && hit.TryGetComponent(out Hurtbox hurtbox)) {
             if (hurtbox != OwnerHurtbox) {
               var direction = transform.position.TryGetDirection(hit.transform.position) ?? transform.forward;
               var directionXZ = direction.XZ().normalized;
-              hurtbox.Damage?.TakeDamage(directionXZ, BurstHitStop.Frames, 0, 20);
+              Debug.LogWarning("Burst damage dealing disabled... check source for details");
+              // hurtbox.Damage?.TakeDamage(directionXZ, BurstHitStop.Frames, 0, 20);
             }
           }
         }
@@ -89,8 +91,10 @@ public class Cannon : MonoBehaviour {
         var distance = BeamRange;
         for (var j = 0; j < hitCount; j++) {
           var hit = BeamHits[j];
+          // TODO: Decide if "HurtBox" should be involved here or not...
           if (hit.collider.TryGetComponent(out Hurtbox hurtbox)) {
-            hurtbox.Damage?.TakeDamage(BeamOrigin.forward, BeamHitStop.Frames, dt*BeamDPS, 0);
+              Debug.LogWarning("Beam damage dealing disabled... check source for details");
+            // hurtbox.Damage?.TakeDamage(BeamOrigin.forward, BeamHitStop.Frames, dt*BeamDPS, 0);
           } else {
             distance = Mathf.Min(distance, hit.distance);
           }

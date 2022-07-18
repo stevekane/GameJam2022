@@ -112,7 +112,7 @@ public class Status : MonoBehaviour {
     if (k != null && Physics.Raycast(transform.position, k.Velocity.normalized, out var hit)) {
       AudioSource.PlayOptionalOneShot(BounceConfig.HitAudioClip);
       Vibrator.Vibrate(transform.right, BounceConfig.Contact.Frames, .15f);
-      Attacker.TrySpawnEffect(BounceConfig.ContactEffect, hit.point);
+      VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, BounceConfig.ContactEffect, hit.point);
       var bounceVel = Vector3.Reflect(k.Velocity, hit.normal.XZ());
       Remove(k);
       Add(new HitStunEffect(BounceConfig.Contact.Frames, new KnockbackEffect(bounceVel)));

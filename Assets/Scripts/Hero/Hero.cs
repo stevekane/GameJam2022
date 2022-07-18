@@ -17,12 +17,6 @@ public class Hero : MonoBehaviour {
   [SerializeField] HeroConfig Config;
 
   [Header("Components")]
-  [SerializeField] CharacterController Controller;
-  [SerializeField] Animator Animator;
-  [SerializeField] Attacker Attacker;
-  [SerializeField] Status Status;
-  [SerializeField] Pushable Pushable;
-  [SerializeField] Grabber Grabber;
   [SerializeField] AudioSource FootstepAudioSource;
   [SerializeField] AudioSource LegAudioSource;
   [SerializeField] AudioSource ArmAudioSource;
@@ -49,6 +43,15 @@ public class Hero : MonoBehaviour {
   public float AirTime;
   public int JumpType = 0;
   public Vector3 LastGroundPosition;
+
+  Attacker Attacker;
+  Defender Defender;
+  Grabber Grabber;
+  Pushable Pushable;
+  Status Status;
+  Animator Animator;
+  CharacterController Controller;
+  AudioSource AudioSource;
 
   List<GameObject> Entered = new List<GameObject>(32);
   List<GameObject> Stayed = new List<GameObject>(32);
@@ -249,6 +252,17 @@ public class Hero : MonoBehaviour {
     ArmAudioSource.PlayOptionalOneShot(Config.ThrowAudioClip);
   }
 
+  void Awake() {
+    Attacker = GetComponent<Attacker>();
+    Defender = GetComponent<Defender>();
+    Grabber = GetComponentInChildren<Grabber>();
+    Pushable = GetComponent<Pushable>();
+    Status = GetComponent<Status>();
+    Controller = GetComponent<CharacterController>();
+    Animator = GetComponent<Animator>();
+    AudioSource = GetComponent<AudioSource>();
+  }
+
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
     var action = Inputs.Action;
@@ -285,8 +299,6 @@ public class Hero : MonoBehaviour {
     } else if (Pulling && ArmFramesRemaining <= 0) {
       Hold(ArmTarget);
     }
-
-    Attacker.Step(dt);
 
     if (LegTarget) {
       var target = LegTarget.transform.position+LegTarget.Height*Vector3.up;

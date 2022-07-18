@@ -1,5 +1,5 @@
 using UnityEngine;
 
 public class Hurtbox : MonoBehaviour {
-  public Damage Damage;
+  public Defender Defender { get; set; }
 }

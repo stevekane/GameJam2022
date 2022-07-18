@@ -29,6 +29,9 @@ public class AttackConfig : ScriptableObject {
   public Timeval ContactDurationRuntime;
   public Timeval RecoveryDurationRuntime;
 
+  [Header("Charging")]
+  public int ChargeDurationMultiplier = 1;
+
   [Header("Movement")]
   [Range(0, 1)]
   public float WindupMoveFactor;
@@ -36,8 +39,8 @@ public class AttackConfig : ScriptableObject {
   public float ActiveMoveFactor;
   [Range(0, 1)]
   public float RecoveryMoveFactor;
-  [Header("Rotation")]
 
+  [Header("Rotation")]
   [Range(0, 360)]
   public float WindupRotationDegreesPerSecond;
   [Range(0, 360)]

@@ -3,6 +3,7 @@ using UnityEngine;
 public class Villain : MonoBehaviour {
   CharacterController Controller;
   Attacker Attacker;
+  Defender Defender;
   Status Status;
   Pushable Pushable;
   Animator Animator;
@@ -14,7 +15,8 @@ public class Villain : MonoBehaviour {
 
   private void Awake() {
     Controller = GetComponent<CharacterController>();
-    Attacker = GetComponentInChildren<Attacker>();
+    Attacker = GetComponent<Attacker>();
+    Defender = GetComponent<Defender>();
     Status = GetComponent<Status>();
     Pushable = GetComponent<Pushable>();
     Animator = GetComponent<Animator>();
@@ -28,7 +30,6 @@ public class Villain : MonoBehaviour {
         Attacker.StartAttack(which);
       }
     }
-    Attacker.Step(Time.fixedDeltaTime);
 
     Vector3 dir = (Target.position - transform.position).XZ().normalized;
     float speed = 0;
