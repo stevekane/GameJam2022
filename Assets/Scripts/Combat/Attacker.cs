@@ -129,7 +129,8 @@ public class Attacker : MonoBehaviour {
       var hitStopFrames = Attack.Config.Contact.Frames;
       var points = Attack.Config.Points;
       var strength = Attack.Config.Strength;
-      hurtbox.Damage?.TakeDamage(direction, hitStopFrames, points, strength);
+      var contact = hurtbox.Damage?.TakeDamage(direction, hitStopFrames, points, strength);
+      // TODO: Use contact to determine what effects / reaction should be
       State = AttackState.Contact;
       FramesRemaining = Attack.Config.Contact.Frames;
       TotalKnockBackStrength = Attack.Config.Strength;
