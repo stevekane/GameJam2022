@@ -17,21 +17,23 @@ public class AttackConfig : ScriptableObject {
   [Header("Animation Clip")]
   public AnimationClip Clip;
 
+  [Tooltip("Used to signal to animators what attack this is")]
+  public int Index;
+
   [Header("Authoring frame data")]
   public Timeval Windup;
   public Timeval Active;
-  public Timeval Contact;
   public Timeval Recovery;
 
   [Header("Runtime frame data")]
   public Timeval WindupDurationRuntime;
   public Timeval ActiveDurationRuntime;
-  public Timeval ContactDurationRuntime;
   public Timeval RecoveryDurationRuntime;
+  public Timeval ContactDurationRuntime;
 
-  [Header("Charging")]
-  [Range(1, 10)]
-  public int ChargeDurationMultiplier = 1;
+  public float WindupAnimationSpeed { get => WindupDurationRuntime.Millis/Windup.Millis; }
+  public float ActiveAnimationSpeed { get => ActiveDurationRuntime.Millis/Active.Millis; }
+  public float RecoveryAnimationSpeed { get => RecoveryDurationRuntime.Millis/Recovery.Millis; }
 
   [Header("Movement")]
   [Range(0, 1)]
@@ -49,15 +51,9 @@ public class AttackConfig : ScriptableObject {
   [Range(0, 360)]
   public float RecoveryRotationDegreesPerSecond;
 
-  [Header("Animation")]
-  [Tooltip("Used to signal to animators what attack this is")]
-  public int Index;
-  [Range(0, 10)]
-  public float WindupAnimationSpeed = 1;
-  [Range(0, 10)]
-  public float ActiveAnimationSpeed = 1;
-  [Range(0, 10)]
-  public float RecoveryAnimationSpeed = 1;
+  [Header("Charging")]
+  [Range(1, 10)]
+  public int ChargeDurationMultiplier = 1;
 
   [Header("Camera")]
   [Range(0, 10)]

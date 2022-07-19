@@ -13,17 +13,27 @@ MonoBehaviour:
   m_Name: Vapor_Light_Punch_Left
   m_EditorClassIdentifier: 
   Clip: {fileID: 7400000, guid: 976e876ec99a2d34584d30aa83e78b19, type: 2}
+  Index: 0
   Windup:
     Millis: 33.333332
     TicksPerSecond: 30
   Active:
     Millis: 33.333332
     TicksPerSecond: 30
-  Contact:
-    Millis: 133.33333
-    TicksPerSecond: 30
   Recovery:
     Millis: 33.333332
+    TicksPerSecond: 30
+  WindupDurationRuntime:
+    Millis: 33.333332
+    TicksPerSecond: 30
+  ActiveDurationRuntime:
+    Millis: 33.333332
+    TicksPerSecond: 30
+  RecoveryDurationRuntime:
+    Millis: 33.333332
+    TicksPerSecond: 30
+  ContactDurationRuntime:
+    Millis: 100
     TicksPerSecond: 30
   WindupMoveFactor: 1
   ActiveMoveFactor: 1
@@ -31,10 +41,7 @@ MonoBehaviour:
   WindupRotationDegreesPerSecond: 0
   ActiveRotationDegreesPerSecond: 0
   RecoveryRotationDegreesPerSecond: 0
-  Index: 0
-  WindupAnimationSpeed: 1
-  ActiveAnimationSpeed: 1
-  RecoveryAnimationSpeed: 1
+  ChargeDurationMultiplier: 1
   HitCameraShakeIntensity: 1
   KnockBackType: 1
   Points: 5

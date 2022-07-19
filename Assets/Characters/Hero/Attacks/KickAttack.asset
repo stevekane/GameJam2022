@@ -13,17 +13,27 @@ MonoBehaviour:
   m_Name: KickAttack
   m_EditorClassIdentifier: 
   Clip: {fileID: 7400000, guid: 0774a8321ec8ff242a55de21f37f4e90, type: 2}
+  Index: 2
   Windup:
     Millis: 533.3333
     TicksPerSecond: 30
   Active:
     Millis: 100
     TicksPerSecond: 30
-  Contact:
-    Millis: 266.66666
-    TicksPerSecond: 30
   Recovery:
     Millis: 533.3333
+    TicksPerSecond: 30
+  WindupDurationRuntime:
+    Millis: 533.3333
+    TicksPerSecond: 30
+  ActiveDurationRuntime:
+    Millis: 100
+    TicksPerSecond: 30
+  RecoveryDurationRuntime:
+    Millis: 533.3333
+    TicksPerSecond: 30
+  ContactDurationRuntime:
+    Millis: 133.33333
     TicksPerSecond: 30
   WindupMoveFactor: 0.5
   ActiveMoveFactor: 1
@@ -31,10 +41,7 @@ MonoBehaviour:
   WindupRotationDegreesPerSecond: 0
   ActiveRotationDegreesPerSecond: 0
   RecoveryRotationDegreesPerSecond: 0
-  Index: 2
-  WindupAnimationSpeed: 2
-  ActiveAnimationSpeed: 1
-  RecoveryAnimationSpeed: 2
+  ChargeDurationMultiplier: 1
   HitCameraShakeIntensity: 7
   KnockBackType: 1
   Points: 10

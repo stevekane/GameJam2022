@@ -72,7 +72,6 @@ public class Status : MonoBehaviour {
   internal Bouncebox Bouncebox;
   internal Vibrator Vibrator;
   internal Attacker Attacker;
-  public AttackConfig BounceConfig;
   public AudioSource AudioSource;
 
   public bool CanMove = true;
@@ -110,12 +109,12 @@ public class Status : MonoBehaviour {
 
     var k = Get<KnockbackEffect>();
     if (k != null && Physics.Raycast(transform.position, k.Velocity.normalized, out var hit)) {
-      AudioSource.PlayOptionalOneShot(BounceConfig.HitAudioClip);
-      Vibrator.Vibrate(transform.right, BounceConfig.Contact.Frames, .15f);
-      VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, BounceConfig.ContactEffect, hit.point);
+      AudioSource.PlayOptionalOneShot(Bouncebox.AudioClip);
+      Vibrator.Vibrate(transform.right, Bouncebox.Duration.Frames, .15f);
+      VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Bouncebox.Effect, hit.point);
       var bounceVel = Vector3.Reflect(k.Velocity, hit.normal.XZ());
       Remove(k);
-      Add(new HitStunEffect(BounceConfig.Contact.Frames, new KnockbackEffect(bounceVel)));
+      Add(new HitStunEffect(Bouncebox.Duration.Frames, new KnockbackEffect(bounceVel)));
     }
   }
 

@@ -12,7 +12,7 @@ public class Defender : MonoBehaviour {
   // TODO: Remove all magic values
   public Attack.Contact ResolveAttack(Attacker attacker, Attack attack) {
     var knockBackType = attack.Config.KnockBackType;
-    var hitStopFrames = attack.Config.Contact.Frames;
+    var hitStopFrames = attack.Config.ContactDurationRuntime.Frames;
     var points = attack.Config.Points;
     var strength = attack.Config.Strength;
     var power = 5f * strength * Mathf.Pow((points+100f) / 100f, 2f);

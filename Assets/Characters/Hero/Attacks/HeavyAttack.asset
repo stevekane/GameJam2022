@@ -13,17 +13,27 @@ MonoBehaviour:
   m_Name: HeavyAttack
   m_EditorClassIdentifier: 
   Clip: {fileID: 7400000, guid: a13f47dfcef53cc4c97d4e8a26968c04, type: 2}
+  Index: 1
   Windup:
     Millis: 733.3333
     TicksPerSecond: 30
   Active:
     Millis: 66.666664
     TicksPerSecond: 30
-  Contact:
-    Millis: 266.66666
-    TicksPerSecond: 30
   Recovery:
     Millis: 833.3333
+    TicksPerSecond: 30
+  WindupDurationRuntime:
+    Millis: 733.3333
+    TicksPerSecond: 30
+  ActiveDurationRuntime:
+    Millis: 66.666664
+    TicksPerSecond: 30
+  RecoveryDurationRuntime:
+    Millis: 833.3333
+    TicksPerSecond: 30
+  ContactDurationRuntime:
+    Millis: 133.33333
     TicksPerSecond: 30
   WindupMoveFactor: 0.5
   ActiveMoveFactor: 0.25
@@ -31,10 +41,7 @@ MonoBehaviour:
   WindupRotationDegreesPerSecond: 0
   ActiveRotationDegreesPerSecond: 0
   RecoveryRotationDegreesPerSecond: 0
-  Index: 1
-  WindupAnimationSpeed: 2
-  ActiveAnimationSpeed: 1
-  RecoveryAnimationSpeed: 3
+  ChargeDurationMultiplier: 1
   HitCameraShakeIntensity: 7
   KnockBackType: 0
   Points: 10
