@@ -31,7 +31,10 @@ public class AttackConfig : ScriptableObject {
   public Timeval RecoveryDurationRuntime;
   public Timeval ContactDurationRuntime;
 
-  public float WindupAnimationSpeed { get => WindupDurationRuntime.Millis/Windup.Millis; }
+  public float WindupAnimationSpeed(bool IsCharging) {
+    var scale = IsCharging ? 1f/ChargeDurationMultiplier : 1f;
+    return scale*WindupDurationRuntime.Millis/Windup.Millis;
+  }
   public float ActiveAnimationSpeed { get => ActiveDurationRuntime.Millis/Active.Millis; }
   public float RecoveryAnimationSpeed { get => RecoveryDurationRuntime.Millis/Recovery.Millis; }
 

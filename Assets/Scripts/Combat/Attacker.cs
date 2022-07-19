@@ -45,13 +45,12 @@ public class Attacker : MonoBehaviour {
   public bool IsReady { get => State == AttackState.None; }
   public bool IsParried { get => State == AttackState.Parried; }
   public int AttackIndex { get => Attack ? Attack.Config.Index : -1; }
-  public float WindupAttackSpeedMultiplier { get => Attack && IsCharging ? 1f/Attack.Config.ChargeDurationMultiplier : 1f; }
 
   public float AttackSpeed {
     get {
       return State switch {
         AttackState.None => 1,
-        AttackState.Windup => WindupAttackSpeedMultiplier*Attack.Config.WindupAnimationSpeed,
+        AttackState.Windup => Attack.Config.WindupAnimationSpeed(IsCharging),
         AttackState.Active when InContact => 0,
         AttackState.Active when !InContact => Attack.Config.ActiveAnimationSpeed,
         AttackState.Recovery => Attack.Config.RecoveryAnimationSpeed,
