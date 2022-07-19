@@ -128,21 +128,26 @@ public class Attacker : MonoBehaviour {
 
   public void Hit(Hurtbox hurtbox) {
     if (State == AttackState.Active || State == AttackState.Contact) {
-      var direction = Attack.KnockbackVector(transform, hurtbox.transform, Attack.Config.KnockBackType);
-      var hitStopFrames = Attack.Config.ContactDurationRuntime.Frames;
-      var points = Attack.Config.Points;
-      var strength = Attack.Config.Strength;
-      var contact = hurtbox.Defender.ResolveAttack(this, Attack);
       // TODO: Use contact to determine what effects / reaction should be
-      State = AttackState.Contact;
-      FramesRemaining = Attack.Config.ContactDurationRuntime.Frames;
-      TotalKnockBackStrength = Attack.Config.Strength;
-      TotalKnockbackVector += Attack.KnockbackVector(transform, hurtbox.transform, Attack.Config.KnockBackType);
+      var contact = hurtbox.Defender.ResolveAttack(this, Attack);
+      
+      if (contact == Attack.Contact.Hit) {
+        var direction = Attack.KnockbackVector(transform, hurtbox.transform, Attack.Config.KnockBackType);
+        var hitStopFrames = Attack.Config.ContactDurationRuntime.Frames;
+        var points = Attack.Config.Points;
+        var strength = Attack.Config.Strength;
+        State = AttackState.Contact;
+        FramesRemaining = Attack.Config.ContactDurationRuntime.Frames;
+        TotalKnockBackStrength = Attack.Config.Strength;
+        TotalKnockbackVector += Attack.KnockbackVector(transform, hurtbox.transform, Attack.Config.KnockBackType);
 
-      AudioSource?.PlayOptionalOneShot(Attack.Config.HitAudioClip);
-      Vibrator?.Vibrate(transform.forward, Attack.Config.ContactDurationRuntime.Frames, .15f);
-      VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Attack.Config.ContactEffect, hurtbox.transform.position);
-      CameraShaker.Instance?.Shake(Attack.Config.HitCameraShakeIntensity);
+        AudioSource?.PlayOptionalOneShot(Attack.Config.HitAudioClip);
+        Vibrator?.Vibrate(transform.forward, Attack.Config.ContactDurationRuntime.Frames, .15f);
+        VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Attack.Config.ContactEffect, hurtbox.transform.position);
+        CameraShaker.Instance?.Shake(Attack.Config.HitCameraShakeIntensity);
+      } else {
+        Debug.Log("Attack did not hit!");
+      }
     }
   }
 
