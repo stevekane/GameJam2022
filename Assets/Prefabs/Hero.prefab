@@ -559,6 +559,7 @@ GameObject:
   - component: {fileID: 4102725152112460098}
   - component: {fileID: 4102725152112460096}
   - component: {fileID: 2655167195076173382}
+  - component: {fileID: 7388499907381325622}
   - component: {fileID: 6278674678144464738}
   - component: {fileID: 5203862340116443992}
   - component: {fileID: 1604618934501359742}
@@ -594,7 +595,7 @@ Transform:
   - {fileID: 8696207422598767898}
   - {fileID: 912778195731948833}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4102725152112460096
 MonoBehaviour:
@@ -609,12 +610,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Config: {fileID: 11400000, guid: 1a8a917e4cbe2904da17667533536c7d, type: 2}
-  Controller: {fileID: 4102725152112460099}
-  Animator: {fileID: 7508363702064596809}
-  Attacker: {fileID: 2655167195076173382}
-  Status: {fileID: 6278674678144464738}
-  Pushable: {fileID: 5203862340116443992}
-  Grabber: {fileID: 5640303072316059443}
   FootstepAudioSource: {fileID: 5678751747484202716}
   LegAudioSource: {fileID: 3911948467034089528}
   ArmAudioSource: {fileID: 7005934936953075945}
@@ -647,6 +642,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 12e8843d6958d99489b475fb6195665e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7388499907381325622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4102725152112460109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c806621753f76840a91b87e3c0d2fc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &6278674678144464738
@@ -1148,7 +1155,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 89a2e351fb965d4419b358613fdcb198, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0.00000005960463
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 89a2e351fb965d4419b358613fdcb198, type: 3}
       propertyPath: m_LocalRotation.z
