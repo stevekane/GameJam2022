@@ -49,12 +49,6 @@ public class Attack : MonoBehaviour {
     }
   }
 
-  public Attacker Attacker { get; set; }
   public AttackConfig Config;
-
-  void OnTriggerEnter(Collider other) {
-    if (other.TryGetComponent(out Hurtbox hurtbox)) {
-      Attacker?.Hit(hurtbox);
-    }
-  }
+  public Hitbox Hitbox;
 }

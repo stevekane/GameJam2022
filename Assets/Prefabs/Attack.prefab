@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1116239509914543907}
   - component: {fileID: 3731707558533869425}
+  - component: {fileID: 8588800153350754543}
   - component: {fileID: 6384560198116435372}
   m_Layer: 13
   m_Name: Attack
@@ -45,38 +46,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7df551a1d3ab7e2489677c30f1fce8bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Windup:
-    AuthoringDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    RuntimeDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    MoveSpeed: 1
-    TurnSpeed: 360
-  Active:
-    AuthoringDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    RuntimeDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    MoveSpeed: 1
-    TurnSpeed: 360
-  Recovery:
-    AuthoringDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    RuntimeDuration:
-      Millis: 3
-      TicksPerSecond: 30
-    MoveSpeed: 1
-    TurnSpeed: 360
-  ContactRuntimeDuration:
-    Millis: 4
-    TicksPerSecond: 30
   Config: {fileID: 0}
-  HitBox: {fileID: 0}
+  Hitbox: {fileID: 8588800153350754543}
+--- !u!114 &8588800153350754543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4992029599749696119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b2dfa4f331f9914d9762c56b8681b5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!65 &6384560198116435372
 BoxCollider:
   m_ObjectHideFlags: 0

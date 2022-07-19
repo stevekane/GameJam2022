@@ -13,10 +13,6 @@ MonoBehaviour:
   m_Name: Vapor_Heavy_Punch_Left
   m_EditorClassIdentifier: 
   Clip: {fileID: 7400000, guid: 513455d72952b384f8a7a6e6c6cf9b5f, type: 2}
-  Chargeable: 0
-  Charge:
-    Millis: 1
-    TicksPerSecond: 30
   Windup:
     Millis: 333.33334
     TicksPerSecond: 30
@@ -29,8 +25,20 @@ MonoBehaviour:
   Recovery:
     Millis: 300
     TicksPerSecond: 30
+  WindupDurationRuntime:
+    Millis: 1
+    TicksPerSecond: 30
+  ActiveDurationRuntime:
+    Millis: 1
+    TicksPerSecond: 30
+  ContactDurationRuntime:
+    Millis: 1
+    TicksPerSecond: 30
+  RecoveryDurationRuntime:
+    Millis: 1
+    TicksPerSecond: 30
+  ChargeDurationMultiplier: 3
   WindupMoveFactor: 0.5
-  ChargingMoveFactor: 0.5
   ActiveMoveFactor: 0.5
   RecoveryMoveFactor: 0.5
   WindupRotationDegreesPerSecond: 0

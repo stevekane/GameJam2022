@@ -26,11 +26,11 @@ public class Attacker : MonoBehaviour {
     AudioSource = GetComponent<AudioSource>();
     Defender = GetComponent<Defender>();
     Attacks = GetComponentsInChildren<Attack>();
-    Attacks.ForEach(a => a.Attacker = this);
+    Attacks.ForEach(a => a.Hitbox.Attacker = this);
   }
 
   void OnDestroy() {
-    Attacks.ForEach(a => a.Attacker = null);
+    Attacks.ForEach(a => a.Hitbox.Attacker = null);
   }
 
   public bool IsAttacking { 

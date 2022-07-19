@@ -30,6 +30,7 @@ public class AttackConfig : ScriptableObject {
   public Timeval RecoveryDurationRuntime;
 
   [Header("Charging")]
+  [Range(1, 10)]
   public int ChargeDurationMultiplier = 1;
 
   [Header("Movement")]
