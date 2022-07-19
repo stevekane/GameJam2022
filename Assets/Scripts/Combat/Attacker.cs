@@ -1,6 +1,12 @@
 using UnityEngine;
 
-enum AttackState { None, Windup, Active, Contact, Recovery }
+enum AttackState { 
+  None, 
+  Windup, 
+  Active, 
+  Recovery,
+  Parried
+}
 
 public class Attacker : MonoBehaviour {
   Status Status;
@@ -12,11 +18,12 @@ public class Attacker : MonoBehaviour {
   Defender Defender;
 
   AttackState State;
-  Attack Attack;
   Vector3 TotalKnockbackVector;
   float TotalKnockBackStrength;
-  int FramesRemaining = 0;
+  int FramesRemaining;
+  int ContactFramesRemaining;
   bool IsCharging;
+  bool InContact;
 
   void Awake() {
     Status = GetComponent<Status>();
@@ -33,33 +40,23 @@ public class Attacker : MonoBehaviour {
     Attacks.ForEach(a => a.Hitbox.Attacker = null);
   }
 
-  public bool IsAttacking { 
-    get { 
-      return State != AttackState.None; 
-    } 
-  }
-
-  public int AttackIndex {
-    get {
-      return Attack ? Attack.Config.Index : -1;
-    }
-  }
-
-  public float WindupAttackSpeedMultiplier {
-    get {
-      return Attack && IsCharging ? 1f/Attack.Config.ChargeDurationMultiplier : 1f;
-    }
-  }
+  public Attack Attack { get; internal set; }
+  public bool IsAttacking { get => State != AttackState.None && State != AttackState.Parried; }
+  public bool IsReady { get => State == AttackState.None; }
+  public bool IsParried { get => State == AttackState.Parried; }
+  public int AttackIndex { get => Attack ? Attack.Config.Index : -1; }
+  public float WindupAttackSpeedMultiplier { get => Attack && IsCharging ? 1f/Attack.Config.ChargeDurationMultiplier : 1f; }
 
   public float AttackSpeed {
     get {
       return State switch {
-        AttackState.None => 1f,
+        AttackState.None => 1,
         AttackState.Windup => WindupAttackSpeedMultiplier*Attack.Config.WindupAnimationSpeed,
-        AttackState.Active => Attack.Config.ActiveAnimationSpeed,
+        AttackState.Active when InContact => 0,
+        AttackState.Active when !InContact => Attack.Config.ActiveAnimationSpeed,
         AttackState.Recovery => Attack.Config.RecoveryAnimationSpeed,
-        AttackState.Contact => 0f,
-        _ => 1f,
+        AttackState.Parried => 1,
+        _ => 1,
       };
     }
   }
@@ -68,9 +65,10 @@ public class Attacker : MonoBehaviour {
     get {
       return State switch {
         AttackState.Windup => Attack.Config.WindupMoveFactor,
-        AttackState.Active => Attack.Config.ActiveMoveFactor,
+        AttackState.Active when InContact => 0, 
+        AttackState.Active when !InContact => Attack.Config.ActiveMoveFactor,
         AttackState.Recovery => Attack.Config.RecoveryMoveFactor,
-        AttackState.Contact => 0,
+        AttackState.Parried => 0,
         _ => 1,
       };
     }
@@ -80,9 +78,10 @@ public class Attacker : MonoBehaviour {
     get {
       return State switch {
         AttackState.Windup => Attack.Config.WindupRotationDegreesPerSecond,
-        AttackState.Active => Attack.Config.ActiveRotationDegreesPerSecond,
+        AttackState.Active when InContact => 0,
+        AttackState.Active when !InContact => Attack.Config.ActiveRotationDegreesPerSecond,
         AttackState.Recovery => Attack.Config.RecoveryRotationDegreesPerSecond,
-        AttackState.Contact => 0,
+        AttackState.Parried => 0,
         _ => 360,
       };
     }
@@ -126,34 +125,30 @@ public class Attacker : MonoBehaviour {
     FramesRemaining = 0;
   }
 
-  public void Hit(Hurtbox hurtbox) {
-    if (State == AttackState.Active || State == AttackState.Contact) {
-      // TODO: Use contact to determine what effects / reaction should be
-      var contact = hurtbox.Defender.ResolveAttack(this, Attack);
-      
-      if (contact == Attack.Contact.Hit) {
-        var direction = Attack.KnockbackVector(transform, hurtbox.transform, Attack.Config.KnockBackType);
-        var hitStopFrames = Attack.Config.ContactDurationRuntime.Frames;
-        var points = Attack.Config.Points;
-        var strength = Attack.Config.Strength;
-        State = AttackState.Contact;
-        FramesRemaining = Attack.Config.ContactDurationRuntime.Frames;
-        TotalKnockBackStrength = Attack.Config.Strength;
-        TotalKnockbackVector += Attack.KnockbackVector(transform, hurtbox.transform, Attack.Config.KnockBackType);
+  public void OnBlock(Defender defender) {
 
-        AudioSource?.PlayOptionalOneShot(Attack.Config.HitAudioClip);
-        Vibrator?.Vibrate(transform.forward, Attack.Config.ContactDurationRuntime.Frames, .15f);
-        VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Attack.Config.ContactEffect, hurtbox.transform.position);
-        CameraShaker.Instance?.Shake(Attack.Config.HitCameraShakeIntensity);
-      } else {
-        Debug.Log("Attack did not hit!");
-      }
-    }
+  }
+
+  public void OnParry(Defender defender) {
+
+  }
+
+  public void OnHit(Defender defender) {
+    var direction = Attack.KnockbackVector(transform, defender.transform, Attack.Config.KnockBackType);
+    var hitStopFrames = Attack.Config.ContactDurationRuntime.Frames;
+    var points = Attack.Config.Points;
+    var strength = Attack.Config.Strength;
+    InContact = true;
+    ContactFramesRemaining = Attack.Config.ContactDurationRuntime.Frames;
+    TotalKnockBackStrength = Attack.Config.Strength;
+    TotalKnockbackVector += Attack.KnockbackVector(transform, defender.transform, Attack.Config.KnockBackType);
+    AudioSource?.PlayOptionalOneShot(Attack.Config.HitAudioClip);
+    Vibrator?.Vibrate(transform.forward, Attack.Config.ContactDurationRuntime.Frames, .15f);
+    VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Attack.Config.ContactEffect, defender.transform.position);
+    CameraShaker.Instance?.Shake(Attack.Config.HitCameraShakeIntensity);
   }
 
   void FixedUpdate() {
-    var dt = Time.fixedDeltaTime;
-
     if (State == AttackState.Windup && FramesRemaining <= 0) {
       State = AttackState.Active;
       FramesRemaining = Attack.Config.ActiveDurationRuntime.Frames;
@@ -162,13 +157,10 @@ public class Attacker : MonoBehaviour {
     } else if (State == AttackState.Active && FramesRemaining <= 0) {
       State = AttackState.Recovery;
       FramesRemaining = Attack.Config.RecoveryDurationRuntime.Frames; 
+      TotalKnockBackStrength = 0;
+      TotalKnockbackVector = Vector3.zero;
+      Pushable?.Push(TotalKnockBackStrength*TotalKnockbackVector.normalized);
       AudioSource?.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
-      VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Attack.Config.RecoveryEffect, transform.position);
-    } else if (State == AttackState.Contact && FramesRemaining <= 0) {
-      State = AttackState.Recovery;
-      FramesRemaining = Attack.Config.RecoveryDurationRuntime.Frames; 
-      AudioSource?.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
-      Pushable?.Push(TotalKnockBackStrength * TotalKnockbackVector.normalized);
       VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Attack.Config.RecoveryEffect, transform.position);
     } else if (State == AttackState.Recovery && FramesRemaining <= 0) {
       Attack = null;
@@ -176,9 +168,19 @@ public class Attacker : MonoBehaviour {
       FramesRemaining = 0;
     }
 
+    if (State == AttackState.Active && InContact && ContactFramesRemaining <= 0) {
+      InContact = false;
+    }
+
     Attacks.ForEach(a => a.gameObject.SetActive(a == Attack && State == AttackState.Active));
-    FramesRemaining = State == AttackState.None ? 0 : FramesRemaining-1;
-    TotalKnockBackStrength = 0;
-    TotalKnockbackVector = Vector3.zero;
+    FramesRemaining = State switch {
+      AttackState.None => 0,
+      AttackState.Active when InContact => FramesRemaining,
+      _ => FramesRemaining-1
+    };
+    ContactFramesRemaining = State switch {
+      AttackState.Active when InContact => ContactFramesRemaining-1,
+      _ => 0
+    };
   }
 }
