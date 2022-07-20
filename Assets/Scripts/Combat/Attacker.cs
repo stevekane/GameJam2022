@@ -48,7 +48,8 @@ public class Attacker : MonoBehaviour {
       return State switch {
         AttackState.None => 1,
         AttackState.Windup => Attack.Config.WindupAnimationSpeed(IsCharging),
-        AttackState.Active when (InContact || IsHolding) => 0,
+        // AttackState.Active when (InContact || IsHolding) => 0,
+        AttackState.Active when InContact => 0,
         AttackState.Active when !(InContact || IsHolding) => Attack.Config.ActiveAnimationSpeed,
         AttackState.Recovery => Attack.Config.RecoveryAnimationSpeed,
         AttackState.Parried => 1,

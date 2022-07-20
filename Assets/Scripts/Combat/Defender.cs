@@ -18,7 +18,7 @@ public class Defender : MonoBehaviour {
   }
 
   public void OnBlock(Attack attack) {
-    // Animator.SetTrigger("Block");
+    Animator.SetTrigger("Block");
   }
 
   // TODO: Remove all magic values

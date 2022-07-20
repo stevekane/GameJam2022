@@ -50,6 +50,7 @@ public class Badger : MonoBehaviour {
     if (Status.CanAttack && !Attacker.IsAttacking) {
       if (TargetAttacker.IsAttacking) {
         Attacker.StartHoldAttack(1);
+        Animator.SetBool("Held", true);
         WaitFrames = Timeval.FromMillis(1000).Frames;
       } else if (inRange) {
         Attacker.StartAttack(0);
@@ -59,8 +60,10 @@ public class Badger : MonoBehaviour {
     if (Defender.IsBlocking) {
       if (TargetAttacker.IsAttacking)
         WaitFrames = Timeval.FromMillis(1000).Frames;
-      if (WaitFrames <= 0)
+      if (WaitFrames <= 0) {
         Attacker.ReleaseHoldAttack();
+        Animator.SetBool("Held", false);
+      }
     }
 
     if (!inRange && Status.CanMove && !Attacker.IsAttacking && WaitFrames <= 0) {
