@@ -5,19 +5,20 @@ public class Defender : MonoBehaviour {
   Damage Damage;
   Pushable Pushable;
   Vibrator Vibrator;
+  Animator Animator;
   AudioSource AudioSource;
   Attacker Attacker;
   Hurtbox[] Hurtboxes;
 
-  public bool IsParrying { get => false; }
-  public bool IsBlocking { get => false; }
+  public bool IsParrying; 
+  public bool IsBlocking;
 
   public void OnParry(Attacker attacker) {
-    Debug.Log("Parried!");
+    Animator.SetTrigger("Parry");
   }
 
   public void OnBlock(Attacker attacker) {
-    Debug.Log("Blocked!");
+    Animator.SetTrigger("Block");
   }
 
   // TODO: Remove all magic values
@@ -38,6 +39,7 @@ public class Defender : MonoBehaviour {
     Damage = GetComponent<Damage>();
     Pushable = GetComponent<Pushable>();
     Vibrator = GetComponent<Vibrator>();
+    Animator = GetComponent<Animator>();
     AudioSource = GetComponent<AudioSource>();
     Attacker = GetComponent<Attacker>();
     Hurtboxes = GetComponentsInChildren<Hurtbox>();

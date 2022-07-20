@@ -124,7 +124,7 @@ public class Vapor : MonoBehaviour, IWireRider {
     Animator.SetFloat("AttackSpeed", Attacker.AttackSpeed);
 
     if (Motion == Motion.Base) {
-      var moveSpeed = MOVE_SPEED switch {
+      var moveSpeed = 0 switch {
         _ when !Status.CanMove => 0,
         _ when Attacker.IsAttacking => Attacker.MoveFactor*MOVE_SPEED,
         _ when Cannon.IsFiring => FIRING_MOVE_SPEED,
@@ -154,7 +154,7 @@ public class Vapor : MonoBehaviour, IWireRider {
       WireFramesTraveled++;
     }
     
-    var turnSpeed = TURN_SPEED switch {
+    var turnSpeed = 0 switch {
       _ when Attacker.IsAttacking => ATTACKING_TURN_SPEED,
       _ when Cannon.IsFiring => FIRING_TURN_SPEED,
       _ => TURN_SPEED

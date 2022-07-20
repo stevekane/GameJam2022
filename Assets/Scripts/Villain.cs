@@ -13,7 +13,7 @@ public class Villain : MonoBehaviour {
   public float AttackRange = 2f;
   public float MoveSpeed = 3f;
 
-  private void Awake() {
+  void Awake() {
     Controller = GetComponent<CharacterController>();
     Attacker = GetComponent<Attacker>();
     Defender = GetComponent<Defender>();

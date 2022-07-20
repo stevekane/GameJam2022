@@ -41,9 +41,9 @@ public class Attacker : MonoBehaviour {
   }
 
   public Attack Attack { get; internal set; }
-  public bool IsAttacking { get => State != AttackState.None && State != AttackState.Parried; }
   public bool IsReady { get => State == AttackState.None; }
   public bool IsParried { get => State == AttackState.Parried; }
+  public bool IsAttacking { get => State != AttackState.None && State != AttackState.Parried; }
   public int AttackIndex { get => Attack ? Attack.Config.Index : -1; }
 
   public float AttackSpeed {
