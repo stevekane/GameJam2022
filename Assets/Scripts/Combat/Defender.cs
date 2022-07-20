@@ -10,24 +10,26 @@ public class Defender : MonoBehaviour {
   Hurtbox[] Hurtboxes;
 
   public bool IsParrying { get => false; }
-  public bool IsBlocking { get => false; }
+  public bool IsBlocking = false;
 
-  public void OnParry(Attacker attacker) {
+
+  public void OnParry(Attack attack) {
     Debug.Log("Parried!");
   }
 
-  public void OnBlock(Attacker attacker) {
-    Debug.Log("Blocked!");
+  public void OnBlock(Attack attack) {
+    //Debug.Log("Blocked!");
   }
 
   // TODO: Remove all magic values
-  public void OnHit(Attacker attacker) {
-    var knockBackType = attacker.Attack.Config.KnockBackType;
-    var hitStopFrames = attacker.Attack.Config.ContactDurationRuntime.Frames;
-    var points = attacker.Attack.Config.Points;
-    var strength = attacker.Attack.Config.Strength;
+  public void OnHit(Attack attack) {
+    var knockBackType = attack.Config.KnockBackType;
+    var hitStopFrames = attack.Config.ContactDurationRuntime.Frames;
+    var points = attack.Config.Points;
+    var strength = attack.Config.Strength;
     var power = 5f * strength * Mathf.Pow((points+100f) / 100f, 2f);
-    var knockBackDirection = Attack.KnockbackVector(attacker.transform, transform, knockBackType);
+    // TODO: how to handle projectiles?
+    var knockBackDirection = AttackMelee.KnockbackVector(attack.Attacker.transform, transform, knockBackType);
     Status?.Add(new HitStunEffect(hitStopFrames, new KnockbackEffect(knockBackDirection*power)));
     Vibrator?.Vibrate(knockBackDirection, hitStopFrames, .15f);
     Damage?.AddPoints(points);

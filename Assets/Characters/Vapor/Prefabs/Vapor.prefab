@@ -137,9 +137,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8276870501347812075}
-  - component: {fileID: 6349535731575937158}
   - component: {fileID: 4268059542726780982}
   - component: {fileID: 3741317903704437167}
+  - component: {fileID: 6233178323179195203}
   m_Layer: 13
   m_Name: Light Attack Right
   m_TagString: Untagged
@@ -162,20 +162,6 @@ Transform:
   m_Father: {fileID: 5571416123097895009}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6349535731575937158
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1717042477283418564}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7df551a1d3ab7e2489677c30f1fce8bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Config: {fileID: 11400000, guid: 1ffe122b42164ec41a9f875f7076e519, type: 2}
-  Hitbox: {fileID: 4268059542726780982}
 --- !u!114 &4268059542726780982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -201,6 +187,20 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 4, y: 6, z: 3}
   m_Center: {x: 0, y: 3, z: 2}
+--- !u!114 &6233178323179195203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1717042477283418564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 493018ebd509c5d41b01572c08321f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Config: {fileID: 11400000, guid: 1ffe122b42164ec41a9f875f7076e519, type: 2}
+  Hitbox: {fileID: 0}
 --- !u!1 &2498605777088830892
 GameObject:
   m_ObjectHideFlags: 0
@@ -210,9 +210,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8304307046753205748}
-  - component: {fileID: 1094939034538663479}
   - component: {fileID: 4045774661948088018}
   - component: {fileID: 7056676672454585593}
+  - component: {fileID: 7135579598967139483}
   m_Layer: 13
   m_Name: Light Attack Left
   m_TagString: Untagged
@@ -235,20 +235,6 @@ Transform:
   m_Father: {fileID: 5571416123097895009}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1094939034538663479
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2498605777088830892}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7df551a1d3ab7e2489677c30f1fce8bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Config: {fileID: 11400000, guid: 8dd869ec3a42eb34584c25f46604ed47, type: 2}
-  Hitbox: {fileID: 4045774661948088018}
 --- !u!114 &4045774661948088018
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -274,6 +260,20 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 4, y: 6, z: 3}
   m_Center: {x: 0, y: 3, z: 2}
+--- !u!114 &7135579598967139483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2498605777088830892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 493018ebd509c5d41b01572c08321f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Config: {fileID: 11400000, guid: 8dd869ec3a42eb34584c25f46604ed47, type: 2}
+  Hitbox: {fileID: 0}
 --- !u!1 &5276269203500440461
 GameObject:
   m_ObjectHideFlags: 0
@@ -1530,9 +1530,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6728625958890429450}
-  - component: {fileID: 8455619902670000658}
   - component: {fileID: 204938996995444713}
   - component: {fileID: 985012342642136553}
+  - component: {fileID: 3696616696382862986}
   m_Layer: 13
   m_Name: Heavy Attack Left
   m_TagString: Untagged
@@ -1555,20 +1555,6 @@ Transform:
   m_Father: {fileID: 5571416123097895009}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8455619902670000658
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8263464366804425869}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7df551a1d3ab7e2489677c30f1fce8bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Config: {fileID: 11400000, guid: f70c6d1a6b97f3e48ad2f0fe87ed6b9a, type: 2}
-  Hitbox: {fileID: 204938996995444713}
 --- !u!114 &204938996995444713
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1594,6 +1580,20 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 4, y: 6, z: 5}
   m_Center: {x: 0, y: 3, z: 3}
+--- !u!114 &3696616696382862986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8263464366804425869}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 493018ebd509c5d41b01572c08321f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Config: {fileID: 11400000, guid: f70c6d1a6b97f3e48ad2f0fe87ed6b9a, type: 2}
+  Hitbox: {fileID: 0}
 --- !u!1 &9016870599835868789
 GameObject:
   m_ObjectHideFlags: 0
@@ -1603,9 +1603,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 310168140572090673}
-  - component: {fileID: 2367959653046050394}
   - component: {fileID: 8963530978215227341}
   - component: {fileID: 6471702437748426824}
+  - component: {fileID: 987150470361598521}
   m_Layer: 13
   m_Name: Heavy Attack Right
   m_TagString: Untagged
@@ -1628,20 +1628,6 @@ Transform:
   m_Father: {fileID: 5571416123097895009}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2367959653046050394
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9016870599835868789}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7df551a1d3ab7e2489677c30f1fce8bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Config: {fileID: 11400000, guid: 6cd24d8e38c66bc4d95a6bcccb8a231e, type: 2}
-  Hitbox: {fileID: 8963530978215227341}
 --- !u!114 &8963530978215227341
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1667,6 +1653,20 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 4, y: 6, z: 5}
   m_Center: {x: 0, y: 3, z: 3}
+--- !u!114 &987150470361598521
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9016870599835868789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 493018ebd509c5d41b01572c08321f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Config: {fileID: 11400000, guid: 6cd24d8e38c66bc4d95a6bcccb8a231e, type: 2}
+  Hitbox: {fileID: 0}
 --- !u!1001 &1011520355114941726
 PrefabInstance:
   m_ObjectHideFlags: 0

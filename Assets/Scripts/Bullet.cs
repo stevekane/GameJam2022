@@ -6,36 +6,35 @@ public class Bullet : MonoBehaviour {
   public Vector3 Direction;
   public float Speed = 5;
 
-  Rigidbody body;
+  Hitbox Hitbox;
+  Rigidbody Body;
 
   public void Awake() {
-    body = GetComponent<Rigidbody>();
+    Body = GetComponent<Rigidbody>();
+    Hitbox = GetComponent<Hitbox>();
   }
 
-  public static void Fire(Bullet prefab, Vector3 position, Vector3 direction, BulletType type, float speed = 5) {
+  public static Bullet Fire(Bullet prefab, Vector3 position, Vector3 direction, Attack attack) {
     var bullet = Instantiate(prefab, position, Quaternion.FromToRotation(Vector3.forward, direction));
-    bullet.Type = type;
+    bullet.Hitbox.Attack = attack;
     bullet.Direction = direction;
+    return bullet;
+  }
+
+  // TODO: remove
+  public static void Fire(Bullet prefab, Vector3 position, Vector3 direction, BulletType type, float speed = 5) {
+    var bullet = Fire(prefab, position, direction, null);
+    bullet.Type = type;
     bullet.Speed = speed;
   }
 
   void FixedUpdate() {
-    body.MovePosition(transform.position + Speed * Time.deltaTime * Direction);
+    Body.MovePosition(transform.position + Speed * Time.deltaTime * Direction);
   }
 
   void OnTriggerEnter(Collider collider) {
     if (collider.gameObject.tag == "Ground")
       return;
-
-    var player = collider.gameObject.GetComponentInParent<Hero>();
-    if (player) {
-      if (Type == BulletType.NET) {
-        //player.Bump(player.transform.position, transform.forward.XZ().normalized * 15f, .3f);
-        //player.Stun(.5f);
-      } else {
-        //player.Bump(player.transform.position, transform.forward.XZ().normalized * 15f, .05f);
-      }
-    }
     Destroy(gameObject, .01f);
   }
 }

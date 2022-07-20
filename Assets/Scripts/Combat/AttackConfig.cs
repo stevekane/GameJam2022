@@ -33,10 +33,10 @@ public class AttackConfig : ScriptableObject {
 
   public float WindupAnimationSpeed(bool IsCharging) {
     var scale = IsCharging ? 1f/ChargeDurationMultiplier : 1f;
-    return scale*WindupDurationRuntime.Millis/Windup.Millis;
+    return scale*Windup.Millis/WindupDurationRuntime.Millis;
   }
-  public float ActiveAnimationSpeed { get => ActiveDurationRuntime.Millis/Active.Millis; }
-  public float RecoveryAnimationSpeed { get => RecoveryDurationRuntime.Millis/Recovery.Millis; }
+  public float ActiveAnimationSpeed { get => Active.Millis/ActiveDurationRuntime.Millis; }
+  public float RecoveryAnimationSpeed { get => Recovery.Millis/RecoveryDurationRuntime.Millis; }
 
   [Header("Movement")]
   [Range(0, 1)]
