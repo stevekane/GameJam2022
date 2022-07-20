@@ -12,7 +12,7 @@ public class Vapor : MonoBehaviour, IWireRider {
   }
 
   static Vector3 HeadingFromInputs(Transform t, Action action) {
-    var heading = 
+    var heading =
       action.Left.XZ.TryGetDirection() ??
       action.Right.XZ.TryGetDirection() ??
       t.forward;
@@ -84,7 +84,7 @@ public class Vapor : MonoBehaviour, IWireRider {
       WireFramesTraveled = 0;
     } else if (Motion == Motion.WireRiding && WireFramesTraveled >= WireRide.Frames) {
       if (action.L1.Down) {
-        Motion = Motion.Dashing; 
+        Motion = Motion.Dashing;
         Wire = null;
       } else {
         AudioSource.Stop();
@@ -153,7 +153,7 @@ public class Vapor : MonoBehaviour, IWireRider {
       Controller.Move(delta);
       WireFramesTraveled++;
     }
-    
+
     var turnSpeed = 0 switch {
       _ when Attacker.IsAttacking => ATTACKING_TURN_SPEED,
       _ when Cannon.IsFiring => FIRING_TURN_SPEED,
