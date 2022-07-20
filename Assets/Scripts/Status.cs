@@ -69,10 +69,7 @@ public class HitStunEffect : StatusEffect {
 public class Status : MonoBehaviour {
   public List<StatusEffect> Active = new();
   internal CharacterController Controller;
-  internal Bouncebox Bouncebox;
-  internal Vibrator Vibrator;
   internal Attacker Attacker;
-  public AudioSource AudioSource;
 
   public bool CanMove = true;
   public bool CanAttack = true;
@@ -104,26 +101,9 @@ public class Status : MonoBehaviour {
     }
   }
 
-  private void BouncedInto(Collider other) {
-    if (other.gameObject.tag == "Ground") return;
-
-    var k = Get<KnockbackEffect>();
-    if (k != null && Physics.Raycast(transform.position, k.Velocity.normalized, out var hit)) {
-      AudioSource.PlayOptionalOneShot(Bouncebox.AudioClip);
-      Vibrator.Vibrate(transform.right, Bouncebox.Duration.Frames, .15f);
-      VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Bouncebox.Effect, hit.point);
-      var bounceVel = Vector3.Reflect(k.Velocity, hit.normal.XZ());
-      Remove(k);
-      Add(new HitStunEffect(Bouncebox.Duration.Frames, new KnockbackEffect(bounceVel)));
-    }
-  }
-
   private void Awake() {
     Controller = GetComponent<CharacterController>();
-    Vibrator = GetComponent<Vibrator>();
     Attacker = GetComponentInChildren<Attacker>();
-    Bouncebox = GetComponentInChildren<Bouncebox>();
-    Bouncebox.OnHit = BouncedInto;
   }
 
   private void FixedUpdate() {
@@ -138,7 +118,5 @@ public class Status : MonoBehaviour {
     Removed.Clear();
 
     Active.ForEach(e => e.Apply(this));
-
-    Bouncebox.Collider.enabled = IsAirborne;
   }
 }

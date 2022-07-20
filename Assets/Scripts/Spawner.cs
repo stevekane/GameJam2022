@@ -20,11 +20,11 @@ public class Spawner : MonoBehaviour {
   List<GameObject> ActiveSpawns = new List<GameObject>();
   int FramesRemaining = 0;
 
-  private void Awake() {
+  void Awake() {
     FramesRemaining = SpawnPeriod.Frames;
   }
 
-  private void FixedUpdate() {
+  void FixedUpdate() {
     if (ActiveSpawns.Count < MaxActiveSpawns && --FramesRemaining <= 0) {
       var spawn = PrefabUtility.InstantiatePrefab(Spawn) as GameObject;
       spawn = spawn ? spawn : Instantiate(Spawn);
