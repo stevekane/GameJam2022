@@ -11,6 +11,7 @@ public class Badger : MonoBehaviour {
   Defender Defender;
   Transform Target;
   Attacker TargetAttacker;
+  Shield Shield;
   int WaitFrames = 1000;
 
   enum StateType { Idle, Chase, Attack, Block }
@@ -23,6 +24,7 @@ public class Badger : MonoBehaviour {
     Animator = GetComponent<Animator>();
     Attacker = GetComponent<Attacker>();
     Defender = GetComponent<Defender>();
+    Shield = GetComponentInChildren<Shield>();
   }
 
   Vector3 ChoosePosition() {
@@ -47,8 +49,11 @@ public class Badger : MonoBehaviour {
     var desiredFacing = (Target.position - transform.position).XZ().normalized;
     var inRange = IsInRange(desiredPos);
 
+    if (Shield && !Shield.isActiveAndEnabled)
+      Shield = null;
+
     if (Status.CanAttack && !Attacker.IsAttacking) {
-      if (TargetAttacker.IsAttacking) {
+      if (TargetAttacker.IsAttacking && Shield) {
         Attacker.StartHoldAttack(1);
         Animator.SetBool("Held", true);
         WaitFrames = Timeval.FromMillis(1000).Frames;
@@ -58,11 +63,16 @@ public class Badger : MonoBehaviour {
       }
     }
     if (Defender.IsBlocking) {
-      if (TargetAttacker.IsAttacking)
-        WaitFrames = Timeval.FromMillis(1000).Frames;
-      if (WaitFrames <= 0) {
+      if (!Shield) {
         Attacker.ReleaseHoldAttack();
         Animator.SetBool("Held", false);
+      } else {
+        if (TargetAttacker.IsAttacking)
+          WaitFrames = Timeval.FromMillis(1000).Frames;
+        if (WaitFrames <= 0) {
+          Attacker.ReleaseHoldAttack();
+          Animator.SetBool("Held", false);
+        }
       }
     }
 
