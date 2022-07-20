@@ -200,7 +200,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Config: {fileID: 11400000, guid: 1ffe122b42164ec41a9f875f7076e519, type: 2}
-  Hitbox: {fileID: 0}
+  Attacker: {fileID: 0}
 --- !u!1 &2498605777088830892
 GameObject:
   m_ObjectHideFlags: 0
@@ -273,7 +273,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Config: {fileID: 11400000, guid: 8dd869ec3a42eb34584c25f46604ed47, type: 2}
-  Hitbox: {fileID: 0}
+  Attacker: {fileID: 0}
 --- !u!1 &5276269203500440461
 GameObject:
   m_ObjectHideFlags: 0
@@ -916,6 +916,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c806621753f76840a91b87e3c0d2fc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsBlocking: 0
 --- !u!114 &5571416124093621156
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -940,7 +941,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b25f034a0a2d6547bb601e0fe361f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AudioSource: {fileID: 5571416124367791815}
   CanMove: 1
   CanAttack: 1
   IsAirborne: 0
@@ -1593,7 +1593,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Config: {fileID: 11400000, guid: f70c6d1a6b97f3e48ad2f0fe87ed6b9a, type: 2}
-  Hitbox: {fileID: 0}
+  Attacker: {fileID: 0}
 --- !u!1 &9016870599835868789
 GameObject:
   m_ObjectHideFlags: 0
@@ -1666,7 +1666,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Config: {fileID: 11400000, guid: 6cd24d8e38c66bc4d95a6bcccb8a231e, type: 2}
-  Hitbox: {fileID: 0}
+  Attacker: {fileID: 0}
 --- !u!1001 &1011520355114941726
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1937,6 +1937,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: BounceBox
       objectReference: {fileID: 0}
+    - target: {fileID: 2778587330317048687, guid: 6407c82dbc47b104088bc8830d6c18ff, type: 3}
+      propertyPath: AudioSource
+      value: 
+      objectReference: {fileID: 4599928758009979224}
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 6407c82dbc47b104088bc8830d6c18ff, type: 3}

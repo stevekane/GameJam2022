@@ -581,6 +581,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c806621753f76840a91b87e3c0d2fc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsBlocking: 0
 --- !u!114 &6278674678144464738
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -593,7 +594,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b25f034a0a2d6547bb601e0fe361f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AudioSource: {fileID: 3911948467034089528}
   CanMove: 1
   CanAttack: 1
   IsAirborne: 0
@@ -1365,6 +1365,10 @@ PrefabInstance:
       propertyPath: m_Center.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2778587330317048687, guid: 6407c82dbc47b104088bc8830d6c18ff, type: 3}
+      propertyPath: AudioSource
+      value: 
+      objectReference: {fileID: 7854180695945705383}
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 6407c82dbc47b104088bc8830d6c18ff, type: 3}
