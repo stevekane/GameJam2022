@@ -71,6 +71,7 @@ public class Smoke : MonoBehaviour {
   Coroutine AttackRoutine;
   Coroutine DodgeRoutine;
   bool IsDodging = false;
+  Vector3 Velocity;
 
   void Awake() {
     Attacker = GetComponent<Attacker>();
@@ -116,11 +117,12 @@ public class Smoke : MonoBehaviour {
       _ when Motion == Motion.Dashing => DASH_SPEED,
       _ => MOVE_SPEED
     };
-    var velocity = moveSpeed * (desiredPos - transform.position).XZ().normalized;
-    velocity += Pushable.Impulse;
-    Controller.Move(dt*velocity);
+    Velocity.SetXZ(moveSpeed * (desiredPos - transform.position).XZ().normalized);
+    Velocity += Pushable.Impulse;
+    Velocity.y = Controller.isGrounded ? GRAVITY*dt : Velocity.y + GRAVITY*dt;
+    Controller.Move(dt*Velocity);
     if (Motion == Motion.Dashing) {
-      ChargeParticles.transform.forward = -velocity.TryGetDirection() ?? -transform.forward;
+      ChargeParticles.transform.forward = -Velocity.TryGetDirection() ?? -transform.forward;
     }
 
     var turnSpeed = 0 switch {

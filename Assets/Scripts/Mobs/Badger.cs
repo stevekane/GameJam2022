@@ -14,6 +14,7 @@ public class Badger : MonoBehaviour {
   Shield Shield;
   int WaitFrames = 1000;
   int RecoveryFrames = 0;
+  Vector3 Velocity;
 
   enum StateType { Idle, Chase, Attack, Block }
 
@@ -80,7 +81,10 @@ public class Badger : MonoBehaviour {
     if (!inRange && Status.CanMove && !Attacker.IsAttacking && WaitFrames <= 0 && RecoveryFrames <= 0) {
       transform.forward = desiredFacing;
       var dir = (desiredPos - transform.position).normalized;
-      Controller.Move(dir * MoveSpeed * Time.fixedDeltaTime);
+      Velocity.SetXZ(MoveSpeed * dir);
+      var gravity = -200f * Time.fixedDeltaTime;
+      Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
+      Controller.Move(Velocity*Time.fixedDeltaTime);
     }
 
     if ((!Attacker.IsAttacking || Defender.IsBlocking) && WaitFrames > 0)

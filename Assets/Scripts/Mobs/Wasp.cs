@@ -10,6 +10,7 @@ public class Wasp : MonoBehaviour {
   Attacker Attacker;
   Transform Target;
   int FramesRemaining = 0;
+  Vector3 Velocity;
 
   enum StateType { Idle, Chase, Shoot, Kite }
   StateType State = StateType.Idle;
@@ -23,6 +24,10 @@ public class Wasp : MonoBehaviour {
   }
 
   void FixedUpdate() {
+    Velocity.SetXZ(Vector3.zero);
+    var gravity = -200f * Time.fixedDeltaTime;
+    Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
+
     switch (State) {
     case StateType.Idle:
       if (--FramesRemaining <= 0) {
@@ -39,7 +44,7 @@ public class Wasp : MonoBehaviour {
           State = StateType.Shoot;
           Attacker.StartAttack(0);
         } else if (Status.CanMove) {
-          Controller.Move(dir * MoveSpeed * Time.fixedDeltaTime);
+          Velocity.SetXZ(dir * MoveSpeed);
         }
         break;
       }
@@ -57,7 +62,7 @@ public class Wasp : MonoBehaviour {
         var desiredDist = ShootRadius - 5f;
         if (targetDelta.sqrMagnitude < desiredDist*desiredDist && Status.CanMove) {
           var dir = -targetDelta.normalized;
-          Controller.Move(dir * MoveSpeed * Time.fixedDeltaTime);
+          Velocity.SetXZ(dir * MoveSpeed);
           transform.forward = dir;
         } else {
           State = StateType.Idle;
@@ -66,6 +71,8 @@ public class Wasp : MonoBehaviour {
         break;
       }
     }
+
+    Controller.Move(Velocity*Time.fixedDeltaTime);
 
     Animator.SetBool("Attacking", Attacker.IsAttacking);
     Animator.SetInteger("AttackIndex", Attacker.AttackIndex);
