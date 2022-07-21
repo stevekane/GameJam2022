@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 
@@ -8,12 +9,10 @@ public class AbilityMan : MonoBehaviour {
   */
   abstract class Ability {
     public bool IsComplete { get; private set; }
-    public void Start() {
-      OnStart();
+    public virtual void Start() {
       IsComplete = false;
     }
-    public void Stop() {
-      OnStop();
+    public virtual void Stop() {
       IsComplete = true;
     }
     public bool TryStart() {
@@ -34,8 +33,6 @@ public class AbilityMan : MonoBehaviour {
     }
     public virtual bool CanStart() => true;
     public virtual bool CanStop() => true;
-    public virtual void OnStart() {}
-    public virtual void OnStop() {}
     public virtual void Step(Action action, float dt) {}
   }
 
@@ -49,7 +46,7 @@ public class AbilityMan : MonoBehaviour {
   abstract class TaskAbility : Ability {
     public abstract IEnumerator Graph();
     public MonoBehaviour Owner;
-    public override void OnStart() {
+    public override void Start() {
       Owner.StartCoroutine(Graph());
     }
   }
@@ -59,11 +56,13 @@ public class AbilityMan : MonoBehaviour {
   as long as L2 is continually held down.
   */
   class ShoutKey : Ability {
-    public override void OnStart() {
+    public override void Start() {
       Debug.Log("Begin shouting");
+      base.Start();
     }
-    public override void OnStop() {
+    public override void Stop() {
       Debug.Log("End shouting");
+      base.Stop();
     }
     public override void Step(Action action, float dt) {
       if (action.L1.JustDown) {
@@ -80,10 +79,106 @@ public class AbilityMan : MonoBehaviour {
   */
   class WaitNShout : TaskAbility {
     public override IEnumerator Graph() {
-      Debug.Log("Preparing to should in 3 seconds...");
+      Debug.Log("Preparing to shout in 3 seconds...");
       yield return new WaitForSeconds(3);
       Debug.Log("SHOUT");
       Stop();
+    }
+  }
+
+  /*
+  What is an async task graph?
+
+  Async tasks are constructed with Constructors based on the data they need.
+  Once constructed, an async task has internal logic that runs until it decides
+  to exit by calling one of several possible continuations.
+  */
+  abstract class AbilityTask {
+    public bool IsComplete { get; private set; }
+    public virtual void Step(AbilityGraph graph) {}
+    public virtual void Start(AbilityGraph graph) {
+      graph.Tasks.Add(this);
+      IsComplete = false;
+    }
+    public virtual void Stop(AbilityGraph graph) {
+      IsComplete = true;
+    }
+  }
+
+  abstract class AbilityGraph : Ability {
+    public List<AbilityTask> Tasks = new List<AbilityTask>();
+
+    public override void Start() {
+      base.Start();
+    }
+
+    public override void Stop() {
+      Tasks.ForEach(t => t.Stop(this));
+      base.Stop();
+    }
+
+    public override void Step(Action action, float dt) {
+      if (IsComplete) {
+        Debug.LogError("Tried to step a completed task");
+      }
+
+      for (var i = Tasks.Count-1; i >= 0; i--) {
+        var t = Tasks[i];
+        t.Step(this);
+        if (t.IsComplete) {
+          Tasks.RemoveAt(i);
+        }
+      }
+      if (Tasks.Count <= 0) {
+        Stop();
+      }
+    }
+  }
+
+  public delegate void Continuation();
+
+  class FartAbilityTask : AbilityTask {
+    public Continuation PostFart;
+    public override void Step(AbilityGraph graph) {
+      Debug.Log("Fart");
+      Stop(graph);
+      PostFart?.Invoke();
+    }
+  }
+
+  class BurpAbilityTask : AbilityTask {
+    public Continuation PostBurp;
+    public override void Step(AbilityGraph graph) {
+      Debug.Log("Burp");
+      Stop(graph);
+      PostBurp?.Invoke();
+    }
+  }
+
+  class WaitAbilityTask : AbilityTask {
+    public int Frames;
+    public Continuation PostWait;
+    public override void Step(AbilityGraph graph) {
+      base.Step(graph);
+      if (Frames <= 0) {
+        Stop(graph);
+        PostWait?.Invoke();
+      } else {
+        Frames--;
+      }
+    }
+  }
+
+  class FartWaitBurpAbility : AbilityGraph {
+    public override void Start() {
+      void PostFart() {
+        void PostWait() {
+          new BurpAbilityTask().Start(this);
+        }
+        new WaitAbilityTask { Frames = 1000, PostWait = PostWait }.Start(this);
+      }
+      base.Start();
+      new FartAbilityTask { PostFart = PostFart }.Start(this);
     }
   }
 
@@ -100,9 +195,10 @@ public class AbilityMan : MonoBehaviour {
   }
 
   void Start() {
-    Abilities = new Ability[2] {
+    Abilities = new Ability[3] {
       new ShoutKey(),
-      new WaitNShout { Owner = this }
+      new WaitNShout { Owner = this },
+      new FartWaitBurpAbility()
     };
   }
 
@@ -117,6 +213,8 @@ public class AbilityMan : MonoBehaviour {
         TryStartAbility(Abilities[0]);
       } else if (action.R2.JustDown) {
         TryStartAbility(Abilities[1]);
+      } else if (action.R1.JustDown) {
+        TryStartAbility(Abilities[2]);
       }
     }
     CurrentAbility?.Step(Inputs.Action, Time.fixedDeltaTime);
