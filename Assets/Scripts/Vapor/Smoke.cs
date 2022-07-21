@@ -86,6 +86,9 @@ public class Smoke : MonoBehaviour {
   }
 
   void FixedUpdate() {
+    if (Target == null)
+      return;
+
     (Vector3 desiredPos, Vector3 desiredFacing, float distToTarget) = ChoosePosition();
     bool inAttackRange = distToTarget < ATTACK_RANGE;
     bool inMoveRange = distToTarget < ATTACK_RANGE*.9f;

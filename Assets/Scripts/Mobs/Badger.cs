@@ -47,6 +47,9 @@ public class Badger : MonoBehaviour {
   }
 
   void FixedUpdate() {
+    if (Target == null)
+      return;
+
     var desiredPos = ChoosePosition();
     var desiredFacing = (Target.position - transform.position).XZ().normalized;
     var inRange = IsInRange(desiredPos);

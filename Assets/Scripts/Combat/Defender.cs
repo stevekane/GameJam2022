@@ -48,5 +48,8 @@ public class Defender : MonoBehaviour {
 
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
+    if (transform.position.y < -100f) {
+      Destroy(gameObject, .01f);
+    }
   }
 }

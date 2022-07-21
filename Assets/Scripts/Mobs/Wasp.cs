@@ -24,6 +24,9 @@ public class Wasp : MonoBehaviour {
   }
 
   void FixedUpdate() {
+    if (Target == null)
+      return;
+
     Velocity.SetXZ(Vector3.zero);
     var gravity = -200f * Time.fixedDeltaTime;
     Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
