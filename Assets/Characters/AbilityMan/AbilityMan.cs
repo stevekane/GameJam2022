@@ -1,50 +1,124 @@
+using System.Collections;
 using UnityEngine;
 
 public class AbilityMan : MonoBehaviour {
+  /*
+  This class my be sub-classed to create arbitrary abilities by providing
+  overrides for CanStart, CanStop, OnStart, OnStop, and Step.
+  */
   abstract class Ability {
-    public abstract void Step(Action action, float dt);
-    public void Start() {}
-    public void Stop() {}
-    public abstract bool Complete { get; }
-    public abstract bool Cancellable { get; }
+    public bool IsComplete { get; private set; }
+    public void Start() {
+      OnStart();
+      IsComplete = false;
+    }
+    public void Stop() {
+      OnStop();
+      IsComplete = true;
+    }
+    public bool TryStart() {
+      if (CanStart()) {
+        Start();
+        return true;
+      } else {
+        return false;
+      }
+    }
+    public bool TryStop() {
+      if (CanStop()) {
+        Stop();
+        return true;
+      } else {
+        return false;
+      }
+    }
+    public virtual bool CanStart() => true;
+    public virtual bool CanStop() => true;
+    public virtual void OnStart() {}
+    public virtual void OnStop() {}
+    public virtual void Step(Action action, float dt) {}
   }
 
-  class SayHello : Ability {
-    int FramesPerRep;
-    int Frames;    
-    int Count;
-    public SayHello(int framesPerRep, int count) {
-      FramesPerRep = framesPerRep;
-      Frames = framesPerRep;
-      Count = count;
+  /*
+  This class may be sub-classed to provide an IEnumerator "Graph" which
+  will be run as a co-routine. Note, you must provide an "Owning" Monobehavior
+  for now... very gross... very gross...
+  Eventually, these tasks will themselves be Monobehaviors and this requirement
+  will not exist.
+  */
+  abstract class TaskAbility : Ability {
+    public abstract IEnumerator Graph();
+    public MonoBehaviour Owner;
+    public override void OnStart() {
+      Owner.StartCoroutine(Graph());
     }
-    public override bool Complete { get => Count == 0; }
-    public override bool Cancellable { get => true; }
+  }
+
+  /*
+  Extends from Ability and this uses Steps explicitly to check L1 presses
+  as long as L2 is continually held down.
+  */
+  class ShoutKey : Ability {
+    public override void OnStart() {
+      Debug.Log("Begin shouting");
+    }
+    public override void OnStop() {
+      Debug.Log("End shouting");
+    }
     public override void Step(Action action, float dt) {
-      if (Count > 0) {
-        if (Frames <= 0) {
-          Debug.Log("hello");
-          Count--;
-          Frames = FramesPerRep;
-        } else {
-          Frames--;
-        }
+      if (action.L1.JustDown) {
+        Debug.Log("L1");
+      } else if (action.L2.JustUp) {
+        Stop();
       }
     }
   }
 
+  /*
+  Extends from TaskAbility and provides an IEnumerator Graph which prints a message,
+  waits 3 seconds, then prints a final message before Stopping.
+  */
+  class WaitNShout : TaskAbility {
+    public override IEnumerator Graph() {
+      Debug.Log("Preparing to should in 3 seconds...");
+      yield return new WaitForSeconds(3);
+      Debug.Log("SHOUT");
+      Stop();
+    }
+  }
+
+  Ability[] Abilities;
   Ability CurrentAbility;
 
+  bool TryStartAbility(Ability ability) {
+    if (ability.TryStart()) {
+      CurrentAbility = ability;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   void Start() {
-    CurrentAbility = new SayHello(500, 5);
+    Abilities = new Ability[2] {
+      new ShoutKey(),
+      new WaitNShout { Owner = this }
+    };
   }
 
   void FixedUpdate() {
-    CurrentAbility?.Step(Inputs.Action, Time.fixedDeltaTime);
-    if (CurrentAbility != null && CurrentAbility.Complete) {
-      CurrentAbility.Stop();
+    var action = Inputs.Action;
+
+    if (CurrentAbility != null && CurrentAbility.IsComplete) {
       CurrentAbility = null;
-      Debug.Log("Ability complete");
     }
+    if (CurrentAbility == null) {
+      if (action.L2.JustDown) {
+        TryStartAbility(Abilities[0]);
+      } else if (action.R2.JustDown) {
+        TryStartAbility(Abilities[1]);
+      }
+    }
+    CurrentAbility?.Step(Inputs.Action, Time.fixedDeltaTime);
   }
 }
