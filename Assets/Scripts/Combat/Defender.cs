@@ -8,7 +8,6 @@ public class Defender : MonoBehaviour {
   Animator Animator;
   AudioSource AudioSource;
   Attacker Attacker;
-  Hurtbox[] Hurtboxes;
 
   public bool IsParrying; 
   public bool IsBlocking;
@@ -43,12 +42,6 @@ public class Defender : MonoBehaviour {
     Animator = GetComponent<Animator>();
     AudioSource = GetComponent<AudioSource>();
     Attacker = GetComponent<Attacker>();
-    Hurtboxes = GetComponentsInChildren<Hurtbox>();
-    Hurtboxes.ForEach(b => b.Defender = this);
-  }
-
-  void OnDestroy() {
-    Hurtboxes.ForEach(b => b.Defender = null);
   }
 
   void FixedUpdate() {
