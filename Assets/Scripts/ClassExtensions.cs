@@ -52,7 +52,7 @@ public static class MonoExtensions {
   }
 
   public static bool IsVisibleFrom(this Transform t, Vector3 p, LayerMask layerMask) {
-    var delta = t.position-p; 
+    var delta = t.position-p;
     var direction = delta.normalized;
     var distance = delta.magnitude;
     var didHit = Physics.Raycast(p, direction, out RaycastHit hit, distance, layerMask);
@@ -75,6 +75,14 @@ public static class ArrayLikeExtensions {
   public static void ForEach<T>(this IEnumerable<T> xs, Action<T> p) {
     foreach (var x in xs) {
       p(x);
+    }
+  }
+
+  public static void Remove<T>(this List<T> xs, Predicate<T> predicate) {
+    for (var i = xs.Count-1; i >= 0; i--) {
+      if (predicate(xs[i])) {
+        xs.RemoveAt(i);
+      }
     }
   }
 

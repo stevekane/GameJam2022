@@ -43,11 +43,56 @@ public class AbilityMan : MonoBehaviour {
   Eventually, these tasks will themselves be Monobehaviors and this requirement
   will not exist.
   */
-  abstract class TaskAbility : Ability {
+  abstract class CoroutineAbility : Ability {
     public abstract IEnumerator Graph();
     public MonoBehaviour Owner;
     public override void Start() {
       Owner.StartCoroutine(Graph());
+    }
+  }
+
+  public delegate void Continuation();
+
+  abstract class AbilityTask {
+    public bool IsComplete { get; private set; }
+    public virtual void Step(AbilityGraph graph) {}
+    public virtual void Start(AbilityGraph graph) {
+      graph.Tasks.Add(this);
+      IsComplete = false;
+    }
+    public virtual void Stop(AbilityGraph graph) {
+      IsComplete = true;
+    }
+  }
+
+  abstract class AbilityGraph : Ability {
+    public List<AbilityTask> Tasks = new List<AbilityTask>();
+
+    public override void Start() {
+      base.Start();
+    }
+
+    public override void Stop() {
+      Tasks.ForEach(t => t.Stop(this));
+      base.Stop();
+    }
+
+    public override void Step(Action action, float dt) {
+      /*
+      This is subtle. We are looping backwards for two reasons:
+        1. Calling step may ADD new tasks to the end of the list
+        2. Completed tasks are removed from the list
+      */
+      for (var i = Tasks.Count-1; i >= 0; i--) {
+        var t = Tasks[i];
+        t.Step(this);
+        if (t.IsComplete) {
+          Tasks.RemoveAt(i);
+        }
+      }
+      if (Tasks.Count <= 0) {
+        Stop();
+      }
     }
   }
 
@@ -77,7 +122,7 @@ public class AbilityMan : MonoBehaviour {
   Extends from TaskAbility and provides an IEnumerator Graph which prints a message,
   waits 3 seconds, then prints a final message before Stopping.
   */
-  class WaitNShout : TaskAbility {
+  class WaitNShout : CoroutineAbility {
     public override IEnumerator Graph() {
       Debug.Log("Preparing to shout in 3 seconds...");
       yield return new WaitForSeconds(3);
@@ -85,57 +130,6 @@ public class AbilityMan : MonoBehaviour {
       Stop();
     }
   }
-
-  /*
-  What is an async task graph?
-
-  Async tasks are constructed with Constructors based on the data they need.
-  Once constructed, an async task has internal logic that runs until it decides
-  to exit by calling one of several possible continuations.
-  */
-  abstract class AbilityTask {
-    public bool IsComplete { get; private set; }
-    public virtual void Step(AbilityGraph graph) {}
-    public virtual void Start(AbilityGraph graph) {
-      graph.Tasks.Add(this);
-      IsComplete = false;
-    }
-    public virtual void Stop(AbilityGraph graph) {
-      IsComplete = true;
-    }
-  }
-
-  abstract class AbilityGraph : Ability {
-    public List<AbilityTask> Tasks = new List<AbilityTask>();
-
-    public override void Start() {
-      base.Start();
-    }
-
-    public override void Stop() {
-      Tasks.ForEach(t => t.Stop(this));
-      base.Stop();
-    }
-
-    public override void Step(Action action, float dt) {
-      if (IsComplete) {
-        Debug.LogError("Tried to step a completed task");
-      }
-
-      for (var i = Tasks.Count-1; i >= 0; i--) {
-        var t = Tasks[i];
-        t.Step(this);
-        if (t.IsComplete) {
-          Tasks.RemoveAt(i);
-        }
-      }
-      if (Tasks.Count <= 0) {
-        Stop();
-      }
-    }
-  }
-
-  public delegate void Continuation();
 
   class FartAbilityTask : AbilityTask {
     public Continuation PostFart;
@@ -158,6 +152,10 @@ public class AbilityMan : MonoBehaviour {
   class WaitAbilityTask : AbilityTask {
     public int Frames;
     public Continuation PostWait;
+    public override void Start(AbilityGraph graph) {
+      base.Start(graph);
+      Debug.Log($"Waitin {Frames} frames...");
+    }
     public override void Step(AbilityGraph graph) {
       base.Step(graph);
       if (Frames <= 0) {
