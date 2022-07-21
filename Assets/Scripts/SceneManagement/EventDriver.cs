@@ -13,6 +13,16 @@ public struct ButtonState {
     JustDown = justDown;
     JustUp = justUp;
   }
+  public void UpdateFromKeycode(KeyCode code) {
+    Down = Down || Input.GetKey(code);
+    JustDown = JustDown || Input.GetKeyDown(code);
+    JustUp = JustUp || Input.GetKeyUp(code);
+  }
+  public void UpdateFromMouse(int button) {
+    Down = Down || Input.GetMouseButton(button);
+    JustDown = JustDown || Input.GetMouseButtonDown(button);
+    JustUp = JustUp || Input.GetMouseButtonUp(button);
+  }
   public void UpdateFromInput(string name) {
     Down = Down || Input.GetButton(name);
     JustDown = JustDown || Input.GetButtonDown(name);
@@ -92,6 +102,7 @@ public enum PlayState { Idle, Play, PlayBack }
 public class EventDriver : MonoBehaviour {
   [Header("Configuration")]
   public float RadialDeadZone;
+  public bool UseMouseAndKeyboard = false;
 
   [Header("State")]
   public PlayState PlayState;
@@ -151,32 +162,58 @@ public class EventDriver : MonoBehaviour {
     PlayState = PlayState.PlayBack;
   }
 
+  Vector2 GetKeyboardMove() {
+    float right = (Input.GetKey(KeyCode.D) ? 1 : 0) - (Input.GetKey(KeyCode.A) ? 1 : 0);
+    float up = (Input.GetKey(KeyCode.W) ? 1 : 0) - (Input.GetKey(KeyCode.S) ? 1 : 0);
+    return new Vector2(right, up);
+  }
+
+  Vector2 GetMouseAim() {
+    var playerPos = Camera.WorldToScreenPoint(Player.transform.position);
+    var playerPos2 = new Vector2(playerPos.x, playerPos.y);
+    var mousePos2 = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+    return (mousePos2 - playerPos2).normalized;
+  }
+
   // Cache/accumulate input changes in Update. Feed them into simulation on FixedUpdate.
   void Update() {
-    North.UpdateFromInput("North");
-    East.UpdateFromInput("East");
-    South.UpdateFromInput("South");
-    West.UpdateFromInput("West");
-    L1.UpdateFromInput("L1");
-    L2.UpdateFromInput("L2");
-    R1.UpdateFromInput("R1");
-    R2.UpdateFromInput("R2");
-    Left = StickState.FromInput(RadialDeadZone, "LeftX", "LeftY");
-    Right = StickState.FromInput(RadialDeadZone, "RightX", "RightY");
+    if (UseMouseAndKeyboard) {
+      L1.UpdateFromKeycode(KeyCode.LeftShift);
+      R1.UpdateFromMouse(0);
+      R2.UpdateFromMouse(1);
+      Left = new StickState(0f, GetKeyboardMove());
+      Right = new StickState(0f, GetMouseAim());
+    } else {
+      North.UpdateFromInput("North");
+      East.UpdateFromInput("East");
+      South.UpdateFromInput("South");
+      West.UpdateFromInput("West");
+      L1.UpdateFromInput("L1");
+      L2.UpdateFromInput("L2");
+      R1.UpdateFromInput("R1");
+      R2.UpdateFromInput("R2");
+      Left = StickState.FromInput(RadialDeadZone, "LeftX", "LeftY");
+      Right = StickState.FromInput(RadialDeadZone, "RightX", "RightY");
+    }
   }
 
   void FixedUpdate() {
     switch (PlayState) {
     case PlayState.Play: {
         // Record the current values the down status of buttons right before consumption
-        North.Down = Input.GetButton("North");
-        East.Down = Input.GetButton("East");
-        South.Down = Input.GetButton("South");
-        West.Down = Input.GetButton("West");
-        L1.Down = Input.GetButton("L1");
-        L2.Down = Input.GetButton("L2");
-        R1.Down = Input.GetButton("R1");
-        R2.Down = Input.GetButton("R2");
+        if (UseMouseAndKeyboard) {
+          R1.Down = Input.GetMouseButton(0);
+          R2.Down = Input.GetMouseButton(1);
+        } else {
+          North.Down = Input.GetButton("North");
+          East.Down = Input.GetButton("East");
+          South.Down = Input.GetButton("South");
+          West.Down = Input.GetButton("West");
+          L1.Down = Input.GetButton("L1");
+          L2.Down = Input.GetButton("L2");
+          R1.Down = Input.GetButton("R1");
+          R2.Down = Input.GetButton("R2");
+        }
         var action = new Action(North, East, South, West, L1, L2, R1, R2, Left, Right);
         Inputs.InPlayBack = false;
         Inputs.Action = action;
