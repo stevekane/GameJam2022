@@ -7,9 +7,11 @@ public class Shield : MonoBehaviour {
   public Animator Animator;
   Damage Damage;
   Collider Hurtbox;
+  public Defender Defender { get; private set; }
 
   void Awake() {
     Damage = GetComponent<Damage>();
+    Defender = GetComponent<Defender>();
     Hurtbox = GetComponentInChildren<Hurtbox>().GetComponent<Collider>();
   }
 

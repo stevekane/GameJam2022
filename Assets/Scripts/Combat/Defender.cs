@@ -13,11 +13,13 @@ public class Defender : MonoBehaviour {
   public bool IsBlocking;
 
   public void OnParry(Attack attack) {
-    Animator.SetTrigger("Parry");
+    if (Animator)
+      Animator.SetTrigger("Parry");
   }
 
   public void OnBlock(Attack attack) {
-    Animator.SetTrigger("Block");
+    if (Animator)
+      Animator.SetTrigger("Block");
   }
 
   // TODO: Remove all magic values
