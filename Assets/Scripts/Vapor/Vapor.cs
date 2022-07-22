@@ -133,15 +133,13 @@ public class Vapor : MonoBehaviour, IWireRider {
       var moveVelocity = VelocityFromMove(action, moveSpeed);
       var pushVelocity = Pushable.Impulse;
       var gravity = dt*GRAVITY;
-      Velocity.x = moveVelocity.x;
-      Velocity.z = moveVelocity.z;
+      Velocity.SetXZ(moveVelocity);
       Velocity += pushVelocity;
       Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
       Controller.Move(dt*Velocity);
     } else if (Motion == Motion.Dashing) {
       var moveVelocity = VelocityFromMove(action, DASH_SPEED);
-      Velocity.x = moveVelocity.x;
-      Velocity.z = moveVelocity.z;
+      Velocity.SetXZ(moveVelocity);
       Velocity.y = 0;
       ChargeParticles.transform.forward = -moveVelocity.TryGetDirection() ?? -transform.forward;
       Controller.Move(dt*Velocity);

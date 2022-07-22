@@ -13,6 +13,8 @@ public class Badger : MonoBehaviour {
   Attacker TargetAttacker;
   Shield Shield;
   int WaitFrames = 1000;
+  int RecoveryFrames = 0;
+  Vector3 Velocity;
 
   enum StateType { Idle, Chase, Attack, Block }
 
@@ -45,6 +47,9 @@ public class Badger : MonoBehaviour {
   }
 
   void FixedUpdate() {
+    if (Target == null)
+      return;
+
     var desiredPos = ChoosePosition();
     var desiredFacing = (Target.position - transform.position).XZ().normalized;
     var inRange = IsInRange(desiredPos);
@@ -52,7 +57,7 @@ public class Badger : MonoBehaviour {
     if (Shield && !Shield.isActiveAndEnabled)
       Shield = null;
 
-    if (Status.CanAttack && !Attacker.IsAttacking) {
+    if (Status.CanAttack && !Attacker.IsAttacking && RecoveryFrames <= 0) {
       if (TargetAttacker.IsAttacking && Shield) {
         Attacker.StartHoldAttack(1);
         Animator.SetBool("Held", true);
@@ -76,19 +81,30 @@ public class Badger : MonoBehaviour {
       }
     }
 
-    if (!inRange && Status.CanMove && !Attacker.IsAttacking && WaitFrames <= 0) {
+    if (!inRange && Status.CanMove && !Attacker.IsAttacking && WaitFrames <= 0 && RecoveryFrames <= 0) {
       transform.forward = desiredFacing;
       var dir = (desiredPos - transform.position).normalized;
-      Controller.Move(dir * MoveSpeed * Time.fixedDeltaTime);
+      Velocity.SetXZ(MoveSpeed * dir);
+      var gravity = -200f * Time.fixedDeltaTime;
+      Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
+      Controller.Move(Velocity*Time.fixedDeltaTime);
     }
 
     if ((!Attacker.IsAttacking || Defender.IsBlocking) && WaitFrames > 0)
       --WaitFrames;
+    if (Status.IsHitstun) {
+      RecoveryFrames = Timeval.FromMillis(1000).Frames;
+      Animator.SetBool("Held", false);
+    } else if (RecoveryFrames > 0) {
+      --RecoveryFrames;
+    }
 
     Animator.SetBool("Attacking", Attacker.IsAttacking);
     Animator.SetInteger("AttackIndex", Attacker.AttackIndex);
     Animator.SetFloat("AttackSpeed", Attacker.AttackSpeed);
     Animator.SetBool("HitFlinch", Status.IsHitstun);
     Defender.IsBlocking = Attacker.AttackIndex == 1 && Attacker.AttackState == AttackState.Active;
+    if (Shield)
+      Shield.Defender.IsBlocking = !Defender.IsBlocking;
   }
 }
