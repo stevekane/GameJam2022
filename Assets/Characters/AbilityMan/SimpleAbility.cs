@@ -14,9 +14,12 @@ public abstract class SimpleTask {
 public class AimAt : SimpleTask {
   public Transform Aimer;
   public Transform Target;
+  public float TurnSpeed;
   public override IEnumerator Routine() {
     while (true) {
-      Aimer.LookAt(Target);
+      var current = Aimer.forward.XZ();
+      var desired = Target.position-Aimer.position.XZ();
+      Aimer.forward = Vector3.RotateTowards(current, desired, Time.fixedDeltaTime*TurnSpeed, 0);
       yield return null;
     }
   }

@@ -297,11 +297,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8db1d4fc560ada348a59786480066615, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsComplete: 1
   Aimer: {fileID: 1511601687}
   Target: {fileID: 2044670467}
   Origin: {fileID: 567089275}
   ProjectilePrefab: {fileID: 9049558066432398897, guid: 0322fa542d4a2b74e8a51dd1d85dfcad, type: 3}
+  ProjectileForce: 200
+  TurnSpeed: 24
   AudioSource: {fileID: 305352900}
   FireSound: {fileID: 8300000, guid: 2748fd56516fbae4e943aef64f26db1b, type: 3}
   ShotCooldown:
@@ -934,7 +935,7 @@ GameObject:
   - component: {fileID: 1511601688}
   - component: {fileID: 1511601689}
   - component: {fileID: 1511601690}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: AbilityMan
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -955,12 +956,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MOVE_SPEED: 25
   Controller: {fileID: 1511601690}
-  Target: {fileID: 2044670467}
-  Muzzle: {fileID: 567089275}
-  Animator: {fileID: 1511601688}
-  AudioSource: {fileID: 1511601689}
-  ProjectilePrefab: {fileID: 9049558066432398897, guid: 0322fa542d4a2b74e8a51dd1d85dfcad, type: 3}
-  FireSound: {fileID: 8300000, guid: 2748fd56516fbae4e943aef64f26db1b, type: 3}
   CurrentAbility: {fileID: 0}
   Abilities: []
 --- !u!4 &1511601687
@@ -975,8 +970,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 59375856}
   - {fileID: 305352898}
+  - {fileID: 59375856}
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
