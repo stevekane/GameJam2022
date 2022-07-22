@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -199,82 +201,6 @@ public class AbilityMan : MonoBehaviour {
     }
   }
 
-  class FartWaitBurpAbility : AbilityGraph {
-    public override void OnStart() {
-      new FartAbilityTask()
-      .Activate(this)
-      .AddOutput(delegate {
-        new WaitAbilityTask { Frames = 1000 }
-        .Activate(this)
-        .AddOutput(delegate { new BurpAbilityTask().Activate(this); })
-        .AddOutput(delegate { new BurpAbilityTask().Activate(this); });
-      });
-    }
-  }
-
-  class SetAnimatorParam : AbilityTask {
-    public abstract class ParamType {
-      public string Key;
-      public abstract void Set(Animator animator);
-    }
-
-    public class FloatParam : ParamType {
-      public float Value;
-      public FloatParam(string name, float value) {
-        Key = name;
-        Value = value;
-      }
-      public override void Set(Animator animator) {
-        animator.SetFloat(Key, Value);
-      }
-    }
-
-    public class IntParam : ParamType {
-      public int Value;
-      public IntParam(string name, int value) {
-        Key = name;
-        Value = value;
-      }
-      public override void Set(Animator animator) {
-        animator.SetInteger(Key, Value);
-      }
-    }
-
-    public class BoolParam : ParamType {
-      public bool Value;
-      public BoolParam(string name, bool value) {
-        Key = name;
-        Value = value;
-      }
-      public override void Set(Animator animator) {
-        animator.SetBool(Key, Value);
-      }
-    }
-
-    public class TriggerParam : ParamType {
-      public TriggerParam(string name) {
-        Key = name;
-      }
-      public override void Set(Animator animator) {
-        animator.SetTrigger(Key);
-      }
-    }
-
-    Animator Animator;
-    ParamType Param;
-
-    SetAnimatorParam(Animator animator, ParamType param) {
-      Animator = animator;
-      Param = param;
-    }
-
-    public override void OnStart() {
-      Param.Set(Animator);
-    }
-  }
-
-  // TODO: Maybe you could break this into Aim + Wait and a combinator Either
-  // then you would say Either(Aim,Wait) -> Next
   class Aim : AbilityTask {
     public float TurnSpeed;
     public int Frames;
@@ -334,19 +260,73 @@ public class AbilityMan : MonoBehaviour {
     }
   }
 
-  [SerializeField] float MOVE_SPEED = 10;
-  [SerializeField] CharacterController Controller;
-  [SerializeField] Transform Target;
-  [SerializeField] Transform Muzzle;
-  [SerializeField] Animator Animator;
-  [SerializeField] AudioSource AudioSource;
-  [SerializeField] Rigidbody ProjectilePrefab;
-  [SerializeField] AudioClip FireSound;
-  IAbility[] Abilities;
-  IAbility CurrentAbility;
+  // Aims continuously while firing two staggered shots
+  class DoubleShotConstantAim : AbilityGraph {
+    public Timeval ShotCooldown;
+    public Transform Owner;
+    public Transform Target;
+    public Transform Origin;
+    public Rigidbody ProjectilePrefab;
+    public AudioClip FireSound;
+    public Animator Animator;
+    public AudioSource AudioSource;
 
-  bool TryStartAbility(IAbility ability) {
-    if (ability.TryStart()) {
+    public override void OnStart() {
+      Animator.SetBool("Attacking", true);
+      var aim = new Aim { Frames = int.MaxValue, TurnSpeed = Mathf.PI, Target = Target, Owner = Owner };
+      var shotVolley = new Sequence(this, Fire, Fire);
+      aim.Activate(this);
+      shotVolley.Activate(this);
+      shotVolley.AddOutput(aim.Stop);
+    }
+
+    public override void OnStop() {
+      Animator.SetBool("Attacking", false);
+    }
+
+    AbilityTask Fire() {
+      Debug.Log("Fire");
+      Animator.SetTrigger("Attack");
+      AudioSource.PlayOptionalOneShot(FireSound);
+      Instantiate(ProjectilePrefab, Origin.transform.position, Owner.transform.rotation)
+      .AddForce(Owner.transform.forward*100, ForceMode.Impulse);
+      return new WaitAbilityTask { Frames = ShotCooldown.Frames };
+    }
+  }
+
+  class Sequence : AbilityTask {
+    public Func<AbilityTask> First;
+    public Func<AbilityTask> Second;
+    public AbilityGraph Graph;
+
+    public Sequence(AbilityGraph graph, Func<AbilityTask> first, Func<AbilityTask> second) {
+      Graph = graph;
+      First = first;
+      Second = second;
+    }
+
+    public override void OnStart() {
+      First()
+      .Activate(Graph)
+      .AddOutput(delegate {
+        Second()
+        .Activate(Graph)
+        .AddOutput(delegate {
+          Stop();
+          Continuation?.Invoke();
+        });
+      });
+    }
+  }
+
+  public float MOVE_SPEED = 10;
+  public CharacterController Controller;
+  public SimpleAbility CurrentAbility;
+  public SimpleAbility[] Abilities;
+
+  bool TryStartAbility(SimpleAbility ability) {
+    if (ability.IsComplete) {
+      ability.Begin();
       CurrentAbility = ability;
       return true;
     } else {
@@ -355,21 +335,7 @@ public class AbilityMan : MonoBehaviour {
   }
 
   void Start() {
-    Abilities = new IAbility[3] {
-      new ShoutKey(),
-      new FartWaitBurpAbility(),
-      new TripleShot {
-        AimDuration = Timeval.FromTicks(1000, 1000),
-        ShotCooldown = Timeval.FromTicks(500, 1000),
-        Target = Target,
-        Origin = Muzzle,
-        Owner = transform,
-        ProjectilePrefab = ProjectilePrefab,
-        FireSound = FireSound,
-        Animator = Animator,
-        AudioSource = AudioSource
-      }
-    };
+    Abilities = GetComponentsInChildren<SimpleAbility>();
   }
 
   void FixedUpdate() {
@@ -381,12 +347,8 @@ public class AbilityMan : MonoBehaviour {
       CurrentAbility = null;
     }
     if (CurrentAbility == null) {
-      if (action.L2.JustDown) {
+      if (action.R2.JustDown) {
         TryStartAbility(Abilities[0]);
-      } else if (action.R1.JustDown) {
-        TryStartAbility(Abilities[1]);
-      } else if (action.R2.JustDown) {
-        TryStartAbility(Abilities[2]);
       }
     }
 
@@ -394,6 +356,5 @@ public class AbilityMan : MonoBehaviour {
       transform.forward = move;
     }
     Controller.Move(dt*MOVE_SPEED*Inputs.Action.Left.XZ);
-    CurrentAbility?.Step();
   }
 }
