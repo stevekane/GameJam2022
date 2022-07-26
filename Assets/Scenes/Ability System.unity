@@ -298,29 +298,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Owner: {fileID: 1511601687}
+  Animator: {fileID: 1511601688}
   Windup:
     Animator: {fileID: 1511601688}
     Duration:
-      Millis: 33.333332
+      Millis: 66.666664
       TicksPerSecond: 30
     ClipDuration:
-      Millis: 33.333332
+      Millis: 66.666664
       TicksPerSecond: 30
-    OnBegin:
-      m_PersistentCalls:
-        m_Calls: []
-    OnEnd:
-      m_PersistentCalls:
-        m_Calls: []
-    OnTick:
-      m_PersistentCalls:
-        m_Calls: []
   Active:
     Owner: {fileID: 1511601687}
     Animator: {fileID: 1511601688}
     Hitbox: {fileID: 1154141671}
-    Hits: []
-    PhaseHits: []
     Duration:
       Millis: 33.333332
       TicksPerSecond: 30
@@ -328,17 +318,10 @@ MonoBehaviour:
       Millis: 33.333332
       TicksPerSecond: 30
     HitFreezeDuration:
-      Millis: 1000
+      Millis: 100
       TicksPerSecond: 30
-    OnBegin:
-      m_PersistentCalls:
-        m_Calls: []
-    OnEnd:
-      m_PersistentCalls:
-        m_Calls: []
-    OnTick:
-      m_PersistentCalls:
-        m_Calls: []
+    Hits: []
+    PhaseHits: []
     OnContactStart:
       m_PersistentCalls:
         m_Calls:
@@ -377,21 +360,14 @@ MonoBehaviour:
     ClipDuration:
       Millis: 33.333332
       TicksPerSecond: 30
-    OnBegin:
-      m_PersistentCalls:
-        m_Calls: []
-    OnEnd:
-      m_PersistentCalls:
-        m_Calls: []
-    OnTick:
-      m_PersistentCalls:
-        m_Calls: []
   AnimatorParams:
     Attacking: Attacking
     AttackIndex: AttackIndex
     AttackSpeed: AttackSpeed
   HitVFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
   HitSFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
+  HitVFXOffset: {x: 0, y: 1, z: 0}
+  HitStopVibrationAmplitude: 0.2
   HitCameraShakeIntensity: 2
   HitDamage: 5
   HitTargetKnockbackStrength: 15
@@ -1304,6 +1280,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MOVE_SPEED: 25
   Controller: {fileID: 1511601690}
+  Status: {fileID: 1511601691}
   CurrentAbility: {fileID: 0}
   Abilities: []
 --- !u!4 &1511601687
