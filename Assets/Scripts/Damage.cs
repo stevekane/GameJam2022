@@ -1,7 +1,8 @@
 using UnityEngine;
 
 public class Damage : MonoBehaviour {
-  public float Points { get; private set; }
+  [SerializeField] float _Points;
+  public float Points { get => _Points; private set => _Points = value; }
 
   public void AddPoints(float dp) {
     Points += dp;

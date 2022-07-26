@@ -72,6 +72,7 @@ public class Smoke : MonoBehaviour {
   Coroutine DodgeRoutine;
   bool IsDodging = false;
   Vector3 Velocity;
+  int RecoveryFrames;
 
   void Awake() {
     Attacker = GetComponent<Attacker>();
@@ -94,7 +95,7 @@ public class Smoke : MonoBehaviour {
     bool inMoveRange = distToTarget < ATTACK_RANGE*.9f;
     var dt = Time.fixedDeltaTime;
 
-    var shouldAttack = Status.CanAttack && inAttackRange;
+    var shouldAttack = Status.CanAttack && inAttackRange && RecoveryFrames <= 0;
     if (shouldAttack && AttackRoutine == null) {
       AttackRoutine = StartCoroutine(AttackSequence());
     }
@@ -104,8 +105,14 @@ public class Smoke : MonoBehaviour {
     //  AttackRoutine = null;
     //}
 
-    if (Target.IsAttacking && DodgeRoutine == null) {
-      DodgeRoutine = StartCoroutine(DodgeSequence());
+    //if (Target.IsAttacking && DodgeRoutine == null) {
+    //  DodgeRoutine = StartCoroutine(DodgeSequence());
+    //}
+
+    if (Status.IsHitstun) {
+      RecoveryFrames = Timeval.FromMillis(1000).Frames;
+    } else if (RecoveryFrames > 0) {
+      --RecoveryFrames;
     }
 
     Animator.SetBool("Dashing", Motion == Motion.Dashing);
