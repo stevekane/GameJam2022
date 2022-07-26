@@ -1,9 +1,9 @@
 using UnityEngine;
 
-public enum AttackState { 
-  None, 
-  Windup, 
-  Active, 
+public enum AttackState {
+  None,
+  Windup,
+  Active,
   Recovery,
   Parried
 }
@@ -90,9 +90,9 @@ public class Attacker : MonoBehaviour {
     Attack = attack;
     State = AttackState.Windup;
     IsCharging = false;
-    FramesRemaining = Attack.Config.WindupDurationRuntime.Frames; 
+    FramesRemaining = Attack.Config.WindupDurationRuntime.Frames;
     AudioSource?.PlayOptionalOneShot(Attack.Config.WindupAudioClip);
-    VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Attack.Config.WindupEffect, transform.position);
+    VFXManager.Instance?.TrySpawnEffect(Attack.Config.WindupEffect, transform.position);
   }
 
   public void StartChargeAttack(Attack attack) {
@@ -101,7 +101,7 @@ public class Attacker : MonoBehaviour {
     IsCharging = true;
     FramesRemaining = Attack.Config.ChargeDurationMultiplier*Attack.Config.WindupDurationRuntime.Frames;
     AudioSource?.PlayOptionalOneShot(Attack.Config.WindupAudioClip);
-    VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Attack.Config.WindupEffect, transform.position);
+    VFXManager.Instance?.TrySpawnEffect(Attack.Config.WindupEffect, transform.position);
   }
 
   public void ReleaseChargeAttack() {
@@ -138,11 +138,11 @@ public class Attacker : MonoBehaviour {
   }
 
   public void OnBlock(Attack attack, Defender defender) {
-    VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, attack.Config.ContactEffect, defender.transform.position);
+    VFXManager.Instance?.TrySpawnEffect(attack.Config.ContactEffect, defender.transform.position);
   }
 
   public void OnParry(Attack attack, Defender defender) {
-    VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, attack.Config.ContactEffect, defender.transform.position);
+    VFXManager.Instance?.TrySpawnEffect(attack.Config.ContactEffect, defender.transform.position);
   }
 
   public void OnHit(Attack attack, Defender defender) {
@@ -157,11 +157,11 @@ public class Attacker : MonoBehaviour {
       TotalKnockbackVector += AttackMelee.KnockbackVector(transform, defender.transform, attack.Config.KnockBackType);
       AudioSource?.PlayOptionalOneShot(attack.Config.HitAudioClip);
       Vibrator?.Vibrate(transform.forward, attack.Config.ContactDurationRuntime.Frames, .15f);
-      VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, attack.Config.ContactEffect, defender.transform.position);
+      VFXManager.Instance?.TrySpawnEffect(attack.Config.ContactEffect, defender.transform.position);
       CameraShaker.Instance?.Shake(attack.Config.HitCameraShakeIntensity);
     } else {
       AudioSource?.PlayOptionalOneShot(attack.Config.HitAudioClip);
-      VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, attack.Config.ContactEffect, defender.transform.position);
+      VFXManager.Instance?.TrySpawnEffect(attack.Config.ContactEffect, defender.transform.position);
     }
   }
 
@@ -170,7 +170,7 @@ public class Attacker : MonoBehaviour {
       State = AttackState.Active;
       FramesRemaining = IsHolding ? int.MaxValue : Attack.Config.ActiveDurationRuntime.Frames;
       AudioSource?.PlayOptionalOneShot(Attack.Config.ActiveAudioClip);
-      VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Attack.Config.ActiveEffect, transform.position);
+      VFXManager.Instance?.TrySpawnEffect(Attack.Config.ActiveEffect, transform.position);
       (Attack as AttackRanged)?.EnterActive();
     } else if (State == AttackState.Active && FramesRemaining <= 0) {
       State = AttackState.Recovery;
@@ -180,7 +180,7 @@ public class Attacker : MonoBehaviour {
       (Attack as AttackRanged)?.ExitActive();
       Pushable?.Push(TotalKnockBackStrength*TotalKnockbackVector.normalized);
       AudioSource?.PlayOptionalOneShot(Attack.Config.RecoveryAudioClip);
-      VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Attack.Config.RecoveryEffect, transform.position);
+      VFXManager.Instance?.TrySpawnEffect(Attack.Config.RecoveryEffect, transform.position);
     } else if (State == AttackState.Recovery && FramesRemaining <= 0) {
       Attack = null;
       State = AttackState.None;

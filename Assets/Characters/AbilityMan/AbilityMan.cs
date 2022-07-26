@@ -349,6 +349,8 @@ public class AbilityMan : MonoBehaviour {
     if (CurrentAbility == null) {
       if (action.R2.JustDown) {
         TryStartAbility(Abilities[0]);
+      } else if (action.R1.JustDown) {
+        TryStartAbility(Abilities[1]);
       }
     }
 

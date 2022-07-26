@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -12,20 +13,33 @@ public class AimAndFireAbility : SimpleAbility {
   public AudioClip FireSound;
   public Timeval ShotCooldown;
   public Animator Animator;
-  public override IEnumerator Routine() {
-    StartCoroutine(new AimAt { Aimer = Aimer, Target = Target, TurnSpeed = TurnSpeed }.Start());
-    Animator.SetBool("Attacking", true);
-    for (var i = 0; i < 3; i++) {
-      yield return new WaitFrames(ShotCooldown.Frames).Start();
-      Fire();
-    }
-    yield return new WaitFrames(ShotCooldown.Frames).Start();
-    Animator.SetBool("Attacking", false);
+
+  public override void BeforeBegin() {
+    Animator.SetBool("Firing", true);
   }
-  void Fire() {
-    Animator.SetTrigger("Attack");
+
+  public override IEnumerator Routine() {
+    var aim = StartCoroutine(new AimAt(Aimer, Target, TurnSpeed));
+    yield return new WaitFrames(ShotCooldown.Frames);
+    yield return NTimes(3, Fire);
+    StopCoroutine(aim);
+  }
+
+  public override void AfterEnd() {
+    Animator.SetBool("Firing", false);
+  }
+
+  IEnumerator Fire() {
+    Animator.SetTrigger("Fire");
     AudioSource.PlayOptionalOneShot(FireSound);
     Instantiate(ProjectilePrefab, Origin.transform.position, Aimer.transform.rotation)
     .AddForce(ProjectileForce*Aimer.transform.forward, ForceMode.Impulse);
+    yield return new WaitFrames(ShotCooldown.Frames);
+  }
+
+  IEnumerator NTimes(int n, Func<IEnumerator> f) {
+    for (var i = 0; i < n; i++) {
+      yield return f();
+    }
   }
 }

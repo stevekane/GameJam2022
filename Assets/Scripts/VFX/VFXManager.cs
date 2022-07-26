@@ -11,10 +11,10 @@ public class VFXManager : MonoBehaviour {
     Instance = null;
   }
 
-  public bool TrySpawnEffect(Camera camera, GameObject prefab, Vector3 position) {
+  public bool TrySpawnEffect(GameObject prefab, Vector3 position) {
     if (prefab) {
-      var rotation = camera
-        ? Quaternion.LookRotation(camera.transform.position)
+      var rotation = MainCamera.Instance
+        ? Quaternion.LookRotation(MainCamera.Instance.transform.position)
         : Quaternion.identity;
       var effect = Instantiate(prefab, position, rotation);
       Destroy(effect, 3);

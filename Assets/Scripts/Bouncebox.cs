@@ -35,7 +35,7 @@ public class Bouncebox : MonoBehaviour {
       } else {
         AudioSource.PlayOptionalOneShot(AudioClip);
         Vibrator.Vibrate(transform.right, Duration.Frames, .15f);
-        VFXManager.Instance?.TrySpawnEffect(MainCamera.Instance, Effect, hit.point);
+        VFXManager.Instance?.TrySpawnEffect(Effect, hit.point);
         var bounceVel = Vector3.Reflect(k.Velocity, hit.normal.XZ());
         Status.Remove(k);
         Status.Add(new HitStunEffect(Duration.Frames, new KnockbackEffect(bounceVel)));
