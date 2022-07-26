@@ -301,10 +301,10 @@ MonoBehaviour:
   Windup:
     Animator: {fileID: 1511601688}
     Duration:
-      Millis: 66.666664
+      Millis: 33.333332
       TicksPerSecond: 30
     ClipDuration:
-      Millis: 66.666664
+      Millis: 33.333332
       TicksPerSecond: 30
     OnBegin:
       m_PersistentCalls:
@@ -328,7 +328,7 @@ MonoBehaviour:
       Millis: 33.333332
       TicksPerSecond: 30
     HitFreezeDuration:
-      Millis: 100
+      Millis: 1000
       TicksPerSecond: 30
     OnBegin:
       m_PersistentCalls:
@@ -344,7 +344,7 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 286873701}
           m_TargetAssemblyTypeName: MeleeAttackAbility, Assembly-CSharp
-          m_MethodName: OnHit
+          m_MethodName: OnHitStopStart
           m_Mode: 0
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -359,7 +359,7 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 286873701}
           m_TargetAssemblyTypeName: MeleeAttackAbility, Assembly-CSharp
-          m_MethodName: PostHitFreeze
+          m_MethodName: OnHitStopEnd
           m_Mode: 0
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -372,10 +372,10 @@ MonoBehaviour:
   Recovery:
     Animator: {fileID: 1511601688}
     Duration:
-      Millis: 66.666664
+      Millis: 33.333332
       TicksPerSecond: 30
     ClipDuration:
-      Millis: 66.666664
+      Millis: 33.333332
       TicksPerSecond: 30
     OnBegin:
       m_PersistentCalls:
@@ -1279,6 +1279,7 @@ GameObject:
   - component: {fileID: 1511601687}
   - component: {fileID: 1511601686}
   - component: {fileID: 1511601691}
+  - component: {fileID: 1511601692}
   - component: {fileID: 1511601688}
   - component: {fileID: 1511601689}
   - component: {fileID: 1511601690}
@@ -1473,6 +1474,19 @@ MonoBehaviour:
   CanAttack: 1
   IsAirborne: 0
   IsHitstun: 0
+--- !u!114 &1511601692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511601685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d0cba5e795e3e24f94847040ed69f07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Target: {fileID: 59375856}
 --- !u!1 &1747206823
 GameObject:
   m_ObjectHideFlags: 0

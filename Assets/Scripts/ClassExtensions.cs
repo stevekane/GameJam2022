@@ -75,6 +75,12 @@ public static class AudioSourceExtensions {
   }
 }
 
+public static class AnimatorExtensions {
+  public static void SetSpeed(this Animator animator, float speed) {
+    animator.speed = speed;
+  }
+}
+
 public static class ArrayLikeExtensions {
   public static void ForEach<T>(this IEnumerable<T> xs, Action<T> p) {
     foreach (var x in xs) {
