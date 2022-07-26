@@ -6,85 +6,54 @@ using UnityEngine.Events;
 
 [Serializable]
 public class InactiveAttackPhase : SimpleTask {
-  [Header("Components")]
   public Animator Animator;
-  [Header("Frame Data")]
-  public Timeval Duration = Timeval.FromMillis(0,30);
-  public Timeval ClipDuration = Timeval.FromMillis(0,30);
-  [Header("Events")]
-  public UnityEvent OnBegin;
-  public UnityEvent OnEnd;
-  public UnityEvent OnTick;
+  public Timeval Duration = Timeval.FromMillis(0, 30);
+  public Timeval ClipDuration = Timeval.FromMillis(0, 30);
   public override IEnumerator Routine() {
-    OnBegin.Invoke();
-    for (var i = 0; i < Duration.Frames; i++) {
-      Animator.SetFloat("AttackSpeed", ClipDuration.Millis/Duration.Millis);
-      OnTick.Invoke();
-      yield return null;
-    }
-    OnEnd.Invoke();
+    Animator.SetFloat("AttackSpeed", ClipDuration.Millis/Duration.Millis);
+    yield return new WaitFrames(Duration.Frames);
   }
 }
 
 [Serializable]
 public class HitboxAttackPhase : SimpleTask {
-  static int INITIAL_HIT_BUFFER_SIZE = 4;
-
-  [Header("Components")]
   public Transform Owner;
   public Animator Animator;
   public AttackHitbox Hitbox;
-  [Header("Buffers")]
-  public List<Transform> Hits = new List<Transform>(INITIAL_HIT_BUFFER_SIZE);
-  public List<Transform> PhaseHits = new List<Transform>(INITIAL_HIT_BUFFER_SIZE);
-  [Header("Frame Data")]
-  public Timeval Duration = Timeval.FromMillis(0,30);
-  public Timeval ClipDuration = Timeval.FromMillis(0,30);
-  public Timeval HitFreezeDuration = Timeval.FromMillis(3,30);
-  [Header("Events")]
-  public UnityEvent OnBegin;
-  public UnityEvent OnEnd;
-  public UnityEvent OnTick;
-  public UnityEvent<Transform, Transform> OnContactStart;
-  public UnityEvent<Transform, Transform> OnContactEnd;
+  public Timeval Duration = Timeval.FromMillis(0, 30);
+  public Timeval ClipDuration = Timeval.FromMillis(0, 30);
+  public Timeval HitFreezeDuration = Timeval.FromMillis(3, 30);
+  public List<Transform> Hits = new List<Transform>(capacity: 4);
+  public List<Transform> PhaseHits = new List<Transform>(capacity: 4);
+  public UnityEvent<Transform, List<Transform>, int> OnContactStart;
+  public UnityEvent<Transform, List<Transform>> OnContactEnd;
 
-  /*
-  TODO : First punch never detected. I am not sure why as all subsequent punches work...
-  TODO : Animator.speed does not seem to slow down the attack... why?
-  DONE : Punches fire 3 ContactStart and 3 ContactEnd events... why?
-  */
+  public void OnContact(Transform target) {
+    if (!PhaseHits.Contains(target)) {
+      Hits.Add(target);
+      PhaseHits.Add(target);
+    }
+  }
+
   public override IEnumerator Routine() {
-    Hits.Clear();
     PhaseHits.Clear();
-    OnBegin.Invoke();
+    Hitbox.Collider.enabled = false;
     Hitbox.Collider.enabled = true;
-    Hitbox.TriggerEnter += OnContact;
+    Hitbox.TriggerStay = OnContact;
+    Animator.SetFloat("AttackSpeed", ClipDuration.Millis/Duration.Millis);
     for (var j = 0; j < Duration.Frames; j++) {
-      Animator.SetFloat("AttackSpeed", ClipDuration.Millis/Duration.Millis);
-      OnTick.Invoke();
+      Hits.Clear();
+      yield return null;
       if (Hits.Count > 0) {
+        OnContactStart.Invoke(Owner, Hits, HitFreezeDuration.Frames);
         Hitbox.Collider.enabled = false;
-        Hits.ForEach(target => OnContactStart.Invoke(Owner, target));
         yield return new WaitFrames(HitFreezeDuration.Frames);
-        Hits.ForEach(target => OnContactEnd.Invoke(Owner, target));
-        Hits.Clear();
         Hitbox.Collider.enabled = true;
-      } else {
-        Hitbox.Collider.enabled = true;
-        yield return null;
+        OnContactEnd.Invoke(Owner, Hits);
       }
     }
-    Hitbox.TriggerEnter -= OnContact;
     Hitbox.Collider.enabled = false;
-    OnEnd.Invoke();
-    PhaseHits.Clear();
-    Hits.Clear();
-  }
-  void OnContact(Collider c) {
-    if (!PhaseHits.Contains(c.transform)) {
-      Hits.Add(c.transform);
-      PhaseHits.Add(c.transform);
-    }
+    Hitbox.TriggerStay = null;
   }
 }
 
@@ -97,12 +66,15 @@ public class AttackAnimatorParams {
 
 public class MeleeAttackAbility : SimpleAbility {
   public Transform Owner;
+  public Animator Animator;
   public InactiveAttackPhase Windup;
   public HitboxAttackPhase Active;
   public InactiveAttackPhase Recovery;
   public AttackAnimatorParams AnimatorParams;
   public GameObject HitVFX;
   public AudioClip HitSFX;
+  public Vector3 HitVFXOffset = Vector3.up;
+  public float HitStopVibrationAmplitude;
   public float HitCameraShakeIntensity;
   public float HitDamage;
   public float HitTargetKnockbackStrength;
@@ -110,57 +82,44 @@ public class MeleeAttackAbility : SimpleAbility {
   public int Index;
 
   public override void BeforeBegin() {
-    Windup.Reset();
-    Active.Reset();
-    Recovery.Reset();
-    Owner.GetComponent<Animator>().SetBool(AnimatorParams.Attacking, true);
-    Owner.GetComponent<Animator>().SetInteger(AnimatorParams.AttackIndex, Index);
-    Owner.GetComponent<Animator>().SetFloat(AnimatorParams.AttackSpeed, 1);
+    Animator.SetBool(AnimatorParams.Attacking, true);
+    Animator.SetInteger(AnimatorParams.AttackIndex, Index);
+    Animator.SetFloat(AnimatorParams.AttackSpeed, 1);
   }
 
   public override IEnumerator Routine() {
+    Windup.Reset();
     yield return Windup;
+    Active.Reset();
     yield return Active;
+    Recovery.Reset();
     yield return Recovery;
   }
 
   public override void AfterEnd() {
-    Owner.GetComponent<Animator>().SetBool(AnimatorParams.Attacking, false);
-    Owner.GetComponent<Animator>().SetInteger(AnimatorParams.AttackIndex, -1);
-    Owner.GetComponent<Animator>().SetFloat(AnimatorParams.AttackSpeed, 1);
+    Animator.SetBool(AnimatorParams.Attacking, false);
+    Animator.SetInteger(AnimatorParams.AttackIndex, -1);
+    Animator.SetFloat(AnimatorParams.AttackSpeed, 1);
   }
 
-  // TODO: Not sure this should live on this most basic class
-  public void OnHit(Transform attacker, Transform target) {
-    CameraShaker.Instance.Shake(HitCameraShakeIntensity);
-    VFXManager.Instance.TrySpawnEffect(HitVFX, target.transform.position+Vector3.up);
+  public void OnHitStopStart(Transform attacker, List<Transform> targets, int stopFrames) {
     SFXManager.Instance.TryPlayOneShot(HitSFX);
-    if (target.TryGetComponent(out Damage damage)) {
-      damage.AddPoints(HitDamage);
-    }
-    if (attacker.TryGetComponent(out Animator attackerAnimator)) {
-      attackerAnimator.speed = 0;
-    }
-    if (target.TryGetComponent(out Animator targetAnimator)) {
-      targetAnimator.speed = 0;
-    }
+    CameraShaker.Instance.Shake(HitCameraShakeIntensity);
+    Owner.GetComponent<Status>()?.Add(new HitStopEffect(attacker.forward, HitStopVibrationAmplitude, stopFrames));
+    targets.ForEach(target => {
+      var delta = attacker.position-target.position;
+      var axis = delta.normalized;
+      target.GetComponent<Status>()?.Add(new HitStopEffect(axis, HitStopVibrationAmplitude, stopFrames));
+      VFXManager.Instance.TrySpawnEffect(HitVFX, target.transform.position+HitVFXOffset);
+    });
   }
 
-  // TODO: Not sure this should live on this most basic class
-  public void PostHitFreeze(Transform attacker, Transform target) {
-    var toTargetDelta = target.position-attacker.position;
-    var toTarget = toTargetDelta.XZ().normalized;
-    if (attacker.TryGetComponent(out Status attackerStatus)) {
-      attackerStatus.Add(new KnockbackEffect(HitAttackerKnockbackStrength*-toTarget));
-    }
-    if (target.TryGetComponent(out Status targetStatus)) {
-      targetStatus.Add(new KnockbackEffect(HitTargetKnockbackStrength*toTarget));
-    }
-    if (attacker.TryGetComponent(out Animator attackerAnimator)) {
-      attackerAnimator.speed = 1;
-    }
-    if (target.TryGetComponent(out Animator targetAnimator)) {
-      targetAnimator.speed = 1;
-    }
+  public void OnHitStopEnd(Transform attacker, List<Transform> targets) {
+    attacker.GetComponent<Status>()?.Add(new KnockbackEffect(HitAttackerKnockbackStrength*-attacker.forward));
+    targets.ForEach(target => {
+      var delta = target.position-attacker.position;
+      var direction = delta.normalized;
+      target.GetComponent<Status>()?.Add(new KnockbackEffect(HitTargetKnockbackStrength*direction));
+    });
   }
 }

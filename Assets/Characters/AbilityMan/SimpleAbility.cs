@@ -1,15 +1,13 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
 public abstract class SimpleTask : IEnumerator {
-  public abstract IEnumerator Routine();
   public IEnumerator Enumerator;
-  public IEnumerator GetEnumerator() => Enumerator;
   public object Current { get => Enumerator.Current; }
   public bool MoveNext() => Enumerator.MoveNext();
   public void Dispose() => Enumerator = null;
   public void Reset() => Enumerator = Routine();
+  public abstract IEnumerator Routine();
 }
 
 public class AimAt : SimpleTask {

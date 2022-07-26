@@ -36,6 +36,46 @@ public class KnockbackEffect : StatusEffect {
   }
 }
 
+public class HitStopEffect : StatusEffect {
+  public Vector3 Axis;
+  public float Amplitude;
+  public int TotalFrames;
+  public int Frames;
+  public StatusEffect PostEffect;
+  public override Types Type { get => Types.None; }
+
+  public HitStopEffect(Vector3 axis, float amplitude, int totalFrames, StatusEffect postEffect = null) {
+    Frames = 0;
+    Axis = axis;
+    Amplitude = amplitude;
+    TotalFrames = totalFrames;
+    PostEffect = postEffect;
+  }
+
+  public override bool Reset(StatusEffect e) {
+    Frames = TotalFrames;
+    return true;
+  }
+
+  public override void Apply(Status status) {
+    if (Frames <= TotalFrames) {
+      status.CanAttack = false;
+      status.CanMove = false;
+      status.GetComponent<Animator>()?.SetSpeed(0);
+      status.GetComponent<Vibrator>()?.Vibrate(Axis, TotalFrames, Amplitude);
+      Frames++;
+    } else {
+      status.CanAttack = true;
+      status.CanMove = true;
+      status.GetComponent<Animator>()?.SetSpeed(1);
+      status.Remove(this);
+      if (PostEffect != null) {
+        status.Add(PostEffect);
+      }
+    }
+  }
+}
+
 // TODO: Move to Damage.cs?
 public class HitStunEffect : StatusEffect {
   public int Frames, HitStopFrames;

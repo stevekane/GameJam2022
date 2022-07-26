@@ -4,10 +4,22 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class AttackHitbox : MonoBehaviour {
   public Collider Collider;
-  public Action<Collider> TriggerEnter;
-  public Action<Collider> TriggerStay;
-  public Action<Collider> TriggerExit;
-  void OnTriggerEnter(Collider c) => TriggerEnter?.Invoke(c);
-  void OnTriggerStay(Collider c) => TriggerStay?.Invoke(c);
-  void OnTriggerExit(Collider c) => TriggerExit?.Invoke(c);
+  public Action<Transform> TriggerEnter;
+  public Action<Transform> TriggerStay;
+  public Action<Transform> TriggerExit;
+  void OnTriggerEnter(Collider c) {
+    if (c.TryGetComponent(out Hurtbox hurtbox)) {
+      TriggerEnter?.Invoke(hurtbox.Defender.transform);
+    }
+  }
+  void OnTriggerStay(Collider c) {
+    if (c.TryGetComponent(out Hurtbox hurtbox)) {
+      TriggerStay?.Invoke(hurtbox.Defender.transform);
+    }
+  }
+  void OnTriggerExit(Collider c) {
+    if (c.TryGetComponent(out Hurtbox hurtbox)) {
+      TriggerExit?.Invoke(hurtbox.Defender.transform);
+    }
+  }
 }
