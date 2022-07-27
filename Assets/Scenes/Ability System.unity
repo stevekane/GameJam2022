@@ -297,17 +297,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70667403218b956439fa1816c19b5e1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Index: 0
   Owner: {fileID: 1511601687}
   Animator: {fileID: 1511601688}
   Windup:
+    Index: 0
     Animator: {fileID: 1511601688}
     Duration:
-      Millis: 66.666664
+      Millis: 33.333332
       TicksPerSecond: 30
     ClipDuration:
-      Millis: 66.666664
+      Millis: 33.333332
       TicksPerSecond: 30
   Active:
+    Index: 0
     Owner: {fileID: 1511601687}
     Animator: {fileID: 1511601688}
     Hitbox: {fileID: 1154141671}
@@ -353,6 +356,7 @@ MonoBehaviour:
             m_BoolArgument: 0
           m_CallState: 2
   Recovery:
+    Index: 0
     Animator: {fileID: 1511601688}
     Duration:
       Millis: 33.333332
@@ -360,10 +364,6 @@ MonoBehaviour:
     ClipDuration:
       Millis: 33.333332
       TicksPerSecond: 30
-  AnimatorParams:
-    Attacking: Attacking
-    AttackIndex: AttackIndex
-    AttackSpeed: AttackSpeed
   HitVFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
   HitSFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
   HitVFXOffset: {x: 0, y: 1, z: 0}
@@ -372,7 +372,6 @@ MonoBehaviour:
   HitDamage: 5
   HitTargetKnockbackStrength: 15
   HitAttackerKnockbackStrength: 15
-  Index: 0
 --- !u!1 &305352897
 GameObject:
   m_ObjectHideFlags: 0
@@ -625,6 +624,29 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &531131531 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4692194450172351927, guid: bf3f367c6df14294a91d31e141d74127, type: 3}
+  m_PrefabInstance: {fileID: 845376668}
+  m_PrefabAsset: {fileID: 0}
+--- !u!143 &531131538
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 531131531}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 4
+  m_Radius: 1
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 2, z: 0}
 --- !u!850595691 &544137047
 LightingSettings:
   m_ObjectHideFlags: 0

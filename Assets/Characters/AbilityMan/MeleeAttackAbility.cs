@@ -6,17 +6,57 @@ using UnityEngine.Events;
 
 [Serializable]
 public class InactiveAttackPhase : SimpleTask {
+  public int Index;
   public Animator Animator;
   public Timeval Duration = Timeval.FromMillis(0, 30);
   public Timeval ClipDuration = Timeval.FromMillis(0, 30);
   public override IEnumerator Routine() {
-    Animator.SetFloat("AttackSpeed", ClipDuration.Millis/Duration.Millis);
-    yield return new WaitFrames(Duration.Frames);
+    for (var i = 0; i < Duration.Frames; i++) {
+      yield return null;
+      var attackSpeed = ClipDuration.Millis/Duration.Millis;
+      Animator.SetFloat("AttackSpeed", attackSpeed);
+      Animator.SetBool("Attacking", true);
+      Animator.SetInteger("AttackIndex", Index);
+    }
+  }
+}
+
+[Serializable]
+public class ChargedAttackPhase : SimpleTask {
+  public int Index;
+  public Animator Animator;
+  public Timeval Duration = Timeval.FromMillis(0, 30);
+  public Timeval ClipDuration = Timeval.FromMillis(0, 30);
+  public int ChargeFrameMultiplier = 1;
+  public int FramesRemaining;
+  public bool IsCharging;
+
+  public void OnChargeBegin() {
+    IsCharging = true;
+    FramesRemaining *= ChargeFrameMultiplier;
+  }
+
+  public void OnChargeEnd() {
+    IsCharging = false;
+    FramesRemaining /= ChargeFrameMultiplier;
+  }
+
+  public override IEnumerator Routine() {
+    while (FramesRemaining > 0) {
+      yield return null;
+      var multiplier = IsCharging ? ChargeFrameMultiplier : 1;
+      var attackSpeed = ClipDuration.Millis/Duration.Millis;
+      Animator.SetFloat("AttackSpeed", multiplier*attackSpeed);
+      Animator.SetBool("Attacking", true);
+      Animator.SetInteger("AttackIndex", Index);
+      FramesRemaining--;
+    }
   }
 }
 
 [Serializable]
 public class HitboxAttackPhase : SimpleTask {
+  public int Index;
   public Transform Owner;
   public Animator Animator;
   public AttackHitbox Hitbox;
@@ -37,19 +77,22 @@ public class HitboxAttackPhase : SimpleTask {
 
   public override IEnumerator Routine() {
     PhaseHits.Clear();
-    Hitbox.Collider.enabled = false;
     Hitbox.Collider.enabled = true;
     Hitbox.TriggerStay = OnContact;
-    Animator.SetFloat("AttackSpeed", ClipDuration.Millis/Duration.Millis);
-    for (var j = 0; j < Duration.Frames; j++) {
-      Hits.Clear();
+    for (var i = 0; i < Duration.Frames; i++) {
       yield return null;
+      Animator.SetFloat("AttackSpeed", ClipDuration.Millis/Duration.Millis);
+      Animator.SetBool("Attacking", true);
+      Animator.SetInteger("AttackIndex", Index);
       if (Hits.Count > 0) {
-        OnContactStart.Invoke(Owner, Hits, HitFreezeDuration.Frames);
         Hitbox.Collider.enabled = false;
+        Hitbox.TriggerStay = null;
+        OnContactStart.Invoke(Owner, Hits, HitFreezeDuration.Frames);
         yield return new WaitFrames(HitFreezeDuration.Frames);
-        Hitbox.Collider.enabled = true;
         OnContactEnd.Invoke(Owner, Hits);
+        Hitbox.Collider.enabled = true;
+        Hitbox.TriggerStay = OnContact;
+        Hits.Clear();
       }
     }
     Hitbox.Collider.enabled = false;
@@ -57,20 +100,13 @@ public class HitboxAttackPhase : SimpleTask {
   }
 }
 
-[Serializable]
-public class AttackAnimatorParams {
-  public string Attacking = "Attacking";
-  public string AttackIndex = "AttackIndex";
-  public string AttackSpeed = "AttackSpeed";
-}
-
 public class MeleeAttackAbility : SimpleAbility {
+  public int Index;
   public Transform Owner;
   public Animator Animator;
   public InactiveAttackPhase Windup;
   public HitboxAttackPhase Active;
   public InactiveAttackPhase Recovery;
-  public AttackAnimatorParams AnimatorParams;
   public GameObject HitVFX;
   public AudioClip HitSFX;
   public Vector3 HitVFXOffset = Vector3.up;
@@ -79,13 +115,6 @@ public class MeleeAttackAbility : SimpleAbility {
   public float HitDamage;
   public float HitTargetKnockbackStrength;
   public float HitAttackerKnockbackStrength;
-  public int Index;
-
-  public override void BeforeBegin() {
-    Animator.SetBool(AnimatorParams.Attacking, true);
-    Animator.SetInteger(AnimatorParams.AttackIndex, Index);
-    Animator.SetFloat(AnimatorParams.AttackSpeed, 1);
-  }
 
   public override IEnumerator Routine() {
     Windup.Reset();
@@ -97,9 +126,9 @@ public class MeleeAttackAbility : SimpleAbility {
   }
 
   public override void AfterEnd() {
-    Animator.SetBool(AnimatorParams.Attacking, false);
-    Animator.SetInteger(AnimatorParams.AttackIndex, -1);
-    Animator.SetFloat(AnimatorParams.AttackSpeed, 1);
+    Animator.SetBool("Attacking", false);
+    Animator.SetInteger("AttackIndex", -1);
+    Animator.SetFloat("AttackSpeed", 1);
   }
 
   public void OnHitStopStart(Transform attacker, List<Transform> targets, int stopFrames) {
