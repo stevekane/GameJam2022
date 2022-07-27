@@ -877,7 +877,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   RadialDeadZone: 0.2
-  UseMouseAndKeyboard: 0
+  UseMouseAndKeyboard: 1
   PlayState: 0
 --- !u!4 &723377968
 Transform:
@@ -1011,7 +1011,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh29384
+  m_Name: pb_Mesh44370
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -1376,6 +1376,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b42bd7ad895126f47abf0c5823bd25a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MOVE_SPEED: 10
+  Controller: {fileID: 0}
+  CurrentAbility: {fileID: 0}
+  Abilities: []
 --- !u!4 &1511601687
 Transform:
   m_ObjectHideFlags: 0
@@ -1550,7 +1554,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3356372153345074898, guid: e49299597d4035747bb85947974510bb, type: 3}
       propertyPath: m_AmplitudeGain
-      value: 1.75e-43
+      value: 0.00001165231
       objectReference: {fileID: 0}
     - target: {fileID: 7775614649029596951, guid: e49299597d4035747bb85947974510bb, type: 3}
       propertyPath: m_BiasX
@@ -1774,7 +1778,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 289355291137479491, guid: c7e64ff75a228aa4a98ea4183747c8b0, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 289355291137479493, guid: c7e64ff75a228aa4a98ea4183747c8b0, type: 3}
       propertyPath: m_RootOrder

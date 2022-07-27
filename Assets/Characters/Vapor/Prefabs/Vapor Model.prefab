@@ -30,7 +30,7 @@ Transform:
   m_Children:
   - {fileID: 8886774217921706565}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1171725925536240703
 GameObject:
@@ -469,6 +469,7 @@ GameObject:
   - component: {fileID: 4086794335372888829}
   - component: {fileID: 3382046238397422986}
   - component: {fileID: 866864447672104640}
+  - component: {fileID: 3178341254607339245}
   m_Layer: 0
   m_Name: Right Helm Plate
   m_TagString: Untagged
@@ -521,6 +522,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 40168b05aeeaaeb46ad1dc23cc13d1f4, type: 2}
+  - {fileID: -876546973899608171, guid: 87915bb2628c4d047871fea0fb3d6b01, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -542,6 +544,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &3178341254607339245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1321031780467409423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d25edbc91485245b0f56be67ef140f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Damage: {fileID: 0}
 --- !u!1 &1330266626544396442
 GameObject:
   m_ObjectHideFlags: 0
@@ -553,6 +568,7 @@ GameObject:
   - component: {fileID: 1955821651701771695}
   - component: {fileID: 3140195816563307045}
   - component: {fileID: 1385860941520930866}
+  - component: {fileID: 8174657568542737959}
   m_Layer: 0
   m_Name: Wing
   m_TagString: Untagged
@@ -604,6 +620,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 40168b05aeeaaeb46ad1dc23cc13d1f4, type: 2}
+  - {fileID: -876546973899608171, guid: 87915bb2628c4d047871fea0fb3d6b01, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -625,6 +642,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &8174657568542737959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1330266626544396442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d25edbc91485245b0f56be67ef140f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Damage: {fileID: 0}
 --- !u!1 &1549912138928036990
 GameObject:
   m_ObjectHideFlags: 0
@@ -636,6 +666,7 @@ GameObject:
   - component: {fileID: 3990876520324553108}
   - component: {fileID: 9099390128323450950}
   - component: {fileID: 5414644749004367551}
+  - component: {fileID: 102011409788419556}
   m_Layer: 0
   m_Name: Right Wing
   m_TagString: Untagged
@@ -687,6 +718,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 40168b05aeeaaeb46ad1dc23cc13d1f4, type: 2}
+  - {fileID: -876546973899608171, guid: 87915bb2628c4d047871fea0fb3d6b01, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -708,6 +740,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &102011409788419556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1549912138928036990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d25edbc91485245b0f56be67ef140f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Damage: {fileID: 0}
 --- !u!1 &2166942849966517538
 GameObject:
   m_ObjectHideFlags: 0
@@ -719,6 +764,7 @@ GameObject:
   - component: {fileID: 3894818648140230297}
   - component: {fileID: 5248887206767285663}
   - component: {fileID: 1063387248226569654}
+  - component: {fileID: 627600954474891731}
   m_Layer: 0
   m_Name: Left Helm Plate
   m_TagString: Untagged
@@ -771,6 +817,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 40168b05aeeaaeb46ad1dc23cc13d1f4, type: 2}
+  - {fileID: -876546973899608171, guid: 87915bb2628c4d047871fea0fb3d6b01, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -792,6 +839,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &627600954474891731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2166942849966517538}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d25edbc91485245b0f56be67ef140f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Damage: {fileID: 0}
 --- !u!1 &2965250728146688597
 GameObject:
   m_ObjectHideFlags: 0
@@ -803,6 +863,7 @@ GameObject:
   - component: {fileID: 2695858318615958816}
   - component: {fileID: 1812323334822899579}
   - component: {fileID: 7432053383528933181}
+  - component: {fileID: 4612427486607841157}
   m_Layer: 0
   m_Name: Head
   m_TagString: Untagged
@@ -854,6 +915,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 40168b05aeeaaeb46ad1dc23cc13d1f4, type: 2}
+  - {fileID: -876546973899608171, guid: 87915bb2628c4d047871fea0fb3d6b01, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -875,6 +937,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &4612427486607841157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2965250728146688597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d25edbc91485245b0f56be67ef140f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Damage: {fileID: 0}
 --- !u!1 &3219098484687486882
 GameObject:
   m_ObjectHideFlags: 0
@@ -11155,6 +11230,7 @@ GameObject:
   - component: {fileID: 9087725658905391096}
   - component: {fileID: 1985440008102750820}
   - component: {fileID: 860785861147353927}
+  - component: {fileID: 3416143104226788333}
   m_Layer: 0
   m_Name: Left Wing
   m_TagString: Untagged
@@ -11206,6 +11282,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 40168b05aeeaaeb46ad1dc23cc13d1f4, type: 2}
+  - {fileID: -876546973899608171, guid: 87915bb2628c4d047871fea0fb3d6b01, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -11227,6 +11304,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &3416143104226788333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6487536284503437687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d25edbc91485245b0f56be67ef140f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Damage: {fileID: 0}
 --- !u!1 &6622874209967080798
 GameObject:
   m_ObjectHideFlags: 0
@@ -11238,6 +11328,7 @@ GameObject:
   - component: {fileID: 2289282152666194416}
   - component: {fileID: 1070948915542767405}
   - component: {fileID: 7293709755546065879}
+  - component: {fileID: 8115305556327900729}
   m_Layer: 0
   m_Name: Head Membrane
   m_TagString: Untagged
@@ -11289,6 +11380,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 67c89c7d4dde46244be15c9cf7037144, type: 2}
+  - {fileID: -876546973899608171, guid: 87915bb2628c4d047871fea0fb3d6b01, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -11310,6 +11402,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &8115305556327900729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6622874209967080798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d25edbc91485245b0f56be67ef140f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Damage: {fileID: 0}
 --- !u!1 &7041690228802738961
 GameObject:
   m_ObjectHideFlags: 0
@@ -11321,6 +11426,7 @@ GameObject:
   - component: {fileID: 5129291407087299122}
   - component: {fileID: 7289409015873866118}
   - component: {fileID: 3861030003183053230}
+  - component: {fileID: 5702075885033333757}
   m_Layer: 0
   m_Name: Wing
   m_TagString: Untagged
@@ -11372,6 +11478,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 40168b05aeeaaeb46ad1dc23cc13d1f4, type: 2}
+  - {fileID: -876546973899608171, guid: 87915bb2628c4d047871fea0fb3d6b01, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -11393,6 +11500,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &5702075885033333757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7041690228802738961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d25edbc91485245b0f56be67ef140f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Damage: {fileID: 0}
 --- !u!1 &8832765633050425228
 GameObject:
   m_ObjectHideFlags: 0
@@ -11543,9 +11663,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 40168b05aeeaaeb46ad1dc23cc13d1f4, type: 2}
+    - target: {fileID: -7511558181221131132, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: -876546973899608171, guid: 87915bb2628c4d047871fea0fb3d6b01, type: 3}
     - target: {fileID: 919132149155446097, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
       propertyPath: m_Name
       value: Crown Spike
@@ -11553,6 +11681,24 @@ PrefabInstance:
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
+--- !u!1 &1482848193245160122 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
+  m_PrefabInstance: {fileID: 1753390379492188139}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8866678743928983887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1482848193245160122}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d25edbc91485245b0f56be67ef140f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Damage: {fileID: 0}
 --- !u!4 &2296820691078838272 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
@@ -11623,9 +11769,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 40168b05aeeaaeb46ad1dc23cc13d1f4, type: 2}
+    - target: {fileID: -7511558181221131132, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: -876546973899608171, guid: 87915bb2628c4d047871fea0fb3d6b01, type: 3}
     - target: {fileID: 919132149155446097, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
       propertyPath: m_Name
       value: Crown Spike
@@ -11633,6 +11787,24 @@ PrefabInstance:
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
+--- !u!1 &1167543477004725195 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
+  m_PrefabInstance: {fileID: 2085900323225720474}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &669118550071374230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1167543477004725195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d25edbc91485245b0f56be67ef140f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Damage: {fileID: 0}
 --- !u!4 &1979369658599387505 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
@@ -11703,9 +11875,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 40168b05aeeaaeb46ad1dc23cc13d1f4, type: 2}
+    - target: {fileID: -7511558181221131132, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: -876546973899608171, guid: 87915bb2628c4d047871fea0fb3d6b01, type: 3}
     - target: {fileID: 919132149155446097, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
       propertyPath: m_Name
       value: Crown Spike
@@ -11718,3 +11898,21 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
   m_PrefabInstance: {fileID: 7210106426971665950}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7552000330454862671 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0b0ea2bc4d5fcd840bd4327ec76a867b, type: 3}
+  m_PrefabInstance: {fileID: 7210106426971665950}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6402587575112050279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7552000330454862671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d25edbc91485245b0f56be67ef140f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Damage: {fileID: 0}
