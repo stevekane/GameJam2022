@@ -14,19 +14,25 @@ public class AimAndFireAbility : SimpleAbility {
   public Timeval ShotCooldown;
   public Animator Animator;
 
+  Coroutine Aim;
+  AutoAimEffect AutoAimEffect;
+
   public override void BeforeBegin() {
+    AutoAimEffect = new AutoAimEffect();
+    Aimer.GetComponent<Status>()?.Add(AutoAimEffect);
     Animator.SetBool("Firing", true);
   }
 
   public override IEnumerator Routine() {
-    var aim = StartCoroutine(new AimAt(Aimer, Target, TurnSpeed));
+    Aim = StartCoroutine(new AimAt(Aimer, Target, TurnSpeed));
     yield return new WaitFrames(ShotCooldown.Frames);
     yield return NTimes(3, Fire);
-    StopCoroutine(aim);
   }
 
   public override void AfterEnd() {
+    StopCoroutine(Aim);
     Animator.SetBool("Firing", false);
+    Aimer.GetComponent<Status>()?.Remove(AutoAimEffect);
   }
 
   IEnumerator Fire() {

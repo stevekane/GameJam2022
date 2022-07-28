@@ -7,10 +7,6 @@ public class VFXManager : MonoBehaviour {
     Instance = this;
   }
 
-  void OnDestroy() {
-    Instance = null;
-  }
-
   public bool TrySpawnEffect(GameObject prefab, Vector3 position) {
     if (prefab) {
       var rotation = MainCamera.Instance

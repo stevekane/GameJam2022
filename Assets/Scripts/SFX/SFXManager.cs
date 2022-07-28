@@ -9,10 +9,6 @@ public class SFXManager : MonoBehaviour {
     Instance = this;
   }
 
-  void OnDestroy() {
-    Instance = null;
-  }
-
   public bool TryPlayOneShot(AudioClip clip) {
     return AudioSource.PlayOptionalOneShot(clip);
   }

@@ -10,6 +10,14 @@ public abstract class StatusEffect {
   public abstract void Apply(Status status);
 }
 
+public class AutoAimEffect : StatusEffect {
+  public override Types Type { get => Types.None; }
+  public override bool Reset(StatusEffect e) => true;
+  public override void Apply(Status status) {
+    status.CanRotate = false;
+  }
+}
+
 public class KnockbackEffect : StatusEffect {
   static readonly float DRAG = 5f;
   static readonly float AIRBORNE_SPEED = 100f;
@@ -28,8 +36,9 @@ public class KnockbackEffect : StatusEffect {
   public override void Apply(Status status) {
     Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * DRAG);
     status.Move(Velocity*Time.fixedDeltaTime);
-    status.IsAirborne = Velocity.sqrMagnitude >= AIRBORNE_SPEED*AIRBORNE_SPEED;
+    status.IsAirborne |= Velocity.sqrMagnitude >= AIRBORNE_SPEED*AIRBORNE_SPEED;
     status.CanMove = !status.IsAirborne;
+    status.CanRotate = !status.IsAirborne;
     status.CanAttack = !status.IsAirborne;
     if (Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED)
       status.Remove(this);
@@ -59,14 +68,13 @@ public class HitStopEffect : StatusEffect {
 
   public override void Apply(Status status) {
     if (Frames <= TotalFrames) {
-      status.CanAttack = false;
       status.CanMove = false;
+      status.CanRotate = false;
+      status.CanAttack = false;
       status.GetComponent<Animator>()?.SetSpeed(0);
       status.GetComponent<Vibrator>()?.Vibrate(Axis, TotalFrames, Amplitude);
       Frames++;
     } else {
-      status.CanAttack = true;
-      status.CanMove = true;
       status.GetComponent<Animator>()?.SetSpeed(1);
       status.Remove(this);
       if (PostEffect != null) {
@@ -95,6 +103,7 @@ public class HitStunEffect : StatusEffect {
   }
   public override void Apply(Status status) {
     status.CanMove = false;
+    status.CanRotate = false;
     status.CanAttack = false;
     status.IsHitstun = true;
     if (Frames++ == 0) {
@@ -112,6 +121,7 @@ public class Status : MonoBehaviour {
   internal Attacker Attacker;
 
   public bool CanMove = true;
+  public bool CanRotate = true;
   public bool CanAttack = true;
   public bool IsAirborne = false;
   public bool IsHitstun = false;
@@ -148,6 +158,7 @@ public class Status : MonoBehaviour {
 
   private void FixedUpdate() {
     CanMove = true;
+    CanRotate = true;
     CanAttack = true;
     IsAirborne = false;
     IsHitstun = false;
