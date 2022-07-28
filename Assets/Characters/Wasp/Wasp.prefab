@@ -401,19 +401,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b19c15c6473ec504da9b3e539be45d59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Index: 0
   Animator: {fileID: 7727835182619467870}
   Windup:
-    Index: 0
-    Animator: {fileID: 7727835182619467870}
     Duration:
-      Millis: 300
+      Millis: 333.33334
       TicksPerSecond: 30
     ClipDuration:
-      Millis: 300
+      Millis: 333.33334
       TicksPerSecond: 30
   Active:
-    Index: 0
-    Animator: {fileID: 7727835182619467870}
     Duration:
       Millis: 333.33334
       TicksPerSecond: 30
@@ -421,8 +418,6 @@ MonoBehaviour:
       Millis: 33.333332
       TicksPerSecond: 30
   Recovery:
-    Index: 0
-    Animator: {fileID: 7727835182619467870}
     Duration:
       Millis: 333.33334
       TicksPerSecond: 30
@@ -437,7 +432,7 @@ MonoBehaviour:
       TicksPerSecond: 30
     Damage: 5
     KnockbackStrength: 2
-    KnockbackType: 0
+    KnockbackType: 1
   FireVFX: {fileID: 0}
   FireSFX: {fileID: 8300000, guid: 70c8c80c739dc744c92ad158212b921b, type: 3}
   HitVFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
@@ -767,6 +762,7 @@ GameObject:
   - component: {fileID: 7727835182619467870}
   - component: {fileID: 6865395085482706047}
   - component: {fileID: 1657031132205634076}
+  - component: {fileID: 4362511970478309579}
   m_Layer: 10
   m_Name: Wasp
   m_TagString: Untagged
@@ -821,6 +817,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CanMove: 1
+  CanRotate: 1
   CanAttack: 1
   IsAirborne: 0
   IsHitstun: 0
@@ -905,7 +902,6 @@ MonoBehaviour:
   ShootDelay:
     Millis: 3000
     TicksPerSecond: 1
-  CurrentAbility: {fileID: 0}
 --- !u!114 &1657031132205634076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -920,6 +916,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsParrying: 0
   IsBlocking: 0
+--- !u!114 &4362511970478309579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba179080412a6af41a99d021d690c5fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Abilities: []
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0

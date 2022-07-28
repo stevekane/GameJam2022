@@ -9,13 +9,13 @@ public class Badger : MonoBehaviour {
   Animator Animator;
   Defender Defender;
   Transform Target;
+  AbilityUser Abilities;
   Attacker TargetAttacker;
   Shield Shield;
   int WaitFrames = 0;
   int RecoveryFrames = 0;
   Vector3 Velocity;
   SimpleAbility CurrentAbility;
-  SimpleAbility[] Abilities;
   ShieldAbility ShieldAbility;
 
   public void Awake() {
@@ -26,19 +26,10 @@ public class Badger : MonoBehaviour {
     Animator = GetComponent<Animator>();
     Defender = GetComponent<Defender>();
     Shield = GetComponentInChildren<Shield>();
-    Abilities = GetComponentsInChildren<SimpleAbility>();
-    ShieldAbility = Abilities[1] as ShieldAbility;
+    Abilities = GetComponent<AbilityUser>();
+    ShieldAbility = GetComponentInChildren<ShieldAbility>();
   }
 
-  bool TryStartAbility(SimpleAbility ability) {
-    if (ability.IsComplete) {
-      ability.Begin();
-      CurrentAbility = ability;
-      return true;
-    } else {
-      return false;
-    }
-  }
   Vector3 ChoosePosition() {
     var t = Target.transform;
     var d = AttackRange*.9f;
@@ -71,10 +62,10 @@ public class Badger : MonoBehaviour {
 
     if (Status.CanAttack && CurrentAbility == null && RecoveryFrames <= 0) {
       if (TargetAttacker.IsAttacking && Shield) {
-        TryStartAbility(Abilities[1]);
+        CurrentAbility = Abilities.TryStartAbility(1);
         WaitFrames = Timeval.FromMillis(1000).Frames;
       } else if (inRange) {
-        TryStartAbility(Abilities[0]);
+        CurrentAbility = Abilities.TryStartAbility(0);
         WaitFrames = AttackDelay.Frames;
       }
     }

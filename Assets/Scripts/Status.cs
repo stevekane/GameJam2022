@@ -95,6 +95,7 @@ public class HitStunEffect : StatusEffect {
     status.CanAttack = false;
     status.IsHitstun = true;
     if (Frames++ == 0) {
+      status.GetComponent<AbilityUser>()?.StopAllAbilities();
       status.Attacker?.CancelAttack();
     } else if (Frames >= HitStopFrames) {
       status.Remove(this);
