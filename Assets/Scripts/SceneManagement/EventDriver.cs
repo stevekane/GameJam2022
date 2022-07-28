@@ -130,6 +130,7 @@ public class EventDriver : MonoBehaviour {
       Destroy(gameObject);
       return;
     }
+    transform.SetParent(null, true);
     DontDestroyOnLoad(this.gameObject);
 
     Time.fixedDeltaTime = 1f / Timeval.FramesPerSecond;
