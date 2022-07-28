@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 public class PelletAbility : SimpleAbility {
+  public int Index;
   public Animator Animator;
   public InactiveAttackPhase Windup;
   public InactiveAttackPhase Active;
@@ -18,14 +19,11 @@ public class PelletAbility : SimpleAbility {
   public AudioClip HitSFX;
 
   public override IEnumerator Routine() {
-    Windup.Reset();
-    yield return Windup;
-    Active.Reset();
+    yield return Windup.Start(Animator, Index);
     var shoot = StartCoroutine(ShootRoutine());
-    yield return Active;
+    yield return Active.Start(Animator, Index);
     StopCoroutine(shoot);
-    Recovery.Reset();
-    yield return Recovery;
+    yield return Recovery.Start(Animator, Index);
   }
 
   IEnumerator ShootRoutine() {
