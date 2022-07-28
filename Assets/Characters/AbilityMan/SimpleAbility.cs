@@ -26,7 +26,7 @@ public class AimAt : SimpleTask {
       var current = Aimer.rotation;
       var desired = Quaternion.LookRotation(Target.position.XZ()-Aimer.position.XZ(), Vector3.up);
       Aimer.rotation = Quaternion.RotateTowards(current, desired, Time.fixedDeltaTime*TurnSpeed);
-      yield return null;
+      yield return new WaitForFixedUpdate();
     }
   }
 }

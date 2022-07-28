@@ -7,25 +7,39 @@ public class Wasp : MonoBehaviour {
   CharacterController Controller;
   Status Status;
   Animator Animator;
-  Attacker Attacker;
   Transform Target;
   int FramesRemaining = 0;
   Vector3 Velocity;
+  public SimpleAbility CurrentAbility;
+  SimpleAbility[] Abilities;
 
   enum StateType { Idle, Chase, Shoot, Kite }
   StateType State = StateType.Idle;
+
+  bool TryStartAbility(SimpleAbility ability) {
+    if (ability.IsComplete) {
+      ability.Begin();
+      CurrentAbility = ability;
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   public void Awake() {
     Target = GameObject.FindObjectOfType<Player>().transform;
     Controller = GetComponent<CharacterController>();
     Status = GetComponent<Status>();
     Animator = GetComponent<Animator>();
-    Attacker = GetComponentInChildren<Attacker>();
+    Abilities = GetComponentsInChildren<SimpleAbility>();
   }
 
   void FixedUpdate() {
     if (Target == null)
       return;
+
+    if (CurrentAbility?.IsComplete ?? false)
+      CurrentAbility = null;
 
     Velocity.SetXZ(Vector3.zero);
     var gravity = -200f * Time.fixedDeltaTime;
@@ -43,9 +57,9 @@ public class Wasp : MonoBehaviour {
         var targetInRange = targetDelta.sqrMagnitude < ShootRadius*ShootRadius;
         var dir = targetDelta.normalized;
         transform.forward = dir;
-        if (targetInRange && Status.CanAttack) {
+        if (targetInRange && Status.CanAttack && CurrentAbility == null) {
           State = StateType.Shoot;
-          Attacker.StartAttack(0);
+          TryStartAbility(Abilities[0]);
         } else if (Status.CanMove) {
           Velocity.SetXZ(dir * MoveSpeed);
         }
@@ -55,7 +69,7 @@ public class Wasp : MonoBehaviour {
         var targetDelta = (Target.transform.position - transform.position);
         var dir = targetDelta.normalized;
         transform.forward = dir;
-        if (!Attacker.IsAttacking) {
+        if (CurrentAbility == null) {
           State = StateType.Kite;
         }
         break;
@@ -77,9 +91,6 @@ public class Wasp : MonoBehaviour {
 
     Controller.Move(Velocity*Time.fixedDeltaTime);
 
-    Animator.SetBool("Attacking", Attacker.IsAttacking);
-    Animator.SetInteger("AttackIndex", Attacker.AttackIndex);
-    Animator.SetFloat("AttackSpeed", Attacker.AttackSpeed);
     Animator.SetBool("HitFlinch", Status.IsHitstun);
   }
 }

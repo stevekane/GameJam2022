@@ -2,17 +2,16 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public abstract class StatusEffect {
-  public enum Types { None, Knockback }
-  public abstract Types Type { get; }
+public delegate void OnEffectComplete(Status status);
 
-  public abstract bool Reset(StatusEffect e);
+public abstract class StatusEffect {
+  public OnEffectComplete OnComplete;
+  public abstract bool Merge(StatusEffect e);
   public abstract void Apply(Status status);
 }
 
 public class AutoAimEffect : StatusEffect {
-  public override Types Type { get => Types.None; }
-  public override bool Reset(StatusEffect e) => true;
+  public override bool Merge(StatusEffect e) => true;
   public override void Apply(Status status) {
     status.CanRotate = false;
   }
@@ -22,14 +21,13 @@ public class KnockbackEffect : StatusEffect {
   static readonly float DRAG = 5f;
   static readonly float AIRBORNE_SPEED = 100f;
   static readonly float DONE_SPEED = 5f;
-  public override Types Type { get => Types.Knockback; }
 
   public Vector3 Velocity;
   public KnockbackEffect(Vector3 velocity) {
     Velocity = velocity;
   }
 
-  public override bool Reset(StatusEffect e) {
+  public override bool Merge(StatusEffect e) {
     Velocity += ((KnockbackEffect)e).Velocity;
     return true;
   }
@@ -50,18 +48,15 @@ public class HitStopEffect : StatusEffect {
   public float Amplitude;
   public int TotalFrames;
   public int Frames;
-  public StatusEffect PostEffect;
-  public override Types Type { get => Types.None; }
 
-  public HitStopEffect(Vector3 axis, float amplitude, int totalFrames, StatusEffect postEffect = null) {
+  public HitStopEffect(Vector3 axis, float amplitude, int totalFrames) {
     Frames = 0;
     Axis = axis;
     Amplitude = amplitude;
     TotalFrames = totalFrames;
-    PostEffect = postEffect;
   }
 
-  public override bool Reset(StatusEffect e) {
+  public override bool Merge(StatusEffect e) {
     Frames = TotalFrames;
     return true;
   }
@@ -77,9 +72,6 @@ public class HitStopEffect : StatusEffect {
     } else {
       status.GetComponent<Animator>()?.SetSpeed(1);
       status.Remove(this);
-      if (PostEffect != null) {
-        status.Add(PostEffect);
-      }
     }
   }
 }
@@ -87,18 +79,14 @@ public class HitStopEffect : StatusEffect {
 // TODO: Move to Damage.cs?
 public class HitStunEffect : StatusEffect {
   public int Frames, HitStopFrames;
-  public StatusEffect PostEffect;
-  public override Types Type { get => Types.None; }
 
-  public HitStunEffect(int hitStopFrames, StatusEffect postEffect) {
+  public HitStunEffect(int hitStopFrames) {
     Frames = 0;
     HitStopFrames = hitStopFrames;
-    PostEffect = postEffect;
   }
-  public override bool Reset(StatusEffect e) {
+  public override bool Merge(StatusEffect e) {
     var h = (HitStunEffect)e;
     h.HitStopFrames = Mathf.Max(HitStopFrames, h.HitStopFrames);
-    h.PostEffect.Reset(h.PostEffect);
     return true;
   }
   public override void Apply(Status status) {
@@ -110,7 +98,6 @@ public class HitStunEffect : StatusEffect {
       status.Attacker?.CancelAttack();
     } else if (Frames >= HitStopFrames) {
       status.Remove(this);
-      status.Add(PostEffect);
     }
   }
 }
@@ -119,6 +106,7 @@ public class Status : MonoBehaviour {
   public List<StatusEffect> Active = new();
   internal CharacterController Controller;
   internal Attacker Attacker;
+  internal Animator Animator;
 
   public bool CanMove = true;
   public bool CanRotate = true;
@@ -127,11 +115,14 @@ public class Status : MonoBehaviour {
   public bool IsHitstun = false;
 
   List<StatusEffect> Added = new();
-  public void Add(StatusEffect effect) {
+  public void Add(StatusEffect effect, OnEffectComplete onComplete = null) {
     var count = Active.Count;
-    var existing = Active.FirstOrDefault((e) => e.Type == effect.Type);
-    if (existing == null || !existing.Reset(effect))
+    var existing = Active.FirstOrDefault((e) => e.GetType() == effect.GetType());
+    if (existing == null || !existing.Merge(effect)) {
+      effect.OnComplete = onComplete;
       Added.Add(effect);
+    }
+    // TODO: merge onComplete with existing.OnComplete?
   }
 
   List<StatusEffect> Removed = new();
@@ -153,6 +144,7 @@ public class Status : MonoBehaviour {
 
   private void Awake() {
     Controller = GetComponent<CharacterController>();
+    Animator = GetComponent<Animator>();
     Attacker = GetComponentInChildren<Attacker>();
   }
 
@@ -163,10 +155,10 @@ public class Status : MonoBehaviour {
     IsAirborne = false;
     IsHitstun = false;
 
+    Removed.ForEach(e => { e.OnComplete?.Invoke(this); Active.Remove(e); });
+    Removed.Clear();
     Added.ForEach(e => Active.Add(e));
     Added.Clear();
-    Removed.ForEach(e => Active.Remove(e));
-    Removed.Clear();
 
     Active.ForEach(e => e.Apply(this));
   }

@@ -38,7 +38,7 @@ public class Bouncebox : MonoBehaviour {
         VFXManager.Instance?.TrySpawnEffect(Effect, hit.point);
         var bounceVel = Vector3.Reflect(k.Velocity, hit.normal.XZ());
         Status.Remove(k);
-        Status.Add(new HitStunEffect(Duration.Frames, new KnockbackEffect(bounceVel)));
+        Status.Add(new HitStunEffect(Duration.Frames), (s) => s.Add(new KnockbackEffect(bounceVel)));
       }
     }
   }
