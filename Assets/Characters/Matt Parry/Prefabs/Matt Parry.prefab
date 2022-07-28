@@ -204,6 +204,7 @@ GameObject:
   - component: {fileID: 2793019997782131147}
   - component: {fileID: 869648123590668608}
   - component: {fileID: 4692194450172351924}
+  - component: {fileID: 704825919502182732}
   - component: {fileID: 4661272542552748758}
   m_Layer: 0
   m_Name: Matt Parry
@@ -254,6 +255,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CanMove: 1
+  CanRotate: 1
   CanAttack: 1
   IsAirborne: 0
   IsHitstun: 0
@@ -284,6 +286,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsParrying: 1
   IsBlocking: 0
+--- !u!114 &704825919502182732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4692194450172351927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 589031cb649129f4595d6562a2fa54c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _Points: 0
 --- !u!95 &4661272542552748758
 Animator:
   serializedVersion: 4
