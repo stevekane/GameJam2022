@@ -36,7 +36,7 @@ public class Vapor : MonoBehaviour, IWireRider {
   [SerializeField] AudioClip ChargeAudioClip;
   [SerializeField] float ChargeAudioClipStartingTime;
 
-  Attacker Attacker;
+  AbilityUser Abilities;
   Defender Defender;
   Cannon Cannon;
   Pushable Pushable;
@@ -45,18 +45,21 @@ public class Vapor : MonoBehaviour, IWireRider {
   Animator Animator;
   AudioSource AudioSource;
 
+  SimpleAbility CurrentAbility;
   Wire Wire;
   int WireFramesTraveled;
   Motion Motion;
   Vector3 Velocity;
   int PunchCycleIndex;
 
+  bool IsAttacking { get => CurrentAbility != null; }
+
   public void RideWire(Wire wire) {
     Wire = wire;
   }
 
   void Awake() {
-    Attacker = GetComponent<Attacker>();
+    Abilities = GetComponent<AbilityUser>();
     Defender = GetComponent<Defender>();
     Cannon = GetComponentInChildren<Cannon>();
     Pushable = GetComponent<Pushable>();
@@ -69,6 +72,9 @@ public class Vapor : MonoBehaviour, IWireRider {
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
     var action = Inputs.Action;
+
+    if (CurrentAbility?.IsComplete ?? false)
+      CurrentAbility = null;
 
     if (Status.CanMove && Motion == Motion.Base && action.L1.JustDown) {
       AudioSource.Stop();
@@ -102,14 +108,15 @@ public class Vapor : MonoBehaviour, IWireRider {
         Cannon.ReleaseTrigger();
       }
 
-      if (action.R1.JustDown && !Attacker.IsAttacking) {
-        Attacker.StartAttack(0+PunchCycleIndex);
+      if (action.R1.JustDown && !IsAttacking) {
+        CurrentAbility = Abilities.TryStartAbility(0+PunchCycleIndex);
+        //Attacker.StartAttack(0+PunchCycleIndex);
         PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
-      } else if (action.R2.JustDown && !Attacker.IsAttacking) {
-        Attacker.StartChargeAttack(2+PunchCycleIndex);
-        PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
-      } else if (action.R2.JustUp && Attacker.IsAttacking) {
-        Attacker.ReleaseChargeAttack();
+      } else if (action.R2.JustDown && !IsAttacking) {
+        CurrentAbility = Abilities.TryStartAbility(2);
+        // TODO: charge
+      } else if (action.R2.JustUp && IsAttacking) {
+        //Attacker.ReleaseChargeAttack();
       }
 
       if (Cannon.IsFiring) {
@@ -119,14 +126,12 @@ public class Vapor : MonoBehaviour, IWireRider {
 
     Animator.SetBool("Dashing", Motion == Motion.Dashing);
     Animator.SetBool("WireRiding", Motion == Motion.WireRiding);
-    Animator.SetBool("Attacking", Attacker.IsAttacking);
-    Animator.SetInteger("AttackIndex", Attacker.AttackIndex);
-    Animator.SetFloat("AttackSpeed", Attacker.AttackSpeed);
 
     if (Motion == Motion.Base) {
       var moveSpeed = 0 switch {
         _ when !Status.CanMove => 0,
-        _ when Attacker.IsAttacking => Attacker.MoveFactor*MOVE_SPEED,
+        //_ when IsAttacking => Attacker.MoveFactor*MOVE_SPEED, // TODO
+        _ when IsAttacking => .5f*MOVE_SPEED,
         _ when Cannon.IsFiring => FIRING_MOVE_SPEED,
         _ => MOVE_SPEED
       };
@@ -153,7 +158,7 @@ public class Vapor : MonoBehaviour, IWireRider {
     }
 
     var turnSpeed = 0 switch {
-      _ when Attacker.IsAttacking => ATTACKING_TURN_SPEED,
+      _ when IsAttacking => ATTACKING_TURN_SPEED,
       _ when Cannon.IsFiring => FIRING_TURN_SPEED,
       _ => TURN_SPEED
     };

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 public class Smoke : MonoBehaviour {
@@ -20,17 +21,17 @@ public class Smoke : MonoBehaviour {
 
   IEnumerator AttackSequence() {
     yield return new WaitForSeconds(.1f);
-    Attacker.StartAttack(0);
-    yield return new WaitUntil(() => !Attacker.IsAttacking);
+    CurrentAbility = Abilities.TryStartAbility(0);
+    yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    Attacker.StartAttack(1);
-    yield return new WaitUntil(() => !Attacker.IsAttacking);
+    CurrentAbility = Abilities.TryStartAbility(1);
+    yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    Attacker.StartAttack(0);
-    yield return new WaitUntil(() => !Attacker.IsAttacking);
+    CurrentAbility = Abilities.TryStartAbility(0);
+    yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    Attacker.StartAttack(2);
-    yield return new WaitUntil(() => !Attacker.IsAttacking);
+    CurrentAbility = Abilities.TryStartAbility(2);
+    yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForSeconds(.8f);
     AttackRoutine = null;
   }
@@ -38,7 +39,7 @@ public class Smoke : MonoBehaviour {
   IEnumerator DodgeSequence() {
     yield return new WaitForSeconds(.1f);
     IsDodging = true;
-    yield return new WaitUntil(() => !Target.IsAttacking);
+    yield return new WaitUntil(() => !TargetIsAttacking);
     yield return new WaitForSeconds(.1f);
     IsDodging = false;
     DodgeRoutine = null;
@@ -57,7 +58,7 @@ public class Smoke : MonoBehaviour {
   [SerializeField] AudioClip ChargeAudioClip;
   [SerializeField] float ChargeAudioClipStartingTime;
 
-  Attacker Attacker;
+  AbilityUser Abilities;
   Defender Defender;
   Cannon Cannon;
   Pushable Pushable;
@@ -65,8 +66,9 @@ public class Smoke : MonoBehaviour {
   CharacterController Controller;
   Animator Animator;
   AudioSource AudioSource;
-  Attacker Target;
+  AbilityUser Target;
 
+  SimpleAbility CurrentAbility;
   Motion Motion;
   Coroutine AttackRoutine;
   Coroutine DodgeRoutine;
@@ -75,7 +77,7 @@ public class Smoke : MonoBehaviour {
   int RecoveryFrames;
 
   void Awake() {
-    Attacker = GetComponent<Attacker>();
+    Abilities = GetComponent<AbilityUser>();
     Defender = GetComponent<Defender>();
     Cannon = GetComponentInChildren<Cannon>();
     Pushable = GetComponent<Pushable>();
@@ -83,12 +85,18 @@ public class Smoke : MonoBehaviour {
     Controller = GetComponent<CharacterController>();
     Animator = GetComponent<Animator>();
     AudioSource = GetComponent<AudioSource>();
-    Target = GameObject.FindObjectOfType<Player>().GetComponent<Attacker>();
+    Target = GameObject.FindObjectOfType<Player>().GetComponent<AbilityUser>();
   }
+
+  bool IsAttacking { get => CurrentAbility != null; }
+  bool TargetIsAttacking { get => Target.Abilities.Any((a) => !a.IsComplete); }
 
   void FixedUpdate() {
     if (Target == null)
       return;
+
+    if (CurrentAbility?.IsComplete ?? false)
+      CurrentAbility = null;
 
     (Vector3 desiredPos, Vector3 desiredFacing, float distToTarget) = ChoosePosition();
     bool inAttackRange = distToTarget < ATTACK_RANGE;
@@ -116,14 +124,11 @@ public class Smoke : MonoBehaviour {
     }
 
     Animator.SetBool("Dashing", Motion == Motion.Dashing);
-    Animator.SetBool("Attacking", Attacker.IsAttacking);
-    Animator.SetInteger("AttackIndex", Attacker.AttackIndex);
-    Animator.SetFloat("AttackSpeed", Attacker.AttackSpeed);
 
     var moveSpeed = 0 switch {
       _ when !Status.CanMove => 0,
       _ when inMoveRange => 0,
-      _ when Attacker.IsAttacking => Attacker.MoveFactor*MOVE_SPEED,
+      _ when IsAttacking => .5f*MOVE_SPEED,
       _ when Motion == Motion.Dashing => DASH_SPEED,
       _ => MOVE_SPEED
     };
@@ -136,7 +141,7 @@ public class Smoke : MonoBehaviour {
     }
 
     var turnSpeed = 0 switch {
-      _ when Attacker.IsAttacking => ATTACKING_TURN_SPEED,
+      _ when IsAttacking => ATTACKING_TURN_SPEED,
       _ when Cannon.IsFiring => FIRING_TURN_SPEED,
       _ => TURN_SPEED
     };

@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 public class Badger : MonoBehaviour {
@@ -10,7 +11,7 @@ public class Badger : MonoBehaviour {
   Defender Defender;
   Transform Target;
   AbilityUser Abilities;
-  Attacker TargetAttacker;
+  AbilityUser TargetAbilities;
   Shield Shield;
   int WaitFrames = 0;
   int RecoveryFrames = 0;
@@ -20,7 +21,7 @@ public class Badger : MonoBehaviour {
 
   public void Awake() {
     Target = GameObject.FindObjectOfType<Player>().transform;
-    TargetAttacker = Target.GetComponent<Attacker>();
+    TargetAbilities = Target.GetComponent<AbilityUser>();
     Controller = GetComponent<CharacterController>();
     Status = GetComponent<Status>();
     Animator = GetComponent<Animator>();
@@ -29,6 +30,9 @@ public class Badger : MonoBehaviour {
     Abilities = GetComponent<AbilityUser>();
     ShieldAbility = GetComponentInChildren<ShieldAbility>();
   }
+
+  // TODO: What about dash?
+  bool TargetIsAttacking { get => TargetAbilities.Abilities.Any((a) => !a.IsComplete); }
 
   Vector3 ChoosePosition() {
     var t = Target.transform;
@@ -61,7 +65,7 @@ public class Badger : MonoBehaviour {
       Shield = null;
 
     if (Status.CanAttack && CurrentAbility == null && RecoveryFrames <= 0) {
-      if (TargetAttacker.IsAttacking && Shield) {
+      if (TargetIsAttacking && Shield) {
         CurrentAbility = Abilities.TryStartAbility(1);
         WaitFrames = Timeval.FromMillis(1000).Frames;
       } else if (inRange) {
@@ -73,7 +77,7 @@ public class Badger : MonoBehaviour {
       if (!Shield) {
         ShieldAbility.Release();
       } else {
-        if (TargetAttacker.IsAttacking)
+        if (TargetIsAttacking)
           WaitFrames = Timeval.FromMillis(1000).Frames;
         if (WaitFrames <= 0) {
           ShieldAbility.Release();
