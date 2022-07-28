@@ -12,7 +12,7 @@ public class InactiveAttackPhase : SimpleTask {
   public Timeval ClipDuration = Timeval.FromMillis(0, 30);
   public override IEnumerator Routine() {
     for (var i = 0; i < Duration.Frames; i++) {
-      yield return null;
+      yield return new WaitForFixedUpdate();
       var attackSpeed = ClipDuration.Millis/Duration.Millis;
       Animator.SetFloat("AttackSpeed", attackSpeed);
       Animator.SetBool("Attacking", true);
@@ -43,7 +43,7 @@ public class ChargedAttackPhase : SimpleTask {
 
   public override IEnumerator Routine() {
     while (FramesRemaining > 0) {
-      yield return null;
+      yield return new WaitForFixedUpdate();
       var multiplier = IsCharging ? ChargeFrameMultiplier : 1;
       var attackSpeed = ClipDuration.Millis/Duration.Millis;
       Animator.SetFloat("AttackSpeed", multiplier*attackSpeed);
@@ -80,7 +80,7 @@ public class HitboxAttackPhase : SimpleTask {
     Hitbox.Collider.enabled = true;
     Hitbox.TriggerStay = OnContact;
     for (var i = 0; i < Duration.Frames; i++) {
-      yield return null;
+      yield return new WaitForFixedUpdate();
       Animator.SetFloat("AttackSpeed", ClipDuration.Millis/Duration.Millis);
       Animator.SetBool("Attacking", true);
       Animator.SetInteger("AttackIndex", Index);

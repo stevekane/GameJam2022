@@ -98,6 +98,7 @@ public class Status : MonoBehaviour {
   public List<StatusEffect> Active = new();
   internal CharacterController Controller;
   internal Attacker Attacker;
+  internal Animator Animator;
 
   public bool CanMove = true;
   public bool CanAttack = true;
@@ -134,6 +135,7 @@ public class Status : MonoBehaviour {
 
   private void Awake() {
     Controller = GetComponent<CharacterController>();
+    Animator = GetComponent<Animator>();
     Attacker = GetComponentInChildren<Attacker>();
   }
 
