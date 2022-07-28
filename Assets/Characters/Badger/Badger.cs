@@ -109,7 +109,7 @@ public class Badger : MonoBehaviour {
     }
 
     Animator.SetBool("HitFlinch", Status.IsHitstun);
-    Defender.IsBlocking = ShieldAbility.IsActive;
+    Defender.IsBlocking = ShieldAbility.IsRaised;
     if (Shield)
       Shield.Defender.IsBlocking = !Defender.IsBlocking;
   }

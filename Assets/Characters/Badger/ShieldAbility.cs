@@ -7,30 +7,30 @@ public class ShieldAbility : SimpleAbility {
   public InactiveAttackPhase Windup;
   public InactiveAttackPhase Active;
   public InactiveAttackPhase Recovery;
-  public bool IsActive;
-  bool IsHeld;
+  public bool IsRaised;
+  bool IsHolding;
 
   public void Release() {
-    IsHeld = false;
+    IsHolding = false;
   }
 
   public override IEnumerator Routine() {
-    IsHeld = true;
-    Animator.SetBool("Held", true);
+    IsHolding = true;
+    Animator.SetBool("Shielding", true);
     yield return Windup.Start(Animator, Index);
-    IsActive = true;
-    yield return new WaitUntil(() => IsHeld == false);
-    Animator.SetBool("Held", false);
-    IsActive = false;
+    IsRaised = true;
+    yield return new WaitUntil(() => !IsHolding);
+    IsRaised = false;
+    Animator.SetBool("Shielding", false);
     yield return Recovery.Start(Animator, Index);
   }
 
   public override void AfterEnd() {
-    IsActive = false;
-    IsHeld = false;
+    IsRaised = false;
+    IsHolding = false;
     Animator.SetBool("Attacking", false);
     Animator.SetInteger("AttackIndex", -1);
     Animator.SetFloat("AttackSpeed", 1);
-    Animator.SetBool("Held", false);
+    Animator.SetBool("Shielding", false);
   }
 }

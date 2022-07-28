@@ -17,7 +17,7 @@ public class Shield : MonoBehaviour {
 
   void FixedUpdate() {
     if (Damage.Points > MaxDamage && Hurtbox.enabled) {
-      Animator.SetTrigger("Shield Die");
+      Animator.SetTrigger("ShieldDie");
       Hurtbox.enabled = false;
     }
     if (!gameObject.activeSelf) {
