@@ -10,7 +10,7 @@ public class Wasp : MonoBehaviour {
   Transform Target;
   int FramesRemaining = 0;
   Vector3 Velocity;
-  public SimpleAbility CurrentAbility;
+  SimpleAbility CurrentAbility;
   SimpleAbility[] Abilities;
 
   enum StateType { Idle, Chase, Shoot, Kite }

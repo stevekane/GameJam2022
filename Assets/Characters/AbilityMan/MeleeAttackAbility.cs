@@ -127,7 +127,7 @@ public class MeleeAttackAbility : SimpleAbility {
   public float HitTargetKnockbackStrength;
   public float HitAttackerKnockbackStrength;
 
-  public override IEnumerator Routine() {
+public override IEnumerator Routine() {
     yield return Windup.Start(Animator, Index);
     yield return Active.Start(Animator, Index);
     yield return Recovery.Start(Animator, Index);
@@ -144,19 +144,13 @@ public class MeleeAttackAbility : SimpleAbility {
     CameraShaker.Instance.Shake(HitCameraShakeIntensity);
     Owner.GetComponent<Status>()?.Add(new HitStopEffect(attacker.forward, HitStopVibrationAmplitude, stopFrames));
     targets.ForEach(target => {
-      var delta = attacker.position-target.position;
-      var axis = delta.normalized;
-      target.GetComponent<Status>()?.Add(new HitStopEffect(axis, HitStopVibrationAmplitude, stopFrames));
+      // TODO: this is gross
+      target.GetComponent<Defender>()?.OnHit(new HitParams { HitStopDuration = Active.HitFreezeDuration, Damage = HitDamage, KnockbackStrength = HitTargetKnockbackStrength, KnockbackType = KnockBackType.Delta }, attacker);
       VFXManager.Instance.TrySpawnEffect(HitVFX, target.transform.position+HitVFXOffset);
     });
   }
 
   public void OnHitStopEnd(Transform attacker, List<Transform> targets) {
     attacker.GetComponent<Status>()?.Add(new KnockbackEffect(HitAttackerKnockbackStrength*-attacker.forward));
-    targets.ForEach(target => {
-      var delta = target.position-attacker.position;
-      var direction = delta.normalized;
-      target.GetComponent<Status>()?.Add(new KnockbackEffect(HitTargetKnockbackStrength*direction));
-    });
   }
 }

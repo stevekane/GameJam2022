@@ -853,7 +853,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh127046
+  m_Name: pb_Mesh198472
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -1080,6 +1080,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Wasp
       objectReference: {fileID: 0}
+    - target: {fileID: 5571416124093621165, guid: ab129e03610f14f4bbeeea02c0119926, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: ab129e03610f14f4bbeeea02c0119926, type: 3}
@@ -1141,7 +1145,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5571416124093621165, guid: d84c5cd595094654fa88cca685e8d2a1, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5655145547083067649, guid: d84c5cd595094654fa88cca685e8d2a1, type: 3}
+      propertyPath: m_Layer
+      value: 15
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -1290,10 +1298,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MOVE_SPEED: 10
-  Controller: {fileID: 0}
-  Status: {fileID: 0}
-  CurrentAbility: {fileID: 0}
-  Abilities: []
 --- !u!4 &1511601687
 Transform:
   m_ObjectHideFlags: 0
@@ -1546,6 +1550,14 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3255596729825345913, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 27.999998
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441861468932765123, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 27.999998
+      objectReference: {fileID: 0}
     - target: {fileID: 3441861468932765124, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
       propertyPath: m_Follow
       value: 
@@ -1554,6 +1566,10 @@ PrefabInstance:
       propertyPath: m_LookAt
       value: 
       objectReference: {fileID: 1899292709}
+    - target: {fileID: 3441861468932765124, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
+      propertyPath: m_Lens.m_SensorSize.x
+      value: 2.0786026
+      objectReference: {fileID: 0}
     - target: {fileID: 4912154605914978066, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
       propertyPath: m_Name
       value: SceneCommon
@@ -1601,6 +1617,10 @@ PrefabInstance:
     - target: {fileID: 4912154605914978067, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7691937222385314386, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
+      propertyPath: m_AmplitudeGain
+      value: 4.928744e-11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
