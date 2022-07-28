@@ -4,7 +4,7 @@ using UnityEngine;
 
 [Serializable]
 public class Timeval {
-  public static int FramesPerSecond = 500;
+  public static int FramesPerSecond = 60;
 
   [SerializeField] public float Millis = 1;
   [SerializeField] public int TicksPerSecond = 30;
