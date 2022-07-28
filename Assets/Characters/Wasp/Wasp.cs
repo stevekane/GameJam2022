@@ -8,30 +8,20 @@ public class Wasp : MonoBehaviour {
   Status Status;
   Animator Animator;
   Transform Target;
+  AbilityUser Abilities;
   int FramesRemaining = 0;
   Vector3 Velocity;
   SimpleAbility CurrentAbility;
-  SimpleAbility[] Abilities;
 
   enum StateType { Idle, Chase, Shoot, Kite }
   StateType State = StateType.Idle;
-
-  bool TryStartAbility(SimpleAbility ability) {
-    if (ability.IsComplete) {
-      ability.Begin();
-      CurrentAbility = ability;
-      return true;
-    } else {
-      return false;
-    }
-  }
 
   public void Awake() {
     Target = GameObject.FindObjectOfType<Player>().transform;
     Controller = GetComponent<CharacterController>();
     Status = GetComponent<Status>();
     Animator = GetComponent<Animator>();
-    Abilities = GetComponentsInChildren<SimpleAbility>();
+    Abilities = GetComponent<AbilityUser>();
   }
 
   void FixedUpdate() {
@@ -59,7 +49,7 @@ public class Wasp : MonoBehaviour {
         transform.forward = dir;
         if (targetInRange && Status.CanAttack && CurrentAbility == null) {
           State = StateType.Shoot;
-          TryStartAbility(Abilities[0]);
+          CurrentAbility = Abilities.TryStartAbility(0);
         } else if (Status.CanMove) {
           Velocity.SetXZ(dir * MoveSpeed);
         }
