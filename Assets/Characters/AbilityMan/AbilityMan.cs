@@ -45,23 +45,31 @@ public class AbilityMan : MonoBehaviour {
   IEnumerator PingPong;
   IEnumerator PingPongForever() {
     while (true) {
-      var w1 = Random.Range(1000,5000);
-      var w2 = Random.Range(1000,5000);
+      var w1 = Random.Range(100,500);
+      var w2 = Random.Range(100,500);
       var initial = FrameNumber;
-      Debug.Log($"Waiting EITHER {w1} or {w2} frames");
+      Debug.Log($"Waiting EITHER {w1} and {w2} frames");
       yield return Either(WaitF(w1),WaitF(w2));
       Debug.Log($"Waited {FrameNumber-initial} frames");
     }
   }
 
   IEnumerator Either(IEnumerator a, IEnumerator b) {
-    while (a.MoveNext() & b.MoveNext()) {
+    var astack = new Stack<IEnumerator>();
+    var bstack = new Stack<IEnumerator>();
+    astack.Push(a);
+    bstack.Push(b);
+    while (RunStack(astack) & RunStack(bstack)) {
       yield return null;
     }
   }
 
   IEnumerator Both(IEnumerator a, IEnumerator b) {
-    while (a.MoveNext() | b.MoveNext()) {
+    var astack = new Stack<IEnumerator>();
+    var bstack = new Stack<IEnumerator>();
+    astack.Push(a);
+    bstack.Push(b);
+    while (RunStack(astack) | RunStack(bstack)) {
       yield return null;
     }
   }
@@ -72,30 +80,28 @@ public class AbilityMan : MonoBehaviour {
     }
   }
 
+  bool RunStack(Stack<IEnumerator> stack) {
+    while (stack.TryPeek(out IEnumerator top)) {
+      var running = top.MoveNext();
+      if (!running) {
+        stack.Pop();
+      } else {
+        if (top.Current is IEnumerator) {
+          stack.Push(top.Current as IEnumerator);
+        } else {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   void FixedUpdate() {
     var action = Inputs.Action;
     var dt = Time.fixedDeltaTime;
     var move = action.Left.XZ;
 
-    // run top of the stack
-    // if it yields an enumerable push it on the stack and run it
-    // else if it not done then stop execution for this frame
-    // if it is done then pop it from the stack
-    if (null != PingPong && null != Stack) {
-      while (Stack.Count > 0) {
-        var top = Stack.Peek();
-        var running = top.MoveNext();
-        if (!running) {
-          Stack.Pop();
-        } else {
-          if (top.Current is IEnumerator) {
-            Stack.Push(top.Current as IEnumerator);
-          } else {
-            break;
-          }
-        }
-      }
-    }
+    RunStack(Stack);
     FrameNumber++;
 
     if (CurrentAbility != null && CurrentAbility.IsComplete) {
