@@ -68,7 +68,7 @@ public class Smoke : MonoBehaviour {
   AudioSource AudioSource;
   AbilityUser Target;
 
-  SimpleAbility CurrentAbility;
+  Ability CurrentAbility;
   Motion Motion;
   Coroutine AttackRoutine;
   Coroutine DodgeRoutine;

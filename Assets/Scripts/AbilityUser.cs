@@ -1,13 +1,13 @@
 using UnityEngine;
 
 public class AbilityUser : MonoBehaviour {
-  [HideInInspector] public SimpleAbility[] Abilities;
+  [HideInInspector] public Ability[] Abilities;
 
   void Awake() {
-    Abilities = GetComponentsInChildren<SimpleAbility>();
+    Abilities = GetComponentsInChildren<Ability>();
   }
 
-  public SimpleAbility TryStartAbility(SimpleAbility ability) {
+  public Ability TryStartAbility(Ability ability) {
     if (ability.IsComplete) {
       ability.Begin();
       return ability;
@@ -15,7 +15,7 @@ public class AbilityUser : MonoBehaviour {
       return null;
     }
   }
-  public SimpleAbility TryStartAbility(int index) {
+  public Ability TryStartAbility(int index) {
     return TryStartAbility(Abilities[index]);
   }
   public void StopAllAbilities() {

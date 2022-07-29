@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class PelletAbility : SimpleAbility {
+public class PelletAbility : Ability {
   public int Index;
   public Animator Animator;
   public InactiveAttackPhase Windup;

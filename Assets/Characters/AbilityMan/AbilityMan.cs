@@ -1,24 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Fiber;
 
 public class AbilityMan : MonoBehaviour {
   public float MOVE_SPEED = 10;
 
   CharacterController Controller;
   Status Status;
-  SimpleAbility[] Abilities;
-  SimpleAbility CurrentAbility;
+  Ability[] Abilities;
+  Ability CurrentAbility;
 
   void Start() {
     Controller = GetComponent<CharacterController>();
     Status = GetComponent<Status>();
-    Abilities = GetComponentsInChildren<SimpleAbility>();
+    Abilities = GetComponentsInChildren<Ability>();
     InputManager.Instance.R1.JustDown += LightAttack;
     InputManager.Instance.R2.JustDown += TripleShot;
-    PingPong = PingPongForever();
-    Stack = new();
-    Stack.Push(PingPong);
+    Fiber = new Fiber(PingPongForever());
   }
 
   void OnDestroy() {
@@ -41,59 +40,16 @@ public class AbilityMan : MonoBehaviour {
   }
 
   int FrameNumber = 0;
-  Stack<IEnumerator> Stack;
-  IEnumerator PingPong;
+  Fiber Fiber;
   IEnumerator PingPongForever() {
     while (true) {
       var w1 = Random.Range(100,500);
       var w2 = Random.Range(100,500);
       var initial = FrameNumber;
       Debug.Log($"Waiting EITHER {w1} and {w2} frames");
-      yield return Either(WaitF(w1),WaitF(w2));
+      yield return Any(Wait(w1),Wait(w2));
       Debug.Log($"Waited {FrameNumber-initial} frames");
     }
-  }
-
-  IEnumerator Either(IEnumerator a, IEnumerator b) {
-    var astack = new Stack<IEnumerator>();
-    var bstack = new Stack<IEnumerator>();
-    astack.Push(a);
-    bstack.Push(b);
-    while (RunStack(astack) & RunStack(bstack)) {
-      yield return null;
-    }
-  }
-
-  IEnumerator Both(IEnumerator a, IEnumerator b) {
-    var astack = new Stack<IEnumerator>();
-    var bstack = new Stack<IEnumerator>();
-    astack.Push(a);
-    bstack.Push(b);
-    while (RunStack(astack) | RunStack(bstack)) {
-      yield return null;
-    }
-  }
-
-  IEnumerator WaitF(int f) {
-    for (var i = 0; i < f; i++) {
-      yield return null;
-    }
-  }
-
-  bool RunStack(Stack<IEnumerator> stack) {
-    while (stack.TryPeek(out IEnumerator top)) {
-      var running = top.MoveNext();
-      if (!running) {
-        stack.Pop();
-      } else {
-        if (top.Current is IEnumerator) {
-          stack.Push(top.Current as IEnumerator);
-        } else {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   void FixedUpdate() {
@@ -101,7 +57,7 @@ public class AbilityMan : MonoBehaviour {
     var dt = Time.fixedDeltaTime;
     var move = action.Left.XZ;
 
-    RunStack(Stack);
+    Fiber.Run();
     FrameNumber++;
 
     if (CurrentAbility != null && CurrentAbility.IsComplete) {

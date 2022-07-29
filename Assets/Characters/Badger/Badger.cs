@@ -16,7 +16,7 @@ public class Badger : MonoBehaviour {
   int WaitFrames = 0;
   int RecoveryFrames = 0;
   Vector3 Velocity;
-  SimpleAbility CurrentAbility;
+  Ability CurrentAbility;
   ShieldAbility ShieldAbility;
 
   public void Awake() {

@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class AimAndFireAbility : SimpleAbility {
+public class AimAndFireAbility : Ability {
   public Transform Aimer;
   public Transform Target;
   public Transform Origin;
