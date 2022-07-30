@@ -1,17 +1,22 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
-[Serializable]
 public class ButtonEvents {
   public string Name;
-  public UnityAction JustDown;
-  public UnityAction Down;
-  public UnityAction JustUp;
+  public EventSource JustDown;
+  public EventSource Down;
+  public EventSource JustUp;
   public ButtonEvents(string name) {
     Name = name;
+    JustDown = new();
+    Down = new();
+    JustUp = new();
   }
+}
+
+public class EventSource {
+  public System.Action Action;
 }
 
 public class InputManager : MonoBehaviour {
@@ -51,13 +56,13 @@ public class InputManager : MonoBehaviour {
 
   void BroadcastEvents(ButtonEvents events) {
     if (Input.GetButtonDown(events.Name)) {
-      events.JustDown?.Invoke();
+      events.JustDown.Action?.Invoke();
     }
     if (Input.GetButton(events.Name)) {
-      events.Down?.Invoke();
+      events.Down.Action?.Invoke();
     }
     if (Input.GetButtonUp(events.Name)) {
-      events.JustUp?.Invoke();
+      events.JustUp.Action?.Invoke();
     }
   }
 

@@ -1,7 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using static Fiber;
 
 public class AbilityMan : MonoBehaviour {
   public float MOVE_SPEED = 10;
@@ -10,19 +8,22 @@ public class AbilityMan : MonoBehaviour {
   Status Status;
   Ability[] Abilities;
   Ability CurrentAbility;
+  GrappleAbility GrappleAbility;
 
   void Start() {
     Controller = GetComponent<CharacterController>();
     Status = GetComponent<Status>();
     Abilities = GetComponentsInChildren<Ability>();
-    InputManager.Instance.R1.JustDown += LightAttack;
-    InputManager.Instance.R2.JustDown += TripleShot;
-    Fiber = new Fiber(PingPongForever());
+    GrappleAbility = GetComponentInChildren<GrappleAbility>();
+    InputManager.Instance.R1.JustDown.Action += LightAttack;
+    InputManager.Instance.R2.JustDown.Action += TripleShot;
+    // InputManager.Instance.L2.JustDown += Grapple;
+    StartCoroutine(Bar());
   }
 
   void OnDestroy() {
-    InputManager.Instance.R1.JustDown -= LightAttack;
-    InputManager.Instance.R2.JustDown -= TripleShot;
+    InputManager.Instance.R1.JustDown.Action -= LightAttack;
+    InputManager.Instance.R2.JustDown.Action -= TripleShot;
   }
 
   void TripleShot() {
@@ -39,16 +40,35 @@ public class AbilityMan : MonoBehaviour {
     }
   }
 
-  int FrameNumber = 0;
-  Fiber Fiber;
-  IEnumerator PingPongForever() {
-    while (true) {
-      var w1 = Random.Range(100,500);
-      var w2 = Random.Range(100,500);
-      var initial = FrameNumber;
-      Debug.Log($"Waiting EITHER {w1} and {w2} frames");
-      yield return Any(Wait(w1),Wait(w2));
-      Debug.Log($"Waited {FrameNumber-initial} frames");
+  void Grapple() {
+    if (Status.CanAttack && CurrentAbility == null || CurrentAbility.IsComplete) {
+      GrappleAbility.Stop();
+      GrappleAbility.Activate();
+    }
+  }
+
+  IEnumerator Bar() {
+    var charge = InputManager.Instance.L1.JustDown;
+    var cancel = InputManager.Instance.L2.JustDown;
+    var op1 = new Choose(charge, cancel);
+    yield return StartCoroutine(op1);
+    if (op1.Value) {
+      Debug.Log("Charging...");
+      var fire = InputManager.Instance.L1.JustUp;
+      var op2 = new Switch(fire, cancel);
+      yield return StartCoroutine(op2);
+      switch (op2.Value) {
+        case 0: {
+          Debug.Log("Fire!");
+        }
+        break;
+        default: {
+          Debug.Log("Canceled");
+        }
+        break;
+      }
+    } else {
+      Debug.Log("Canceled");
     }
   }
 
@@ -57,9 +77,6 @@ public class AbilityMan : MonoBehaviour {
     var dt = Time.fixedDeltaTime;
     var move = action.Left.XZ;
 
-    Fiber.Run();
-    FrameNumber++;
-
     if (CurrentAbility != null && CurrentAbility.IsComplete) {
       CurrentAbility = null;
     }
@@ -67,7 +84,7 @@ public class AbilityMan : MonoBehaviour {
       transform.forward = move;
     }
     if (Status.CanMove) {
-      Controller.Move(dt*MOVE_SPEED*Inputs.Action.Left.XZ);
+      Controller.Move(dt*MOVE_SPEED*Inputs.Action.Left.XZ+dt*Physics.gravity);
     }
   }
 }
