@@ -9,6 +9,7 @@ public class AbilityMan : MonoBehaviour {
   Ability[] Abilities;
   Ability CurrentAbility;
   GrappleAbility GrappleAbility;
+  AbilityFibered AbilityFibered;
 
   void Start() {
     Controller = GetComponent<CharacterController>();
@@ -17,13 +18,15 @@ public class AbilityMan : MonoBehaviour {
     GrappleAbility = GetComponentInChildren<GrappleAbility>();
     InputManager.Instance.R1.JustDown.Action += LightAttack;
     InputManager.Instance.R2.JustDown.Action += TripleShot;
-    // InputManager.Instance.L2.JustDown += Grapple;
-    StartCoroutine(Bar());
+    InputManager.Instance.L2.JustDown.Action += Grapple;
+    InputManager.Instance.L1.JustDown.Action += Fibered;
   }
 
   void OnDestroy() {
     InputManager.Instance.R1.JustDown.Action -= LightAttack;
     InputManager.Instance.R2.JustDown.Action -= TripleShot;
+    InputManager.Instance.L2.JustDown.Action -= Grapple;
+    InputManager.Instance.L1.JustDown.Action -= Fibered;
   }
 
   void TripleShot() {
@@ -47,29 +50,8 @@ public class AbilityMan : MonoBehaviour {
     }
   }
 
-  IEnumerator Bar() {
-    var charge = InputManager.Instance.L1.JustDown;
-    var cancel = InputManager.Instance.L2.JustDown;
-    var op1 = new Choose(charge, cancel);
-    yield return StartCoroutine(op1);
-    if (op1.Value) {
-      Debug.Log("Charging...");
-      var fire = InputManager.Instance.L1.JustUp;
-      var op2 = new Switch(fire, cancel);
-      yield return StartCoroutine(op2);
-      switch (op2.Value) {
-        case 0: {
-          Debug.Log("Fire!");
-        }
-        break;
-        default: {
-          Debug.Log("Canceled");
-        }
-        break;
-      }
-    } else {
-      Debug.Log("Canceled");
-    }
+  void Fibered() {
+    AbilityFibered = new AbilityFibered(gameObject);
   }
 
   void FixedUpdate() {
@@ -77,6 +59,9 @@ public class AbilityMan : MonoBehaviour {
     var dt = Time.fixedDeltaTime;
     var move = action.Left.XZ;
 
+    if (AbilityFibered != null) {
+      AbilityFibered.Run();
+    }
     if (CurrentAbility != null && CurrentAbility.IsComplete) {
       CurrentAbility = null;
     }

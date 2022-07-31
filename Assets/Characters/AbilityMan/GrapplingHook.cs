@@ -1,10 +1,16 @@
 using UnityEngine;
-using UnityEngine.Events;
 
 public class GrapplingHook : MonoBehaviour {
-  public UnityAction<Collision> OnHit;
+  public Transform Origin;
+  public EventSource<Collision> OnHit = new();
 
   void OnCollisionEnter(Collision c) {
-    OnHit.Invoke(c);
+    OnHit.Action?.Invoke(c);
+  }
+
+  void LateUpdate() {
+    var lr = GetComponent<LineRenderer>();
+    lr.SetPosition(0, transform.position);
+    lr.SetPosition(1, Origin.position);
   }
 }

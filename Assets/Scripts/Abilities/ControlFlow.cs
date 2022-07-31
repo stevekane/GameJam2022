@@ -48,6 +48,58 @@ public class Choose : IEnumerator {
   }
 }
 
+public class Choose<A,B> : IEnumerator {
+  bool Waiting;
+  EventSource<A> SourceA;
+  EventSource<B> SourceB;
+  IEnumerator Routine;
+
+  public Choose(EventSource<A> a, EventSource<B> b) {
+    Waiting = true;
+    SourceA = a;
+    SourceB = b;
+    SourceA.Action += ChooseA;
+    SourceB.Action += ChooseB;
+    Routine = MkRoutine();
+  }
+
+  ~Choose() {
+    SourceA.Action -= ChooseA;
+    SourceB.Action -= ChooseB;
+    Routine = null;
+    Waiting = false;
+  }
+
+  public bool Value { get; private set; }
+  public A FirstResult { get; private set; }
+  public B SecondResult { get; private set; }
+  public object Current { get => Routine.Current; }
+  public bool MoveNext() => Routine.MoveNext();
+  public void Reset() => Routine.Reset();
+
+  void ChooseA(A a) {
+    Value = true;
+    FirstResult = a;
+    Waiting = false;
+    SourceA.Action -= ChooseA;
+    SourceB.Action -= ChooseB;
+  }
+
+  void ChooseB(B b) {
+    Value = false;
+    SecondResult = b;
+    Waiting = false;
+    SourceA.Action -= ChooseA;
+    SourceB.Action -= ChooseB;
+  }
+
+  IEnumerator MkRoutine() {
+    while (Waiting) {
+      yield return null;
+    }
+  }
+}
+
 public class Switch : IEnumerator {
   EventSource Source0;
   EventSource Source1;

@@ -6,7 +6,6 @@ enum GrappleState { Holding, Throwing, Pulling }
 public class GrappleAbility : MonoBehaviour {
   public GameObject Owner;
   public GrapplingHook HookPrefab;
-  public Vector3 LaunchOffset;
   public Timeval HookTravelDuration = Timeval.FromMillis(30, 30);
   public float Speed;
   public float ReleaseDistance = 1;
@@ -26,7 +25,7 @@ public class GrappleAbility : MonoBehaviour {
     InputManager.Instance.L2.JustUp.Action -= Throw;
     InputManager.Instance.R2.JustDown.Action -= Stop;
     if (Hook) {
-      Hook.OnHit -= Hit;
+      Hook.OnHit.Action -= Hit;
       Destroy(Hook.gameObject);
     }
     StopAllCoroutines();
@@ -36,17 +35,18 @@ public class GrappleAbility : MonoBehaviour {
     InputManager.Instance.L2.JustUp.Action -= Throw;
     InputManager.Instance.R2.JustDown.Action -= Stop;
     Owner.GetComponent<Animator>().SetInteger("GrappleState", (int)GrappleState.Throwing);
-    Hook = Instantiate(HookPrefab, Owner.transform.position+LaunchOffset, Owner.transform.rotation);
-    Hook.GetComponent<Rigidbody>().AddForce(Speed*Owner.transform.forward, ForceMode.Impulse);
-    Hook.OnHit += Hit;
+    Hook = Instantiate(HookPrefab, transform.position, transform.rotation);
+    Hook.Origin = transform;
+    Hook.GetComponent<Rigidbody>().AddForce(Speed*transform.forward, ForceMode.Impulse);
+    Hook.OnHit.Action += Hit;
     StartCoroutine(Wait(HookTravelDuration.Frames));
   }
 
   void Hit(Collision collision) {
-    StopAllCoroutines();
-    Hook.OnHit -= Hit;
+    Hook.OnHit.Action -= Hit;
     Destroy(Hook.GetComponent<Collider>());
     Destroy(Hook.GetComponent<Rigidbody>());
+    StopAllCoroutines();
     StartCoroutine(PullTowards(collision.GetContact(0).point));
   }
 
@@ -61,7 +61,7 @@ public class GrappleAbility : MonoBehaviour {
     var frames = 0;
     Owner.GetComponent<Animator>().SetInteger("GrappleState", (int)GrappleState.Pulling);
     while (true) {
-      var delta = destination-Owner.transform.position-LaunchOffset;
+      var delta = destination-transform.position;
       var direction = delta.normalized;
       if (delta.magnitude < ReleaseDistance || frames > HookTravelDuration.Frames) {
         break;
