@@ -54,6 +54,10 @@ public class AbilityMan : MonoBehaviour {
     AbilityFibered = new AbilityFibered(gameObject);
   }
 
+  void LightAttackActive() {
+    Debug.Log("Hi");
+  }
+
   void FixedUpdate() {
     var action = Inputs.Action;
     var dt = Time.fixedDeltaTime;

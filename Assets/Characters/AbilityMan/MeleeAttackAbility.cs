@@ -31,17 +31,24 @@ public class MeleeAttackAbility : Ability {
   }
 
   public void OnHitStopStart(Transform attacker, List<Transform> targets, int stopFrames) {
+    var hitStop = new HitStopEffect(attacker.forward, HitStopVibrationAmplitude, stopFrames);
+    Owner.GetComponent<Status>()?.Add(hitStop);
     SFXManager.Instance.TryPlayOneShot(HitSFX);
     CameraShaker.Instance.Shake(HitCameraShakeIntensity);
-    Owner.GetComponent<Status>()?.Add(new HitStopEffect(attacker.forward, HitStopVibrationAmplitude, stopFrames));
     targets.ForEach(target => {
-      // TODO: this is gross
-      target.GetComponent<Defender>()?.OnHit(new HitParams { HitStopDuration = Active.HitFreezeDuration, Damage = HitDamage, KnockbackStrength = HitTargetKnockbackStrength, KnockbackType = KnockBackType.Delta }, attacker);
+      var hitParams = new HitParams {
+        HitStopDuration = Active.HitFreezeDuration,
+        Damage = HitDamage,
+        KnockbackStrength = HitTargetKnockbackStrength,
+        KnockbackType = KnockBackType.Delta
+      };
+      target.GetComponent<Defender>()?.OnHit(hitParams, attacker);
       VFXManager.Instance.TrySpawnEffect(HitVFX, target.transform.position+HitVFXOffset);
     });
   }
 
   public void OnHitStopEnd(Transform attacker, List<Transform> targets) {
-    attacker.GetComponent<Status>()?.Add(new KnockbackEffect(HitAttackerKnockbackStrength*-attacker.forward));
+    var knockback = new KnockbackEffect(HitAttackerKnockbackStrength*-attacker.forward);
+    attacker.GetComponent<Status>()?.Add(knockback);
   }
 }
