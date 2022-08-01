@@ -26,11 +26,11 @@ public struct Fiber {
   }
 
   public static IEnumerator Any(IEnumerator a, IEnumerator b, IEnumerator c) => Any(a, Any(b,c));
-  public static IEnumerator Any(IEnumerator a, IEnumerator b, IEnumerator c, IEnumerator d) => Any(Any(a, b), Any(b, c));
+  public static IEnumerator Any(IEnumerator a, IEnumerator b, IEnumerator c, IEnumerator d) => Any(Any(a, b), Any(c, d));
   public static IEnumerator Any(IEnumerable<IEnumerator> xs) => xs.Aggregate(Any);
 
   public static IEnumerator All(IEnumerator a, IEnumerator b, IEnumerator c) => All(a, All(b,c));
-  public static IEnumerator All(IEnumerator a, IEnumerator b, IEnumerator c, IEnumerator d) => All(All(a, b), All(b, c));
+  public static IEnumerator All(IEnumerator a, IEnumerator b, IEnumerator c, IEnumerator d) => All(All(a, b), All(c, d));
   public static IEnumerator All(IEnumerable<IEnumerator> xs) => xs.Aggregate(All);
 
   public interface IValue<T> {
@@ -81,7 +81,7 @@ public struct Fiber {
     public T Value { get; internal set; }
   }
 
-  public class Select: AbilityTask, IValue<int> {
+  public class Select : AbilityTask, IValue<int> {
     IEnumerator A;
     IEnumerator B;
     public Select(IEnumerator a, IEnumerator b) {
