@@ -37,6 +37,13 @@ public struct Fiber {
     public T Value { get; }
   }
 
+  // Suggestion: rename and use these static methods for the public interface so you can do:
+  // var foo = Fiber.ListenFor(event);  -- instead of
+  // var foo = new Fiber.ListenFor<Transform>(event);
+  public static ListenFor<T> MakeListenFor<T>(EventSource<T> source) {
+    return new ListenFor<T>(source);
+  }
+
   public class ListenFor : IEnumerator {
     EventSource Source;
     bool Waiting = true;

@@ -63,6 +63,29 @@ public class InactiveAttackPhase : AbilityTask {
 }
 
 [Serializable]
+public class InactiveAttackPhaseFiber : AbilityTask {
+  int Index;
+  Animator Animator;
+  public Timeval Duration = Timeval.FromMillis(0, 30);
+  public Timeval ClipDuration = Timeval.FromMillis(0, 30);
+  public IEnumerator Start(Animator animator, int index) {
+    Reset();
+    Animator = animator;
+    Index = index;
+    return this;
+  }
+  public override IEnumerator Routine() {
+    for (var i = 0; i < Duration.Frames; i++) {
+      yield return null;
+      var attackSpeed = ClipDuration.Millis/Duration.Millis;
+      Animator.SetFloat("AttackSpeed", attackSpeed);
+      Animator.SetBool("Attacking", true);
+      Animator.SetInteger("AttackIndex", Index);
+    }
+  }
+}
+
+[Serializable]
 public class ChargedAttackPhase : AbilityTask {
   public int Index;
   public Animator Animator;
@@ -136,6 +159,58 @@ public class HitboxAttackPhase : AbilityTask {
         OnContactStart.Invoke(Owner, Hits, HitFreezeDuration.Frames);
         yield return new WaitFrames(HitFreezeDuration.Frames);
         OnContactEnd.Invoke(Owner, Hits);
+        Hitbox.Collider.enabled = true;
+        Hitbox.TriggerStay = OnContact;
+        Hits.Clear();
+      }
+    }
+    Hitbox.Collider.enabled = false;
+    Hitbox.TriggerStay = null;
+  }
+}
+
+[Serializable]
+public class HitboxAttackPhaseFiber : AbilityTask {
+  int Index;
+  Animator Animator;
+  Transform Owner;
+  public AttackHitbox Hitbox;
+  public Timeval Duration = Timeval.FromMillis(0, 30);
+  public Timeval ClipDuration = Timeval.FromMillis(0, 30);
+  public Timeval HitFreezeDuration = Timeval.FromMillis(3, 30);
+  public EventSource<(Transform, List<Transform>, int)> OnContactStart = new();
+  public EventSource<(Transform, List<Transform>)> OnContactEnd = new();
+  List<Transform> Hits = new List<Transform>(capacity: 4);
+  List<Transform> PhaseHits = new List<Transform>(capacity: 4);
+
+  public IEnumerator Start(Transform owner, Animator animator, int index) {
+    Reset();
+    Owner = owner;
+    Animator = animator;
+    Index = index;
+    return this;
+  }
+  public void OnContact(Transform target) {
+    if (!PhaseHits.Contains(target)) {
+      Hits.Add(target);
+      PhaseHits.Add(target);
+    }
+  }
+  public override IEnumerator Routine() {
+    PhaseHits.Clear();
+    Hitbox.Collider.enabled = true;
+    Hitbox.TriggerStay = OnContact;
+    for (var i = 0; i < Duration.Frames; i++) {
+      yield return null;
+      Animator.SetFloat("AttackSpeed", ClipDuration.Millis/Duration.Millis);
+      Animator.SetBool("Attacking", true);
+      Animator.SetInteger("AttackIndex", Index);
+      if (Hits.Count > 0) {
+        Hitbox.Collider.enabled = false;
+        Hitbox.TriggerStay = null;
+        OnContactStart.Action?.Invoke((Owner, Hits, HitFreezeDuration.Frames));
+        yield return Fiber.Wait(HitFreezeDuration.Frames);
+        OnContactEnd.Action?.Invoke((Owner, Hits));
         Hitbox.Collider.enabled = true;
         Hitbox.TriggerStay = OnContact;
         Hits.Clear();

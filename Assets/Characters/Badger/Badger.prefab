@@ -760,7 +760,7 @@ GameObject:
   - component: {fileID: 2819409936395190925}
   - component: {fileID: 6575210274505399943}
   - component: {fileID: 2011504321417715554}
-  - component: {fileID: 7749871172930239616}
+  - component: {fileID: 2673847396898803468}
   m_Layer: 15
   m_Name: Heavy
   m_TagString: Untagged
@@ -809,7 +809,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Collider: {fileID: 6575210274505399943}
---- !u!114 &7749871172930239616
+--- !u!114 &2673847396898803468
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -818,7 +818,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5274468485158292295}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70667403218b956439fa1816c19b5e1c, type: 3}
+  m_Script: {fileID: 11500000, guid: c05e2b324b7be2447826a43593dd3bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Index: 0
@@ -843,38 +843,6 @@ MonoBehaviour:
     HitFreezeDuration:
       Millis: 200
       TicksPerSecond: 30
-    Hits: []
-    PhaseHits: []
-    OnContactStart:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 7749871172930239616}
-          m_TargetAssemblyTypeName: MeleeAttackAbility, Assembly-CSharp
-          m_MethodName: OnHitStopStart
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    OnContactEnd:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 7749871172930239616}
-          m_TargetAssemblyTypeName: MeleeAttackAbility, Assembly-CSharp
-          m_MethodName: OnHitStopEnd
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
   Recovery:
     Duration:
       Millis: 300
@@ -1269,6 +1237,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Abilities: []
+  AbilitiesF: []
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0
