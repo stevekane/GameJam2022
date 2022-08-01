@@ -1,11 +1,15 @@
 using UnityEngine;
 
 public class GrapplingHook : MonoBehaviour {
+  public GameObject Owner;
   public Transform Origin;
   public EventSource<Collision> OnHit = new();
 
   void OnCollisionEnter(Collision c) {
-    OnHit.Action?.Invoke(c);
+    if (c.transform.gameObject != Owner) {
+      Debug.Log($"You hit {c.transform.name}");
+      OnHit.Action?.Invoke(c);
+    }
   }
 
   void LateUpdate() {

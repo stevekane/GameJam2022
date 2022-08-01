@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 public class AbilityMan : MonoBehaviour {
@@ -9,13 +8,14 @@ public class AbilityMan : MonoBehaviour {
   Ability[] Abilities;
   Ability CurrentAbility;
   GrappleAbility GrappleAbility;
-  AbilityFibered AbilityFibered;
+  GrappleAbilityFibered GrappleAbilityFibered;
 
   void Start() {
     Controller = GetComponent<CharacterController>();
     Status = GetComponent<Status>();
     Abilities = GetComponentsInChildren<Ability>();
     GrappleAbility = GetComponentInChildren<GrappleAbility>();
+    GrappleAbilityFibered = GetComponentInChildren<GrappleAbilityFibered>();
     InputManager.Instance.R1.JustDown.Action += LightAttack;
     InputManager.Instance.R2.JustDown.Action += TripleShot;
     InputManager.Instance.L2.JustDown.Action += Grapple;
@@ -51,7 +51,8 @@ public class AbilityMan : MonoBehaviour {
   }
 
   void Fibered() {
-    AbilityFibered = new AbilityFibered(gameObject);
+    GrappleAbilityFibered.Stop();
+    GrappleAbilityFibered.Activate();
   }
 
   void LightAttackActive() {
@@ -63,9 +64,6 @@ public class AbilityMan : MonoBehaviour {
     var dt = Time.fixedDeltaTime;
     var move = action.Left.XZ;
 
-    if (AbilityFibered != null) {
-      AbilityFibered.Run();
-    }
     if (CurrentAbility != null && CurrentAbility.IsComplete) {
       CurrentAbility = null;
     }
