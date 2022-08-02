@@ -139,7 +139,7 @@ GameObject:
   - component: {fileID: 7199471196977928480}
   - component: {fileID: 846017969810757966}
   - component: {fileID: 6497165714247605303}
-  - component: {fileID: 5336460106413157015}
+  - component: {fileID: 3232894417174932624}
   m_Layer: 13
   m_Name: Heavy
   m_TagString: Untagged
@@ -188,7 +188,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Collider: {fileID: 846017969810757966}
---- !u!114 &5336460106413157015
+--- !u!114 &3232894417174932624
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -197,7 +197,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2769119998121042157}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70667403218b956439fa1816c19b5e1c, type: 3}
+  m_Script: {fileID: 11500000, guid: c05e2b324b7be2447826a43593dd3bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Index: 2
@@ -211,7 +211,6 @@ MonoBehaviour:
       Millis: 366.66666
       TicksPerSecond: 30
   Active:
-    Owner: {fileID: 5571416124093621163}
     Hitbox: {fileID: 6497165714247605303}
     Duration:
       Millis: 33.333332
@@ -222,38 +221,6 @@ MonoBehaviour:
     HitFreezeDuration:
       Millis: 200
       TicksPerSecond: 30
-    Hits: []
-    PhaseHits: []
-    OnContactStart:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 5336460106413157015}
-          m_TargetAssemblyTypeName: MeleeAttackAbility, Assembly-CSharp
-          m_MethodName: OnHitStopStart
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    OnContactEnd:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 5336460106413157015}
-          m_TargetAssemblyTypeName: MeleeAttackAbility, Assembly-CSharp
-          m_MethodName: OnHitStopEnd
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
   Recovery:
     Duration:
       Millis: 300
@@ -280,7 +247,7 @@ GameObject:
   - component: {fileID: 7905156309691345306}
   - component: {fileID: 8768634875209681655}
   - component: {fileID: 4506088330109088452}
-  - component: {fileID: 4067462665761786997}
+  - component: {fileID: 776304553845593926}
   m_Layer: 13
   m_Name: Light Left
   m_TagString: Untagged
@@ -329,7 +296,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Collider: {fileID: 8768634875209681655}
---- !u!114 &4067462665761786997
+--- !u!114 &776304553845593926
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -338,7 +305,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4872877845196898822}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70667403218b956439fa1816c19b5e1c, type: 3}
+  m_Script: {fileID: 11500000, guid: c05e2b324b7be2447826a43593dd3bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Index: 0
@@ -352,7 +319,6 @@ MonoBehaviour:
       Millis: 33.333332
       TicksPerSecond: 30
   Active:
-    Owner: {fileID: 5571416124093621163}
     Hitbox: {fileID: 4506088330109088452}
     Duration:
       Millis: 33.333332
@@ -363,38 +329,6 @@ MonoBehaviour:
     HitFreezeDuration:
       Millis: 100
       TicksPerSecond: 30
-    Hits: []
-    PhaseHits: []
-    OnContactStart:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 4067462665761786997}
-          m_TargetAssemblyTypeName: MeleeAttackAbility, Assembly-CSharp
-          m_MethodName: OnHitStopStart
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    OnContactEnd:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 4067462665761786997}
-          m_TargetAssemblyTypeName: MeleeAttackAbility, Assembly-CSharp
-          m_MethodName: OnHitStopEnd
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
   Recovery:
     Duration:
       Millis: 33.333332
@@ -1256,6 +1190,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Abilities: []
+  AbilitiesF: []
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0
@@ -1671,7 +1606,7 @@ GameObject:
   - component: {fileID: 9052555834542644548}
   - component: {fileID: 6569306498281430680}
   - component: {fileID: 3383263203924479122}
-  - component: {fileID: 7376119839575728548}
+  - component: {fileID: 5960270733240712027}
   m_Layer: 13
   m_Name: Light Right
   m_TagString: Untagged
@@ -1720,7 +1655,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Collider: {fileID: 6569306498281430680}
---- !u!114 &7376119839575728548
+--- !u!114 &5960270733240712027
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1729,7 +1664,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8809422246135798032}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70667403218b956439fa1816c19b5e1c, type: 3}
+  m_Script: {fileID: 11500000, guid: c05e2b324b7be2447826a43593dd3bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Index: 1
@@ -1743,7 +1678,6 @@ MonoBehaviour:
       Millis: 33.333332
       TicksPerSecond: 30
   Active:
-    Owner: {fileID: 5571416124093621163}
     Hitbox: {fileID: 3383263203924479122}
     Duration:
       Millis: 33.333332
@@ -1754,38 +1688,6 @@ MonoBehaviour:
     HitFreezeDuration:
       Millis: 100
       TicksPerSecond: 30
-    Hits: []
-    PhaseHits: []
-    OnContactStart:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 7376119839575728548}
-          m_TargetAssemblyTypeName: MeleeAttackAbility, Assembly-CSharp
-          m_MethodName: OnHitStopStart
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    OnContactEnd:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 7376119839575728548}
-          m_TargetAssemblyTypeName: MeleeAttackAbility, Assembly-CSharp
-          m_MethodName: OnHitStopEnd
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
   Recovery:
     Duration:
       Millis: 33.333332

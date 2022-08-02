@@ -45,7 +45,7 @@ public class Vapor : MonoBehaviour, IWireRider {
   Animator Animator;
   AudioSource AudioSource;
 
-  Ability CurrentAbility;
+  AbilityFibered CurrentAbility;
   Wire Wire;
   int WireFramesTraveled;
   Motion Motion;
@@ -73,7 +73,7 @@ public class Vapor : MonoBehaviour, IWireRider {
     var dt = Time.fixedDeltaTime;
     var action = Inputs.Action;
 
-    if (CurrentAbility?.IsComplete ?? false)
+    if (!CurrentAbility?.IsRunning ?? false)
       CurrentAbility = null;
 
     if (Status.CanMove && Motion == Motion.Base && action.L1.JustDown) {
@@ -109,11 +109,11 @@ public class Vapor : MonoBehaviour, IWireRider {
       }
 
       if (action.R1.JustDown && !IsAttacking) {
-        CurrentAbility = Abilities.TryStartAbility(0+PunchCycleIndex);
+        CurrentAbility = Abilities.TryStartAbilityF(0+PunchCycleIndex);
         //Attacker.StartAttack(0+PunchCycleIndex);
         PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
       } else if (action.R2.JustDown && !IsAttacking) {
-        CurrentAbility = Abilities.TryStartAbility(2);
+        CurrentAbility = Abilities.TryStartAbilityF(2);
         // TODO: charge
       } else if (action.R2.JustUp && IsAttacking) {
         //Attacker.ReleaseChargeAttack();
