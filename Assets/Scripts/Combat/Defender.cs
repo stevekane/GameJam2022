@@ -40,7 +40,7 @@ public class Defender : MonoBehaviour {
     var power = 5f * strength * Mathf.Pow((Damage.Points+100f) / 100f, 2f);
     // TODO: how to handle projectiles?
     var knockBackDirection = AttackMelee.KnockbackVector(attack.Attacker.transform, transform, knockBackType);
-    Status?.Add(new HitStunEffect(hitStopFrames), (s) => s.Add(new KnockbackEffect(knockBackDirection*power)));
+    Status?.Add(new HitStopEffect(knockBackDirection, .15f, hitStopFrames), (s) => s.Add(new KnockbackEffect(knockBackDirection*power)));
     Vibrator?.Vibrate(knockBackDirection, hitStopFrames, .15f);
     Damage?.AddPoints(points);
   }
@@ -49,8 +49,7 @@ public class Defender : MonoBehaviour {
     var power = 5f * hit.KnockbackStrength * Mathf.Pow((Damage.Points+100f) / 100f, 2f);
     var hitStopFrames = hit.HitStopDuration.Frames;
     var knockBackDirection = AttackMelee.KnockbackVector(hitTransform, transform, hit.KnockbackType);
-    Status?.Add(new HitStunEffect(hitStopFrames), (s) => s.Add(new KnockbackEffect(knockBackDirection*power)));
-    Vibrator?.Vibrate(knockBackDirection, hitStopFrames, .15f);
+    Status?.Add(new HitStopEffect(knockBackDirection, .15f, hitStopFrames), (s) => s.Add(new KnockbackEffect(knockBackDirection*power)));
     Damage?.AddPoints(hit.Damage);
   }
 

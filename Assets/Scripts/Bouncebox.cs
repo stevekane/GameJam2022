@@ -20,7 +20,7 @@ public class Bouncebox : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    Collider.enabled = Status.IsAirborne;
+    Collider.enabled = Status.Get<KnockbackEffect>()?.IsAirborne ?? false;
   }
 
   void OnTriggerEnter(Collider other) {
@@ -34,11 +34,10 @@ public class Bouncebox : MonoBehaviour {
         Destroy(Damage.gameObject, .01f);
       } else {
         AudioSource.PlayOptionalOneShot(AudioClip);
-        Vibrator.Vibrate(transform.right, Duration.Frames, .15f);
         VFXManager.Instance?.TrySpawnEffect(Effect, hit.point);
         var bounceVel = Vector3.Reflect(k.Velocity, hit.normal.XZ());
         Status.Remove(k);
-        Status.Add(new HitStunEffect(Duration.Frames), (s) => s.Add(new KnockbackEffect(bounceVel)));
+        Status.Add(new HitStopEffect(transform.right, .15f, Duration.Frames), (s) => s.Add(new KnockbackEffect(bounceVel)));
       }
     }
   }

@@ -8,6 +8,7 @@ public abstract class StatusEffect {
   public OnEffectComplete OnComplete;
   public abstract bool Merge(StatusEffect e);
   public abstract void Apply(Status status);
+  public virtual void OnRemoved(Status status) { }
 }
 
 public class AutoAimEffect : StatusEffect {
@@ -23,6 +24,7 @@ public class KnockbackEffect : StatusEffect {
   static readonly float DONE_SPEED = 5f;
 
   public Vector3 Velocity;
+  public bool IsAirborne = false;
   public KnockbackEffect(Vector3 velocity) {
     Velocity = velocity;
   }
@@ -34,12 +36,20 @@ public class KnockbackEffect : StatusEffect {
   public override void Apply(Status status) {
     Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * DRAG);
     status.Move(Velocity*Time.fixedDeltaTime);
-    status.IsAirborne |= Velocity.sqrMagnitude >= AIRBORNE_SPEED*AIRBORNE_SPEED;
-    status.CanMove = !status.IsAirborne;
-    status.CanRotate = !status.IsAirborne;
-    status.CanAttack = !status.IsAirborne;
+    IsAirborne = Velocity.sqrMagnitude >= AIRBORNE_SPEED*AIRBORNE_SPEED;
+    status.CanMove = !IsAirborne;
+    status.CanRotate = !IsAirborne;
+    status.CanAttack = !IsAirborne;
+    status.Animator?.SetBool("HitFlinch", IsAirborne);
+    if (!status.CanAttack) {
+      status.GetComponent<AbilityUser>()?.StopAllAbilities();
+      status.Attacker?.CancelAttack();
+    }
     if (Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED)
       status.Remove(this);
+  }
+  public override void OnRemoved(Status status) {
+    status.Animator?.SetBool("HitFlinch", false);
   }
 }
 
@@ -57,49 +67,24 @@ public class HitStopEffect : StatusEffect {
   }
 
   public override bool Merge(StatusEffect e) {
-    Frames = TotalFrames;
+    var h = (HitStopEffect)e;
+    TotalFrames = Mathf.Max(TotalFrames - Frames, h.TotalFrames);
+    Frames = 0;
     return true;
   }
 
   public override void Apply(Status status) {
+    if (Frames == 0) {
+      status.GetComponent<Vibrator>()?.Vibrate(Axis, TotalFrames, Amplitude);
+    }
     if (Frames <= TotalFrames) {
       status.CanMove = false;
       status.CanRotate = false;
       status.CanAttack = false;
       status.GetComponent<Animator>()?.SetSpeed(0);
-      status.GetComponent<Vibrator>()?.Vibrate(Axis, TotalFrames, Amplitude);
       Frames++;
     } else {
       status.GetComponent<Animator>()?.SetSpeed(1);
-      status.Remove(this);
-    }
-  }
-}
-
-// TODO: Move to Damage.cs?
-public class HitStunEffect : StatusEffect {
-  public int Frames, HitStopFrames;
-
-  public HitStunEffect(int hitStopFrames) {
-    Frames = 0;
-    HitStopFrames = hitStopFrames;
-  }
-
-  public override bool Merge(StatusEffect e) {
-    var h = (HitStunEffect)e;
-    h.HitStopFrames = Mathf.Max(HitStopFrames, h.HitStopFrames);
-    return true;
-  }
-
-  public override void Apply(Status status) {
-    status.CanMove = false;
-    status.CanRotate = false;
-    status.CanAttack = false;
-    status.IsHitstun = true;
-    if (Frames++ == 0) {
-      status.GetComponent<AbilityUser>()?.StopAllAbilities();
-      status.Attacker?.CancelAttack();
-    } else if (Frames >= HitStopFrames) {
       status.Remove(this);
     }
   }
@@ -114,8 +99,6 @@ public class Status : MonoBehaviour {
   public bool CanMove = true;
   public bool CanRotate = true;
   public bool CanAttack = true;
-  public bool IsAirborne = false;
-  public bool IsHitstun = false;
 
   List<StatusEffect> Added = new();
   public void Add(StatusEffect effect, OnEffectComplete onComplete = null) {
@@ -155,10 +138,9 @@ public class Status : MonoBehaviour {
     CanMove = true;
     CanRotate = true;
     CanAttack = true;
-    IsAirborne = false;
-    IsHitstun = false;
 
-    Removed.ForEach(e => { e.OnComplete?.Invoke(this); Active.Remove(e); });
+    // TODO: differentiate between cancelled and completed?
+    Removed.ForEach(e => { e.OnComplete?.Invoke(this); e.OnRemoved(this); Active.Remove(e); });
     Removed.Clear();
     Added.ForEach(e => Active.Add(e));
     Added.Clear();

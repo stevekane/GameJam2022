@@ -96,14 +96,13 @@ public class Badger : MonoBehaviour {
 
     if ((CurrentAbility == null || Defender.IsBlocking) && WaitFrames > 0)
       --WaitFrames;
-    if (Status.IsHitstun) {
+    if (Status.Get<KnockbackEffect>() != null) {
       RecoveryFrames = Timeval.FromMillis(1000).Frames;
       ShieldAbility.Stop();
     } else if (RecoveryFrames > 0) {
       --RecoveryFrames;
     }
 
-    Animator.SetBool("HitFlinch", Status.IsHitstun);
     Defender.IsBlocking = ShieldAbility.IsRaised;
     if (Shield)
       Shield.Defender.IsBlocking = !Defender.IsBlocking;

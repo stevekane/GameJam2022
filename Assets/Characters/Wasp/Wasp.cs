@@ -80,7 +80,5 @@ public class Wasp : MonoBehaviour {
     }
 
     Controller.Move(Velocity*Time.fixedDeltaTime);
-
-    Animator.SetBool("HitFlinch", Status.IsHitstun);
   }
 }

@@ -117,7 +117,7 @@ public class Smoke : MonoBehaviour {
     //  DodgeRoutine = StartCoroutine(DodgeSequence());
     //}
 
-    if (Status.IsHitstun) {
+    if (Status.Get<KnockbackEffect>() != null) {
       RecoveryFrames = Timeval.FromMillis(1000).Frames;
     } else if (RecoveryFrames > 0) {
       --RecoveryFrames;
