@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class PelletAbility : Ability {
+public class PelletAbility : AbilityFibered {
   public int Index;
   public Animator Animator;
-  public InactiveAttackPhase Windup;
-  public InactiveAttackPhase Active;
-  public InactiveAttackPhase Recovery;
+  public InactiveAttackPhaseFiber Windup;
+  public InactiveAttackPhaseFiber Active;
+  public InactiveAttackPhaseFiber Recovery;
   public Bullet BulletPrefab;
   public int NumBullets;
   public HitParams HitParams;
@@ -18,29 +18,27 @@ public class PelletAbility : Ability {
   public GameObject HitVFX;
   public AudioClip HitSFX;
 
-  public override IEnumerator Routine() {
+  protected override IEnumerator MakeRoutine() {
     yield return Windup.Start(Animator, Index);
-    var shoot = StartCoroutine(ShootRoutine());
-    yield return Active.Start(Animator, Index);
-    StopCoroutine(shoot);
+    yield return Fiber.All(ShootRoutine(), Active.Start(Animator, Index));
     yield return Recovery.Start(Animator, Index);
+    Stop();
   }
 
   IEnumerator ShootRoutine() {
     for (int i = 0; i < NumBullets; i++) {
-      var framesRemaining = Active.Duration.Frames / NumBullets;
-      while (--framesRemaining > 0)
-        yield return new WaitForFixedUpdate();
+      yield return Fiber.Wait(Active.Duration.Frames / NumBullets);
       VFXManager.Instance.TrySpawnEffect(FireVFX, transform.position);
       SFXManager.Instance.TryPlayOneShot(FireSFX);
       Bullet.Fire(BulletPrefab, transform.position, transform.forward, OnHit);
     }
   }
 
-  public override void AfterEnd() {
+  public override void Stop() {
     Animator.SetBool("Attacking", false);
     Animator.SetInteger("AttackIndex", -1);
     Animator.SetFloat("AttackSpeed", 1);
+    base.Stop();
   }
 
   void OnHit(Bullet bullet, Defender defender) {
