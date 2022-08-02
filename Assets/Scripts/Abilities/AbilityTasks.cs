@@ -83,23 +83,23 @@ public class ChargedAttackPhase : AbilityTask {
 
 [Serializable]
 public class HitboxAttackPhase : AbilityTask {
+  public delegate IEnumerator OnHitFunc(List<Transform> hits, int stopFrames);
+
   int Index;
   Animator Animator;
-  Transform Owner;
   public AttackHitbox Hitbox;
   public Timeval Duration = Timeval.FromMillis(0, 30);
   public Timeval ClipDuration = Timeval.FromMillis(0, 30);
   public Timeval HitFreezeDuration = Timeval.FromMillis(3, 30);
-  public EventSource<(Transform, List<Transform>, int)> OnContactStart = new();
-  public EventSource<(Transform, List<Transform>)> OnContactEnd = new();
+  public OnHitFunc OnHit;
   List<Transform> Hits = new List<Transform>(capacity: 4);
   List<Transform> PhaseHits = new List<Transform>(capacity: 4);
 
-  public IEnumerator Start(Transform owner, Animator animator, int index) {
+  public IEnumerator Start(Animator animator, int index, OnHitFunc onHit) {
     Reset();
-    Owner = owner;
     Animator = animator;
     Index = index;
+    OnHit = onHit;
     return this;
   }
   public void OnContact(Transform target) {
@@ -120,9 +120,7 @@ public class HitboxAttackPhase : AbilityTask {
       if (Hits.Count > 0) {
         Hitbox.Collider.enabled = false;
         Hitbox.TriggerStay = null;
-        OnContactStart.Action?.Invoke((Owner, Hits, HitFreezeDuration.Frames));
-        yield return Fiber.Wait(HitFreezeDuration.Frames);
-        OnContactEnd.Action?.Invoke((Owner, Hits));
+        yield return OnHit(Hits, HitFreezeDuration.Frames);
         Hitbox.Collider.enabled = true;
         Hitbox.TriggerStay = OnContact;
         Hits.Clear();
