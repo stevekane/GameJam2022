@@ -2,7 +2,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
-public struct Fiber {
+public struct Fiber : IEnumerator {
   public interface IValue<T> {
     public T Value { get; }
   }
@@ -16,7 +16,7 @@ public struct Fiber {
   public static IEnumerator Any(IEnumerator a, IEnumerator b) {
     var aFiber = new Fiber(a);
     var bFiber = new Fiber(b);
-    while (aFiber.Run() & bFiber.Run()) {
+    while (aFiber.MoveNext() & bFiber.MoveNext()) {
       yield return null;
     }
   }
@@ -24,7 +24,7 @@ public struct Fiber {
   public static IEnumerator All(IEnumerator a, IEnumerator b) {
     var aFiber = new Fiber(a);
     var bFiber = new Fiber(b);
-    while (aFiber.Run() | bFiber.Run()) {
+    while (aFiber.MoveNext() | bFiber.MoveNext()) {
       yield return null;
     }
   }
@@ -103,8 +103,8 @@ public struct Fiber {
       var aFiber = new Fiber(A);
       var bFiber = new Fiber(B);
       while (true) {
-        var aActive = aFiber.Run();
-        var bActive = bFiber.Run();
+        var aActive = aFiber.MoveNext();
+        var bActive = bFiber.MoveNext();
         if (!aActive) {
           Value = 0;
           yield break;
@@ -119,16 +119,26 @@ public struct Fiber {
     public int Value { get; internal set; }
   }
 
+  IEnumerator Enumerator;
   Stack<IEnumerator> Stack;
   public Fiber(Stack<IEnumerator> stack) {
+    Current = null;
+    Enumerator = stack.Peek();
     Stack = stack;
   }
   public Fiber(IEnumerator enumerator) {
+    Current = null;
+    Enumerator = enumerator;
     Stack = new();
     Stack.Push(enumerator);
   }
-
-  public bool Run() {
+  public void Reset() {
+    Current = null;
+    Stack.Clear();
+    Stack.Push(Enumerator);
+  }
+  public object Current { get; internal set; }
+  public bool MoveNext() {
     while (Stack.TryPeek(out IEnumerator top)) {
       if (!top.MoveNext()) {
         Stack.Pop();
@@ -136,6 +146,7 @@ public struct Fiber {
         if (top.Current is IEnumerator) {
           Stack.Push(top.Current as IEnumerator);
         } else {
+          Current = top.Current;
           return true;
         }
       }
