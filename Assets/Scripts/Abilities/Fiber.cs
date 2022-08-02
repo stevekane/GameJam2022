@@ -37,23 +37,21 @@ public struct Fiber {
   public static IEnumerator All(IEnumerator a, IEnumerator b, IEnumerator c, IEnumerator d) => All(All(a, b), All(c, d));
   public static IEnumerator All(IEnumerable<IEnumerator> xs) => xs.Aggregate(All);
 
-  // Suggestion: rename and use these static methods for the public interface so you can do:
-  // var foo = Fiber.ListenFor(event);  -- instead of
-  // var foo = new Fiber.ListenFor<Transform>(event);
-  public static ListenFor<T> MakeListenFor<T>(EventSource<T> source) {
-    return new ListenFor<T>(source);
-  }
+  public static Selector Select(IEnumerator a, IEnumerator b) => new Selector(a, b);
 
-  public class ListenFor : IEnumerator {
+  public static Listener ListenFor(EventSource source) => new Listener(source);
+  public static Listener<T> ListenFor<T>(EventSource<T> source) => new Listener<T>(source);
+
+  public class Listener : IEnumerator {
     EventSource Source;
     bool Waiting = true;
 
-    public ListenFor(EventSource source) {
+    public Listener(EventSource source) {
       Waiting = true;
       Source = source;
       Source.Action += Callback;
     }
-    ~ListenFor() {
+    ~Listener() {
       Source.Action -= Callback;
     }
     public void Callback() {
@@ -65,16 +63,16 @@ public struct Fiber {
     public object Current { get => null; }
   }
 
-  public class ListenFor<T> : IEnumerator, IValue<T> {
+  public class Listener<T> : IEnumerator, IValue<T> {
     EventSource<T> Source;
     bool Waiting = true;
 
-    public ListenFor(EventSource<T> source) {
+    public Listener(EventSource<T> source) {
       Waiting = true;
       Source = source;
       Source.Action += Callback;
     }
-    ~ListenFor() {
+    ~Listener() {
       Source.Action -= Callback;
     }
     public void Callback(T t) {
@@ -88,15 +86,15 @@ public struct Fiber {
     public T Value { get; internal set; }
   }
 
-  public class Select : AbilityTask, IValue<int> {
+  public class Selector : AbilityTask, IValue<int> {
     IEnumerator A;
     IEnumerator B;
-    public Select(IEnumerator a, IEnumerator b) {
+    public Selector(IEnumerator a, IEnumerator b) {
       A = a;
       B = b;
       Enumerator = Routine();
     }
-    ~Select() {
+    ~Selector() {
       A = null;
       B = null;
       Enumerator = null;

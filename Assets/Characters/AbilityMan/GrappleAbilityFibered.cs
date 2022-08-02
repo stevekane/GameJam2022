@@ -30,7 +30,7 @@ public class GrappleAbilityFibered : AbilityFibered {
     Owner.GetComponent<Animator>().SetBool("Grappling", true);
     Owner.GetComponent<Animator>().SetInteger("GrappleState", (int)GrappleState.Holding);
     var chargeWait = Wait(MAX_CHARGE_DURATION.Frames);
-    var release = new ListenFor(InputManager.Instance.L1.JustUp);
+    var release = ListenFor(InputManager.Instance.L1.JustUp);
     yield return Any(chargeWait, release);
     // Create and throw the hook
     Owner.GetComponent<Animator>().SetBool("Grappling", true);
@@ -39,9 +39,9 @@ public class GrappleAbilityFibered : AbilityFibered {
     Hook.Owner = Owner;
     Hook.Origin = transform;
     Hook.GetComponent<Rigidbody>().AddForce(HOOK_SPEED*transform.forward, ForceMode.Impulse);
-    var hookHit = new ListenFor<Collision>(Hook.OnHit);
+    var hookHit = ListenFor(Hook.OnHit);
     var throwWait = Wait(MAX_THROW_DURATION.Frames);
-    var throwOutcome = new Select(hookHit, throwWait);
+    var throwOutcome = Select(hookHit, throwWait);
     yield return throwOutcome;
     // Hook hit something
     if (throwOutcome.Value == (int)ThrowResult.Hit) {
@@ -53,11 +53,8 @@ public class GrappleAbilityFibered : AbilityFibered {
       var pullWait = Wait(MAX_PULL_DURATION.Frames);
       var pullComplete = PullTowards(Owner, contactPoint, HOOK_SPEED, HOOK_RELEASE_DISTANCE);
       yield return Any(pullWait, pullComplete);
-      Stop();
-    // Hook did not hit
-    } else {
-      Stop();
     }
+    Stop();
   }
 
   IEnumerator PullTowards(GameObject subject, Vector3 destination, float speed, float releaseDistance) {
