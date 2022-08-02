@@ -7,5 +7,5 @@ public abstract class AbilityFibered : MonoBehaviour {
   public virtual void Activate() => Routine = new Fiber(MakeRoutine());
   public virtual void Stop() => Routine = null;
   protected abstract IEnumerator MakeRoutine();
-  void FixedUpdate() => Routine?.Run();
+  void FixedUpdate() => Routine?.MoveNext();
 }

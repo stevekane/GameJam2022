@@ -38,15 +38,15 @@ public class GrappleAbilityFibered : AbilityFibered {
     Hook = Instantiate(HookPrefab, transform.position, transform.rotation);
     Hook.Owner = Owner;
     Hook.Origin = transform;
+    Hook.OnHit.Action += OnHit;
     Hook.GetComponent<Rigidbody>().AddForce(HOOK_SPEED*transform.forward, ForceMode.Impulse);
     var hookHit = ListenFor(Hook.OnHit);
     var throwWait = Wait(MAX_THROW_DURATION.Frames);
     var throwOutcome = Select(hookHit, throwWait);
     yield return throwOutcome;
+    Hook.OnHit.Action -= OnHit;
     // Hook hit something
     if (throwOutcome.Value == (int)ThrowResult.Hit) {
-      Destroy(Hook.GetComponent<Collider>());
-      Destroy(Hook.GetComponent<Rigidbody>());
       Owner.GetComponent<Animator>().SetBool("Grappling", true);
       Owner.GetComponent<Animator>().SetInteger("GrappleState", (int)GrappleState.Pulling);
       var contactPoint = hookHit.Value.GetContact(0).point;
@@ -57,13 +57,19 @@ public class GrappleAbilityFibered : AbilityFibered {
     Stop();
   }
 
+  void OnHit(Collision c) {
+    Destroy(Hook.GetComponent<Rigidbody>());
+    Destroy(Hook.GetComponent<Collider>());
+  }
+
   IEnumerator PullTowards(GameObject subject, Vector3 destination, float speed, float releaseDistance) {
     while (subject) {
       var delta = destination-subject.transform.position;
       if (delta.magnitude > releaseDistance) {
         var direction = delta.normalized;
-        var distance = Time.fixedDeltaTime*speed*direction;
-        subject.GetComponent<CharacterController>().Move(distance);
+        var displacement = Time.fixedDeltaTime*speed*direction;
+        Debug.DrawRay(subject.transform.position, displacement);
+        subject.GetComponent<CharacterController>().Move(displacement);
         yield return null;
       } else {
         yield break;
