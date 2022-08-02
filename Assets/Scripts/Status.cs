@@ -18,6 +18,7 @@ public class AutoAimEffect : StatusEffect {
   }
 }
 
+// The flying state that happens to a defender when they get hit by a strong attack.
 public class KnockbackEffect : StatusEffect {
   static readonly float DRAG = 5f;
   static readonly float AIRBORNE_SPEED = 100f;
@@ -28,7 +29,6 @@ public class KnockbackEffect : StatusEffect {
   public KnockbackEffect(Vector3 velocity) {
     Velocity = velocity;
   }
-
   public override bool Merge(StatusEffect e) {
     Velocity += ((KnockbackEffect)e).Velocity;
     return true;
@@ -53,6 +53,7 @@ public class KnockbackEffect : StatusEffect {
   }
 }
 
+// The hit pause that happens to attacker and defender during melee attack contact.
 public class HitStopEffect : StatusEffect {
   public Vector3 Axis;
   public float Amplitude;
@@ -65,7 +66,6 @@ public class HitStopEffect : StatusEffect {
     Amplitude = amplitude;
     TotalFrames = totalFrames;
   }
-
   public override bool Merge(StatusEffect e) {
     var h = (HitStopEffect)e;
     TotalFrames = Mathf.Max(TotalFrames - Frames, h.TotalFrames);
@@ -87,6 +87,30 @@ public class HitStopEffect : StatusEffect {
       status.GetComponent<Animator>()?.SetSpeed(1);
       status.Remove(this);
     }
+  }
+}
+
+// The recoil effect that pushes you back when you hit something.
+public class RecoilEffect : StatusEffect {
+  static readonly float DRAG = 5f;
+  static readonly float DONE_SPEED = 5f;
+
+  public Vector3 Velocity;
+  public RecoilEffect(Vector3 velocity) {
+    Velocity = velocity;
+  }
+  public override bool Merge(StatusEffect e) {
+    Velocity += ((KnockbackEffect)e).Velocity;
+    return true;
+  }
+  public override void Apply(Status status) {
+    Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * DRAG);
+    status.Move(Velocity*Time.fixedDeltaTime);
+    status.CanMove = false;
+    status.CanRotate = false;
+    status.CanAttack = false;
+    if (Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED)
+      status.Remove(this);
   }
 }
 

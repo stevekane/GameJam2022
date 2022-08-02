@@ -16,7 +16,7 @@ public class MeleeAttackAbilityFiber : AbilityFibered {
   public float HitCameraShakeIntensity;
   public float HitDamage;
   public float HitTargetKnockbackStrength;
-  public float HitAttackerKnockbackStrength;
+  public float HitRecoilStrength;
 
   protected override IEnumerator MakeRoutine() {
     yield return Windup.Start(Animator, Index);
@@ -53,7 +53,6 @@ public class MeleeAttackAbilityFiber : AbilityFibered {
   }
 
   public void OnHitStopEnd((Transform attacker, List<Transform> targets) arg) {
-    var knockback = new KnockbackEffect(HitAttackerKnockbackStrength* - arg.attacker.forward);
-    arg.attacker.GetComponent<Status>()?.Add(knockback);
+    arg.attacker.GetComponent<Status>()?.Add(new RecoilEffect(HitRecoilStrength * -arg.attacker.forward));
   }
 }

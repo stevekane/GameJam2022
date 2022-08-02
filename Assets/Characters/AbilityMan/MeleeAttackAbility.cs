@@ -48,7 +48,7 @@ public class MeleeAttackAbility : Ability {
   }
 
   public void OnHitStopEnd(Transform attacker, List<Transform> targets) {
-    var knockback = new KnockbackEffect(HitAttackerKnockbackStrength*-attacker.forward);
+    var knockback = new RecoilEffect(HitAttackerKnockbackStrength*-attacker.forward);
     attacker.GetComponent<Status>()?.Add(knockback);
   }
 }
