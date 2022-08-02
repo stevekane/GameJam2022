@@ -34,5 +34,8 @@ public class AbilityUser : MonoBehaviour {
       if (!a.IsComplete)
         a.End();
     }
+    foreach (var a in AbilitiesF) {
+      a.Stop();
+    }
   }
 }

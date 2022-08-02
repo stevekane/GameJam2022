@@ -66,7 +66,7 @@ public class Badger : MonoBehaviour {
 
     if (Status.CanAttack && CurrentAbility == null && RecoveryFrames <= 0) {
       if (TargetIsAttacking && Shield) {
-        //CurrentAbility = Abilities.TryStartAbilityF(1);
+        CurrentAbility = Abilities.TryStartAbilityF(1);
         WaitFrames = Timeval.FromMillis(1000).Frames;
       } else if (inRange) {
         CurrentAbility = Abilities.TryStartAbilityF(0);
@@ -98,7 +98,7 @@ public class Badger : MonoBehaviour {
       --WaitFrames;
     if (Status.IsHitstun) {
       RecoveryFrames = Timeval.FromMillis(1000).Frames;
-      ShieldAbility.End();
+      ShieldAbility.Stop();
     } else if (RecoveryFrames > 0) {
       --RecoveryFrames;
     }
