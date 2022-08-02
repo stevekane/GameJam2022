@@ -1,6 +1,9 @@
 using System.Collections;
 using UnityEngine;
 
+interface IAbility {
+}
+
 abstract public class Ability : MonoBehaviour {
   public bool IsComplete { get; private set; } = true;
   public IEnumerator Wrapper() {

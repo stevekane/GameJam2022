@@ -21,16 +21,16 @@ public class Smoke : MonoBehaviour {
 
   IEnumerator AttackSequence() {
     yield return new WaitForSeconds(.1f);
-    CurrentAbility = Abilities.TryStartAbility(0);
+    CurrentAbility = Abilities.TryStartAbilityF(0);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    CurrentAbility = Abilities.TryStartAbility(1);
+    CurrentAbility = Abilities.TryStartAbilityF(1);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    CurrentAbility = Abilities.TryStartAbility(0);
+    CurrentAbility = Abilities.TryStartAbilityF(0);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    CurrentAbility = Abilities.TryStartAbility(2);
+    CurrentAbility = Abilities.TryStartAbilityF(2);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForSeconds(.8f);
     AttackRoutine = null;
@@ -68,7 +68,7 @@ public class Smoke : MonoBehaviour {
   AudioSource AudioSource;
   AbilityUser Target;
 
-  Ability CurrentAbility;
+  AbilityFibered CurrentAbility;
   Motion Motion;
   Coroutine AttackRoutine;
   Coroutine DodgeRoutine;
@@ -95,7 +95,7 @@ public class Smoke : MonoBehaviour {
     if (Target == null)
       return;
 
-    if (CurrentAbility?.IsComplete ?? false)
+    if (!CurrentAbility?.IsRunning ?? false)
       CurrentAbility = null;
 
     (Vector3 desiredPos, Vector3 desiredFacing, float distToTarget) = ChoosePosition();

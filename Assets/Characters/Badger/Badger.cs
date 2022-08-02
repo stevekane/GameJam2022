@@ -16,7 +16,7 @@ public class Badger : MonoBehaviour {
   int WaitFrames = 0;
   int RecoveryFrames = 0;
   Vector3 Velocity;
-  Ability CurrentAbility;
+  AbilityFibered CurrentAbility;
   ShieldAbility ShieldAbility;
 
   public void Awake() {
@@ -54,7 +54,7 @@ public class Badger : MonoBehaviour {
     if (Target == null)
       return;
 
-    if (CurrentAbility?.IsComplete ?? false)
+    if (!CurrentAbility?.IsRunning ?? false)
       CurrentAbility = null;
 
     var desiredPos = ChoosePosition();
@@ -66,10 +66,10 @@ public class Badger : MonoBehaviour {
 
     if (Status.CanAttack && CurrentAbility == null && RecoveryFrames <= 0) {
       if (TargetIsAttacking && Shield) {
-        CurrentAbility = Abilities.TryStartAbility(1);
+        CurrentAbility = Abilities.TryStartAbilityF(1);
         WaitFrames = Timeval.FromMillis(1000).Frames;
       } else if (inRange) {
-        CurrentAbility = Abilities.TryStartAbility(0);
+        CurrentAbility = Abilities.TryStartAbilityF(0);
         WaitFrames = AttackDelay.Frames;
       }
     }
@@ -98,7 +98,7 @@ public class Badger : MonoBehaviour {
       --WaitFrames;
     if (Status.IsHitstun) {
       RecoveryFrames = Timeval.FromMillis(1000).Frames;
-      ShieldAbility.End();
+      ShieldAbility.Stop();
     } else if (RecoveryFrames > 0) {
       --RecoveryFrames;
     }
