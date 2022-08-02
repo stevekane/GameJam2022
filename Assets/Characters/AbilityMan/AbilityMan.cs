@@ -5,58 +5,39 @@ public class AbilityMan : MonoBehaviour {
 
   CharacterController Controller;
   Status Status;
-  Ability[] Abilities;
-  Ability CurrentAbility;
-  GrappleAbility GrappleAbility;
+  AbilityFibered CurrentAbility;
+  AimAndFireAbility AimAndFireAbility;
   GrappleAbilityFibered GrappleAbilityFibered;
 
   void Start() {
     Controller = GetComponent<CharacterController>();
     Status = GetComponent<Status>();
-    Abilities = GetComponentsInChildren<Ability>();
-    GrappleAbility = GetComponentInChildren<GrappleAbility>();
+    AimAndFireAbility = GetComponentInChildren<AimAndFireAbility>();
     GrappleAbilityFibered = GetComponentInChildren<GrappleAbilityFibered>();
-    InputManager.Instance.R1.JustDown.Action += LightAttack;
+    GrappleAbilityFibered.ButtonEvents = InputManager.Instance.L2;
+    GrappleAbilityFibered.ButtonEvents.JustDown.Action += Grapple;
     InputManager.Instance.R2.JustDown.Action += TripleShot;
-    InputManager.Instance.L2.JustDown.Action += Grapple;
-    InputManager.Instance.L1.JustDown.Action += Fibered;
   }
 
   void OnDestroy() {
-    InputManager.Instance.R1.JustDown.Action -= LightAttack;
     InputManager.Instance.R2.JustDown.Action -= TripleShot;
-    InputManager.Instance.L2.JustDown.Action -= Grapple;
-    InputManager.Instance.L1.JustDown.Action -= Fibered;
+    GrappleAbilityFibered.ButtonEvents.JustDown.Action -= Grapple;
+  }
+
+  void TryStartAbility(AbilityFibered ability) {
+    if (Status.CanAttack && CurrentAbility == null || !CurrentAbility.IsRunning) {
+      ability.Stop();
+      ability.Activate();
+      CurrentAbility = ability;
+    }
   }
 
   void TripleShot() {
-    if (Status.CanAttack && CurrentAbility == null || CurrentAbility.IsComplete) {
-      Abilities[0].Begin();
-      CurrentAbility = Abilities[0];
-    }
-  }
-
-  void LightAttack() {
-    if (Status.CanAttack && CurrentAbility == null || CurrentAbility.IsComplete) {
-      Abilities[1].Begin();
-      CurrentAbility = Abilities[1];
-    }
+    TryStartAbility(AimAndFireAbility);
   }
 
   void Grapple() {
-    if (Status.CanAttack && CurrentAbility == null || CurrentAbility.IsComplete) {
-      GrappleAbility.Stop();
-      GrappleAbility.Activate();
-    }
-  }
-
-  void Fibered() {
-    GrappleAbilityFibered.Stop();
-    GrappleAbilityFibered.Activate();
-  }
-
-  void LightAttackActive() {
-    Debug.Log("Hi");
+    TryStartAbility(GrappleAbilityFibered);
   }
 
   void FixedUpdate() {
@@ -64,7 +45,7 @@ public class AbilityMan : MonoBehaviour {
     var dt = Time.fixedDeltaTime;
     var move = action.Left.XZ;
 
-    if (CurrentAbility != null && CurrentAbility.IsComplete) {
+    if (CurrentAbility != null && !CurrentAbility.IsRunning) {
       CurrentAbility = null;
     }
     if (Status.CanRotate && move.magnitude > 0) {

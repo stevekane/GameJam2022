@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,6 +11,12 @@ public struct Fiber : IEnumerator {
   public static IEnumerator Wait(int n) {
     for (var i = 0; i < n; i++) {
       yield return null;
+    }
+  }
+
+  public static IEnumerator NTimes(int n, Func<IEnumerator> f) {
+    for (var i = 0; i < n; i++) {
+      yield return f();
     }
   }
 
@@ -29,12 +36,7 @@ public struct Fiber : IEnumerator {
     }
   }
 
-  public static IEnumerator Any(IEnumerator a, IEnumerator b, IEnumerator c) => Any(a, Any(b,c));
-  public static IEnumerator Any(IEnumerator a, IEnumerator b, IEnumerator c, IEnumerator d) => Any(Any(a, b), Any(c, d));
   public static IEnumerator Any(IEnumerable<IEnumerator> xs) => xs.Aggregate(Any);
-
-  public static IEnumerator All(IEnumerator a, IEnumerator b, IEnumerator c) => All(a, All(b,c));
-  public static IEnumerator All(IEnumerator a, IEnumerator b, IEnumerator c, IEnumerator d) => All(All(a, b), All(c, d));
   public static IEnumerator All(IEnumerable<IEnumerator> xs) => xs.Aggregate(All);
 
   public static Selector Select(IEnumerator a, IEnumerator b) => new Selector(a, b);

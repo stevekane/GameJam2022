@@ -1,170 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1789714647939162451
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4810854067739620363}
-  - component: {fileID: 8590153875358509409}
-  m_Layer: 10
-  m_Name: GrappleAbility
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4810854067739620363
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1789714647939162451}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 1}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5058609327624050481}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8590153875358509409
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1789714647939162451}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 793a19599d8e74a4fbed443b68d096a4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Owner: {fileID: 4601772429776417504}
-  HookPrefab: {fileID: 4206010857455279376, guid: 3462e04d2cfb3324e96569400006d60d, type: 3}
-  HookTravelDuration:
-    Millis: 1000
-    TicksPerSecond: 30
-  Speed: 150
-  ReleaseDistance: 1.5
---- !u!1 &4601772428820094102
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4601772428820094097}
-  - component: {fileID: 4601772428820094096}
-  m_Layer: 0
-  m_Name: MeleeAttackAbility
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4601772428820094097
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4601772428820094102}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 4601772430091979024}
-  m_Father: {fileID: 5058609327624050481}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4601772428820094096
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4601772428820094102}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70667403218b956439fa1816c19b5e1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Index: 0
-  Owner: {fileID: 4601772429776417506}
-  Animator: {fileID: 4601772429776417517}
-  Windup:
-    Duration:
-      Millis: 33.333332
-      TicksPerSecond: 30
-    ClipDuration:
-      Millis: 33.333332
-      TicksPerSecond: 30
-  Active:
-    Owner: {fileID: 4601772429776417506}
-    Hitbox: {fileID: 4601772430091979026}
-    Duration:
-      Millis: 33.333332
-      TicksPerSecond: 30
-    ClipDuration:
-      Millis: 33.333332
-      TicksPerSecond: 30
-    HitFreezeDuration:
-      Millis: 100
-      TicksPerSecond: 30
-    Hits: []
-    PhaseHits: []
-    OnContactStart:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 4601772428820094096}
-          m_TargetAssemblyTypeName: MeleeAttackAbility, Assembly-CSharp
-          m_MethodName: OnHitStopStart
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-    OnContactEnd:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 4601772428820094096}
-          m_TargetAssemblyTypeName: MeleeAttackAbility, Assembly-CSharp
-          m_MethodName: OnHitStopEnd
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  Recovery:
-    Duration:
-      Millis: 33.333332
-      TicksPerSecond: 30
-    ClipDuration:
-      Millis: 33.333332
-      TicksPerSecond: 30
-  HitVFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
-  HitSFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
-  HitVFXOffset: {x: 0, y: 1, z: 0}
-  HitStopVibrationAmplitude: 0.2
-  HitCameraShakeIntensity: 2
-  HitDamage: 5
-  HitTargetKnockbackStrength: 15
-  HitAttackerKnockbackStrength: 15
 --- !u!1 &4601772428839359540
 GameObject:
   m_ObjectHideFlags: 0
@@ -697,8 +532,6 @@ MonoBehaviour:
   CanMove: 1
   CanRotate: 1
   CanAttack: 1
-  IsAirborne: 0
-  IsHitstun: 0
 --- !u!114 &4601772429776417513
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -846,65 +679,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1, z: 0}
---- !u!1 &4601772430091979025
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4601772430091979024}
-  - component: {fileID: 4601772430091979026}
-  - component: {fileID: 4601772430091979027}
-  m_Layer: 13
-  m_Name: Hitbox
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4601772430091979024
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4601772430091979025}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4601772428820094097}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4601772430091979026
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4601772430091979025}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e93db3e391a640243a06b63541cd965b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Collider: {fileID: 4601772430091979027}
---- !u!65 &4601772430091979027
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4601772430091979025}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 3, y: 2, z: 4}
-  m_Center: {x: 0, y: 1, z: 2}
 --- !u!1 &4601772430502717097
 GameObject:
   m_ObjectHideFlags: 0
@@ -1104,7 +878,7 @@ MonoBehaviour:
     Millis: 3000
     TicksPerSecond: 30
   MAX_THROW_DURATION:
-    Millis: 1000
+    Millis: 333.33334
     TicksPerSecond: 30
   MAX_PULL_DURATION:
     Millis: 1000
@@ -1141,9 +915,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4810854067739620363}
   - {fileID: 4601772428839359543}
-  - {fileID: 4601772428820094097}
   - {fileID: 6754213077101348298}
   m_Father: {fileID: 4601772429776417506}
   m_RootOrder: -1

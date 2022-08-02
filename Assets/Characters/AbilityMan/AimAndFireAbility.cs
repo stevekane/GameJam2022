@@ -1,8 +1,8 @@
-using System;
 using System.Collections;
 using UnityEngine;
+using static Fiber;
 
-public class AimAndFireAbility : Ability {
+public class AimAndFireAbility : AbilityFibered {
   public Transform Aimer;
   public Transform Target;
   public Transform Origin;
@@ -14,38 +14,32 @@ public class AimAndFireAbility : Ability {
   public Timeval ShotCooldown;
   public Animator Animator;
 
-  Coroutine Aim;
   AutoAimEffect AutoAimEffect;
 
-  public override void BeforeBegin() {
+  public override void Activate() {
     AutoAimEffect = new AutoAimEffect();
     Aimer.GetComponent<Status>()?.Add(AutoAimEffect);
     Animator.SetBool("Firing", true);
+    base.Activate();
   }
 
-  public override IEnumerator Routine() {
-    Aim = StartCoroutine(new AimAt(Aimer, Target, TurnSpeed));
-    yield return new WaitFrames(ShotCooldown.Frames);
-    yield return NTimes(3, Fire);
-  }
-
-  public override void AfterEnd() {
-    StopCoroutine(Aim);
+  public override void Stop() {
+    if (AutoAimEffect != null)
+      Aimer.GetComponent<Status>()?.Remove(AutoAimEffect);
     Animator.SetBool("Firing", false);
-    Aimer.GetComponent<Status>()?.Remove(AutoAimEffect);
+    base.Stop();
+  }
+
+  protected override IEnumerator MakeRoutine() {
+    yield return Any(new AimAt(Aimer, Target, TurnSpeed), NTimes(3, Fire));
+    Stop();
   }
 
   IEnumerator Fire() {
+    yield return new WaitFrames(ShotCooldown.Frames);
     Animator.SetTrigger("Fire");
     AudioSource.PlayOptionalOneShot(FireSound);
     Instantiate(ProjectilePrefab, Origin.transform.position, Aimer.transform.rotation)
     .AddForce(ProjectileForce*Aimer.transform.forward, ForceMode.Impulse);
-    yield return new WaitFrames(ShotCooldown.Frames);
-  }
-
-  IEnumerator NTimes(int n, Func<IEnumerator> f) {
-    for (var i = 0; i < n; i++) {
-      yield return f();
-    }
   }
 }

@@ -6,6 +6,7 @@ public class GrappleAbilityFibered : AbilityFibered {
   enum GrappleState { Holding, Throwing, Pulling }
   enum ThrowResult { Hit, None }
 
+  public ButtonEvents ButtonEvents;
   public Timeval MAX_CHARGE_DURATION = Timeval.FromMillis(3000);
   public Timeval MAX_THROW_DURATION = Timeval.FromMillis(1000);
   public Timeval MAX_PULL_DURATION = Timeval.FromMillis(1000);
@@ -30,7 +31,7 @@ public class GrappleAbilityFibered : AbilityFibered {
     Owner.GetComponent<Animator>().SetBool("Grappling", true);
     Owner.GetComponent<Animator>().SetInteger("GrappleState", (int)GrappleState.Holding);
     var chargeWait = Wait(MAX_CHARGE_DURATION.Frames);
-    var release = ListenFor(InputManager.Instance.L1.JustUp);
+    var release = ListenFor(ButtonEvents.JustUp);
     yield return Any(chargeWait, release);
     // Create and throw the hook
     Owner.GetComponent<Animator>().SetBool("Grappling", true);
