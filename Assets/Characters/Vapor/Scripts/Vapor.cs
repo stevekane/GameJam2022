@@ -44,7 +44,7 @@ public class Vapor : MonoBehaviour, IWireRider {
   Animator Animator;
   AudioSource AudioSource;
 
-  AbilityFibered CurrentAbility;
+  Ability CurrentAbility;
   Wire Wire;
   int WireFramesTraveled;
   Motion Motion;

@@ -1,18 +1,18 @@
 using UnityEngine;
 
 public class AbilityUser : MonoBehaviour {
-  [HideInInspector] public AbilityFibered[] Abilities;
+  [HideInInspector] public Ability[] Abilities;
 
   void Awake() {
-    Abilities = GetComponentsInChildren<AbilityFibered>();
+    Abilities = GetComponentsInChildren<Ability>();
   }
 
-  public AbilityFibered TryStartAbility(AbilityFibered ability) {
+  public Ability TryStartAbility(Ability ability) {
     if (ability.IsRunning)
       return null;
     ability.Activate();
     return ability;
   }
-  public AbilityFibered TryStartAbility(int index) => TryStartAbility(Abilities[index]);
+  public Ability TryStartAbility(int index) => TryStartAbility(Abilities[index]);
   public void StopAllAbilities() => Abilities.ForEach((a) => a.Stop());
 }

@@ -5,26 +5,26 @@ public class AbilityMan : MonoBehaviour {
 
   CharacterController Controller;
   Status Status;
-  AbilityFibered CurrentAbility;
+  Ability CurrentAbility;
   AimAndFireAbility AimAndFireAbility;
-  GrappleAbilityFibered GrappleAbilityFibered;
+  GrappleAbility GrappleAbility;
 
   void Start() {
     Controller = GetComponent<CharacterController>();
     Status = GetComponent<Status>();
     AimAndFireAbility = GetComponentInChildren<AimAndFireAbility>();
-    GrappleAbilityFibered = GetComponentInChildren<GrappleAbilityFibered>();
-    GrappleAbilityFibered.ButtonEvents = InputManager.Instance.L2;
-    GrappleAbilityFibered.ButtonEvents.JustDown.Action += Grapple;
+    GrappleAbility = GetComponentInChildren<GrappleAbility>();
+    GrappleAbility.ButtonEvents = InputManager.Instance.L2;
+    GrappleAbility.ButtonEvents.JustDown.Action += Grapple;
     InputManager.Instance.R2.JustDown.Action += TripleShot;
   }
 
   void OnDestroy() {
     InputManager.Instance.R2.JustDown.Action -= TripleShot;
-    GrappleAbilityFibered.ButtonEvents.JustDown.Action -= Grapple;
+    GrappleAbility.ButtonEvents.JustDown.Action -= Grapple;
   }
 
-  void TryStartAbility(AbilityFibered ability) {
+  void TryStartAbility(Ability ability) {
     if (Status.CanAttack && CurrentAbility == null || !CurrentAbility.IsRunning) {
       ability.Stop();
       ability.Activate();
@@ -37,7 +37,7 @@ public class AbilityMan : MonoBehaviour {
   }
 
   void Grapple() {
-    TryStartAbility(GrappleAbilityFibered);
+    TryStartAbility(GrappleAbility);
   }
 
   void FixedUpdate() {

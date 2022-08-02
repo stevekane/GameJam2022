@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MeleeAttackAbilityFiber : AbilityFibered {
+public class MeleeAttackAbility : Ability {
   public int Index;
   public Transform Owner;
   public Animator Animator;
-  public InactiveAttackPhaseFiber Windup;
-  public HitboxAttackPhaseFiber Active;
-  public InactiveAttackPhaseFiber Recovery;
+  public InactiveAttackPhase Windup;
+  public HitboxAttackPhase Active;
+  public InactiveAttackPhase Recovery;
   public GameObject HitVFX;
   public AudioClip HitSFX;
   public Vector3 HitVFXOffset = Vector3.up;

@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using static Fiber;
 
-public class AimAndFireAbility : AbilityFibered {
+public class AimAndFireAbility : Ability {
   public Transform Aimer;
   public Transform Target;
   public Transform Origin;
@@ -36,7 +36,7 @@ public class AimAndFireAbility : AbilityFibered {
   }
 
   IEnumerator Fire() {
-    yield return new WaitFrames(ShotCooldown.Frames);
+    yield return Wait(ShotCooldown.Frames);
     Animator.SetTrigger("Fire");
     AudioSource.PlayOptionalOneShot(FireSound);
     Instantiate(ProjectilePrefab, Origin.transform.position, Aimer.transform.rotation)

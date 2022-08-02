@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class ShieldAbility : AbilityFibered {
+public class ShieldAbility : Ability {
   public int Index;
   public Animator Animator;
   public InactiveAttackPhase Windup;

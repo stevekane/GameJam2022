@@ -11,7 +11,7 @@ public class Wasp : MonoBehaviour {
   AbilityUser Abilities;
   int FramesRemaining = 0;
   Vector3 Velocity;
-  AbilityFibered CurrentAbility;
+  Ability CurrentAbility;
 
   enum StateType { Idle, Chase, Shoot, Kite }
   StateType State = StateType.Idle;
