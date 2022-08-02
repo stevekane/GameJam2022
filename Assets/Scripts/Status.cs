@@ -84,11 +84,13 @@ public class HitStunEffect : StatusEffect {
     Frames = 0;
     HitStopFrames = hitStopFrames;
   }
+
   public override bool Merge(StatusEffect e) {
     var h = (HitStunEffect)e;
     h.HitStopFrames = Mathf.Max(HitStopFrames, h.HitStopFrames);
     return true;
   }
+
   public override void Apply(Status status) {
     status.CanMove = false;
     status.CanRotate = false;

@@ -3,6 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 
 public struct Fiber {
+  public interface IValue<T> {
+    public T Value { get; }
+  }
+
   public static IEnumerator Wait(int n) {
     for (var i = 0; i < n; i++) {
       yield return null;
@@ -32,10 +36,6 @@ public struct Fiber {
   public static IEnumerator All(IEnumerator a, IEnumerator b, IEnumerator c) => All(a, All(b,c));
   public static IEnumerator All(IEnumerator a, IEnumerator b, IEnumerator c, IEnumerator d) => All(All(a, b), All(b, c));
   public static IEnumerator All(IEnumerable<IEnumerator> xs) => xs.Aggregate(All);
-
-  public interface IValue<T> {
-    public T Value { get; }
-  }
 
   public class ListenFor : IEnumerator {
     EventSource Source;
