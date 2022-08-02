@@ -10,8 +10,6 @@ public class Explosion : MonoBehaviour {
     for (int i = 0; i < numHits; i++) {
       if (hits[i].TryGetComponent(out Player player)) {
         Debug.Log("Player go BOOM");
-      } else if (hits[i].TryGetComponent(out Hittable hit)) {
-        hit.ExplosionHitMe(this);
       }
     }
   }

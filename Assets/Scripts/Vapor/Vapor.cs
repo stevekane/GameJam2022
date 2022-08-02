@@ -39,7 +39,6 @@ public class Vapor : MonoBehaviour, IWireRider {
   AbilityUser Abilities;
   Defender Defender;
   Cannon Cannon;
-  Pushable Pushable;
   Status Status;
   CharacterController Controller;
   Animator Animator;
@@ -62,7 +61,6 @@ public class Vapor : MonoBehaviour, IWireRider {
     Abilities = GetComponent<AbilityUser>();
     Defender = GetComponent<Defender>();
     Cannon = GetComponentInChildren<Cannon>();
-    Pushable = GetComponent<Pushable>();
     Status = GetComponent<Status>();
     Controller = GetComponent<CharacterController>();
     Animator = GetComponent<Animator>();
@@ -119,9 +117,10 @@ public class Vapor : MonoBehaviour, IWireRider {
         //Attacker.ReleaseChargeAttack();
       }
 
-      if (Cannon.IsFiring) {
-        Pushable.Push(FIRING_PUSHBACK_SPEED*-transform.forward);
-      }
+      // TODO: recoil
+      //if (Cannon.IsFiring) {
+      //  Pushable.Push(FIRING_PUSHBACK_SPEED*-transform.forward);
+      //}
     }
 
     Animator.SetBool("Dashing", Motion == Motion.Dashing);
@@ -136,10 +135,8 @@ public class Vapor : MonoBehaviour, IWireRider {
         _ => MOVE_SPEED
       };
       var moveVelocity = VelocityFromMove(action, moveSpeed);
-      var pushVelocity = Pushable.Impulse;
       var gravity = dt*GRAVITY;
       Velocity.SetXZ(moveVelocity);
-      Velocity += pushVelocity;
       Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
       Controller.Move(dt*Velocity);
     } else if (Motion == Motion.Dashing) {

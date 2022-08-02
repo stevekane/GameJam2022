@@ -8,12 +8,10 @@ public class Bullet : MonoBehaviour {
   public float Speed = 5;
   Action<Bullet, Defender> OnHit;
 
-  Hitbox Hitbox;
   Rigidbody Body;
 
   public void Awake() {
     Body = GetComponent<Rigidbody>();
-    Hitbox = GetComponent<Hitbox>();
   }
 
   public static Bullet Fire(Bullet prefab, Vector3 position, Vector3 direction, Action<Bullet, Defender> onHit) {
@@ -21,21 +19,6 @@ public class Bullet : MonoBehaviour {
     bullet.OnHit = onHit;
     bullet.Direction = direction;
     return bullet;
-  }
-
-  // TODO: remove
-  public static Bullet Fire(Bullet prefab, Vector3 position, Vector3 direction, Attack attack = null) {
-    var bullet = Instantiate(prefab, position, Quaternion.FromToRotation(Vector3.forward, direction));
-    bullet.Hitbox.Attack = attack;
-    bullet.Direction = direction;
-    return bullet;
-  }
-
-  // TODO: remove
-  public static void Fire(Bullet prefab, Vector3 position, Vector3 direction, BulletType type, float speed = 5) {
-    var bullet = Fire(prefab, position, direction);
-    bullet.Type = type;
-    bullet.Speed = speed;
   }
 
   void FixedUpdate() {

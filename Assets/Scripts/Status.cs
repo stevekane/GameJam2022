@@ -43,7 +43,6 @@ public class KnockbackEffect : StatusEffect {
     status.Animator?.SetBool("HitFlinch", IsAirborne);
     if (!status.CanAttack) {
       status.GetComponent<AbilityUser>()?.StopAllAbilities();
-      status.Attacker?.CancelAttack();
     }
     if (Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED)
       status.Remove(this);
@@ -117,7 +116,6 @@ public class RecoilEffect : StatusEffect {
 public class Status : MonoBehaviour {
   public List<StatusEffect> Active = new();
   internal CharacterController Controller;
-  internal Attacker Attacker;
   internal Animator Animator;
 
   public bool CanMove = true;
@@ -155,7 +153,6 @@ public class Status : MonoBehaviour {
   private void Awake() {
     Controller = GetComponent<CharacterController>();
     Animator = GetComponent<Animator>();
-    Attacker = GetComponentInChildren<Attacker>();
   }
 
   private void FixedUpdate() {

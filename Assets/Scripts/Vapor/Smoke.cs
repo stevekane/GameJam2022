@@ -61,7 +61,6 @@ public class Smoke : MonoBehaviour {
   AbilityUser Abilities;
   Defender Defender;
   Cannon Cannon;
-  Pushable Pushable;
   Status Status;
   CharacterController Controller;
   Animator Animator;
@@ -80,7 +79,6 @@ public class Smoke : MonoBehaviour {
     Abilities = GetComponent<AbilityUser>();
     Defender = GetComponent<Defender>();
     Cannon = GetComponentInChildren<Cannon>();
-    Pushable = GetComponent<Pushable>();
     Status = GetComponent<Status>();
     Controller = GetComponent<CharacterController>();
     Animator = GetComponent<Animator>();
@@ -133,7 +131,6 @@ public class Smoke : MonoBehaviour {
       _ => MOVE_SPEED
     };
     Velocity.SetXZ(moveSpeed * (desiredPos - transform.position).XZ().normalized);
-    Velocity += Pushable.Impulse;
     Velocity.y = Controller.isGrounded ? GRAVITY*dt : Velocity.y + GRAVITY*dt;
     Controller.Move(dt*Velocity);
     if (Motion == Motion.Dashing) {
