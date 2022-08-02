@@ -435,7 +435,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   RadialDeadZone: 0.2
-  UseMouseAndKeyboard: 0
+  UseMouseAndKeyboard: 1
   PlayState: 0
 --- !u!4 &723377968
 Transform:
@@ -746,11 +746,28 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1384715404 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4601772429776417504, guid: 495399c56d5b6ae4fa0204b094058bbf, type: 3}
+  m_PrefabInstance: {fileID: 4601772429073401077}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1511601687 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4601772429776417506, guid: 495399c56d5b6ae4fa0204b094058bbf, type: 3}
   m_PrefabInstance: {fileID: 4601772429073401077}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1511601694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1384715404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38b5f85dc564c4f4fafa2b5115a61de1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1762592068
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -761,7 +778,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3356372153345074898, guid: e49299597d4035747bb85947974510bb, type: 3}
       propertyPath: m_AmplitudeGain
-      value: 2.545755e-18
+      value: 1.8e-44
       objectReference: {fileID: 0}
     - target: {fileID: 7775614649029596951, guid: e49299597d4035747bb85947974510bb, type: 3}
       propertyPath: m_BiasX
@@ -857,7 +874,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7775614649085704516, guid: e49299597d4035747bb85947974510bb, type: 3}
       propertyPath: m_Lens.m_SensorSize.x
-      value: 1.7775468
+      value: 2.0786026
       objectReference: {fileID: 0}
     - target: {fileID: 7775614649085704517, guid: e49299597d4035747bb85947974510bb, type: 3}
       propertyPath: m_Name

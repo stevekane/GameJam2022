@@ -49,7 +49,7 @@ public class Wasp : MonoBehaviour {
         transform.forward = dir;
         if (targetInRange && Status.CanAttack && CurrentAbility == null) {
           State = StateType.Shoot;
-          CurrentAbility = Abilities.TryStartAbilityF(0);
+          CurrentAbility = Abilities.TryStartAbility(0);
         } else if (Status.CanMove) {
           Velocity.SetXZ(dir * MoveSpeed);
         }

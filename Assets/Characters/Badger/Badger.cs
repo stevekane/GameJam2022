@@ -32,7 +32,7 @@ public class Badger : MonoBehaviour {
   }
 
   // TODO: What about dash?
-  bool TargetIsAttacking { get => TargetAbilities.Abilities.Any((a) => !a.IsComplete); }
+  bool TargetIsAttacking { get => TargetAbilities.Abilities.Any((a) => a.IsRunning); }
 
   Vector3 ChoosePosition() {
     var t = Target.transform;
@@ -66,10 +66,10 @@ public class Badger : MonoBehaviour {
 
     if (Status.CanAttack && CurrentAbility == null && RecoveryFrames <= 0) {
       if (TargetIsAttacking && Shield) {
-        CurrentAbility = Abilities.TryStartAbilityF(1);
+        CurrentAbility = Abilities.TryStartAbility(1);
         WaitFrames = Timeval.FromMillis(1000).Frames;
       } else if (inRange) {
-        CurrentAbility = Abilities.TryStartAbilityF(0);
+        CurrentAbility = Abilities.TryStartAbility(0);
         WaitFrames = AttackDelay.Frames;
       }
     }

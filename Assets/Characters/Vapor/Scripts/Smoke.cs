@@ -21,16 +21,16 @@ public class Smoke : MonoBehaviour {
 
   IEnumerator AttackSequence() {
     yield return new WaitForSeconds(.1f);
-    CurrentAbility = Abilities.TryStartAbilityF(0);
+    CurrentAbility = Abilities.TryStartAbility(0);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    CurrentAbility = Abilities.TryStartAbilityF(1);
+    CurrentAbility = Abilities.TryStartAbility(1);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    CurrentAbility = Abilities.TryStartAbilityF(0);
+    CurrentAbility = Abilities.TryStartAbility(0);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    CurrentAbility = Abilities.TryStartAbilityF(2);
+    CurrentAbility = Abilities.TryStartAbility(2);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForSeconds(.8f);
     AttackRoutine = null;
@@ -87,7 +87,7 @@ public class Smoke : MonoBehaviour {
   }
 
   bool IsAttacking { get => CurrentAbility != null; }
-  bool TargetIsAttacking { get => Target.Abilities.Any((a) => !a.IsComplete); }
+  bool TargetIsAttacking { get => Target.Abilities.Any((a) => a.IsRunning); }
 
   void FixedUpdate() {
     if (Target == null)

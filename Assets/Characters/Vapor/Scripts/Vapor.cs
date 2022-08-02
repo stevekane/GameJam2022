@@ -107,11 +107,11 @@ public class Vapor : MonoBehaviour, IWireRider {
       }
 
       if (action.R1.JustDown && !IsAttacking) {
-        CurrentAbility = Abilities.TryStartAbilityF(0+PunchCycleIndex);
+        CurrentAbility = Abilities.TryStartAbility(0+PunchCycleIndex);
         //Attacker.StartAttack(0+PunchCycleIndex);
         PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
       } else if (action.R2.JustDown && !IsAttacking) {
-        CurrentAbility = Abilities.TryStartAbilityF(2);
+        CurrentAbility = Abilities.TryStartAbility(2);
         // TODO: charge
       } else if (action.R2.JustUp && IsAttacking) {
         //Attacker.ReleaseChargeAttack();
