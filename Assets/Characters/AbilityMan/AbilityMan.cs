@@ -8,18 +8,22 @@ public class AbilityMan : MonoBehaviour {
   AbilityFibered CurrentAbility;
   AimAndFireAbility AimAndFireAbility;
   GrappleAbilityFibered GrappleAbilityFibered;
+  MeleeAttackAbility MeleeAttackAbility;
 
   void Start() {
     Controller = GetComponent<CharacterController>();
     Status = GetComponent<Status>();
     AimAndFireAbility = GetComponentInChildren<AimAndFireAbility>();
     GrappleAbilityFibered = GetComponentInChildren<GrappleAbilityFibered>();
+    MeleeAttackAbility = GetComponentInChildren<MeleeAttackAbility>();
     GrappleAbilityFibered.ButtonEvents = InputManager.Instance.L2;
     GrappleAbilityFibered.ButtonEvents.JustDown.Action += Grapple;
     InputManager.Instance.R2.JustDown.Action += TripleShot;
+    InputManager.Instance.R1.JustDown.Action += LightAttack;
   }
 
   void OnDestroy() {
+    InputManager.Instance.R1.JustDown.Action -= LightAttack;
     InputManager.Instance.R2.JustDown.Action -= TripleShot;
     GrappleAbilityFibered.ButtonEvents.JustDown.Action -= Grapple;
   }
@@ -38,6 +42,10 @@ public class AbilityMan : MonoBehaviour {
 
   void Grapple() {
     TryStartAbility(GrappleAbilityFibered);
+  }
+
+  void LightAttack() {
+    TryStartAbility(MeleeAttackAbility);
   }
 
   void FixedUpdate() {
