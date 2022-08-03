@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+public static class Inputs {
+  public static Action Action;
+  public static bool InPlayBack;
+}
+
 [Serializable]
 public struct ButtonState {
   public bool Down;

@@ -1,34 +1,11 @@
 using System.Collections;
 using UnityEngine;
 
-interface IAbility {
-}
-
-abstract public class Ability : MonoBehaviour {
-  public bool IsComplete { get; private set; } = true;
-  public IEnumerator Wrapper() {
-    IsComplete = false;
-    BeforeBegin();
-    AfterBegin();
-    yield return Routine();
-    BeforeEnd();
-    StopAllCoroutines();
-    AfterEnd();
-    IsComplete = true;
-  }
-  public void Begin() {
-    StopAllCoroutines();
-    StartCoroutine(Wrapper());
-  }
-  public void End() {
-    BeforeEnd();
-    StopAllCoroutines();
-    AfterEnd();
-    IsComplete = true;
-  }
-  public abstract IEnumerator Routine();
-  public virtual void BeforeBegin() {}
-  public virtual void AfterBegin() {}
-  public virtual void BeforeEnd() {}
-  public virtual void AfterEnd() {}
+public abstract class Ability : MonoBehaviour {
+  Fiber? Routine;
+  public bool IsRunning { get => Routine.HasValue; }
+  public virtual void Activate() => Routine = new Fiber(MakeRoutine());
+  public virtual void Stop() => Routine = null;
+  protected abstract IEnumerator MakeRoutine();
+  void FixedUpdate() => Routine?.MoveNext();
 }

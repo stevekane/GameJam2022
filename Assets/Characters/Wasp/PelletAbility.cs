@@ -1,12 +1,12 @@
 using System.Collections;
 using UnityEngine;
 
-public class PelletAbility : AbilityFibered {
+public class PelletAbility : Ability {
   public int Index;
   public Animator Animator;
-  public InactiveAttackPhaseFiber Windup;
-  public InactiveAttackPhaseFiber Active;
-  public InactiveAttackPhaseFiber Recovery;
+  public InactiveAttackPhase Windup;
+  public InactiveAttackPhase Active;
+  public InactiveAttackPhase Recovery;
   public Bullet BulletPrefab;
   public int NumBullets;
   public HitParams HitParams;

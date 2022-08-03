@@ -878,7 +878,7 @@ MonoBehaviour:
     Millis: 3000
     TicksPerSecond: 30
   MAX_THROW_DURATION:
-    Millis: 333.33334
+    Millis: 1000
     TicksPerSecond: 30
   MAX_PULL_DURATION:
     Millis: 1000
@@ -930,9 +930,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2477357805457900356}
-  - component: {fileID: 7170610877982673070}
+  - component: {fileID: 7044849233803929173}
   m_Layer: 0
-  m_Name: MeleeAttackAbility
+  m_Name: LightAttackAbility
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -953,7 +953,7 @@ Transform:
   m_Father: {fileID: 5058609327624050481}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7170610877982673070
+--- !u!114 &7044849233803929173
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -962,9 +962,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 8683805225698379235}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70667403218b956439fa1816c19b5e1c, type: 3}
+  m_Script: {fileID: 11500000, guid: 174ea97c62f9dc2469788bc98ba437c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Clip: {fileID: 7400000, guid: cc3da0e246460fe46bcf09b2303d8af8, type: 2}
-  Owner: {fileID: 4601772429776417506}
+  Owner: {fileID: 4601772429776417504}
   Animator: {fileID: 4601772429776417517}
+  Clip: {fileID: 7400000, guid: cc3da0e246460fe46bcf09b2303d8af8, type: 2}

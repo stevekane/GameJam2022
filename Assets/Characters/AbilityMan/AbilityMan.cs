@@ -5,19 +5,19 @@ public class AbilityMan : MonoBehaviour {
 
   CharacterController Controller;
   Status Status;
-  AbilityFibered CurrentAbility;
+  Ability CurrentAbility;
+  LightAttackAbility LightAttackAbility;
   AimAndFireAbility AimAndFireAbility;
-  GrappleAbilityFibered GrappleAbilityFibered;
-  MeleeAttackAbility MeleeAttackAbility;
+  GrappleAbility GrappleAbility;
 
   void Start() {
     Controller = GetComponent<CharacterController>();
     Status = GetComponent<Status>();
+    LightAttackAbility = GetComponentInChildren<LightAttackAbility>();
     AimAndFireAbility = GetComponentInChildren<AimAndFireAbility>();
-    GrappleAbilityFibered = GetComponentInChildren<GrappleAbilityFibered>();
-    MeleeAttackAbility = GetComponentInChildren<MeleeAttackAbility>();
-    GrappleAbilityFibered.ButtonEvents = InputManager.Instance.L2;
-    GrappleAbilityFibered.ButtonEvents.JustDown.Action += Grapple;
+    GrappleAbility = GetComponentInChildren<GrappleAbility>();
+    GrappleAbility.ButtonEvents = InputManager.Instance.L2;
+    GrappleAbility.ButtonEvents.JustDown.Action += Grapple;
     InputManager.Instance.R2.JustDown.Action += TripleShot;
     InputManager.Instance.R1.JustDown.Action += LightAttack;
   }
@@ -25,10 +25,10 @@ public class AbilityMan : MonoBehaviour {
   void OnDestroy() {
     InputManager.Instance.R1.JustDown.Action -= LightAttack;
     InputManager.Instance.R2.JustDown.Action -= TripleShot;
-    GrappleAbilityFibered.ButtonEvents.JustDown.Action -= Grapple;
+    GrappleAbility.ButtonEvents.JustDown.Action -= Grapple;
   }
 
-  void TryStartAbility(AbilityFibered ability) {
+  void TryStartAbility(Ability ability) {
     if (Status.CanAttack && CurrentAbility == null || !CurrentAbility.IsRunning) {
       ability.Stop();
       ability.Activate();
@@ -41,11 +41,11 @@ public class AbilityMan : MonoBehaviour {
   }
 
   void Grapple() {
-    TryStartAbility(GrappleAbilityFibered);
+    TryStartAbility(GrappleAbility);
   }
 
   void LightAttack() {
-    TryStartAbility(MeleeAttackAbility);
+    TryStartAbility(LightAttackAbility);
   }
 
   void FixedUpdate() {

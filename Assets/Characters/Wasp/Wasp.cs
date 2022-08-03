@@ -11,7 +11,7 @@ public class Wasp : MonoBehaviour {
   AbilityUser Abilities;
   int FramesRemaining = 0;
   Vector3 Velocity;
-  AbilityFibered CurrentAbility;
+  Ability CurrentAbility;
 
   enum StateType { Idle, Chase, Shoot, Kite }
   StateType State = StateType.Idle;
@@ -49,7 +49,7 @@ public class Wasp : MonoBehaviour {
         transform.forward = dir;
         if (targetInRange && Status.CanAttack && CurrentAbility == null) {
           State = StateType.Shoot;
-          CurrentAbility = Abilities.TryStartAbilityF(0);
+          CurrentAbility = Abilities.TryStartAbility(0);
         } else if (Status.CanMove) {
           Velocity.SetXZ(dir * MoveSpeed);
         }

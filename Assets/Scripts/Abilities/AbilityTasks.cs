@@ -20,50 +20,13 @@ public class AimAt : AbilityTask {
       var current = Aimer.rotation;
       var desired = Quaternion.LookRotation(Target.position.XZ()-Aimer.position.XZ(), Vector3.up);
       Aimer.rotation = Quaternion.RotateTowards(current, desired, Time.fixedDeltaTime*TurnSpeed);
-      yield return new WaitForFixedUpdate();
-    }
-  }
-}
-
-[Serializable]
-public class WaitFrames : AbilityTask {
-  public int Frames;
-  public WaitFrames(int frames) {
-    Frames = frames;
-    Enumerator = Routine();
-  }
-  public override IEnumerator Routine() {
-    for (var i = 0; i < Frames; i++) {
-      yield return new WaitForFixedUpdate();
+      yield return null;
     }
   }
 }
 
 [Serializable]
 public class InactiveAttackPhase : AbilityTask {
-  int Index;
-  Animator Animator;
-  public Timeval Duration = Timeval.FromMillis(0, 30);
-  public Timeval ClipDuration = Timeval.FromMillis(0, 30);
-  public IEnumerator Start(Animator animator, int index) {
-    Reset();
-    Animator = animator;
-    Index = index;
-    return this;
-  }
-  public override IEnumerator Routine() {
-    for (var i = 0; i < Duration.Frames; i++) {
-      yield return new WaitForFixedUpdate();
-      var attackSpeed = ClipDuration.Millis/Duration.Millis;
-      Animator.SetFloat("AttackSpeed", attackSpeed);
-      Animator.SetBool("Attacking", true);
-      Animator.SetInteger("AttackIndex", Index);
-    }
-  }
-}
-
-[Serializable]
-public class InactiveAttackPhaseFiber : AbilityTask {
   int Index;
   Animator Animator;
   public Timeval Duration = Timeval.FromMillis(0, 30);
@@ -107,7 +70,7 @@ public class ChargedAttackPhase : AbilityTask {
 
   public override IEnumerator Routine() {
     while (FramesRemaining > 0) {
-      yield return new WaitForFixedUpdate();
+      yield return null;
       var multiplier = IsCharging ? ChargeFrameMultiplier : 1;
       var attackSpeed = ClipDuration.Millis/Duration.Millis;
       Animator.SetFloat("AttackSpeed", multiplier*attackSpeed);
@@ -120,74 +83,23 @@ public class ChargedAttackPhase : AbilityTask {
 
 [Serializable]
 public class HitboxAttackPhase : AbilityTask {
+  public delegate IEnumerator OnHitFunc(List<Transform> hits, int stopFrames);
+
   int Index;
   Animator Animator;
-  public Transform Owner;
   public AttackHitbox Hitbox;
   public Timeval Duration = Timeval.FromMillis(0, 30);
   public Timeval ClipDuration = Timeval.FromMillis(0, 30);
   public Timeval HitFreezeDuration = Timeval.FromMillis(3, 30);
-  public List<Transform> Hits = new List<Transform>(capacity: 4);
-  public List<Transform> PhaseHits = new List<Transform>(capacity: 4);
-  public UnityEvent<Transform, List<Transform>, int> OnContactStart;
-  public UnityEvent<Transform, List<Transform>> OnContactEnd;
-
-  public IEnumerator Start(Animator animator, int index) {
-    Reset();
-    Animator = animator;
-    Index = index;
-    return this;
-  }
-  public void OnContact(Transform target) {
-    if (!PhaseHits.Contains(target)) {
-      Hits.Add(target);
-      PhaseHits.Add(target);
-    }
-  }
-  public override IEnumerator Routine() {
-    PhaseHits.Clear();
-    Hitbox.Collider.enabled = true;
-    Hitbox.TriggerStay = OnContact;
-    for (var i = 0; i < Duration.Frames; i++) {
-      yield return new WaitForFixedUpdate();
-      Animator.SetFloat("AttackSpeed", ClipDuration.Millis/Duration.Millis);
-      Animator.SetBool("Attacking", true);
-      Animator.SetInteger("AttackIndex", Index);
-      if (Hits.Count > 0) {
-        Hitbox.Collider.enabled = false;
-        Hitbox.TriggerStay = null;
-        OnContactStart.Invoke(Owner, Hits, HitFreezeDuration.Frames);
-        yield return new WaitFrames(HitFreezeDuration.Frames);
-        OnContactEnd.Invoke(Owner, Hits);
-        Hitbox.Collider.enabled = true;
-        Hitbox.TriggerStay = OnContact;
-        Hits.Clear();
-      }
-    }
-    Hitbox.Collider.enabled = false;
-    Hitbox.TriggerStay = null;
-  }
-}
-
-[Serializable]
-public class HitboxAttackPhaseFiber : AbilityTask {
-  int Index;
-  Animator Animator;
-  Transform Owner;
-  public AttackHitbox Hitbox;
-  public Timeval Duration = Timeval.FromMillis(0, 30);
-  public Timeval ClipDuration = Timeval.FromMillis(0, 30);
-  public Timeval HitFreezeDuration = Timeval.FromMillis(3, 30);
-  public EventSource<(Transform, List<Transform>, int)> OnContactStart = new();
-  public EventSource<(Transform, List<Transform>)> OnContactEnd = new();
+  public OnHitFunc OnHit;
   List<Transform> Hits = new List<Transform>(capacity: 4);
   List<Transform> PhaseHits = new List<Transform>(capacity: 4);
 
-  public IEnumerator Start(Transform owner, Animator animator, int index) {
+  public IEnumerator Start(Animator animator, int index, OnHitFunc onHit) {
     Reset();
-    Owner = owner;
     Animator = animator;
     Index = index;
+    OnHit = onHit;
     return this;
   }
   public void OnContact(Transform target) {
@@ -208,9 +120,7 @@ public class HitboxAttackPhaseFiber : AbilityTask {
       if (Hits.Count > 0) {
         Hitbox.Collider.enabled = false;
         Hitbox.TriggerStay = null;
-        OnContactStart.Action?.Invoke((Owner, Hits, HitFreezeDuration.Frames));
-        yield return Fiber.Wait(HitFreezeDuration.Frames);
-        OnContactEnd.Action?.Invoke((Owner, Hits));
+        yield return OnHit(Hits, HitFreezeDuration.Frames);
         Hitbox.Collider.enabled = true;
         Hitbox.TriggerStay = OnContact;
         Hits.Clear();

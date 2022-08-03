@@ -1,76 +1,80 @@
 using System.Collections;
 using UnityEngine;
+using static Fiber;
 
-enum GrappleState { Holding, Throwing, Pulling }
+public class GrappleAbility : Ability {
+  enum GrappleState { Holding, Throwing, Pulling }
+  enum ThrowResult { Hit, None }
 
-public class GrappleAbility : MonoBehaviour {
+  public ButtonEvents ButtonEvents;
+  public Timeval MAX_CHARGE_DURATION = Timeval.FromMillis(3000);
+  public Timeval MAX_THROW_DURATION = Timeval.FromMillis(1000);
+  public Timeval MAX_PULL_DURATION = Timeval.FromMillis(1000);
+  public float HOOK_SPEED = 150f;
+  public float HOOK_RELEASE_DISTANCE = 1.5f;
   public GameObject Owner;
   public GrapplingHook HookPrefab;
-  public Timeval HookTravelDuration = Timeval.FromMillis(30, 30);
-  public float Speed;
-  public float ReleaseDistance = 1;
 
   GrapplingHook Hook;
 
-  public void Activate() {
-    Owner.GetComponent<Animator>().SetBool("Grappling", true);
-    Owner.GetComponent<Animator>().SetInteger("GrappleState", (int)GrappleState.Holding);
-    InputManager.Instance.L2.JustUp.Action += Throw;
-    InputManager.Instance.R2.JustDown.Action += Stop;
-  }
-
-  public void Stop() {
-    Owner.GetComponent<Animator>().SetBool("Grappling", false);
-    Owner.GetComponent<Animator>().SetInteger("GrappleState", -1);
-    InputManager.Instance.L2.JustUp.Action -= Throw;
-    InputManager.Instance.R2.JustDown.Action -= Stop;
+  public override void Stop() {
     if (Hook) {
-      Hook.OnHit.Action -= Hit;
       Destroy(Hook.gameObject);
     }
-    StopAllCoroutines();
+    Owner.GetComponent<Animator>().SetBool("Grappling", false);
+    Owner.GetComponent<Animator>().SetInteger("GrappleState", -1);
+    base.Stop();
   }
 
-  void Throw() {
-    InputManager.Instance.L2.JustUp.Action -= Throw;
-    InputManager.Instance.R2.JustDown.Action -= Stop;
+  protected override IEnumerator MakeRoutine() {
+    // Holding down the activation button
+    Owner.GetComponent<Animator>().SetBool("Grappling", true);
+    Owner.GetComponent<Animator>().SetInteger("GrappleState", (int)GrappleState.Holding);
+    var chargeWait = Wait(MAX_CHARGE_DURATION.Frames);
+    var release = ListenFor(ButtonEvents.JustUp);
+    yield return Any(chargeWait, release);
+    // Create and throw the hook
+    Owner.GetComponent<Animator>().SetBool("Grappling", true);
     Owner.GetComponent<Animator>().SetInteger("GrappleState", (int)GrappleState.Throwing);
     Hook = Instantiate(HookPrefab, transform.position, transform.rotation);
+    Hook.Owner = Owner;
     Hook.Origin = transform;
-    Hook.GetComponent<Rigidbody>().AddForce(Speed*transform.forward, ForceMode.Impulse);
-    Hook.OnHit.Action += Hit;
-    StartCoroutine(Wait(HookTravelDuration.Frames));
-  }
-
-  void Hit(Collision collision) {
-    Hook.OnHit.Action -= Hit;
-    Destroy(Hook.GetComponent<Collider>());
-    Destroy(Hook.GetComponent<Rigidbody>());
-    StopAllCoroutines();
-    StartCoroutine(PullTowards(collision.GetContact(0).point));
-  }
-
-  IEnumerator Wait(int n) {
-    for (var i = 0; i < n; i++) {
-      yield return new WaitForFixedUpdate();
+    Hook.OnHit.Action += OnHit;
+    Hook.GetComponent<Rigidbody>().AddForce(HOOK_SPEED*transform.forward, ForceMode.Impulse);
+    var hookHit = ListenFor(Hook.OnHit);
+    var throwWait = Wait(MAX_THROW_DURATION.Frames);
+    var throwOutcome = Select(hookHit, throwWait);
+    yield return throwOutcome;
+    Hook.OnHit.Action -= OnHit;
+    // Hook hit something
+    if (throwOutcome.Value == (int)ThrowResult.Hit) {
+      Owner.GetComponent<Animator>().SetBool("Grappling", true);
+      Owner.GetComponent<Animator>().SetInteger("GrappleState", (int)GrappleState.Pulling);
+      var contactPoint = hookHit.Value.GetContact(0).point;
+      var pullWait = Wait(MAX_PULL_DURATION.Frames);
+      var pullComplete = PullTowards(Owner, contactPoint, HOOK_SPEED, HOOK_RELEASE_DISTANCE);
+      yield return Any(pullWait, pullComplete);
     }
     Stop();
   }
 
-  IEnumerator PullTowards(Vector3 destination) {
-    var frames = 0;
-    Owner.GetComponent<Animator>().SetInteger("GrappleState", (int)GrappleState.Pulling);
-    while (true) {
-      var delta = destination-transform.position;
-      var direction = delta.normalized;
-      if (delta.magnitude < ReleaseDistance || frames > HookTravelDuration.Frames) {
-        break;
+  void OnHit(Collision c) {
+    Destroy(Hook.GetComponent<Rigidbody>());
+    Destroy(Hook.GetComponent<Collider>());
+  }
+
+  IEnumerator PullTowards(GameObject subject, Vector3 destination, float speed, float releaseDistance) {
+    while (subject) {
+      var delta = destination-subject.transform.position;
+      if (delta.magnitude > releaseDistance) {
+        var direction = delta.normalized;
+        var displacement = Time.fixedDeltaTime*speed*direction;
+        Debug.DrawRay(subject.transform.position, displacement);
+        subject.GetComponent<CharacterController>().Move(displacement);
+        yield return null;
       } else {
-        frames++;
-        Owner.GetComponent<CharacterController>().Move(Time.fixedDeltaTime*Speed*direction);
-        yield return new WaitForFixedUpdate();
+        yield break;
       }
     }
-    Stop();
   }
 }
