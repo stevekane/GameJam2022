@@ -26,17 +26,19 @@ public class KnockbackEffect : StatusEffect {
 
   public Vector3 Velocity;
   public bool IsAirborne = false;
+  bool IsFirstFrame = true; // Hacky way to ensure we have a hitflinch+cancel effect when a defender is first hit
   public KnockbackEffect(Vector3 velocity) {
     Velocity = velocity;
   }
   public override bool Merge(StatusEffect e) {
     Velocity += ((KnockbackEffect)e).Velocity;
+    IsFirstFrame = true;
     return true;
   }
   public override void Apply(Status status) {
     Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * DRAG);
     status.Move(Velocity*Time.fixedDeltaTime);
-    IsAirborne = Velocity.sqrMagnitude >= AIRBORNE_SPEED*AIRBORNE_SPEED;
+    IsAirborne = IsFirstFrame || Velocity.sqrMagnitude >= AIRBORNE_SPEED*AIRBORNE_SPEED;
     status.CanMove = !IsAirborne;
     status.CanRotate = !IsAirborne;
     status.CanAttack = !IsAirborne;
@@ -46,6 +48,7 @@ public class KnockbackEffect : StatusEffect {
     }
     if (Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED)
       status.Remove(this);
+    IsFirstFrame = false;
   }
   public override void OnRemoved(Status status) {
     status.Animator?.SetBool("HitFlinch", false);

@@ -32,6 +32,8 @@ public class Defender : MonoBehaviour {
   }
 
   public void OnHit(HitParams hit, Transform hitTransform) {
+    if (IsBlocking || IsParrying)
+      return;
     var power = 5f * hit.KnockbackStrength * Mathf.Pow((Damage.Points+100f) / 100f, 2f);
     var hitStopFrames = hit.HitStopDuration.Frames;
     var knockBackDirection = KnockbackVector(hitTransform, transform, hit.KnockbackType);
