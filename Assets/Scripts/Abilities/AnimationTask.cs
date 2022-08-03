@@ -11,21 +11,13 @@ public class AnimationTask : IEnumerator {
   PlayableGraph Graph;
   double Duration;
   int EventHead;
-  System.Action<int> OnEvent;
 
-  /*
-  TODO:
-  Implement new base class for AbilityTask that does not assume
-  you will be wrapping an IEnumerator. It should instead extend
-  IEnumerator but add explicit Activate/Stop methods ala AbilityFibered
-  which will be called in the event a Task is stopped forcibly for
-  whatever reason.
-  */
+  public FrameEventTimeline FrameEventTimeline;
+  public Action<FrameEvent> OnFrameEvent;
 
-  public AnimationTask(Animator animator, AnimationClip clip, System.Action<int> onEvent) {
+  public AnimationTask(Animator animator, AnimationClip clip) {
     EventHead = 0;
     Animator = animator;
-    OnEvent = onEvent;
     Graph = PlayableGraph.Create();
     Graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
     ClipPlayable = AnimationClipPlayable.Create(Graph, clip);
@@ -43,16 +35,22 @@ public class AnimationTask : IEnumerator {
 
   public object Current { get; }
   public bool MoveNext() {
-    var clip = ClipPlayable.GetAnimationClip();
-    var frames = clip.length*clip.frameRate+1;
-    var time = ClipPlayable.GetTime();
-    var interpolant = (float)(time/Duration);
-    var newHead = (int)Mathf.Lerp(0, frames, interpolant);
-    var oldHead = EventHead;
-    for (var i = oldHead; i < newHead; i++) {
-      OnEvent?.Invoke(i);
+    if (FrameEventTimeline != null && OnFrameEvent != null) {
+      var clip = ClipPlayable.GetAnimationClip();
+      var frames = clip.length*clip.frameRate+1;
+      var time = ClipPlayable.GetTime();
+      var interpolant = (float)(time/Duration);
+      var newHead = (int)Mathf.Lerp(0, frames, interpolant);
+      var oldHead = EventHead;
+      for (var i = oldHead; i < newHead; i++) {
+        foreach (var e in FrameEventTimeline.Events) {
+          if (e.Frame == i) {
+            OnFrameEvent.Invoke(e);
+          }
+        }
+      }
+      EventHead = newHead;
     }
-    EventHead = newHead;
     if (Graph.IsDone()) {
       Graph.Destroy();
       ClipPlayable.Destroy();
@@ -61,6 +59,7 @@ public class AnimationTask : IEnumerator {
       return true;
     }
   }
+
   public void Reset() {
     throw new NotImplementedException("Reset not implemented for AnimationTask!");
   }
