@@ -38,9 +38,10 @@ public class PelletAbility : Ability {
     base.Stop();
   }
 
-  void OnHit(Bullet bullet, Defender defender) {
-    defender.OnHit(HitParams, bullet.transform);
-
+  void OnHit(Bullet bullet, Hurtbox hurtbox) {
+    if (Physics.GetIgnoreLayerCollision(gameObject.layer, hurtbox.gameObject.layer))
+      return;
+    hurtbox.Defender.OnHit(HitParams, bullet.transform);
     SFXManager.Instance.TryPlayOneShot(HitSFX);
     VFXManager.Instance.TrySpawnEffect(HitVFX, bullet.transform.position);
   }
