@@ -138,6 +138,7 @@ public class EventDriver : MonoBehaviour {
     transform.SetParent(null, true);
     DontDestroyOnLoad(this.gameObject);
 
+    Timeval.FrameCount = 0;
     Time.fixedDeltaTime = 1f / Timeval.FramesPerSecond;
     PlayState = PlayState.Play;
     History.Clear();
@@ -152,6 +153,7 @@ public class EventDriver : MonoBehaviour {
   }
 
   public void RestartScene() {
+    Timeval.FrameCount = 0;
     Time.timeScale = 1;
     SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     //SceneManager.MoveGameObjectToScene(this.gameObject, scene);
@@ -161,6 +163,7 @@ public class EventDriver : MonoBehaviour {
   }
 
   public void PlaybackScene() {
+    Timeval.FrameCount = 0;
     Time.timeScale = 1;
     SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     HistoryIndex = 0;
@@ -204,6 +207,7 @@ public class EventDriver : MonoBehaviour {
   }
 
   void FixedUpdate() {
+    Timeval.FrameCount++;
     switch (PlayState) {
     case PlayState.Play: {
         // Record the current values the down status of buttons right before consumption

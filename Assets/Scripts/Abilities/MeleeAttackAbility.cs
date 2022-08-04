@@ -19,6 +19,8 @@ public class MeleeAttackAbility : Ability {
   public float HitRecoilStrength;
 
   protected override IEnumerator MakeRoutine() {
+    Owner = GetComponentInParent<AbilityUser>().transform;
+    Animator = GetComponentInParent<Animator>();
     yield return Windup.Start(Animator, Index);
     yield return Active.Start(Animator, Index, OnHit);
     yield return Recovery.Start(Animator, Index);
