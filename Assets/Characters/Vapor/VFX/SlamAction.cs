@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,7 @@ public class SlamAction : MonoBehaviour {
   public GameObject Piece;
   public float PieceLength = 1;
   public Timeval PieceActivateDelay;
+  public Action<Transform, Defender> OnHit;
   float NextPieceZ = 0;
   List<GameObject> Pieces;
   bool DoneRaising;
@@ -61,5 +63,8 @@ public class SlamAction : MonoBehaviour {
 
   void OnContact(Transform other) {
     Debug.Log($"Slam hit {other}");
+    if (other.TryGetComponent(out Defender defender)) {
+      OnHit?.Invoke(transform, defender);
+    }
   }
 }
