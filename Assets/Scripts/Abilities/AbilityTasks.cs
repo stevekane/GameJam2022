@@ -50,30 +50,36 @@ public class InactiveAttackPhase : AbilityTask {
 
 [Serializable]
 public class ChargedAttackPhase : AbilityTask {
-  public int Index;
-  public Animator Animator;
+  int Index;
+  Animator Animator;
   public Timeval Duration = Timeval.FromMillis(0, 30);
   public Timeval ClipDuration = Timeval.FromMillis(0, 30);
   public int ChargeFrameMultiplier = 1;
-  public int FramesRemaining;
-  public bool IsCharging;
+  int FramesRemaining;
+  float AttackSpeed;
 
-  public void OnChargeBegin() {
-    IsCharging = true;
-    FramesRemaining *= ChargeFrameMultiplier;
+  public IEnumerator StartWithCharge(Animator animator, int index) {
+    Reset();
+    Animator = animator;
+    Index = index;
+    FramesRemaining = Duration.Frames;
+    OnChargeBegin();
+    return this;
   }
-
+  public void OnChargeBegin() {
+    FramesRemaining *= ChargeFrameMultiplier;
+    AttackSpeed = 1f/ChargeFrameMultiplier * ClipDuration.Millis/Duration.Millis;
+  }
   public void OnChargeEnd() {
-    IsCharging = false;
     FramesRemaining /= ChargeFrameMultiplier;
+    AttackSpeed = FramesRemaining;
+    FramesRemaining = 1;
   }
 
   public override IEnumerator Routine() {
     while (FramesRemaining > 0) {
       yield return null;
-      var multiplier = IsCharging ? ChargeFrameMultiplier : 1;
-      var attackSpeed = ClipDuration.Millis/Duration.Millis;
-      Animator.SetFloat("AttackSpeed", multiplier*attackSpeed);
+      Animator.SetFloat("AttackSpeed", AttackSpeed);
       Animator.SetBool("Attacking", true);
       Animator.SetInteger("AttackIndex", Index);
       FramesRemaining--;

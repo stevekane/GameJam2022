@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 enum Motion { Base, Dashing, WireRiding }
@@ -45,6 +46,7 @@ public class Vapor : MonoBehaviour, IWireRider {
   AudioSource AudioSource;
 
   Ability CurrentAbility;
+  Func<ButtonState> CurrentAbilityButton;
   Wire Wire;
   int WireFramesTraveled;
   Motion Motion;
@@ -55,6 +57,11 @@ public class Vapor : MonoBehaviour, IWireRider {
 
   public void RideWire(Wire wire) {
     Wire = wire;
+  }
+
+  void TryStartAbility(int index, Func<ButtonState> button) {
+    CurrentAbility = Abilities.TryStartAbility(index);
+    CurrentAbilityButton = button;
   }
 
   void Awake() {
@@ -107,14 +114,13 @@ public class Vapor : MonoBehaviour, IWireRider {
       }
 
       if (action.R1.JustDown && !IsAttacking) {
-        CurrentAbility = Abilities.TryStartAbility(0+PunchCycleIndex);
-        //Attacker.StartAttack(0+PunchCycleIndex);
+        TryStartAbility(0+PunchCycleIndex, () => Inputs.Action.R1);
         PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
       } else if (action.R2.JustDown && !IsAttacking) {
-        CurrentAbility = Abilities.TryStartAbility(2);
-        // TODO: charge
-      } else if (action.R2.JustUp && IsAttacking) {
-        //Attacker.ReleaseChargeAttack();
+        TryStartAbility(2, () => Inputs.Action.R2);
+      }
+      if (IsAttacking && CurrentAbilityButton().JustUp && CurrentAbility is ChargedAbility) {
+        ((ChargedAbility)CurrentAbility).ReleaseCharge();
       }
 
       // TODO: recoil
