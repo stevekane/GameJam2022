@@ -19,12 +19,12 @@ public class AnimationTask : IEnumerator {
     EventHead = 0;
     Animator = animator;
     Graph = PlayableGraph.Create();
-    Graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
-    ClipPlayable = AnimationClipPlayable.Create(Graph, clip);
     Duration = clip.isLooping ? double.MaxValue : clip.length;
+    ClipPlayable = AnimationClipPlayable.Create(Graph, clip);
     ClipPlayable.SetDuration(Duration);
     Output = AnimationPlayableOutput.Create(Graph, "AnimationTask", Animator);
     Output.SetSourcePlayable(ClipPlayable);
+    Graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
     Graph.Play();
   }
   ~AnimationTask() {
