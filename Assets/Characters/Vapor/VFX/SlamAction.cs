@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,7 @@ public class SlamAction : MonoBehaviour {
   public GameObject Piece;
   public float PieceLength = 1;
   public Timeval PieceActivateDelay;
+  public Action<Transform, Defender> OnHit;
   float NextPieceZ = 0;
   List<GameObject> Pieces;
   bool DoneRaising;
@@ -39,7 +41,7 @@ public class SlamAction : MonoBehaviour {
 
   IEnumerator RaisePiece(int i) {
     var raiseFrames = Mathf.Max(1, PieceActivateDelay.Frames/3);
-    var yScale = 4f;
+    var yScale = 5f;
     var raiseDelta = new Vector3(0, yScale / raiseFrames, 0);
 
     var hitbox = Pieces[i].GetComponent<AttackHitbox>();
@@ -61,5 +63,8 @@ public class SlamAction : MonoBehaviour {
 
   void OnContact(Transform other) {
     Debug.Log($"Slam hit {other}");
+    if (other.TryGetComponent(out Defender defender)) {
+      OnHit?.Invoke(transform, defender);
+    }
   }
 }
