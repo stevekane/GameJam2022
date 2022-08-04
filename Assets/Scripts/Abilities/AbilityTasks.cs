@@ -58,11 +58,16 @@ public class ChargedAttackPhase : AbilityTask {
   int FramesRemaining;
   float AttackSpeed;
 
-  public IEnumerator StartWithCharge(Animator animator, int index) {
+  public IEnumerator Start(Animator animator, int index) {
     Reset();
     Animator = animator;
     Index = index;
     FramesRemaining = Duration.Frames;
+    AttackSpeed = ClipDuration.Millis/Duration.Millis;
+    return this;
+  }
+  public IEnumerator StartWithCharge(Animator animator, int index) {
+    Start(animator, index);
     OnChargeBegin();
     return this;
   }

@@ -2,11 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MeleeAttackAbility : Ability {
+public class MeleeAttackAbility : ChargedAbility {
   public int Index;
   public Transform Owner;
   public Animator Animator;
-  public InactiveAttackPhase Windup;
+  public bool Chargeable;
+  public ChargedAttackPhase Windup;
   public HitboxAttackPhase Active;
   public InactiveAttackPhase Recovery;
   public GameObject HitVFX;
@@ -21,7 +22,11 @@ public class MeleeAttackAbility : Ability {
   protected override IEnumerator MakeRoutine() {
     Owner = GetComponentInParent<AbilityUser>().transform;
     Animator = GetComponentInParent<Animator>();
-    yield return Windup.Start(Animator, Index);
+    if (Chargeable) {
+      yield return Windup.StartWithCharge(Animator, Index);
+    } else {
+      yield return Windup.Start(Animator, Index);
+    }
     yield return Active.Start(Animator, Index, OnHit);
     yield return Recovery.Start(Animator, Index);
     Stop();
@@ -52,5 +57,9 @@ public class MeleeAttackAbility : Ability {
     yield return Fiber.Wait(stopFrames);
 
     Owner.GetComponent<Status>()?.Add(new RecoilEffect(HitRecoilStrength * -Owner.forward));
+  }
+
+  public override void ReleaseCharge() {
+    Windup.OnChargeEnd();
   }
 }
