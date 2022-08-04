@@ -16,6 +16,13 @@ public class LightAttackAbility : Ability {
   }
 
   void OnFrameEvent(FrameEvent fe) {
-    Debug.Log($"Something happened on frame {fe.Frame}");
+    switch (fe.Type) {
+    case FrameEventType.Begin:
+      Debug.Log($"Animation Start Event on frame {fe.Frame}");
+    break;
+    case FrameEventType.End:
+      Debug.Log($"Animation End Event on frame {fe.Frame}");
+    break;
+    }
   }
 }
