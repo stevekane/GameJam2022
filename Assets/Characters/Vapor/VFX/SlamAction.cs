@@ -39,7 +39,7 @@ public class SlamAction : MonoBehaviour {
 
   IEnumerator RaisePiece(int i) {
     var raiseFrames = Mathf.Max(1, PieceActivateDelay.Frames/3);
-    var yScale = 4f;
+    var yScale = 5f;
     var raiseDelta = new Vector3(0, yScale / raiseFrames, 0);
 
     var hitbox = Pieces[i].GetComponent<AttackHitbox>();
