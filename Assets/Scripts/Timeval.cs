@@ -5,6 +5,7 @@ using UnityEngine;
 [Serializable]
 public class Timeval {
   public static int FramesPerSecond = 60;
+  public static int FrameCount = 0;
 
   [SerializeField] public float Millis = 1;
   [SerializeField] public int TicksPerSecond = 30;
@@ -24,7 +25,7 @@ public class Timeval {
     get { return Mathf.RoundToInt(Millis * TicksPerSecond / 1000f); }
   }
   public float Seconds {
-    get { return Millis * .0001f; }
+    get { return Millis * .001f; }
   }
 }
 

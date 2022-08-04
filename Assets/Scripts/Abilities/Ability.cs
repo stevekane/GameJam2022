@@ -9,3 +9,7 @@ public abstract class Ability : MonoBehaviour {
   protected abstract IEnumerator MakeRoutine();
   void FixedUpdate() => Routine?.MoveNext();
 }
+
+public abstract class ChargedAbility : Ability {
+  public virtual void ReleaseCharge() { }
+}
