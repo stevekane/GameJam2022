@@ -88,6 +88,13 @@ public static class ArrayLikeExtensions {
     }
   }
 
+  public static void ForEach<T>(this IEnumerable<T> xs, Action<T,int> p) {
+    var index = 0;
+    foreach (var x in xs) {
+      p(x, index++);
+    }
+  }
+
   public static void Remove<T>(this List<T> xs, Predicate<T> predicate) {
     for (var i = xs.Count-1; i >= 0; i--) {
       if (predicate(xs[i])) {
