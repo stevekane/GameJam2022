@@ -7,12 +7,13 @@ public class AbilityRunner {
   public Func<bool> CanRun;
   public Func<IEnumerator> Routine;
   public EventSource Event;
-  Fiber Fiber;
+  Fiber? Fiber;
   Ability Owner;
 
   public bool IsRunning { get {
       //Debug.Log($"Fiber isRunning: {Fiber} {Fiber != null} {Owner.IsFiberRunning(Fiber)}");
-      return Fiber != null && Owner.IsFiberRunning(Fiber);
+      return Fiber.HasValue && Owner.IsFiberRunning(Fiber.Value);
+      //return Fiber != null && Owner.IsFiberRunning(Fiber);
     } }
 
   public void Init(Ability ability, Func<IEnumerator> routine, Func<bool> canRun) {
@@ -29,13 +30,13 @@ public class AbilityRunner {
   }
 
   public void Stop() {
-    Owner.StopRoutine(Fiber);
+    Owner.StopRoutine(Fiber.Value);
   }
 
   void EventAction() {
     if (CanRun()) {
       Fiber = new Fiber(Routine());
-      Owner.StartRoutine(Fiber);
+      Owner.StartRoutine(Fiber.Value);
       //Debug.Log($"Fiber starting: {Fiber} {IsRunning}");
     }
   }

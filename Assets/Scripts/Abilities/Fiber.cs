@@ -9,10 +9,7 @@ class Bundle {
   List<Fiber> Added = new();
   List<Fiber> Removed = new();
 
-  public bool IsFiberRunning(Fiber f) {
-    //Debug.Log($"IsFiberRunning? {f} vs {Fibers}");
-    return Fibers.Contains(f);
-  }
+  public bool IsFiberRunning(Fiber f) => Fibers.Contains(f);
   public bool IsRunning { get => Fibers.Count > 0; }
   public void Run() {
     Fibers.AddRange(Added);
@@ -31,7 +28,7 @@ class Bundle {
   }
 }
 
-public class Fiber : IEnumerator {
+public struct Fiber : IEnumerator {
   public interface IValue<T> {
     public T Value { get; }
   }
