@@ -13,15 +13,25 @@ public class AbilityMan : MonoBehaviour {
     Status = GetComponent<Status>();
     AbilityManager = GetComponent<AbilityManager>();
     AbilityManager.TryRun(AbilityManBaseAbility);
-    InputManager.Instance.R1.JustDown.Action += delegate {
-      AbilityManager.OnAbilityAction(AbilityAction.R1JustDown);
-    };
-    InputManager.Instance.R2.JustDown.Action += delegate {
-      AbilityManager.OnAbilityAction(AbilityAction.R2JustDown);
-    };
+    InputManager.Instance.L1.JustUp.Connected.Add(AbilityManager.L1JustUp);
+    InputManager.Instance.L1.JustDown.Connected.Add(AbilityManager.L1JustDown);
+    InputManager.Instance.L2.JustUp.Connected.Add(AbilityManager.L2JustUp);
+    InputManager.Instance.L2.JustDown.Connected.Add(AbilityManager.L2JustDown);
+    InputManager.Instance.R1.JustUp.Connected.Add(AbilityManager.R1JustUp);
+    InputManager.Instance.R1.JustDown.Connected.Add(AbilityManager.R1JustDown);
+    InputManager.Instance.R2.JustUp.Connected.Add(AbilityManager.R2JustUp);
+    InputManager.Instance.R2.JustDown.Connected.Add(AbilityManager.R2JustDown);
   }
 
   void OnDestroy() {
+    InputManager.Instance.L1.JustUp.Connected.Remove(AbilityManager.L1JustUp);
+    InputManager.Instance.L1.JustDown.Connected.Remove(AbilityManager.L1JustDown);
+    InputManager.Instance.L2.JustUp.Connected.Remove(AbilityManager.L2JustUp);
+    InputManager.Instance.L2.JustDown.Connected.Remove(AbilityManager.L2JustDown);
+    InputManager.Instance.R1.JustUp.Connected.Remove(AbilityManager.R1JustUp);
+    InputManager.Instance.R1.JustDown.Connected.Remove(AbilityManager.R1JustDown);
+    InputManager.Instance.R2.JustUp.Connected.Remove(AbilityManager.R2JustUp);
+    InputManager.Instance.R2.JustDown.Connected.Remove(AbilityManager.R2JustDown);
   }
 
   void FixedUpdate() {

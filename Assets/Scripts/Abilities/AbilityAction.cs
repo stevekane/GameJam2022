@@ -4,5 +4,8 @@ public enum AbilityAction {
   R1JustUp,
   R2JustDown,
   R2Down,
-  R2JustUp
+  R2JustUp,
+  L2JustDown,
+  L2Down,
+  L2JustUp
 }

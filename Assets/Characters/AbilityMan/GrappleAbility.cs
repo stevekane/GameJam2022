@@ -31,7 +31,7 @@ public class GrappleAbility : Ability {
     Owner.GetComponent<Animator>().SetBool("Grappling", true);
     Owner.GetComponent<Animator>().SetInteger("GrappleState", (int)GrappleState.Holding);
     var chargeWait = Wait(MAX_CHARGE_DURATION.Frames);
-    var release = ListenFor(ButtonEvents.JustUp);
+    var release = ListenFor(AbilityManager.L2JustUp);
     yield return Any(chargeWait, release);
     // Create and throw the hook
     Owner.GetComponent<Animator>().SetBool("Grappling", true);

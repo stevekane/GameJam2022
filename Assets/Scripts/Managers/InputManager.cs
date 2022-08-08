@@ -34,13 +34,13 @@ public class InputManager : MonoBehaviour {
 
   void BroadcastEvents(ButtonEvents events) {
     if (Input.GetButtonDown(events.Name)) {
-      events.JustDown.Action?.Invoke();
+      EventSource.Fire(events.JustDown);
     }
     if (Input.GetButton(events.Name)) {
-      events.Down.Action?.Invoke();
+      EventSource.Fire(events.Down);
     }
     if (Input.GetButtonUp(events.Name)) {
-      events.JustUp.Action?.Invoke();
+      EventSource.Fire(events.JustUp);
     }
   }
 }
