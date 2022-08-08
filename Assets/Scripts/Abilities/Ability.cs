@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Ability : MonoBehaviour {
-  Fiber? Routine;
+  Bundle Routines = new();
   public AbilityTag Tags;
   public AbilityTag Cancels;
   public AbilityTag Blocks;
   public List<AbilityAction> ConsumedActions = new();
-  public bool IsRunning { get => Routine.HasValue; }
-  public virtual void Activate() => Routine = new Fiber(MakeRoutine());
-  public virtual void Stop() => Routine = null;
+  public bool IsRunning { get => Routines.IsRunning; }
+  public bool IsFiberRunning(Fiber f) => Routines.IsFiberRunning(f);
+  public virtual void Activate() => Routines.StartRoutine(new Fiber(MakeRoutine()));
+  public virtual void Stop() => Routines.StopAll();
   public virtual void OnAbilityAction(AbilityManager manager, AbilityAction action) {}
+  public System.Action Activator(System.Func<IEnumerator> mkRoutine) => () => Routines.StartRoutine(new Fiber(mkRoutine()));
   protected abstract IEnumerator MakeRoutine();
-  void FixedUpdate() => Routine?.MoveNext();
+  public void StartRoutine(Fiber routine) => Routines.StartRoutine(routine);
+  public void StopRoutine(Fiber routine) => Routines.StopRoutine(routine);
+  void FixedUpdate() => Routines.Run();
 }
 
 public abstract class ChargedAbility : Ability {

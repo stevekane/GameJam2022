@@ -1,6 +1,45 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+public class AbilityRunner {
+  public Func<bool> CanRun;
+  public Func<IEnumerator> Routine;
+  public EventSource Event;
+  Fiber Fiber;
+  Ability Owner;
+
+  public bool IsRunning { get {
+      //Debug.Log($"Fiber isRunning: {Fiber} {Fiber != null} {Owner.IsFiberRunning(Fiber)}");
+      return Fiber != null && Owner.IsFiberRunning(Fiber);
+    } }
+
+  public void Init(Ability ability, Func<IEnumerator> routine, Func<bool> canRun) {
+    Owner = ability;
+    Routine = routine;
+    CanRun = canRun;
+    //Event.Action += () => {
+    //  if (CanRun()) {
+    //    Fiber = new Fiber(Routine());
+    //    ability.StartRoutine(Fiber.Value);
+    //  }
+    //};
+    Event.Action += EventAction;
+  }
+
+  public void Stop() {
+    Owner.StopRoutine(Fiber);
+  }
+
+  void EventAction() {
+    if (CanRun()) {
+      Fiber = new Fiber(Routine());
+      Owner.StartRoutine(Fiber);
+      //Debug.Log($"Fiber starting: {Fiber} {IsRunning}");
+    }
+  }
+}
 
 public class SlamAbility : ChargedAbility {
   public int Index;
@@ -18,6 +57,8 @@ public class SlamAbility : ChargedAbility {
   public Vector3 FireVFXOffset;
   public GameObject HitVFX;
   public AudioClip HitSFX;
+  public AbilityRunner ChargeStart = new();
+  public AbilityRunner ChargeRelease = new();
 
   protected override IEnumerator MakeRoutine() {
     Owner = GetComponentInParent<AbilityUser>().transform;
@@ -60,6 +101,25 @@ public class SlamAbility : ChargedAbility {
  
   public override void ReleaseCharge() {
     Windup.OnChargeEnd();
+  }
+  protected IEnumerator ChargeStartR() {
+    Debug.Log($"Start A {ChargeStart.IsRunning}");
+    yield return MakeRoutine();
+    Debug.Log($"Start B {ChargeStart.IsRunning}");
+  }
+  protected IEnumerator ChargeReleaseR() {
+    Debug.Log($"Release A {ChargeStart.IsRunning}");
+    Windup.OnChargeEnd();
+    yield return null;
+    Debug.Log($"Release B {ChargeStart.IsRunning}");
+  }
+
+  void Start() {
+    Debug.Log("Slam START");
+    ChargeStart.Event = InputManager.Instance.R2.JustDown;
+    ChargeStart.Init(this, ChargeStartR, () => !ChargeStart.IsRunning);
+    ChargeRelease.Event = InputManager.Instance.R2.JustUp;
+    ChargeRelease.Init(this, ChargeReleaseR, () => ChargeStart.IsRunning);
   }
 
   void OnHit(Transform attacker, Defender defender) {

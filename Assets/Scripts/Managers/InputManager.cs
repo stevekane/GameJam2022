@@ -22,6 +22,7 @@ public class InputManager : MonoBehaviour {
   public ButtonEvents L2 = new ButtonEvents("L2");
 
   void Awake() {
+    Debug.Log("Input AWAKE");
     Instance = this;
   }
 
