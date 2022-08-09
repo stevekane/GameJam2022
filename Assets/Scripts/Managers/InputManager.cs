@@ -48,7 +48,6 @@ public class InputManager : MonoBehaviour {
 
   void Awake() {
     Instance = this;
-    MP.AbilityManager.Instance = new();
   }
 
   void Update() {
@@ -99,32 +98,6 @@ public class InputManager : MonoBehaviour {
     }
     if (Input.GetButtonUp(events.Name)) {
       events.JustUp.Fire();
-    }
-  }
-}
-
-namespace MP {
-  public class AbilityManager {
-    public static AbilityManager Instance;
-
-    // TODO: some kind of disjoint union would be preferred
-    Dictionary<string, (ButtonCode, ButtonPressType)> TagToButton;
-    Dictionary<string, EventSource> TagToEvent;
-
-    public void RegisterTag(string name, ButtonCode code, ButtonPressType type) {
-      Debug.Assert(!TagToEvent.ContainsKey(name));
-      TagToButton[name] = (code, type);
-    }
-    public void RegisterTag(string name, EventSource source) {
-      Debug.Assert(!TagToButton.ContainsKey(name));
-      TagToEvent[name] = source;
-    }
-    public EventSource GetEvent(string name) {
-      if (TagToEvent.TryGetValue(name, out EventSource evt))
-        return evt;
-      if (TagToButton.TryGetValue(name, out var button))
-        return InputManager.Instance.ButtonEvent(button.Item1, button.Item2);
-      return null;
     }
   }
 }
