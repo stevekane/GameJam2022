@@ -24,16 +24,16 @@ public class Smoke : MonoBehaviour {
     CurrentAbility = Abilities.TryStartAbility(0);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    SlamStart.Fire();
-    yield return new WaitForSeconds(0.5f);
-    CurrentAbility = Abilities.Abilities.FirstOrDefault((a) => a.IsRunning); // hack
-    SlamRelease.Fire();
+    CurrentAbility = Abilities.TryStartAbility(1);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
     CurrentAbility = Abilities.TryStartAbility(0);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    CurrentAbility = Abilities.TryStartAbility(2);
+    SlamStart.Fire();
+    CurrentAbility = Abilities.Abilities.FirstOrDefault((a) => a.IsRunning); // hack
+    yield return new WaitForSeconds(0.5f);
+    SlamRelease.Fire();
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForSeconds(.8f);
     AttackRoutine = null;
