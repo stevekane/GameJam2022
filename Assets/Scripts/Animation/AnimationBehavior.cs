@@ -1,6 +1,4 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "AnimationBehavior", menuName = "Animation/Behavior")]
-public class AnimationBehavior : ScriptableObject {
-  // public override void Begin() {}
-}
+[CreateAssetMenu(fileName = "Behavior", menuName = "Animations/Behavior")]
+public class AnimationBehavior : ScriptableObject {}

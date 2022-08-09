@@ -7,5 +7,17 @@ public enum AbilityAction {
   R2JustUp,
   L2JustDown,
   L2Down,
-  L2JustUp
+  L2JustUp,
+  NorthJustDown,
+  NorthDown,
+  NorthJustUp,
+  WestJustDown,
+  WestDown,
+  WestJustUp,
+  SouthJustDown,
+  SouthDown,
+  SouthJustUp,
+  EastJustDown,
+  EastDown,
+  EastJustUp,
 }
