@@ -79,6 +79,8 @@ public class Smoke : MonoBehaviour {
   int RecoveryFrames;
   EventSource SlamStart = new();
   EventSource SlamRelease = new();
+  AxisState MoveAxis = new();
+  AxisState AimAxis = new();
 
   void Awake() {
     Abilities = GetComponent<AbilityUser>();
@@ -92,6 +94,9 @@ public class Smoke : MonoBehaviour {
 
     Abilities.RegisterTag("SlamStart", SlamStart);
     Abilities.RegisterTag("SlamRelease", SlamRelease);
+    // TODO: generic mobaxis component that inputs and processes these?
+    Abilities.RegisterTag("MoveAxis", MoveAxis);
+    Abilities.RegisterTag("AimAxis", AimAxis);
   }
 
   bool IsAttacking { get => CurrentAbility != null; }

@@ -7,6 +7,7 @@ public class AbilityUser : MonoBehaviour {
   // TODO: some kind of disjoint union would be preferred
   Dictionary<string, (ButtonCode, ButtonPressType)> TagToButton = new();
   Dictionary<string, EventSource> TagToEvent = new();
+  Dictionary<string, AxisState> TagToAxis = new();
 
   void Awake() {
     Abilities = GetComponentsInChildren<Ability>();
@@ -25,9 +26,12 @@ public class AbilityUser : MonoBehaviour {
     Debug.Assert(!TagToEvent.ContainsKey(name));
     TagToButton[name] = (code, type);
   }
-  public void RegisterTag(string name, EventSource source) {
+  public void RegisterTag(string name, EventSource evt) {
     Debug.Assert(!TagToButton.ContainsKey(name));
-    TagToEvent[name] = source;
+    TagToEvent[name] = evt;
+  }
+  public void RegisterTag(string name, AxisState axis) {
+    TagToAxis[name] = axis;
   }
   public EventSource GetEvent(string name) {
     if (TagToEvent.TryGetValue(name, out EventSource evt))
@@ -35,5 +39,8 @@ public class AbilityUser : MonoBehaviour {
     if (TagToButton.TryGetValue(name, out var button))
       return InputManager.Instance.ButtonEvent(button.Item1, button.Item2);
     return null;
+  }
+  public AxisState GetAxis(string name) {
+    return TagToAxis[name];
   }
 }

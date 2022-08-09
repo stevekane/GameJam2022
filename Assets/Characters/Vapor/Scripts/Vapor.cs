@@ -4,24 +4,18 @@ using UnityEngine;
 enum Motion { Base, Dashing, WireRiding }
 
 public class Vapor : MonoBehaviour, IWireRider {
-  static Quaternion RotationFromInputs(Transform t, float speed, Action action, float dt) {
-    var desiredForward = action.Right.XZ.TryGetDirection() ?? t.forward;
+  Quaternion RotationFromInputs(Transform t, float speed, float dt) {
+    var axis = Abilities.GetAxis("AimAxis");
+    var desiredForward = axis.XZ.TryGetDirection() ?? t.forward;
     var currentRotation = t.rotation;
     var desiredRotation = Quaternion.LookRotation(desiredForward);
     var degrees = dt*speed;
     return Quaternion.RotateTowards(currentRotation, desiredRotation, degrees);
   }
 
-  static Vector3 HeadingFromInputs(Transform t, Action action) {
-    var heading =
-      action.Left.XZ.TryGetDirection() ??
-      action.Right.XZ.TryGetDirection() ??
-      t.forward;
-    return heading;
-  }
-
-  static Vector3 VelocityFromMove(Action action, float speed) {
-    return speed*action.Left.XZ;
+  Vector3 VelocityFromMove(float speed) {
+    var axis = Abilities.GetAxis("MoveAxis");
+    return speed*axis.XZ;
   }
 
   [SerializeField] float GRAVITY;
@@ -73,6 +67,8 @@ public class Vapor : MonoBehaviour, IWireRider {
     Animator = GetComponent<Animator>();
     AudioSource = GetComponent<AudioSource>();
 
+    Abilities.RegisterTag("MoveAxis", InputManager.Instance.AxisLeft);
+    Abilities.RegisterTag("AimAxis", InputManager.Instance.AxisRight);
     Abilities.RegisterTag("SlamStart", ButtonCode.R2, ButtonPressType.JustDown);
     Abilities.RegisterTag("SlamRelease", ButtonCode.R2, ButtonPressType.JustUp);
   }
@@ -143,13 +139,13 @@ public class Vapor : MonoBehaviour, IWireRider {
         _ when Cannon.IsFiring => FIRING_MOVE_SPEED,
         _ => MOVE_SPEED
       };
-      var moveVelocity = VelocityFromMove(action, moveSpeed);
+      var moveVelocity = VelocityFromMove(moveSpeed);
       var gravity = dt*GRAVITY;
       Velocity.SetXZ(moveVelocity);
       Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
       Controller.Move(dt*Velocity);
     } else if (Motion == Motion.Dashing) {
-      var moveVelocity = VelocityFromMove(action, DASH_SPEED);
+      var moveVelocity = VelocityFromMove(DASH_SPEED);
       Velocity.SetXZ(moveVelocity);
       Velocity.y = 0;
       ChargeParticles.transform.forward = -moveVelocity.TryGetDirection() ?? -transform.forward;
@@ -168,6 +164,6 @@ public class Vapor : MonoBehaviour, IWireRider {
       _ when Cannon.IsFiring => FIRING_TURN_SPEED,
       _ => TURN_SPEED
     };
-    transform.rotation = RotationFromInputs(transform, turnSpeed, action, dt);
+    transform.rotation = RotationFromInputs(transform, turnSpeed, dt);
   }
 }
