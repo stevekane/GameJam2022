@@ -1110,6 +1110,10 @@ MonoBehaviour:
   FireVFXOffset: {x: 0, y: 0, z: 0}
   HitVFX: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
   HitSFX: {fileID: 8300000, guid: 332a6114ed184a44188829a8f87db1a7, type: 3}
+  ChargeStart:
+    EventTag: SlamStart
+  ChargeRelease:
+    EventTag: SlamRelease
 --- !u!114 &1179151239
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1762,7 +1766,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1890260110
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1919,6 +1923,10 @@ MonoBehaviour:
   FireVFXOffset: {x: 0, y: 0, z: 0}
   HitVFX: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
   HitSFX: {fileID: 8300000, guid: 332a6114ed184a44188829a8f87db1a7, type: 3}
+  ChargeStart:
+    EventTag: SlamStart
+  ChargeRelease:
+    EventTag: SlamRelease
 --- !u!114 &1986280862
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1964,7 +1972,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 289355291137479491, guid: c7e64ff75a228aa4a98ea4183747c8b0, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 289355291137479493, guid: c7e64ff75a228aa4a98ea4183747c8b0, type: 3}
       propertyPath: m_RootOrder
@@ -2036,6 +2044,10 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1968700850553037122, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
+      propertyPath: UseMouseAndKeyboard
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3255596729825345913, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
       propertyPath: m_LocalPosition.x
       value: 27.999998
@@ -2110,7 +2122,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7691937222385314386, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
       propertyPath: m_AmplitudeGain
-      value: 0.000150732
+      value: 1e-45
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []

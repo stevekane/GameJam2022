@@ -77,6 +77,9 @@ public class Smoke : MonoBehaviour {
   bool IsDodging = false;
   Vector3 Velocity;
   int RecoveryFrames;
+  EventSource LightAttack = new();
+  EventSource HeavyStart = new();
+  EventSource HeavyRelease = new();
   EventSource SlamStart = new();
   EventSource SlamRelease = new();
   AxisState MoveAxis = new();
@@ -92,6 +95,9 @@ public class Smoke : MonoBehaviour {
     AudioSource = GetComponent<AudioSource>();
     Target = GameObject.FindObjectOfType<Player>().GetComponent<AbilityUser>();
 
+    Abilities.RegisterTag("LightAttack", LightAttack);
+    Abilities.RegisterTag("HeavyStart", HeavyStart);
+    Abilities.RegisterTag("HeavyRelease", HeavyRelease);
     Abilities.RegisterTag("SlamStart", SlamStart);
     Abilities.RegisterTag("SlamRelease", SlamRelease);
     // TODO: generic mobaxis component that inputs and processes these?

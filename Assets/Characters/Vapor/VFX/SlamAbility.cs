@@ -3,42 +3,54 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class AbilityRunner {
-  public Func<bool> CanRun;
-  public Func<IEnumerator> Routine;
-  public EventSource Event;
+  public string EventTag;
+  EventSource Event;
+  Func<bool> CanRun;
+  System.Action DidRun;
+  Func<IEnumerator> Routine;
   Fiber? Fiber;
   Ability Owner;
 
-  public bool IsRunning { get {
-      //Debug.Log($"Fiber isRunning: {Fiber} {Fiber != null} {Owner.IsFiberRunning(Fiber)}");
-      return Fiber.HasValue && Owner.IsFiberRunning(Fiber.Value);
-      //return Fiber != null && Owner.IsFiberRunning(Fiber);
-    } }
+  public bool IsRunning { get => Fiber.HasValue && Owner.IsFiberRunning(Fiber.Value); }
 
-  public void Init(Ability ability, Func<IEnumerator> routine, Func<bool> canRun) {
+  public void Init(AbilityUser user, Ability ability, Func<IEnumerator> routine, Func<bool> canRun) {
     Owner = ability;
     Routine = routine;
-    CanRun = canRun;
-    //Event.Action += () => {
-    //  if (CanRun()) {
-    //    Fiber = new Fiber(Routine());
-    //    ability.StartRoutine(Fiber.Value);
-    //  }
-    //};
+    AddRunCondition(canRun);
+    Event = user.GetEvent(EventTag);
     Event.Action += EventAction;
+    // TODO: unregister
   }
 
   public void Stop() {
     Owner.StopRoutine(Fiber.Value);
   }
 
+  public void AddRunCondition(Func<bool> canRun) {
+    var oldCanRun = CanRun;
+    if (oldCanRun != null)
+      CanRun = () => oldCanRun() && canRun();
+    else
+      CanRun = canRun;
+  }
+
+  public void AddDidRun(System.Action didRun) {
+    DidRun += didRun;
+  }
+
   void EventAction() {
     if (CanRun()) {
-      Fiber = new Fiber(Routine());
+      Fiber = new Fiber(MakeRoutine());
       Owner.StartRoutine(Fiber.Value);
       //Debug.Log($"Fiber starting: {Fiber} {IsRunning}");
     }
+  }
+
+  IEnumerator MakeRoutine() {
+    yield return Routine();
+    DidRun?.Invoke();
   }
 }
 
@@ -105,25 +117,19 @@ public class SlamAbility : ChargedAbility {
     Windup.OnChargeEnd();
   }
   protected IEnumerator ChargeStartR() {
-    Debug.Log($"Start A {ChargeStart.IsRunning}");
     yield return MakeRoutine();
-    Debug.Log($"Start B {ChargeStart.IsRunning}");
   }
   protected IEnumerator ChargeReleaseR() {
-    Debug.Log($"Release A {ChargeStart.IsRunning}");
     Windup.OnChargeEnd();
     yield return null;
-    Debug.Log($"Release B {ChargeStart.IsRunning}");
   }
 
   void Start() {
     Owner = GetComponentInParent<AbilityUser>().transform;
     Animator = GetComponentInParent<Animator>();
     AbilityUser = GetComponentInParent<AbilityUser>();
-    ChargeStart.Event = AbilityUser.GetEvent("SlamStart");
-    ChargeStart.Init(this, ChargeStartR, () => !ChargeStart.IsRunning);
-    ChargeRelease.Event = AbilityUser.GetEvent("SlamRelease");
-    ChargeRelease.Init(this, ChargeReleaseR, () => ChargeStart.IsRunning);
+    ChargeStart.Init(AbilityUser, this, ChargeStartR, () => !ChargeStart.IsRunning);
+    ChargeRelease.Init(AbilityUser, this, ChargeReleaseR, () => ChargeStart.IsRunning);
   }
 
   void OnHit(Transform attacker, Defender defender) {

@@ -9,8 +9,8 @@ class Bundle {
   List<Fiber> Added = new();
   List<Fiber> Removed = new();
 
-  public bool IsFiberRunning(Fiber f) => Fibers.Contains(f);
-  public bool IsRunning { get => Fibers.Count > 0; }
+  public bool IsFiberRunning(Fiber f) => Fibers.Contains(f) || Added.Contains(f);
+  public bool IsRunning { get => Fibers.Count > 0 || Added.Count > 0; }
   public void Run() {
     Fibers.AddRange(Added);
     Added.Clear();

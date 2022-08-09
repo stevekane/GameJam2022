@@ -45,7 +45,7 @@ public class Vapor : MonoBehaviour, IWireRider {
   int WireFramesTraveled;
   Motion Motion;
   Vector3 Velocity;
-  int PunchCycleIndex;
+  public int PunchCycleIndex;
 
   bool IsAttacking { get => CurrentAbility != null; }
 
@@ -69,8 +69,17 @@ public class Vapor : MonoBehaviour, IWireRider {
 
     Abilities.RegisterTag("MoveAxis", InputManager.Instance.AxisLeft);
     Abilities.RegisterTag("AimAxis", InputManager.Instance.AxisRight);
+    Abilities.RegisterTag("LightAttack", ButtonCode.R1, ButtonPressType.JustDown);
     Abilities.RegisterTag("SlamStart", ButtonCode.R2, ButtonPressType.JustDown);
     Abilities.RegisterTag("SlamRelease", ButtonCode.R2, ButtonPressType.JustUp);
+    Abilities.RegisterTag("HeavyStart", new EventSource());
+    Abilities.RegisterTag("HeavyRelease", new EventSource());
+
+    // Better way to do this? Maybe a sub ability that manages the toggle? But how to key abilities in general?
+    (Abilities.Abilities[0] as MeleeAttackAbility).ChargeStart.AddRunCondition(() => PunchCycleIndex == 0);
+    (Abilities.Abilities[0] as MeleeAttackAbility).ChargeStart.AddDidRun(() => PunchCycleIndex = 1);
+    (Abilities.Abilities[1] as MeleeAttackAbility).ChargeStart.AddRunCondition(() => PunchCycleIndex == 1);
+    (Abilities.Abilities[1] as MeleeAttackAbility).ChargeStart.AddDidRun(() => PunchCycleIndex = 0);
   }
 
   void FixedUpdate() {
@@ -112,15 +121,15 @@ public class Vapor : MonoBehaviour, IWireRider {
         Cannon.ReleaseTrigger();
       }
 
-      if (action.R1.JustDown && !IsAttacking) {
-        TryStartAbility(0+PunchCycleIndex, () => Inputs.Action.R1);
-        PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
-      } else if (action.R2.JustDown && !IsAttacking) {
-        //TryStartAbility(2, () => Inputs.Action.R2);
-      }
-      if (IsAttacking && CurrentAbilityButton().JustUp && CurrentAbility is ChargedAbility) {
-        ((ChargedAbility)CurrentAbility).ReleaseCharge();
-      }
+      //if (action.R1.JustDown && !IsAttacking) {
+      //  TryStartAbility(0+PunchCycleIndex, () => Inputs.Action.R1);
+      //  PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
+      //} else if (action.R2.JustDown && !IsAttacking) {
+      //  TryStartAbility(2, () => Inputs.Action.R2);
+      //}
+      //if (IsAttacking && CurrentAbilityButton().JustUp && CurrentAbility is ChargedAbility) {
+      //  ((ChargedAbility)CurrentAbility).ReleaseCharge();
+      //}
 
       // TODO: recoil
       //if (Cannon.IsFiring) {

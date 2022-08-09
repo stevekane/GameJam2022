@@ -200,10 +200,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c05e2b324b7be2447826a43593dd3bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AbilityManager: {fileID: 0}
+  Tags: 0
+  Cancels: 0
+  Blocks: 0
   Index: 2
-  Owner: {fileID: 5571416124093621163}
-  Animator: {fileID: 7727835182619467870}
-  Chargeable: 1
   Windup:
     Duration:
       Millis: 300
@@ -238,6 +239,10 @@ MonoBehaviour:
   HitDamage: 15
   HitTargetKnockbackStrength: 50
   HitRecoilStrength: 50
+  ChargeStart:
+    EventTag: HeavyStart
+  ChargeRelease:
+    EventTag: HeavyRelease
 --- !u!1 &4872877845196898822
 GameObject:
   m_ObjectHideFlags: 0
@@ -310,10 +315,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c05e2b324b7be2447826a43593dd3bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AbilityManager: {fileID: 0}
+  Tags: 0
+  Cancels: 0
+  Blocks: 0
   Index: 0
-  Owner: {fileID: 5571416124093621163}
-  Animator: {fileID: 7727835182619467870}
-  Chargeable: 0
   Windup:
     Duration:
       Millis: 33.333332
@@ -348,6 +354,10 @@ MonoBehaviour:
   HitDamage: 5
   HitTargetKnockbackStrength: 0
   HitRecoilStrength: 1
+  ChargeStart:
+    EventTag: LightAttack
+  ChargeRelease:
+    EventTag: 
 --- !u!1 &5276269203500440461
 GameObject:
   m_ObjectHideFlags: 0
@@ -1654,10 +1664,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c05e2b324b7be2447826a43593dd3bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AbilityManager: {fileID: 0}
+  Tags: 0
+  Cancels: 0
+  Blocks: 0
   Index: 1
-  Owner: {fileID: 5571416124093621163}
-  Animator: {fileID: 7727835182619467870}
-  Chargeable: 0
   Windup:
     Duration:
       Millis: 33.333332
@@ -1692,6 +1703,10 @@ MonoBehaviour:
   HitDamage: 5
   HitTargetKnockbackStrength: 0
   HitRecoilStrength: 1
+  ChargeStart:
+    EventTag: LightAttack
+  ChargeRelease:
+    EventTag: 
 --- !u!1001 &1011520355114941726
 PrefabInstance:
   m_ObjectHideFlags: 0

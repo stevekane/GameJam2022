@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class MeleeAttackAbility : ChargedAbility {
   public int Index;
-  public Transform Owner;
-  public Animator Animator;
-  public bool Chargeable;
+  AbilityUser AbilityUser;
+  Transform Owner;
+  Animator Animator;
   public ChargedAttackPhase Windup;
   public HitboxAttackPhase Active;
   public InactiveAttackPhase Recovery;
@@ -18,6 +18,10 @@ public class MeleeAttackAbility : ChargedAbility {
   public float HitDamage;
   public float HitTargetKnockbackStrength;
   public float HitRecoilStrength;
+  public AbilityRunner ChargeStart = new();
+  public AbilityRunner ChargeRelease = new();
+
+  public bool Chargeable { get => ChargeRelease.EventTag.Length > 0; }
 
   protected override IEnumerator MakeRoutine() {
     Owner = GetComponentInParent<AbilityUser>().transform;
@@ -61,5 +65,23 @@ public class MeleeAttackAbility : ChargedAbility {
 
   public override void ReleaseCharge() {
     Windup.OnChargeEnd();
+  }
+
+  protected IEnumerator ChargeStartRoutine() {
+    yield return MakeRoutine();
+  }
+  protected IEnumerator ChargeReleaseRoutine() {
+    Windup.OnChargeEnd();
+    yield return null;
+  }
+
+  void Start() {
+    AbilityUser = GetComponentInParent<AbilityUser>();
+    Owner = GetComponentInParent<AbilityUser>().transform;
+    Animator = GetComponentInParent<Animator>();
+    ChargeStart.Init(AbilityUser, this, ChargeStartRoutine, () => !ChargeStart.IsRunning);
+    if (Chargeable) {
+      ChargeRelease.Init(AbilityUser, this, ChargeReleaseRoutine, () => ChargeStart.IsRunning);
+    }
   }
 }
