@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ButtonEvents {
@@ -14,6 +15,19 @@ public class ButtonEvents {
   }
 }
 
+public enum ButtonPressType {
+  JustDown,
+  Down,
+  JustUp
+}
+
+public enum ButtonCode {
+  L1,
+  L2,
+  R1,
+  R2,
+}
+
 public class InputManager : MonoBehaviour {
   public static InputManager Instance;
 
@@ -22,13 +36,24 @@ public class InputManager : MonoBehaviour {
   public ButtonEvents L1 = new ButtonEvents("L1");
   public ButtonEvents L2 = new ButtonEvents("L2");
   public InputAction[] InputActions;
+  Dictionary<(ButtonCode, ButtonPressType), EventSource> Buttons = new();
+  
+  public EventSource ButtonEvent(ButtonCode code, ButtonPressType type) {
+    if (!Buttons.TryGetValue((code, type), out EventSource evt)) {
+      evt = new();
+      Buttons.Add((code, type), evt);
+    }
+    return evt;
+  }
 
   void Awake() {
-    Debug.Log("Input AWAKE");
     Instance = this;
   }
 
   void Update() {
+    foreach (var it in Buttons) {
+      BroadcastEvent(it.Key.Item1, it.Key.Item2, it.Value);
+    }
     BroadcastEvents(R1);
     BroadcastEvents(R2);
     BroadcastEvents(L1);
@@ -44,6 +69,25 @@ public class InputManager : MonoBehaviour {
         i.Fire();
     }
   }
+
+  void BroadcastEvent(ButtonCode code, ButtonPressType type, EventSource evt) {
+    Predicate<string> func = type switch {
+      ButtonPressType.JustDown => Input.GetButtonDown,
+      ButtonPressType.Down => Input.GetButton,
+      ButtonPressType.JustUp => Input.GetButtonUp,
+      _ => Input.GetButtonDown
+    };
+    var name = code switch {
+      ButtonCode.L1 => "L1",
+      ButtonCode.L2 => "L2",
+      ButtonCode.R1 => "R1",
+      ButtonCode.R2 => "R2",
+      _ => "",
+    };
+    if (func(name))
+      evt.Fire();
+  }
+
 
   void BroadcastEvents(ButtonEvents events) {
     if (Input.GetButtonDown(events.Name)) {

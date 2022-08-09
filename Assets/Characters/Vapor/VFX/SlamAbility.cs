@@ -117,9 +117,9 @@ public class SlamAbility : ChargedAbility {
 
   void Start() {
     Debug.Log("Slam START");
-    ChargeStart.Event = InputManager.Instance.R2.JustDown;
+    ChargeStart.Event = InputManager.Instance.ButtonEvent(ButtonCode.R2, ButtonPressType.JustDown);
     ChargeStart.Init(this, ChargeStartR, () => !ChargeStart.IsRunning);
-    ChargeRelease.Event = InputManager.Instance.R2.JustUp;
+    ChargeRelease.Event = InputManager.Instance.ButtonEvent(ButtonCode.R2, ButtonPressType.JustUp);
     ChargeRelease.Init(this, ChargeReleaseR, () => ChargeStart.IsRunning);
   }
 
