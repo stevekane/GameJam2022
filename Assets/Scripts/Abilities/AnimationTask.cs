@@ -4,6 +4,12 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Animations;
 
+public static class AnimatorTastExtensions {
+  public static AnimationTask Run(this Animator animator, AnimationClip clip) {
+    return new AnimationTask(animator, clip);
+  }
+}
+
 public class AnimationTask : IEnumerator {
   Animator Animator;
   AnimationClipPlayable ClipPlayable;
