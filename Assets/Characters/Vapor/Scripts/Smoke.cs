@@ -24,7 +24,10 @@ public class Smoke : MonoBehaviour {
     CurrentAbility = Abilities.TryStartAbility(0);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    CurrentAbility = Abilities.TryStartAbility(1);
+    SlamStart.Fire();
+    yield return new WaitForSeconds(0.5f);
+    CurrentAbility = Abilities.Abilities.FirstOrDefault((a) => a.IsRunning); // hack
+    SlamRelease.Fire();
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
     CurrentAbility = Abilities.TryStartAbility(0);
@@ -74,6 +77,8 @@ public class Smoke : MonoBehaviour {
   bool IsDodging = false;
   Vector3 Velocity;
   int RecoveryFrames;
+  EventSource SlamStart = new();
+  EventSource SlamRelease = new();
 
   void Awake() {
     Abilities = GetComponent<AbilityUser>();
@@ -84,6 +89,9 @@ public class Smoke : MonoBehaviour {
     Animator = GetComponent<Animator>();
     AudioSource = GetComponent<AudioSource>();
     Target = GameObject.FindObjectOfType<Player>().GetComponent<AbilityUser>();
+
+    Abilities.RegisterTag("SlamStart", SlamStart);
+    Abilities.RegisterTag("SlamRelease", SlamRelease);
   }
 
   bool IsAttacking { get => CurrentAbility != null; }

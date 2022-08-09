@@ -60,6 +60,7 @@ public class SlamAbility : ChargedAbility {
   public AudioClip HitSFX;
   public AbilityRunner ChargeStart = new();
   public AbilityRunner ChargeRelease = new();
+  AbilityUser AbilityUser;
 
   protected override IEnumerator MakeRoutine() {
     Owner = GetComponentInParent<AbilityUser>().transform;
@@ -116,10 +117,12 @@ public class SlamAbility : ChargedAbility {
   }
 
   void Start() {
-    Debug.Log("Slam START");
-    ChargeStart.Event = InputManager.Instance.ButtonEvent(ButtonCode.R2, ButtonPressType.JustDown);
+    Owner = GetComponentInParent<AbilityUser>().transform;
+    Animator = GetComponentInParent<Animator>();
+    AbilityUser = GetComponentInParent<AbilityUser>();
+    ChargeStart.Event = AbilityUser.GetEvent("SlamStart");
     ChargeStart.Init(this, ChargeStartR, () => !ChargeStart.IsRunning);
-    ChargeRelease.Event = InputManager.Instance.ButtonEvent(ButtonCode.R2, ButtonPressType.JustUp);
+    ChargeRelease.Event = AbilityUser.GetEvent("SlamRelease");
     ChargeRelease.Init(this, ChargeReleaseR, () => ChargeStart.IsRunning);
   }
 

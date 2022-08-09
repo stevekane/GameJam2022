@@ -72,6 +72,9 @@ public class Vapor : MonoBehaviour, IWireRider {
     Controller = GetComponent<CharacterController>();
     Animator = GetComponent<Animator>();
     AudioSource = GetComponent<AudioSource>();
+
+    Abilities.RegisterTag("SlamStart", ButtonCode.R2, ButtonPressType.JustDown);
+    Abilities.RegisterTag("SlamRelease", ButtonCode.R2, ButtonPressType.JustUp);
   }
 
   void FixedUpdate() {
