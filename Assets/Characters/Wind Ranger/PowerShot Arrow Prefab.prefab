@@ -10,10 +10,12 @@ GameObject:
   m_Component:
   - component: {fileID: 784070462922033995}
   - component: {fileID: 784070462922033992}
+  - component: {fileID: 770273405835763687}
+  - component: {fileID: -9009849104711908222}
+  - component: {fileID: 2207480808002748888}
   - component: {fileID: 6774862715720459903}
   - component: {fileID: -8401834391010525102}
-  - component: {fileID: 2207480808002748888}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: PowerShot Arrow Prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -48,37 +50,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8613a7ec564f7db4fb3d01db2650ac6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DestructionPrefab: {fileID: 159918, guid: f3d60ef1464f95348a9ffe17f312927e, type: 3}
   LifeTime: 3
   LaunchSpeed: 240
---- !u!65 &6774862715720459903
-BoxCollider:
+  DamageReductionPerTarget: 0.2
+  Damage: 100
+--- !u!114 &770273405835763687
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 784070462922033993}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
   m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 0.5, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &-8401834391010525102
-Rigidbody:
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9a88b1df843bb04fb7a21e4e9ee4307, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InitialSpeed: 240
+--- !u!114 &-9009849104711908222
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 784070462922033993}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 112
-  m_CollisionDetection: 2
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca12e696ba8256048aac71ba4426cd05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LifeTime: 2
 --- !u!96 &2207480808002748888
 TrailRenderer:
   serializedVersion: 3
@@ -181,6 +183,35 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
+--- !u!65 &6774862715720459903
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 784070462922033993}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 0.5, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &-8401834391010525102
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 784070462922033993}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 112
+  m_CollisionDetection: 2
 --- !u!1 &784070463706885899
 GameObject:
   m_ObjectHideFlags: 0

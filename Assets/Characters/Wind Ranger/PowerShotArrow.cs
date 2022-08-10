@@ -2,15 +2,21 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody), typeof(Collider))]
 public class PowerShotArrow : MonoBehaviour {
-  public float LifeTime = 3;
-  public float LaunchSpeed = 120;
+  public GameObject DestructionPrefab;
+  public float DamageReductionPerTarget = .2f;
+  public float Damage = 100;
 
-  void Start() {
-    Destroy(gameObject, LifeTime);
-    GetComponent<Rigidbody>().AddForce(LaunchSpeed*transform.forward, ForceMode.Impulse);
-  }
+  int TargetsHit;
 
-  void OnTriggerEnter(Collider c) {
-    Debug.Log($"Arrow hit {c.name}");
+  void OnCollisionEnter(Collision c) {
+    if (c.collider.TryGetComponent(out Hurtbox hurtbox)) {
+      if (hurtbox.Defender.TryGetComponent(out Damage damage)) {
+        damage.AddPoints(Damage*Mathf.Pow(1-DamageReductionPerTarget, TargetsHit));
+        TargetsHit++;
+      }
+    } else {
+      VFXManager.Instance.TrySpawnEffect(DestructionPrefab, transform.position);
+      Destroy(gameObject);
+    }
   }
 }

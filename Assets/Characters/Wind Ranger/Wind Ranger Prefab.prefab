@@ -99,6 +99,30 @@ MonoBehaviour:
   Tags: 10
   Cancels: 0
   Blocks: 10
+  DamageMultiplierFromDuration:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   ArrowPrefab: {fileID: 784070462922033992, guid: 6dea11b6857468a44a87db05b8de29cf, type: 3}
   Animator: {fileID: 2582651164267693602}
   WindupClip: {fileID: 7400000, guid: 8c9354c19de70ae47a15c7f4f4ec971c, type: 2}
@@ -115,7 +139,7 @@ GameObject:
   - component: {fileID: 2582651163493360452}
   - component: {fileID: 2582651163493360455}
   - component: {fileID: 2582651163493360474}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wind Ranger Prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
