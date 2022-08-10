@@ -5,10 +5,10 @@ public class AbilitySwapper : MonoBehaviour {
   public Ability Ability;
 
   [Header("SwapOnStart")]
-  public AbilityUser SwapWithUser;
+  public AbilityManager SwapWithUser;
   public int SwapAbilityIndex;
 
-  void SwapWith(AbilityUser user, int index) {
+  void SwapWith(AbilityManager user, int index) {
     var (myParent, usersParent) = (Ability.transform.parent, user.Abilities[index].transform.parent);
     (user.Abilities[index], Ability) = (Ability, user.Abilities[index]);
     (user.Abilities[index].gameObject.layer, Ability.gameObject.layer) = (Ability.gameObject.layer, user.Abilities[index].gameObject.layer);
@@ -17,7 +17,7 @@ public class AbilitySwapper : MonoBehaviour {
   }
 
   void OnTriggerStay(Collider other) {
-    if (other.TryGetComponent(out Hurtbox hurtbox) && hurtbox.Defender.TryGetComponent(out AbilityUser user)) {
+    if (other.TryGetComponent(out Hurtbox hurtbox) && hurtbox.Defender.TryGetComponent(out AbilityManager user)) {
       var activeIndex = Array.FindIndex(user.Abilities, (a) => a.IsRunning);
       if (activeIndex >= 0) {
         user.Abilities[activeIndex].Stop();

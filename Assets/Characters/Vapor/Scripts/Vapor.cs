@@ -4,24 +4,18 @@ using UnityEngine;
 enum Motion { Base, Dashing, WireRiding }
 
 public class Vapor : MonoBehaviour, IWireRider {
-  static Quaternion RotationFromInputs(Transform t, float speed, Action action, float dt) {
-    var desiredForward = action.Right.XZ.TryGetDirection() ?? t.forward;
+  Quaternion RotationFromInputs(Transform t, float speed, float dt) {
+    var axis = Abilities.GetAxis(EventTag.AimAxis);
+    var desiredForward = axis.XZ.TryGetDirection() ?? t.forward;
     var currentRotation = t.rotation;
     var desiredRotation = Quaternion.LookRotation(desiredForward);
     var degrees = dt*speed;
     return Quaternion.RotateTowards(currentRotation, desiredRotation, degrees);
   }
 
-  static Vector3 HeadingFromInputs(Transform t, Action action) {
-    var heading =
-      action.Left.XZ.TryGetDirection() ??
-      action.Right.XZ.TryGetDirection() ??
-      t.forward;
-    return heading;
-  }
-
-  static Vector3 VelocityFromMove(Action action, float speed) {
-    return speed*action.Left.XZ;
+  Vector3 VelocityFromMove(float speed) {
+    var axis = Abilities.GetAxis(EventTag.MoveAxis);
+    return speed*axis.XZ;
   }
 
   [SerializeField] float GRAVITY;
@@ -37,7 +31,7 @@ public class Vapor : MonoBehaviour, IWireRider {
   [SerializeField] AudioClip ChargeAudioClip;
   [SerializeField] float ChargeAudioClipStartingTime;
 
-  AbilityUser Abilities;
+  AbilityManager Abilities;
   Defender Defender;
   Cannon Cannon;
   Status Status;
@@ -46,12 +40,11 @@ public class Vapor : MonoBehaviour, IWireRider {
   AudioSource AudioSource;
 
   Ability CurrentAbility;
-  Func<ButtonState> CurrentAbilityButton;
   Wire Wire;
   int WireFramesTraveled;
   Motion Motion;
   Vector3 Velocity;
-  int PunchCycleIndex;
+  public int PunchCycleIndex;
 
   bool IsAttacking { get => CurrentAbility != null; }
 
@@ -59,75 +52,77 @@ public class Vapor : MonoBehaviour, IWireRider {
     Wire = wire;
   }
 
-  void TryStartAbility(int index, Func<ButtonState> button) {
-    CurrentAbility = Abilities.TryStartAbility(index);
-    CurrentAbilityButton = button;
-  }
-
   void Awake() {
-    Abilities = GetComponent<AbilityUser>();
+    Abilities = GetComponent<AbilityManager>();
     Defender = GetComponent<Defender>();
     Cannon = GetComponentInChildren<Cannon>();
     Status = GetComponent<Status>();
     Controller = GetComponent<CharacterController>();
     Animator = GetComponent<Animator>();
     AudioSource = GetComponent<AudioSource>();
+
+    Abilities.RegisterTag(EventTag.MoveAxis, InputManager.Instance.AxisLeft);
+    Abilities.RegisterTag(EventTag.AimAxis, InputManager.Instance.AxisRight);
+    Abilities.RegisterTag(EventTag.LightAttack, ButtonCode.R1, ButtonPressType.JustDown);
+    Abilities.RegisterTag(EventTag.SlamStart, ButtonCode.R2, ButtonPressType.JustDown);
+    Abilities.RegisterTag(EventTag.SlamRelease, ButtonCode.R2, ButtonPressType.JustUp);
+    Abilities.RegisterTag(EventTag.HeavyStart, new EventSource());
+    Abilities.RegisterTag(EventTag.HeavyRelease, new EventSource());
   }
 
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
-    var action = Inputs.Action;
 
     if (!CurrentAbility?.IsRunning ?? false)
       CurrentAbility = null;
 
-    if (Status.CanMove && Motion == Motion.Base && action.L1.JustDown) {
-      AudioSource.Stop();
-      AudioSource.clip = ChargeAudioClip;
-      AudioSource.time = ChargeAudioClipStartingTime;
-      AudioSource.Play();
-      Motion = Motion.Dashing;
-    } else if (Motion == Motion.Dashing && action.L1.JustUp) {
-      AudioSource.Stop();
-      Motion = Motion.Base;
-    } else if (Motion == Motion.Dashing && Wire) {
-      Motion = Motion.WireRiding;
-      WireFramesTraveled = 0;
-    } else if (Motion == Motion.WireRiding && WireFramesTraveled >= WireRide.Frames) {
-      if (action.L1.Down) {
-        Motion = Motion.Dashing;
-        Wire = null;
-      } else {
-        AudioSource.Stop();
-        Motion = Motion.Base;
-        Wire = null;
-      }
-    }
+    //if (Status.CanMove && Motion == Motion.Base && action.L1.JustDown) {
+    //  AudioSource.Stop();
+    //  AudioSource.clip = ChargeAudioClip;
+    //  AudioSource.time = ChargeAudioClipStartingTime;
+    //  AudioSource.Play();
+    //  Motion = Motion.Dashing;
+    //} else if (Motion == Motion.Dashing && action.L1.JustUp) {
+    //  AudioSource.Stop();
+    //  Motion = Motion.Base;
+    //} else if (Motion == Motion.Dashing && Wire) {
+    //  Motion = Motion.WireRiding;
+    //  WireFramesTraveled = 0;
+    //} else if (Motion == Motion.WireRiding && WireFramesTraveled >= WireRide.Frames) {
+    //  if (action.L1.Down) {
+    //    Motion = Motion.Dashing;
+    //    Wire = null;
+    //  } else {
+    //    AudioSource.Stop();
+    //    Motion = Motion.Base;
+    //    Wire = null;
+    //  }
+    //}
 
-    if (Status.CanAttack) {
-      if (action.L2.JustDown) {
-        Cannon.DepressTrigger();
-      } else if (Status.CanAttack && action.L2.Down) {
-        Cannon.HoldTrigger();
-      } else if (action.L2.JustUp) {
-        Cannon.ReleaseTrigger();
-      }
+    //if (Status.CanAttack) {
+    //  if (action.L2.JustDown) {
+    //    Cannon.DepressTrigger();
+    //  } else if (Status.CanAttack && action.L2.Down) {
+    //    Cannon.HoldTrigger();
+    //  } else if (action.L2.JustUp) {
+    //    Cannon.ReleaseTrigger();
+    //  }
 
-      if (action.R1.JustDown && !IsAttacking) {
-        TryStartAbility(0+PunchCycleIndex, () => Inputs.Action.R1);
-        PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
-      } else if (action.R2.JustDown && !IsAttacking) {
-        TryStartAbility(2, () => Inputs.Action.R2);
-      }
-      if (IsAttacking && CurrentAbilityButton().JustUp && CurrentAbility is ChargedAbility) {
-        ((ChargedAbility)CurrentAbility).ReleaseCharge();
-      }
+    //  //if (action.R1.JustDown && !IsAttacking) {
+    //  //  TryStartAbility(0+PunchCycleIndex, () => Inputs.Action.R1);
+    //  //  PunchCycleIndex = PunchCycleIndex <= 0 ? 1 : 0;
+    //  //} else if (action.R2.JustDown && !IsAttacking) {
+    //  //  TryStartAbility(2, () => Inputs.Action.R2);
+    //  //}
+    //  //if (IsAttacking && CurrentAbilityButton().JustUp && CurrentAbility is ChargedAbility) {
+    //  //  ((ChargedAbility)CurrentAbility).ReleaseCharge();
+    //  //}
 
-      // TODO: recoil
-      //if (Cannon.IsFiring) {
-      //  Pushable.Push(FIRING_PUSHBACK_SPEED*-transform.forward);
-      //}
-    }
+    //  // TODO: recoil
+    //  //if (Cannon.IsFiring) {
+    //  //  Pushable.Push(FIRING_PUSHBACK_SPEED*-transform.forward);
+    //  //}
+    //}
 
     Animator.SetBool("Dashing", Motion == Motion.Dashing);
     Animator.SetBool("WireRiding", Motion == Motion.WireRiding);
@@ -140,13 +135,13 @@ public class Vapor : MonoBehaviour, IWireRider {
         _ when Cannon.IsFiring => FIRING_MOVE_SPEED,
         _ => MOVE_SPEED
       };
-      var moveVelocity = VelocityFromMove(action, moveSpeed);
+      var moveVelocity = VelocityFromMove(moveSpeed);
       var gravity = dt*GRAVITY;
       Velocity.SetXZ(moveVelocity);
       Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
       Controller.Move(dt*Velocity);
     } else if (Motion == Motion.Dashing) {
-      var moveVelocity = VelocityFromMove(action, DASH_SPEED);
+      var moveVelocity = VelocityFromMove(DASH_SPEED);
       Velocity.SetXZ(moveVelocity);
       Velocity.y = 0;
       ChargeParticles.transform.forward = -moveVelocity.TryGetDirection() ?? -transform.forward;
@@ -165,6 +160,6 @@ public class Vapor : MonoBehaviour, IWireRider {
       _ when Cannon.IsFiring => FIRING_TURN_SPEED,
       _ => TURN_SPEED
     };
-    transform.rotation = RotationFromInputs(transform, turnSpeed, action, dt);
+    transform.rotation = RotationFromInputs(transform, turnSpeed, dt);
   }
 }

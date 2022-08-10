@@ -1,8 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SlamAbility : ChargedAbility {
+public class SlamAbility : Ability {
   public int Index;
   public Transform Owner;
   public Animator Animator;
@@ -19,9 +20,20 @@ public class SlamAbility : ChargedAbility {
   public GameObject HitVFX;
   public AudioClip HitSFX;
 
-  protected override IEnumerator MakeRoutine() {
-    Owner = GetComponentInParent<AbilityUser>().transform;
+  void Start() {
+    Owner = GetComponentInParent<AbilityManager>().transform;
     Animator = GetComponentInParent<Animator>();
+  }
+
+  public IEnumerator ChargeStart() {
+    yield return MakeRoutine();
+  }
+  public IEnumerator ChargeRelease() {
+    Windup.OnChargeEnd();
+    yield return null;
+  }
+
+  protected override IEnumerator MakeRoutine() {
     yield return Fiber.Any(Charging(), Windup.StartWithCharge(Animator, Index));
     SlamAction.Activate();
     SFXManager.Instance.TryPlayOneShot(FireSFX);
@@ -29,10 +41,10 @@ public class SlamAbility : ChargedAbility {
     SlamAction = null;
     yield return Active.Start(Animator, Index);
     yield return Recovery.Start(Animator, Index);
-    Stop();
+    Done();
   }
 
-  public override void Stop() {
+  public void Done() {
     Animator.SetBool("Attacking", false);
     Animator.SetInteger("AttackIndex", -1);
     Animator.SetFloat("AttackSpeed", 1);
@@ -40,7 +52,6 @@ public class SlamAbility : ChargedAbility {
       SlamAction.Activate();
       SlamAction = null;
     }
-    base.Stop();
   }
 
   IEnumerator Charging() {
@@ -56,10 +67,6 @@ public class SlamAbility : ChargedAbility {
       }
       yield return null;
     }
-  }
- 
-  public override void ReleaseCharge() {
-    Windup.OnChargeEnd();
   }
 
   void OnHit(Transform attacker, Defender defender) {

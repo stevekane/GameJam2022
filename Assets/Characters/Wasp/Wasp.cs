@@ -8,7 +8,7 @@ public class Wasp : MonoBehaviour {
   Status Status;
   Animator Animator;
   Transform Target;
-  AbilityUser Abilities;
+  AbilityManager Abilities;
   int FramesRemaining = 0;
   Vector3 Velocity;
   Ability CurrentAbility;
@@ -21,7 +21,7 @@ public class Wasp : MonoBehaviour {
     Controller = GetComponent<CharacterController>();
     Status = GetComponent<Status>();
     Animator = GetComponent<Animator>();
-    Abilities = GetComponent<AbilityUser>();
+    Abilities = GetComponent<AbilityManager>();
   }
 
   void FixedUpdate() {

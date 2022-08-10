@@ -1,21 +1,23 @@
 using System.Collections;
 
 public class AbilityManBaseAbility : Ability {
+  AbilityManager AbilityManager;
   public LightAttackAbility LightAttack;
   public AimAndFireAbility AimAndFire;
   public GrappleAbility Grapple;
 
   public override void Activate() {
-    AbilityManager.R1JustDown.Action += TryRunLightAttack;
-    AbilityManager.R2JustDown.Action += TryRunAimAndFire;
-    AbilityManager.L2JustDown.Action += TryRunGrapple;
+    AbilityManager = GetComponentInParent<AbilityManager>();
+    InputManager.Instance.ButtonEvent(ButtonCode.R1, ButtonPressType.JustDown).Action += TryRunLightAttack;
+    InputManager.Instance.ButtonEvent(ButtonCode.R2, ButtonPressType.JustDown).Action += TryRunAimAndFire;
+    InputManager.Instance.ButtonEvent(ButtonCode.L2, ButtonPressType.JustDown).Action += TryRunGrapple;
     base.Activate();
   }
 
   public override void Stop() {
-    AbilityManager.R1JustDown.Action -= TryRunLightAttack;
-    AbilityManager.R2JustDown.Action -= TryRunAimAndFire;
-    AbilityManager.L2JustDown.Action -= TryRunGrapple;
+    InputManager.Instance.ButtonEvent(ButtonCode.R1, ButtonPressType.JustDown).Action -= TryRunLightAttack;
+    InputManager.Instance.ButtonEvent(ButtonCode.R2, ButtonPressType.JustDown).Action -= TryRunAimAndFire;
+    InputManager.Instance.ButtonEvent(ButtonCode.L2, ButtonPressType.JustDown).Action -= TryRunGrapple;
     base.Stop();
   }
 

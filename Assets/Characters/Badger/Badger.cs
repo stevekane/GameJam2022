@@ -10,8 +10,8 @@ public class Badger : MonoBehaviour {
   Animator Animator;
   Defender Defender;
   Transform Target;
-  AbilityUser Abilities;
-  AbilityUser TargetAbilities;
+  AbilityManager Abilities;
+  AbilityManager TargetAbilities;
   Shield Shield;
   int WaitFrames = 0;
   int RecoveryFrames = 0;
@@ -21,13 +21,13 @@ public class Badger : MonoBehaviour {
 
   public void Awake() {
     Target = GameObject.FindObjectOfType<Player>().transform;
-    TargetAbilities = Target.GetComponent<AbilityUser>();
+    TargetAbilities = Target.GetComponent<AbilityManager>();
     Controller = GetComponent<CharacterController>();
     Status = GetComponent<Status>();
     Animator = GetComponent<Animator>();
     Defender = GetComponent<Defender>();
     Shield = GetComponentInChildren<Shield>();
-    Abilities = GetComponent<AbilityUser>();
+    Abilities = GetComponent<AbilityManager>();
     ShieldAbility = GetComponentInChildren<ShieldAbility>();
   }
 

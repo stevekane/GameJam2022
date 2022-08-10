@@ -45,11 +45,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8db1d4fc560ada348a59786480066615, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AbilityManager: {fileID: 1807262642378782650}
+  Triggers: []
+  AbilityManager: {fileID: 0}
   Tags: 2
   Cancels: 0
   Blocks: 3
-  ConsumedActions: 
   Aimer: {fileID: 4601772429776417506}
   Target: {fileID: 0}
   Origin: {fileID: 4601772429639310478}
@@ -481,12 +481,12 @@ GameObject:
   - component: {fileID: 4601772429776417506}
   - component: {fileID: 4601772429776417507}
   - component: {fileID: 7747944924966294688}
-  - component: {fileID: 1807262642378782650}
   - component: {fileID: 4601772429776417518}
   - component: {fileID: 4601772429776417513}
   - component: {fileID: 4601772429776417517}
   - component: {fileID: 4601772429776417516}
   - component: {fileID: 4601772429776417519}
+  - component: {fileID: 6174041741950012008}
   m_Layer: 10
   m_Name: AbilityMan Prefab
   m_TagString: Untagged
@@ -537,20 +537,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38b5f85dc564c4f4fafa2b5115a61de1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1807262642378782650
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4601772429776417504}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75cc28080031bcb49ad288bd1cba1b94, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Abilities: []
-  ToAdd: []
 --- !u!114 &4601772429776417518
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -713,6 +699,19 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &6174041741950012008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4601772429776417504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba179080412a6af41a99d021d690c5fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Abilities: []
 --- !u!1 &4601772430502717097
 GameObject:
   m_ObjectHideFlags: 0
@@ -908,11 +907,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5c7fb2a1360c9347a8ff1a9c5b1330a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AbilityManager: {fileID: 1807262642378782650}
+  Triggers: []
+  AbilityManager: {fileID: 0}
   Tags: 2
   Cancels: 0
   Blocks: -1
-  ConsumedActions: 08000000
   MAX_CHARGE_DURATION:
     Millis: 3000
     TicksPerSecond: 30
@@ -1003,11 +1002,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 904255f28b12cee41a8aea946f938cf2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Triggers: []
   AbilityManager: {fileID: 0}
   Tags: 0
   Cancels: 0
   Blocks: 0
-  ConsumedActions: 
   Owner: {fileID: 4601772429776417504}
   DashThreshold:
     Millis: 1000
@@ -1059,11 +1058,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45083b0df92c8c048b36bc76d9fc0d22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AbilityManager: {fileID: 1807262642378782650}
+  Triggers: []
+  AbilityManager: {fileID: 0}
   Tags: 4
   Cancels: 0
   Blocks: 0
-  ConsumedActions: 000000000300000006000000
   LightAttack: {fileID: 125423903905483418}
   AimAndFire: {fileID: 4601772428839359542}
   Grapple: {fileID: 8024295469742284886}
@@ -1111,11 +1110,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 174ea97c62f9dc2469788bc98ba437c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AbilityManager: {fileID: 1807262642378782650}
+  Triggers: []
+  AbilityManager: {fileID: 0}
   Tags: 1
   Cancels: 0
   Blocks: 3
-  ConsumedActions: 00000000
   Owner: {fileID: 4601772429776417506}
   Animator: {fileID: 4601772429776417517}
   Clip: {fileID: 7400000, guid: cc3da0e246460fe46bcf09b2303d8af8, type: 2}

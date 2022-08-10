@@ -17,14 +17,14 @@ public class DashManagerAbility : Ability {
   }
 
   public override void Activate() {
-    InputManager.Instance.L1.JustDown.Action += OnKeyDown;
-    InputManager.Instance.L1.JustUp.Action += OnKeyUp;
+    InputManager.Instance.ButtonEvent(ButtonCode.L1, ButtonPressType.JustDown).Action += OnKeyDown;
+    InputManager.Instance.ButtonEvent(ButtonCode.L1, ButtonPressType.JustUp).Action += OnKeyUp;
     base.Activate();
   }
 
   public override void Stop() {
-    InputManager.Instance.L1.JustDown.Action -= OnKeyDown;
-    InputManager.Instance.L1.JustUp.Action -= OnKeyUp;
+    InputManager.Instance.ButtonEvent(ButtonCode.L1, ButtonPressType.JustDown).Action -= OnKeyDown;
+    InputManager.Instance.ButtonEvent(ButtonCode.L1, ButtonPressType.JustUp).Action -= OnKeyUp;
     base.Stop();
   }
 

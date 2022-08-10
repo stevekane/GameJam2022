@@ -21,16 +21,18 @@ public class Smoke : MonoBehaviour {
 
   IEnumerator AttackSequence() {
     yield return new WaitForSeconds(.1f);
-    CurrentAbility = Abilities.TryStartAbility(0);
+    LightAttack.Fire();
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    CurrentAbility = Abilities.TryStartAbility(1);
+    LightAttack.Fire();
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    CurrentAbility = Abilities.TryStartAbility(0);
+    LightAttack.Fire();
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    CurrentAbility = Abilities.TryStartAbility(2);
+    SlamStart.Fire();
+    yield return new WaitForSeconds(0.5f);
+    SlamRelease.Fire();
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForSeconds(.8f);
     AttackRoutine = null;
@@ -58,43 +60,55 @@ public class Smoke : MonoBehaviour {
   [SerializeField] AudioClip ChargeAudioClip;
   [SerializeField] float ChargeAudioClipStartingTime;
 
-  AbilityUser Abilities;
+  AbilityManager Abilities;
   Defender Defender;
   Cannon Cannon;
   Status Status;
   CharacterController Controller;
   Animator Animator;
   AudioSource AudioSource;
-  AbilityUser Target;
+  AbilityManager Target;
 
-  Ability CurrentAbility;
   Motion Motion;
   Coroutine AttackRoutine;
   Coroutine DodgeRoutine;
   bool IsDodging = false;
   Vector3 Velocity;
   int RecoveryFrames;
+  EventSource LightAttack = new();
+  EventSource HeavyStart = new();
+  EventSource HeavyRelease = new();
+  EventSource SlamStart = new();
+  EventSource SlamRelease = new();
+  AxisState MoveAxis = new();
+  AxisState AimAxis = new();
 
   void Awake() {
-    Abilities = GetComponent<AbilityUser>();
+    Abilities = GetComponent<AbilityManager>();
     Defender = GetComponent<Defender>();
     Cannon = GetComponentInChildren<Cannon>();
     Status = GetComponent<Status>();
     Controller = GetComponent<CharacterController>();
     Animator = GetComponent<Animator>();
     AudioSource = GetComponent<AudioSource>();
-    Target = GameObject.FindObjectOfType<Player>().GetComponent<AbilityUser>();
+    Target = GameObject.FindObjectOfType<Player>().GetComponent<AbilityManager>();
+
+    Abilities.RegisterTag(EventTag.LightAttack, LightAttack);
+    Abilities.RegisterTag(EventTag.HeavyStart, HeavyStart);
+    Abilities.RegisterTag(EventTag.HeavyRelease, HeavyRelease);
+    Abilities.RegisterTag(EventTag.SlamStart, SlamStart);
+    Abilities.RegisterTag(EventTag.SlamRelease, SlamRelease);
+    // TODO: generic mobaxis component that inputs and processes these?
+    Abilities.RegisterTag(EventTag.MoveAxis, MoveAxis);
+    Abilities.RegisterTag(EventTag.AimAxis, AimAxis);
   }
 
-  bool IsAttacking { get => CurrentAbility != null; }
+  bool IsAttacking { get => Abilities.Abilities.Any((a) => a.IsRunning); }
   bool TargetIsAttacking { get => Target.Abilities.Any((a) => a.IsRunning); }
 
   void FixedUpdate() {
     if (Target == null)
       return;
-
-    if (!CurrentAbility?.IsRunning ?? false)
-      CurrentAbility = null;
 
     (Vector3 desiredPos, Vector3 desiredFacing, float distToTarget) = ChoosePosition();
     bool inAttackRange = distToTarget < ATTACK_RANGE;

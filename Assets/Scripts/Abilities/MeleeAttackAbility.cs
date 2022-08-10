@@ -2,11 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MeleeAttackAbility : ChargedAbility {
+public class MeleeAttackAbility : Ability {
   public int Index;
-  public Transform Owner;
-  public Animator Animator;
-  public bool Chargeable;
+  Transform Owner;
+  Animator Animator;
   public ChargedAttackPhase Windup;
   public HitboxAttackPhase Active;
   public InactiveAttackPhase Recovery;
@@ -19,24 +18,37 @@ public class MeleeAttackAbility : ChargedAbility {
   public float HitTargetKnockbackStrength;
   public float HitRecoilStrength;
 
-  protected override IEnumerator MakeRoutine() {
-    Owner = GetComponentInParent<AbilityUser>().transform;
+  void Start() {
+    Owner = GetComponentInParent<AbilityManager>().transform;
     Animator = GetComponentInParent<Animator>();
-    if (Chargeable) {
+  }
+
+  public IEnumerator AttackStart() {
+    yield return Routine(false);
+  }
+  public IEnumerator ChargeStart() {
+    yield return Routine(true);
+  }
+  public IEnumerator ChargeRelease() {
+    Windup.OnChargeEnd();
+    yield return null;
+  }
+
+  IEnumerator Routine(bool chargeable) {
+    if (chargeable) {
       yield return Windup.StartWithCharge(Animator, Index);
     } else {
       yield return Windup.Start(Animator, Index);
     }
     yield return Active.Start(Animator, Index, OnHit);
     yield return Recovery.Start(Animator, Index);
-    Stop();
+    Done();
   }
 
-  public override void Stop() {
+  public void Done() {
     Animator.SetBool("Attacking", false);
     Animator.SetInteger("AttackIndex", -1);
     Animator.SetFloat("AttackSpeed", 1);
-    base.Stop();
   }
 
   protected IEnumerator OnHit(List<Transform> targets, int stopFrames) {
@@ -57,9 +69,5 @@ public class MeleeAttackAbility : ChargedAbility {
     yield return Fiber.Wait(stopFrames);
 
     Owner.GetComponent<Status>()?.Add(new RecoilEffect(HitRecoilStrength * -Owner.forward));
-  }
-
-  public override void ReleaseCharge() {
-    Windup.OnChargeEnd();
   }
 }

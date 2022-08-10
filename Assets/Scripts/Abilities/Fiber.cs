@@ -2,6 +2,31 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+
+class Bundle {
+  List<Fiber> Fibers = new();
+  List<Fiber> Added = new();
+  List<Fiber> Removed = new();
+
+  public bool IsFiberRunning(Fiber f) => Fibers.Contains(f) || Added.Contains(f);
+  public bool IsRunning { get => Fibers.Count > 0 || Added.Count > 0; }
+  public void Run() {
+    Fibers.AddRange(Added);
+    Added.Clear();
+    Removed.ForEach((f) => Fibers.Remove(f));
+    Fibers.ForEach((f) => { if (!f.MoveNext()) StopRoutine(f); });
+  }
+  public void StartRoutine(Fiber fiber) {
+    Added.Add(fiber);
+  }
+  public void StopRoutine(Fiber fiber) {
+    Removed.Add(fiber);
+  }
+  public void StopAll() {
+    Removed.AddRange(Fibers);
+  }
+}
 
 public struct Fiber : IEnumerator {
   public interface IValue<T> {
