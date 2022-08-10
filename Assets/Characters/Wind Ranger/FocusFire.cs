@@ -17,7 +17,6 @@ public class FocusFire : Ability {
   IEnumerator RapidFire(int cooldown) {
     while (true) {
       if (Target && Vector3.Distance(Owner.position, Target.position) < MaxRange) {
-        Debug.Log("Pew");
         yield return Wait(cooldown);
       } else {
         yield return null;
