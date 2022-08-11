@@ -36,13 +36,6 @@ public class AbilityManager : MonoBehaviour {
     }
   }
 
-  public Ability TryStartAbility(Ability ability) {
-    if (ability.IsRunning)
-      return null;
-    ability.Activate();
-    return ability;
-  }
-  public Ability TryStartAbility(int index) => TryStartAbility(Abilities[index]);
   public void StopAllAbilities() => Abilities.ForEach((a) => a.Stop());
 
   public void RegisterTag(EventTag tag, ButtonCode code, ButtonPressType type) {
