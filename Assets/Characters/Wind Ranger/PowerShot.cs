@@ -9,8 +9,8 @@ public class Timer : AbilityTask, IValue<Timeval> {
   }
   public override IEnumerator Routine() {
     while (true) {
-      yield return null;
       Value.Millis+=Time.fixedDeltaTime;
+      yield return null;
     }
   }
 }
@@ -21,13 +21,13 @@ public class PowerShot : Ability {
   public Animator Animator;
   public AnimationClip WindupClip;
   public AnimationClip ReleaseClip;
-  public EventSource Release = new();
 
   protected override IEnumerator MakeRoutine() {
     var windup = Animator.Run(WindupClip);
-    var keyRelease = ListenFor(Release);
+    var release = ListenFor(AbilityManager.GetEvent(EventTag.WindRangerReleasePowerShot));
     var timer = new Timer();
-    yield return Any(Any(windup, keyRelease), timer);
+    using var scoped = Scoped(Bundle, timer);
+    yield return Any(windup, release);
     var maxDuration = WindupClip.length;
     var duration = timer.Value.Millis;
     var arrow = Instantiate(ArrowPrefab, transform.position, transform.rotation);

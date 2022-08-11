@@ -10,6 +10,10 @@ public static class AnimatorTastExtensions {
   }
 }
 
+// TODO: This needs to be interuptible/stoppable
+// This more or less illustrates why it is probably not sufficient
+// to implement naked IEnumerators for Tasks but rather that they
+// must be IEnumerator + ITask
 public class AnimationTask : IEnumerator {
   Animator Animator;
   AnimationClipPlayable ClipPlayable;

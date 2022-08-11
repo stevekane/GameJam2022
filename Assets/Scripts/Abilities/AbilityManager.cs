@@ -16,10 +16,12 @@ public class AbilityManager : MonoBehaviour {
     Abilities = GetComponentsInChildren<Ability>();
   }
   void Start() {
-    Abilities.ForEach((a) => a.Triggers.ForEach((t) => t.Init(this, a)));
+    Abilities.ForEach(a => a.Triggers.ForEach(t => t.Init(this, a)));
+    Abilities.ForEach(a => a.AbilityManager = this);
   }
   void OnDestroy() {
-    Abilities.ForEach((a) => a.Triggers.ForEach((t) => t.Destroy()));
+    Abilities.ForEach(a => a.Triggers.ForEach(t => t.Destroy()));
+    Abilities.ForEach(a => a.AbilityManager = null);
   }
 
   public void TryRun(Ability ability) {
