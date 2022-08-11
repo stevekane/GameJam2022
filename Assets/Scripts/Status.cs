@@ -102,7 +102,7 @@ public class RecoilEffect : StatusEffect {
     Velocity = velocity;
   }
   public override bool Merge(StatusEffect e) {
-    Velocity += ((KnockbackEffect)e).Velocity;
+    Velocity += ((RecoilEffect)e).Velocity;
     return true;
   }
   public override void Apply(Status status) {
