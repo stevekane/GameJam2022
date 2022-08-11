@@ -11,9 +11,11 @@ public class AbilityTrigger {
   public EventTag EventTag;
   public EventSource EventSource;
   Action Handler;
+  Ability Ability;
 
-  public void Init(AbilityManager user, Ability ability) {
-    EventSource = user.GetEvent(EventTag);
+  public void Init(Ability ability) {
+    Ability = ability;
+    EventSource = ability.AbilityManager.GetEvent(EventTag);
     EventSource.Action += EventAction;
     var bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
     var method = ability.GetType().GetMethod(MethodReference.MethodName, bindingFlags);
@@ -25,7 +27,18 @@ public class AbilityTrigger {
   }
 
   void EventAction() {
-    Handler?.Invoke();
+    // TODO: This should be per-trigger not per-ability
+    var notAlreadyRunning = !Ability.IsRunning;
+    var notBlocked = Ability.AbilityManager.Running.TrueForAll(a => (a.Blocks & Ability.Tags) == 0);
+    if (notAlreadyRunning && notBlocked) {
+      Handler?.Invoke();
+      Ability.AbilityManager.ToAdd.Add(Ability);
+      foreach (var activeAbility in Ability.AbilityManager.Running) {
+        if ((activeAbility.Cancels & Ability.Tags) != 0) {
+          activeAbility.Stop();
+        }
+      }
+    }
   }
 }
 

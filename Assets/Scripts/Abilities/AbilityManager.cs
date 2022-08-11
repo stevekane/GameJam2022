@@ -3,9 +3,8 @@ using UnityEngine;
 
 public class AbilityManager : MonoBehaviour {
   [HideInInspector] public Ability[] Abilities;
-
-  List<Ability> Running = new();
-  List<Ability> ToAdd = new();
+  [HideInInspector] public List<Ability> Running = new();
+  [HideInInspector] public List<Ability> ToAdd = new();
 
   // TODO: some kind of disjoint union would be preferred
   Dictionary<EventTag, (ButtonCode, ButtonPressType)> TagToButton = new();
@@ -16,27 +15,13 @@ public class AbilityManager : MonoBehaviour {
     Abilities = GetComponentsInChildren<Ability>();
   }
   void Start() {
-    Abilities.ForEach(a => a.Triggers.ForEach(t => t.Init(this, a)));
     Abilities.ForEach(a => a.AbilityManager = this);
+    Abilities.ForEach(a => a.Triggers.ForEach(t => t.Init(a)));
   }
   void OnDestroy() {
     Abilities.ForEach(a => a.Triggers.ForEach(t => t.Destroy()));
     Abilities.ForEach(a => a.AbilityManager = null);
   }
-
-  //public void TryRun(Ability ability) {
-  //  var notAlreadyRunning = !ability.IsRunning;
-  //  var notBlocked = Running.TrueForAll(a => (a.Blocks & ability.Tags) == 0);
-  //  if (notAlreadyRunning && notBlocked) {
-  //    ability.Activate();
-  //    ToAdd.Add(ability);
-  //    foreach (var activeAbility in Running) {
-  //      if ((activeAbility.Cancels & ability.Tags) != 0) {
-  //        activeAbility.Stop();
-  //      }
-  //    }
-  //  }
-  //}
 
   public void StopAllAbilities() => Abilities.ForEach((a) => a.Stop());
 
