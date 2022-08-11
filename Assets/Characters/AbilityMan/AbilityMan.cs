@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class AbilityMan : MonoBehaviour {
   public float MOVE_SPEED = 10;
-  public AbilityManBaseAbility AbilityManBaseAbility;
 
   CharacterController Controller;
   Status Status;
@@ -12,9 +11,7 @@ public class AbilityMan : MonoBehaviour {
     Controller = GetComponent<CharacterController>();
     Status = GetComponent<Status>();
     AbilityManager = GetComponent<AbilityManager>();
-    AbilityManager.TryRun(AbilityManBaseAbility);
   }
-
 
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;

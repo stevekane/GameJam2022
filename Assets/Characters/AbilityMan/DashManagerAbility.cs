@@ -16,10 +16,9 @@ public class DashManagerAbility : Ability {
     Stop();
   }
 
-  public override void Activate() {
+  public void Activate() {
     InputManager.Instance.ButtonEvent(ButtonCode.L1, ButtonPressType.JustDown).Action += OnKeyDown;
     InputManager.Instance.ButtonEvent(ButtonCode.L1, ButtonPressType.JustUp).Action += OnKeyUp;
-    base.Activate();
   }
 
   public override void Stop() {
@@ -36,7 +35,7 @@ public class DashManagerAbility : Ability {
     IsKeyDown = false;
   }
 
-  protected override IEnumerator MakeRoutine() {
+  protected IEnumerator MakeRoutine() {
     while (true) {
       FramesDown = IsKeyDown ? FramesDown+1 : 0;
       yield return null;

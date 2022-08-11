@@ -26,14 +26,6 @@ public class SlamAbility : Ability {
   }
 
   public IEnumerator ChargeStart() {
-    yield return MakeRoutine();
-  }
-  public IEnumerator ChargeRelease() {
-    Windup.OnChargeEnd();
-    yield return null;
-  }
-
-  protected override IEnumerator MakeRoutine() {
     yield return Fiber.Any(Charging(), Windup.StartWithCharge(Animator, Index));
     SlamAction.Activate();
     SFXManager.Instance.TryPlayOneShot(FireSFX);
@@ -42,6 +34,11 @@ public class SlamAbility : Ability {
     yield return Active.Start(Animator, Index);
     yield return Recovery.Start(Animator, Index);
     Done();
+  }
+
+  public IEnumerator ChargeRelease() {
+    Windup.OnChargeEnd();
+    yield return null;
   }
 
   public void Done() {

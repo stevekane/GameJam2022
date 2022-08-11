@@ -22,7 +22,7 @@ public class PowerShot : Ability {
   public AnimationClip WindupClip;
   public AnimationClip ReleaseClip;
 
-  protected override IEnumerator MakeRoutine() {
+  public IEnumerator MakeRoutine() {
     var windup = Animator.Run(WindupClip);
     var release = ListenFor(AbilityManager.GetEvent(EventTag.WindRangerReleasePowerShot));
     var timer = new Timer();

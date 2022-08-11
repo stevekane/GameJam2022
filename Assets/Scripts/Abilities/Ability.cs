@@ -75,8 +75,6 @@ public abstract class Ability : MonoBehaviour {
   public bool IsRoutineRunning(Fiber f) => Bundle.IsRoutineRunning(f);
   public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
   public void StopRoutine(Fiber routine) => Bundle.StopRoutine(routine);
-  public virtual void Activate() => Bundle.StartRoutine(new Fiber(MakeRoutine()));
   public virtual void Stop() => Bundle.StopAll();
-  protected virtual IEnumerator MakeRoutine() { yield return null; } // TODO remove
   void FixedUpdate() => Bundle.Run();
 }

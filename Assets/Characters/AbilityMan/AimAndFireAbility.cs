@@ -16,13 +16,6 @@ public class AimAndFireAbility : Ability {
 
   AutoAimEffect AutoAimEffect;
 
-  public override void Activate() {
-    AutoAimEffect = new AutoAimEffect();
-    Aimer.GetComponent<Status>()?.Add(AutoAimEffect);
-    Animator.SetBool("Firing", true);
-    base.Activate();
-  }
-
   public override void Stop() {
     if (AutoAimEffect != null)
       Aimer.GetComponent<Status>()?.Remove(AutoAimEffect);
@@ -30,7 +23,10 @@ public class AimAndFireAbility : Ability {
     base.Stop();
   }
 
-  protected override IEnumerator MakeRoutine() {
+  public IEnumerator AttackStart() {
+    AutoAimEffect = new AutoAimEffect();
+    Aimer.GetComponent<Status>()?.Add(AutoAimEffect);
+    Animator.SetBool("Firing", true);
     yield return Any(new AimAt(Aimer, Target, TurnSpeed), NTimes(3, Fire));
     Stop();
   }

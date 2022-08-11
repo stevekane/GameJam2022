@@ -9,7 +9,7 @@ public class FocusFire : Ability {
   public Timeval ShotCooldown = Timeval.FromMillis(100);
   public float MaxRange = 5;
 
-  protected override IEnumerator MakeRoutine() {
+  public IEnumerator MakeRoutine() {
     yield return Any(Wait(Duration.Frames), RapidFire(ShotCooldown.Frames));
     Stop();
   }

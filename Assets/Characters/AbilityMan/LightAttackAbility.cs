@@ -7,12 +7,11 @@ public class LightAttackAbility : Ability {
   public AnimationClip Clip;
   public FrameEventTimeline FrameEventTimeline;
 
-  protected override IEnumerator MakeRoutine() {
+  public IEnumerator AttackStart() {
     yield return new AnimationTask(Animator, Clip) {
       FrameEventTimeline = FrameEventTimeline,
       OnFrameEvent = OnFrameEvent
     };
-    Stop();
   }
 
   void OnFrameEvent(FrameEvent fe) {

@@ -18,4 +18,9 @@ public enum EventTag {
   WindRangerReleasePowerShot,
   WindRangerWindRun,
   WindRangerFocusFire,
+
+  AbilityManLightAttack,
+  AbilityManAimAndFire,
+  AbilityManGrappleStart,
+  AbilityManGrappleRelease,
 }

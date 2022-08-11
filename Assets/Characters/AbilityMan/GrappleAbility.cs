@@ -25,12 +25,13 @@ public class GrappleAbility : Ability {
     base.Stop();
   }
 
-  protected override IEnumerator MakeRoutine() {
+  public IEnumerator GrappleStart() {
     // Holding down the activation button
     Owner.GetComponent<Animator>().SetBool("Grappling", true);
     Owner.GetComponent<Animator>().SetInteger("GrappleState", (int)GrappleState.Holding);
     var chargeWait = Wait(MAX_CHARGE_DURATION.Frames);
-    var release = ListenFor(InputManager.Instance.ButtonEvent(ButtonCode.L2, ButtonPressType.JustUp));
+    var release = ListenFor(AbilityManager.GetEvent(EventTag.AbilityManGrappleRelease));
+    //InputManager.Instance.ButtonEvent(ButtonCode.L2, ButtonPressType.JustUp));
     yield return Any(chargeWait, release);
     // Create and throw the hook
     Owner.GetComponent<Animator>().SetBool("Grappling", true);

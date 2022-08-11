@@ -7,7 +7,7 @@ public class ShackleShot : Ability {
   public AnimationClip WindupClip;
   public AnimationClip ReleaseClip;
 
-  protected override IEnumerator MakeRoutine() {
+  public IEnumerator MakeRoutine() {
     yield return Animator.Run(WindupClip);
     Instantiate(ShacklePrefab, transform.position, transform.rotation);
     yield return Animator.Run(ReleaseClip);

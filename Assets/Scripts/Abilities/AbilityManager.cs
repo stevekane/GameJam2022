@@ -24,19 +24,19 @@ public class AbilityManager : MonoBehaviour {
     Abilities.ForEach(a => a.AbilityManager = null);
   }
 
-  public void TryRun(Ability ability) {
-    var notAlreadyRunning = !ability.IsRunning;
-    var notBlocked = Running.TrueForAll(a => (a.Blocks & ability.Tags) == 0);
-    if (notAlreadyRunning && notBlocked) {
-      ability.Activate();
-      ToAdd.Add(ability);
-      foreach (var activeAbility in Running) {
-        if ((activeAbility.Cancels & ability.Tags) != 0) {
-          activeAbility.Stop();
-        }
-      }
-    }
-  }
+  //public void TryRun(Ability ability) {
+  //  var notAlreadyRunning = !ability.IsRunning;
+  //  var notBlocked = Running.TrueForAll(a => (a.Blocks & ability.Tags) == 0);
+  //  if (notAlreadyRunning && notBlocked) {
+  //    ability.Activate();
+  //    ToAdd.Add(ability);
+  //    foreach (var activeAbility in Running) {
+  //      if ((activeAbility.Cancels & ability.Tags) != 0) {
+  //        activeAbility.Stop();
+  //      }
+  //    }
+  //  }
+  //}
 
   public void StopAllAbilities() => Abilities.ForEach((a) => a.Stop());
 

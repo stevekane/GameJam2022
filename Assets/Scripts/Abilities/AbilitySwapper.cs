@@ -34,7 +34,7 @@ public class AbilitySwapper : MonoBehaviour {
     }
     if (!Ability.IsRunning && WaitFrames-- < 0) {
       WaitFrames = Timeval.FromMillis(2000).Frames;
-      Ability.Activate();
+      //Ability.Activate();
     }
   }
 }
