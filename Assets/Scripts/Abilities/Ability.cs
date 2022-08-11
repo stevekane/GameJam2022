@@ -12,6 +12,7 @@ public class AbilityTrigger {
   public EventSource EventSource;
   Action Handler;
   Ability Ability;
+  Fiber? Fiber;
 
   public void Init(Ability ability) {
     Ability = ability;
@@ -19,7 +20,7 @@ public class AbilityTrigger {
     EventSource.Action += EventAction;
     var bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
     var method = ability.GetType().GetMethod(MethodReference.MethodName, bindingFlags);
-    Handler = () => ability.StartRoutine(new Fiber((IEnumerator)method.Invoke(ability, null)));
+    Handler = () => ability.StartRoutine((Fiber = new Fiber((IEnumerator)method.Invoke(ability, null))).Value);
   }
 
   public void Destroy() {
@@ -28,9 +29,9 @@ public class AbilityTrigger {
 
   void EventAction() {
     // TODO: This should be per-trigger not per-ability
-    var notAlreadyRunning = !Ability.IsRunning;
+    var alreadyRunning = Fiber.HasValue && Ability.IsRoutineRunning(Fiber.Value);
     var notBlocked = Ability.AbilityManager.Running.TrueForAll(a => (a.Blocks & Ability.Tags) == 0);
-    if (notAlreadyRunning && notBlocked) {
+    if (!alreadyRunning && notBlocked) {
       Handler?.Invoke();
       Ability.AbilityManager.ToAdd.Add(Ability);
       foreach (var activeAbility in Ability.AbilityManager.Running) {
