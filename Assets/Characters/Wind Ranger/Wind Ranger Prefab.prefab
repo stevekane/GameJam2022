@@ -47,8 +47,7 @@ MonoBehaviour:
   Triggers:
   - MethodReference:
       MethodName: MakeRoutine
-    EventTag: 0
-    MethodName: 
+    EventTag: 14
   Tags: 0
   Cancels: 0
   Blocks: 0
@@ -102,8 +101,7 @@ MonoBehaviour:
   Triggers:
   - MethodReference:
       MethodName: MakeRoutine
-    EventTag: 0
-    MethodName: 
+    EventTag: 12
   Tags: 10
   Cancels: 0
   Blocks: 10
@@ -147,6 +145,7 @@ GameObject:
   - component: {fileID: 2582651163493360452}
   - component: {fileID: 2582651163493360474}
   - component: {fileID: 6994602829365010295}
+  - component: {fileID: 1187110745423436195}
   m_Layer: 10
   m_Name: Wind Ranger Prefab
   m_TagString: Untagged
@@ -169,7 +168,7 @@ Transform:
   - {fileID: 2582651164198254622}
   - {fileID: 2582651164267693613}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2582651163493360452
 MonoBehaviour:
@@ -216,6 +215,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Abilities: []
+--- !u!114 &1187110745423436195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2582651163493360454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df14dd7788a55f4488b07026df12a010, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ButtonEventTagMaps:
+  - ButtonCode: 4
+    ButtonPressType: 0
+    EventTag: 15
+  - ButtonCode: 5
+    ButtonPressType: 0
+    EventTag: 11
+  - ButtonCode: 6
+    ButtonPressType: 0
+    EventTag: 14
+  - ButtonCode: 7
+    ButtonPressType: 0
+    EventTag: 12
+  AxisEventTagMaps:
+  - AxisCode: 0
+    EventTag: 0
+  - AxisCode: 1
+    EventTag: 1
 --- !u!1 &2582651163494764176
 GameObject:
   m_ObjectHideFlags: 0
@@ -263,8 +292,7 @@ MonoBehaviour:
   Triggers:
   - MethodReference:
       MethodName: MakeRoutine
-    EventTag: 0
-    MethodName: 
+    EventTag: 11
   Tags: 8
   Cancels: 0
   Blocks: 8
@@ -490,8 +518,7 @@ MonoBehaviour:
   Triggers:
   - MethodReference:
       MethodName: MakeRoutine
-    EventTag: 0
-    MethodName: 
+    EventTag: 15
   Tags: 0
   Cancels: 0
   Blocks: 0

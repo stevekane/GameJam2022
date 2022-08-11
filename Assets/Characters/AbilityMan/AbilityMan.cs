@@ -13,9 +13,6 @@ public class AbilityMan : MonoBehaviour {
     Status = GetComponent<Status>();
     AbilityManager = GetComponent<AbilityManager>();
     AbilityManager.TryRun(AbilityManBaseAbility);
-
-    AbilityManager.RegisterTag(EventTag.MoveAxis, InputManager.Instance.AxisLeft);
-    AbilityManager.RegisterTag(EventTag.AimAxis, InputManager.Instance.AxisRight);
   }
 
 

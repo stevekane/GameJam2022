@@ -10,7 +10,7 @@ public class AbilityManager : MonoBehaviour {
   // TODO: some kind of disjoint union would be preferred
   Dictionary<EventTag, (ButtonCode, ButtonPressType)> TagToButton = new();
   Dictionary<EventTag, EventSource> TagToEvent = new();
-  Dictionary<EventTag, AxisState> TagToAxis = new();
+  Dictionary<EventTag, AxisCode> TagToAxis = new();
 
   void Awake() {
     Abilities = GetComponentsInChildren<Ability>();
@@ -53,8 +53,8 @@ public class AbilityManager : MonoBehaviour {
     Debug.Assert(!TagToButton.ContainsKey(tag));
     TagToEvent[tag] = evt;
   }
-  public void RegisterTag(EventTag tag, AxisState axis) {
-    TagToAxis[tag] = axis;
+  public void RegisterTag(EventTag tag, AxisCode axisCode) {
+    TagToAxis[tag] = axisCode;
   }
   public EventSource GetEvent(EventTag tag) {
     if (TagToButton.TryGetValue(tag, out var button))
@@ -64,9 +64,12 @@ public class AbilityManager : MonoBehaviour {
     return evt;
   }
   public AxisState GetAxis(EventTag tag) {
-    if (!TagToAxis.TryGetValue(tag, out AxisState axis))
-      TagToAxis[tag] = axis = new();
-    return axis;
+    if (TagToAxis.TryGetValue(tag, out var axisCode)) {
+      return InputManager.Instance.Axis(axisCode);
+    } else {
+      // TODO: Tough call here...what to do/return if there is no existing mapping?
+      return null;
+    }
   }
 
   // TODO: Should this be manually set high in Script Execution Order instead?

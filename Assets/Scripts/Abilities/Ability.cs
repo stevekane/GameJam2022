@@ -9,14 +9,14 @@ using UnityEditor;
 public class AbilityTrigger {
   public TaskMethodReference MethodReference;
   public EventTag EventTag;
-  public string MethodName;
-  Action Handler;
   public EventSource EventSource;
+  Action Handler;
 
   public void Init(AbilityManager user, Ability ability) {
     EventSource = user.GetEvent(EventTag);
     EventSource.Action += EventAction;
-    var method = ability.GetType().GetMethod(MethodName, BindingFlags.Public | BindingFlags.Instance, null, CallingConventions.Any, new Type[] { }, null);
+    var bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+    var method = ability.GetType().GetMethod(MethodReference.MethodName, bindingFlags);
     Handler = () => ability.StartRoutine(new Fiber((IEnumerator)method.Invoke(ability, null)));
   }
 

@@ -415,13 +415,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Triggers:
-  - EventTag: 9
+  - MethodReference:
+      MethodName: HoldStart
+    EventTag: 9
     MethodName: HoldStart
   Tags: 0
   Cancels: 0
   Blocks: 0
   Index: 1
   Animator: {fileID: 7727835182619467870}
+  ReleaseEvent: 10
   Windup:
     Duration:
       Millis: 133.33333
@@ -444,7 +447,6 @@ MonoBehaviour:
       Millis: 100
       TicksPerSecond: 30
   IsRaised: 0
-  ReleaseEvent: 10
 --- !u!1 &5014731968964829092
 GameObject:
   m_ObjectHideFlags: 0
@@ -829,7 +831,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Triggers:
-  - EventTag: 8
+  - MethodReference:
+      MethodName: AttackStart
+    EventTag: 8
     MethodName: AttackStart
   Tags: 0
   Cancels: 0
