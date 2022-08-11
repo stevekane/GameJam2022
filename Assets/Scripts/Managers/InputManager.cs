@@ -8,11 +8,22 @@ public enum ButtonPressType {
   JustUp
 }
 
+// TODO: Maybe don't need/want these? Maybe just use strings
 public enum ButtonCode {
   L1,
   L2,
   R1,
   R2,
+  North,
+  East,
+  South,
+  West
+}
+
+// TODO: Maybe don't need/want these? Maybe just use strings
+public enum AxisCode {
+  AxisLeft,
+  AxisRight
 }
 
 [Serializable]
@@ -47,6 +58,14 @@ public class InputManager : MonoBehaviour {
     if (!Buttons.TryGetValue((code, type), out EventSource evt))
       Buttons.Add((code, type), evt = new());
     return evt;
+  }
+
+  public AxisState Axis(AxisCode code) {
+    return code switch {
+      AxisCode.AxisLeft => AxisLeft,
+      AxisCode.AxisRight => AxisRight,
+      _ => null
+    };
   }
 
   void Awake() {
@@ -85,6 +104,10 @@ public class InputManager : MonoBehaviour {
       ButtonCode.L2 => "L2",
       ButtonCode.R1 => "R1",
       ButtonCode.R2 => "R2",
+      ButtonCode.North => "North",
+      ButtonCode.East => "East",
+      ButtonCode.South => "South",
+      ButtonCode.West => "West",
       _ => "",
     };
     if (func(name))

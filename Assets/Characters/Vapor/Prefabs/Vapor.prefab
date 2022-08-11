@@ -73,10 +73,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Triggers:
-  - EventTag: 3
-    MethodName: ChargeStart
-  - EventTag: 4
-    MethodName: ChargeRelease
+  - MethodReference:
+      MethodName: ChargeStart
+    EventTag: 3
+  - MethodReference:
+      MethodName: ChargeRelease
+    EventTag: 4
   Tags: 0
   Cancels: 0
   Blocks: 0
@@ -322,10 +324,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Triggers:
-  - EventTag: 5
-    MethodName: ChargeStart
-  - EventTag: 6
-    MethodName: ChargeRelease
+  - MethodReference:
+      MethodName: ChargeStart
+    EventTag: 5
+  - MethodReference:
+      MethodName: 
+    EventTag: 6
   Tags: 0
   Cancels: 0
   Blocks: 0
@@ -437,8 +441,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Triggers:
-  - EventTag: 2
-    MethodName: AttackStart
+  - MethodReference:
+      MethodName: AttackStart
+    EventTag: 2
   Tags: 0
   Cancels: 0
   Blocks: 0
@@ -1039,6 +1044,7 @@ GameObject:
   - component: {fileID: 7727835182619467870}
   - component: {fileID: 4599928758009979224}
   - component: {fileID: 2218451550939315152}
+  - component: {fileID: 526021623948216688}
   m_Layer: 10
   m_Name: Vapor
   m_TagString: Untagged
@@ -1309,6 +1315,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Abilities: []
+--- !u!114 &526021623948216688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df14dd7788a55f4488b07026df12a010, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ButtonEventTagMaps:
+  - ButtonCode: 2
+    ButtonPressType: 0
+    EventTag: 2
+  - ButtonCode: 3
+    ButtonPressType: 0
+    EventTag: 3
+  - ButtonCode: 3
+    ButtonPressType: 2
+    EventTag: 4
+  AxisEventTagMaps:
+  - AxisCode: 0
+    EventTag: 0
+  - AxisCode: 1
+    EventTag: 1
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0
@@ -1786,8 +1819,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Triggers:
-  - EventTag: 2
-    MethodName: AttackStart
+  - MethodReference:
+      MethodName: AttackStart
+    EventTag: 2
   Tags: 0
   Cancels: 0
   Blocks: 0

@@ -12,4 +12,10 @@ public enum EventTag {
   BadgerPunch,
   BadgerShieldStart,
   BadgerShieldRelease,
+
+  WindRangerShackleShot,
+  WindRangerChargePowerShot,
+  WindRangerReleasePowerShot,
+  WindRangerWindRun,
+  WindRangerFocusFire,
 }
