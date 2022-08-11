@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-class Bundle {
+public class Bundle {
   List<Fiber> Fibers = new();
   List<Fiber> Added = new();
   List<Fiber> Removed = new();
@@ -68,6 +68,8 @@ public struct Fiber : IEnumerator {
 
   public static Listener ListenFor(EventSource source) => new Listener(source);
   public static Listener<T> ListenFor<T>(EventSource<T> source) => new Listener<T>(source);
+
+  public static ScopedRunner Scoped(Bundle bundle, IEnumerator routine) => new ScopedRunner(bundle, routine);
 
   public class Listener : IEnumerator {
     EventSource Source;
@@ -144,6 +146,28 @@ public struct Fiber : IEnumerator {
       }
     }
     public int Value { get; internal set; }
+  }
+
+  // A Fiber that runs in the background until it is disposed. Usable with `using` declarations, like:
+  //   using var asyncCountdown = Fiber.Scoped(Bundle, Fiber.Wait(120));
+  //   yield ChargeAnimationTask.Run();
+  //   if (!asyncCountdown.IsRunning)
+  //     Explode();  // oops - time ran out before we got here!
+  //   ResetAnimations();
+  public class ScopedRunner : IDisposable {
+    Bundle Bundle;
+    Fiber? Fiber;
+
+    public bool IsRunning { get => Fiber.HasValue && Bundle.IsFiberRunning(Fiber.Value); }
+    public ScopedRunner(Bundle bundle, IEnumerator routine) {
+      Bundle = bundle;
+      Bundle.StartRoutine((Fiber = new Fiber(routine)).Value);
+    }
+    public void Dispose() {
+      if (Fiber.HasValue)
+        Bundle.StopRoutine(Fiber.Value);
+      Fiber = null;
+    }
   }
 
   IEnumerator Enumerator;
