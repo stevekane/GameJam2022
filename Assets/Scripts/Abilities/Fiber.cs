@@ -2,29 +2,22 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class Bundle {
   List<Fiber> Fibers = new();
   List<Fiber> Added = new();
   List<Fiber> Removed = new();
 
-  public bool IsFiberRunning(Fiber f) => Fibers.Contains(f) || Added.Contains(f);
   public bool IsRunning { get => Fibers.Count > 0 || Added.Count > 0; }
+  public bool IsRoutineRunning(Fiber f) => Fibers.Contains(f) || Added.Contains(f);
+  public void StartRoutine(Fiber fiber) => Added.Add(fiber);
+  public void StopRoutine(Fiber fiber) => Removed.Add(fiber);
+  public void StopAll() => Removed.AddRange(Fibers);
   public void Run() {
     Fibers.AddRange(Added);
     Added.Clear();
     Removed.ForEach((f) => Fibers.Remove(f));
     Fibers.ForEach((f) => { if (!f.MoveNext()) StopRoutine(f); });
-  }
-  public void StartRoutine(Fiber fiber) {
-    Added.Add(fiber);
-  }
-  public void StopRoutine(Fiber fiber) {
-    Removed.Add(fiber);
-  }
-  public void StopAll() {
-    Removed.AddRange(Fibers);
   }
 }
 
@@ -158,7 +151,7 @@ public struct Fiber : IEnumerator {
     Bundle Bundle;
     Fiber? Fiber;
 
-    public bool IsRunning { get => Fiber.HasValue && Bundle.IsFiberRunning(Fiber.Value); }
+    public bool IsRunning { get => Fiber.HasValue && Bundle.IsRoutineRunning(Fiber.Value); }
     public ScopedRunner(Bundle bundle, IEnumerator routine) {
       Bundle = bundle;
       Bundle.StartRoutine((Fiber = new Fiber(routine)).Value);

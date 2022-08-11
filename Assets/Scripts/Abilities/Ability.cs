@@ -72,11 +72,11 @@ public abstract class Ability : MonoBehaviour {
   public AbilityTag Cancels;
   public AbilityTag Blocks;
   public bool IsRunning { get => Bundle.IsRunning; }
-  public bool IsFiberRunning(Fiber f) => Bundle.IsFiberRunning(f);
+  public bool IsRoutineRunning(Fiber f) => Bundle.IsRoutineRunning(f);
+  public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
+  public void StopRoutine(Fiber routine) => Bundle.StopRoutine(routine);
   public virtual void Activate() => Bundle.StartRoutine(new Fiber(MakeRoutine()));
   public virtual void Stop() => Bundle.StopAll();
   protected virtual IEnumerator MakeRoutine() { yield return null; } // TODO remove
-  public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
-  public void StopRoutine(Fiber routine) => Bundle.StopRoutine(routine);
   void FixedUpdate() => Bundle.Run();
 }

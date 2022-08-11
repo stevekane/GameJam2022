@@ -1,7 +1,6 @@
 using System.Collections;
 
 public class AbilityManBaseAbility : Ability {
-  AbilityManager AbilityManager;
   public LightAttackAbility LightAttack;
   public AimAndFireAbility AimAndFire;
   public GrappleAbility Grapple;
