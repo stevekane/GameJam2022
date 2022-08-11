@@ -70,6 +70,7 @@ public class InputManager : MonoBehaviour {
 
   void Awake() {
     Instance = this;
+    Time.fixedDeltaTime = 1f / Timeval.FramesPerSecond;
   }
 
   void Start() {
@@ -128,5 +129,9 @@ public class InputManager : MonoBehaviour {
 
     if (Input.GetKeyDown(KeyCode.W))
       UseMouseAndKeyboard = true;
+  }
+
+  void FixedUpdate() {
+    Timeval.FrameCount++;
   }
 }

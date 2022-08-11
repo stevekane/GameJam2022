@@ -56,7 +56,7 @@ public class SlamAbility : Ability {
 
   IEnumerator Charging() {
     int frames = 0;
-    var slam = Instantiate(SlamActionPrefab, transform.position, transform.rotation);
+    var slam = Instantiate(SlamActionPrefab, transform, false);
     slam.layer = gameObject.layer;
     SlamAction = slam.GetComponent<SlamAction>();
     SlamAction.OnHit = OnHit;

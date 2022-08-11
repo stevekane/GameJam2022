@@ -30,6 +30,7 @@ public class SlamAction : MonoBehaviour {
 
   IEnumerator RaiseAll() {
     DoneRaising = false;
+    transform.SetParent(null, true);
     for (int i = 0; i < Pieces.Count; i++) {
       StartCoroutine(RaisePiece(i));
       yield return new WaitForSeconds(PieceActivateDelay.Seconds);
