@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 public class Wasp : MonoBehaviour {
@@ -49,7 +50,8 @@ public class Wasp : MonoBehaviour {
         transform.forward = dir;
         if (targetInRange && Status.CanAttack && CurrentAbility == null) {
           State = StateType.Shoot;
-          CurrentAbility = Abilities.TryStartAbility(0);
+          Abilities.GetEvent(EventTag.WaspShoot).Fire();
+          CurrentAbility = Abilities.Abilities.FirstOrDefault((a) => a.IsRunning);
         } else if (Status.CanMove) {
           Velocity.SetXZ(dir * MoveSpeed);
         }

@@ -21,18 +21,18 @@ public class Smoke : MonoBehaviour {
 
   IEnumerator AttackSequence() {
     yield return new WaitForSeconds(.1f);
-    LightAttack.Fire();
+    Abilities.GetEvent(EventTag.LightAttack).Fire();
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    LightAttack.Fire();
+    Abilities.GetEvent(EventTag.LightAttack).Fire();
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    LightAttack.Fire();
+    Abilities.GetEvent(EventTag.LightAttack).Fire();
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    SlamStart.Fire();
+    Abilities.GetEvent(EventTag.SlamStart).Fire();
     yield return new WaitForSeconds(0.5f);
-    SlamRelease.Fire();
+    Abilities.GetEvent(EventTag.SlamRelease).Fire();
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForSeconds(.8f);
     AttackRoutine = null;
@@ -75,13 +75,6 @@ public class Smoke : MonoBehaviour {
   bool IsDodging = false;
   Vector3 Velocity;
   int RecoveryFrames;
-  EventSource LightAttack = new();
-  EventSource HeavyStart = new();
-  EventSource HeavyRelease = new();
-  EventSource SlamStart = new();
-  EventSource SlamRelease = new();
-  AxisState MoveAxis = new();
-  AxisState AimAxis = new();
 
   void Awake() {
     Abilities = GetComponent<AbilityManager>();
@@ -92,15 +85,6 @@ public class Smoke : MonoBehaviour {
     Animator = GetComponent<Animator>();
     AudioSource = GetComponent<AudioSource>();
     Target = GameObject.FindObjectOfType<Player>().GetComponent<AbilityManager>();
-
-    Abilities.RegisterTag(EventTag.LightAttack, LightAttack);
-    Abilities.RegisterTag(EventTag.HeavyStart, HeavyStart);
-    Abilities.RegisterTag(EventTag.HeavyRelease, HeavyRelease);
-    Abilities.RegisterTag(EventTag.SlamStart, SlamStart);
-    Abilities.RegisterTag(EventTag.SlamRelease, SlamRelease);
-    // TODO: generic mobaxis component that inputs and processes these?
-    Abilities.RegisterTag(EventTag.MoveAxis, MoveAxis);
-    Abilities.RegisterTag(EventTag.AimAxis, AimAxis);
   }
 
   bool IsAttacking { get => Abilities.Abilities.Any((a) => a.IsRunning); }

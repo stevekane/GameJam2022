@@ -44,10 +44,8 @@ public class InputManager : MonoBehaviour {
   public AxisState AxisRight = new();
 
   public EventSource ButtonEvent(ButtonCode code, ButtonPressType type) {
-    if (!Buttons.TryGetValue((code, type), out EventSource evt)) {
-      evt = new();
-      Buttons.Add((code, type), evt);
-    }
+    if (!Buttons.TryGetValue((code, type), out EventSource evt))
+      Buttons.Add((code, type), evt = new());
     return evt;
   }
 

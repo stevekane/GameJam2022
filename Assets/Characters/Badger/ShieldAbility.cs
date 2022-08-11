@@ -4,23 +4,17 @@ using UnityEngine;
 public class ShieldAbility : Ability {
   public int Index;
   public Animator Animator;
+  public EventTag ReleaseEvent;
   public InactiveAttackPhase Windup;
   public InactiveAttackPhase Active;
   public InactiveAttackPhase Recovery;
   public bool IsRaised;
-  bool IsHolding;
 
-  public void Release() {
-    IsHolding = false;
-  }
-
-  protected override IEnumerator MakeRoutine() {
-    IsHolding = true;
+  public IEnumerator HoldStart() {
     Animator.SetBool("Shielding", true);
     yield return Windup.Start(Animator, Index);
     IsRaised = true;
-    while (IsHolding)
-      yield return null;
+    yield return Fiber.ListenFor(GetComponentInParent<AbilityManager>().GetEvent(ReleaseEvent));
     IsRaised = false;
     Animator.SetBool("Shielding", false);
     yield return Recovery.Start(Animator, Index);
@@ -29,7 +23,6 @@ public class ShieldAbility : Ability {
 
   public override void Stop() {
     IsRaised = false;
-    IsHolding = false;
     Animator.SetBool("Attacking", false);
     Animator.SetInteger("AttackIndex", -1);
     Animator.SetFloat("AttackSpeed", 1);

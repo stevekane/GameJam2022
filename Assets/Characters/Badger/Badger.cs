@@ -66,21 +66,23 @@ public class Badger : MonoBehaviour {
 
     if (Status.CanAttack && CurrentAbility == null && RecoveryFrames <= 0) {
       if (TargetIsAttacking && Shield) {
-        CurrentAbility = Abilities.TryStartAbility(1);
+        Abilities.GetEvent(EventTag.BadgerShieldStart).Fire();
+        CurrentAbility = Abilities.Abilities.FirstOrDefault((a) => a.IsRunning);
         WaitFrames = Timeval.FromMillis(1000).Frames;
       } else if (inRange) {
-        CurrentAbility = Abilities.TryStartAbility(0);
+        Abilities.GetEvent(EventTag.BadgerPunch).Fire();
+        CurrentAbility = Abilities.Abilities.FirstOrDefault((a) => a.IsRunning);
         WaitFrames = AttackDelay.Frames;
       }
     }
     if (CurrentAbility == ShieldAbility) {
       if (!Shield) {
-        ShieldAbility.Release();
+        Abilities.GetEvent(EventTag.BadgerShieldRelease).Fire();
       } else {
         if (TargetIsAttacking)
           WaitFrames = Timeval.FromMillis(1000).Frames;
         if (WaitFrames <= 0) {
-          ShieldAbility.Release();
+          Abilities.GetEvent(EventTag.BadgerShieldRelease).Fire();
         }
       }
     }

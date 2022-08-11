@@ -11,7 +11,7 @@ public class AbilityTrigger {
   public EventTag EventTag;
   public string MethodName;
   Action Handler;
-  EventSource EventSource;
+  public EventSource EventSource;
 
   public void Init(AbilityManager user, Ability ability) {
     EventSource = user.GetEvent(EventTag);
@@ -63,17 +63,17 @@ public class AbilityEventHandlerPropertyDrawer : PropertyDrawer {
 }
 
 public abstract class Ability : MonoBehaviour {
-  Bundle Routines = new();
+  protected Bundle Bundle = new();
   public List<AbilityTrigger> Triggers;
   public AbilityTag Tags;
   public AbilityTag Cancels;
   public AbilityTag Blocks;
-  public bool IsRunning { get => Routines.IsRunning; }
-  public bool IsFiberRunning(Fiber f) => Routines.IsFiberRunning(f);
-  public virtual void Activate() => Routines.StartRoutine(new Fiber(MakeRoutine()));
-  public virtual void Stop() => Routines.StopAll();
+  public bool IsRunning { get => Bundle.IsRunning; }
+  public bool IsFiberRunning(Fiber f) => Bundle.IsFiberRunning(f);
+  public virtual void Activate() => Bundle.StartRoutine(new Fiber(MakeRoutine()));
+  public virtual void Stop() => Bundle.StopAll();
   protected virtual IEnumerator MakeRoutine() { yield return null; } // TODO remove
-  public void StartRoutine(Fiber routine) => Routines.StartRoutine(routine);
-  public void StopRoutine(Fiber routine) => Routines.StopRoutine(routine);
-  void FixedUpdate() => Routines.Run();
+  public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
+  public void StopRoutine(Fiber routine) => Bundle.StopRoutine(routine);
+  void FixedUpdate() => Bundle.Run();
 }

@@ -15,7 +15,7 @@ public class PelletAbility : Ability {
   public GameObject HitVFX;
   public AudioClip HitSFX;
 
-  protected override IEnumerator MakeRoutine() {
+  public IEnumerator AttackStart() {
     yield return Windup.Start(Animator, Index);
     yield return Fiber.All(ShootRoutine(), Active.Start(Animator, Index));
     yield return Recovery.Start(Animator, Index);

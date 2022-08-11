@@ -57,14 +57,16 @@ public class AbilityManager : MonoBehaviour {
     TagToAxis[tag] = axis;
   }
   public EventSource GetEvent(EventTag tag) {
-    if (TagToEvent.TryGetValue(tag, out EventSource evt))
-      return evt;
     if (TagToButton.TryGetValue(tag, out var button))
       return InputManager.Instance.ButtonEvent(button.Item1, button.Item2);
-    return null;
+    if (!TagToEvent.TryGetValue(tag, out EventSource evt))
+      TagToEvent[tag] = evt = new();
+    return evt;
   }
   public AxisState GetAxis(EventTag tag) {
-    return TagToAxis[tag];
+    if (!TagToAxis.TryGetValue(tag, out AxisState axis))
+      TagToAxis[tag] = axis = new();
+    return axis;
   }
 
   // TODO: Should this be manually set high in Script Execution Order instead?
