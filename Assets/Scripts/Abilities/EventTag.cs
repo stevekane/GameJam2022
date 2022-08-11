@@ -6,4 +6,10 @@ public enum EventTag {
   SlamRelease,
   HeavyStart,
   HeavyRelease,
+
+  WaspShoot,
+
+  BadgerPunch,
+  BadgerShieldStart,
+  BadgerShieldRelease,
 }

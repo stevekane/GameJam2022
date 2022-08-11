@@ -414,6 +414,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a72310bdd2a379942a1c3610f4d7c3b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Triggers:
+  - EventTag: 9
+    MethodName: HoldStart
+  Tags: 0
+  Cancels: 0
+  Blocks: 0
   Index: 1
   Animator: {fileID: 7727835182619467870}
   Windup:
@@ -438,6 +444,7 @@ MonoBehaviour:
       Millis: 100
       TicksPerSecond: 30
   IsRaised: 0
+  ReleaseEvent: 10
 --- !u!1 &5014731968964829092
 GameObject:
   m_ObjectHideFlags: 0
@@ -821,9 +828,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c05e2b324b7be2447826a43593dd3bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Triggers:
+  - EventTag: 8
+    MethodName: AttackStart
+  Tags: 0
+  Cancels: 0
+  Blocks: 0
   Index: 0
-  Owner: {fileID: 5571416124093621163}
-  Animator: {fileID: 7727835182619467870}
   Windup:
     Duration:
       Millis: 366.66666
@@ -831,6 +842,7 @@ MonoBehaviour:
     ClipDuration:
       Millis: 366.66666
       TicksPerSecond: 30
+    ChargeFrameMultiplier: 1
   Active:
     Hitbox: {fileID: 2011504321417715554}
     Duration:
@@ -1220,7 +1232,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Abilities: []
-  AbilitiesF: []
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0

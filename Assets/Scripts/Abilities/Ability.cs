@@ -9,7 +9,7 @@ public class AbilityTrigger {
   public EventTag EventTag;
   public string MethodName;
   Action Handler;
-  EventSource EventSource;
+  public EventSource EventSource;
 
   public void Init(AbilityManager user, Ability ability) {
     EventSource = user.GetEvent(EventTag);

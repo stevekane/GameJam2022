@@ -349,7 +349,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2549292637007557135}
-  - component: {fileID: 3207391754051695043}
   - component: {fileID: 2255387197228384673}
   m_Layer: 15
   m_Name: Shoot
@@ -373,22 +372,6 @@ Transform:
   m_Father: {fileID: 7625706422200811700}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3207391754051695043
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4414380605203049529}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbd3dacf7f3575f4784ed76c053d42c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Config: {fileID: 11400000, guid: 2ecb7886977282f40af7f3768da33864, type: 2}
-  Attacker: {fileID: 0}
-  BulletPrefab: {fileID: 1315075950411549743, guid: b8cc40c600c2d9446b5b190fe0ca5f17, type: 3}
-  NumBullets: 3
 --- !u!114 &2255387197228384673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -401,6 +384,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b19c15c6473ec504da9b3e539be45d59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Triggers:
+  - EventTag: 7
+    MethodName: AttackStart
+  Tags: 0
+  Cancels: 0
+  Blocks: 0
   Index: 0
   Animator: {fileID: 7727835182619467870}
   Windup:
@@ -913,7 +902,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Abilities: []
-  AbilitiesF: []
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0
