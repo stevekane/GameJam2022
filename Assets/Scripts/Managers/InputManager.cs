@@ -125,5 +125,8 @@ public class InputManager : MonoBehaviour {
       AxisLeft.Update(0f, GetAxisFromInput("LeftX", "LeftY"));
       AxisRight.Update(0f, GetAxisFromInput("RightX", "RightY"));
     }
+
+    if (Input.GetKeyDown(KeyCode.W))
+      UseMouseAndKeyboard = true;
   }
 }
