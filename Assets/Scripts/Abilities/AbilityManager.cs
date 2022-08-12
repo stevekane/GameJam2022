@@ -4,6 +4,11 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
+public enum AxisTag {
+  Move,
+  Aim,
+}
+
 public class AbilityManager : MonoBehaviour {
   [HideInInspector] public Ability[] Abilities;
   [HideInInspector] public List<Ability> Running = new();
@@ -12,7 +17,8 @@ public class AbilityManager : MonoBehaviour {
   // TODO: some kind of disjoint union would be preferred
   Dictionary<EventTag, (ButtonCode, ButtonPressType)> TagToButton = new();
   Dictionary<EventTag, EventSource> TagToEvent = new();
-  Dictionary<EventTag, AxisCode> TagToAxis = new();
+  Dictionary<EventTag, AxisCode> ETagToAxis = new();
+  Dictionary<AxisTag, AxisState> TagToAxis = new();
   Dictionary<AbilityMethod, EventSource> MethodToEvent = new();
 
   void Awake() {
@@ -38,11 +44,13 @@ public class AbilityManager : MonoBehaviour {
     TagToEvent[tag] = evt;
   }
   public void RegisterTag(EventTag tag, AxisCode axisCode) {
-    TagToAxis[tag] = axisCode;
+    ETagToAxis[tag] = axisCode;
   }
-  public void RegisterTrigger(EventSource evt, Ability ability, MethodInfo method) {
-    AbilityMethod m = (AbilityMethod)Delegate.CreateDelegate(typeof(AbilityMethod), ability, method);
-    ConnectEvent(m, evt);
+  public void RegisterAxis(AxisTag tag, AxisState axis) {
+    TagToAxis[tag] = axis;
+  }
+  public void RegisterTrigger(AbilityMethod method, EventSource evt) {
+    ConnectEvent(method, evt);
   }
   public EventSource GetEvent(EventTag tag) {
     if (TagToButton.TryGetValue(tag, out var button))
@@ -52,17 +60,21 @@ public class AbilityManager : MonoBehaviour {
     return evt;
   }
   public AxisState GetAxis(EventTag tag) {
-    if (TagToAxis.TryGetValue(tag, out var axisCode)) {
+    if (ETagToAxis.TryGetValue(tag, out var axisCode)) {
       return InputManager.Instance.Axis(axisCode);
     } else {
       // TODO: Tough call here...what to do/return if there is no existing mapping?
       return null;
     }
   }
+  public AxisState GetAxis(AxisTag tag) {
+    if (!TagToAxis.TryGetValue(tag, out AxisState axis))
+      TagToAxis[tag] = axis = new();
+    return axis;
+  }
   public EventSource GetEvent(AbilityMethod method) {
-    if (!MethodToEvent.TryGetValue(method, out EventSource evt)) {
+    if (!MethodToEvent.TryGetValue(method, out EventSource evt))
       ConnectEvent(method, evt = new());
-    }
     return evt;
   }
   void ConnectEvent(AbilityMethod method, EventSource evt) {

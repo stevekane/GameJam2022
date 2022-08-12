@@ -15,7 +15,7 @@ public class ButtonTriggerMap {
 [Serializable]
 public class AxisTriggerMap {
   public AxisCode AxisCode;
-  public AbilityMethodReference Entry;
+  public AxisTag AxisTag;
 }
 
 [Serializable]
@@ -58,22 +58,18 @@ public class AbilityEventHandlerPropertyDrawer : PropertyDrawer {
 
 [RequireComponent(typeof(AbilityManager))]
 public class InputToTriggerMap : MonoBehaviour {
-  [SerializeField] List<ButtonTriggerMap> ButtonEventTagMaps;
-  [SerializeField] List<AxisTriggerMap> AxisEventTagMaps;
+  [SerializeField] List<ButtonTriggerMap> ButtonMaps;
+  [SerializeField] List<AxisTriggerMap> AxisMaps;
 
-  // TODO: This is where we should grab actual eventsources or axes by reference from InputManager.Instance
-  // The AbilityManager should have no idea where these things are coming from
   void Start() {
     var AbilityManager = GetComponent<AbilityManager>();
-
-    ButtonEventTagMaps.ForEach(btm => {
-      var method = btm.Entry.Ability.GetType().GetMethod(btm.Entry.MethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-      AbilityManager.RegisterTrigger(InputManager.Instance.ButtonEvent(btm.ButtonCode, btm.ButtonPressType), btm.Entry.Ability, method);
+    ButtonMaps.ForEach(b => {
+      var methodInfo = b.Entry.Ability.GetType().GetMethod(b.Entry.MethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+      var method = (AbilityMethod)Delegate.CreateDelegate(typeof(AbilityMethod), b.Entry.Ability, methodInfo);
+      AbilityManager.RegisterTrigger(method, InputManager.Instance.ButtonEvent(b.ButtonCode, b.ButtonPressType));
     });
-    //AxisEventTagMaps.ForEach(atm => {
-    //  var method = btm.Ability.GetType().GetMethod(btm.Entry.MethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-    //  //AbilityManager.RegisterTrigger(InputManager.Instance.Axis(atm.AxisCode), btm.Ability, method);
-    //}); 
-    //AbilityManager.RegisterTag(atm.EventTag, atm.AxisCode));
+    AxisMaps.ForEach(a => {
+      AbilityManager.RegisterAxis(a.AxisTag, InputManager.Instance.Axis(a.AxisCode));
+    });
   }
 }
