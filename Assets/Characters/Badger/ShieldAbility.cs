@@ -4,7 +4,6 @@ using UnityEngine;
 public class ShieldAbility : Ability {
   public int Index;
   public Animator Animator;
-  public EventTag ReleaseEvent;
   public InactiveAttackPhase Windup;
   public InactiveAttackPhase Active;
   public InactiveAttackPhase Recovery;
