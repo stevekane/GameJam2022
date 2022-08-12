@@ -78,7 +78,6 @@ public class TaskMethodReferencePropertyDrawer : PropertyDrawer {
 }
 
 [Serializable]
-
 public abstract class Ability : MonoBehaviour {
   protected Bundle Bundle = new();
   public AbilityManager AbilityManager { get; set; }
