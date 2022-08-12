@@ -1020,7 +1020,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh66884
+  m_Name: pb_Mesh29392
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -1427,6 +1427,11 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
+--- !u!1 &1451428298 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5571416124093621165, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+  m_PrefabInstance: {fileID: 5571416124375894926}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1511601685
 GameObject:
   m_ObjectHideFlags: 0
@@ -1457,7 +1462,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MOVE_SPEED: 10
-  AbilityManBaseAbility: {fileID: 0}
 --- !u!4 &1511601687
 Transform:
   m_ObjectHideFlags: 0
@@ -1487,6 +1491,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c05e2b324b7be2447826a43593dd3bf1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1575228918 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5938650978471480679, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+  m_PrefabInstance: {fileID: 5571416124375894926}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bce66daebde14349aeca8a15d7e3c96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1627282615
@@ -1722,6 +1737,35 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5571416124093621163, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
   m_PrefabInstance: {fileID: 5571416124375894926}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1899292721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1451428298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8704b5fdcd5dad4cbc42e869b75d29f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ButtonEventTagMaps:
+  - ButtonCode: 2
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 1557723748}
+      MethodName: AttackStart
+  - ButtonCode: 3
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 1575228918}
+      MethodName: ChargeStart
+  - ButtonCode: 3
+    ButtonPressType: 2
+    Entry:
+      Ability: {fileID: 1575228918}
+      MethodName: ChargeRelease
+  AxisEventTagMaps: []
 --- !u!1001 &2140058138
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1736,7 +1780,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 289355291137479491, guid: c7e64ff75a228aa4a98ea4183747c8b0, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 289355291137479493, guid: c7e64ff75a228aa4a98ea4183747c8b0, type: 3}
       propertyPath: m_RootOrder
@@ -1879,7 +1923,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7691937222385314386, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
       propertyPath: m_AmplitudeGain
-      value: 0.002411005
+      value: 8e-45
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -1892,6 +1936,14 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 526021623948216688, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: ButtonEventTagMaps.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 776304553845593926, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: Triggers.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 776304553845593926, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
       propertyPath: Triggers.Array.data[0].FuncName
       value: TestRoutine
@@ -1966,6 +2018,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2758245753487164443, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3232894417174932624, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: Triggers.Array.size
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3778848490017935077, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
@@ -2083,6 +2139,14 @@ PrefabInstance:
     - target: {fileID: 5571416125040588448, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
       propertyPath: m_Size.z
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5938650978471480679, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: Triggers.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5960270733240712027, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: Triggers.Array.size
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6059168075155362537, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

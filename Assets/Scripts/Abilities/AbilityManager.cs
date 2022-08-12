@@ -1,4 +1,7 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 public class AbilityManager : MonoBehaviour {
@@ -10,6 +13,7 @@ public class AbilityManager : MonoBehaviour {
   Dictionary<EventTag, (ButtonCode, ButtonPressType)> TagToButton = new();
   Dictionary<EventTag, EventSource> TagToEvent = new();
   Dictionary<EventTag, AxisCode> TagToAxis = new();
+  Dictionary<AbilityMethod, EventSource> MethodToEvent = new();
 
   void Awake() {
     Abilities = GetComponentsInChildren<Ability>();
@@ -36,6 +40,10 @@ public class AbilityManager : MonoBehaviour {
   public void RegisterTag(EventTag tag, AxisCode axisCode) {
     TagToAxis[tag] = axisCode;
   }
+  public void RegisterTrigger(EventSource evt, Ability ability, MethodInfo method) {
+    AbilityMethod m = (AbilityMethod)Delegate.CreateDelegate(typeof(AbilityMethod), ability, method);
+    ConnectEvent(m, evt);
+  }
   public EventSource GetEvent(EventTag tag) {
     if (TagToButton.TryGetValue(tag, out var button))
       return InputManager.Instance.ButtonEvent(button.Item1, button.Item2);
@@ -51,7 +59,17 @@ public class AbilityManager : MonoBehaviour {
       return null;
     }
   }
-
+  public EventSource GetEvent(AbilityMethod method) {
+    if (!MethodToEvent.TryGetValue(method, out EventSource evt)) {
+      ConnectEvent(method, evt = new());
+    }
+    return evt;
+  }
+  void ConnectEvent(AbilityMethod method, EventSource evt) {
+    MethodToEvent[method] = evt;
+    Action handler = () => ((Ability)method.Target).StartRoutine(new Fiber(method()));
+    evt.Action += handler;
+  }
   // TODO: Should this be manually set high in Script Execution Order instead?
   void LateUpdate() {
     Running.RemoveAll(a => !a.IsRunning);

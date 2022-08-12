@@ -10,6 +10,7 @@ public class AbilityTrigger {
   public TaskMethodReference MethodReference;
   public EventTag EventTag;
   public EventSource EventSource;
+  public MethodInfo Method;
   Action Handler;
   Ability Ability;
   Fiber? Fiber;
@@ -19,8 +20,8 @@ public class AbilityTrigger {
     EventSource = ability.AbilityManager.GetEvent(EventTag);
     EventSource.Action += EventAction;
     var bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-    var method = ability.GetType().GetMethod(MethodReference.MethodName, bindingFlags);
-    Handler = () => ability.StartRoutine((Fiber = new Fiber((IEnumerator)method.Invoke(ability, null))).Value);
+    Method = ability.GetType().GetMethod(MethodReference.MethodName, bindingFlags);
+    Handler = () => ability.StartRoutine((Fiber = new Fiber((IEnumerator)Method.Invoke(ability, null))).Value);
   }
 
   public void Destroy() {
@@ -50,7 +51,7 @@ public class TaskMethodReference {
 
 [Serializable]
 [CustomPropertyDrawer(typeof(TaskMethodReference))]
-public class AbilityEventHandlerPropertyDrawer : PropertyDrawer {
+public class TaskMethodReferencePropertyDrawer : PropertyDrawer {
   public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
     var methodName = property.FindPropertyRelative("MethodName");
     var dropDownText = methodName.stringValue == "" ? "Select method" : methodName.stringValue;
