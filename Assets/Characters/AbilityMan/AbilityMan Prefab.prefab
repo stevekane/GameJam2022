@@ -45,10 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8db1d4fc560ada348a59786480066615, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Triggers:
-  - MethodReference:
-      MethodName: AttackStart
-    EventTag: 17
+  Triggers: []
   Tags: 2
   Cancels: 0
   Blocks: 3
@@ -489,7 +486,6 @@ GameObject:
   - component: {fileID: 4601772429776417516}
   - component: {fileID: 4601772429776417519}
   - component: {fileID: 6174041741950012008}
-  - component: {fileID: 4656451745961112461}
   - component: {fileID: 1116655485323081664}
   m_Layer: 10
   m_Name: AbilityMan Prefab
@@ -717,36 +713,6 @@ MonoBehaviour:
   Abilities: []
   Running: []
   ToAdd: []
---- !u!114 &4656451745961112461
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4601772429776417504}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df14dd7788a55f4488b07026df12a010, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ButtonEventTagMaps:
-  - ButtonCode: 2
-    ButtonPressType: 0
-    EventTag: 16
-  - ButtonCode: 3
-    ButtonPressType: 0
-    EventTag: 17
-  - ButtonCode: 1
-    ButtonPressType: 0
-    EventTag: 18
-  - ButtonCode: 1
-    ButtonPressType: 2
-    EventTag: 19
-  AxisEventTagMaps:
-  - AxisCode: 0
-    EventTag: 0
-  - AxisCode: 1
-    EventTag: 1
 --- !u!114 &1116655485323081664
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -759,7 +725,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8704b5fdcd5dad4cbc42e869b75d29f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ButtonEventTagMaps:
+  ButtonMaps:
   - ButtonCode: 2
     ButtonPressType: 0
     Entry:
@@ -780,7 +746,11 @@ MonoBehaviour:
     Entry:
       Ability: {fileID: 8024295469742284886}
       MethodName: GrappleRelease
-  AxisEventTagMaps: []
+  AxisMaps:
+  - AxisCode: 0
+    AxisTag: 0
+  - AxisCode: 1
+    AxisTag: 1
 --- !u!1 &4601772430502717097
 GameObject:
   m_ObjectHideFlags: 0

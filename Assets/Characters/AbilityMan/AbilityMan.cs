@@ -15,7 +15,7 @@ public class AbilityMan : MonoBehaviour {
 
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
-    var move = AbilityManager.GetAxis(EventTag.MoveAxis).XZ;
+    var move = AbilityManager.GetAxis(AxisTag.Move).XZ;
 
     if (Status.CanRotate && move.magnitude > 0) {
       transform.forward = move;

@@ -5,7 +5,7 @@ enum Motion { Base, Dashing, WireRiding }
 
 public class Vapor : MonoBehaviour, IWireRider {
   Quaternion RotationFromInputs(Transform t, float speed, float dt) {
-    var axis = Abilities.GetAxis(EventTag.AimAxis);
+    var axis = Abilities.GetAxis(AxisTag.Aim);
     var desiredForward = axis.XZ.TryGetDirection() ?? t.forward;
     var currentRotation = t.rotation;
     var desiredRotation = Quaternion.LookRotation(desiredForward);
@@ -14,7 +14,7 @@ public class Vapor : MonoBehaviour, IWireRider {
   }
 
   Vector3 VelocityFromMove(float speed) {
-    var axis = Abilities.GetAxis(EventTag.MoveAxis);
+    var axis = Abilities.GetAxis(AxisTag.Move);
     return speed*axis.XZ;
   }
 
