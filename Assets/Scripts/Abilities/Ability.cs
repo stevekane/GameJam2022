@@ -76,7 +76,6 @@ public class AbilityEventHandlerPropertyDrawer : PropertyDrawer {
 }
 
 [Serializable]
-
 public abstract class Ability : MonoBehaviour {
   protected Bundle Bundle = new();
   public AbilityManager AbilityManager { get; set; }

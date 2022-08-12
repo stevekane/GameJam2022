@@ -3,6 +3,15 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
+public interface IValue<T> {
+  public T Value { get; }
+}
+
+public interface IStoppable {
+  public bool IsRunning { get; }
+  public void Stop();
+}
+
 public class Bundle {
   List<Fiber> Fibers = new();
   List<Fiber> Added = new();
@@ -21,11 +30,179 @@ public class Bundle {
   }
 }
 
-public struct Fiber : IEnumerator {
-  public interface IValue<T> {
-    public T Value { get; }
-  }
+public class Listener : IEnumerator, IStoppable {
+  EventSource Source;
 
+  public Listener(EventSource source) {
+    IsRunning = true;
+    Source = source;
+    Source.Action += Callback;
+  }
+  ~Listener() {
+    Source.Action -= Callback;
+  }
+  public void Callback() {
+    IsRunning = false;
+    Source.Action -= Callback;
+  }
+  public void Stop() {
+    IsRunning = false;
+    Source.Action -= Callback;
+  }
+  public bool IsRunning { get; set; }
+  public void Reset() => throw new NotSupportedException();
+  public bool MoveNext() => IsRunning;
+  public object Current { get => null; }
+}
+
+public class Listener<T> : IEnumerator, IStoppable, IValue<T> {
+  EventSource<T> Source;
+
+  public Listener(EventSource<T> source) {
+    IsRunning = true;
+    Source = source;
+    Source.Action += Callback;
+  }
+  ~Listener() {
+    IsRunning = false;
+    Source.Action -= Callback;
+  }
+  public void Callback(T t) {
+    Value = t;
+    IsRunning = false;
+    Source.Action -= Callback;
+  }
+  public void Stop() {
+    IsRunning = false;
+    Source.Action -= Callback;
+  }
+  public bool IsRunning { get; set; }
+  public void Reset() => IsRunning = true;
+  public bool MoveNext() => IsRunning;
+  public object Current { get => null; }
+  public T Value { get; internal set; }
+}
+
+// TODO: This does not need to be Ability Task. Just implement this as
+// a custom IEnumerator + IValue + IStoppable
+public class Selector : AbilityTask, IValue<int> {
+  IEnumerator A;
+  IEnumerator B;
+  public Selector(IEnumerator a, IEnumerator b) {
+    A = a;
+    B = b;
+    Enumerator = Routine();
+  }
+  ~Selector() {
+    A = null;
+    B = null;
+    Enumerator = null;
+  }
+  public override IEnumerator Routine() {
+    var aFiber = new Fiber(A);
+    var bFiber = new Fiber(B);
+    while (true) {
+      var aActive = aFiber.MoveNext();
+      var bActive = bFiber.MoveNext();
+      if (!aActive) {
+        Value = 0;
+        yield break;
+      } else if (!bActive) {
+        Value = 1;
+        yield break;
+      } else {
+        yield return null;
+      }
+    }
+  }
+  public int Value { get; internal set; }
+}
+
+// TODO: Take a look at this in light of the recent addition of the notion
+// of "runners" as well as IStoppable
+public class ScopedRunner : IDisposable {
+  Bundle Bundle;
+  Fiber Fiber;
+
+  public bool IsRunning { get => Bundle.IsRoutineRunning(Fiber); }
+  public ScopedRunner(Bundle bundle, IEnumerator routine) {
+    Bundle = bundle;
+    Bundle.StartRoutine((Fiber = new Fiber(routine)));
+  }
+  public void Dispose() {
+    Fiber.Stop();
+    Bundle.StopRoutine(Fiber);
+    Fiber = null;
+  }
+}
+
+public class Any : IEnumerator, IStoppable {
+  Fiber A;
+  Fiber B;
+  public Any(IEnumerator a, IEnumerator b) {
+    IsRunning = true;
+    A = a as Fiber ?? new Fiber(a);
+    B = b as Fiber ?? new Fiber(b);
+  }
+  public void Stop() {
+    if (A.IsRunning) A.Stop();
+    if (B.IsRunning) B.Stop();
+  }
+  public bool MoveNext() {
+    if (IsRunning) {
+      IsRunning = A.MoveNext() & B.MoveNext();
+      if (!IsRunning) {
+        if (A.IsRunning) {
+          A.Stop();
+        }
+        if (B.IsRunning) {
+          B.Stop();
+        }
+      }
+      return IsRunning;
+    } else {
+      return false;
+    }
+  }
+  public void Reset() => throw new NotSupportedException();
+  public object Current { get => null; }
+  public bool IsRunning { get; internal set; }
+}
+
+public class All: IEnumerator, IStoppable {
+  Fiber A;
+  Fiber B;
+  public All(IEnumerator a, IEnumerator b) {
+    IsRunning = true;
+    A = a as Fiber ?? new Fiber(a);
+    B = b as Fiber ?? new Fiber(b);
+  }
+  public void Stop() {
+    if (A.IsRunning) A.Stop();
+    if (B.IsRunning) B.Stop();
+  }
+  public bool MoveNext() {
+    if (IsRunning) {
+      IsRunning = A.MoveNext() | B.MoveNext();
+      if (!IsRunning) {
+        if (A.IsRunning) {
+          A.Stop();
+        }
+        if (B.IsRunning) {
+          B.Stop();
+        }
+      }
+      return IsRunning;
+    } else {
+      return false;
+    }
+  }
+  public void Reset() => throw new NotSupportedException();
+  public object Current { get => null; }
+  public bool IsRunning { get; internal set; }
+}
+
+public class Fiber : IEnumerator, IStoppable {
   public static IEnumerator Wait(int n) {
     for (var i = 0; i < n; i++) {
       yield return null;
@@ -38,159 +215,41 @@ public struct Fiber : IEnumerator {
     }
   }
 
-  public static IEnumerator Any(IEnumerator a, IEnumerator b) {
-    var aFiber = new Fiber(a);
-    var bFiber = new Fiber(b);
-    while (aFiber.MoveNext() & bFiber.MoveNext()) {
-      yield return null;
-    }
-  }
-
-  public static IEnumerator All(IEnumerator a, IEnumerator b) {
-    var aFiber = new Fiber(a);
-    var bFiber = new Fiber(b);
-    while (aFiber.MoveNext() | bFiber.MoveNext()) {
-      yield return null;
-    }
-  }
-
+  public static Any Any(IEnumerator a, IEnumerator b) => new Any(a, b);
+  public static All All(IEnumerator a, IEnumerator b) => new All(a, b);
   public static IEnumerator Any(IEnumerable<IEnumerator> xs) => xs.Aggregate(Any);
   public static IEnumerator All(IEnumerable<IEnumerator> xs) => xs.Aggregate(All);
-
   public static Selector Select(IEnumerator a, IEnumerator b) => new Selector(a, b);
-
   public static Listener ListenFor(EventSource source) => new Listener(source);
   public static Listener<T> ListenFor<T>(EventSource<T> source) => new Listener<T>(source);
-
   public static ScopedRunner Scoped(Bundle bundle, IEnumerator routine) => new ScopedRunner(bundle, routine);
-
-  public class Listener : IEnumerator {
-    EventSource Source;
-    bool Waiting = true;
-
-    public Listener(EventSource source) {
-      Waiting = true;
-      Source = source;
-      Source.Action += Callback;
-    }
-    ~Listener() {
-      Source.Action -= Callback;
-    }
-    public void Callback() {
-      Waiting = false;
-      Source.Action -= Callback;
-    }
-    public void Reset() => Waiting = true;
-    public bool MoveNext() => Waiting;
-    public object Current { get => null; }
-  }
-
-  public class Listener<T> : IEnumerator, IValue<T> {
-    EventSource<T> Source;
-    bool Waiting = true;
-
-    public Listener(EventSource<T> source) {
-      Waiting = true;
-      Source = source;
-      Source.Action += Callback;
-    }
-    ~Listener() {
-      Source.Action -= Callback;
-    }
-    public void Callback(T t) {
-      Value = t;
-      Waiting = false;
-      Source.Action -= Callback;
-    }
-    public void Reset() => Waiting = true;
-    public bool MoveNext() => Waiting;
-    public object Current { get => null; }
-    public T Value { get; internal set; }
-  }
-
-  public class Selector : AbilityTask, IValue<int> {
-    IEnumerator A;
-    IEnumerator B;
-    public Selector(IEnumerator a, IEnumerator b) {
-      A = a;
-      B = b;
-      Enumerator = Routine();
-    }
-    ~Selector() {
-      A = null;
-      B = null;
-      Enumerator = null;
-    }
-    public override IEnumerator Routine() {
-      var aFiber = new Fiber(A);
-      var bFiber = new Fiber(B);
-      while (true) {
-        var aActive = aFiber.MoveNext();
-        var bActive = bFiber.MoveNext();
-        if (!aActive) {
-          Value = 0;
-          yield break;
-        } else if (!bActive) {
-          Value = 1;
-          yield break;
-        } else {
-          yield return null;
-        }
-      }
-    }
-    public int Value { get; internal set; }
-  }
-
-  // A Fiber that runs in the background until it is disposed. Usable with `using` declarations, like:
-  //   using var asyncCountdown = Fiber.Scoped(Bundle, Fiber.Wait(120));
-  //   yield ChargeAnimationTask.Run();
-  //   if (!asyncCountdown.IsRunning)
-  //     Explode();  // oops - time ran out before we got here!
-  //   ResetAnimations();
-  public class ScopedRunner : IDisposable {
-    Bundle Bundle;
-    Fiber? Fiber;
-
-    public bool IsRunning { get => Fiber.HasValue && Bundle.IsRoutineRunning(Fiber.Value); }
-    public ScopedRunner(Bundle bundle, IEnumerator routine) {
-      Bundle = bundle;
-      Bundle.StartRoutine((Fiber = new Fiber(routine)).Value);
-    }
-    public void Dispose() {
-      if (Fiber.HasValue)
-        Bundle.StopRoutine(Fiber.Value);
-      Fiber = null;
-    }
-  }
 
   IEnumerator Enumerator;
   Stack<IEnumerator> Stack;
-  public Fiber(Stack<IEnumerator> stack) {
-    Current = null;
-    Enumerator = stack.Peek();
-    Stack = stack;
-  }
   public Fiber(IEnumerator enumerator) {
-    Current = null;
-    Enumerator = enumerator;
     Stack = new();
     Stack.Push(enumerator);
   }
-  public void Reset() {
-    Current = null;
+  public void Stop() {
+    Stack.ForEach(s => {
+      if (s is IStoppable) {
+        (s as IStoppable).Stop();
+      }
+    });
     Stack.Clear();
-    Stack.Push(Enumerator);
   }
-  public object Current { get; internal set; }
+  public bool IsRunning { get => Stack.Count > 0; }
+  public object Current { get => Stack.Peek(); }
+  public void Reset() => throw new NotSupportedException();
   public bool MoveNext() {
     while (Stack.TryPeek(out IEnumerator top)) {
       if (!top.MoveNext()) {
+        // TODO: Possibly check if Stoppable and if Stopped and Stop?
         Stack.Pop();
       } else {
         if (top.Current is IEnumerator) {
           Stack.Push(top.Current as IEnumerator);
         } else {
-          Current = top.Current;
           return true;
         }
       }

@@ -10,11 +10,7 @@ public static class AnimatorTastExtensions {
   }
 }
 
-// TODO: This needs to be interuptible/stoppable
-// This more or less illustrates why it is probably not sufficient
-// to implement naked IEnumerators for Tasks but rather that they
-// must be IEnumerator + ITask
-public class AnimationTask : IEnumerator {
+public class AnimationTask : IEnumerator, IStoppable {
   Animator Animator;
   AnimationClipPlayable ClipPlayable;
   AnimationPlayableOutput Output;
@@ -26,6 +22,7 @@ public class AnimationTask : IEnumerator {
   public Action<FrameEvent> OnFrameEvent;
 
   public AnimationTask(Animator animator, AnimationClip clip) {
+    IsRunning = true;
     EventHead = 0;
     Animator = animator;
     Graph = PlayableGraph.Create();
@@ -38,39 +35,41 @@ public class AnimationTask : IEnumerator {
     Graph.Play();
   }
   ~AnimationTask() {
-    Animator = null;
     ClipPlayable.Destroy();
     Graph.Destroy();
   }
-
+  public void Stop() {
+    ClipPlayable.Destroy();
+    Graph.Destroy();
+    IsRunning = false;
+  }
+  public bool IsRunning { get; set; }
   public object Current { get; }
+  public void Reset() => throw new NotSupportedException();
   public bool MoveNext() {
-    if (FrameEventTimeline != null && OnFrameEvent != null) {
-      var clip = ClipPlayable.GetAnimationClip();
-      var frames = clip.length*clip.frameRate+1;
-      var time = ClipPlayable.GetTime();
-      var interpolant = (float)(time/Duration);
-      var newHead = (int)Mathf.Lerp(0, frames, interpolant);
-      var oldHead = EventHead;
-      for (var i = oldHead; i < newHead; i++) {
-        foreach (var e in FrameEventTimeline.Events) {
-          if (e.Frame == i) {
-            OnFrameEvent.Invoke(e);
+    if (!Graph.IsDone()) {
+      if (FrameEventTimeline != null && OnFrameEvent != null) {
+        var clip = ClipPlayable.GetAnimationClip();
+        var frames = clip.length*clip.frameRate+1;
+        var time = ClipPlayable.GetTime();
+        var interpolant = (float)(time/Duration);
+        var newHead = (int)Mathf.Lerp(0, frames, interpolant);
+        var oldHead = EventHead;
+        for (var i = oldHead; i < newHead; i++) {
+          foreach (var e in FrameEventTimeline.Events) {
+            if (e.Frame == i) {
+              OnFrameEvent.Invoke(e);
+            }
           }
         }
+        EventHead = newHead;
       }
-      EventHead = newHead;
-    }
-    if (Graph.IsDone()) {
-      Graph.Destroy();
-      ClipPlayable.Destroy();
-      return false;
-    } else {
       return true;
+    } else {
+      if (IsRunning) {
+        Stop();
+      }
+      return false;
     }
-  }
-
-  public void Reset() {
-    throw new NotImplementedException("Reset not implemented for AnimationTask!");
   }
 }
