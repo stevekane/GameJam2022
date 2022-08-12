@@ -44,10 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 123d084abbb537147b65147028fce357, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Triggers:
-  - MethodReference:
-      MethodName: MakeRoutine
-    EventTag: 14
   Tags: 0
   Cancels: 0
   Blocks: 0
@@ -98,10 +94,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1708c1a0d4da9b642a2fb09bb9391425, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Triggers:
-  - MethodReference:
-      MethodName: MakeRoutine
-    EventTag: 12
   Tags: 10
   Cancels: 0
   Blocks: 10
@@ -143,10 +135,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2582651163493360453}
   - component: {fileID: 2582651163493360452}
-  - component: {fileID: 2582651163493360474}
   - component: {fileID: 6994602829365010295}
   - component: {fileID: 2940330219637808556}
   - component: {fileID: 374224407259611018}
+  - component: {fileID: 2582651163493360474}
   m_Layer: 10
   m_Name: Wind Ranger Prefab
   m_TagString: Untagged
@@ -185,24 +177,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AbilityManager: {fileID: 6994602829365010295}
   CharacterController: {fileID: 2582651163493360474}
---- !u!143 &2582651163493360474
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2582651163493360454}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Height: 2
-  m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &6994602829365010295
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -259,7 +233,7 @@ MonoBehaviour:
   AxisMaps:
   - AxisCode: 0
     AxisTag: 0
-  - AxisCode: 0
+  - AxisCode: 1
     AxisTag: 1
 --- !u!114 &374224407259611018
 MonoBehaviour:
@@ -273,6 +247,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38b5f85dc564c4f4fafa2b5115a61de1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!143 &2582651163493360474
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2582651163493360454}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &2582651163494764176
 GameObject:
   m_ObjectHideFlags: 0
@@ -317,10 +309,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddb99724099100d4e8a780bf64296eb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Triggers:
-  - MethodReference:
-      MethodName: MakeRoutine
-    EventTag: 11
   Tags: 8
   Cancels: 0
   Blocks: 8
@@ -543,10 +531,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01ca85eaef70a3f4babba1b221c9e0c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Triggers:
-  - MethodReference:
-      MethodName: MakeRoutine
-    EventTag: 15
   Tags: 0
   Cancels: 0
   Blocks: 0
