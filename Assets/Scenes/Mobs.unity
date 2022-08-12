@@ -1020,7 +1020,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh66884
+  m_Name: pb_Mesh39366
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -1241,7 +1241,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6865395085482706047, guid: ab129e03610f14f4bbeeea02c0119926, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -1308,7 +1308,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5571416124093621165, guid: d84c5cd595094654fa88cca685e8d2a1, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -1457,7 +1457,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MOVE_SPEED: 10
-  AbilityManBaseAbility: {fileID: 0}
 --- !u!4 &1511601687
 Transform:
   m_ObjectHideFlags: 0
@@ -1879,7 +1878,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7691937222385314386, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
       propertyPath: m_AmplitudeGain
-      value: 0.002411005
+      value: 0.00000001022979
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -1892,6 +1891,10 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 776304553845593926, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: Triggers.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 776304553845593926, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
       propertyPath: Triggers.Array.data[0].FuncName
       value: TestRoutine
@@ -1966,6 +1969,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2758245753487164443, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3232894417174932624, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: Triggers.Array.size
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3778848490017935077, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
@@ -2084,6 +2091,14 @@ PrefabInstance:
       propertyPath: m_Size.z
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 5938650978471480679, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: Triggers.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5960270733240712027, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: Triggers.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6059168075155362537, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
@@ -2092,8 +2107,6 @@ PrefabInstance:
       propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 0}
-    - {fileID: 0}
+    m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}

@@ -17,6 +17,7 @@ public class Badger : MonoBehaviour {
   int RecoveryFrames = 0;
   Vector3 Velocity;
   Ability CurrentAbility;
+  MeleeAttackAbility PunchAbility;
   ShieldAbility ShieldAbility;
 
   public void Awake() {
@@ -28,6 +29,7 @@ public class Badger : MonoBehaviour {
     Defender = GetComponent<Defender>();
     Shield = GetComponentInChildren<Shield>();
     Abilities = GetComponent<AbilityManager>();
+    PunchAbility = GetComponentInChildren<MeleeAttackAbility>();
     ShieldAbility = GetComponentInChildren<ShieldAbility>();
   }
 
@@ -66,23 +68,23 @@ public class Badger : MonoBehaviour {
 
     if (Status.CanAttack && CurrentAbility == null && RecoveryFrames <= 0) {
       if (TargetIsAttacking && Shield) {
-        Abilities.GetEvent(EventTag.BadgerShieldStart).Fire();
+        Abilities.GetEvent(ShieldAbility.HoldStart).Fire();
         CurrentAbility = Abilities.Abilities.FirstOrDefault((a) => a.IsRunning);
         WaitFrames = Timeval.FromMillis(1000).Frames;
       } else if (inRange) {
-        Abilities.GetEvent(EventTag.BadgerPunch).Fire();
+        Abilities.GetEvent(PunchAbility.AttackStart).Fire();
         CurrentAbility = Abilities.Abilities.FirstOrDefault((a) => a.IsRunning);
         WaitFrames = AttackDelay.Frames;
       }
     }
     if (CurrentAbility == ShieldAbility) {
       if (!Shield) {
-        Abilities.GetEvent(EventTag.BadgerShieldRelease).Fire();
+        Abilities.GetEvent(ShieldAbility.HoldRelease).Fire();
       } else {
         if (TargetIsAttacking)
           WaitFrames = Timeval.FromMillis(1000).Frames;
         if (WaitFrames <= 0) {
-          Abilities.GetEvent(EventTag.BadgerShieldRelease).Fire();
+          Abilities.GetEvent(ShieldAbility.HoldRelease).Fire();
         }
       }
     }

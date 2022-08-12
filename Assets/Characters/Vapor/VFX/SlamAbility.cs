@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public delegate IEnumerator AbilityMethod();
+
 public class SlamAbility : Ability {
   public int Index;
   public Transform Owner;
@@ -26,7 +28,8 @@ public class SlamAbility : Ability {
   }
 
   public IEnumerator ChargeStart() {
-    yield return Fiber.Any(Charging(), Windup.StartWithCharge(Animator, Index));
+    //Debug.Log($"ChargeRelease event: {AbilityManager.GetEvent(ChargeRelease)}");
+    yield return Fiber.Any(new[]{Charging(), Windup.StartWithCharge(Animator, Index), Fiber.ListenFor(AbilityManager.GetEvent(ChargeRelease))});
     SlamAction.Activate();
     SFXManager.Instance.TryPlayOneShot(FireSFX);
     VFXManager.Instance.TrySpawnEffect(FireVFX, SlamAction.Piece.transform.position + FireVFXOffset);
@@ -37,8 +40,10 @@ public class SlamAbility : Ability {
   }
 
   public IEnumerator ChargeRelease() {
-    Windup.OnChargeEnd();
+    Debug.Log($"ChargeRelease");
     yield return null;
+    //Windup.OnChargeEnd();
+    //yield return null;
   }
 
   public void Done() {

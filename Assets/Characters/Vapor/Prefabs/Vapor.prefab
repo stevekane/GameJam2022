@@ -1044,7 +1044,7 @@ GameObject:
   - component: {fileID: 7727835182619467870}
   - component: {fileID: 4599928758009979224}
   - component: {fileID: 2218451550939315152}
-  - component: {fileID: 526021623948216688}
+  - component: {fileID: 8130814572018751882}
   m_Layer: 10
   m_Name: Vapor
   m_TagString: Untagged
@@ -1315,7 +1315,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Abilities: []
---- !u!114 &526021623948216688
+  Running: []
+  ToAdd: []
+--- !u!114 &8130814572018751882
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1324,24 +1326,30 @@ MonoBehaviour:
   m_GameObject: {fileID: 5571416124093621165}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df14dd7788a55f4488b07026df12a010, type: 3}
+  m_Script: {fileID: 11500000, guid: e8704b5fdcd5dad4cbc42e869b75d29f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ButtonEventTagMaps:
+  ButtonMaps:
   - ButtonCode: 2
     ButtonPressType: 0
-    EventTag: 2
+    Entry:
+      Ability: {fileID: 776304553845593926}
+      MethodName: AttackStart
   - ButtonCode: 3
     ButtonPressType: 0
-    EventTag: 3
+    Entry:
+      Ability: {fileID: 5938650978471480679}
+      MethodName: ChargeStart
   - ButtonCode: 3
     ButtonPressType: 2
-    EventTag: 4
-  AxisEventTagMaps:
+    Entry:
+      Ability: {fileID: 5938650978471480679}
+      MethodName: ChargeRelease
+  AxisMaps:
   - AxisCode: 0
-    EventTag: 0
+    AxisTag: 0
   - AxisCode: 1
-    EventTag: 1
+    AxisTag: 1
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0

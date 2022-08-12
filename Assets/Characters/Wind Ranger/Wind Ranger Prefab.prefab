@@ -145,7 +145,8 @@ GameObject:
   - component: {fileID: 2582651163493360452}
   - component: {fileID: 2582651163493360474}
   - component: {fileID: 6994602829365010295}
-  - component: {fileID: 1187110745423436195}
+  - component: {fileID: 2940330219637808556}
+  - component: {fileID: 374224407259611018}
   m_Layer: 10
   m_Name: Wind Ranger Prefab
   m_TagString: Untagged
@@ -168,7 +169,7 @@ Transform:
   - {fileID: 2582651164198254622}
   - {fileID: 2582651164267693613}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2582651163493360452
 MonoBehaviour:
@@ -215,7 +216,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Abilities: []
---- !u!114 &1187110745423436195
+  Running: []
+  ToAdd: []
+--- !u!114 &2940330219637808556
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -224,30 +227,52 @@ MonoBehaviour:
   m_GameObject: {fileID: 2582651163493360454}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df14dd7788a55f4488b07026df12a010, type: 3}
+  m_Script: {fileID: 11500000, guid: e8704b5fdcd5dad4cbc42e869b75d29f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ButtonEventTagMaps:
+  ButtonMaps:
   - ButtonCode: 4
     ButtonPressType: 0
-    EventTag: 15
+    Entry:
+      Ability: {fileID: 2582651164299228350}
+      MethodName: MakeRoutine
   - ButtonCode: 5
     ButtonPressType: 0
-    EventTag: 11
+    Entry:
+      Ability: {fileID: 2582651163494764182}
+      MethodName: MakeRoutine
   - ButtonCode: 6
     ButtonPressType: 0
-    EventTag: 14
+    Entry:
+      Ability: {fileID: 2582651162785018872}
+      MethodName: MakeRoutine
   - ButtonCode: 7
     ButtonPressType: 0
-    EventTag: 12
+    Entry:
+      Ability: {fileID: 2582651163176662532}
+      MethodName: MakeRoutine
   - ButtonCode: 7
     ButtonPressType: 2
-    EventTag: 13
-  AxisEventTagMaps:
+    Entry:
+      Ability: {fileID: 2582651163176662532}
+      MethodName: Release
+  AxisMaps:
   - AxisCode: 0
-    EventTag: 0
-  - AxisCode: 1
-    EventTag: 1
+    AxisTag: 0
+  - AxisCode: 0
+    AxisTag: 1
+--- !u!114 &374224407259611018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2582651163493360454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38b5f85dc564c4f4fafa2b5115a61de1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2582651163494764176
 GameObject:
   m_ObjectHideFlags: 0
