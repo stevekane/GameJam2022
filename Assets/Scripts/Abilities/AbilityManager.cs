@@ -58,6 +58,9 @@ public class AbilityManager : MonoBehaviour {
     //var alreadyRunning = Fiber != null && Ability.IsRoutineRunning(Fiber);
     var notBlocked = Running.TrueForAll(a => (a.Blocks & ability.Tags) == 0);
     if (notBlocked) {
+      var result = method();
+      if (result == null)
+        return;  // Just a method tag
       ability.StartRoutine(new Fiber(method()));
       ToAdd.Add(ability);
       foreach (var activeAbility in Running) {
