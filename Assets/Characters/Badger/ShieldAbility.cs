@@ -14,12 +14,14 @@ public class ShieldAbility : Ability {
     Animator.SetBool("Shielding", true);
     yield return Windup.Start(Animator, Index);
     IsRaised = true;
-    yield return Fiber.ListenFor(GetComponentInParent<AbilityManager>().GetEvent(ReleaseEvent));
+    yield return Fiber.ListenFor(GetComponentInParent<AbilityManager>().GetEvent(HoldRelease));
     IsRaised = false;
     Animator.SetBool("Shielding", false);
     yield return Recovery.Start(Animator, Index);
     Stop();
   }
+
+  public IEnumerator HoldRelease() => null;
 
   public override void Stop() {
     IsRaised = false;

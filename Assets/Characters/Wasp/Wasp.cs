@@ -13,6 +13,7 @@ public class Wasp : MonoBehaviour {
   int FramesRemaining = 0;
   Vector3 Velocity;
   Ability CurrentAbility;
+  PelletAbility Pellet;
 
   enum StateType { Idle, Chase, Shoot, Kite }
   StateType State = StateType.Idle;
@@ -23,6 +24,7 @@ public class Wasp : MonoBehaviour {
     Status = GetComponent<Status>();
     Animator = GetComponent<Animator>();
     Abilities = GetComponent<AbilityManager>();
+    Pellet = GetComponentInChildren<PelletAbility>();
   }
 
   void FixedUpdate() {
@@ -50,7 +52,7 @@ public class Wasp : MonoBehaviour {
         transform.forward = dir;
         if (targetInRange && Status.CanAttack && CurrentAbility == null) {
           State = StateType.Shoot;
-          Abilities.GetEvent(EventTag.WaspShoot).Fire();
+          Abilities.GetEvent(Pellet.AttackStart).Fire();
           CurrentAbility = Abilities.Abilities.FirstOrDefault((a) => a.IsRunning);
         } else if (Status.CanMove) {
           Velocity.SetXZ(dir * MoveSpeed);

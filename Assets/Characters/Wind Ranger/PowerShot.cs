@@ -24,7 +24,7 @@ public class PowerShot : Ability {
 
   public IEnumerator MakeRoutine() {
     var windup = Animator.Run(WindupClip);
-    var release = ListenFor(AbilityManager.GetEvent(EventTag.WindRangerReleasePowerShot));
+    var release = ListenFor(AbilityManager.GetEvent(Release));
     var timer = new Timer();
     using var scoped = Scoped(Bundle, timer);
     yield return Any(windup, release);
@@ -37,4 +37,6 @@ public class PowerShot : Ability {
     yield return Animator.Run(ReleaseClip);
     Stop();
   }
+
+  public IEnumerator Release() => null;
 }
