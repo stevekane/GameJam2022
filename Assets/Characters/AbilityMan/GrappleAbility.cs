@@ -30,8 +30,7 @@ public class GrappleAbility : Ability {
     Owner.GetComponent<Animator>().SetBool("Grappling", true);
     Owner.GetComponent<Animator>().SetInteger("GrappleState", (int)GrappleState.Holding);
     var chargeWait = Wait(MAX_CHARGE_DURATION.Frames);
-    var release = ListenFor(AbilityManager.GetEvent(EventTag.AbilityManGrappleRelease));
-    //InputManager.Instance.ButtonEvent(ButtonCode.L2, ButtonPressType.JustUp));
+    var release = ListenFor(AbilityManager.GetEvent(GrappleRelease));
     yield return Any(chargeWait, release);
     // Create and throw the hook
     Owner.GetComponent<Animator>().SetBool("Grappling", true);
@@ -57,6 +56,8 @@ public class GrappleAbility : Ability {
     }
     Stop();
   }
+
+  public IEnumerator GrappleRelease() => null;
 
   void OnHit(Collision c) {
     Destroy(Hook.GetComponent<Rigidbody>());

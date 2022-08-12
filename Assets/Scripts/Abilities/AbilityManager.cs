@@ -67,7 +67,7 @@ public class AbilityManager : MonoBehaviour {
   }
   void ConnectEvent(AbilityMethod method, EventSource evt) {
     MethodToEvent[method] = evt;
-    Action handler = () => ((Ability)method.Target).StartRoutine(new Fiber(method()));
+    Action handler = () => { var r = method(); if (r != null) ((Ability)method.Target).StartRoutine(new Fiber(method())); };
     evt.Action += handler;
   }
   // TODO: Should this be manually set high in Script Execution Order instead?

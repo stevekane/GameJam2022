@@ -490,6 +490,7 @@ GameObject:
   - component: {fileID: 4601772429776417519}
   - component: {fileID: 6174041741950012008}
   - component: {fileID: 4656451745961112461}
+  - component: {fileID: 1116655485323081664}
   m_Layer: 10
   m_Name: AbilityMan Prefab
   m_TagString: Untagged
@@ -527,7 +528,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MOVE_SPEED: 25
-  AbilityManBaseAbility: {fileID: 0}
 --- !u!114 &7747944924966294688
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -715,6 +715,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Abilities: []
+  Running: []
+  ToAdd: []
 --- !u!114 &4656451745961112461
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -745,6 +747,40 @@ MonoBehaviour:
     EventTag: 0
   - AxisCode: 1
     EventTag: 1
+--- !u!114 &1116655485323081664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4601772429776417504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8704b5fdcd5dad4cbc42e869b75d29f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ButtonEventTagMaps:
+  - ButtonCode: 2
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 125423903905483418}
+      MethodName: AttackStart
+  - ButtonCode: 3
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 4601772428839359542}
+      MethodName: AttackStart
+  - ButtonCode: 1
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 8024295469742284886}
+      MethodName: GrappleStart
+  - ButtonCode: 1
+    ButtonPressType: 2
+    Entry:
+      Ability: {fileID: 8024295469742284886}
+      MethodName: GrappleRelease
+  AxisEventTagMaps: []
 --- !u!1 &4601772430502717097
 GameObject:
   m_ObjectHideFlags: 0
