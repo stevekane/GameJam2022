@@ -72,13 +72,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bce66daebde14349aeca8a15d7e3c96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Triggers:
-  - MethodReference:
-      MethodName: ChargeStart
-    EventTag: 3
-  - MethodReference:
-      MethodName: ChargeRelease
-    EventTag: 4
   Tags: 0
   Cancels: 0
   Blocks: 0
@@ -323,13 +316,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c05e2b324b7be2447826a43593dd3bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Triggers:
-  - MethodReference:
-      MethodName: ChargeStart
-    EventTag: 5
-  - MethodReference:
-      MethodName: 
-    EventTag: 6
   Tags: 0
   Cancels: 0
   Blocks: 0
@@ -440,10 +426,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c05e2b324b7be2447826a43593dd3bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Triggers:
-  - MethodReference:
-      MethodName: AttackStart
-    EventTag: 2
   Tags: 0
   Cancels: 0
   Blocks: 0
@@ -610,6 +592,56 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &5529297459764154501
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1922017593864157115}
+  - component: {fileID: 696150299245317217}
+  m_Layer: 0
+  m_Name: Dash
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1922017593864157115
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5529297459764154501}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5571416123097895009}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &696150299245317217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5529297459764154501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a101e05126a70ce4ea7eb457d5f90342, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Tags: 0
+  Cancels: 0
+  Blocks: 0
+  Particles: {fileID: 4585268613483689328}
+  AudioClip: {fileID: 8300000, guid: 0eda13886c86ca145936c7017a0dafa5, type: 3}
+  AudioClipStartingTime: 0.25
 --- !u!1 &5571416123097895008
 GameObject:
   m_ObjectHideFlags: 0
@@ -642,6 +674,7 @@ Transform:
   - {fileID: 9052555834542644548}
   - {fileID: 232568689298950285}
   - {fileID: 7199471196977928480}
+  - {fileID: 1922017593864157115}
   m_Father: {fileID: 5571416124093621163}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1826,10 +1859,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c05e2b324b7be2447826a43593dd3bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Triggers:
-  - MethodReference:
-      MethodName: AttackStart
-    EventTag: 2
   Tags: 0
   Cancels: 0
   Blocks: 0

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-enum Motion { Base, Dashing, WireRiding }
+enum Motion { Base, WireRiding }
 
 public class Vapor : MonoBehaviour, IWireRider {
   Quaternion RotationFromInputs(Transform t, float speed, float dt) {
@@ -21,15 +21,11 @@ public class Vapor : MonoBehaviour, IWireRider {
   [SerializeField] float GRAVITY;
   [SerializeField] float MOVE_SPEED;
   [SerializeField] float FIRING_MOVE_SPEED;
-  [SerializeField] float DASH_SPEED;
   [SerializeField] float TURN_SPEED;
   [SerializeField] float FIRING_TURN_SPEED;
   [SerializeField] float ATTACKING_TURN_SPEED;
   [SerializeField] float FIRING_PUSHBACK_SPEED;
   [SerializeField] Timeval WireRide;
-  [SerializeField] ParticleSystem ChargeParticles;
-  [SerializeField] AudioClip ChargeAudioClip;
-  [SerializeField] float ChargeAudioClipStartingTime;
 
   AbilityManager Abilities;
   Defender Defender;
@@ -37,7 +33,6 @@ public class Vapor : MonoBehaviour, IWireRider {
   Status Status;
   CharacterController Controller;
   Animator Animator;
-  AudioSource AudioSource;
 
   Ability CurrentAbility;
   Wire Wire;
@@ -59,7 +54,6 @@ public class Vapor : MonoBehaviour, IWireRider {
     Status = GetComponent<Status>();
     Controller = GetComponent<CharacterController>();
     Animator = GetComponent<Animator>();
-    AudioSource = GetComponent<AudioSource>();
   }
 
   void FixedUpdate() {
@@ -116,7 +110,7 @@ public class Vapor : MonoBehaviour, IWireRider {
     //  //}
     //}
 
-    Animator.SetBool("Dashing", Motion == Motion.Dashing);
+    //Animator.SetBool("Dashing", Motion == Motion.Dashing);
     Animator.SetBool("WireRiding", Motion == Motion.WireRiding);
 
     if (Motion == Motion.Base) {
@@ -127,17 +121,18 @@ public class Vapor : MonoBehaviour, IWireRider {
         _ when Cannon.IsFiring => FIRING_MOVE_SPEED,
         _ => MOVE_SPEED
       };
+      moveSpeed *= Status.MoveSpeedFactor;
       var moveVelocity = VelocityFromMove(moveSpeed);
       var gravity = dt*GRAVITY;
       Velocity.SetXZ(moveVelocity);
       Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
       Controller.Move(dt*Velocity);
-    } else if (Motion == Motion.Dashing) {
-      var moveVelocity = VelocityFromMove(DASH_SPEED);
-      Velocity.SetXZ(moveVelocity);
-      Velocity.y = 0;
-      ChargeParticles.transform.forward = -moveVelocity.TryGetDirection() ?? -transform.forward;
-      Controller.Move(dt*Velocity);
+    //} else if (Motion == Motion.Dashing) {
+    //  var moveVelocity = VelocityFromMove(DASH_SPEED);
+    //  Velocity.SetXZ(moveVelocity);
+    //  Velocity.y = 0;
+    //  ChargeParticles.transform.forward = -moveVelocity.TryGetDirection() ?? -transform.forward;
+    //  Controller.Move(dt*Velocity);
     } else if (Motion == Motion.WireRiding) {
       var distance = 1f-(float)WireFramesTraveled/(float)WireRide.Frames;
       var wirePathData = Wire.Waypoints.ToWorldSpace(distance);
@@ -152,6 +147,7 @@ public class Vapor : MonoBehaviour, IWireRider {
       _ when Cannon.IsFiring => FIRING_TURN_SPEED,
       _ => TURN_SPEED
     };
+    turnSpeed *= Status.RotateSpeedFactor;
     transform.rotation = RotationFromInputs(transform, turnSpeed, dt);
   }
 }
