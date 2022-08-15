@@ -21,7 +21,7 @@ public class AbilityMan : MonoBehaviour {
       transform.forward = move;
     }
     if (Status.CanMove) {
-      Controller.Move(dt*MOVE_SPEED*move+dt*Physics.gravity);
+      Controller.Move(dt*MOVE_SPEED*Status.MoveSpeedFactor*move+dt*Physics.gravity);
     }
   }
 }

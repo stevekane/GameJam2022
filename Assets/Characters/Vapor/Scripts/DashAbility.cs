@@ -37,7 +37,8 @@ public class DashAbility : Ability {
     while (true) {
       Vector3 delta = (AbilityManager.transform.position - lastPosition) / Time.fixedDeltaTime;
       lastPosition = AbilityManager.transform.position;
-      Particles.transform.forward = -delta.TryGetDirection() ?? -AbilityManager.transform.forward;
+      if (Particles != null)
+        Particles.transform.forward = -delta.TryGetDirection() ?? -AbilityManager.transform.forward;
       yield return null;
     }
   }
