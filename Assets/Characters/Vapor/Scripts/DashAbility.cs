@@ -7,7 +7,7 @@ public class DashEffect : StatusEffect {
   public DashEffect(float factor) => Factor = factor;
   public override bool Merge(StatusEffect e) => false;
   public override void Apply(Status status) {
-    status.MoveSpeedFactor = Factor;
+    status.MoveSpeedFactor *= Factor;
   }
 }
 
