@@ -14,6 +14,16 @@ public class AbilityManager : MonoBehaviour {
 
   Dictionary<AxisTag, AxisState> TagToAxis = new();
   Dictionary<AbilityMethod, EventSource> MethodToEvent = new();
+  //Dictionary<EventSource, EventIntercept> s = new();
+
+  //class EventIntercept : IEventSource {
+  //  EventSource Source;
+  //  public System.Action Action;
+  //  public List<IEventSource> Connected { get => null; set { } }
+  //  public void Fire() {
+  //    Action?.Invoke();
+  //  }
+  //}
 
   void Awake() {
     Abilities = GetComponentsInChildren<Ability>();
@@ -48,7 +58,7 @@ public class AbilityManager : MonoBehaviour {
     // Hmmmm... This only works for dispatching events. ListenFor (and other things that connect directly to the EventSource)
     // bypass all this machinery.
     Action handler = () => DispatchEvent((Ability)method.Target, method);
-    evt.Action += handler; // TODO: how to remove?
+    evt.Listen(handler); // TODO: how to remove?
   }
   void DispatchEvent(Ability ability, AbilityMethod method) {
     // TODO: This should be per-trigger not per-ability
