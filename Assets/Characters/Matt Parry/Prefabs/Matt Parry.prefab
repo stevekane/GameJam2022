@@ -127,7 +127,7 @@ GameObject:
   - component: {fileID: 4692194449579004222}
   - component: {fileID: 4692194449579004221}
   - component: {fileID: 4692194449579004220}
-  - component: {fileID: 4692194449579004223}
+  - component: {fileID: 3934282978319618277}
   m_Layer: 16
   m_Name: HurtBox
   m_TagString: Untagged
@@ -175,7 +175,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 2, y: 6, z: 2}
   m_Center: {x: 0, y: 3, z: 0}
---- !u!54 &4692194449579004223
+--- !u!54 &3934282978319618277
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -185,12 +185,12 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_UseGravity: 0
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
-  m_CollisionDetection: 2
+  m_Constraints: 0
+  m_CollisionDetection: 1
 --- !u!1 &4692194450172351927
 GameObject:
   m_ObjectHideFlags: 0
@@ -201,6 +201,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4692194450172351818}
   - component: {fileID: 4692194450172351925}
+  - component: {fileID: 2682167282304232492}
   - component: {fileID: 2793019997782131147}
   - component: {fileID: 869648123590668608}
   - component: {fileID: 4692194450172351924}
@@ -242,6 +243,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ad6469a979949144ad1604c35ccf83b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2682167282304232492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4692194450172351927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1d9f7493e521df49a7af36797d00810, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 4661272542552748758}
 --- !u!114 &2793019997782131147
 MonoBehaviour:
   m_ObjectHideFlags: 0

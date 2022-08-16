@@ -13,7 +13,7 @@ public class Defender : MonoBehaviour {
   Status Status;
   Damage Damage;
 
-  public bool IsParrying; 
+  public bool IsParrying;
   public bool IsBlocking;
 
   public static Vector3 KnockbackVector(Transform attacker, Transform target, KnockBackType type) {
@@ -32,6 +32,7 @@ public class Defender : MonoBehaviour {
   }
 
   public void OnHit(HitParams hit, Transform hitTransform) {
+    Debug.Log(hitTransform.name);
     if (IsBlocking || IsParrying)
       return;
     var power = 5f * hit.KnockbackStrength * Mathf.Pow((Damage.Points+100f) / 100f, 2f);

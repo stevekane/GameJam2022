@@ -33,7 +33,6 @@ public class PowerShot : Ability {
     var arrow = Instantiate(ArrowPrefab, transform.position, transform.rotation);
     var damageMultiplier = DamageMultiplierFromDuration.Evaluate(duration/maxDuration);
     arrow.Damage *= damageMultiplier;
-    Debug.Log($"Duration: {duration} | MaxDuration {maxDuration} | Damage {arrow.Damage}");
     yield return Animator.Run(ReleaseClip);
     Stop();
   }

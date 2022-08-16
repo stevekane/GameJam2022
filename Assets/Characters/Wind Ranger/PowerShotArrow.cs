@@ -9,14 +9,17 @@ public class PowerShotArrow : MonoBehaviour {
   int TargetsHit;
 
   void OnCollisionEnter(Collision c) {
-    if (c.collider.TryGetComponent(out Hurtbox hurtbox)) {
+    VFXManager.Instance.TrySpawnEffect(DestructionPrefab, c.contacts[0].point);
+    Destroy(gameObject);
+  }
+
+  void OnProjectileEnter(ProjectileCollision c) {
+    if (c.Collider.TryGetComponent(out Hurtbox hurtbox)) {
+      hurtbox.Defender.gameObject.SendMessage("OnContact", gameObject, SendMessageOptions.DontRequireReceiver);
       if (hurtbox.Defender.TryGetComponent(out Damage damage)) {
         damage.AddPoints(Damage*Mathf.Pow(1-DamageReductionPerTarget, TargetsHit));
         TargetsHit++;
       }
-    } else {
-      VFXManager.Instance.TrySpawnEffect(DestructionPrefab, transform.position);
-      Destroy(gameObject);
     }
   }
 }
