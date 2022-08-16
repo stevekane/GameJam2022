@@ -56,9 +56,6 @@ public class Smoke : MonoBehaviour {
   [SerializeField] float ATTACKING_TURN_SPEED;
   [SerializeField] float ATTACK_RANGE = 8f;
   [SerializeField] float FIRING_PUSHBACK_SPEED;
-  [SerializeField] ParticleSystem ChargeParticles;
-  [SerializeField] AudioClip ChargeAudioClip;
-  [SerializeField] float ChargeAudioClipStartingTime;
 
   AbilityManager Abilities;
   Defender Defender;
@@ -127,21 +124,15 @@ public class Smoke : MonoBehaviour {
       --RecoveryFrames;
     }
 
-    Animator.SetBool("Dashing", Motion == Motion.Dashing);
-
     var moveSpeed = 0 switch {
       _ when !Status.CanMove => 0,
       _ when inMoveRange => 0,
       _ when IsAttacking => .5f*MOVE_SPEED,
-      _ when Motion == Motion.Dashing => DASH_SPEED,
       _ => MOVE_SPEED
     };
     Velocity.SetXZ(moveSpeed * (desiredPos - transform.position).XZ().normalized);
     Velocity.y = Controller.isGrounded ? GRAVITY*dt : Velocity.y + GRAVITY*dt;
     Controller.Move(dt*Velocity);
-    if (Motion == Motion.Dashing) {
-      ChargeParticles.transform.forward = -Velocity.TryGetDirection() ?? -transform.forward;
-    }
 
     var turnSpeed = 0 switch {
       _ when IsAttacking => ATTACKING_TURN_SPEED,

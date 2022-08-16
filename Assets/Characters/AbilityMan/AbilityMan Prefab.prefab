@@ -45,7 +45,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8db1d4fc560ada348a59786480066615, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Triggers: []
   Tags: 2
   Cancels: 0
   Blocks: 3
@@ -551,6 +550,8 @@ MonoBehaviour:
   CanMove: 1
   CanRotate: 1
   CanAttack: 1
+  MoveSpeedFactor: 1
+  RotateSpeedFactor: 1
 --- !u!114 &4601772429776417513
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -746,6 +747,16 @@ MonoBehaviour:
     Entry:
       Ability: {fileID: 8024295469742284886}
       MethodName: GrappleRelease
+  - ButtonCode: 0
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 2615019952461112204}
+      MethodName: Begin
+  - ButtonCode: 0
+    ButtonPressType: 2
+    Entry:
+      Ability: {fileID: 2615019952461112204}
+      MethodName: Release
   AxisMaps:
   - AxisCode: 0
     AxisTag: 0
@@ -913,7 +924,7 @@ GameObject:
   - component: {fileID: 6754213077101348298}
   - component: {fileID: 8024295469742284886}
   m_Layer: 0
-  m_Name: GrappleAbilityFibered
+  m_Name: GrappleAbility
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -946,10 +957,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5c7fb2a1360c9347a8ff1a9c5b1330a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Triggers:
-  - MethodReference:
-      MethodName: GrappleStart
-    EventTag: 18
   Tags: 2
   Cancels: 0
   Blocks: -1
@@ -1010,9 +1017,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3847493186566153015}
-  - component: {fileID: 2905338135085366194}
+  - component: {fileID: 2615019952461112204}
   m_Layer: 0
-  m_Name: DashManagerAbility
+  m_Name: DashAbility
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1033,7 +1040,7 @@ Transform:
   m_Father: {fileID: 5058609327624050481}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2905338135085366194
+--- !u!114 &2615019952461112204
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1042,17 +1049,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 6608343477612587529}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 904255f28b12cee41a8aea946f938cf2, type: 3}
+  m_Script: {fileID: 11500000, guid: a101e05126a70ce4ea7eb457d5f90342, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Triggers: []
   Tags: 0
   Cancels: 0
   Blocks: 0
-  Owner: {fileID: 4601772429776417504}
-  DashThreshold:
-    Millis: 1000
-    TicksPerSecond: 60
+  MoveSpeedFactor: 2.5
+  Particles: {fileID: 0}
+  AudioClip: {fileID: 8300000, guid: 0eda13886c86ca145936c7017a0dafa5, type: 3}
+  AudioClipStartingTime: 0.25
 --- !u!1 &8683805225698379235
 GameObject:
   m_ObjectHideFlags: 0
@@ -1097,10 +1103,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 174ea97c62f9dc2469788bc98ba437c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Triggers:
-  - MethodReference:
-      MethodName: AttackStart
-    EventTag: 16
   Tags: 1
   Cancels: 0
   Blocks: 3

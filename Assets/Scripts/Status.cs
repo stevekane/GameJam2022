@@ -124,6 +124,8 @@ public class Status : MonoBehaviour {
   public bool CanMove = true;
   public bool CanRotate = true;
   public bool CanAttack = true;
+  public float MoveSpeedFactor = 1f;  // TODO: replaces CanMove?
+  public float RotateSpeedFactor = 1f;
 
   List<StatusEffect> Added = new();
   public void Add(StatusEffect effect, OnEffectComplete onComplete = null) {
@@ -162,6 +164,8 @@ public class Status : MonoBehaviour {
     CanMove = true;
     CanRotate = true;
     CanAttack = true;
+    MoveSpeedFactor = 1f;
+    RotateSpeedFactor = 1f;
 
     // TODO: differentiate between cancelled and completed?
     Removed.ForEach(e => { e.OnComplete?.Invoke(this); e.OnRemoved(this); Active.Remove(e); });
