@@ -124,6 +124,7 @@ public class ScopedRunner : IDisposable {
   Bundle Bundle;
   Fiber Fiber;
 
+  // TODO: could just test Fiber.IsRunning?
   public bool IsRunning { get => Bundle.IsRoutineRunning(Fiber); }
   public ScopedRunner(Bundle bundle, IEnumerator routine) {
     Bundle = bundle;

@@ -28,23 +28,28 @@ public class AbilityManager : MonoBehaviour {
       if (ShouldFire()) {
         Action?.Invoke();
         var enumerator = Method();
-        if (enumerator == null)
-          return;  // Just a method tag
-        Ability.StartRoutine(new Fiber(enumerator));
-        Ability.AbilityManager.ToAdd.Add(Ability);
+        if (enumerator != null) {  // Can be null for events that listen temporarily.
+          Ability.StartRoutine(new Fiber(enumerator));
+          Ability.AbilityManager.ToAdd.Add(Ability);
+        }
+        var tags = Ability.GetTriggerCondition(Method).Tags;
         foreach (var activeAbility in Ability.AbilityManager.Running) {
-          if ((activeAbility.Cancels & Ability.Tags) != 0) {
+          if ((activeAbility.CancelledBy & tags) != 0) {
             activeAbility.Stop();
           }
         }
       }
     }
     bool ShouldFire() {
-      // TODO: This should be per-trigger not per-ability
-      // TODO: how to detect already running? the fiber is recreated for each dispatch
-      //var alreadyRunning = Fiber != null && Ability.IsRoutineRunning(Fiber);
-      var isBlocked = Ability.AbilityManager.Running.Exists(a => (a.Blocks & Ability.Tags) != 0);
-      return !isBlocked;
+      var conditions = Ability.GetTriggerCondition(Method);
+      var runStateOk = conditions.ActiveIf switch {
+        AbilityRunState.Always => true,
+        AbilityRunState.AbilityIsRunning => Ability.IsRunning,
+        AbilityRunState.AbilityIsNotRunning => !Ability.IsRunning,
+        _ => false,
+      };
+      var isBlocked = Ability.AbilityManager.Running.Exists(a => (a.Blocks & conditions.Tags) != 0);
+      return runStateOk && !isBlocked;
     }
   }
 
@@ -77,7 +82,7 @@ public class AbilityManager : MonoBehaviour {
     Abilities = GetComponentsInChildren<Ability>();
   }
   void Start() {
-    Abilities.ForEach(a => a.AbilityManager = this);
+    Abilities.ForEach(a => { a.AbilityManager = this; a.Init(); });
   }
   void OnDestroy() {
     Abilities.ForEach(a => a.AbilityManager = null);

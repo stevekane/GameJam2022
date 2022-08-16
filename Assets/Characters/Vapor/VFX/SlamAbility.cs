@@ -28,7 +28,6 @@ public class SlamAbility : Ability {
   }
 
   public IEnumerator ChargeStart() {
-    //Debug.Log($"ChargeRelease event: {AbilityManager.GetEvent(ChargeRelease)}");
     yield return Fiber.Any(new[]{Charging(), Windup.StartWithCharge(Animator, Index), Fiber.ListenFor(AbilityManager.GetEvent(ChargeRelease))});
     SlamAction.Activate();
     SFXManager.Instance.TryPlayOneShot(FireSFX);
@@ -39,12 +38,7 @@ public class SlamAbility : Ability {
     Done();
   }
 
-  public IEnumerator ChargeRelease() {
-    Debug.Log($"ChargeRelease");
-    yield return null;
-    //Windup.OnChargeEnd();
-    //yield return null;
-  }
+  public IEnumerator ChargeRelease() => null;
 
   public void Done() {
     Animator.SetBool("Attacking", false);
