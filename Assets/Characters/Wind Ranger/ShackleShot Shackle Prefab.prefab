@@ -49,6 +49,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 427bb0273288b944699caf0b8586da40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  LayerMask:
+    serializedVersion: 2
+    m_Bits: 65536
+  TriggerInteraction: 2
+  Radius: 20
+  Radians: 3.14159
 --- !u!114 &4581995352491449725
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61,7 +67,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9a88b1df843bb04fb7a21e4e9ee4307, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InitialSpeed: 120
+  LayerMask:
+    serializedVersion: 2
+    m_Bits: 65536
+  TriggerInteraction: 2
+  PreviousPosition: {x: 0, y: 0, z: 0}
+  InitialSpeed: 100
 --- !u!114 &-2736372406954328272
 MonoBehaviour:
   m_ObjectHideFlags: 0

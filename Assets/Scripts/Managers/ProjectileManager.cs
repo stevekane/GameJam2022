@@ -23,7 +23,7 @@ public class ProjectileManager : MonoBehaviour {
   Dictionary<Projectile,HashSet<Collider>> Contacts = new(INITIAL_PROJECTILE_OCCUPANCY);
 
   public void AddProjectile(Projectile p) {
-    p.PreviousPosition = transform.position;
+    p.PreviousPosition = p.transform.position;
     Projectiles.Add(p);
     Contacts.Add(p, new());
   }
