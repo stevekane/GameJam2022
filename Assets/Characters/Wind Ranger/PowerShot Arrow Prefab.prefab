@@ -51,8 +51,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DestructionPrefab: {fileID: 159918, guid: f3d60ef1464f95348a9ffe17f312927e, type: 3}
-  LifeTime: 3
-  LaunchSpeed: 240
   DamageReductionPerTarget: 0.2
   Damage: 100
 --- !u!114 &770273405835763687
@@ -67,6 +65,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9a88b1df843bb04fb7a21e4e9ee4307, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  LayerMask:
+    serializedVersion: 2
+    m_Bits: 65536
+  TriggerInteraction: 2
+  PreviousPosition: {x: 0, y: 0, z: 0}
   InitialSpeed: 240
 --- !u!114 &-9009849104711908222
 MonoBehaviour:
