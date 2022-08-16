@@ -140,7 +140,8 @@ public class Status : MonoBehaviour {
 
   List<StatusEffect> Removed = new();
   public void Remove(StatusEffect effect) {
-    Removed.Add(effect);
+    if (effect != null)
+      Removed.Add(effect);
   }
 
   public T Get<T>() where T : StatusEffect {

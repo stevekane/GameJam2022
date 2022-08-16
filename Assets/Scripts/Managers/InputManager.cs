@@ -50,13 +50,13 @@ public class InputManager : MonoBehaviour {
 
   public bool UseMouseAndKeyboard = false;
   Player Player;
-  Dictionary<(ButtonCode, ButtonPressType), EventSource> Buttons = new();
+  Dictionary<(ButtonCode, ButtonPressType), IEventSource> Buttons = new();
   public AxisState AxisLeft = new();
   public AxisState AxisRight = new();
 
-  public EventSource ButtonEvent(ButtonCode code, ButtonPressType type) {
-    if (!Buttons.TryGetValue((code, type), out EventSource evt))
-      Buttons.Add((code, type), evt = new());
+  public IEventSource ButtonEvent(ButtonCode code, ButtonPressType type, Func<IEventSource> cons) {
+    if (!Buttons.TryGetValue((code, type), out IEventSource evt))
+      Buttons.Add((code, type), evt = cons());
     return evt;
   }
 
@@ -93,7 +93,7 @@ public class InputManager : MonoBehaviour {
     return new Vector2(Input.GetAxisRaw(xname), Input.GetAxisRaw(yname));
   }
 
-  void BroadcastEvent(ButtonCode code, ButtonPressType type, EventSource evt) {
+  void BroadcastEvent(ButtonCode code, ButtonPressType type, IEventSource evt) {
     Predicate<string> func = type switch {
       ButtonPressType.JustDown => Input.GetButtonDown,
       ButtonPressType.Down => Input.GetButton,
