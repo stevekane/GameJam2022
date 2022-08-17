@@ -25,6 +25,10 @@ public static class VectorExtensions {
   public static Vector3? TryGetDirection(this Vector3 vector) {
     return vector.sqrMagnitude > 0 ? vector : null;
   }
+
+  public static Vector3 MidPoint(this Vector3 first, Vector3 second) {
+    return first+(second-first)/2;
+  }
 }
 
 public static class NullableExtensions {
