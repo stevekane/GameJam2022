@@ -28,9 +28,7 @@ public abstract class Ability : MonoBehaviour {
   public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
   public void StopRoutine(Fiber routine) => Bundle.StopRoutine(routine);
   public virtual void Stop() => Bundle.StopAll();
-  public void Init() {
-    TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.GetMethod(this)] = c);
-  }
+  public void Init() => TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.GetMethod(this)] = c);
   public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, EmptyCondition);
   void FixedUpdate() => Bundle.Run();
 }

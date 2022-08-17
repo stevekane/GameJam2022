@@ -35,17 +35,18 @@ public class SlamAbility : Ability {
     SlamAction = null;
     yield return Active.Start(Animator, Index);
     yield return Recovery.Start(Animator, Index);
-    Done();
+    Stop();
   }
 
   public IEnumerator ChargeRelease() => null;
 
-  public void Done() {
+  public override void Stop() {
+    base.Stop();
     Animator.SetBool("Attacking", false);
     Animator.SetInteger("AttackIndex", -1);
     Animator.SetFloat("AttackSpeed", 1);
     if (SlamAction != null) {
-      SlamAction.Activate();
+      Destroy(SlamAction.gameObject);
       SlamAction = null;
     }
   }
