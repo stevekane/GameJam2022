@@ -7,7 +7,7 @@ public class GrapplingHook : MonoBehaviour {
 
   void OnCollisionEnter(Collision c) {
     if (c.transform.gameObject != Owner) {
-      OnHit.Action?.Invoke(c);
+      OnHit.Fire(c);
     }
   }
 

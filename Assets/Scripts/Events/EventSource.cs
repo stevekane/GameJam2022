@@ -1,20 +1,27 @@
-using System.Collections.Generic;
+using System;
+
+public interface IEventSource {
+  public void Listen(Action handler);
+  public void Unlisten(Action handler);
+  public void Fire();
+}
+
+public interface IEventSource<T> {
+  public void Listen(Action<T> handler);
+  public void Unlisten(Action<T> handler);
+  public void Fire(T t);
+}
 
 public class EventSource : IEventSource {
-  public List<IEventSource> Connected { get; set; } = new();
-  public System.Action Action;
-
-  public void Fire() {
-    Action?.Invoke();
-    Connected.ForEach(c => c.Fire());
-  }
+  Action Action;
+  public void Listen(Action handler) => Action += handler;
+  public void Unlisten(Action handler) => Action -= handler;
+  public void Fire() => Action?.Invoke();
 }
 
 public class EventSource<T> : IEventSource<T> {
-  public List<IEventSource<T>> Connected { get; set; } = new();
-  public System.Action<T> Action;
-  public void Fire(T t) {
-    Action?.Invoke(t);
-    Connected.ForEach(c => c.Fire(t));
-  }
+  Action<T> Action;
+  public void Listen(Action<T> handler) => Action += handler;
+  public void Unlisten(Action<T> handler) => Action -= handler;
+  public void Fire(T t) => Action?.Invoke(t);
 }

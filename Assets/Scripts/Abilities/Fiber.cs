@@ -31,23 +31,23 @@ public class Bundle {
 }
 
 public class Listener : IEnumerator, IStoppable {
-  EventSource Source;
+  IEventSource Source;
 
-  public Listener(EventSource source) {
+  public Listener(IEventSource source) {
     IsRunning = true;
     Source = source;
-    Source.Action += Callback;
+    Source.Listen(Callback);
   }
   ~Listener() {
-    Source.Action -= Callback;
+    Source.Unlisten(Callback);
   }
   public void Callback() {
     IsRunning = false;
-    Source.Action -= Callback;
+    Source.Unlisten(Callback);
   }
   public void Stop() {
     IsRunning = false;
-    Source.Action -= Callback;
+    Source.Unlisten(Callback);
   }
   public bool IsRunning { get; set; }
   public void Reset() => throw new NotSupportedException();
@@ -56,25 +56,25 @@ public class Listener : IEnumerator, IStoppable {
 }
 
 public class Listener<T> : IEnumerator, IStoppable, IValue<T> {
-  EventSource<T> Source;
+  IEventSource<T> Source;
 
-  public Listener(EventSource<T> source) {
+  public Listener(IEventSource<T> source) {
     IsRunning = true;
     Source = source;
-    Source.Action += Callback;
+    Source.Listen(Callback);
   }
   ~Listener() {
     IsRunning = false;
-    Source.Action -= Callback;
+    Source.Unlisten(Callback);
   }
   public void Callback(T t) {
     Value = t;
     IsRunning = false;
-    Source.Action -= Callback;
+    Source.Unlisten(Callback);
   }
   public void Stop() {
     IsRunning = false;
-    Source.Action -= Callback;
+    Source.Unlisten(Callback);
   }
   public bool IsRunning { get; set; }
   public void Reset() => IsRunning = true;
@@ -124,6 +124,7 @@ public class ScopedRunner : IDisposable {
   Bundle Bundle;
   Fiber Fiber;
 
+  // TODO: could just test Fiber.IsRunning?
   public bool IsRunning { get => Bundle.IsRoutineRunning(Fiber); }
   public ScopedRunner(Bundle bundle, IEnumerator routine) {
     Bundle = bundle;
@@ -220,11 +221,10 @@ public class Fiber : IEnumerator, IStoppable {
   public static IEnumerator Any(IEnumerable<IEnumerator> xs) => xs.Aggregate(Any);
   public static IEnumerator All(IEnumerable<IEnumerator> xs) => xs.Aggregate(All);
   public static Selector Select(IEnumerator a, IEnumerator b) => new Selector(a, b);
-  public static Listener ListenFor(EventSource source) => new Listener(source);
-  public static Listener<T> ListenFor<T>(EventSource<T> source) => new Listener<T>(source);
+  public static Listener ListenFor(IEventSource source) => new Listener(source);
+  public static Listener<T> ListenFor<T>(IEventSource<T> source) => new Listener<T>(source);
   public static ScopedRunner Scoped(Bundle bundle, IEnumerator routine) => new ScopedRunner(bundle, routine);
 
-  IEnumerator Enumerator;
   Stack<IEnumerator> Stack;
   public Fiber(IEnumerator enumerator) {
     Stack = new();

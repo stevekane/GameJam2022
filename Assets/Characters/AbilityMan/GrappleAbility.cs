@@ -38,13 +38,13 @@ public class GrappleAbility : Ability {
     Hook = Instantiate(HookPrefab, transform.position, transform.rotation);
     Hook.Owner = Owner;
     Hook.Origin = transform;
-    Hook.OnHit.Action += OnHit;
+    Hook.OnHit.Listen(OnHit);
     Hook.GetComponent<Rigidbody>().AddForce(HOOK_SPEED*transform.forward, ForceMode.Impulse);
     var hookHit = ListenFor(Hook.OnHit);
     var throwWait = Wait(MAX_THROW_DURATION.Frames);
     var throwOutcome = Select(hookHit, throwWait);
     yield return throwOutcome;
-    Hook.OnHit.Action -= OnHit;
+    Hook.OnHit.Unlisten(OnHit);
     // Hook hit something
     if (throwOutcome.Value == (int)ThrowResult.Hit) {
       Owner.GetComponent<Animator>().SetBool("Grappling", true);
