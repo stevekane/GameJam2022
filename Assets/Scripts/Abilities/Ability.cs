@@ -19,7 +19,9 @@ public class TriggerCondition {
 public abstract class Ability : MonoBehaviour {
   static TriggerCondition EmptyCondition = new();
   protected Bundle Bundle = new();
+  protected List<IDisposable> Disposables = new();
   public AbilityManager AbilityManager { get; set; }
+  public Status Status { get => AbilityManager.GetComponent<Status>(); }
   public List<TriggerCondition> TriggerConditions = new();
   Dictionary<AbilityMethod, TriggerCondition> TriggerConditionsMap = new();
   public AbilityTag CancelledBy;
@@ -27,7 +29,15 @@ public abstract class Ability : MonoBehaviour {
   public bool IsRunning { get => Bundle.IsRunning; }
   public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
   public void StopRoutine(Fiber routine) => Bundle.StopRoutine(routine);
-  public virtual void Stop() => Bundle.StopAll();
+  public StatusEffect AddStatusEffect(StatusEffect effect, OnEffectComplete onComplete = null) {
+    Status.Add(effect, onComplete);
+    Disposables.Add(effect);
+    return effect;
+  }
+  public virtual void Stop() {
+    Bundle.StopAll();
+    Disposables.ForEach(s => s.Dispose());
+  }
   public void Init() => TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.GetMethod(this)] = c);
   public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, EmptyCondition);
   void FixedUpdate() => Bundle.Run();

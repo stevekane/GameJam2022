@@ -17,7 +17,6 @@ public class DashAbility : Ability {
   [SerializeField] AudioClip AudioClip;
   [SerializeField] float AudioClipStartingTime;
   Animator Animator;
-  Status Status;
   AudioSource AudioSource;
 
   public IEnumerator Begin() {
@@ -26,7 +25,7 @@ public class DashAbility : Ability {
     AudioSource.clip = AudioClip;
     AudioSource.time = AudioClipStartingTime;
     AudioSource.Play();
-    Status.Add(new DashEffect(MoveSpeedFactor));
+    AddStatusEffect(new DashEffect(MoveSpeedFactor));
     yield return Fiber.Any(Dashing(), Fiber.ListenFor(AbilityManager.GetEvent(Release)));
     Stop();
   }
@@ -46,12 +45,10 @@ public class DashAbility : Ability {
   public override void Stop() {
     Animator.SetBool("Dashing", false);
     AudioSource.Stop();
-    Status.Remove(Status.Get<DashEffect>());
     base.Stop();
   }
 
   void Awake() {
-    Status = GetComponentInParent<Status>();
     //Controller = GetComponent<CharacterController>();
     Animator = GetComponentInParent<Animator>();
     AudioSource = GetComponentInParent<AudioSource>();

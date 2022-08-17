@@ -1,14 +1,17 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public delegate void OnEffectComplete(Status status);
 
-public abstract class StatusEffect {
+public abstract class StatusEffect : IDisposable {
+  internal Status Status; // non-null while Added to this Status
   public OnEffectComplete OnComplete;
   public abstract bool Merge(StatusEffect e);
   public abstract void Apply(Status status);
   public virtual void OnRemoved(Status status) { }
+  public void Dispose() => Status?.Remove(this);
 }
 
 public class AutoAimEffect : StatusEffect {
@@ -129,6 +132,7 @@ public class Status : MonoBehaviour {
 
   List<StatusEffect> Added = new();
   public void Add(StatusEffect effect, OnEffectComplete onComplete = null) {
+    effect.Status = this;
     var count = Active.Count;
     var existing = Active.FirstOrDefault((e) => e.GetType() == effect.GetType());
     if (existing == null || !existing.Merge(effect)) {
@@ -169,7 +173,7 @@ public class Status : MonoBehaviour {
     RotateSpeedFactor = 1f;
 
     // TODO: differentiate between cancelled and completed?
-    Removed.ForEach(e => { e.OnComplete?.Invoke(this); e.OnRemoved(this); Active.Remove(e); });
+    Removed.ForEach(e => { e.OnComplete?.Invoke(this); e.OnRemoved(this); e.Status = null; Active.Remove(e); });
     Removed.Clear();
     Added.ForEach(e => Active.Add(e));
     Added.Clear();
