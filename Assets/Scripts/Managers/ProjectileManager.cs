@@ -66,7 +66,7 @@ public class ProjectileManager : MonoBehaviour {
 
   void SendExitEvents(Projectile p) {
     var delta = p.PreviousPosition-p.transform.position;
-    var ray = new Ray(p.PreviousPosition, delta.normalized);
+    var ray = new Ray(p.transform.position, delta.normalized);
     var hits = Physics.RaycastNonAlloc(ray, Hits, delta.magnitude, p.LayerMask, p.TriggerInteraction);
     var colliders = Contacts.GetValueOrDefault(p);
     for (var i = 0; i < hits; i++) {
