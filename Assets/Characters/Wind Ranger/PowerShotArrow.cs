@@ -15,11 +15,14 @@ public class PowerShotArrow : MonoBehaviour {
 
   void OnProjectileEnter(ProjectileCollision c) {
     if (c.Collider.TryGetComponent(out Hurtbox hurtbox)) {
-      hurtbox.Defender.gameObject.SendMessage("OnContact", gameObject, SendMessageOptions.DontRequireReceiver);
-      if (hurtbox.Defender.TryGetComponent(out Damage damage)) {
-        damage.AddPoints(Damage*Mathf.Pow(1-DamageReductionPerTarget, TargetsHit));
-        TargetsHit++;
-      }
+      var hitParams = new HitParams {
+        HitStopDuration = Timeval.FromMillis(100),
+        Damage = Damage*Mathf.Pow(1-DamageReductionPerTarget, TargetsHit),
+        KnockbackStrength = 0,
+        KnockbackType = KnockBackType.Forward
+      };
+      TargetsHit++;
+      hurtbox.Defender.OnHit(hitParams, transform);
     }
   }
 }

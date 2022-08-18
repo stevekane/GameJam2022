@@ -271,6 +271,10 @@ MonoBehaviour:
   CanMove: 1
   CanRotate: 1
   CanAttack: 1
+  IsHittable: 1
+  IsDamageable: 1
+  MoveSpeedFactor: 1
+  RotateSpeedFactor: 1
 --- !u!114 &869648123590668608
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -296,7 +300,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c806621753f76840a91b87e3c0d2fc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsParrying: 1
+  IsParrying: 0
   IsBlocking: 0
 --- !u!114 &704825919502182732
 MonoBehaviour:

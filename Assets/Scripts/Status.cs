@@ -124,6 +124,8 @@ public class Status : MonoBehaviour {
   public bool CanMove = true;
   public bool CanRotate = true;
   public bool CanAttack = true;
+  public bool IsHittable = true;
+  public bool IsDamageable = true;
   public float MoveSpeedFactor = 1f;  // TODO: replaces CanMove?
   public float RotateSpeedFactor = 1f;
 
@@ -165,6 +167,8 @@ public class Status : MonoBehaviour {
     CanMove = true;
     CanRotate = true;
     CanAttack = true;
+    IsHittable = true;
+    IsDamageable = true;
     MoveSpeedFactor = 1f;
     RotateSpeedFactor = 1f;
 

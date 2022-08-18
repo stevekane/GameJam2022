@@ -217,6 +217,7 @@ public class Fiber : IEnumerator, IStoppable {
   }
 
   public static Any Any(IEnumerator a, IEnumerator b) => new Any(a, b);
+  public static Any Any(IEnumerator a, IEnumerator b, IEnumerator c) => new Any(new Any(a, b), c);
   public static All All(IEnumerator a, IEnumerator b) => new All(a, b);
   public static IEnumerator Any(IEnumerable<IEnumerator> xs) => xs.Aggregate(Any);
   public static IEnumerator All(IEnumerable<IEnumerator> xs) => xs.Aggregate(All);

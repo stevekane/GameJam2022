@@ -44,12 +44,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 123d084abbb537147b65147028fce357, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Tags: 0
-  Cancels: 0
+  TriggerConditions: []
+  CancelledBy: 0
   Blocks: 0
+  SlowDuration:
+    Millis: 2000
+    TicksPerSecond: 30
   Duration:
     Millis: 3000
     TicksPerSecond: 30
+  LayerMask:
+    serializedVersion: 2
+    m_Bits: 65536
+  TriggerInteraction: 2
+  Radius: 20
 --- !u!1 &2582651163176662534
 GameObject:
   m_ObjectHideFlags: 0
@@ -94,8 +102,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1708c1a0d4da9b642a2fb09bb9391425, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Tags: 10
-  Cancels: 0
+  TriggerConditions: []
+  CancelledBy: 0
   Blocks: 10
   DamageMultiplierFromDuration:
     serializedVersion: 2
@@ -135,6 +143,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2582651163493360453}
   - component: {fileID: 2582651163493360452}
+  - component: {fileID: 5431750401187216590}
   - component: {fileID: 6994602829365010295}
   - component: {fileID: 2940330219637808556}
   - component: {fileID: 374224407259611018}
@@ -177,6 +186,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AbilityManager: {fileID: 6994602829365010295}
   CharacterController: {fileID: 2582651163493360474}
+--- !u!114 &5431750401187216590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2582651163493360454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b25f034a0a2d6547bb601e0fe361f46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CanMove: 1
+  CanRotate: 1
+  CanAttack: 1
+  IsHittable: 1
+  IsDamageable: 1
+  MoveSpeedFactor: 1
+  RotateSpeedFactor: 1
 --- !u!114 &6994602829365010295
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -309,8 +337,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddb99724099100d4e8a780bf64296eb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Tags: 8
-  Cancels: 0
+  TriggerConditions: []
+  CancelledBy: 0
   Blocks: 8
   ShacklePrefab: {fileID: 1086418695680750777, guid: 071c5ef180598904e83962926cb585b8, type: 3}
   Animator: {fileID: 2582651164267693602}
@@ -531,8 +559,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01ca85eaef70a3f4babba1b221c9e0c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Tags: 0
-  Cancels: 0
+  TriggerConditions: []
+  CancelledBy: 0
   Blocks: 0
   Owner: {fileID: 2582651163493360453}
   Target: {fileID: 0}
