@@ -43,6 +43,13 @@ public static class IntExtensions {
   }
 }
 
+public static class FlagLikeExtensions {
+  public static AbilityTag AddFlags(this ref AbilityTag tag, AbilityTag mask) => tag |= mask;
+  public static AbilityTag ClearFlags(this ref AbilityTag tag, AbilityTag mask) => tag &= ~mask;
+  public static bool HasAllFlags(this AbilityTag tag, AbilityTag mask) => (tag & mask) == mask;
+  public static bool HasAnyFlags(this AbilityTag tag, AbilityTag mask) => (tag & mask) != 0;
+}
+
 public static class MonoExtensions {
   // Returns the (first matching) requested component on this object, creating it first if necessary.
   public static T GetOrCreateComponent<T>(this MonoBehaviour self) where T : MonoBehaviour {

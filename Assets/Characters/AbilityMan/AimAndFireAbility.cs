@@ -14,18 +14,13 @@ public class AimAndFireAbility : Ability {
   public Timeval ShotCooldown;
   public Animator Animator;
 
-  AutoAimEffect AutoAimEffect;
-
   public override void Stop() {
-    if (AutoAimEffect != null)
-      Aimer.GetComponent<Status>()?.Remove(AutoAimEffect);
     Animator.SetBool("Firing", false);
     base.Stop();
   }
 
   public IEnumerator AttackStart() {
-    AutoAimEffect = new AutoAimEffect();
-    Aimer.GetComponent<Status>()?.Add(AutoAimEffect);
+    AddStatusEffect(new SpeedFactorEffect(1f, 0f));
     Animator.SetBool("Firing", true);
     yield return Any(new AimAt(Aimer, Target, TurnSpeed), NTimes(3, Fire));
     Stop();

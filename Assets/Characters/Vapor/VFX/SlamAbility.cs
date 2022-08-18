@@ -28,6 +28,7 @@ public class SlamAbility : Ability {
   }
 
   public IEnumerator ChargeStart() {
+    AddStatusEffect(new SpeedFactorEffect(.5f, .5f));
     yield return Fiber.Any(new[]{Charging(), Windup.StartWithCharge(Animator, Index), Fiber.ListenFor(AbilityManager.GetEvent(ChargeRelease))});
     SlamAction.Activate();
     SFXManager.Instance.TryPlayOneShot(FireSFX);
@@ -35,17 +36,18 @@ public class SlamAbility : Ability {
     SlamAction = null;
     yield return Active.Start(Animator, Index);
     yield return Recovery.Start(Animator, Index);
-    Done();
+    Stop();
   }
 
   public IEnumerator ChargeRelease() => null;
 
-  public void Done() {
+  public override void Stop() {
+    base.Stop();
     Animator.SetBool("Attacking", false);
     Animator.SetInteger("AttackIndex", -1);
     Animator.SetFloat("AttackSpeed", 1);
     if (SlamAction != null) {
-      SlamAction.Activate();
+      Destroy(SlamAction.gameObject);
       SlamAction = null;
     }
   }
