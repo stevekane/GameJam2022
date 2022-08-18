@@ -124,10 +124,10 @@ public class Status : MonoBehaviour {
   internal CharacterController Controller;
   internal Animator Animator;
 
-  public bool CanMove = true;
-  public bool CanRotate = true;
+  public bool CanMove { get => MoveSpeedFactor > 0f; set => MoveSpeedFactor = value ? 1f : 0f; }
+  public bool CanRotate { get => RotateSpeedFactor > 0f; set => RotateSpeedFactor = value ? 1f : 0f; }
   public bool CanAttack = true;
-  public float MoveSpeedFactor = 1f;  // TODO: replaces CanMove?
+  public float MoveSpeedFactor = 1f;
   public float RotateSpeedFactor = 1f;
 
   List<StatusEffect> Added = new();
@@ -166,8 +166,6 @@ public class Status : MonoBehaviour {
   }
 
   private void FixedUpdate() {
-    CanMove = true;
-    CanRotate = true;
     CanAttack = true;
     MoveSpeedFactor = 1f;
     RotateSpeedFactor = 1f;
