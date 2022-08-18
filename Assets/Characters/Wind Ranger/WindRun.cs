@@ -12,7 +12,6 @@ public class WindRun : Ability {
   WindRunBoostEffect WindRunBoostEffect;
   Collider[] Colliders { get => PhysicsBuffers.Colliders; }
   Vector3 Position { get => AbilityManager.transform.position; }
-  Status Status { get => AbilityManager.GetComponent<Status>(); }
   Status TargetStatus(GameObject g) => g.GetComponent<Hurtbox>()?.Defender.GetComponent<Status>();
 
   IEnumerator SlowNearby() {
