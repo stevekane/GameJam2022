@@ -132,6 +132,7 @@ public class Status : MonoBehaviour {
   public bool CanAttack = true;
   public bool IsHittable = true;
   public bool IsDamageable = true;
+  public float MoveSpeedFactor = 1f;
   public float RotateSpeedFactor = 1f;
 
   List<StatusEffect> Added = new();
