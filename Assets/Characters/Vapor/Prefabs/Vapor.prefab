@@ -72,9 +72,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bce66daebde14349aeca8a15d7e3c96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TriggerConditions:
+  - Method:
+      MethodName: ChargeStart
+    Tags: 19
+  - Method:
+      MethodName: ChargeRelease
+    Tags: 4
   Tags: 0
-  Cancels: 0
-  Blocks: 0
   Index: 4
   Owner: {fileID: 0}
   Animator: {fileID: 0}
@@ -316,9 +321,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c05e2b324b7be2447826a43593dd3bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TriggerConditions:
+  - Method:
+      MethodName: ChargeStart
+    Tags: 5
+  - Method:
+      MethodName: ChargeRelease
+    Tags: 4
   Tags: 0
-  Cancels: 0
-  Blocks: 0
   Index: 2
   Windup:
     Duration:
@@ -426,9 +436,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c05e2b324b7be2447826a43593dd3bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TriggerConditions:
+  - Method:
+      MethodName: AttackStart
+    Tags: 33
   Tags: 0
-  Cancels: 0
-  Blocks: 0
   Index: 0
   Windup:
     Duration:
@@ -636,9 +648,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a101e05126a70ce4ea7eb457d5f90342, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TriggerConditions:
+  - Method:
+      MethodName: Begin
+    Tags: 8
+  - Method:
+      MethodName: Release
+    Tags: 4
   Tags: 0
-  Cancels: 0
-  Blocks: 0
+  MoveSpeedFactor: 2.5
   Particles: {fileID: 4585268613483689328}
   AudioClip: {fileID: 8300000, guid: 0eda13886c86ca145936c7017a0dafa5, type: 3}
   AudioClipStartingTime: 0.25
@@ -1122,7 +1140,6 @@ MonoBehaviour:
   GRAVITY: -200
   MOVE_SPEED: 20
   FIRING_MOVE_SPEED: 5
-  DASH_SPEED: 55
   TURN_SPEED: 1080
   FIRING_TURN_SPEED: 45
   ATTACKING_TURN_SPEED: 0
@@ -1130,9 +1147,6 @@ MonoBehaviour:
   WireRide:
     Millis: 666.6667
     TicksPerSecond: 30
-  ChargeParticles: {fileID: 4585268613483689328}
-  ChargeAudioClip: {fileID: 8300000, guid: 0eda13886c86ca145936c7017a0dafa5, type: 3}
-  ChargeAudioClipStartingTime: 0.25
   PunchCycleIndex: 0
 --- !u!114 &5758432820797294223
 MonoBehaviour:
@@ -1176,6 +1190,8 @@ MonoBehaviour:
   CanMove: 1
   CanRotate: 1
   CanAttack: 1
+  MoveSpeedFactor: 1
+  RotateSpeedFactor: 1
 --- !u!114 &5571416124093621161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1378,6 +1394,16 @@ MonoBehaviour:
     Entry:
       Ability: {fileID: 5938650978471480679}
       MethodName: ChargeRelease
+  - ButtonCode: 0
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 696150299245317217}
+      MethodName: Begin
+  - ButtonCode: 0
+    ButtonPressType: 2
+    Entry:
+      Ability: {fileID: 696150299245317217}
+      MethodName: Release
   AxisMaps:
   - AxisCode: 0
     AxisTag: 0
@@ -1859,9 +1885,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c05e2b324b7be2447826a43593dd3bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TriggerConditions:
+  - Method:
+      MethodName: AttackStart
+    Tags: 33
   Tags: 0
-  Cancels: 0
-  Blocks: 0
   Index: 1
   Windup:
     Duration:

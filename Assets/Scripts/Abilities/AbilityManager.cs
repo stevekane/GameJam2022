@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum AxisTag {
@@ -21,39 +22,37 @@ public class AbilityManager : MonoBehaviour {
     Action Action;
     Ability Ability;
     AbilityMethod Method;
-    public EventRouter(Ability ability, AbilityMethod method) => (Ability, Method) = (ability, method);
+    AbilityTag TriggerTags;
+    public EventRouter(Ability ability, AbilityMethod method) => (Ability, Method, TriggerTags) = (ability, method, ability.GetTriggerTags(method));
     public void Listen(Action handler) => Action += handler;
     public void Unlisten(Action handler) => Action -= handler;
     public void Fire() {
       if (ShouldFire()) {
+        Ability.Tags.AddFlags(TriggerTags);
         Action?.Invoke();
         var enumerator = Method();
         if (enumerator != null) {  // Can be null for events that listen temporarily.
           Ability.StartRoutine(new Fiber(enumerator));
           Ability.AbilityManager.ToAdd.Add(Ability);
         }
-        var tags = Ability.GetTriggerCondition(Method).Tags;
-        foreach (var activeAbility in Ability.AbilityManager.Running) {
-          if ((activeAbility.CancelledBy & tags) != 0) {
-            activeAbility.Stop();
-          }
-        }
+        if (TriggerTags.HasAllFlags(AbilityTag.CancelOthers))
+          Ability.AbilityManager.Running.Where(a => a.Tags.HasAllFlags(AbilityTag.Cancellable)).ForEach(a => a.Stop());
       }
     }
     bool ShouldFire() {
-      var conditions = Ability.GetTriggerCondition(Method);
-      var runStateOk = conditions.ActiveIf switch {
-        AbilityRunState.Always => true,
-        AbilityRunState.AbilityIsRunning => Ability.IsRunning,
-        AbilityRunState.AbilityIsNotRunning => !Ability.IsRunning,
-        _ => false,
+      var am = Ability.AbilityManager;
+      var canRun = 0 switch {
+        _ when TriggerTags.HasAllFlags(AbilityTag.OnlyOne) && am.Running.Any(a => a.Tags.HasAllFlags(AbilityTag.OnlyOne) && !CanCancel(a)) => false,
+        _ when TriggerTags.HasAllFlags(AbilityTag.BlockIfRunning) && Ability.IsRunning => false,
+        _ when TriggerTags.HasAllFlags(AbilityTag.BlockIfNotRunning) && !Ability.IsRunning => false,
+        _ => true,
       };
-      var isBlocked = Ability.AbilityManager.Running.Exists(a => (a.Blocks & conditions.Tags) != 0);
-      return runStateOk && !isBlocked;
+      return canRun;
     }
+    bool CanCancel(Ability other) => TriggerTags.HasAllFlags(AbilityTag.CancelOthers) && other.Tags.HasAllFlags(AbilityTag.Cancellable);
   }
 
-  public void StopAllAbilities() => Abilities.ForEach((a) => { if (a.IsRunning) a.Stop(); });
+  public void InterruptAbilities() => Abilities.Where(a => a.IsRunning && !a.Tags.HasAllFlags(AbilityTag.Uninterruptible)).ForEach(a => a.Stop());
 
   public void RegisterAxis(AxisTag tag, AxisState axis) {
     TagToAxis[tag] = axis;
@@ -80,8 +79,6 @@ public class AbilityManager : MonoBehaviour {
 
   void Awake() {
     Abilities = GetComponentsInChildren<Ability>();
-  }
-  void Start() {
     Abilities.ForEach(a => { a.AbilityManager = this; a.Init(); });
   }
   void OnDestroy() {

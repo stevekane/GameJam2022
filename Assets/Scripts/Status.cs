@@ -47,7 +47,7 @@ public class KnockbackEffect : StatusEffect {
     status.CanAttack = !IsAirborne;
     status.Animator?.SetBool("HitFlinch", IsAirborne);
     if (!status.CanAttack) {
-      status.GetComponent<AbilityManager>()?.StopAllAbilities();
+      status.GetComponent<AbilityManager>()?.InterruptAbilities();
     }
     if (Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED)
       status.Remove(this);
