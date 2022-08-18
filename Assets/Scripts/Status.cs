@@ -14,10 +14,13 @@ public abstract class StatusEffect : IDisposable {
   public void Dispose() => Status?.Remove(this);
 }
 
-public class AutoAimEffect : StatusEffect {
-  public override bool Merge(StatusEffect e) => true;
+public class SpeedFactorEffect : StatusEffect {
+  float MoveSpeedFactor, RotateSpeedFactor;
+  public SpeedFactorEffect(float move, float rotate) => (MoveSpeedFactor, RotateSpeedFactor) = (move, rotate);
+  public override bool Merge(StatusEffect e) => false;
   public override void Apply(Status status) {
-    status.CanRotate = false;
+    status.MoveSpeedFactor *= MoveSpeedFactor;
+    status.RotateSpeedFactor *= RotateSpeedFactor;
   }
 }
 

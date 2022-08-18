@@ -28,6 +28,7 @@ public class SlamAbility : Ability {
   }
 
   public IEnumerator ChargeStart() {
+    AddStatusEffect(new SpeedFactorEffect(.5f, .5f));
     yield return Fiber.Any(new[]{Charging(), Windup.StartWithCharge(Animator, Index), Fiber.ListenFor(AbilityManager.GetEvent(ChargeRelease))});
     SlamAction.Activate();
     SFXManager.Instance.TryPlayOneShot(FireSFX);

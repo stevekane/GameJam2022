@@ -1,15 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
-public class DashEffect : StatusEffect {
-  float Factor;
-  public DashEffect(float factor) => Factor = factor;
-  public override bool Merge(StatusEffect e) => false;
-  public override void Apply(Status status) {
-    status.MoveSpeedFactor *= Factor;
-  }
-}
 
 public class DashAbility : Ability {
   [SerializeField] float MoveSpeedFactor = 3f;
@@ -25,7 +15,7 @@ public class DashAbility : Ability {
     AudioSource.clip = AudioClip;
     AudioSource.time = AudioClipStartingTime;
     AudioSource.Play();
-    AddStatusEffect(new DashEffect(MoveSpeedFactor));
+    AddStatusEffect(new SpeedFactorEffect(MoveSpeedFactor, 1f));
     yield return Fiber.Any(Dashing(), Fiber.ListenFor(AbilityManager.GetEvent(Release)));
     Stop();
   }
