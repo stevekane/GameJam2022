@@ -364,6 +364,86 @@ MonoBehaviour:
   HitDamage: 15
   HitTargetKnockbackStrength: 50
   HitRecoilStrength: 50
+--- !u!1 &2784476827323047724
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 371394410303385243}
+  - component: {fileID: 2018989688727340095}
+  - component: {fileID: 9220310676260380902}
+  - component: {fileID: 3002947848983109568}
+  m_Layer: 13
+  m_Name: Suplex
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &371394410303385243
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2784476827323047724}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5571416123097895009}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &2018989688727340095
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2784476827323047724}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 4, y: 6, z: 5}
+  m_Center: {x: 0, y: 3, z: 3}
+--- !u!114 &9220310676260380902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2784476827323047724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e93db3e391a640243a06b63541cd965b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Collider: {fileID: 2018989688727340095}
+--- !u!114 &3002947848983109568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2784476827323047724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e488fb5f5cc76c499448ac0a698eb9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TriggerConditions:
+  - Method:
+      MethodName: AttackStart
+    Tags: 11
+  Tags: 0
+  CollideMask:
+    serializedVersion: 2
+    m_Bits: 2147483647
 --- !u!1 &4872877845196898822
 GameObject:
   m_ObjectHideFlags: 0
@@ -693,6 +773,7 @@ Transform:
   - {fileID: 232568689298950285}
   - {fileID: 7199471196977928480}
   - {fileID: 1922017593864157115}
+  - {fileID: 371394410303385243}
   m_Father: {fileID: 5571416124093621163}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1187,9 +1268,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b25f034a0a2d6547bb601e0fe361f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CanMove: 1
-  CanRotate: 1
   CanAttack: 1
+  IsHittable: 1
+  IsDamageable: 1
   MoveSpeedFactor: 1
   RotateSpeedFactor: 1
 --- !u!114 &5571416124093621161
@@ -1404,6 +1485,11 @@ MonoBehaviour:
     Entry:
       Ability: {fileID: 696150299245317217}
       MethodName: Release
+  - ButtonCode: 1
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 3002947848983109568}
+      MethodName: AttackStart
   AxisMaps:
   - AxisCode: 0
     AxisTag: 0

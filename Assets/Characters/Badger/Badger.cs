@@ -92,10 +92,12 @@ public class Badger : MonoBehaviour {
     if (!inRange && Status.CanMove && CurrentAbility == null && WaitFrames <= 0 && RecoveryFrames <= 0) {
       transform.forward = desiredFacing;
       var dir = (desiredPos - transform.position).normalized;
-      Velocity.SetXZ(MoveSpeed * dir);
+      Velocity.SetXZ(MoveSpeed * Status.MoveSpeedFactor * dir);
       var gravity = -200f * Time.fixedDeltaTime;
       Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
-      Controller.Move(Velocity*Time.fixedDeltaTime);
+      if (!Status.HasGravity)
+        Velocity.y = 0f;
+      Controller.Move(Time.fixedDeltaTime * Velocity);
     }
 
     if ((CurrentAbility == null || Defender.IsBlocking) && WaitFrames > 0)

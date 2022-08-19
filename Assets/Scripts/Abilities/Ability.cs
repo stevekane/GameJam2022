@@ -20,9 +20,12 @@ public abstract class Ability : MonoBehaviour {
   public bool IsRunning { get => Bundle.IsRunning; }
   public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
   public void StopRoutine(Fiber routine) => Bundle.StopRoutine(routine);
+  public T Using<T>(T d) where T : IDisposable {
+    Disposables.Add(d);
+    return d;
+  }
   public StatusEffect AddStatusEffect(StatusEffect effect, OnEffectComplete onComplete = null) {
-    Status.Add(effect, onComplete);
-    Disposables.Add(effect);
+    Status.Add(Using(effect), onComplete);
     return effect;
   }
   public virtual void Stop() {

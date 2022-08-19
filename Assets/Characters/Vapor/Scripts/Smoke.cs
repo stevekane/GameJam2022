@@ -130,15 +130,20 @@ public class Smoke : MonoBehaviour {
       _ when IsAttacking => .5f*MOVE_SPEED,
       _ => MOVE_SPEED
     };
+    moveSpeed *= Status.MoveSpeedFactor;
     Velocity.SetXZ(moveSpeed * (desiredPos - transform.position).XZ().normalized);
-    Velocity.y = Controller.isGrounded ? GRAVITY*dt : Velocity.y + GRAVITY*dt;
-    Controller.Move(dt*Velocity);
+    var gravity = GRAVITY*dt;
+    Velocity.y = Controller.isGrounded ? gravity : Velocity.y + gravity;
+    if (!Status.HasGravity)
+      Velocity.y = 0f;
+    Controller.Move(dt * Velocity);
 
     var turnSpeed = 0 switch {
       _ when IsAttacking => ATTACKING_TURN_SPEED,
       _ when Cannon.IsFiring => FIRING_TURN_SPEED,
       _ => TURN_SPEED
     };
+    turnSpeed *= Status.RotateSpeedFactor;
     transform.rotation = RotationFromDesired(transform, turnSpeed, desiredFacing, dt);
   }
 }

@@ -116,8 +116,6 @@ public class Vapor : MonoBehaviour, IWireRider {
     if (Motion == Motion.Base) {
       var moveSpeed = 0 switch {
         _ when !Status.CanMove => 0,
-        //_ when IsAttacking => Attacker.MoveFactor*MOVE_SPEED, // TODO
-        _ when IsAttacking => .5f*MOVE_SPEED,
         _ when Cannon.IsFiring => FIRING_MOVE_SPEED,
         _ => MOVE_SPEED
       };
@@ -126,13 +124,15 @@ public class Vapor : MonoBehaviour, IWireRider {
       var gravity = dt*GRAVITY;
       Velocity.SetXZ(moveVelocity);
       Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
+      if (!Status.HasGravity)
+        Velocity.y = 0f;
       Controller.Move(dt*Velocity);
-    //} else if (Motion == Motion.Dashing) {
-    //  var moveVelocity = VelocityFromMove(DASH_SPEED);
-    //  Velocity.SetXZ(moveVelocity);
-    //  Velocity.y = 0;
-    //  ChargeParticles.transform.forward = -moveVelocity.TryGetDirection() ?? -transform.forward;
-    //  Controller.Move(dt*Velocity);
+      //} else if (Motion == Motion.Dashing) {
+      //  var moveVelocity = VelocityFromMove(DASH_SPEED);
+      //  Velocity.SetXZ(moveVelocity);
+      //  Velocity.y = 0;
+      //  ChargeParticles.transform.forward = -moveVelocity.TryGetDirection() ?? -transform.forward;
+      //  Controller.Move(dt*Velocity);
     } else if (Motion == Motion.WireRiding) {
       var distance = 1f-(float)WireFramesTraveled/(float)WireRide.Frames;
       var wirePathData = Wire.Waypoints.ToWorldSpace(distance);

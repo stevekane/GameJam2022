@@ -37,6 +37,10 @@ public class Wasp : MonoBehaviour {
     Velocity.SetXZ(Vector3.zero);
     var gravity = -200f * Time.fixedDeltaTime;
     Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
+    if (!Status.HasGravity)
+      Velocity.y = 0f;
+    var moveSpeed = MoveSpeed;
+    moveSpeed *= Status.MoveSpeedFactor;
 
     switch (State) {
     case StateType.Idle:
@@ -55,7 +59,7 @@ public class Wasp : MonoBehaviour {
           Abilities.GetEvent(Pellet.AttackStart).Fire();
           CurrentAbility = Abilities.Abilities.FirstOrDefault((a) => a.IsRunning);
         } else if (Status.CanMove) {
-          Velocity.SetXZ(dir * MoveSpeed);
+          Velocity.SetXZ(dir * moveSpeed);
         }
         break;
       }
@@ -73,7 +77,7 @@ public class Wasp : MonoBehaviour {
         var desiredDist = ShootRadius - 5f;
         if (targetDelta.sqrMagnitude < desiredDist*desiredDist && Status.CanMove) {
           var dir = -targetDelta.normalized;
-          Velocity.SetXZ(dir * MoveSpeed);
+          Velocity.SetXZ(dir * moveSpeed);
           transform.forward = dir;
         } else {
           State = StateType.Idle;
@@ -83,6 +87,6 @@ public class Wasp : MonoBehaviour {
       }
     }
 
-    Controller.Move(Velocity*Time.fixedDeltaTime);
+    Controller.Move(Time.fixedDeltaTime * Velocity);
   }
 }
