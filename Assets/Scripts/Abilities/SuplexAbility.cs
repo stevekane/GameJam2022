@@ -60,18 +60,19 @@ public class SuplexAbility : Ability {
         targetStatus.Move(move);
         yield return null;
       }
+      if (i == 0)
+        targetStatus.transform.up = -targetStatus.transform.up;
     }
 
     var hitParams = new HitParams {
-      HitStopDuration = Timeval.FromMillis(200),
+      HitStopDuration = Timeval.FromMillis(400),
       Damage = Damage,
       KnockbackStrength = 20,
       KnockbackType = KnockBackType.Forward
     };
     // TODO: vfx/sfx
     target.OnHit(hitParams, transform);
-  }
-
-  void Awake() {
+    yield return Fiber.Wait(hitParams.HitStopDuration.Frames);
+    targetStatus.transform.up = -targetStatus.transform.up;
   }
 }
