@@ -2,19 +2,6 @@ using System.Collections;
 using UnityEngine;
 using static Fiber;
 
-public class Timer : AbilityTask, IValue<Timeval> {
-  public Timeval Value { get; } = Timeval.FromMillis(0);
-  public Timer() {
-    Enumerator = Routine();
-  }
-  public override IEnumerator Routine() {
-    while (true) {
-      Value.Millis+=Time.fixedDeltaTime;
-      yield return null;
-    }
-  }
-}
-
 public class PowerShot : Ability {
   public AnimationCurve DamageMultiplierFromDuration;
   public PowerShotArrow ArrowPrefab;
@@ -28,7 +15,7 @@ public class PowerShot : Ability {
     var timer = new Timer();
     using var scoped = Scoped(Bundle, timer);
     yield return Any(windup, release);
-    var maxDuration = WindupClip.length;
+    var maxDuration = WindupClip.length*1000; // to ms
     var duration = timer.Value.Millis;
     var arrow = Instantiate(ArrowPrefab, transform.position, transform.rotation);
     var damageMultiplier = DamageMultiplierFromDuration.Evaluate(duration/maxDuration);

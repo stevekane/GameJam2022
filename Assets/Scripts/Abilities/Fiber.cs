@@ -30,6 +30,16 @@ public class Bundle {
   }
 }
 
+public class Timer : IEnumerator, IValue<Timeval> {
+  public Timeval Value { get; } = Timeval.FromMillis(0);
+  public bool MoveNext() {
+    Value.Frames++;
+    return true;
+  }
+  public object Current { get => Value; }
+  public void Reset() => Value.Millis = 0;
+}
+
 public class Listener : IEnumerator, IStoppable {
   IEventSource Source;
 

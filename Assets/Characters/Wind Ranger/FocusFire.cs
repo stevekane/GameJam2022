@@ -3,6 +3,9 @@ using UnityEngine;
 using static Fiber;
 
 public class FocusFire : Ability {
+  public FocusFireArrow ArrowPrefab;
+  public AnimationClip FireClip;
+  public Animator Animator;
   public Transform Owner;
   public Transform Target;
   public Timeval Duration = Timeval.FromMillis(10000);
@@ -16,11 +19,15 @@ public class FocusFire : Ability {
 
   IEnumerator RapidFire(int cooldown) {
     while (true) {
-      if (Target && Vector3.Distance(Owner.position, Target.position) < MaxRange) {
-        yield return Wait(cooldown);
-      } else {
-        yield return null;
-      }
+      yield return Animator.Run(FireClip);
+      Instantiate(ArrowPrefab, transform.position, transform.rotation);
+      yield return Wait(ShotCooldown.Frames);
+      // if (Target && Vector3.Distance(Owner.position, Target.position) < MaxRange) {
+      //   yield return Animator.Run(FireClip);
+      //   Instantiate(ArrowPrefab, transform.position, transform.rotation);
+      // } else {
+      //   yield return null;
+      // }
     }
   }
 }
