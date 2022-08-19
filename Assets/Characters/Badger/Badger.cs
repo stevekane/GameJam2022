@@ -2,12 +2,9 @@ using System.Linq;
 using UnityEngine;
 
 public class Badger : MonoBehaviour {
-  public float MoveSpeed = 15f;
   public float AttackRange = 2f;
   public Timeval AttackDelay = Timeval.FromMillis(1000);
-  CharacterController Controller;
   Status Status;
-  Animator Animator;
   Defender Defender;
   Transform Target;
   AbilityManager Abilities;
@@ -15,7 +12,6 @@ public class Badger : MonoBehaviour {
   Shield Shield;
   int WaitFrames = 0;
   int RecoveryFrames = 0;
-  Vector3 Velocity;
   Ability CurrentAbility;
   MeleeAttackAbility PunchAbility;
   ShieldAbility ShieldAbility;
@@ -23,9 +19,7 @@ public class Badger : MonoBehaviour {
   public void Awake() {
     Target = GameObject.FindObjectOfType<Player>().transform;
     TargetAbilities = Target.GetComponent<AbilityManager>();
-    Controller = GetComponent<CharacterController>();
     Status = GetComponent<Status>();
-    Animator = GetComponent<Animator>();
     Defender = GetComponent<Defender>();
     Shield = GetComponentInChildren<Shield>();
     Abilities = GetComponent<AbilityManager>();
@@ -89,16 +83,11 @@ public class Badger : MonoBehaviour {
       }
     }
 
-    if (!inRange && Status.CanMove && CurrentAbility == null && WaitFrames <= 0 && RecoveryFrames <= 0) {
-      transform.forward = desiredFacing;
-      var dir = (desiredPos - transform.position).normalized;
-      Velocity.SetXZ(MoveSpeed * Status.MoveSpeedFactor * dir);
-      var gravity = -200f * Time.fixedDeltaTime;
-      Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
-      if (!Status.HasGravity)
-        Velocity.y = 0f;
-      Controller.Move(Time.fixedDeltaTime * Velocity);
-    }
+    var desiredMoveDir = Vector3.zero;
+    if (!inRange && CurrentAbility == null && WaitFrames <= 0 && RecoveryFrames <= 0)
+      desiredMoveDir = (desiredPos - transform.position).XZ().normalized;
+    Abilities.GetAxis(AxisTag.Move).Update(0f, new Vector2(desiredMoveDir.x, desiredMoveDir.z));
+    Abilities.GetAxis(AxisTag.Aim).Update(0f, new Vector2(desiredFacing.x, desiredFacing.z));
 
     if ((CurrentAbility == null || Defender.IsBlocking) && WaitFrames > 0)
       --WaitFrames;

@@ -3,13 +3,6 @@ using System.Linq;
 using UnityEngine;
 
 public class Smoke : MonoBehaviour {
-  static Quaternion RotationFromDesired(Transform t, float speed, Vector3 desiredForward, float dt) {
-    var currentRotation = t.rotation;
-    var desiredRotation = Quaternion.LookRotation(desiredForward);
-    var degrees = dt*speed;
-    return Quaternion.RotateTowards(currentRotation, desiredRotation, degrees);
-  }
-
   (Vector3, Vector3, float) ChoosePosition() {
     var t = Target.transform;
     var pos = t.position;
@@ -38,51 +31,31 @@ public class Smoke : MonoBehaviour {
     AttackRoutine = null;
   }
 
-  IEnumerator DodgeSequence() {
-    yield return new WaitForSeconds(.1f);
-    IsDodging = true;
-    yield return new WaitUntil(() => !TargetIsAttacking);
-    yield return new WaitForSeconds(.1f);
-    IsDodging = false;
-    DodgeRoutine = null;
-  }
+  //IEnumerator DodgeSequence() {
+  //  yield return new WaitForSeconds(.1f);
+  //  IsDodging = true;
+  //  yield return new WaitUntil(() => !TargetIsAttacking);
+  //  yield return new WaitForSeconds(.1f);
+  //  IsDodging = false;
+  //  DodgeRoutine = null;
+  //}
 
-  [SerializeField] float GRAVITY;
-  [SerializeField] float MOVE_SPEED;
-  [SerializeField] float FIRING_MOVE_SPEED;
-  [SerializeField] float DASH_SPEED;
-  [SerializeField] float TURN_SPEED;
-  [SerializeField] float FIRING_TURN_SPEED;
-  [SerializeField] float ATTACKING_TURN_SPEED;
   [SerializeField] float ATTACK_RANGE = 8f;
-  [SerializeField] float FIRING_PUSHBACK_SPEED;
 
   AbilityManager Abilities;
-  Defender Defender;
-  Cannon Cannon;
   Status Status;
-  CharacterController Controller;
-  Animator Animator;
-  AudioSource AudioSource;
   AbilityManager Target;
   MeleeAttackAbility LightAttack;
   SlamAbility Slam;
 
-  Motion Motion;
   Coroutine AttackRoutine;
-  Coroutine DodgeRoutine;
+  //Coroutine DodgeRoutine;
   bool IsDodging = false;
-  Vector3 Velocity;
   int RecoveryFrames;
 
   void Awake() {
     Abilities = GetComponent<AbilityManager>();
-    Defender = GetComponent<Defender>();
-    Cannon = GetComponentInChildren<Cannon>();
     Status = GetComponent<Status>();
-    Controller = GetComponent<CharacterController>();
-    Animator = GetComponent<Animator>();
-    AudioSource = GetComponent<AudioSource>();
     Target = GameObject.FindObjectOfType<Player>().GetComponent<AbilityManager>();
     LightAttack = GetComponentInChildren<MeleeAttackAbility>();
     Slam = GetComponentInChildren<SlamAbility>();
@@ -98,7 +71,6 @@ public class Smoke : MonoBehaviour {
     (Vector3 desiredPos, Vector3 desiredFacing, float distToTarget) = ChoosePosition();
     bool inAttackRange = distToTarget < ATTACK_RANGE;
     bool inMoveRange = distToTarget < ATTACK_RANGE*.9f;
-    var dt = Time.fixedDeltaTime;
 
     var shouldAttack = Status.CanAttack && inAttackRange && RecoveryFrames <= 0;
     if (shouldAttack && AttackRoutine == null) {
@@ -124,26 +96,10 @@ public class Smoke : MonoBehaviour {
       --RecoveryFrames;
     }
 
-    var moveSpeed = 0 switch {
-      _ when !Status.CanMove => 0,
-      _ when inMoveRange => 0,
-      _ when IsAttacking => .5f*MOVE_SPEED,
-      _ => MOVE_SPEED
-    };
-    moveSpeed *= Status.MoveSpeedFactor;
-    Velocity.SetXZ(moveSpeed * (desiredPos - transform.position).XZ().normalized);
-    var gravity = GRAVITY*dt;
-    Velocity.y = Controller.isGrounded ? gravity : Velocity.y + gravity;
-    if (!Status.HasGravity)
-      Velocity.y = 0f;
-    Controller.Move(dt * Velocity);
-
-    var turnSpeed = 0 switch {
-      _ when IsAttacking => ATTACKING_TURN_SPEED,
-      _ when Cannon.IsFiring => FIRING_TURN_SPEED,
-      _ => TURN_SPEED
-    };
-    turnSpeed *= Status.RotateSpeedFactor;
-    transform.rotation = RotationFromDesired(transform, turnSpeed, desiredFacing, dt);
+    var desiredMoveDir = (desiredPos - transform.position).XZ().normalized;
+    if (inMoveRange)
+      desiredMoveDir = Vector3.zero;
+    Abilities.GetAxis(AxisTag.Move).Update(0f, new Vector2(desiredMoveDir.x, desiredMoveDir.z));
+    Abilities.GetAxis(AxisTag.Aim).Update(0f, new Vector2(desiredFacing.x, desiredFacing.z));
   }
 }

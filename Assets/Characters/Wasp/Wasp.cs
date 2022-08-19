@@ -5,13 +5,10 @@ public class Wasp : MonoBehaviour {
   public float ShootRadius = 20f;
   public float MoveSpeed = 15f;
   public Timeval ShootDelay = Timeval.FromMillis(1000);
-  CharacterController Controller;
   Status Status;
-  Animator Animator;
   Transform Target;
   AbilityManager Abilities;
   int FramesRemaining = 0;
-  Vector3 Velocity;
   Ability CurrentAbility;
   PelletAbility Pellet;
 
@@ -20,9 +17,7 @@ public class Wasp : MonoBehaviour {
 
   public void Awake() {
     Target = GameObject.FindObjectOfType<Player>().transform;
-    Controller = GetComponent<CharacterController>();
     Status = GetComponent<Status>();
-    Animator = GetComponent<Animator>();
     Abilities = GetComponent<AbilityManager>();
     Pellet = GetComponentInChildren<PelletAbility>();
   }
@@ -33,14 +28,8 @@ public class Wasp : MonoBehaviour {
 
     if (!CurrentAbility?.IsRunning ?? false)
       CurrentAbility = null;
-
-    Velocity.SetXZ(Vector3.zero);
-    var gravity = -200f * Time.fixedDeltaTime;
-    Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
-    if (!Status.HasGravity)
-      Velocity.y = 0f;
-    var moveSpeed = MoveSpeed;
-    moveSpeed *= Status.MoveSpeedFactor;
+    var desiredMoveDir = Vector3.zero;
+    var desiredFacing = transform.forward;
 
     switch (State) {
     case StateType.Idle:
@@ -53,20 +42,20 @@ public class Wasp : MonoBehaviour {
         var targetDelta = (Target.transform.position - transform.position);
         var targetInRange = targetDelta.sqrMagnitude < ShootRadius*ShootRadius;
         var dir = targetDelta.normalized;
-        transform.forward = dir;
+        desiredFacing = dir;
         if (targetInRange && Status.CanAttack && CurrentAbility == null) {
           State = StateType.Shoot;
           Abilities.GetEvent(Pellet.AttackStart).Fire();
           CurrentAbility = Abilities.Abilities.FirstOrDefault((a) => a.IsRunning);
-        } else if (Status.CanMove) {
-          Velocity.SetXZ(dir * moveSpeed);
+        } else {
+          desiredMoveDir = dir;
         }
         break;
       }
     case StateType.Shoot: {
         var targetDelta = (Target.transform.position - transform.position);
         var dir = targetDelta.normalized;
-        transform.forward = dir;
+        desiredFacing = dir;
         if (CurrentAbility == null) {
           State = StateType.Kite;
         }
@@ -77,8 +66,8 @@ public class Wasp : MonoBehaviour {
         var desiredDist = ShootRadius - 5f;
         if (targetDelta.sqrMagnitude < desiredDist*desiredDist && Status.CanMove) {
           var dir = -targetDelta.normalized;
-          Velocity.SetXZ(dir * moveSpeed);
-          transform.forward = dir;
+          desiredMoveDir = dir;
+          desiredFacing = dir;
         } else {
           State = StateType.Idle;
           FramesRemaining = ShootDelay.Frames;
@@ -87,6 +76,7 @@ public class Wasp : MonoBehaviour {
       }
     }
 
-    Controller.Move(Time.fixedDeltaTime * Velocity);
+    Abilities.GetAxis(AxisTag.Move).Update(0f, new Vector2(desiredMoveDir.x, desiredMoveDir.z));
+    Abilities.GetAxis(AxisTag.Aim).Update(0f, new Vector2(desiredFacing.x, desiredFacing.z));
   }
 }

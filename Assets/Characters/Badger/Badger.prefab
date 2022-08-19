@@ -414,17 +414,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a72310bdd2a379942a1c3610f4d7c3b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Triggers:
-  - MethodReference:
-      MethodName: HoldStart
-    EventTag: 9
-    MethodName: HoldStart
+  TriggerConditions: []
   Tags: 0
-  Cancels: 0
-  Blocks: 0
   Index: 1
   Animator: {fileID: 7727835182619467870}
-  ReleaseEvent: 10
   Windup:
     Duration:
       Millis: 133.33333
@@ -830,14 +823,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c05e2b324b7be2447826a43593dd3bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Triggers:
-  - MethodReference:
-      MethodName: AttackStart
-    EventTag: 8
-    MethodName: AttackStart
+  TriggerConditions: []
   Tags: 0
-  Cancels: 0
-  Blocks: 0
   Index: 0
   Windup:
     Duration:
@@ -1085,6 +1072,7 @@ GameObject:
   - component: {fileID: 1657031132205634076}
   - component: {fileID: 7219340043180141366}
   - component: {fileID: 242195660756952769}
+  - component: {fileID: 6204311958514039916}
   m_Layer: 10
   m_Name: Badger
   m_TagString: Untagged
@@ -1138,9 +1126,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b25f034a0a2d6547bb601e0fe361f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CanMove: 1
-  CanRotate: 1
+  HasGravity: 1
   CanAttack: 1
+  IsHittable: 1
+  IsDamageable: 1
+  MoveSpeedFactor: 1
+  RotateSpeedFactor: 1
 --- !u!114 &5571416124093621161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1218,7 +1209,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4071ddb671e87845a206a5ccb097d6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveSpeed: 15
   AttackRange: 4
   AttackDelay:
     Millis: 2000
@@ -1236,6 +1226,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Abilities: []
+  Running: []
+  ToAdd: []
+--- !u!114 &6204311958514039916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MoveSpeed: 20
+  TurnSpeed: 1080
+  Gravity: -200
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0
