@@ -384,14 +384,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b19c15c6473ec504da9b3e539be45d59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Triggers:
-  - MethodReference:
-      MethodName: AttackStart
-    EventTag: 7
-    MethodName: AttackStart
+  TriggerConditions: []
   Tags: 0
-  Cancels: 0
-  Blocks: 0
   Index: 0
   Animator: {fileID: 7727835182619467870}
   Windup:
@@ -753,6 +747,7 @@ GameObject:
   - component: {fileID: 6865395085482706047}
   - component: {fileID: 1657031132205634076}
   - component: {fileID: 4362511970478309579}
+  - component: {fileID: 7227641143467178568}
   m_Layer: 10
   m_Name: Wasp
   m_TagString: Untagged
@@ -806,9 +801,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b25f034a0a2d6547bb601e0fe361f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CanMove: 1
-  CanRotate: 1
+  HasGravity: 1
   CanAttack: 1
+  IsHittable: 1
+  IsDamageable: 1
+  MoveSpeedFactor: 1
+  RotateSpeedFactor: 1
 --- !u!114 &5571416124093621161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -904,6 +902,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Abilities: []
+  Running: []
+  ToAdd: []
+--- !u!114 &7227641143467178568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MoveSpeed: 15
+  TurnSpeed: 1080
+  Gravity: -200
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0

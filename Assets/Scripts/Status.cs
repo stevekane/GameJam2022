@@ -129,6 +129,7 @@ public class Status : MonoBehaviour {
 
   public bool CanMove { get => MoveSpeedFactor > 0f; set => MoveSpeedFactor = value ? 1f : 0f; }
   public bool CanRotate { get => RotateSpeedFactor > 0f; set => RotateSpeedFactor = value ? 1f : 0f; }
+  public bool HasGravity = true;  // hmmm does this make sense?
   public bool CanAttack = true;
   public bool IsHittable = true;
   public bool IsDamageable = true;
@@ -171,11 +172,12 @@ public class Status : MonoBehaviour {
   }
 
   private void FixedUpdate() {
+    MoveSpeedFactor = 1f;
+    RotateSpeedFactor = 1f;
+    HasGravity = true;
     CanAttack = true;
     IsHittable = true;
     IsDamageable = true;
-    MoveSpeedFactor = 1f;
-    RotateSpeedFactor = 1f;
 
     // TODO: differentiate between cancelled and completed?
     Removed.ForEach(e => { e.OnComplete?.Invoke(this); e.OnRemoved(this); e.Status = null; Active.Remove(e); });

@@ -23,7 +23,7 @@ public static class VectorExtensions {
   }
 
   public static Vector3? TryGetDirection(this Vector3 vector) {
-    return vector.sqrMagnitude > 0 ? vector : null;
+    return vector.sqrMagnitude > 0 ? vector.normalized : null;
   }
 
   public static Vector3 MidPoint(this Vector3 first, Vector3 second) {
@@ -63,6 +63,12 @@ public static class MonoExtensions {
   public static bool IsInFrontOf(this Vector3 p, Transform t) {
     var delta = p-t.position;
     var dot = Vector3.Dot(delta.normalized, t.forward);
+    return dot >= 0;
+  }
+
+  public static bool IsInFrontOf(this Vector3 p, Transform t, out float dot) {
+    var delta = p-t.position;
+    dot = Vector3.Dot(delta.normalized, t.forward);
     return dot >= 0;
   }
 
