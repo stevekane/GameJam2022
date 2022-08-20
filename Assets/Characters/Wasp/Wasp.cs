@@ -76,7 +76,6 @@ public class Wasp : MonoBehaviour {
       }
     }
 
-    Abilities.GetAxis(AxisTag.Move).Update(0f, new Vector2(desiredMoveDir.x, desiredMoveDir.z));
-    Abilities.GetAxis(AxisTag.Aim).Update(0f, new Vector2(desiredFacing.x, desiredFacing.z));
+    Mover.UpdateAxes(Abilities, desiredMoveDir, desiredFacing);
   }
 }

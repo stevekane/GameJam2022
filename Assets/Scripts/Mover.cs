@@ -2,6 +2,16 @@ using UnityEngine;
 
 [RequireComponent(typeof(CharacterController), typeof(Status), typeof(AbilityManager))]
 public class Mover : MonoBehaviour {
+  public static void UpdateAxes(AbilityManager manager, Vector3 desiredMoveDir, Vector3 desiredFacing) {
+    manager.GetAxis(AxisTag.Move).Update(0f, new Vector2(desiredMoveDir.x, desiredMoveDir.z));
+    manager.GetAxis(AxisTag.Aim).Update(0f, new Vector2(desiredFacing.x, desiredFacing.z));
+  }
+
+  public static void GetAxes(AbilityManager manager, out Vector3 desiredMoveDir, out Vector3 desiredFacing) {
+    desiredMoveDir = manager.GetAxis(AxisTag.Move).XZ;
+    desiredFacing = manager.GetAxis(AxisTag.Aim).XZ.TryGetDirection() ?? manager.transform.forward;
+  }
+
   [SerializeField] float MoveSpeed;
   [SerializeField] float TurnSpeed;
   [SerializeField] float Gravity;
@@ -26,7 +36,8 @@ public class Mover : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    var desiredMoveDir = AbilityManager.GetAxis(AxisTag.Move).XZ;
+    GetAxes(AbilityManager, out var desiredMoveDir, out var desiredFacing);
+
     var moveVelocity = MoveSpeed * Status.MoveSpeedFactor * desiredMoveDir;
     Velocity.SetXZ(moveVelocity);
     var gravity = Time.fixedDeltaTime * Gravity;
@@ -35,7 +46,6 @@ public class Mover : MonoBehaviour {
       Velocity.y = 0f;
     Controller.Move(Time.fixedDeltaTime * Velocity);
 
-    var desiredFacing = AbilityManager.GetAxis(AxisTag.Aim).XZ.TryGetDirection() ?? transform.forward;
     transform.rotation = RotationFromDesired(transform, TurnSpeed * Status.RotateSpeedFactor, desiredFacing);
   }
 }

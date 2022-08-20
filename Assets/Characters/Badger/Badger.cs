@@ -86,8 +86,7 @@ public class Badger : MonoBehaviour {
     var desiredMoveDir = Vector3.zero;
     if (!inRange && CurrentAbility == null && WaitFrames <= 0 && RecoveryFrames <= 0)
       desiredMoveDir = (desiredPos - transform.position).XZ().normalized;
-    Abilities.GetAxis(AxisTag.Move).Update(0f, new Vector2(desiredMoveDir.x, desiredMoveDir.z));
-    Abilities.GetAxis(AxisTag.Aim).Update(0f, new Vector2(desiredFacing.x, desiredFacing.z));
+    Mover.UpdateAxes(Abilities, desiredMoveDir, desiredFacing);
 
     if ((CurrentAbility == null || Defender.IsBlocking) && WaitFrames > 0)
       --WaitFrames;
