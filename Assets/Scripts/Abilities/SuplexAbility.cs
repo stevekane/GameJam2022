@@ -21,7 +21,6 @@ public class SuplexAbility : Ability {
   public GameObject HitVFX;
   public AudioClip HitSFX;
   public Vector3 HitVFXOffset = Vector3.up;
-  public LayerMask HitLayerMask;
 
   public IEnumerator AttackStart() {
     var targets = FindObjectsOfType<Hurtbox>();
@@ -78,14 +77,13 @@ public class SuplexAbility : Ability {
       KnockbackStrength = 20,
       KnockbackType = KnockBackType.Forward
     };
-    var hits = Physics.OverlapSphereNonAlloc(target.transform.position, HitRadius, PhysicsBuffers.Colliders, HitLayerMask);
+    var hits = Physics.OverlapSphereNonAlloc(target.transform.position, HitRadius, PhysicsBuffers.Colliders, Layers.CollidesWith(gameObject.layer));
     PhysicsBuffers.GetColliders(hits).ForEach(c => {
       if (c.TryGetComponent(out Hurtbox hurtbox)) {
         VFXManager.Instance.TrySpawnEffect(HitVFX, hurtbox.Defender.transform.position+HitVFXOffset);
         hurtbox.Defender.OnHit(hitParams, transform);
       }
     });
-
     yield return Fiber.Wait(hitParams.HitStopDuration.Frames);
     targetStatus.transform.up = -targetStatus.transform.up;
   }
