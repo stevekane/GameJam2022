@@ -14,13 +14,13 @@ public class Smoke : MonoBehaviour {
 
   IEnumerator AttackSequence() {
     yield return new WaitForSeconds(.1f);
-    Abilities.GetEvent(LightAttack.AttackStart).Fire();
+    Abilities.GetEvent(LightAttack.Attack).Fire();
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    Abilities.GetEvent(LightAttack.AttackStart).Fire();
+    Abilities.GetEvent(LightAttack.Attack).Fire();
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    Abilities.GetEvent(LightAttack.AttackStart).Fire();
+    Abilities.GetEvent(LightAttack.Attack).Fire();
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
     Abilities.GetEvent(Slam.ChargeStart).Fire();
@@ -45,7 +45,7 @@ public class Smoke : MonoBehaviour {
   AbilityManager Abilities;
   Status Status;
   AbilityManager Target;
-  MeleeAttackAbility LightAttack;
+  CycleAbility LightAttack;
   SlamAbility Slam;
 
   Coroutine AttackRoutine;
@@ -57,7 +57,7 @@ public class Smoke : MonoBehaviour {
     Abilities = GetComponent<AbilityManager>();
     Status = GetComponent<Status>();
     Target = GameObject.FindObjectOfType<Player>().GetComponent<AbilityManager>();
-    LightAttack = GetComponentInChildren<MeleeAttackAbility>();
+    LightAttack = GetComponentInChildren<CycleAbility>();
     Slam = GetComponentInChildren<SlamAbility>();
   }
 

@@ -210,6 +210,11 @@ public class Fiber : IEnumerator, IStoppable {
     }
   }
 
+  public static IEnumerator Until(Func<bool> pred) {
+    while (!pred())
+      yield return null;
+  }
+
   public static IEnumerator NTimes(int n, Func<IEnumerator> f) {
     for (var i = 0; i < n; i++) {
       yield return f();

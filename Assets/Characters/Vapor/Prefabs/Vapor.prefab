@@ -449,9 +449,6 @@ MonoBehaviour:
   HitVFX: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
   HitSFX: {fileID: 8300000, guid: f161f54138dc0314abdabf7ab71e3404, type: 3}
   HitVFXOffset: {x: 0, y: 1, z: 0}
-  HitLayerMask:
-    serializedVersion: 2
-    m_Bits: 65536
 --- !u!1 &4872877845196898822
 GameObject:
   m_ObjectHideFlags: 0
@@ -782,6 +779,7 @@ Transform:
   - {fileID: 7199471196977928480}
   - {fileID: 1922017593864157115}
   - {fileID: 371394410303385243}
+  - {fileID: 7036988371491868621}
   m_Father: {fileID: 5571416124093621163}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1466,8 +1464,8 @@ MonoBehaviour:
   - ButtonCode: 2
     ButtonPressType: 0
     Entry:
-      Ability: {fileID: 776304553845593926}
-      MethodName: AttackStart
+      Ability: {fileID: 626726736180106372}
+      MethodName: Attack
   - ButtonCode: 3
     ButtonPressType: 0
     Entry:
@@ -2029,6 +2027,60 @@ MonoBehaviour:
   HitDamage: 5
   HitTargetKnockbackStrength: 0
   HitRecoilStrength: 1
+--- !u!1 &9127015034591396752
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7036988371491868621}
+  - component: {fileID: 626726736180106372}
+  m_Layer: 0
+  m_Name: LeftRight Combo
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7036988371491868621
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9127015034591396752}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5571416123097895009}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &626726736180106372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9127015034591396752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 040bdab7322687b4388385856a2f3625, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TriggerConditions:
+  - Method:
+      MethodName: Attack
+    Tags: 2
+  Tags: 0
+  Abilities:
+  - Ability: {fileID: 776304553845593926}
+    MethodName: AttackStart
+  - Ability: {fileID: 5960270733240712027}
+    MethodName: AttackStart
 --- !u!1001 &1011520355114941726
 PrefabInstance:
   m_ObjectHideFlags: 0
