@@ -44,7 +44,9 @@ public class Defender : MonoBehaviour {
   }
 
   void Awake() {
-    Status = GetComponent<Status>();
+    // Note: GetComponentInParent is probably wrong. Badger's shield has a Defender so it can be destructible, but it's missing
+    // a bunch of other components like Status and Animator.
+    Status = GetComponentInParent<Status>();
     Damage = GetComponent<Damage>();
   }
 
