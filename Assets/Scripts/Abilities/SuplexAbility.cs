@@ -78,7 +78,7 @@ public class SuplexAbility : Ability {
       KnockbackType = KnockBackType.Forward
     };
     var hits = Physics.OverlapSphereNonAlloc(target.transform.position, HitRadius, PhysicsBuffers.Colliders, Layers.CollidesWith(gameObject.layer));
-    PhysicsBuffers.GetColliders(hits).ForEach(c => {
+    PhysicsBuffers.Colliders[..hits].ForEach(c => {
       if (c.TryGetComponent(out Hurtbox hurtbox)) {
         VFXManager.Instance.TrySpawnEffect(HitVFX, hurtbox.Defender.transform.position+HitVFXOffset);
         hurtbox.Defender.OnHit(hitParams, transform);
