@@ -14,18 +14,18 @@ public class Smoke : MonoBehaviour {
 
   IEnumerator AttackSequence() {
     yield return new WaitForSeconds(.1f);
-    Abilities.GetEvent(LightAttack.Attack).Fire();
+    Abilities.TryInvoke(LightAttack.Attack);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    Abilities.GetEvent(LightAttack.Attack).Fire();
+    Abilities.TryInvoke(LightAttack.Attack);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    Abilities.GetEvent(LightAttack.Attack).Fire();
+    Abilities.TryInvoke(LightAttack.Attack);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    Abilities.GetEvent(Slam.ChargeStart).Fire();
+    Abilities.TryInvoke(Slam.ChargeStart);
     yield return new WaitForSeconds(0.5f);
-    Abilities.GetEvent(Slam.ChargeRelease).Fire();
+    Abilities.TryInvoke(Slam.ChargeRelease);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForSeconds(.8f);
     AttackRoutine = null;

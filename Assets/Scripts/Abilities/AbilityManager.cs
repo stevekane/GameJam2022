@@ -70,6 +70,7 @@ public class AbilityManager : MonoBehaviour {
       RegisterEvent(method, evt = new EventRouter((Ability)method.Target, method));
     return evt;
   }
+  public void TryInvoke(AbilityMethod method) => GetEvent(method).Fire();
 
   void StackAdd<T>(List<T> target, List<T> additions) {
     target.Reverse();

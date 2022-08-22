@@ -11,7 +11,7 @@ public class CycleAbility : Ability {
   public IEnumerator Attack() {
     var (ability, method) = (Abilities[CycleIndex].Ability, AbilityMethods[CycleIndex]);
     CycleIndex = (CycleIndex + 1) % AbilityMethods.Length;
-    AbilityManager.GetEvent(method).Fire();
+    AbilityManager.TryInvoke(method);
     yield return Fiber.Until(() => !ability.IsRunning);
   }
 
