@@ -26,7 +26,7 @@ public class InputToTriggerMap : MonoBehaviour {
     ButtonMaps.ForEach(b => {
       var methodInfo = b.Entry.Ability.GetType().GetMethod(b.Entry.MethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
       var method = (AbilityMethod)Delegate.CreateDelegate(typeof(AbilityMethod), b.Entry.Ability, methodInfo);
-      AbilityManager.RegisterEvent(method, InputManager.Instance.ButtonEvent(b.ButtonCode, b.ButtonPressType, () => AbilityManager.GetEvent(method)));
+      AbilityManager.RegisterEvent(method, InputManager.Instance.ButtonEvent(b.ButtonCode, b.ButtonPressType));
     });
     AxisMaps.ForEach(a => {
       AbilityManager.RegisterAxis(a.AxisTag, InputManager.Instance.Axis(a.AxisCode));

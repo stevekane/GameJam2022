@@ -59,7 +59,8 @@ public class AbilityManager : MonoBehaviour {
     TagToAxis[tag] = axis;
   }
   public void RegisterEvent(AbilityMethod method, IEventSource evt) {
-    MethodToEvent[method] = evt;
+    var router = CreateRouter(method);
+    evt.Listen(() => router.Fire());  // TODO: Unlisten? need more context through the EventSource
   }
   public AxisState GetAxis(AxisTag tag) {
     if (!TagToAxis.TryGetValue(tag, out AxisState axis))
@@ -68,10 +69,11 @@ public class AbilityManager : MonoBehaviour {
   }
   public IEventSource GetEvent(AbilityMethod method) {
     if (!MethodToEvent.TryGetValue(method, out IEventSource evt))
-      RegisterEvent(method, evt = new EventRouter((Ability)method.Target, method));
+      evt = CreateRouter(method);
     return evt;
   }
   public void TryInvoke(AbilityMethod method) => GetEvent(method).Fire();
+  IEventSource CreateRouter(AbilityMethod method) => MethodToEvent[method] = new EventRouter((Ability)method.Target, method);
 
   void StackAdd<T>(List<T> target, List<T> additions) {
     target.Reverse();
