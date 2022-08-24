@@ -4,8 +4,10 @@ using UnityEngine;
 
 [Serializable]
 public class TriggerCondition {
+  internal static TriggerCondition Empty = new();
   public AbilityMethodReferenceSelf Method;
   public AbilityTag Tags = 0;
+  public AbilityTag RequiredOwnerTags = 0;
 }
 
 [Serializable]
@@ -34,6 +36,6 @@ public abstract class Ability : MonoBehaviour {
     Disposables.ForEach(s => s.Dispose());
   }
   public void Init() => TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.GetMethod(this)] = c);
-  public AbilityTag GetTriggerTags(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, null)?.Tags ?? 0;
+  public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
   void FixedUpdate() => Bundle.Run();
 }
