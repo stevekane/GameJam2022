@@ -14,10 +14,11 @@ public class MetamorphAbility : Ability {
   public Timeval Duration = Timeval.FromSeconds(10f);
   public float DamageFactor = 2f;
   public float KnockbackFactor = 1.5f;
+  Animator Animator;
 
   public IEnumerator Begin() {
+    Animator.SetBool("Morph", true);
     AddStatusEffect(new InlineEffect((status) => {
-    // Animator.SetBool(metamorph);
       status.Tags.ClearFlags(AbilityTag.BaseForm);
       status.Tags.AddFlags(AbilityTag.MorphForm);
       status.DamageFactor *= DamageFactor;
@@ -30,7 +31,11 @@ public class MetamorphAbility : Ability {
   public IEnumerator End() => null;
 
   public override void Stop() {
-    //Animator.SetBool(metamorph);
+    Animator.SetBool("Morph", false);
     base.Stop();
+  }
+
+  void Awake() {
+    Animator = GetComponentInParent<Animator>();
   }
 }
