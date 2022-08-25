@@ -50,13 +50,13 @@ public class InputManager : MonoBehaviour {
 
   public bool UseMouseAndKeyboard = false;
   Player Player;
-  Dictionary<(ButtonCode, ButtonPressType), IEventSource> Buttons = new();
+  Dictionary<(ButtonCode, ButtonPressType), EventSource> Buttons = new();
   public AxisState AxisLeft = new();
   public AxisState AxisRight = new();
 
-  public IEventSource ButtonEvent(ButtonCode code, ButtonPressType type, Func<IEventSource> cons) {
-    if (!Buttons.TryGetValue((code, type), out IEventSource evt))
-      Buttons.Add((code, type), evt = cons());
+  public IEventSource ButtonEvent(ButtonCode code, ButtonPressType type) {
+    if (!Buttons.TryGetValue((code, type), out EventSource evt))
+      Buttons.Add((code, type), evt = new());
     return evt;
   }
 

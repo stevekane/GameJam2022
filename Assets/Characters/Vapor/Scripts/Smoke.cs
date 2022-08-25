@@ -14,18 +14,18 @@ public class Smoke : MonoBehaviour {
 
   IEnumerator AttackSequence() {
     yield return new WaitForSeconds(.1f);
-    Abilities.GetEvent(LightAttack.AttackStart).Fire();
+    Abilities.TryInvoke(LightAttack.Attack);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    Abilities.GetEvent(LightAttack.AttackStart).Fire();
+    Abilities.TryInvoke(LightAttack.Attack);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    Abilities.GetEvent(LightAttack.AttackStart).Fire();
+    Abilities.TryInvoke(LightAttack.Attack);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForFixedUpdate();
-    Abilities.GetEvent(Slam.ChargeStart).Fire();
+    Abilities.TryInvoke(Slam.ChargeStart);
     yield return new WaitForSeconds(0.5f);
-    Abilities.GetEvent(Slam.ChargeRelease).Fire();
+    Abilities.TryInvoke(Slam.ChargeRelease);
     yield return new WaitUntil(() => !IsAttacking);
     yield return new WaitForSeconds(.8f);
     AttackRoutine = null;
@@ -45,7 +45,7 @@ public class Smoke : MonoBehaviour {
   AbilityManager Abilities;
   Status Status;
   AbilityManager Target;
-  MeleeAttackAbility LightAttack;
+  CycleAbility LightAttack;
   SlamAbility Slam;
 
   Coroutine AttackRoutine;
@@ -57,7 +57,7 @@ public class Smoke : MonoBehaviour {
     Abilities = GetComponent<AbilityManager>();
     Status = GetComponent<Status>();
     Target = GameObject.FindObjectOfType<Player>().GetComponent<AbilityManager>();
-    LightAttack = GetComponentInChildren<MeleeAttackAbility>();
+    LightAttack = GetComponentInChildren<CycleAbility>();
     Slam = GetComponentInChildren<SlamAbility>();
   }
 

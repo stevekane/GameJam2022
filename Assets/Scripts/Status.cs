@@ -48,7 +48,8 @@ public class KnockbackEffect : StatusEffect {
     status.CanMove = !IsAirborne;
     status.CanRotate = !IsAirborne;
     status.CanAttack = !IsAirborne;
-    status.Animator?.SetBool("HitFlinch", IsAirborne);
+    if (status.Animator)
+      status.Animator?.SetBool("HitFlinch", IsAirborne);
     if (!status.CanAttack) {
       status.GetComponent<AbilityManager>()?.InterruptAbilities();
     }
@@ -57,7 +58,8 @@ public class KnockbackEffect : StatusEffect {
     IsFirstFrame = false;
   }
   public override void OnRemoved(Status status) {
-    status.Animator?.SetBool("HitFlinch", false);
+    if (status.Animator)
+      status.Animator?.SetBool("HitFlinch", false);
   }
 }
 
@@ -83,16 +85,19 @@ public class HitStopEffect : StatusEffect {
 
   public override void Apply(Status status) {
     if (Frames == 0) {
-      status.GetComponent<Vibrator>()?.Vibrate(Axis, TotalFrames, Amplitude);
+      if (status.TryGetComponent(out Vibrator v))
+        v.Vibrate(Axis, TotalFrames, Amplitude);
     }
     if (Frames <= TotalFrames) {
       status.CanMove = false;
       status.CanRotate = false;
       status.CanAttack = false;
-      status.GetComponent<Animator>()?.SetSpeed(0);
+      if (status.Animator)
+        status.Animator?.SetSpeed(0);
       Frames++;
     } else {
-      status.GetComponent<Animator>()?.SetSpeed(1);
+      if (status.Animator)
+        status.Animator?.SetSpeed(1);
       status.Remove(this);
     }
   }
@@ -135,6 +140,10 @@ public class Status : MonoBehaviour {
   public bool IsDamageable = true;
   public float MoveSpeedFactor = 1f;
   public float RotateSpeedFactor = 1f;
+  public float DamageFactor = 1f;
+  public float KnockbackFactor = 1f;
+  public AbilityTag Tags = 0;
+  readonly public AbilityTag BaseTags = AbilityTag.BaseForm;  // TODO: generic class to encapsulate base/current values
 
   List<StatusEffect> Added = new();
   public void Add(StatusEffect effect, OnEffectComplete onComplete = null) {
@@ -178,6 +187,9 @@ public class Status : MonoBehaviour {
     CanAttack = true;
     IsHittable = true;
     IsDamageable = true;
+    DamageFactor = 1f;
+    KnockbackFactor = 1f;
+    Tags = BaseTags;
 
     // TODO: differentiate between cancelled and completed?
     Removed.ForEach(e => { e.OnComplete?.Invoke(this); e.OnRemoved(this); e.Status = null; Active.Remove(e); });

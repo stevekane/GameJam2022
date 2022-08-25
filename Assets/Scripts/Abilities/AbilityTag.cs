@@ -8,4 +8,7 @@ public enum AbilityTag {
   Uninterruptible = 1 << 3,       // This ability keeps running if hit
   Cancellable = 1 << 4,           // This ability can be cancelled if a CancelOthers ability runs
   CancelOthers = 1 << 5,          // This ability will cancel any of the character's abilities with the Cancellable tag
+
+  BaseForm = 1 << 28,             // Experiment: character's normal form
+  MorphForm = 1 << 29,            // Experiment: character's metamorphasized form
 }

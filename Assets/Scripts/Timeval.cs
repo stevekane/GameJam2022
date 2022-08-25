@@ -10,6 +10,9 @@ public class Timeval {
   [SerializeField] public float Millis = 1;
   [SerializeField] public int TicksPerSecond = 30;
 
+  public static Timeval FromSeconds(float seconds, int ticksPerSecond = 30) {
+    return new Timeval { Millis = seconds*1000f, TicksPerSecond = ticksPerSecond };
+  }
   public static Timeval FromMillis(float millis, int ticksPerSecond = 30) {
     return new Timeval { Millis = millis, TicksPerSecond = ticksPerSecond };
   }

@@ -45,7 +45,7 @@ public class Wasp : MonoBehaviour {
         desiredFacing = dir;
         if (targetInRange && Status.CanAttack && CurrentAbility == null) {
           State = StateType.Shoot;
-          Abilities.GetEvent(Pellet.AttackStart).Fire();
+          Abilities.TryInvoke(Pellet.AttackStart);
           CurrentAbility = Abilities.Abilities.FirstOrDefault((a) => a.IsRunning);
         } else {
           desiredMoveDir = dir;
