@@ -72,11 +72,11 @@ public static class MonoExtensions {
     return dot >= 0;
   }
 
-  public static bool IsVisibleFrom(this Transform t, Vector3 p, LayerMask layerMask) {
+  public static bool IsVisibleFrom(this Transform t, Vector3 p, LayerMask layerMask, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore) {
     var delta = t.position-p;
     var direction = delta.normalized;
     var distance = delta.magnitude;
-    var didHit = Physics.Raycast(p, direction, out RaycastHit hit, distance, layerMask);
+    var didHit = Physics.Raycast(p, direction, out RaycastHit hit, distance, layerMask, triggerInteraction);
     return didHit && hit.transform == t;
   }
 }

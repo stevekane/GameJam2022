@@ -1,21 +1,20 @@
 using UnityEngine;
 
 public class Explosion : MonoBehaviour {
-  float DamageRadius { get { return GetComponent<ParticleSystem>().main.startSize.constantMax*.5f; } }
+  float Radius { get => GetComponent<ParticleSystem>().main.startSize.constantMax*.5f; }
 
-  Collider[] hits = new Collider[32];
   void Start() {
-    Destroy(gameObject, 2f);  // Assume animation is done before 2s.
-    var numHits = Physics.OverlapSphereNonAlloc(transform.position, DamageRadius, hits);
+    var numHits = Physics.OverlapSphereNonAlloc(transform.position, Radius, PhysicsBuffers.Colliders);
     for (int i = 0; i < numHits; i++) {
-      if (hits[i].TryGetComponent(out Player player)) {
+      if (PhysicsBuffers.Colliders[i].TryGetComponent(out Player player)) {
         Debug.Log("Player go BOOM");
       }
     }
+    Destroy(gameObject, 2f);  // Assume animation is done before 2s.
   }
 
   public void OnDrawGizmos() {
     Gizmos.color = UnityEngine.Color.red;
-    Gizmos.DrawWireSphere(transform.position, DamageRadius);
+    Gizmos.DrawWireSphere(transform.position, Radius);
   }
 }

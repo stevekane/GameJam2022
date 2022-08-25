@@ -5,6 +5,8 @@ using static Fiber;
 public class FocusFire : Ability {
   public FocusFireArrow ArrowPrefab;
   public AnimationClip FireClip;
+  public LayerMask LayerMask;
+  public QueryTriggerInteraction TriggerInteraction;
   public Animator Animator;
   public Transform Owner;
   public Transform Target;
@@ -13,21 +15,24 @@ public class FocusFire : Ability {
   public float MaxRange = 5;
 
   public IEnumerator MakeRoutine() {
-    yield return Any(Wait(Duration.Frames), RapidFire(ShotCooldown.Frames));
+    var target = Targeting.StandardTarget(Owner, MaxRange, LayerMask, TriggerInteraction, PhysicsBuffers.Colliders);
+    if (target) {
+      Target = target.transform;
+      yield return Any(Wait(Duration.Frames), RapidFire(ShotCooldown.Frames));
+    }
     Stop();
   }
 
   IEnumerator RapidFire(int cooldown) {
     while (true) {
-      yield return Animator.Run(FireClip);
-      Instantiate(ArrowPrefab, transform.position, transform.rotation);
-      yield return Wait(ShotCooldown.Frames);
-      // if (Target && Vector3.Distance(Owner.position, Target.position) < MaxRange) {
-      //   yield return Animator.Run(FireClip);
-      //   Instantiate(ArrowPrefab, transform.position, transform.rotation);
-      // } else {
-      //   yield return null;
-      // }
+      if (Target && Vector3.Distance(Owner.position, Target.position) < MaxRange) {
+        yield return Animator.Run(FireClip);
+        Owner.transform.LookAt(Target);
+        Instantiate(ArrowPrefab, transform.position, transform.rotation);
+        yield return Wait(ShotCooldown.Frames);
+      } else {
+        yield return null;
+      }
     }
   }
 }
