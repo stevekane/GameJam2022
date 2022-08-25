@@ -14,16 +14,20 @@ public class AbilityManager : MonoBehaviour {
   [HideInInspector] public List<Ability> ToAdd = new();
 
   Dictionary<AxisTag, AxisState> TagToAxis = new();
-  Dictionary<AbilityMethod, IEventSource> MethodToEvent = new();
+  Dictionary<AbilityMethod, EventRouter> MethodToEvent = new();
 
   // All ability events route through this event source. Input-related event sources that connect to abilities
   // are actually instances of this class via InputManager.RegisterButton(code, type, EventRouterMaker);
   class EventRouter : IEventSource {
+    IEventSource EventSource;
     Action Action;
     Ability Ability;
     AbilityMethod Method;
     TriggerCondition Trigger;
-    public EventRouter(Ability ability, AbilityMethod method) => (Ability, Method, Trigger) = (ability, method, ability.GetTriggerCondition(method));
+    public EventRouter(Ability ability, AbilityMethod method) =>
+      (Ability, Method, Trigger) = (ability, method, ability.GetTriggerCondition(method));
+    public void ConnectSource(IEventSource evt) => (EventSource = evt).Listen(Fire);
+    public void DisconnectSource() => EventSource?.Unlisten(Fire);
     public void Listen(Action handler) => Action += handler;
     public void Unlisten(Action handler) => Action -= handler;
     public void Fire() {
@@ -60,7 +64,7 @@ public class AbilityManager : MonoBehaviour {
   }
   public void RegisterEvent(AbilityMethod method, IEventSource evt) {
     var router = CreateRouter(method);
-    evt.Listen(() => router.Fire());  // TODO: Unlisten? need more context through the EventSource
+    router.ConnectSource(evt);
   }
   public AxisState GetAxis(AxisTag tag) {
     if (!TagToAxis.TryGetValue(tag, out AxisState axis))
@@ -68,12 +72,12 @@ public class AbilityManager : MonoBehaviour {
     return axis;
   }
   public IEventSource GetEvent(AbilityMethod method) {
-    if (!MethodToEvent.TryGetValue(method, out IEventSource evt))
+    if (!MethodToEvent.TryGetValue(method, out EventRouter evt))
       evt = CreateRouter(method);
     return evt;
   }
   public void TryInvoke(AbilityMethod method) => GetEvent(method).Fire();
-  IEventSource CreateRouter(AbilityMethod method) => MethodToEvent[method] = new EventRouter((Ability)method.Target, method);
+  EventRouter CreateRouter(AbilityMethod method) => MethodToEvent[method] = new EventRouter((Ability)method.Target, method);
 
   void StackAdd<T>(List<T> target, List<T> additions) {
     target.Reverse();
@@ -87,6 +91,7 @@ public class AbilityManager : MonoBehaviour {
   }
   void OnDestroy() {
     Abilities.ForEach(a => a.AbilityManager = null);
+    MethodToEvent.ForEach(kv => kv.Value.DisconnectSource());
   }
   // TODO: Should this be manually set high in Script Execution Order instead?
   void LateUpdate() {
