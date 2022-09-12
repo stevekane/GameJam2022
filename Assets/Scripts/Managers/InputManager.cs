@@ -53,6 +53,7 @@ public class InputManager : MonoBehaviour {
   Dictionary<(ButtonCode, ButtonPressType), EventSource> Buttons = new();
   public AxisState AxisLeft = new();
   public AxisState AxisRight = new();
+  public float StickDeadZone;
 
   public IEventSource ButtonEvent(ButtonCode code, ButtonPressType type) {
     if (!Buttons.TryGetValue((code, type), out EventSource evt))
@@ -120,11 +121,11 @@ public class InputManager : MonoBehaviour {
       BroadcastEvent(it.Key.Item1, it.Key.Item2, it.Value);
     }
     if (UseMouseAndKeyboard) {
-      AxisLeft.Update(0f, GetAxisFromKeyboard());
-      AxisRight.Update(0f, GetAxisFromMouse());
+      AxisLeft.Update(StickDeadZone, GetAxisFromKeyboard());
+      AxisRight.Update(StickDeadZone, GetAxisFromMouse());
     } else {
-      AxisLeft.Update(0f, GetAxisFromInput("LeftX", "LeftY"));
-      AxisRight.Update(0f, GetAxisFromInput("RightX", "RightY"));
+      AxisLeft.Update(StickDeadZone, GetAxisFromInput("LeftX", "LeftY"));
+      AxisRight.Update(StickDeadZone, GetAxisFromInput("RightX", "RightY"));
     }
 
     if (Input.GetKeyDown(KeyCode.W))
