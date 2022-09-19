@@ -64,6 +64,7 @@ public class MeleeAttackAbility : Ability {
       };
       target.GetComponent<Defender>()?.OnHit(hitParams, Owner);
       VFXManager.Instance.TrySpawnEffect(HitVFX, target.transform.position+HitVFXOffset);
+      Owner.transform.forward = (target.transform.position - Owner.transform.position).normalized;
     });
 
     yield return Fiber.Wait(stopFrames);
