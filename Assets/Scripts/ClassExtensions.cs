@@ -152,3 +152,11 @@ public static class ArrayLikeExtensions {
     return -1;
   }
 }
+
+public static class DictionaryExtensions {
+  public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TValue> createFunc) {
+    if (!dictionary.TryGetValue(key, out TValue value))
+      dictionary.Add(key, value = createFunc());
+    return value;
+  }
+}
