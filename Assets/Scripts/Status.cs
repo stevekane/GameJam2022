@@ -48,8 +48,7 @@ public class KnockbackEffect : StatusEffect {
     status.CanMove = !IsAirborne;
     status.CanRotate = !IsAirborne;
     status.CanAttack = !IsAirborne;
-    if (status.Animator)
-      status.Animator?.SetBool("HitFlinch", IsAirborne);
+    status.Animator?.Value.SetBool("HitFlinch", IsAirborne);
     if (!status.CanAttack) {
       status.GetComponent<AbilityManager>()?.InterruptAbilities();
     }
@@ -58,8 +57,7 @@ public class KnockbackEffect : StatusEffect {
     IsFirstFrame = false;
   }
   public override void OnRemoved(Status status) {
-    if (status.Animator)
-      status.Animator?.SetBool("HitFlinch", false);
+    status.Animator?.Value.SetBool("HitFlinch", false);
   }
 }
 
@@ -92,12 +90,10 @@ public class HitStopEffect : StatusEffect {
       status.CanMove = false;
       status.CanRotate = false;
       status.CanAttack = false;
-      if (status.Animator)
-        status.Animator?.SetSpeed(0);
+      status.Animator?.Value.SetSpeed(0);
       Frames++;
     } else {
-      if (status.Animator)
-        status.Animator?.SetSpeed(1);
+      status.Animator?.Value.SetSpeed(1);
       status.Remove(this);
     }
   }
@@ -130,7 +126,7 @@ public class RecoilEffect : StatusEffect {
 public class Status : MonoBehaviour {
   public List<StatusEffect> Active = new();
   internal CharacterController Controller;
-  internal Animator Animator;
+  internal Optional<Animator> Animator;
 
   public bool CanMove { get => MoveSpeedFactor > 0f; set => MoveSpeedFactor = value ? 1f : 0f; }
   public bool CanRotate { get => RotateSpeedFactor > 0f; set => RotateSpeedFactor = value ? 1f : 0f; }
@@ -178,6 +174,7 @@ public class Status : MonoBehaviour {
   private void Awake() {
     Controller = GetComponent<CharacterController>();
     Animator = GetComponent<Animator>();
+    Debug.Log($"Status: {this}; animator = {Animator}; value = {Animator?.Value}");
   }
 
   private void FixedUpdate() {
