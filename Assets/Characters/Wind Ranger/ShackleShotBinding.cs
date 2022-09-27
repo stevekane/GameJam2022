@@ -9,10 +9,8 @@ public class ShackleShotBinding : MonoBehaviour {
   public float YOffset;
 
   void Start() {
-    FirstEffect = new ShackleShotEffect();
-    SecondEffect = new ShackleShotEffect();
-    First.Add(FirstEffect);
-    Second.Add(SecondEffect);
+    First.Add(FirstEffect = new ShackleShotEffect());
+    Second.Add(SecondEffect = new ShackleShotEffect());
   }
   void Stop() {
     First.Remove(FirstEffect);

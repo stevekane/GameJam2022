@@ -17,8 +17,8 @@ public class ShackleShotShackle : MonoBehaviour {
       var rigidBody = GetComponent<Rigidbody>();
       var direction = rigidBody.velocity.normalized;
       var colliders = PhysicsBuffers.Colliders;
-      var hits = Physics.OverlapSphereNonAlloc(c.Collider.transform.position, Radius, colliders, LayerMask, TriggerInteraction);
       var origin = c.Collider.bounds.center;
+      var hits = Physics.OverlapSphereNonAlloc(origin, Radius, colliders, LayerMask, TriggerInteraction);
       Status bestStatus = null;
       float bestScore = 0;
       for (var i = 0; i < hits; i++) {
@@ -36,7 +36,9 @@ public class ShackleShotShackle : MonoBehaviour {
         }
       }
       if (bestStatus) {
-        var halfway = targetStatus.transform.position+(bestStatus.transform.position-targetStatus.transform.position)/2;
+        var pBest = bestStatus.transform.position;
+        var pTarget = targetStatus.transform.position;
+        var halfway = pTarget+(pBest-pTarget)/2;
         var binding = Instantiate(BindingPrefab, halfway, Quaternion.identity);
         binding.First = targetStatus;
         binding.Second = bestStatus;
