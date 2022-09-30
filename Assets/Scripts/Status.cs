@@ -15,12 +15,12 @@ public abstract class StatusEffect : IDisposable {
 }
 
 public class SpeedFactorEffect : StatusEffect {
-  float MoveSpeedFactor, RotateSpeedFactor;
-  public SpeedFactorEffect(float move, float rotate) => (MoveSpeedFactor, RotateSpeedFactor) = (move, rotate);
+  AttributeModifier MoveSpeedModifier, TurnSpeedModifier;
+  public SpeedFactorEffect(float move, float rotate) => (MoveSpeedModifier, TurnSpeedModifier) = (new() { BonusMult = move }, new() { BonusMult = rotate });
   public override bool Merge(StatusEffect e) => false;
   public override void Apply(Status status) {
-    status.MoveSpeedFactor *= MoveSpeedFactor;
-    status.RotateSpeedFactor *= RotateSpeedFactor;
+    status.AddAttributeModifier(AttributeTag.MoveSpeed, MoveSpeedModifier);
+    status.AddAttributeModifier(AttributeTag.TurnSpeed, TurnSpeedModifier);
   }
 }
 
@@ -125,19 +125,36 @@ public class RecoilEffect : StatusEffect {
 
 public class Status : MonoBehaviour {
   public List<StatusEffect> Active = new();
+  internal Attributes Attributes;
   internal CharacterController Controller;
   internal Optional<Animator> Animator;
+  Dictionary<AttributeTag, AttributeModifier> Modifiers = new();
+  static AttributeModifier Zero = new() { BonusMult = 0 };
 
-  public bool CanMove { get => MoveSpeedFactor > 0f; set => MoveSpeedFactor = value ? 1f : 0f; }
-  public bool CanRotate { get => RotateSpeedFactor > 0f; set => RotateSpeedFactor = value ? 1f : 0f; }
+  public bool CanMove {
+    get => Attributes.GetValue(AttributeTag.MoveSpeed) > 0f;
+    set {
+      if (value) {
+        Modifiers.Remove(AttributeTag.MoveSpeed); // reset it to x1
+      } else {
+        AttributeModifier.Add(Modifiers, AttributeTag.MoveSpeed, Zero);
+      }
+    }
+  }
+  public bool CanRotate {
+    get => Attributes.GetValue(AttributeTag.TurnSpeed) > 0f;
+    set {
+      if (value) {
+        Modifiers.Remove(AttributeTag.TurnSpeed); // reset it to x1
+      } else {
+        AttributeModifier.Add(Modifiers, AttributeTag.TurnSpeed, Zero);
+      }
+    }
+  }
   public bool HasGravity = true;  // hmmm does this make sense?
   public bool CanAttack = true;
   public bool IsHittable = true;
   public bool IsDamageable = true;
-  public float MoveSpeedFactor = 1f;
-  public float RotateSpeedFactor = 1f;
-  public float DamageFactor = 1f;
-  public float KnockbackFactor = 1f;
   public AbilityTag Tags = 0;
   readonly public AbilityTag BaseTags = AbilityTag.BaseForm;  // TODO: generic class to encapsulate base/current values
 
@@ -163,6 +180,10 @@ public class Status : MonoBehaviour {
     return Active.FirstOrDefault(e => e is T) as T;
   }
 
+  public AttributeModifier GetModifier(AttributeTag attrib) => Modifiers.GetValueOrDefault(attrib, null);
+  public void AddAttributeModifier(AttributeTag attrib, AttributeModifier modifier) => AttributeModifier.Add(Modifiers, attrib, modifier);
+  public void RemoveAttributeModifier(AttributeTag attrib, AttributeModifier modifier) => AttributeModifier.Remove(Modifiers, attrib, modifier);
+
   internal void Move(Vector3 delta) {
     if (Controller) {
       Controller.Move(delta);
@@ -172,20 +193,16 @@ public class Status : MonoBehaviour {
   }
 
   private void Awake() {
+    Attributes = this.GetOrCreateComponent<Attributes>();
     Controller = GetComponent<CharacterController>();
     Animator = GetComponent<Animator>();
-    Debug.Log($"Status: {this}; animator = {Animator}; value = {Animator?.Value}");
   }
 
   private void FixedUpdate() {
-    MoveSpeedFactor = 1f;
-    RotateSpeedFactor = 1f;
     HasGravity = true;
     CanAttack = true;
     IsHittable = true;
     IsDamageable = true;
-    DamageFactor = 1f;
-    KnockbackFactor = 1f;
     Tags = BaseTags;
 
     // TODO: differentiate between cancelled and completed?
@@ -193,6 +210,7 @@ public class Status : MonoBehaviour {
     Removed.Clear();
     Added.ForEach(e => Active.Add(e));
     Added.Clear();
+    Modifiers.Clear();
 
     Active.ForEach(e => e.Apply(this));
   }

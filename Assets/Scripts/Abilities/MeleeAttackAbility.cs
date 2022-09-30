@@ -58,8 +58,8 @@ public class MeleeAttackAbility : Ability {
     targets.ForEach(target => {
       var hitParams = new HitParams {
         HitStopDuration = Active.HitFreezeDuration,
-        Damage = HitDamage,
-        KnockbackStrength = HitTargetKnockbackStrength,
+        Damage = Attributes.GetValue(AttributeTag.Damage, HitDamage),
+        KnockbackStrength = Attributes.GetValue(AttributeTag.Knockback, HitTargetKnockbackStrength),
         KnockbackType = KnockBackType.Delta
       };
       target.GetComponent<Defender>()?.OnHit(hitParams, Owner);

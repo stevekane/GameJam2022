@@ -15,6 +15,7 @@ public abstract class Ability : MonoBehaviour {
   protected Bundle Bundle = new();
   protected List<IDisposable> Disposables = new();
   public AbilityManager AbilityManager { get; set; }
+  public Attributes Attributes { get => AbilityManager.GetComponent<Attributes>(); }
   public Status Status { get => AbilityManager.GetComponent<Status>(); }
   public List<TriggerCondition> TriggerConditions = new();
   Dictionary<AbilityMethod, TriggerCondition> TriggerConditionsMap = new();

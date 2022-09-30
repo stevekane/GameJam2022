@@ -3,11 +3,12 @@ using System.Linq;
 using UnityEngine;
 
 public class ScriptedMovementEffect : StatusEffect {
+  static AttributeModifier Modifier = new() { BonusMult = 0f };
   public override bool Merge(StatusEffect e) => false;
   public override void Apply(Status status) {
     status.HasGravity = false;
-    status.MoveSpeedFactor = 0f;
-    status.RotateSpeedFactor = 0f;
+    status.AddAttributeModifier(AttributeTag.MoveSpeed, Modifier);
+    status.AddAttributeModifier(AttributeTag.TurnSpeed, Modifier);
     status.CanAttack = false;
   }
 }
@@ -73,8 +74,8 @@ public class SuplexAbility : Ability {
     CameraShaker.Instance.Shake(HitCameraShakeIntensity);
     var hitParams = new HitParams {
       HitStopDuration = Timeval.FromMillis(400),
-      Damage = Damage,
-      KnockbackStrength = 20,
+      Damage = Attributes.GetValue(AttributeTag.Damage, Damage),
+      KnockbackStrength = Attributes.GetValue(AttributeTag.Knockback, 20),
       KnockbackType = KnockBackType.Forward
     };
     var hits = Physics.OverlapSphereNonAlloc(target.transform.position, HitRadius, PhysicsBuffers.Colliders, Layers.CollidesWith(gameObject.layer));

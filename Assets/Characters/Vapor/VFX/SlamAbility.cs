@@ -68,7 +68,12 @@ public class SlamAbility : Ability {
   }
 
   void OnHit(Transform attacker, Defender defender) {
-    defender.OnHit(HitParams, attacker.transform);
+    defender.OnHit(new() {
+      Damage = Attributes.GetValue(AttributeTag.Damage, HitParams.Damage),
+      HitStopDuration = HitParams.HitStopDuration,
+      KnockbackStrength = Attributes.GetValue(AttributeTag.Knockback, HitParams.KnockbackStrength),
+      KnockbackType = HitParams.KnockbackType,
+    }, attacker.transform);
     SFXManager.Instance.TryPlayOneShot(HitSFX);
     VFXManager.Instance.TrySpawnEffect(HitVFX, defender.transform.position);
   }

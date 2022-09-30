@@ -12,8 +12,8 @@ public class InlineEffect : StatusEffect {
 
 public class MetamorphAbility : Ability {
   public Timeval Duration = Timeval.FromSeconds(10f);
-  public float DamageFactor = 2f;
-  public float KnockbackFactor = 1.5f;
+  public AttributeModifier DamageModifier = new() { BonusMult = 2 };
+  public AttributeModifier KnockbackModifier = new() { BonusMult = 1.5f };
   Animator Animator;
 
   public IEnumerator Begin() {
@@ -21,8 +21,8 @@ public class MetamorphAbility : Ability {
     AddStatusEffect(new InlineEffect((status) => {
       status.Tags.ClearFlags(AbilityTag.BaseForm);
       status.Tags.AddFlags(AbilityTag.MorphForm);
-      status.DamageFactor *= DamageFactor;
-      status.KnockbackFactor *= KnockbackFactor;
+      status.AddAttributeModifier(AttributeTag.Damage, DamageModifier);
+      status.AddAttributeModifier(AttributeTag.Knockback, KnockbackModifier);
     }));
     yield return Fiber.Any(Fiber.Wait(Duration.Frames), Fiber.ListenFor(AbilityManager.GetEvent(End)));
     Stop();

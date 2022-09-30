@@ -1,13 +1,13 @@
 using UnityEngine;
 
 public class Pickup : MonoBehaviour {
-  public virtual Upgrade Upgrade { get; }
+  public virtual Upgrade Upgrade { get => null; }
   void OnTriggerEnter(Collider c) {
-    if (c.TryGetComponent(out UpgradeManager um))
+    if (c.TryGetComponent(out Upgrades um))
       OnPickup(um);
   }
-  void OnPickup(UpgradeManager um) {
+  void OnPickup(Upgrades um) {
     um.AddUpgrade(Upgrade);
-    Destroy(this);
+    Destroy(gameObject);
   }
 }

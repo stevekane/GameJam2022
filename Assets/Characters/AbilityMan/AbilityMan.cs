@@ -4,11 +4,13 @@ public class AbilityMan : MonoBehaviour {
   public float MOVE_SPEED = 10;
 
   CharacterController Controller;
+  Attributes Attributes;
   Status Status;
   AbilityManager AbilityManager;
 
   void Start() {
     Controller = GetComponent<CharacterController>();
+    Attributes = GetComponent<Attributes>();
     Status = GetComponent<Status>();
     AbilityManager = GetComponent<AbilityManager>();
   }
@@ -21,7 +23,7 @@ public class AbilityMan : MonoBehaviour {
       transform.forward = move;
     }
     if (Status.CanMove) {
-      Controller.Move(dt*MOVE_SPEED*Status.MoveSpeedFactor*move+dt*Physics.gravity);
+      Controller.Move(dt*Attributes.GetValue(AttributeTag.MoveSpeed, MOVE_SPEED)*move+dt*Physics.gravity);
     }
   }
 }

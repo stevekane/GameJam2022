@@ -1,4 +1,5 @@
 public class WindRunSlowEffect : StatusEffect {
+  static AttributeModifier Modifier = new() { BonusMult = 0.6f };
   public int Remaining;
 
   public WindRunSlowEffect(int remaining) {
@@ -12,7 +13,7 @@ public class WindRunSlowEffect : StatusEffect {
     if (Remaining <= 0) {
       s.Remove(this);
     } else {
-      s.MoveSpeedFactor *= 0.6f;
+      s.AddAttributeModifier(AttributeTag.MoveSpeed, Modifier);
       Remaining--;
     }
   }

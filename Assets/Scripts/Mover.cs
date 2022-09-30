@@ -19,11 +19,13 @@ public class Mover : MonoBehaviour {
   Vector3 Velocity;
 
   CharacterController Controller;
+  Attributes Attributes;
   Status Status;
   AbilityManager AbilityManager;
 
   void Awake() {
     Controller = GetComponent<CharacterController>();
+    Attributes = GetComponent<Attributes>();
     Status = GetComponent<Status>();
     AbilityManager = GetComponent<AbilityManager>();
   }
@@ -38,7 +40,7 @@ public class Mover : MonoBehaviour {
   void FixedUpdate() {
     GetAxes(AbilityManager, out var desiredMoveDir, out var desiredFacing);
 
-    var moveVelocity = MoveSpeed * Status.MoveSpeedFactor * desiredMoveDir;
+    var moveVelocity = Attributes.GetValue(AttributeTag.MoveSpeed, MoveSpeed) * desiredMoveDir;
     Velocity.SetXZ(moveVelocity);
     var gravity = Time.fixedDeltaTime * Gravity;
     Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
@@ -46,6 +48,6 @@ public class Mover : MonoBehaviour {
       Velocity.y = 0f;
     Controller.Move(Time.fixedDeltaTime * Velocity);
 
-    transform.rotation = RotationFromDesired(transform, TurnSpeed * Status.RotateSpeedFactor, desiredFacing);
+    transform.rotation = RotationFromDesired(transform, Attributes.GetValue(AttributeTag.TurnSpeed, TurnSpeed), desiredFacing);
   }
 }
