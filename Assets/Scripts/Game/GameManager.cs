@@ -35,6 +35,10 @@ public class GameManager : MonoBehaviour {
     CountdownText.text = n.ToString();
   }
 
+  void SetCountdownTextEnabled(TextMeshProUGUI text, bool isEnabled) {
+    text.enabled = isEnabled;
+  }
+
   void SetPlayerInputsEnabled(GameObject player, bool isEnabled) {
     player.GetComponent<InputToTriggerMap>().enabled = isEnabled;
   }
@@ -53,18 +57,17 @@ public class GameManager : MonoBehaviour {
       var playerSpawns = FindObjectsOfType<PlayerSpawn>();
       var playerSpawn = playerSpawns[0];
       Player = Instantiate(PlayerPrefab, playerSpawn.transform.position, playerSpawn.transform.rotation);
+      // Enter pre-game countdown
       SetPlayerInputsEnabled(Player, isEnabled: false);
-
-      CountdownText.enabled = true;
+      SetCountdownTextEnabled(CountdownText, isEnabled: true);
       yield return StartCoroutine(Countdown(PingCountdown, CountdownDuration));
-      CountdownText.enabled = false;
-
+      SetCountdownTextEnabled(CountdownText, isEnabled: false);
       SetPlayerInputsEnabled(Player, isEnabled: true);
-
+      // Exit pre-game countdown
+      // Spawn mobs
       var mobSpawns = FindObjectsOfType<MobSpawn>();
-
+      // Wait for gameover condition to be met
       yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
-
       // Cleanup references and reload the scene
       Player = null;
       yield return StartCoroutine(Await(SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name)));
