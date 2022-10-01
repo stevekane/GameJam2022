@@ -22,6 +22,7 @@ public class ProjectileManager : MonoBehaviour {
   List<Projectile> Projectiles = new(INITIAL_PROJECTILE_OCCUPANCY);
   Dictionary<Projectile,HashSet<Collider>> Contacts = new(INITIAL_PROJECTILE_OCCUPANCY);
 
+
   public void AddProjectile(Projectile p) {
     p.PreviousPosition = p.transform.position;
     Projectiles.Add(p);
@@ -34,7 +35,6 @@ public class ProjectileManager : MonoBehaviour {
   }
 
   void Awake() => Instance = this;
-  void OnDestroy() => Instance = null;
 
   void FixedUpdate() {
     Projectiles.ForEach(SendEnterEvents);
