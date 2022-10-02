@@ -1066,6 +1066,7 @@ GameObject:
   - component: {fileID: 5571416124093621163}
   - component: {fileID: 5571416124093621156}
   - component: {fileID: 5571416124093621157}
+  - component: {fileID: 8521553832860402117}
   - component: {fileID: 5571416124093621161}
   - component: {fileID: 5571416124093621160}
   - component: {fileID: 7727835182619467870}
@@ -1130,8 +1131,29 @@ MonoBehaviour:
   CanAttack: 1
   IsHittable: 1
   IsDamageable: 1
-  MoveSpeedFactor: 1
-  RotateSpeedFactor: 1
+  Tags: 0
+--- !u!114 &8521553832860402117
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 004ed0f90de1a634aab5eefd8f1dea0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BaseValues:
+    Values:
+    - 10
+    - 100
+    - 10
+    - 20
+    - 1080
+    - 10
+    - 10
+    - 10
 --- !u!114 &5571416124093621161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1827,8 +1849,7 @@ MonoBehaviour:
   CanAttack: 1
   IsHittable: 1
   IsDamageable: 1
-  MoveSpeedFactor: 1
-  RotateSpeedFactor: 1
+  Tags: 0
 --- !u!1001 &4326579795788830989
 PrefabInstance:
   m_ObjectHideFlags: 0

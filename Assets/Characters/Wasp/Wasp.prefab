@@ -739,12 +739,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5571416124093621163}
+  - component: {fileID: 6865395085482706047}
   - component: {fileID: 5571416124093621156}
   - component: {fileID: 5571416124093621157}
+  - component: {fileID: 4848494605274439972}
   - component: {fileID: 5571416124093621161}
   - component: {fileID: 5571416124093621160}
   - component: {fileID: 7727835182619467870}
-  - component: {fileID: 6865395085482706047}
   - component: {fileID: 1657031132205634076}
   - component: {fileID: 4362511970478309579}
   - component: {fileID: 7227641143467178568}
@@ -776,6 +777,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6865395085482706047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13cd3e0535f940e429713993be49d243, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShootRadius: 30
+  MoveSpeed: 10
+  ShootDelay:
+    Millis: 3000
+    TicksPerSecond: 1
 --- !u!114 &5571416124093621156
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -805,8 +823,21 @@ MonoBehaviour:
   CanAttack: 1
   IsHittable: 1
   IsDamageable: 1
-  MoveSpeedFactor: 1
-  RotateSpeedFactor: 1
+  Tags: 0
+--- !u!114 &4848494605274439972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 004ed0f90de1a634aab5eefd8f1dea0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BaseValues:
+    Values: []
 --- !u!114 &5571416124093621161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -858,23 +889,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &6865395085482706047
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571416124093621165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13cd3e0535f940e429713993be49d243, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShootRadius: 30
-  MoveSpeed: 10
-  ShootDelay:
-    Millis: 3000
-    TicksPerSecond: 1
 --- !u!114 &1657031132205634076
 MonoBehaviour:
   m_ObjectHideFlags: 0

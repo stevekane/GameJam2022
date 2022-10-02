@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
@@ -13,11 +14,21 @@ public class GameManager : MonoBehaviour {
 
   public static GameManager Instance;
 
-  public GameObject PlayerPrefab;
-  public TextMeshProUGUI CountdownText;
+  [Header("Countdown")]
   public AudioClip[] CountdownClips;
-
   public int CountdownDuration = 3;
+  public TextMeshProUGUI CountdownText;
+
+  [Header("Player")]
+  public GameObject PlayerPrefab;
+  public List<Spawn> PlayerSpawns = new();
+
+  [Header("Mobs")]
+  public GameObject PreviewPrefab;
+  public GameObject SpawnEffectPrefab;
+  public GameObject WaspPrefab;
+  public GameObject BadgerPrefab;
+  public Transform[] MobSpawns;
 
   GameObject Player;
 
@@ -51,12 +62,27 @@ public class GameManager : MonoBehaviour {
     }
   }
 
+  IEnumerator SpawnMob(
+  GameObject previewPrefab,
+  GameObject spawnEffectPrefab,
+  GameObject mobPrefab,
+  float previewDuration,
+  Transform targetTransform) {
+    var p = Instantiate(previewPrefab, targetTransform.position, targetTransform.rotation);
+    yield return new WaitForSeconds(previewDuration);
+    Destroy(p.gameObject);
+    VFXManager.Instance.TrySpawnEffect(spawnEffectPrefab, targetTransform.position);
+    var m = Instantiate(mobPrefab, targetTransform.position, targetTransform.rotation);
+  }
+
+  bool GameOver() => !Player || Player.GetComponent<Attributes>().GetValue(AttributeTag.Health) <= 0;
+
   IEnumerator Start() {
     while (true) {
       // Spawn and configure the player
-      var playerSpawns = FindObjectsOfType<PlayerSpawn>();
-      var playerSpawn = playerSpawns[0];
+      var playerSpawn = PlayerSpawns[0];
       Player = Instantiate(PlayerPrefab, playerSpawn.transform.position, playerSpawn.transform.rotation);
+
       // Enter pre-game countdown
       SetPlayerInputsEnabled(Player, isEnabled: false);
       SetCountdownTextEnabled(CountdownText, isEnabled: true);
@@ -64,12 +90,20 @@ public class GameManager : MonoBehaviour {
       SetCountdownTextEnabled(CountdownText, isEnabled: false);
       SetPlayerInputsEnabled(Player, isEnabled: true);
       // Exit pre-game countdown
-      // Spawn mobs
-      var mobSpawns = FindObjectsOfType<MobSpawn>();
-      // Wait for gameover condition to be met
-      yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
+
+      var i = 0;
+      while (!GameOver()) {
+        yield return StartCoroutine(SpawnMob(
+          previewPrefab: PreviewPrefab,
+          spawnEffectPrefab: SpawnEffectPrefab,
+          mobPrefab: BadgerPrefab,
+          previewDuration: 3,
+          targetTransform: MobSpawns[i]
+        ));
+        i = (i+1)%MobSpawns.Length;
+      }
+
       // Cleanup references and reload the scene
-      Player = null;
       yield return StartCoroutine(Await(SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name)));
     }
   }

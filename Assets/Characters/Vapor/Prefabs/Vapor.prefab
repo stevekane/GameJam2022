@@ -1283,10 +1283,6 @@ MonoBehaviour:
   CanAttack: 1
   IsHittable: 1
   IsDamageable: 1
-  MoveSpeedFactor: 1
-  RotateSpeedFactor: 1
-  DamageFactor: 1
-  KnockbackFactor: 1
   Tags: 0
 --- !u!114 &5571416124093621161
 MonoBehaviour:
@@ -1564,6 +1560,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 004ed0f90de1a634aab5eefd8f1dea0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BaseValues:
+    Values:
+    - 10
+    - 100
+    - 10
+    - 20
+    - 1080
+    - 10
+    - 10
+    - 10
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0
@@ -2021,8 +2027,12 @@ MonoBehaviour:
   Duration:
     Millis: 10000
     TicksPerSecond: 30
-  DamageFactor: 2
-  KnockbackFactor: 1.5
+  DamageModifier:
+    BonusMult: 2
+    BonusAdd: 0
+  KnockbackModifier:
+    BonusMult: 1.5
+    BonusAdd: 0
 --- !u!1 &8809422246135798032
 GameObject:
   m_ObjectHideFlags: 0
