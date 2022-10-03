@@ -19,4 +19,8 @@ public class VFXManager : MonoBehaviour {
       return false;
     }
   }
+
+  public void SpawnEffect(Effect effect, Vector3 position, Quaternion rotation) {
+    Destroy(Instantiate(effect.GameObject, position, rotation), effect.Duration);
+  }
 }

@@ -5,6 +5,19 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 
+[Serializable]
+public struct Effect {
+  public GameObject GameObject;
+  public float Duration;
+}
+
+[Serializable]
+public struct MobSpawnConfig {
+  public Effect PreviewEffect;
+  public Effect SpawnEffect;
+  public GameObject Mob;
+}
+
 public class GameManager : MonoBehaviour {
   public static IEnumerator Await(AsyncOperation op) {
     while (!op.isDone) {
@@ -16,19 +29,16 @@ public class GameManager : MonoBehaviour {
 
   [Header("Countdown")]
   public AudioClip[] CountdownClips;
-  public int CountdownDuration = 3;
   public TextMeshProUGUI CountdownText;
+  public int CountdownDuration = 3;
 
   [Header("Player")]
   public GameObject PlayerPrefab;
   public List<Spawn> PlayerSpawns = new();
 
   [Header("Mobs")]
-  public GameObject PreviewPrefab;
-  public GameObject SpawnEffectPrefab;
-  public GameObject WaspPrefab;
-  public GameObject BadgerPrefab;
   public Transform[] MobSpawns;
+  public MobSpawnConfig[] MobSpawnConfigs;
 
   GameObject Player;
 
@@ -42,7 +52,8 @@ public class GameManager : MonoBehaviour {
   }
 
   void PingCountdown(int n) {
-    SFXManager.Instance.TryPlayOneShot(CountdownClips[n%CountdownClips.Length]);
+    var clip = CountdownClips[n%CountdownClips.Length];
+    SFXManager.Instance.TryPlayOneShot(clip);
     CountdownText.text = n.ToString();
   }
 
@@ -54,34 +65,35 @@ public class GameManager : MonoBehaviour {
     player.GetComponent<InputToTriggerMap>().enabled = isEnabled;
   }
 
-  // N.B. Approximate as you cannot guarantee you will be called back in exactly 1 second
-  IEnumerator Countdown(Action<int> f, int seconds) {
+  bool GameOver() {
+    return !Player || Player.GetComponent<Attributes>().GetValue(AttributeTag.Health) <= 0;
+  }
+
+  IEnumerator Countdown(
+  Action<int> f,
+  int seconds) {
     for (var i = seconds; i >= 0; i--) {
       f(i);
       yield return new WaitForSeconds(1);
     }
   }
 
-  IEnumerator SpawnMob(
-  GameObject previewPrefab,
-  GameObject spawnEffectPrefab,
-  GameObject mobPrefab,
-  float previewDuration,
-  Transform targetTransform) {
-    var p = Instantiate(previewPrefab, targetTransform.position, targetTransform.rotation);
-    yield return new WaitForSeconds(previewDuration);
-    Destroy(p.gameObject);
-    VFXManager.Instance.TrySpawnEffect(spawnEffectPrefab, targetTransform.position);
-    var m = Instantiate(mobPrefab, targetTransform.position, targetTransform.rotation);
+  IEnumerator SpawnMob(MobSpawnConfig config, Transform targetTransform) {
+    var p = targetTransform.position;
+    var r = targetTransform.rotation;
+    VFXManager.Instance.SpawnEffect(config.PreviewEffect, p, r);
+    yield return new WaitForSeconds(config.PreviewEffect.Duration);
+    VFXManager.Instance.SpawnEffect(config.SpawnEffect, p, r);
+    Instantiate(config.Mob, p, r);
   }
-
-  bool GameOver() => !Player || Player.GetComponent<Attributes>().GetValue(AttributeTag.Health) <= 0;
 
   IEnumerator Start() {
     while (true) {
       // Spawn and configure the player
       var playerSpawn = PlayerSpawns[0];
-      Player = Instantiate(PlayerPrefab, playerSpawn.transform.position, playerSpawn.transform.rotation);
+      var p = playerSpawn.transform.position;
+      var r = playerSpawn.transform.rotation;
+      Player = Instantiate(PlayerPrefab, p, r);
 
       // Enter pre-game countdown
       SetPlayerInputsEnabled(Player, isEnabled: false);
@@ -92,15 +104,11 @@ public class GameManager : MonoBehaviour {
       // Exit pre-game countdown
 
       var i = 0;
+      var j = 0;
       while (!GameOver()) {
-        yield return StartCoroutine(SpawnMob(
-          previewPrefab: PreviewPrefab,
-          spawnEffectPrefab: SpawnEffectPrefab,
-          mobPrefab: BadgerPrefab,
-          previewDuration: 3,
-          targetTransform: MobSpawns[i]
-        ));
+        yield return StartCoroutine(SpawnMob(MobSpawnConfigs[j], MobSpawns[i]));
         i = (i+1)%MobSpawns.Length;
+        j = (j+1)%MobSpawnConfigs.Length;
       }
 
       // Cleanup references and reload the scene
