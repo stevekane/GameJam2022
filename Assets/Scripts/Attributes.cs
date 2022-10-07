@@ -103,7 +103,7 @@ public class AttributeBaseValuesPropertyDrawer : PropertyDrawer {
       var i = listProp.arraySize;
       listProp.InsertArrayElementAtIndex(i);
       var e = listProp.GetArrayElementAtIndex(i);
-      e.floatValue = AttributeInfo.Instance.DefaultValues[(AttributeTag)i];
+      e.floatValue = AttributeInfo.Instance.DefaultValues.GetValueOrDefault((AttributeTag)i, 0f);
     }
     for (int i = 0; i < attribNames.Length; i++) {
       var e = listProp.GetArrayElementAtIndex(i);
