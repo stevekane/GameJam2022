@@ -131,32 +131,23 @@ public class Status : MonoBehaviour {
   Dictionary<AttributeTag, AttributeModifier> Modifiers = new();
   static AttributeModifier Zero = new() { BonusMult = 0 };
 
-  public bool CanMove {
-    get => Attributes.GetValue(AttributeTag.MoveSpeed) > 0f;
-    set {
-      if (value) {
-        Modifiers.Remove(AttributeTag.MoveSpeed); // reset it to x1
-      } else {
-        AttributeModifier.Add(Modifiers, AttributeTag.MoveSpeed, Zero);
-      }
-    }
-  }
-  public bool CanRotate {
-    get => Attributes.GetValue(AttributeTag.TurnSpeed) > 0f;
-    set {
-      if (value) {
-        Modifiers.Remove(AttributeTag.TurnSpeed); // reset it to x1
-      } else {
-        AttributeModifier.Add(Modifiers, AttributeTag.TurnSpeed, Zero);
-      }
-    }
-  }
-  public bool HasGravity = true;  // hmmm does this make sense?
-  public bool CanAttack = true;
-  public bool IsHittable = true;
-  public bool IsDamageable = true;
+  public bool CanMove { get => GetBoolean(AttributeTag.MoveSpeed); set => SetBoolean(AttributeTag.MoveSpeed, value); }
+  public bool CanRotate { get => GetBoolean(AttributeTag.TurnSpeed); set => SetBoolean(AttributeTag.TurnSpeed, value); }
+  public bool HasGravity { get => GetBoolean(AttributeTag.HasGravity); set => SetBoolean(AttributeTag.HasGravity, value); }
+  public bool CanAttack { get => GetBoolean(AttributeTag.CanAttack); set => SetBoolean(AttributeTag.CanAttack, value); }
+  public bool IsHittable { get => GetBoolean(AttributeTag.IsHittable); set => SetBoolean(AttributeTag.IsHittable, value); }
+  public bool IsDamageable { get => GetBoolean(AttributeTag.IsDamageable); set => SetBoolean(AttributeTag.IsDamageable, value); }
   public AbilityTag Tags = 0;
   readonly public AbilityTag BaseTags = AbilityTag.BaseForm;  // TODO: generic class to encapsulate base/current values
+
+  bool GetBoolean(AttributeTag attrib) => Attributes.GetValue(attrib, 1f) > 0f;
+  void SetBoolean(AttributeTag attrib, bool value) {
+    if (value) {
+      Modifiers.Remove(attrib); // reset it to default
+    } else {
+      AttributeModifier.Add(Modifiers, attrib, Zero);
+    }
+  }
 
   List<StatusEffect> Added = new();
   public void Add(StatusEffect effect, OnEffectComplete onComplete = null) {

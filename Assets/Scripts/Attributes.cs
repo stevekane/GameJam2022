@@ -12,6 +12,10 @@ public enum AttributeTag {
   AttackSpeed,
   SlamDamage,
   SuplexDamage,
+  HasGravity,
+  CanAttack,
+  IsHittable,
+  IsDamageable,
 }
 
 public class AttributeInfo {
@@ -24,7 +28,7 @@ public class AttributeInfo {
     { AttributeTag.TurnSpeed, 1080 },
     { AttributeTag.AttackSpeed, 10 },
     { AttributeTag.SlamDamage, 10 },
-    { AttributeTag.SuplexDamage, 10 } // TODO: I don't think this is right but the custom GUI cries w/o it
+    { AttributeTag.SuplexDamage, 10 },
   };
   public Dictionary<AttributeTag, AttributeTag?> Parents = new() {
     { AttributeTag.SlamDamage, AttributeTag.Damage },
