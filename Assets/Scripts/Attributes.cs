@@ -12,6 +12,10 @@ public enum AttributeTag {
   AttackSpeed,
   SlamDamage,
   SuplexDamage,
+  HasGravity,
+  CanAttack,
+  IsHittable,
+  IsDamageable,
 }
 
 public class AttributeInfo {
@@ -24,7 +28,7 @@ public class AttributeInfo {
     { AttributeTag.TurnSpeed, 1080 },
     { AttributeTag.AttackSpeed, 10 },
     { AttributeTag.SlamDamage, 10 },
-    { AttributeTag.SuplexDamage, 10 } // TODO: I don't think this is right but the custom GUI cries w/o it
+    { AttributeTag.SuplexDamage, 10 },
   };
   public Dictionary<AttributeTag, AttributeTag?> Parents = new() {
     { AttributeTag.SlamDamage, AttributeTag.Damage },
@@ -103,7 +107,7 @@ public class AttributeBaseValuesPropertyDrawer : PropertyDrawer {
       var i = listProp.arraySize;
       listProp.InsertArrayElementAtIndex(i);
       var e = listProp.GetArrayElementAtIndex(i);
-      e.floatValue = AttributeInfo.Instance.DefaultValues[(AttributeTag)i];
+      e.floatValue = AttributeInfo.Instance.DefaultValues.GetValueOrDefault((AttributeTag)i, 0f);
     }
     for (int i = 0; i < attribNames.Length; i++) {
       var e = listProp.GetArrayElementAtIndex(i);
