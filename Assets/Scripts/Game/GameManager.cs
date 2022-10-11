@@ -87,7 +87,14 @@ public class GameManager : MonoBehaviour {
     Instantiate(config.Mob, p, r);
   }
 
+  IEnumerator Forever(Func<IEnumerator> mkProc) {
+    while (true) {
+      yield return mkProc();
+    }
+  }
+
   IEnumerator Start() {
+    // !(spawn(player).countdown(3).(gameover.reload+!time.spawn(enemy)))
     while (true) {
       // Spawn and configure the player
       var playerSpawn = PlayerSpawns[0];
