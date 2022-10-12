@@ -130,9 +130,36 @@ public class InputManager : MonoBehaviour {
 
     if (Input.GetKeyDown(KeyCode.W))
       UseMouseAndKeyboard = true;
+    CheckSaveLoad();
   }
 
   void FixedUpdate() {
     Timeval.FrameCount++;
+  }
+
+  // TODO: Remove this testing junk.
+  public class SaveStruct {
+    public List<Upgrade> Upgrades;
+  }
+  public List<Upgrade> Upgrades;
+  public string SaveData;
+  void CheckSaveLoad() {
+    if (Input.GetKeyDown(KeyCode.LeftBracket))
+      Save();
+    if (Input.GetKeyDown(KeyCode.RightBracket))
+      Load();
+  }
+  void Save() {
+    var data = new SaveStruct() { Upgrades = Upgrades };
+    SaveData = JsonUtility.ToJson(data);
+    Debug.Log($"Saved: ${SaveData}");
+  }
+  void Load() {
+    var data = JsonUtility.FromJson<SaveStruct>(SaveData);
+    Upgrades = data.Upgrades;
+    var um = FindObjectOfType<Player>().GetComponent<Upgrades>();
+    foreach (var u in Upgrades) {
+      u.Activate(um);
+    }
   }
 }

@@ -1,5 +1,5 @@
 public class WindRunSlowEffect : StatusEffect {
-  static AttributeModifier Modifier = new() { BonusMult = 0.6f };
+  static AttributeModifier Modifier = new() { Mult = 0.6f };
   public int Remaining;
 
   public WindRunSlowEffect(int remaining) {

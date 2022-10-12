@@ -15,6 +15,7 @@ public class SlamAbility : Ability {
   public Timeval SlamPiecePeriod;
   public GameObject SlamActionPrefab;
   SlamAction SlamAction;
+  public float AttackScaling = 1.5f;
   public HitParams HitParams;
   public GameObject FireVFX;
   public AudioClip FireSFX;
@@ -69,7 +70,10 @@ public class SlamAbility : Ability {
 
   void OnHit(Transform attacker, Defender defender) {
     defender.OnHit(new() {
-      Damage = Attributes.GetValue(AttributeTag.Damage, HitParams.Damage),
+      // TODO: This is a mess. Want something like:
+      // (SlamBaseDamage + AttackScaling*AttackAttrib) * SlamMult
+      // => maybe Attributes.GetValue(AttributeTag.SlamDamage, AttackScaling*Attributes.GetValue(AttributeTag.Attack));
+      Damage = HitParams.Damage + AttackScaling*Attributes.GetValue(AttributeTag.Damage, 0f),
       HitStopDuration = HitParams.HitStopDuration,
       KnockbackStrength = Attributes.GetValue(AttributeTag.Knockback, HitParams.KnockbackStrength),
       KnockbackType = HitParams.KnockbackType,

@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 public class ScriptedMovementEffect : StatusEffect {
-  static AttributeModifier Modifier = new() { BonusMult = 0f };
+  static AttributeModifier Modifier = new() { Mult = 0f };
   public override bool Merge(StatusEffect e) => false;
   public override void Apply(Status status) {
     status.HasGravity = false;
