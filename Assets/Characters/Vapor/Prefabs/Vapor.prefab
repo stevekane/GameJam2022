@@ -111,6 +111,7 @@ MonoBehaviour:
     Millis: 333.33334
     TicksPerSecond: 30
   SlamActionPrefab: {fileID: 6110290959185933350, guid: 457d44b88fdf4bd44a1a93c7fb4b858a, type: 3}
+  AttackScaling: 1.5
   HitParams:
     HitStopDuration:
       Millis: 200
@@ -1279,10 +1280,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b25f034a0a2d6547bb601e0fe361f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HasGravity: 1
-  CanAttack: 1
-  IsHittable: 1
-  IsDamageable: 1
   Tags: 0
 --- !u!114 &5571416124093621161
 MonoBehaviour:
@@ -1560,16 +1557,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 004ed0f90de1a634aab5eefd8f1dea0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BaseValues:
-    Values:
-    - 10
-    - 100
-    - 10
-    - 20
-    - 1080
-    - 10
-    - 10
-    - 10
+  BaseUpgrades:
+  - {fileID: 11400000, guid: eeb227d5a03ae7c469f518f08fe5d373, type: 2}
+  - {fileID: 11400000, guid: dc80687754ecb424f854f46614676ec5, type: 2}
+  - {fileID: 11400000, guid: 73583ee841b78204ba64f804e5b0238d, type: 2}
+  - {fileID: 11400000, guid: 4d16dd67b444ff54ca927ea9b501cadf, type: 2}
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0
@@ -2028,11 +2020,11 @@ MonoBehaviour:
     Millis: 10000
     TicksPerSecond: 30
   DamageModifier:
-    BonusMult: 2
-    BonusAdd: 0
+    Base: 0
+    Mult: 2
   KnockbackModifier:
-    BonusMult: 1.5
-    BonusAdd: 0
+    Base: 0
+    Mult: 1.5
 --- !u!1 &8809422246135798032
 GameObject:
   m_ObjectHideFlags: 0

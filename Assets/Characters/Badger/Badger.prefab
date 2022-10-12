@@ -1127,10 +1127,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b25f034a0a2d6547bb601e0fe361f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HasGravity: 1
-  CanAttack: 1
-  IsHittable: 1
-  IsDamageable: 1
   Tags: 0
 --- !u!114 &8521553832860402117
 MonoBehaviour:
@@ -1144,16 +1140,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 004ed0f90de1a634aab5eefd8f1dea0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BaseValues:
-    Values:
-    - 10
-    - 100
-    - 10
-    - 20
-    - 1080
-    - 10
-    - 10
-    - 10
+  BaseUpgrades:
+  - {fileID: 11400000, guid: eeb227d5a03ae7c469f518f08fe5d373, type: 2}
+  - {fileID: 11400000, guid: dc80687754ecb424f854f46614676ec5, type: 2}
+  - {fileID: 11400000, guid: 73583ee841b78204ba64f804e5b0238d, type: 2}
+  - {fileID: 11400000, guid: 4d16dd67b444ff54ca927ea9b501cadf, type: 2}
 --- !u!114 &5571416124093621161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1257,13 +1248,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5571416124093621165}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveSpeed: 20
-  TurnSpeed: 1080
   Gravity: -200
 --- !u!1 &5571416124367791817
 GameObject:
@@ -1594,6 +1583,7 @@ GameObject:
   - component: {fileID: 1786170238716108513}
   - component: {fileID: 3079568010862059109}
   - component: {fileID: 4018320352018985962}
+  - component: {fileID: 5218839550138655464}
   m_Layer: 0
   m_Name: Left Fist
   m_TagString: Untagged
@@ -1845,11 +1835,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b25f034a0a2d6547bb601e0fe361f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HasGravity: 1
-  CanAttack: 1
-  IsHittable: 1
-  IsDamageable: 1
   Tags: 0
+--- !u!114 &5218839550138655464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9165858341678505272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 004ed0f90de1a634aab5eefd8f1dea0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BaseUpgrades:
+  - {fileID: 11400000, guid: dc80687754ecb424f854f46614676ec5, type: 2}
 --- !u!1001 &4326579795788830989
 PrefabInstance:
   m_ObjectHideFlags: 0

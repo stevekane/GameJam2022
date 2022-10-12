@@ -16,7 +16,7 @@ public abstract class StatusEffect : IDisposable {
 
 public class SpeedFactorEffect : StatusEffect {
   AttributeModifier MoveSpeedModifier, TurnSpeedModifier;
-  public SpeedFactorEffect(float move, float rotate) => (MoveSpeedModifier, TurnSpeedModifier) = (new() { BonusMult = move }, new() { BonusMult = rotate });
+  public SpeedFactorEffect(float move, float rotate) => (MoveSpeedModifier, TurnSpeedModifier) = (new() { Mult = move }, new() { Mult = rotate });
   public override bool Merge(StatusEffect e) => false;
   public override void Apply(Status status) {
     status.AddAttributeModifier(AttributeTag.MoveSpeed, MoveSpeedModifier);
@@ -129,7 +129,7 @@ public class Status : MonoBehaviour {
   internal CharacterController Controller;
   internal Optional<Animator> Animator;
   Dictionary<AttributeTag, AttributeModifier> Modifiers = new();
-  static AttributeModifier Zero = new() { BonusMult = 0 };
+  static AttributeModifier Zero = new() { Mult = 0 };
 
   public bool CanMove { get => GetBoolean(AttributeTag.MoveSpeed); set => SetBoolean(AttributeTag.MoveSpeed, value); }
   public bool CanRotate { get => GetBoolean(AttributeTag.TurnSpeed); set => SetBoolean(AttributeTag.TurnSpeed, value); }

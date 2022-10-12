@@ -12,8 +12,6 @@ public class Mover : MonoBehaviour {
     desiredFacing = manager.GetAxis(AxisTag.Aim).XZ.TryGetDirection() ?? manager.transform.forward;
   }
 
-  [SerializeField] float MoveSpeed;
-  [SerializeField] float TurnSpeed;
   [SerializeField] float Gravity;
 
   Vector3 Velocity;
@@ -40,7 +38,7 @@ public class Mover : MonoBehaviour {
   void FixedUpdate() {
     GetAxes(AbilityManager, out var desiredMoveDir, out var desiredFacing);
 
-    var moveVelocity = Attributes.GetValue(AttributeTag.MoveSpeed, MoveSpeed) * desiredMoveDir;
+    var moveVelocity = Attributes.GetValue(AttributeTag.MoveSpeed) * desiredMoveDir;
     Velocity.SetXZ(moveVelocity);
     var gravity = Time.fixedDeltaTime * Gravity;
     Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
@@ -48,6 +46,6 @@ public class Mover : MonoBehaviour {
       Velocity.y = 0f;
     Controller.Move(Time.fixedDeltaTime * Velocity);
 
-    transform.rotation = RotationFromDesired(transform, Attributes.GetValue(AttributeTag.TurnSpeed, TurnSpeed), desiredFacing);
+    transform.rotation = RotationFromDesired(transform, Attributes.GetValue(AttributeTag.TurnSpeed), desiredFacing);
   }
 }

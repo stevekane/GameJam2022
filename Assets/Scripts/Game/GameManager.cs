@@ -66,7 +66,7 @@ public class GameManager : MonoBehaviour {
   }
 
   bool GameOver() {
-    return !Player || Player.GetComponent<Attributes>().GetValue(AttributeTag.Health) <= 0;
+    return !Player || Player.GetComponent<Attributes>().GetValue(AttributeTag.Health, 0f) <= 0;
   }
 
   IEnumerator Countdown(

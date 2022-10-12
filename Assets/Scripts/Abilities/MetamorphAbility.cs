@@ -12,8 +12,8 @@ public class InlineEffect : StatusEffect {
 
 public class MetamorphAbility : Ability {
   public Timeval Duration = Timeval.FromSeconds(10f);
-  public AttributeModifier DamageModifier = new() { BonusMult = 2 };
-  public AttributeModifier KnockbackModifier = new() { BonusMult = 1.5f };
+  public AttributeModifier DamageModifier = new() { Mult = 2 };
+  public AttributeModifier KnockbackModifier = new() { Mult = 1.5f };
   Animator Animator;
 
   public IEnumerator Begin() {
