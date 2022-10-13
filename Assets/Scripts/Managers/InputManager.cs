@@ -138,11 +138,7 @@ public class InputManager : MonoBehaviour {
   }
 
   // TODO: Remove this testing junk.
-  public class SaveStruct {
-    public List<Upgrade> Upgrades;
-  }
-  public List<Upgrade> Upgrades;
-  public string SaveData;
+  public string SaveJson;
   void CheckSaveLoad() {
     if (Input.GetKeyDown(KeyCode.LeftBracket))
       Save();
@@ -150,16 +146,10 @@ public class InputManager : MonoBehaviour {
       Load();
   }
   void Save() {
-    var data = new SaveStruct() { Upgrades = Upgrades };
-    SaveData = JsonUtility.ToJson(data);
-    Debug.Log($"Saved: ${SaveData}");
+    SaveJson = SaveData.Save();
+    Debug.Log($"Saved: ${SaveJson}");
   }
   void Load() {
-    var data = JsonUtility.FromJson<SaveStruct>(SaveData);
-    Upgrades = data.Upgrades;
-    var um = FindObjectOfType<Player>().GetComponent<Upgrades>();
-    foreach (var u in Upgrades) {
-      u.Activate(um);
-    }
+    SaveData.Load(SaveJson);
   }
 }

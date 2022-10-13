@@ -9,7 +9,7 @@ public class Pickup : MonoBehaviour {
   void OnPickup(Upgrades us) {
     Upgrade.Activate(us);
     var a = (Upgrade as UpgradeAttributeList).Attribute;
-    Debug.Log($"{a} is now {us.GetComponent<Attributes>().GetValue(a, 10)}");
+    Debug.Log($"{a} is now {us.GetComponent<Attributes>().GetValue(a)}");
     Destroy(gameObject);
   }
 }
