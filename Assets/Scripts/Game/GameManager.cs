@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
@@ -192,11 +191,13 @@ public class GameManager : MonoBehaviour {
   }
 
   IEnumerator SpawnStaggered(List<SpawnRequest> spawnRequests, int groupSize, float seconds) {
-    for (var i = 0; i < groupSize; i++) {
-      if (i % groupSize == 0) {
+    var batch = new List<SpawnRequest>();
+    for (var i = 0; i < spawnRequests.Count; i++) {
+      batch.Add(spawnRequests[i]);
+      if (batch.Count == groupSize) {
+        yield return StartCoroutine(SpawnConcurrent(batch));
         yield return new WaitForSeconds(seconds);
-      } else {
-        yield return StartCoroutine(SpawnMob(spawnRequests[i]));
+        batch.Clear();
       }
     }
   }
@@ -212,7 +213,7 @@ public class GameManager : MonoBehaviour {
       };
       Debug.Log($"{mobs.Count} mobs spawning at {spawns.Count} locations");
       yield return StartCoroutine(wave.SpawnProcess switch {
-        _ => SpawnConcurrent(spawns)
+        _ => SpawnStaggered(spawns, 1, 2) // TODO: hardcoded.. need to decide where these params live
       });
       yield return wave.NextWaveCondition switch {
         _ => new WaitForSeconds(5) // TODO: hardcoded.. need to decide where this parameter lives
