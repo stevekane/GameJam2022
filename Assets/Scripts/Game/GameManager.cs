@@ -5,59 +5,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 
-/*
-An encounter is simply a program with various continuations.
-
-The current program is to spawn a mob every so often at some spawning location.
-
-The program we want now has a few parts:
-
-  Spawning happens in waves
-    Concurrent
-    Staggered
-
-  Each wave has a continuation condition
-    All defeated
-    Time elapsed
-    Total mobs remaining
-
-  A wave is generated from a seed, a budget, unit prices, mob strategy and spawning strategy
-
-  MobStrategy is an algorithm for consuming the budget
-    Expensive units
-    Cheap units
-    Alternation between expensive and cheap units
-    Same unit
-    Unique units
-
-  SpawnStrategy is an algorithm for selecting spawn locations for a list of mobs
-    Close together
-    Far apart
-    Evenly spaced
-    Random
-    Single Spawn
-
-  Seed : Int
-  Budget : Int
-  Cost : Int
-  SpawnOption : (Unit,Cost)
-  MobStrategy : Set<SpawnOption> -> [Unit]
-  SpawnStrategy : [Unit] -> Set<Transform> -> [(Unit,Transform)]
-
-  A spawning process may
-    send spawn requests to the MobManager
-    play vfx/sfx
-
-  Loop over waves
-    calculate mobstrategy to get list of units
-    calculate spawnstrategy to get spawnrequests
-    play spawn process
-    wait for wave condition (initially passage of time)
-*/
-
 public enum MobStrategy { Base }
 public enum SpawnStrategy { Base }
-public enum SpawnProcess { Staggered } // TODO: needs parameters for wave size and spawn period
+public enum SpawnProcess { Staggered, Concurrent } // TODO: needs parameters for wave size and spawn period
 public enum NextWaveCondition { Time } // TODO: needs paramater for duration and other params
 
 [Serializable]
@@ -213,7 +163,8 @@ public class GameManager : MonoBehaviour {
       };
       Debug.Log($"{mobs.Count} mobs spawning at {spawns.Count} locations");
       yield return StartCoroutine(wave.SpawnProcess switch {
-        _ => SpawnStaggered(spawns, 1, 2) // TODO: hardcoded.. need to decide where these params live
+        SpawnProcess.Staggered => SpawnStaggered(spawns, 1, 2), // TODO: hardcoded.. need to decide where these params live
+        SpawnProcess.Concurrent => SpawnConcurrent(spawns)
       });
       yield return wave.NextWaveCondition switch {
         _ => new WaitForSeconds(5) // TODO: hardcoded.. need to decide where this parameter lives
