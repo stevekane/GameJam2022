@@ -145,23 +145,21 @@ public class GameManager : MonoBehaviour {
     for (var i = 0; i < spawnRequests.Count; i++) {
       batch.Add(spawnRequests[i]);
       if (batch.Count == groupSize) {
-        yield return StartCoroutine(SpawnConcurrent(batch));
-        yield return new WaitForSeconds(seconds);
+        StartCoroutine(SpawnConcurrent(batch));
         batch.Clear();
+        yield return new WaitForSeconds(seconds);
       }
     }
   }
 
   IEnumerator RunEncounter(Encounter encounter) {
     foreach (var wave in encounter.Waves) {
-      Debug.Log("Spawning a wave");
       var mobs = wave.MobStrategy switch {
         _ => BaseMobs(encounter.SpawnConfigs)
       };
       var spawns = wave.SpawnStrategy switch {
         _ => BaseSpawns(mobs, encounter.SpawnPoints)
       };
-      Debug.Log($"{mobs.Count} mobs spawning at {spawns.Count} locations");
       yield return StartCoroutine(wave.SpawnProcess switch {
         SpawnProcess.Staggered => SpawnStaggered(spawns, 1, 2), // TODO: hardcoded.. need to decide where these params live
         SpawnProcess.Concurrent => SpawnConcurrent(spawns)
