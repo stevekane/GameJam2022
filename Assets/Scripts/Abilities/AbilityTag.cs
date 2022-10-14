@@ -9,6 +9,8 @@ public enum AbilityTag {
   Cancellable = 1 << 4,           // This ability can be cancelled if a CancelOthers ability runs
   CancelOthers = 1 << 5,          // This ability will cancel any of the character's abilities with the Cancellable tag
 
-  BaseForm = 1 << 28,             // Experiment: character's normal form
-  MorphForm = 1 << 29,            // Experiment: character's metamorphasized form
+  AbilityHeavyEnabled = 1 << 28,
+  AbilitySlamEnabled = 1 << 29,
+  AbilityMorphEnabled = 1 << 30,
+  AbilitySuplexEnabled = 1 << 31,
 }

@@ -19,8 +19,10 @@ public class MetamorphAbility : Ability {
   public IEnumerator Begin() {
     Animator.SetBool("Morph", true);
     AddStatusEffect(new InlineEffect((status) => {
-      status.Tags.ClearFlags(AbilityTag.BaseForm);
-      status.Tags.AddFlags(AbilityTag.MorphForm);
+      status.Tags.ClearFlags(AbilityTag.AbilityHeavyEnabled);
+      status.Tags.ClearFlags(AbilityTag.AbilityMorphEnabled);
+      status.Tags.AddFlags(AbilityTag.AbilitySlamEnabled);
+      status.Tags.AddFlags(AbilityTag.AbilitySuplexEnabled);
       status.AddAttributeModifier(AttributeTag.Damage, DamageModifier);
       status.AddAttributeModifier(AttributeTag.Knockback, KnockbackModifier);
     }));

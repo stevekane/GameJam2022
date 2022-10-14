@@ -126,6 +126,7 @@ public class RecoilEffect : StatusEffect {
 public class Status : MonoBehaviour {
   public List<StatusEffect> Active = new();
   internal Attributes Attributes;
+  internal Upgrades Upgrades;
   internal CharacterController Controller;
   internal Optional<Animator> Animator;
   Dictionary<AttributeTag, AttributeModifier> Modifiers = new();
@@ -138,7 +139,6 @@ public class Status : MonoBehaviour {
   public bool IsHittable { get => GetBoolean(AttributeTag.IsHittable); set => SetBoolean(AttributeTag.IsHittable, value); }
   public bool IsDamageable { get => GetBoolean(AttributeTag.IsDamageable); set => SetBoolean(AttributeTag.IsDamageable, value); }
   public AbilityTag Tags = 0;
-  readonly public AbilityTag BaseTags = AbilityTag.BaseForm;  // TODO: generic class to encapsulate base/current values
 
   bool GetBoolean(AttributeTag attrib) => Attributes.GetValue(attrib, 1f) > 0f;
   void SetBoolean(AttributeTag attrib, bool value) {
@@ -185,6 +185,7 @@ public class Status : MonoBehaviour {
 
   private void Awake() {
     Attributes = this.GetOrCreateComponent<Attributes>();
+    Upgrades = this.GetOrCreateComponent<Upgrades>();
     Controller = GetComponent<CharacterController>();
     Animator = GetComponent<Animator>();
   }
@@ -194,7 +195,7 @@ public class Status : MonoBehaviour {
     CanAttack = true;
     IsHittable = true;
     IsDamageable = true;
-    Tags = BaseTags;
+    Tags = Upgrades.AbilityTags;
 
     // TODO: differentiate between cancelled and completed?
     Removed.ForEach(e => { e.OnComplete?.Invoke(this); e.OnRemoved(this); e.Status = null; Active.Remove(e); });
