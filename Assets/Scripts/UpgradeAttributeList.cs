@@ -10,16 +10,14 @@ public class UpgradeAttributeListData : UpgradeData {
 public class UpgradeAttributeList : Upgrade {
   public AttributeTag Attribute;
   public List<AttributeModifier> Modifiers;
-  public override void Activate(Upgrades us) {
-    var ud = us.FindUpgrade(ud => ud.Upgrade == this) as UpgradeAttributeListData;
-    if (ud == null)
-      us.AddUpgrade(ud = new() { Upgrade = this, CurrentLevel = -1 });
-    if (ud.CurrentLevel >= 0)
-      us.RemoveAttributeModifier(Attribute, Modifiers[ud.CurrentLevel]);
-    us.AddAttributeModifier(Attribute, Modifiers[++ud.CurrentLevel]);
+  UpgradeAttributeListData GetData(Upgrades us) => us.FindUpgrade(ud => ud.Upgrade == this) as UpgradeAttributeListData;
+  public override void Add(Upgrades us) {
+    if (GetData(us) is var ud && ud != null) {
+      ud.CurrentLevel++;
+      us.OnChanged();
+    } else {
+      us.AddUpgrade(new UpgradeAttributeListData() { Upgrade = this, CurrentLevel = 0 });
+    }
   }
-  public override void Load(Upgrades us, UpgradeData data) {
-    us.AddAttributeModifier(Attribute, Modifiers[((UpgradeAttributeListData)data).CurrentLevel]);
-    us.AddUpgrade(data);
-  }
+  public override void Apply(Upgrades us) => us.AddAttributeModifier(Attribute, Modifiers[GetData(us).CurrentLevel]);
 }
