@@ -9,7 +9,7 @@ public class UpgradeAttributeListData : UpgradeData {
 [CreateAssetMenu(fileName = "Upgrade", menuName = "Upgrade/AttributeList")]
 public class UpgradeAttributeList : Upgrade {
   public AttributeTag Attribute;
-  public List<AttributeModifier> Modifiers;
+  public AttributeModifier[] Modifiers;
   UpgradeAttributeListData GetData(Upgrades us) => us.FindUpgrade(ud => ud.Upgrade == this) as UpgradeAttributeListData;
   public override void Add(Upgrades us) {
     if (GetData(us) is var ud && ud != null) {

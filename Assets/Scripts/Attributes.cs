@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
+[Serializable]
 public enum AttributeTag {
   Damage,
   Health,
@@ -16,6 +16,11 @@ public enum AttributeTag {
   CanAttack,
   IsHittable,
   IsDamageable,
+
+  // Abilities
+  AbilityStart = 1000,
+  AbilityHeavyActive,
+  AbilitySlamActive,
 }
 
 public class AttributeInfo {
@@ -54,19 +59,19 @@ public class AttributeModifier {
 }
 
 public class Attributes : MonoBehaviour {
-  public List<UpgradeAttributeList> BaseUpgrades;
-  Optional<Upgrades> Upgrades;
+  public List<Upgrade> BaseUpgrades;
+  Upgrades Upgrades;
   Optional<Status> Status;
   private void Awake() {
     Upgrades = this.GetOrCreateComponent<Upgrades>();
     Status = GetComponent<Status>();
-    BaseUpgrades.ForEach(u => u.Add(Upgrades.Value));
+    BaseUpgrades.ForEach(u => u.Add(Upgrades));
   }
   AttributeModifier GetModifier(AttributeTag attrib) {
     AttributeModifier modifier = new();
     AttributeTag? current = attrib;
     while (current != null) {
-      if (Upgrades?.Value.GetModifier(attrib) is var mu && mu != null)
+      if (Upgrades.GetModifier(attrib) is var mu && mu != null)
         modifier.Merge(mu);
       if (Status?.Value.GetModifier(attrib) is var ms && ms != null)
         modifier.Merge(ms);
