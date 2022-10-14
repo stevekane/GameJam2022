@@ -8,4 +8,8 @@ public class UpgradeAttribute : Upgrade {
     us.AddAttributeModifier(Attribute, Modifier);
     base.Activate(us);
   }
+  public override void Load(Upgrades us, UpgradeData data) {
+    us.AddAttributeModifier(Attribute, Modifier);
+    us.AddUpgrade(data);
+  }
 }
