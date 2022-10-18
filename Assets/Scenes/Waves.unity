@@ -133,6 +133,72 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1920371574707933465, guid: 10cc3c26a16215b45b1bccfb51dae6da, type: 3}
   m_PrefabInstance: {fileID: 461466404}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &360703935
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 360703937}
+  - component: {fileID: 360703936}
+  m_Layer: 0
+  m_Name: Process Encounter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &360703936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 360703935}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1208d5a2756c3304f827c395712798a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Enc:
+    Event: 1
+    SpawnRequest:
+      transform: {fileID: 190460472}
+      config: {fileID: 11400000, guid: cb1ed2251a51ee24c8825aa66c48302b, type: 2}
+    Name: A
+    Duration: 0
+    Next:
+    - Event: 2
+      SpawnRequest:
+        transform: {fileID: 0}
+        config: {fileID: 0}
+      Name: A
+      Duration: 0
+      Next:
+      - Event: 1
+        SpawnRequest:
+          transform: {fileID: 108255023}
+          config: {fileID: 11400000, guid: 5e51410ea9901fb49a52fc81a0cb7639, type: 2}
+        Name: B
+        Duration: 0
+        Next: []
+--- !u!4 &360703937
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 360703935}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 14
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &446268760
 GameObject:
   m_ObjectHideFlags: 0
@@ -412,6 +478,75 @@ PrefabInstance:
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 10cc3c26a16215b45b1bccfb51dae6da, type: 3}
+--- !u!1 &579452757
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 579452759}
+  - component: {fileID: 579452758}
+  m_Layer: 0
+  m_Name: Wave Encounter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &579452758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 579452757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55588c44c03f6994a9827ef9c6a39f7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpawnConfigs:
+  - {fileID: 11400000, guid: 5e51410ea9901fb49a52fc81a0cb7639, type: 2}
+  - {fileID: 11400000, guid: cb1ed2251a51ee24c8825aa66c48302b, type: 2}
+  SpawnPoints:
+  - {fileID: 190460472}
+  - {fileID: 108255023}
+  - {fileID: 2042819373}
+  - {fileID: 931054508}
+  - {fileID: 1313146307}
+  Waves:
+  - Budget: 5
+    MobStrategy: 0
+    SpawnStrategy: 0
+    SpawnProcess: 1
+    NextWaveCondition: 0
+  - Budget: 7
+    MobStrategy: 0
+    SpawnStrategy: 0
+    SpawnProcess: 0
+    NextWaveCondition: 0
+  - Budget: 9
+    MobStrategy: 0
+    SpawnStrategy: 0
+    SpawnProcess: 1
+    NextWaveCondition: 0
+--- !u!4 &579452759
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 579452757}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 12
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &640266876
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -542,6 +677,59 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1194701424
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1194701426}
+  - component: {fileID: 1194701425}
+  m_Layer: 0
+  m_Name: Doom Encounter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1194701425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1194701424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6be4a66c299c314691b4c6b7690aed4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HeavySpawnConfig: {fileID: 11400000, guid: 5e51410ea9901fb49a52fc81a0cb7639, type: 2}
+  LightSpawnConfig: {fileID: 11400000, guid: cb1ed2251a51ee24c8825aa66c48302b, type: 2}
+  HeavySpawnPoints:
+  - {fileID: 931054508}
+  - {fileID: 1313146307}
+  LightSpawnPoints:
+  - {fileID: 190460472}
+  - {fileID: 108255023}
+  - {fileID: 2042819373}
+--- !u!4 &1194701426
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1194701424}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1219355682
 PrefabInstance:
@@ -1046,6 +1234,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter
+      value: 
+      objectReference: {fileID: 360703936}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
       propertyPath: WaspPrefab
       value: 
       objectReference: {fileID: 5571416124093621165, guid: ab129e03610f14f4bbeeea02c0119926, type: 3}
@@ -1058,9 +1250,33 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4226761272155066953, guid: b725c2c7bace2ad47b988fec44b09228, type: 3}
     - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Name
+      value: A
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Event
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Prefab
+      value: 
+      objectReference: {fileID: 5571416124093621165, guid: d84c5cd595094654fa88cca685e8d2a1, type: 3}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
       propertyPath: SpawnEffectPrefab
       value: 
       objectReference: {fileID: 159918, guid: f3d60ef1464f95348a9ffe17f312927e, type: 3}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Transform
+      value: 
+      objectReference: {fileID: 190460472}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: HeavySpawnConfig.Mob
+      value: 
+      objectReference: {fileID: 5571416124093621165, guid: d84c5cd595094654fa88cca685e8d2a1, type: 3}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: LightSpawnConfig.Mob
+      value: 
+      objectReference: {fileID: 5571416124093621165, guid: ab129e03610f14f4bbeeea02c0119926, type: 3}
     - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
       propertyPath: MobSpawns.Array.size
       value: 5
@@ -1090,6 +1306,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
       propertyPath: MobSpawnConfigs.Array.size
       value: 2
       objectReference: {fileID: 0}
@@ -1098,21 +1318,121 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1499648372}
     - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: HeavySpawnPoints.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: LightSpawnPoints.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: HeavySpawnPoints.Array.data[0]
+      value: 
+      objectReference: {fileID: 931054508}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: HeavySpawnPoints.Array.data[1]
+      value: 
+      objectReference: {fileID: 1313146307}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: HeavySpawnPoints.Array.data[2]
+      value: 
+      objectReference: {fileID: 1313146307}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: LightSpawnPoints.Array.data[0]
+      value: 
+      objectReference: {fileID: 190460472}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: LightSpawnPoints.Array.data[1]
+      value: 
+      objectReference: {fileID: 108255023}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: LightSpawnPoints.Array.data[2]
+      value: 
+      objectReference: {fileID: 2042819373}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: LightSpawnPoints.Array.data[3]
+      value: 
+      objectReference: {fileID: 108255023}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: LightSpawnPoints.Array.data[4]
+      value: 
+      objectReference: {fileID: 2042819373}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.SpawnRequest.transform
+      value: 
+      objectReference: {fileID: 190460472}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
       propertyPath: DefaultEncounter.Waves.Array.size
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].Name
+      value: A
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Name
+      value: A
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.SpawnRequest.config.Mob
+      value: 
+      objectReference: {fileID: 5571416124093621165, guid: ab129e03610f14f4bbeeea02c0119926, type: 3}
     - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
       propertyPath: MobSpawnConfigs.Array.data[1].Mob
       value: 
       objectReference: {fileID: 5571416124093621165, guid: ab129e03610f14f4bbeeea02c0119926, type: 3}
     - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].Event
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Event
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Duration
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: HeavySpawnConfig.SpawnEffect.Duration
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: LightSpawnConfig.SpawnEffect.Duration
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
       propertyPath: DefaultEncounter.SpawnPoints.Array.size
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: HeavySpawnConfig.PreviewEffect.Duration
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: HeavySpawnConfig.SpawnEffect.GameObject
+      value: 
+      objectReference: {fileID: 159918, guid: f3d60ef1464f95348a9ffe17f312927e, type: 3}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: LightSpawnConfig.PreviewEffect.Duration
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: LightSpawnConfig.SpawnEffect.GameObject
+      value: 
+      objectReference: {fileID: 159918, guid: f3d60ef1464f95348a9ffe17f312927e, type: 3}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
       propertyPath: DefaultEncounter.SpawnConfigs.Array.size
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: HeavySpawnConfig.PreviewEffect.GameObject
+      value: 
+      objectReference: {fileID: 4226761272155066953, guid: b725c2c7bace2ad47b988fec44b09228, type: 3}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: LightSpawnConfig.PreviewEffect.GameObject
+      value: 
+      objectReference: {fileID: 622896951325787807, guid: ffaa4a44a4cc3a843ae027759b941f2a, type: 3}
     - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
       propertyPath: DefaultEncounter.SpawnPoints.Array.data[0]
       value: 
@@ -1142,6 +1462,14 @@ PrefabInstance:
       value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].Next.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Next.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
       propertyPath: DefaultEncounter.SpawnConfigs.Array.data[0].Mob
       value: 
       objectReference: {fileID: 5571416124093621165, guid: d84c5cd595094654fa88cca685e8d2a1, type: 3}
@@ -1162,9 +1490,37 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.SpawnRequest.config.SpawnEffect.Duration
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
       propertyPath: MobSpawnConfigs.Array.data[1].SpawnEffect.Duration
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].SpawnRequest.transform
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].Next.Array.data[0].Name
+      value: B
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].SpawnRequest.config.Mob
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Next.Array.data[0].Name
+      value: C
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.SpawnRequest.config.PreviewEffect.Duration
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.SpawnRequest.config.SpawnEffect.GameObject
+      value: 
+      objectReference: {fileID: 159918, guid: f3d60ef1464f95348a9ffe17f312927e, type: 3}
     - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
       propertyPath: MobSpawnConfigs.Array.data[1].PreviewEffect.Duration
       value: 3
@@ -1174,9 +1530,45 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 159918, guid: f3d60ef1464f95348a9ffe17f312927e, type: 3}
     - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].Next.Array.data[0].Event
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Next.Array.data[0].Event
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].Next.Array.data[0].Prefab
+      value: 
+      objectReference: {fileID: 5571416124093621165, guid: ab129e03610f14f4bbeeea02c0119926, type: 3}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Next.Array.data[0].Prefab
+      value: 
+      objectReference: {fileID: 5571416124093621165, guid: ab129e03610f14f4bbeeea02c0119926, type: 3}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.SpawnRequest.config.PreviewEffect.GameObject
+      value: 
+      objectReference: {fileID: 622896951325787807, guid: ffaa4a44a4cc3a843ae027759b941f2a, type: 3}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
       propertyPath: MobSpawnConfigs.Array.data[1].PreviewEffect.GameObject
       value: 
       objectReference: {fileID: 622896951325787807, guid: ffaa4a44a4cc3a843ae027759b941f2a, type: 3}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].Next.Array.data[0].Transform
+      value: 
+      objectReference: {fileID: 108255023}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Next.Array.data[0].Transform
+      value: 
+      objectReference: {fileID: 931054508}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].Next.Array.data[0].Next.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Next.Array.data[0].Next.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
       propertyPath: DefaultEncounter.SpawnConfigs.Array.data[0].SpawnEffect.Duration
       value: 2
@@ -1207,6 +1599,98 @@ PrefabInstance:
       objectReference: {fileID: 4226761272155066953, guid: b725c2c7bace2ad47b988fec44b09228, type: 3}
     - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
       propertyPath: DefaultEncounter.SpawnConfigs.Array.data[1].PreviewEffect.GameObject
+      value: 
+      objectReference: {fileID: 622896951325787807, guid: ffaa4a44a4cc3a843ae027759b941f2a, type: 3}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].SpawnRequest.config.SpawnEffect.Duration
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].Next.Array.data[0].SpawnRequest.transform
+      value: 
+      objectReference: {fileID: 2042819373}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Next.Array.data[0].SpawnRequest.transform
+      value: 
+      objectReference: {fileID: 2042819373}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].Next.Array.data[0].Next.Array.data[0].Name
+      value: B
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].Next.Array.data[0].SpawnRequest.config.Mob
+      value: 
+      objectReference: {fileID: 5571416124093621165, guid: d84c5cd595094654fa88cca685e8d2a1, type: 3}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].SpawnRequest.config.PreviewEffect.Duration
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].SpawnRequest.config.SpawnEffect.GameObject
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Next.Array.data[0].Next.Array.data[0].Name
+      value: C
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Next.Array.data[0].SpawnRequest.config.Mob
+      value: 
+      objectReference: {fileID: 5571416124093621165, guid: ab129e03610f14f4bbeeea02c0119926, type: 3}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].Next.Array.data[0].Next.Array.data[0].Event
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Next.Array.data[0].Next.Array.data[0].Event
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].SpawnRequest.config.PreviewEffect.GameObject
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Next.Array.data[0].Next.Array.data[0].Next.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].Next.Array.data[0].SpawnRequest.config.SpawnEffect.Duration
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Next.Array.data[0].SpawnRequest.config.SpawnEffect.Duration
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].Next.Array.data[0].SpawnRequest.config.PreviewEffect.Duration
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].Next.Array.data[0].SpawnRequest.config.SpawnEffect.GameObject
+      value: 
+      objectReference: {fileID: 159918, guid: f3d60ef1464f95348a9ffe17f312927e, type: 3}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Next.Array.data[0].Next.Array.data[0].Next.Array.data[0].Name
+      value: C
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Next.Array.data[0].SpawnRequest.config.PreviewEffect.Duration
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Next.Array.data[0].SpawnRequest.config.SpawnEffect.GameObject
+      value: 
+      objectReference: {fileID: 159918, guid: f3d60ef1464f95348a9ffe17f312927e, type: 3}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Next.Array.data[0].Next.Array.data[0].Next.Array.data[0].Event
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[0].Next.Array.data[0].SpawnRequest.config.PreviewEffect.GameObject
+      value: 
+      objectReference: {fileID: 4226761272155066953, guid: b725c2c7bace2ad47b988fec44b09228, type: 3}
+    - target: {fileID: 2348650167000098465, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: Encounter.Next.Array.data[1].Next.Array.data[0].SpawnRequest.config.PreviewEffect.GameObject
       value: 
       objectReference: {fileID: 622896951325787807, guid: ffaa4a44a4cc3a843ae027759b941f2a, type: 3}
     - target: {fileID: 2438599627160442252, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}

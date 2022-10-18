@@ -5,48 +5,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 
-public enum MobStrategy { Base }
-public enum SpawnStrategy { Base }
-public enum SpawnProcess { Staggered, Concurrent } // TODO: needs parameters for wave size and spawn period
-public enum NextWaveCondition { Time } // TODO: needs paramater for duration and other params
-
-[Serializable]
-public struct Effect {
-  public GameObject GameObject;
-  public float Duration;
-}
-
-[Serializable]
-public struct SpawnConfig {
-  public int Cost;
-  public Effect PreviewEffect;
-  public Effect SpawnEffect;
-  public GameObject Mob;
-}
-
-[Serializable]
-public struct SpawnRequest {
-  public Transform transform;
-  public SpawnConfig config;
-}
-
-[Serializable]
-public struct Wave {
-  public int Budget;
-  public MobStrategy MobStrategy;
-  public SpawnStrategy SpawnStrategy;
-  public SpawnProcess SpawnProcess;
-  public NextWaveCondition NextWaveCondition;
-}
-
-[Serializable]
-public struct Encounter {
-  public int Seed;
-  public List<SpawnConfig> SpawnConfigs;
-  public List<Transform> SpawnPoints;
-  public List<Wave> Waves;
-}
-
 public class GameManager : MonoBehaviour {
   public static IEnumerator Await(AsyncOperation op) {
     while (!op.isDone) {
@@ -66,9 +24,7 @@ public class GameManager : MonoBehaviour {
   public List<Spawn> PlayerSpawns = new();
 
   [Header("Mobs")]
-  public Transform[] MobSpawns;
-  public SpawnConfig[] MobSpawnConfigs;
-  public Encounter DefaultEncounter;
+  public Encounter Encounter;
 
   GameObject Player;
   List<GameObject> Mobs;
@@ -100,73 +56,12 @@ public class GameManager : MonoBehaviour {
     return !Player || Player.GetComponent<Attributes>().GetValue(AttributeTag.Health, 0f) <= 0;
   }
 
-  List<SpawnConfig> BaseMobs(List<SpawnConfig> spawnConfigs) {
-    return spawnConfigs;
-  }
-
-  List<SpawnRequest> BaseSpawns(List<SpawnConfig> spawnConfigs, List<Transform> spawnPoints) {
-    var spawnRequests = new List<SpawnRequest>(spawnConfigs.Count);
-    for (var i = 0; i < spawnConfigs.Count; i++) {
-      spawnRequests.Add(new SpawnRequest {
-        config = spawnConfigs[i],
-        transform = spawnPoints[i%spawnPoints.Count]
-      });
-    }
-    return spawnRequests;
-  }
-
   IEnumerator Countdown(
   Action<int> f,
   int seconds) {
     for (var i = seconds; i >= 0; i--) {
       f(i);
       yield return new WaitForSeconds(1);
-    }
-  }
-
-  IEnumerator SpawnMob(SpawnRequest sr) {
-    var p = sr.transform.position;
-    var r = sr.transform.rotation;
-    VFXManager.Instance.SpawnEffect(sr.config.PreviewEffect, p, r);
-    yield return new WaitForSeconds(sr.config.PreviewEffect.Duration);
-    VFXManager.Instance.SpawnEffect(sr.config.SpawnEffect, p, r);
-    Mobs.Add(Instantiate(sr.config.Mob, p, r));
-  }
-
-  IEnumerator SpawnConcurrent(List<SpawnRequest> spawnRequests) {
-    foreach (var sr in spawnRequests) {
-      StartCoroutine(SpawnMob(sr));
-    }
-    yield return null;
-  }
-
-  IEnumerator SpawnStaggered(List<SpawnRequest> spawnRequests, int groupSize, float seconds) {
-    var batch = new List<SpawnRequest>();
-    for (var i = 0; i < spawnRequests.Count; i++) {
-      batch.Add(spawnRequests[i]);
-      if (batch.Count == groupSize) {
-        StartCoroutine(SpawnConcurrent(batch));
-        batch.Clear();
-        yield return new WaitForSeconds(seconds);
-      }
-    }
-  }
-
-  IEnumerator RunEncounter(Encounter encounter) {
-    foreach (var wave in encounter.Waves) {
-      var mobs = wave.MobStrategy switch {
-        _ => BaseMobs(encounter.SpawnConfigs)
-      };
-      var spawns = wave.SpawnStrategy switch {
-        _ => BaseSpawns(mobs, encounter.SpawnPoints)
-      };
-      yield return StartCoroutine(wave.SpawnProcess switch {
-        SpawnProcess.Staggered => SpawnStaggered(spawns, 1, 2), // TODO: hardcoded.. need to decide where these params live
-        SpawnProcess.Concurrent => SpawnConcurrent(spawns)
-      });
-      yield return wave.NextWaveCondition switch {
-        _ => new WaitForSeconds(5) // TODO: hardcoded.. need to decide where this parameter lives
-      };
     }
   }
 
@@ -187,7 +82,7 @@ public class GameManager : MonoBehaviour {
       // Exit pre-game countdown
 
       // Start the encounter
-      var encounter = StartCoroutine(RunEncounter(DefaultEncounter));
+      var encounter = StartCoroutine(Encounter.Run());
       while (!GameOver()) {
         yield return null;
       }
