@@ -4,7 +4,7 @@ using UnityEngine;
 [Serializable]
 public struct Effect {
   public GameObject GameObject;
-  public float Duration;
+  public Timeval Duration;
 }
 
 [CreateAssetMenu(fileName = "SpawnConfig", menuName = "Encounters/SpawnConfig")]

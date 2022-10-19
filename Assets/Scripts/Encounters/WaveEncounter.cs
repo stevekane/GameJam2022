@@ -26,7 +26,7 @@ public class WaveEncounter : Encounter {
     var p = sr.transform.position;
     var r = sr.transform.rotation;
     VFXManager.Instance.SpawnEffect(sr.config.PreviewEffect, p, r);
-    yield return new WaitForSeconds(sr.config.PreviewEffect.Duration);
+    yield return new WaitForSeconds(sr.config.PreviewEffect.Duration.Seconds);
     VFXManager.Instance.SpawnEffect(sr.config.SpawnEffect, p, r);
     Instantiate(sr.config.Mob, p, r);
   }

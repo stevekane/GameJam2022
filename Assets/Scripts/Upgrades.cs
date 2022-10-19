@@ -38,10 +38,10 @@ public class Upgrades : MonoBehaviour {
       AbilityTags = 0;
       Active.ForEach(ud => ud.Upgrade.Apply(this));
       // TODO: remove test code
-      Active.ForEach(ud => {
-        if (ud.Upgrade is UpgradeAttributeList ual)
-          Debug.Log($"Upgrade: {this} {ual.Attribute} is now {GetComponent<Attributes>().GetValue(ual.Attribute)}");
-      });
+      // Active.ForEach(ud => {
+      //   if (ud.Upgrade is UpgradeAttributeList ual)
+      //     Debug.Log($"Upgrade: {this} {ual.Attribute} is now {GetComponent<Attributes>().GetValue(ual.Attribute)}");
+      // });
     }
   }
 }

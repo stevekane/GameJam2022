@@ -20,7 +20,7 @@ public class DoomEncounter : Encounter {
     var r = sr.transform.rotation;
     spawner.SpawningCount++;
     VFXManager.Instance.SpawnEffect(sr.config.PreviewEffect, p, r);
-    yield return new WaitForSeconds(sr.config.PreviewEffect.Duration);
+    yield return new WaitForSeconds(sr.config.PreviewEffect.Duration.Frames);
     VFXManager.Instance.SpawnEffect(sr.config.SpawnEffect, p, r);
     spawner.SpawningCount--;
     spawner.Mobs.Add(Instantiate(sr.config.Mob, p, r));

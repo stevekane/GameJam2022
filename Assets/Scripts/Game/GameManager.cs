@@ -26,16 +26,55 @@ public class GameManager : MonoBehaviour {
   [Header("Mobs")]
   public Encounter Encounter;
 
+  Bundle Bundle = new Bundle();
   GameObject Player;
   List<GameObject> Mobs;
 
   void Awake() {
     if (Instance) {
+      Instance.Bundle.StopAll();
       Destroy(gameObject);
     } else {
       Instance = this;
       DontDestroyOnLoad(Instance.gameObject);
     }
+  }
+
+  void Start() {
+    Bundle.StartRoutine(new Fiber(Run()));
+  }
+
+  void FixedUpdate() {
+    Bundle.Run();
+  }
+
+  IEnumerator Run() {
+    //while (true) {
+      Debug.Log("Start loop");
+      // Spawn and configure the player
+      var playerSpawn = PlayerSpawns[0];
+      var p = playerSpawn.transform.position;
+      var r = playerSpawn.transform.rotation;
+      Player = Instantiate(PlayerPrefab, p, r);
+
+      // Enter pre-game countdown
+      SetPlayerInputsEnabled(Player, isEnabled: false);
+      SetCountdownTextEnabled(CountdownText, isEnabled: true);
+      yield return Countdown(PingCountdown, CountdownDuration);
+      SetCountdownTextEnabled(CountdownText, isEnabled: false);
+      SetPlayerInputsEnabled(Player, isEnabled: true);
+      // Exit pre-game countdown
+
+      // Begin Encounter
+      Encounter.Bundle = Bundle;
+      yield return Encounter.Run();
+      // End Encounter
+
+      Debug.Log("Beyond the encounter");
+
+      // Cleanup references and reload the scene
+      // yield return Await(SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name));
+    // }
   }
 
   void PingCountdown(int n) {
@@ -61,36 +100,8 @@ public class GameManager : MonoBehaviour {
   int seconds) {
     for (var i = seconds; i >= 0; i--) {
       f(i);
-      yield return new WaitForSeconds(1);
+      yield return Fiber.Wait(Timeval.FramesPerSecond);
     }
   }
 
-  IEnumerator Start() {
-    while (true) {
-      // Spawn and configure the player
-      var playerSpawn = PlayerSpawns[0];
-      var p = playerSpawn.transform.position;
-      var r = playerSpawn.transform.rotation;
-      Player = Instantiate(PlayerPrefab, p, r);
-
-      // Enter pre-game countdown
-      SetPlayerInputsEnabled(Player, isEnabled: false);
-      SetCountdownTextEnabled(CountdownText, isEnabled: true);
-      yield return StartCoroutine(Countdown(PingCountdown, CountdownDuration));
-      SetCountdownTextEnabled(CountdownText, isEnabled: false);
-      SetPlayerInputsEnabled(Player, isEnabled: true);
-      // Exit pre-game countdown
-
-      // Start the encounter
-      var encounter = StartCoroutine(Encounter.Run());
-      while (!GameOver()) {
-        yield return null;
-      }
-      StopCoroutine(encounter);
-      // Stop encounter
-
-      // Cleanup references and reload the scene
-      yield return StartCoroutine(Await(SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name)));
-    }
-  }
 }
