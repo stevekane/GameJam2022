@@ -1,8 +1,11 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
+// A Newtsonsoft JSON converter that writes ScriptableObjects the Unity way.
+// Contains a hack to work around weird quirks in Unity's Json de/serializer.
 public class ScriptableObjectConverter : JsonConverter {
   class FuckingUnityScriptableObjectWrapper {
     public ScriptableObject Object;
@@ -31,19 +34,33 @@ public class ScriptableObjectConverter : JsonConverter {
   }
 }
 
+// Represents all the save data we read/write to the save file.
 public class SaveData {
   public List<UpgradeData> Upgrades;
 
+  static string FilePath { get => System.IO.Path.Combine(Application.persistentDataPath, "save.json"); }
   static JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings() {
     Converters = new List<JsonConverter>() { new ScriptableObjectConverter() },
     TypeNameHandling = TypeNameHandling.Auto,
   };
-  public static string Save() {
+
+  // TODO: use async IO
+  public static void SaveToFile() {
+    var json = SaveToJson();
+    File.WriteAllTextAsync(FilePath, json);
+    Debug.Log($"Saved to ${FilePath}");
+  }
+  public static void LoadFromFile() {
+    var json = File.ReadAllText(FilePath);
+    LoadFromJson(json);
+  }
+
+  static string SaveToJson() {
     SaveData data = new();
     UnityEngine.Object.FindObjectOfType<Player>().GetComponent<Upgrades>().Save(data);
     return JsonConvert.SerializeObject(data, Formatting.Indented, JsonSerializerSettings);
   }
-  public static void Load(string json) {
+  static void LoadFromJson(string json) {
     var data = JsonConvert.DeserializeObject<SaveData>(json, JsonSerializerSettings);
     UnityEngine.Object.FindObjectOfType<Player>().GetComponent<Upgrades>().Load(data);
   }

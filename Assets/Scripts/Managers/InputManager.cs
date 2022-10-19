@@ -74,10 +74,6 @@ public class InputManager : MonoBehaviour {
     Time.fixedDeltaTime = 1f / Timeval.FramesPerSecond;
   }
 
-  void Start() {
-    Player = FindObjectOfType<Player>();
-  }
-
   Vector2 GetAxisFromKeyboard() {
     float right = (Input.GetKey(KeyCode.D) ? 1 : 0) - (Input.GetKey(KeyCode.A) ? 1 : 0);
     float up = (Input.GetKey(KeyCode.W) ? 1 : 0) - (Input.GetKey(KeyCode.S) ? 1 : 0);
@@ -134,22 +130,15 @@ public class InputManager : MonoBehaviour {
   }
 
   void FixedUpdate() {
+    Player = Player ?? FindObjectOfType<Player>();
     Timeval.FrameCount++;
   }
 
   // TODO: Remove this testing junk.
-  public string SaveJson;
   void CheckSaveLoad() {
     if (Input.GetKeyDown(KeyCode.LeftBracket))
-      Save();
+      SaveData.SaveToFile();
     if (Input.GetKeyDown(KeyCode.RightBracket))
-      Load();
-  }
-  void Save() {
-    SaveJson = SaveData.Save();
-    Debug.Log($"Saved: ${SaveJson}");
-  }
-  void Load() {
-    SaveData.Load(SaveJson);
+      SaveData.LoadFromFile();
   }
 }
