@@ -82,7 +82,7 @@ public class ProcessEncounter : Encounter {
       var p = sr.transform.position;
       var r = sr.transform.rotation;
       VFXManager.Instance.SpawnEffect(sr.config.PreviewEffect, p, r);
-      yield return new WaitForSeconds(sr.config.PreviewEffect.Duration);
+      yield return new WaitForSeconds(sr.config.PreviewEffect.Duration.Frames);
       VFXManager.Instance.SpawnEffect(sr.config.SpawnEffect, p, r);
       d.Add(e.Name, Instantiate(sr.config.Mob, p, r));
     }

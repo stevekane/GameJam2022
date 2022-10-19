@@ -9,5 +9,6 @@ public struct SpawnRequest {
 }
 
 public abstract class Encounter : MonoBehaviour {
+  public Bundle Bundle;
   public abstract IEnumerator Run();
 }
