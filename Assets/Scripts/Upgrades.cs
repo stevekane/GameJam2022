@@ -32,6 +32,7 @@ public class Upgrades : MonoBehaviour {
   }
   void FixedUpdate() {
     if (Added.Count > 0 || Dirty) {
+      Dirty = false;
       Added.ForEach(e => Active.Add(e));
       Added.Clear();
       Modifiers.Clear();
