@@ -37,6 +37,7 @@ public class ScriptableObjectConverter : JsonConverter {
 // Represents all the save data we read/write to the save file.
 public class SaveData {
   public List<UpgradeData> Upgrades;
+  public int Gold;
 
   static string FilePath { get => System.IO.Path.Combine(Application.persistentDataPath, "save.json"); }
   static JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings() {

@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class VFXManager : MonoBehaviour {
   public static VFXManager Instance;
+  public Coin CoinPrefab;
 
   void Awake() {
     Instance = this;
