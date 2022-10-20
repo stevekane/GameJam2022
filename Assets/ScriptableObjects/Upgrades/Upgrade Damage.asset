@@ -14,14 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Permanent: 1
   Attribute: 0
-  Modifiers:
-  - Base: 10
-    Mult: 1
-  - Base: 10
-    Mult: 2
-  - Base: 10
-    Mult: 3
-  - Base: 10
-    Mult: 4
-  - Base: 10
-    Mult: 5
+  Levels:
+  - Modifier:
+      Base: 10
+      Mult: 1
+    Cost: 0
+  - Modifier:
+      Base: 15
+      Mult: 1
+    Cost: 1
+  - Modifier:
+      Base: 15
+      Mult: 2
+    Cost: 1
+  - Modifier:
+      Base: 20
+      Mult: 2
+    Cost: 1
