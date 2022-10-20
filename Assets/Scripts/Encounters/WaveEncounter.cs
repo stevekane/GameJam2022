@@ -55,7 +55,7 @@ public class WaveEncounter : Encounter {
     var p = sr.transform.position;
     var r = sr.transform.rotation;
     VFXManager.Instance.SpawnEffect(sr.config.PreviewEffect, p, r);
-    yield return new WaitForSeconds(sr.config.PreviewEffect.Duration.Frames);
+    yield return Fiber.Wait(sr.config.PreviewEffect.Duration.Frames);
     VFXManager.Instance.SpawnEffect(sr.config.SpawnEffect, p, r);
     Instantiate(sr.config.Mob, p, r);
   }
@@ -64,7 +64,8 @@ public class WaveEncounter : Encounter {
     for (var waveNumber = 0; waveNumber < TotalWaveCount; waveNumber++) {
       yield return Fiber.Wait(WavePeriod.Frames);
       Wave(InitialCost+CostPerWave*waveNumber, Config)
-      .Select(sr => new Fiber(SpawnMob(sr)))
+      .Select(SpawnMob)
+      .Select(Fiber.From)
       .ForEach(Bundle.StartRoutine);
     }
   }
