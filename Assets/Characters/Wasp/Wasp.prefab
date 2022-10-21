@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2086606788159703277}
   - component: {fileID: 1108373107085656809}
   - component: {fileID: 6539316134859821109}
+  - component: {fileID: 4556185380902848206}
   m_Layer: 0
   m_Name: Head
   m_TagString: Untagged
@@ -63,6 +64,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 81b6118b58c33ef48913d896e2d0f3a8, type: 2}
+  - {fileID: -876546973899608171, guid: 87915bb2628c4d047871fea0fb3d6b01, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -84,6 +86,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &4556185380902848206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 545018243301031909}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d25edbc91485245b0f56be67ef140f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Damage: {fileID: 5571416124093621156}
 --- !u!1 &1381238120982410781
 GameObject:
   m_ObjectHideFlags: 0
@@ -223,6 +238,7 @@ GameObject:
   - component: {fileID: 1359320086329930499}
   - component: {fileID: 2913046027420477154}
   - component: {fileID: 7226594029644046785}
+  - component: {fileID: 5589927431163969808}
   m_Layer: 0
   m_Name: Lower Body
   m_TagString: Untagged
@@ -274,6 +290,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 81b6118b58c33ef48913d896e2d0f3a8, type: 2}
+  - {fileID: -876546973899608171, guid: 87915bb2628c4d047871fea0fb3d6b01, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -295,6 +312,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &5589927431163969808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2103406326910975300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37d25edbc91485245b0f56be67ef140f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Damage: {fileID: 5571416124093621156}
 --- !u!1 &3778848490017935077
 GameObject:
   m_ObjectHideFlags: 0
@@ -749,6 +779,7 @@ GameObject:
   - component: {fileID: 1657031132205634076}
   - component: {fileID: 4362511970478309579}
   - component: {fileID: 7227641143467178568}
+  - component: {fileID: 491125434464353236}
   m_Layer: 10
   m_Name: Wasp
   m_TagString: Untagged
@@ -784,7 +815,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5571416124093621165}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 13cd3e0535f940e429713993be49d243, type: 3}
   m_Name: 
@@ -929,9 +960,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveSpeed: 15
-  TurnSpeed: 1080
   Gravity: -200
+--- !u!114 &491125434464353236
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65cced279f9613b45973ba06b4520d5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Wave: 0
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0
