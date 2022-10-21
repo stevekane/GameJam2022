@@ -4,6 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+public interface ISpawnAction<T> {
+  public void OnSpawn(T t);
+}
+
+[Serializable]
+public struct MobSpawnAction : ISpawnAction<GameObject> {
+  public int WaveNumber;
+  public void OnSpawn(GameObject go) => go.GetComponent<Mob>().Wave = WaveNumber;
+}
+
 [Serializable]
 public struct MobCost {
   public GameObject Mob;
@@ -49,22 +59,13 @@ public class WaveEncounter : Encounter {
     }
   }
 
-  interface ISpawnAction<T> {
-    public void OnSpawn(T t);
-  }
-
-  struct MobSpawnAction : ISpawnAction<GameObject> {
-    public int WaveNumber;
-    public void OnSpawn(GameObject go) => go.GetComponent<Mob>().Wave = WaveNumber;
-  }
-
-  IEnumerator Spawn(SpawnRequest sr, ISpawnAction<GameObject> spawnAction) {
+  IEnumerator Spawn(SpawnRequest sr, ISpawnAction<GameObject> spawnAction = null) {
     var p = sr.transform.position;
     var r = sr.transform.rotation;
     VFXManager.Instance.SpawnEffect(sr.config.PreviewEffect, p, r);
     yield return Fiber.Wait(sr.config.PreviewEffect.Duration.Frames);
     VFXManager.Instance.SpawnEffect(sr.config.SpawnEffect, p, r);
-    spawnAction.OnSpawn(Instantiate(sr.config.Mob, p, r));
+    spawnAction?.OnSpawn(Instantiate(sr.config.Mob, p, r));
   }
 
   public override IEnumerator Run() {
