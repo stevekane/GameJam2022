@@ -25,7 +25,6 @@ public class Upgrades : MonoBehaviour {
 
   public void CollectGold(int gold) {
     Gold += gold;
-    Debug.Log($"Gold is now: {Gold} (+{gold})");
   }
 
   public void Save(SaveData data) {

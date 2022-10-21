@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public class Mob : MonoBehaviour {
-  int Gold { get => 4 + Wave*2; }
+  int Gold { get => 1 + Wave*2; }
   public int Wave = 0;
 
   public void DropGold() {
@@ -9,7 +9,7 @@ public class Mob : MonoBehaviour {
     Coin.SpawnCoins(transform.position, gold);
   }
 
-  void OnDestroy() {
+  void OnDeath() {
     DropGold();
   }
 }

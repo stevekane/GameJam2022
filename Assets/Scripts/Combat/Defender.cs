@@ -43,6 +43,12 @@ public class Defender : MonoBehaviour {
     }
   }
 
+  public void Die() {
+    // TODO: keep track of last attacker
+    SendMessage("OnDeath");
+    Destroy(gameObject, .01f);
+  }
+
   void Awake() {
     // Note: GetComponentInParent is probably wrong. Badger's shield has a Defender so it can be destructible, but it's missing
     // a bunch of other components like Status and Animator.
@@ -53,7 +59,7 @@ public class Defender : MonoBehaviour {
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
     if (transform.position.y < -100f) {
-      Destroy(gameObject, .01f);
+      Die();
     }
   }
 }

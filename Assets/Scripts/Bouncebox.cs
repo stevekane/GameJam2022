@@ -31,7 +31,8 @@ public class Bouncebox : MonoBehaviour {
       if (Damage.Points > 100f) {
         Status.Remove(k);
         Instantiate(Explosion, transform.position, Quaternion.identity);
-        Destroy(Damage.gameObject, .01f);
+        if (Damage.TryGetComponent(out Defender d))
+          d.Die();
       } else {
         AudioSource.PlayOptionalOneShot(AudioClip);
         VFXManager.Instance?.TrySpawnEffect(Effect, hit.point);
