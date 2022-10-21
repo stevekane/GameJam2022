@@ -49,21 +49,31 @@ public class WaveEncounter : Encounter {
     }
   }
 
-  IEnumerator SpawnMob(SpawnRequest sr, int waveNumber) {
+  interface ISpawnAction<T> {
+    public void OnSpawn(T t);
+  }
+
+  struct MobSpawnAction : ISpawnAction<GameObject> {
+    public int WaveNumber;
+    public void OnSpawn(GameObject go) => go.GetComponent<Mob>().Wave = WaveNumber;
+  }
+
+  IEnumerator Spawn(SpawnRequest sr, ISpawnAction<GameObject> spawnAction) {
     var p = sr.transform.position;
     var r = sr.transform.rotation;
     VFXManager.Instance.SpawnEffect(sr.config.PreviewEffect, p, r);
     yield return Fiber.Wait(sr.config.PreviewEffect.Duration.Frames);
     VFXManager.Instance.SpawnEffect(sr.config.SpawnEffect, p, r);
-    var mob = Instantiate(sr.config.Mob, p, r);
-    mob.GetComponent<Mob>().Wave = waveNumber;
+    spawnAction.OnSpawn(Instantiate(sr.config.Mob, p, r));
   }
 
   public override IEnumerator Run() {
     for (var waveNumber = 0; waveNumber < TotalWaveCount; waveNumber++) {
       yield return Fiber.Wait(WavePeriod.Frames);
       foreach (var wave in Wave(InitialCost+CostPerWave*waveNumber, Config)) {
-        Bundle.StartRoutine(new Fiber(SpawnMob(wave, waveNumber)));
+        var spawnAction = new MobSpawnAction { WaveNumber = waveNumber };
+        var spawn = new Fiber(Spawn(wave, spawnAction));
+        Bundle.StartRoutine(spawn);
       }
     }
   }
