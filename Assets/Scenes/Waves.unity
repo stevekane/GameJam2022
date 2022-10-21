@@ -635,9 +635,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55588c44c03f6994a9827ef9c6a39f7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InitialCost: 3
+  InitialCost: 1
   CostPerWave: 1
-  TotalWaveCount: 1
+  TotalWaveCount: 5
+  WavePeriod:
+    Millis: 3000
+    TicksPerSecond: 1
   Config:
     SpawnPoints:
     - {fileID: 190460472}
@@ -646,14 +649,13 @@ MonoBehaviour:
     - {fileID: 931054508}
     - {fileID: 1313146307}
     SpawnConfigs:
-    - {fileID: 11400000, guid: 5e51410ea9901fb49a52fc81a0cb7639, type: 2}
     - {fileID: 11400000, guid: cb1ed2251a51ee24c8825aa66c48302b, type: 2}
+    - {fileID: 11400000, guid: 5e51410ea9901fb49a52fc81a0cb7639, type: 2}
     Costs:
     - Mob: {fileID: 5571416124093621165, guid: ab129e03610f14f4bbeeea02c0119926, type: 3}
       Cost: 1
     - Mob: {fileID: 5571416124093621165, guid: d84c5cd595094654fa88cca685e8d2a1, type: 3}
       Cost: 2
-  SpawnRequests: []
 --- !u!4 &579452759
 Transform:
   m_ObjectHideFlags: 0

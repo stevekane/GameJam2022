@@ -34,14 +34,12 @@ public class WaveEncounter : Encounter {
   }
 
   IEnumerable<SpawnRequest> Wave(int budget, WaveConfig config) {
-    var candidates = (config.SpawnConfigs.Clone() as SpawnConfig[]).OrderByDescending(sc => Cost(config.Costs, sc.Mob));
-    var transforms = (config.SpawnPoints.Clone() as Transform[]);
+    var candidates = config.SpawnConfigs.OrderByDescending(sc => Cost(config.Costs, sc.Mob));
+    var transforms = config.SpawnPoints;
     var price = 0;
-
     foreach (var t in transforms) {
       foreach (var c in candidates) {
-        var cost = Cost(config.Costs, c.Mob);
-        var nextPrice = cost+price;
+        var nextPrice = Cost(config.Costs, c.Mob)+price;
         if (nextPrice <= budget) {
           price = nextPrice;
           yield return new SpawnRequest { config = c, transform = t };

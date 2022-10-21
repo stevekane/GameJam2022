@@ -57,6 +57,9 @@ public class GameManager : MonoBehaviour {
       var r = playerSpawn.transform.rotation;
       Player = Instantiate(PlayerPrefab, p, r);
 
+      // Setup camera to target the player
+      PlayerVirtualCamera.Instance.Follow = Player.transform;
+
       // Enter pre-game countdown
       SetPlayerInputsEnabled(Player, isEnabled: false);
       SetCountdownTextEnabled(CountdownText, isEnabled: true);
