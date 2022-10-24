@@ -5,4 +5,5 @@ public class Upgrade : ScriptableObject {
   public virtual void Add(Upgrades us) => us.AddUpgrade(new() { Upgrade = this });
   public virtual void Apply(Upgrades us) { }
   public virtual int GetCost(Upgrades us) => 0;
+  public virtual string GetDescription(Upgrades us) => "Unknown Upgrade";
 }

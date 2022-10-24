@@ -27,4 +27,12 @@ public class UpgradeAttributeList : Upgrade {
   }
   public override void Apply(Upgrades us) => us.AddAttributeModifier(Attribute, Levels[GetData(us).CurrentLevel].Modifier);
   public override int GetCost(Upgrades us) => Levels.TryGetIndex(GetData(us).CurrentLevel+1, out Level lvl) ? lvl.Cost : int.MaxValue;
+  public override string GetDescription(Upgrades us) {
+    var lvl = Levels[GetData(us).CurrentLevel];
+    var nextLvl = Levels[GetData(us).CurrentLevel+1];
+    return $"{Attribute}\n{FormatModifier(lvl.Modifier)}\n=>\n{FormatModifier(nextLvl.Modifier)}";
+  }
+  string FormatModifier(AttributeModifier m) {
+    return $"{m.Base} x{m.Mult}";
+  }
 }
