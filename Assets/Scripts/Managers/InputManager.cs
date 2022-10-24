@@ -48,6 +48,7 @@ public class AxisState {
 public class InputManager : MonoBehaviour {
   public static InputManager Instance;
 
+  bool InputEnabled = true;
   public bool UseMouseAndKeyboard = false;
   Player Player;
   Dictionary<(ButtonCode, ButtonPressType), EventSource> Buttons = new();
@@ -67,6 +68,14 @@ public class InputManager : MonoBehaviour {
       AxisCode.AxisRight => AxisRight,
       _ => null
     };
+  }
+
+  public void SetInputEnabled(bool value) {
+    InputEnabled = value;
+    if (!InputEnabled) {
+      AxisLeft.Update(0, new());
+      AxisRight.Update(0, new());
+    }
   }
 
   void Awake() {
@@ -113,6 +122,8 @@ public class InputManager : MonoBehaviour {
   }
 
   void Update() {
+    if (!InputEnabled)
+      return;
     foreach (var it in Buttons) {
       BroadcastEvent(it.Key.Item1, it.Key.Item2, it.Value);
     }
