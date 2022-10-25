@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class UpgradeUI : MonoBehaviour {
   public GameObject Canvas;
   public GameObject ChoicesFrame;
-  public GameObject ChoicePrefab;
+  public UpgradeCardUI CardPrefab;
   void Start() {
     Canvas.SetActive(false);
   }
@@ -17,18 +17,23 @@ public class UpgradeUI : MonoBehaviour {
       Destroy(child.gameObject);
     Optional<GameObject> selected = null;
     var playerUs = Player.Get().GetComponent<Upgrades>();
-    choices.ForEach(c => {
-      var go = Instantiate(ChoicePrefab, ChoicesFrame.transform);
-      selected ??= go;
-      var b = go.GetComponent<Button>();
-      b.onClick.AddListener(() => OnChooseCard(c));
-      var txt = go.GetComponentInChildren<TextMeshProUGUI>();
-      txt.text = c.GetDescription(playerUs);
+    choices.ForEach(u => {
+      var card = Instantiate(CardPrefab, ChoicesFrame.transform);
+      var descr = u.GetDescription(playerUs);
+      card.Init(descr);
+      var b = card.GetComponent<Button>();
+      if (descr.Cost < int.MaxValue) {
+        selected ??= card.gameObject;
+        b.onClick.AddListener(() => OnChooseCard(u));
+      } else {
+        b.interactable = false;
+      }
     });
     Canvas.SetActive(true);
     InputManager.Instance.SetInputEnabled(false);
     Time.timeScale = 0f;
-    EventSystem.current.SetSelectedGameObject(selected.Value);
+    if (selected.Value)
+      EventSystem.current.SetSelectedGameObject(selected.Value);
   }
 
   public void Hide() {
