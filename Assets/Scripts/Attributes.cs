@@ -65,7 +65,7 @@ public class Attributes : MonoBehaviour {
   private void Awake() {
     Upgrades = this.GetOrCreateComponent<Upgrades>();
     Status = GetComponent<Status>();
-    BaseUpgrades.ForEach(u => u.Add(Upgrades));
+    BaseUpgrades.ForEach(u => u.Buy(Upgrades));
   }
   AttributeModifier GetModifier(AttributeTag attrib) {
     AttributeModifier modifier = new();

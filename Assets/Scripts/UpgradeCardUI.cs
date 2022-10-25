@@ -13,6 +13,10 @@ public class UpgradeCardUI : MonoBehaviour {
     CurrentEffect.text = descr.CurrentEffect;
     NextEffect.text = descr.NextEffect;
     CurrentLevel.text = $"Level: {descr.CurrentLevel}";
-    Cost.text = descr.Cost < int.MaxValue ? $"{descr.Cost} moneys" : "";
+    Cost.text = descr.Cost switch {
+      0 => "FREE",
+      int.MaxValue => "",
+      _ => $"${descr.Cost}",
+    };
   }
 }

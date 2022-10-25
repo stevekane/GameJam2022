@@ -11,8 +11,7 @@ public struct UpgradeDescription {
 
 public class Upgrade : ScriptableObject {
   public bool Permanent = true;
-  public virtual void Add(Upgrades us) => us.AddUpgrade(new() { Upgrade = this });
+  public virtual void Buy(Upgrades us) => us.BuyUpgrade(new() { Upgrade = this }, 0, true);
   public virtual void Apply(Upgrades us) { }
-  public virtual int GetCost(Upgrades us) => 0;
-  public virtual UpgradeDescription GetDescription(Upgrades us) => new() { CurrentEffect = "Unknown" };
+  public virtual UpgradeDescription GetDescription(Upgrades us) => new() { Title = "Unknown" };
 }

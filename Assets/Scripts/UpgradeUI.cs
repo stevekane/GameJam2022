@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -22,7 +20,7 @@ public class UpgradeUI : MonoBehaviour {
       var descr = u.GetDescription(playerUs);
       card.Init(descr);
       var b = card.GetComponent<Button>();
-      if (descr.Cost < int.MaxValue) {
+      if (descr.Cost <= playerUs.Gold) {
         selected ??= card.gameObject;
         b.onClick.AddListener(() => OnChooseCard(u));
       } else {
@@ -32,8 +30,7 @@ public class UpgradeUI : MonoBehaviour {
     Canvas.SetActive(true);
     InputManager.Instance.SetInputEnabled(false);
     Time.timeScale = 0f;
-    if (selected.Value)
-      EventSystem.current.SetSelectedGameObject(selected.Value);
+    EventSystem.current.SetSelectedGameObject(selected?.Value);
   }
 
   public void Hide() {
@@ -43,7 +40,7 @@ public class UpgradeUI : MonoBehaviour {
   }
 
   public void OnChooseCard(Upgrade which) {
-    which.Add(Player.Get().GetComponent<Upgrades>());
+    which.Buy(Player.Get().GetComponent<Upgrades>());
     Hide();
   }
 }
