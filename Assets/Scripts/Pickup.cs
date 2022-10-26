@@ -7,7 +7,7 @@ public class Pickup : MonoBehaviour {
       OnPickup(us);
   }
   void OnPickup(Upgrades us) {
-    Upgrade.Buy(us);
+    Upgrade.Add(us, purchase: false);
     Destroy(gameObject);
   }
 }

@@ -10,26 +10,18 @@ public enum AttributeTag {
   MoveSpeed,
   TurnSpeed,
   AttackSpeed,
-  SlamDamage,
-  SuplexDamage,
+  ObsoleteSlamDamage,
+  ObsoleteSuplexDamage,
   HasGravity,
   CanAttack,
   IsHittable,
   IsDamageable,
+  GoldGain,
 
   // Abilities
   AbilityStart = 1000,
   AbilityHeavyActive,
   AbilitySlamActive,
-}
-
-public class AttributeInfo {
-  public static AttributeInfo Instance = new();
-  // TODO: remove
-  public Dictionary<AttributeTag, AttributeTag?> Parents = new() {
-    { AttributeTag.SlamDamage, AttributeTag.Damage },
-    { AttributeTag.SuplexDamage, AttributeTag.Damage },
-  };
 }
 
 [Serializable]
@@ -65,18 +57,14 @@ public class Attributes : MonoBehaviour {
   private void Awake() {
     Upgrades = this.GetOrCreateComponent<Upgrades>();
     Status = GetComponent<Status>();
-    BaseUpgrades.ForEach(u => u.Buy(Upgrades));
+    BaseUpgrades.ForEach(u => u.Add(Upgrades, purchase: false));
   }
   AttributeModifier GetModifier(AttributeTag attrib) {
     AttributeModifier modifier = new();
-    AttributeTag? current = attrib;
-    while (current != null) {
-      if (Upgrades.GetModifier(attrib) is var mu && mu != null)
-        modifier.Merge(mu);
-      if (Status?.Value.GetModifier(attrib) is var ms && ms != null)
-        modifier.Merge(ms);
-      current = AttributeInfo.Instance.Parents.GetValueOrDefault(current.Value, null);
-    }
+    if (Upgrades.GetModifier(attrib) is var mu && mu != null)
+      modifier.Merge(mu);
+    if (Status?.Value.GetModifier(attrib) is var ms && ms != null)
+      modifier.Merge(ms);
     return modifier;
   }
   public float GetValue(AttributeTag attrib, float baseValue = 0f) => GetModifier(attrib).Apply(baseValue);

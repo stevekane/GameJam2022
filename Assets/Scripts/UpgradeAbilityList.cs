@@ -14,10 +14,10 @@ public class UpgradeAbilityList : Upgrade {
   }
   public Level[] Levels;
   UpgradeAbilityListData GetData(Upgrades us) => us.FindUpgrade(ud => ud.Upgrade == this) as UpgradeAbilityListData;
-  public override void Buy(Upgrades us) {
+  public override void Add(Upgrades us, bool purchase) {
     var ud = GetData(us) ?? new UpgradeAbilityListData() { Upgrade = this, CurrentLevel = -1 };
-    var isNew = ud.CurrentLevel == -1;
-    us.BuyUpgrade(ud, Levels[++ud.CurrentLevel].Cost, isNew);
+    var isNew = ++ud.CurrentLevel == 0;
+    us.BuyUpgrade(ud, purchase ? Levels[ud.CurrentLevel].Cost : 0, isNew);
   }
   public override void Apply(Upgrades us) => us.AbilityTags.AddFlags(Levels[GetData(us).CurrentLevel].AbilityTag);
 }

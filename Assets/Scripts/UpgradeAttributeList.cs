@@ -17,10 +17,10 @@ public class UpgradeAttributeList : Upgrade {
   public AttributeTag Attribute;
   public Level[] Levels;
   UpgradeAttributeListData GetData(Upgrades us) => us.FindUpgrade(ud => ud.Upgrade == this) as UpgradeAttributeListData;
-  public override void Buy(Upgrades us) {
+  public override void Add(Upgrades us, bool purchase) {
     var ud = GetData(us) ?? new UpgradeAttributeListData() { Upgrade = this, CurrentLevel = -1 };
-    var isNew = ud.CurrentLevel == -1;
-    us.BuyUpgrade(ud, Levels[++ud.CurrentLevel].Cost, isNew);
+    var isNew = ++ud.CurrentLevel == 0;
+    us.BuyUpgrade(ud, purchase ? Levels[ud.CurrentLevel].Cost : 0, isNew);
   }
   public override void Apply(Upgrades us) => us.AddAttributeModifier(Attribute, Levels[GetData(us).CurrentLevel].Modifier);
   public override UpgradeDescription GetDescription(Upgrades us) {
