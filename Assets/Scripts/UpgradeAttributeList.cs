@@ -24,7 +24,7 @@ public class UpgradeAttributeList : Upgrade {
   }
   public override void Apply(Upgrades us) => us.AddAttributeModifier(Attribute, Levels[GetData(us).CurrentLevel].Modifier);
   public override UpgradeDescription GetDescription(Upgrades us) {
-    var levelidx = GetData(us).CurrentLevel;
+    var levelidx = GetData(us)?.CurrentLevel ?? 0;
     var level = Levels[levelidx];
     if (Levels.TryGetIndex(levelidx+1, out Level nextLevel)) {
       return new() {
