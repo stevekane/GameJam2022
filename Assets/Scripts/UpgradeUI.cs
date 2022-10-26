@@ -36,8 +36,14 @@ public class UpgradeUI : MonoBehaviour {
 
   public void Hide() {
     Canvas.SetActive(false);
-    InputManager.Instance.SetInputEnabled(true);
     Time.timeScale = 1f;
+    // TODO: This is a dumb hack so the button onRelease doesn't register as a player input.
+    // Should probably have a close-shop animation anyway.
+    Invoke("EnableInput", .1f);
+  }
+
+  void EnableInput() {
+    InputManager.Instance.SetInputEnabled(true);
   }
 
   public void OnChooseCard(Upgrade which) {
