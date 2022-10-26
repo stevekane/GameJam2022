@@ -30,7 +30,8 @@ public class UpgradeUI : MonoBehaviour {
     Canvas.SetActive(true);
     InputManager.Instance.SetInputEnabled(false);
     Time.timeScale = 0f;
-    EventSystem.current.SetSelectedGameObject(selected?.Value);
+    if (selected != null)
+      EventSystem.current.SetSelectedGameObject(selected.Value);
   }
 
   public void Hide() {
@@ -41,6 +42,9 @@ public class UpgradeUI : MonoBehaviour {
 
   public void OnChooseCard(Upgrade which) {
     which.Buy(Player.Get().GetComponent<Upgrades>());
+    Hide();
+  }
+  public void OnExit() {
     Hide();
   }
 }
