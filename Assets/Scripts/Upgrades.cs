@@ -13,15 +13,19 @@ public class Upgrades : MonoBehaviour {
   List<UpgradeData> Added = new();
   Dictionary<AttributeTag, AttributeModifier> Modifiers = new();
   bool Dirty = false;
-  int Gold = 0;
+  public int Gold { get; private set; }
 // TODO: AbilityTag and Attributes are somewhat redundant. What do?
   public AbilityTag AbilityTags;
   public AttributeModifier GetModifier(AttributeTag attrib) => Modifiers.GetValueOrDefault(attrib, null);
   public void AddAttributeModifier(AttributeTag attrib, AttributeModifier modifier) => AttributeModifier.Add(Modifiers, attrib, modifier);
   public void RemoveAttributeModifier(AttributeTag attrib, AttributeModifier modifier) => AttributeModifier.Remove(Modifiers, attrib, modifier);
-  public void AddUpgrade(UpgradeData upgrade) => Added.Add(upgrade);
   public UpgradeData FindUpgrade(Predicate<UpgradeData> pred) => Active.Find(pred);
-  public void OnChanged() => Dirty = true;
+  public void BuyUpgrade(UpgradeData upgrade, int cost, bool add) {
+    Dirty = true;
+    Gold -= cost;
+    if (add)
+      Added.Add(upgrade);
+  }
 
   public void CollectGold(int gold) {
     Gold += gold;

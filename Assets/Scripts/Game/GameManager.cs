@@ -28,7 +28,6 @@ public class GameManager : MonoBehaviour {
 
   Bundle Bundle = new Bundle();
   GameObject Player;
-  List<GameObject> Mobs;
 
   void Awake() {
     if (Instance) {
@@ -48,37 +47,50 @@ public class GameManager : MonoBehaviour {
     Bundle.Run();
   }
 
+  IEnumerator EncounterDefeated(Encounter encounter) {
+    yield return new Fiber(encounter.Run());
+    yield return Fiber.Until(() => MobManager.Instance.Mobs.Count <= 0);
+  }
+
+  IEnumerator PlayerDeath(GameObject player) {
+    yield return Fiber.Until(() => player == null);
+  }
+
   IEnumerator Run() {
-    //while (true) {
-      Debug.Log("Start loop");
+    while (true) {
       // Spawn and configure the player
       var playerSpawn = PlayerSpawns[0];
       var p = playerSpawn.transform.position;
       var r = playerSpawn.transform.rotation;
       Player = Instantiate(PlayerPrefab, p, r);
+      SaveData.LoadFromFile();
 
       // Setup camera to target the player
       PlayerVirtualCamera.Instance.Follow = Player.transform;
 
+      // Cheap hack to allow loaded upgrades to apply before opening the shop
+      yield return Fiber.Wait(2);
+      // Wait for the player to purchase upgrades
+      var shop = GetComponent<Shop>();
+      shop.Open();
+      yield return Fiber.Until(() => !shop.IsOpen);
+
       // Enter pre-game countdown
-      // SetPlayerInputsEnabled(Player, isEnabled: false);
-      // SetCountdownTextEnabled(CountdownText, isEnabled: true);
-      // yield return Countdown(PingCountdown, CountdownDuration);
-      // SetCountdownTextEnabled(CountdownText, isEnabled: false);
-      // SetPlayerInputsEnabled(Player, isEnabled: true);
+      InputManager.Instance.SetInputEnabled(false);
+      SetCountdownTextEnabled(CountdownText, isEnabled: true);
+      yield return Countdown(PingCountdown, CountdownDuration);
+      SetCountdownTextEnabled(CountdownText, isEnabled: false);
+      InputManager.Instance.SetInputEnabled(true);
       // Exit pre-game countdown
 
+      // This is where gameplay begins
       // Begin Encounter
-      // Encounter.Bundle = Bundle;
-      // yield return Encounter.Run();
-      // End Encounter
-      yield return null;
-
-      Debug.Log("Beyond the encounter");
+      Encounter.Bundle = Bundle;
+      yield return Fiber.Any(PlayerDeath(Player), EncounterDefeated(Encounter));
 
       // Cleanup references and reload the scene
-      // yield return Await(SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name));
-    // }
+      yield return Await(SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name));
+    }
   }
 
   void PingCountdown(int n) {

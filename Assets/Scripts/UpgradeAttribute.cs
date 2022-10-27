@@ -5,6 +5,6 @@ public class UpgradeAttribute : Upgrade {
   public AttributeTag Attribute;
   public AttributeModifier Modifier;
   public int Cost;
+  public override void Add(Upgrades us, bool purchase) => us.BuyUpgrade(new() { Upgrade = this }, purchase ? Cost : 0, true);
   public override void Apply(Upgrades us) => us.AddAttributeModifier(Attribute, Modifier);
-  public override int GetCost(Upgrades us) => Cost;
 }

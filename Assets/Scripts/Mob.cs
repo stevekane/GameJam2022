@@ -5,11 +5,19 @@ public class Mob : MonoBehaviour {
   public int Wave = 0;
 
   public void DropGold() {
-    var gold = (int)(Gold*Random.Range(.5f, 2f));
+    var gold = (int)(Player.Get().GetComponent<Attributes>().GetValue(AttributeTag.GoldGain, Gold * Random.Range(.5f, 2f)));
     Coin.SpawnCoins(transform.position, gold);
   }
 
   void OnDeath() {
     DropGold();
+  }
+
+  void Awake() {
+    MobManager.Instance.Mobs.Add(this);
+  }
+
+  void OnDestroy() {
+    MobManager.Instance.Mobs.Remove(this);
   }
 }

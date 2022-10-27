@@ -1141,11 +1141,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 004ed0f90de1a634aab5eefd8f1dea0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BaseUpgrades:
-  - {fileID: 11400000, guid: eeb227d5a03ae7c469f518f08fe5d373, type: 2}
-  - {fileID: 11400000, guid: dc80687754ecb424f854f46614676ec5, type: 2}
-  - {fileID: 11400000, guid: 73583ee841b78204ba64f804e5b0238d, type: 2}
-  - {fileID: 11400000, guid: 4d16dd67b444ff54ca927ea9b501cadf, type: 2}
+  BaseAttributes:
+  - Attribute: 0
+    Modifier:
+      Base: 8
+      Mult: 1
+  - Attribute: 3
+    Modifier:
+      Base: 12
+      Mult: 1
+  - Attribute: 4
+    Modifier:
+      Base: 1080
+      Mult: 1
+  - Attribute: 1
+    Modifier:
+      Base: 40
+      Mult: 1
+  BaseUpgrades: []
 --- !u!114 &5571416124093621161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1249,7 +1262,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5571416124093621165}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
   m_Name: 
@@ -1862,6 +1875,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 004ed0f90de1a634aab5eefd8f1dea0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BaseAttributes: []
   BaseUpgrades:
   - {fileID: 11400000, guid: dc80687754ecb424f854f46614676ec5, type: 2}
 --- !u!1001 &4326579795788830989
