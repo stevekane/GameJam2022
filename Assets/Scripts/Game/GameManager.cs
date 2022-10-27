@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour {
       // Setup camera to target the player
       PlayerVirtualCamera.Instance.Follow = Player.transform;
 
-      // Cheap hack to allow loaded upgrades to apply before opening the shop
+      // TODO: Eliminate this hack to allow loaded upgrades to apply before opening the shop
       yield return Fiber.Wait(2);
       // Wait for the player to purchase upgrades
       var shop = GetComponent<Shop>();
@@ -83,10 +83,21 @@ public class GameManager : MonoBehaviour {
       InputManager.Instance.SetInputEnabled(true);
       // Exit pre-game countdown
 
-      // This is where gameplay begins
-      // Begin Encounter
+      // Begin GameLoop
       Encounter.Bundle = Bundle;
-      yield return Fiber.Any(PlayerDeath(Player), EncounterDefeated(Encounter));
+      var encounterDefeated = EncounterDefeated(Encounter);
+      var playerDeath = PlayerDeath(Player);
+      var outcome = Fiber.Select(encounterDefeated, playerDeath);
+      // TODO: What if both happen at the same time? stupid concurrency
+      yield return outcome;
+      // TODO: Returning an int is pretty horrible... maybe just return the completed Fiber
+      Debug.Log(outcome.Value switch {
+        0 => "You win",
+        _ => "You lose"
+      });
+      InputManager.Instance.SetInputEnabled(false);
+      yield return Fiber.Wait(Timeval.FramesPerSecond * 3);
+      // End GameLoop
 
       // Cleanup references and reload the scene
       yield return Await(SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name));
