@@ -61,17 +61,18 @@ public class GameManager : MonoBehaviour {
       PlayerVirtualCamera.Instance.Follow = Player.transform;
 
       // Enter pre-game countdown
-      SetPlayerInputsEnabled(Player, isEnabled: false);
-      SetCountdownTextEnabled(CountdownText, isEnabled: true);
-      yield return Countdown(PingCountdown, CountdownDuration);
-      SetCountdownTextEnabled(CountdownText, isEnabled: false);
-      SetPlayerInputsEnabled(Player, isEnabled: true);
+      // SetPlayerInputsEnabled(Player, isEnabled: false);
+      // SetCountdownTextEnabled(CountdownText, isEnabled: true);
+      // yield return Countdown(PingCountdown, CountdownDuration);
+      // SetCountdownTextEnabled(CountdownText, isEnabled: false);
+      // SetPlayerInputsEnabled(Player, isEnabled: true);
       // Exit pre-game countdown
 
       // Begin Encounter
-      Encounter.Bundle = Bundle;
-      yield return Encounter.Run();
+      // Encounter.Bundle = Bundle;
+      // yield return Encounter.Run();
       // End Encounter
+      yield return null;
 
       Debug.Log("Beyond the encounter");
 
