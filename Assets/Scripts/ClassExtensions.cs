@@ -84,9 +84,11 @@ public static class MonoExtensions {
 public static class AudioSourceExtensions {
   public static bool PlayOptionalOneShot(this AudioSource source, AudioClip clip) {
     if (clip && source) {
+      Debug.Log($"Actually played {clip.name}");
       source.PlayOneShot(clip);
       return true;
     } else {
+      Debug.Log($"Source {source} Clip {clip}");
       return false;
     }
   }

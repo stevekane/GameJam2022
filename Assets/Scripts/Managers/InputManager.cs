@@ -79,7 +79,6 @@ public class InputManager : MonoBehaviour {
   }
 
   void Awake() {
-    Instance = this;
     Time.fixedDeltaTime = 1f / Timeval.FramesPerSecond;
   }
 

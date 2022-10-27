@@ -34,8 +34,6 @@ public class ProjectileManager : MonoBehaviour {
     Contacts.Remove(p);
   }
 
-  void Awake() => Instance = this;
-
   void FixedUpdate() {
     Projectiles.ForEach(SendEnterEvents);
     Projectiles.ForEach(SendStayEvents);
