@@ -50,22 +50,29 @@ public class GameManager : MonoBehaviour {
 
   IEnumerator Run() {
     //while (true) {
-      Debug.Log("Start loop");
       // Spawn and configure the player
       var playerSpawn = PlayerSpawns[0];
       var p = playerSpawn.transform.position;
       var r = playerSpawn.transform.rotation;
       Player = Instantiate(PlayerPrefab, p, r);
+      SaveData.LoadFromFile();
 
       // Setup camera to target the player
       PlayerVirtualCamera.Instance.Follow = Player.transform;
 
+      // Cheap hack to allow loaded upgrades to apply before opening the shop
+      yield return Fiber.Wait(2);
+      // Wait for the player to purchase upgrades
+      var shop = GetComponent<Shop>();
+      shop.Open();
+      yield return Fiber.Until(() => !shop.IsOpen);
+
       // Enter pre-game countdown
-      SetPlayerInputsEnabled(Player, isEnabled: false);
+      InputManager.Instance.SetInputEnabled(false);
       SetCountdownTextEnabled(CountdownText, isEnabled: true);
       yield return Countdown(PingCountdown, CountdownDuration);
       SetCountdownTextEnabled(CountdownText, isEnabled: false);
-      SetPlayerInputsEnabled(Player, isEnabled: true);
+      InputManager.Instance.SetInputEnabled(true);
       // Exit pre-game countdown
 
       // Begin Encounter

@@ -13,7 +13,6 @@ public class ScriptableObjectConverter : JsonConverter {
 
   public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
     var s = JsonUtility.ToJson(new FuckingUnityScriptableObjectWrapper() { Object = (ScriptableObject)value });
-    Debug.Log($"Newton writing: {s}");
     writer.WriteValue(s);
   }
 
@@ -27,10 +26,7 @@ public class ScriptableObjectConverter : JsonConverter {
   }
 
   public override bool CanConvert(Type objectType) {
-    var tt = objectType.IsSubclassOf(typeof(ScriptableObject));
-    if (tt)
-      Debug.Log($"Newton subclass type: {objectType}");
-    return tt;
+    return objectType.IsSubclassOf(typeof(ScriptableObject)); ;
   }
 }
 
@@ -52,6 +48,8 @@ public class SaveData {
     Debug.Log($"Saved to ${FilePath}");
   }
   public static void LoadFromFile() {
+    if (!File.Exists(FilePath))
+      return;
     var json = File.ReadAllText(FilePath);
     LoadFromJson(json);
   }
