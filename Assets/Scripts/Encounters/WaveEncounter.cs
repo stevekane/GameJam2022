@@ -71,8 +71,8 @@ public class WaveEncounter : Encounter {
   public override IEnumerator Run() {
     for (var waveNumber = 0; waveNumber < TotalWaveCount; waveNumber++) {
       yield return Fiber.Wait(WavePeriod.Frames);
+      var spawnAction = new MobSpawnAction { WaveNumber = waveNumber };
       foreach (var wave in Wave(InitialCost+CostPerWave*waveNumber, Config)) {
-        var spawnAction = new MobSpawnAction { WaveNumber = waveNumber };
         var spawn = new Fiber(Spawn(wave, spawnAction));
         Bundle.StartRoutine(spawn);
       }
