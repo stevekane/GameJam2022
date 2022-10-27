@@ -50,17 +50,30 @@ public class AttributeModifier {
   }
 }
 
+// Fuck you, Unity
+[Serializable]
+public class AttributeTagModifierPair {
+  public AttributeTag Attribute;
+  public AttributeModifier Modifier;
+}
+
 public class Attributes : MonoBehaviour {
+  public List<AttributeTagModifierPair> BaseAttributes;
   public List<Upgrade> BaseUpgrades;
+  Dictionary<AttributeTag, AttributeModifier> BaseAttributesDict = new();
   Upgrades Upgrades;
   Optional<Status> Status;
   private void Awake() {
     Upgrades = this.GetOrCreateComponent<Upgrades>();
     Status = GetComponent<Status>();
+    Debug.Assert(BaseAttributes.Count == 0 || BaseUpgrades.Count == 0, "BaseUpgrades will add to BaseAttributes, you probably only want one of these");
     BaseUpgrades.ForEach(u => u.Add(Upgrades, purchase: false));
+    BaseAttributes.ForEach(kv => BaseAttributesDict.Add(kv.Attribute, kv.Modifier));
   }
   AttributeModifier GetModifier(AttributeTag attrib) {
     AttributeModifier modifier = new();
+    if (BaseAttributesDict.GetValueOrDefault(attrib, null) is var mb && mb != null)
+      modifier.Merge(mb);
     if (Upgrades.GetModifier(attrib) is var mu && mu != null)
       modifier.Merge(mu);
     if (Status?.Value.GetModifier(attrib) is var ms && ms != null)
