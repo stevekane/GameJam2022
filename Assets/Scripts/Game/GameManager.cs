@@ -8,6 +8,7 @@ using TMPro;
 public class GameManager : MonoBehaviour {
   public static IEnumerator Await(AsyncOperation op) {
     while (!op.isDone) {
+      Debug.Log("Still loading...apparently");
       yield return op;
     }
   }
@@ -23,15 +24,11 @@ public class GameManager : MonoBehaviour {
   public GameObject PlayerPrefab;
   public List<Spawn> PlayerSpawns = new();
 
-  [Header("Mobs")]
-  public Encounter Encounter;
-
   Bundle Bundle = new Bundle();
   GameObject Player;
 
   void Awake() {
     if (Instance) {
-      Instance.Bundle.StopAll();
       Destroy(gameObject);
     } else {
       Instance = this;
@@ -58,6 +55,7 @@ public class GameManager : MonoBehaviour {
 
   IEnumerator Run() {
     while (true) {
+      Debug.Log("TOP");
       // Spawn and configure the player
       var playerSpawn = PlayerSpawns[0];
       var p = playerSpawn.transform.position;
@@ -69,23 +67,29 @@ public class GameManager : MonoBehaviour {
       PlayerVirtualCamera.Instance.Follow = Player.transform;
 
       // TODO: Eliminate this hack to allow loaded upgrades to apply before opening the shop
+      Debug.Log("PRE SHOP");
       yield return Fiber.Wait(2);
       // Wait for the player to purchase upgrades
-      var shop = GetComponent<Shop>();
+      var shop = FindObjectOfType<Shop>();
       shop.Open();
       yield return Fiber.Until(() => !shop.IsOpen);
+      Debug.Log("POST SHOP");
 
       // Enter pre-game countdown
+      Debug.Log("PRE COUNTDOWN");
       InputManager.Instance.SetInputEnabled(false);
       SetCountdownTextEnabled(CountdownText, isEnabled: true);
       yield return Countdown(PingCountdown, CountdownDuration);
       SetCountdownTextEnabled(CountdownText, isEnabled: false);
       InputManager.Instance.SetInputEnabled(true);
+      Debug.Log("POST COUNTDOWN");
       // Exit pre-game countdown
 
       // Begin GameLoop
-      Encounter.Bundle = Bundle;
-      var encounterDefeated = EncounterDefeated(Encounter);
+      Debug.Log("PRE GAMELOOP");
+      var encounter = FindObjectOfType<Encounter>();
+      encounter.Bundle = Bundle;
+      var encounterDefeated = EncounterDefeated(encounter);
       var playerDeath = PlayerDeath(Player);
       var outcome = Fiber.Select(encounterDefeated, playerDeath);
       // TODO: What if both happen at the same time? stupid concurrency
@@ -97,10 +101,12 @@ public class GameManager : MonoBehaviour {
       });
       InputManager.Instance.SetInputEnabled(false);
       yield return Fiber.Wait(Timeval.FramesPerSecond * 3);
+      Debug.Log("POST GAMELOOP");
       // End GameLoop
 
       // Cleanup references and reload the scene
       yield return Await(SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name));
+      Debug.Log("BOT");
     }
   }
 
