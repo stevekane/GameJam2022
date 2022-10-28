@@ -2,11 +2,33 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public class HitParams {
+public class HitConfig {
+  public AttributeModifier DamageModifier;
   public Timeval HitStopDuration;
+  public float KnockbackStrength;
+  public KnockBackType KnockbackType;
+  public AudioClip SFX;
+  public GameObject VFX;
+  public Vector3 VFXOffset;
+  public HitParams ComputeParams(Attributes attacker) {
+    return new() {
+      Damage = DamageModifier.Apply(attacker.GetValue(AttributeTag.Damage, 0f)),
+      KnockbackStrength = attacker.GetValue(AttributeTag.Knockback, KnockbackStrength),
+      KnockbackType = KnockbackType,
+      HitStopDuration = HitStopDuration,
+      SFX = SFX,
+      VFX = VFX,
+      VFXOffset = VFXOffset,
+    };
+  }
+}
+
+[Serializable]
+public class HitParams {
   public float Damage;
   public float KnockbackStrength;
   public KnockBackType KnockbackType;
+  public Timeval HitStopDuration;
   public AudioClip SFX;
   public GameObject VFX;
   public Vector3 VFXOffset;

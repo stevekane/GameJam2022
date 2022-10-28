@@ -16,12 +16,9 @@ public class ScriptedMovementEffect : StatusEffect {
 public class SuplexAbility : Ability {
   public float MoveSpeed = 10f;
   public float TargetDistance = 5f;
-  public float Damage = 30f;
   public float HitRadius = 10f;
   public float HitCameraShakeIntensity;
-  public GameObject HitVFX;
-  public AudioClip HitSFX;
-  public Vector3 HitVFXOffset = Vector3.up;
+  public HitConfig HitConfig;
 
   public IEnumerator AttackStart() {
     var targets = FindObjectsOfType<Hurtbox>();
@@ -71,15 +68,7 @@ public class SuplexAbility : Ability {
     }
 
     CameraShaker.Instance.Shake(HitCameraShakeIntensity);
-    var hitParams = new HitParams {
-      HitStopDuration = Timeval.FromMillis(400),
-      Damage = Attributes.GetValue(AttributeTag.Damage, Damage),
-      KnockbackStrength = Attributes.GetValue(AttributeTag.Knockback, 20),
-      KnockbackType = KnockBackType.Forward,
-      VFX = HitVFX,
-      VFXOffset = HitVFXOffset,
-      SFX = HitSFX,
-    };
+    var hitParams = HitConfig.ComputeParams(Attributes);
     var hits = Physics.OverlapSphereNonAlloc(target.transform.position, HitRadius, PhysicsBuffers.Colliders, Layers.CollidesWith(gameObject.layer));
     PhysicsBuffers.Colliders[..hits].ForEach(c => {
       if (c.TryGetComponent(out Hurtbox hurtbox))
