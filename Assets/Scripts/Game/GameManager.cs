@@ -6,14 +6,30 @@ using UnityEngine.SceneManagement;
 using TMPro;
 
 public class GameManager : MonoBehaviour {
+  public class AsyncEvent : IEventSource<AsyncOperation> {
+    public AsyncOperation Operation;
+    public AsyncEvent(AsyncOperation operation) => Operation = operation;
+    public void Listen(Action<AsyncOperation> handler) => Operation.completed += handler;
+    public void Unlisten(Action<AsyncOperation> handler) => Operation.completed -= handler;
+    public void Fire(AsyncOperation op) {}
+  }
+
   public static IEnumerator Await(AsyncOperation op) {
-    while (!op.isDone) {
-      Debug.Log("Still loading...apparently");
-      yield return op;
-    }
+    yield return Fiber.ListenFor(new AsyncEvent(op));
   }
 
   public static GameManager Instance;
+
+  // Subsystems now depend on this class, so we need it. But not every scene wants a game loop.
+  // Would probably be better to disentangle the game loop from the game singleton.
+  public bool ManageGameLoop = true;
+
+  [Header("Subsystems")]
+  public InputManager InputManager;
+  public SFXManager SFXManager;
+  public VFXManager VFXManager;
+  public ProjectileManager ProjectileManager;
+  public MobManager MobManager;
 
   [Header("Countdown")]
   public AudioClip[] CountdownClips;
@@ -32,6 +48,11 @@ public class GameManager : MonoBehaviour {
       Destroy(gameObject);
     } else {
       Instance = this;
+      InputManager.Instance = InputManager;
+      SFXManager.Instance = SFXManager;
+      VFXManager.Instance = VFXManager;
+      ProjectileManager.Instance = ProjectileManager;
+      MobManager.Instance = MobManager;
       DontDestroyOnLoad(Instance.gameObject);
     }
   }
@@ -54,7 +75,7 @@ public class GameManager : MonoBehaviour {
   }
 
   IEnumerator Run() {
-    while (true) {
+    while (ManageGameLoop) {
       Debug.Log("TOP");
       // Spawn and configure the player
       var playerSpawn = PlayerSpawns[0];
@@ -112,6 +133,7 @@ public class GameManager : MonoBehaviour {
 
   void PingCountdown(int n) {
     var clip = CountdownClips[n%CountdownClips.Length];
+    Debug.Log($"Tried playing {clip.name}");
     SFXManager.Instance.TryPlayOneShot(clip);
     CountdownText.text = n.ToString();
   }

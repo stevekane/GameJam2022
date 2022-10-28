@@ -2,11 +2,8 @@ using UnityEngine;
 
 public class VFXManager : MonoBehaviour {
   public static VFXManager Instance;
-  public Coin CoinPrefab;
 
-  void Awake() {
-    Instance = this;
-  }
+  public Coin CoinPrefab;
 
   public bool TrySpawnEffect(GameObject prefab, Vector3 position) {
     if (prefab) {

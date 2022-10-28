@@ -7,10 +7,6 @@ public class SFXManager : MonoBehaviour {
   [SerializeField] AudioSource AudioSource;
   List<AudioClip> ClipsPlayedThisFrame = new();  // TODO: is this a good idea?
 
-  void Awake() {
-    Instance = this;
-  }
-
   void FixedUpdate() {
     ClipsPlayedThisFrame.Clear();
   }
