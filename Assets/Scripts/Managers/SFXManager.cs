@@ -1,15 +1,24 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class SFXManager : MonoBehaviour {
   public static SFXManager Instance;
 
   [SerializeField] AudioSource AudioSource;
+  List<AudioClip> ClipsPlayedThisFrame = new();  // TODO: is this a good idea?
 
   void Awake() {
     Instance = this;
   }
 
+  void FixedUpdate() {
+    ClipsPlayedThisFrame.Clear();
+  }
+
   public bool TryPlayOneShot(AudioClip clip) {
+    if (ClipsPlayedThisFrame.Contains(clip))
+      return false;
+    ClipsPlayedThisFrame.Add(clip);
     return AudioSource.PlayOptionalOneShot(clip);
   }
 }

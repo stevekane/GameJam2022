@@ -12,8 +12,6 @@ public class PelletAbility : Ability {
   public HitParams HitParams;
   public GameObject FireVFX;
   public AudioClip FireSFX;
-  public GameObject HitVFX;
-  public AudioClip HitSFX;
 
   public IEnumerator AttackStart() {
     yield return Windup.Start(Animator, Index);
@@ -27,7 +25,7 @@ public class PelletAbility : Ability {
       yield return Fiber.Wait(Active.Duration.Frames / NumBullets);
       VFXManager.Instance.TrySpawnEffect(FireVFX, transform.position);
       SFXManager.Instance.TryPlayOneShot(FireSFX);
-      Bullet.Fire(BulletPrefab, transform.position, transform.forward, OnHit);
+      Bullet.Fire(BulletPrefab, transform.position, transform.forward, HitParams, gameObject.layer);
     }
   }
 
@@ -36,13 +34,5 @@ public class PelletAbility : Ability {
     Animator.SetInteger("AttackIndex", -1);
     Animator.SetFloat("AttackSpeed", 1);
     base.Stop();
-  }
-
-  void OnHit(Bullet bullet, Hurtbox hurtbox) {
-    if (Physics.GetIgnoreLayerCollision(gameObject.layer, hurtbox.gameObject.layer))
-      return;
-    hurtbox.Defender.OnHit(HitParams, bullet.transform);
-    SFXManager.Instance.TryPlayOneShot(HitSFX);
-    VFXManager.Instance.TrySpawnEffect(HitVFX, bullet.transform.position);
   }
 }

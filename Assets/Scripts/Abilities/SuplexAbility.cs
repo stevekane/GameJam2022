@@ -70,20 +70,20 @@ public class SuplexAbility : Ability {
         targetStatus.transform.up = -targetStatus.transform.up;
     }
 
-    SFXManager.Instance.TryPlayOneShot(HitSFX);
     CameraShaker.Instance.Shake(HitCameraShakeIntensity);
     var hitParams = new HitParams {
       HitStopDuration = Timeval.FromMillis(400),
       Damage = Attributes.GetValue(AttributeTag.Damage, Damage),
       KnockbackStrength = Attributes.GetValue(AttributeTag.Knockback, 20),
-      KnockbackType = KnockBackType.Forward
+      KnockbackType = KnockBackType.Forward,
+      VFX = HitVFX,
+      VFXOffset = HitVFXOffset,
+      SFX = HitSFX,
     };
     var hits = Physics.OverlapSphereNonAlloc(target.transform.position, HitRadius, PhysicsBuffers.Colliders, Layers.CollidesWith(gameObject.layer));
     PhysicsBuffers.Colliders[..hits].ForEach(c => {
-      if (c.TryGetComponent(out Hurtbox hurtbox)) {
-        VFXManager.Instance.TrySpawnEffect(HitVFX, hurtbox.Defender.transform.position+HitVFXOffset);
+      if (c.TryGetComponent(out Hurtbox hurtbox))
         hurtbox.Defender.OnHit(hitParams, transform);
-      }
     });
     yield return Fiber.Wait(hitParams.HitStopDuration.Frames);
     targetStatus.transform.up = -targetStatus.transform.up;

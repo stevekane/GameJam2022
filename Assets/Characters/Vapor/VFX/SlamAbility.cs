@@ -20,8 +20,6 @@ public class SlamAbility : Ability {
   public GameObject FireVFX;
   public AudioClip FireSFX;
   public Vector3 FireVFXOffset;
-  public GameObject HitVFX;
-  public AudioClip HitSFX;
 
   void Start() {
     Owner = GetComponentInParent<AbilityManager>().transform;
@@ -77,8 +75,9 @@ public class SlamAbility : Ability {
       HitStopDuration = HitParams.HitStopDuration,
       KnockbackStrength = Attributes.GetValue(AttributeTag.Knockback, HitParams.KnockbackStrength),
       KnockbackType = HitParams.KnockbackType,
+      VFX = HitParams.VFX,
+      VFXOffset = HitParams.VFXOffset,
+      SFX = HitParams.SFX,
     }, attacker.transform);
-    SFXManager.Instance.TryPlayOneShot(HitSFX);
-    VFXManager.Instance.TrySpawnEffect(HitVFX, defender.transform.position);
   }
 }

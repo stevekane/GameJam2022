@@ -6,7 +6,8 @@ public class Bullet : MonoBehaviour {
   public BulletType Type;
   public Vector3 Direction;
   public float Speed = 5;
-  Action<Bullet, Hurtbox> OnHit;
+  int CollisionLayer;
+  HitParams HitParams;
 
   Rigidbody Body;
 
@@ -14,10 +15,11 @@ public class Bullet : MonoBehaviour {
     Body = GetComponent<Rigidbody>();
   }
 
-  public static Bullet Fire(Bullet prefab, Vector3 position, Vector3 direction, Action<Bullet, Hurtbox> onHit) {
+  public static Bullet Fire(Bullet prefab, Vector3 position, Vector3 direction, HitParams hitparams, int layer) {
     var bullet = Instantiate(prefab, position, Quaternion.FromToRotation(Vector3.forward, direction));
-    bullet.OnHit = onHit;
+    bullet.HitParams = hitparams;
     bullet.Direction = direction;
+    bullet.CollisionLayer = layer;
     return bullet;
   }
 
@@ -29,7 +31,9 @@ public class Bullet : MonoBehaviour {
     if (collider.gameObject.tag == "Ground")
       return;
     if (collider.TryGetComponent(out Hurtbox hurtbox)) {
-      OnHit?.Invoke(this, hurtbox);
+      if (Physics.GetIgnoreLayerCollision(CollisionLayer, hurtbox.gameObject.layer))
+        return;  // TODO: I forgot the point of this
+      hurtbox.Defender.OnHit(HitParams, transform);
     }
     Destroy(gameObject, .01f);
   }

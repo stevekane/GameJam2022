@@ -7,10 +7,13 @@ public class HitParams {
   public float Damage;
   public float KnockbackStrength;
   public KnockBackType KnockbackType;
+  public AudioClip SFX;
+  public GameObject VFX;
+  public Vector3 VFXOffset;
 }
 
 public class Defender : MonoBehaviour {
-  Status Status;
+  Optional<Status> Status;
   Damage Damage;
 
   public bool IsParrying;
@@ -32,15 +35,17 @@ public class Defender : MonoBehaviour {
   }
 
   public void OnHit(HitParams hit, Transform hitTransform) {
-    if (IsBlocking || IsParrying || !Status.IsHittable)
+    SFXManager.Instance.TryPlayOneShot(hit.SFX);
+    VFXManager.Instance.TrySpawnEffect(hit.VFX, transform.position + hit.VFXOffset);
+
+    if (IsBlocking || IsParrying || !(Status?.Value.IsHittable ?? true))
       return;
     var power = 5f * hit.KnockbackStrength * Mathf.Pow((Damage.Points+100f) / 100f, 2f);
-    var hitStopFrames = hit.HitStopDuration.Frames;
     var knockBackDirection = KnockbackVector(hitTransform, transform, hit.KnockbackType);
-    Status?.Add(new HitStopEffect(knockBackDirection, .15f, hitStopFrames), (s) => s.Add(new KnockbackEffect(knockBackDirection*power)));
-    if (Status.IsDamageable) {
-      Damage?.AddPoints(hit.Damage);
-    }
+    Status?.Value.Add(new HitStopEffect(knockBackDirection, .15f, hit.HitStopDuration.Frames),
+      s => s.Add(new KnockbackEffect(knockBackDirection*power)));
+    if (Status?.Value.IsDamageable ?? true)
+      Damage.AddPoints(hit.Damage);
   }
 
   public void Die() {
