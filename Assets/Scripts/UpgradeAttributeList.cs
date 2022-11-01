@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,7 +6,6 @@ using UnityEngine;
 public class UpgradeAttributeListData : UpgradeData {
   public int CurrentLevel = 0;
 }
-
 
 [CreateAssetMenu(fileName = "Upgrade", menuName = "Upgrade/AttributeList")]
 public class UpgradeAttributeList : Upgrade {
