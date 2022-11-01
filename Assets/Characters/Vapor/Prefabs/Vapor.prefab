@@ -112,11 +112,13 @@ MonoBehaviour:
     TicksPerSecond: 30
   SlamActionPrefab: {fileID: 6110290959185933350, guid: 457d44b88fdf4bd44a1a93c7fb4b858a, type: 3}
   AttackScaling: 1.5
-  HitParams:
+  HitConfig:
+    DamageModifier:
+      Base: 15
+      Mult: 1.5
     HitStopDuration:
       Millis: 200
       TicksPerSecond: 30
-    Damage: 15
     KnockbackStrength: 50
     KnockbackType: 1
     SFX: {fileID: 8300000, guid: 332a6114ed184a44188829a8f87db1a7, type: 3}
@@ -125,8 +127,6 @@ MonoBehaviour:
   FireVFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
   FireSFX: {fileID: 8300000, guid: d69edd942348f8b4892dac337d83ac38, type: 3}
   FireVFXOffset: {x: 0, y: 0, z: 0}
-  HitVFX: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
-  HitSFX: {fileID: 8300000, guid: 332a6114ed184a44188829a8f87db1a7, type: 3}
 --- !u!1 &2769119998121042157
 GameObject:
   m_ObjectHideFlags: 0
@@ -236,6 +236,18 @@ MonoBehaviour:
     ClipDuration:
       Millis: 300
       TicksPerSecond: 30
+  HitConfig:
+    DamageModifier:
+      Base: 0
+      Mult: 1
+    HitStopDuration:
+      Millis: 200
+      TicksPerSecond: 30
+    KnockbackStrength: 50
+    KnockbackType: 1
+    SFX: {fileID: 8300000, guid: 36c57d13b5af16a4f9ab941571ef5c0f, type: 3}
+    VFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
+    VFXOffset: {x: 0, y: 2, z: 0}
   HitVFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
   HitSFX: {fileID: 8300000, guid: 36c57d13b5af16a4f9ab941571ef5c0f, type: 3}
   HitVFXOffset: {x: 0, y: 2, z: 0}
@@ -324,12 +336,20 @@ MonoBehaviour:
   Tags: 0
   MoveSpeed: 40
   TargetDistance: 5
-  Damage: 30
   HitRadius: 10
   HitCameraShakeIntensity: 1
-  HitVFX: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
-  HitSFX: {fileID: 8300000, guid: f161f54138dc0314abdabf7ab71e3404, type: 3}
-  HitVFXOffset: {x: 0, y: 1, z: 0}
+  HitConfig:
+    DamageModifier:
+      Base: 10
+      Mult: 2
+    HitStopDuration:
+      Millis: 500
+      TicksPerSecond: 30
+    KnockbackStrength: 20
+    KnockbackType: 0
+    SFX: {fileID: 8300000, guid: f161f54138dc0314abdabf7ab71e3404, type: 3}
+    VFX: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
+    VFXOffset: {x: 0, y: 1, z: 0}
 --- !u!1 &4872877845196898822
 GameObject:
   m_ObjectHideFlags: 0
@@ -435,6 +455,18 @@ MonoBehaviour:
     ClipDuration:
       Millis: 33.333332
       TicksPerSecond: 30
+  HitConfig:
+    DamageModifier:
+      Base: 0
+      Mult: 1
+    HitStopDuration:
+      Millis: 100
+      TicksPerSecond: 30
+    KnockbackStrength: 0
+    KnockbackType: 1
+    SFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
+    VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
+    VFXOffset: {x: 0, y: 2, z: 0}
   HitVFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
   HitSFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
   HitVFXOffset: {x: 0, y: 2, z: 0}
@@ -1167,6 +1199,18 @@ MonoBehaviour:
     ClipDuration:
       Millis: 33.333332
       TicksPerSecond: 30
+  HitConfig:
+    DamageModifier:
+      Base: 0
+      Mult: 1
+    HitStopDuration:
+      Millis: 100
+      TicksPerSecond: 30
+    KnockbackStrength: 0
+    KnockbackType: 1
+    SFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
+    VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
+    VFXOffset: {x: 0, y: 2, z: 0}
   HitVFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
   HitSFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
   HitVFXOffset: {x: 0, y: 2, z: 0}

@@ -9,6 +9,7 @@ public class MeleeAttackAbility : Ability {
   public ChargedAttackPhase Windup;
   public HitboxAttackPhase Active;
   public InactiveAttackPhase Recovery;
+  public HitConfig HitConfig;
   public GameObject HitVFX;
   public AudioClip HitSFX;
   public Vector3 HitVFXOffset = Vector3.up;
@@ -54,16 +55,8 @@ public class MeleeAttackAbility : Ability {
   protected IEnumerator OnHit(List<Transform> targets, int stopFrames) {
     Owner.GetComponent<Status>()?.Add(new HitStopEffect(Owner.forward, HitStopVibrationAmplitude, stopFrames));
     CameraShaker.Instance.Shake(HitCameraShakeIntensity);
+    var hitParams = HitConfig.ComputeParams(Attributes);
     targets.ForEach(target => {
-      var hitParams = new HitParams {
-        HitStopDuration = Active.HitFreezeDuration,
-        Damage = Attributes.GetValue(AttributeTag.Damage, HitDamage),
-        KnockbackStrength = Attributes.GetValue(AttributeTag.Knockback, HitTargetKnockbackStrength),
-        KnockbackType = KnockBackType.Delta,
-        VFX = HitVFX,
-        VFXOffset = HitVFXOffset,
-        SFX = HitSFX,
-      };
       target.GetComponent<Defender>()?.OnHit(hitParams, Owner);
       Owner.transform.forward = (target.transform.position - Owner.transform.position).XZ().normalized;
     });
