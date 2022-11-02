@@ -99,6 +99,49 @@ public class HitStopEffect : StatusEffect {
   }
 }
 
+public class BurningEffect : StatusEffect {
+  float DamagePerFrame = 1f;
+  int Frames = Timeval.FromSeconds(3f).Frames;
+  public BurningEffect(float dps) {
+    DamagePerFrame = dps / Timeval.FramesPerSecond;
+  }
+  public override void Apply(Status status) {
+    if (--Frames <= 0) {
+      status.Remove(this);
+    } else {
+      status.Damage?.Value.AddPoints(DamagePerFrame);
+    }
+  }
+  public override bool Merge(StatusEffect e) {
+    var other = (BurningEffect)e;
+    DamagePerFrame = Mathf.Max(DamagePerFrame, other.DamagePerFrame);
+    Frames = Math.Max(Frames, other.Frames);
+    return true;
+  }
+}
+
+public class FreezingEffect : StatusEffect {
+  int Frames;
+  public FreezingEffect(int frames) {
+    Frames = frames;
+  }
+  public override void Apply(Status status) {
+    if (--Frames <= 0) {
+      status.Remove(this);
+    } else {
+      status.CanMove = false;
+      status.CanRotate = false;
+      status.CanAttack = false;
+      status.Animator?.Value.SetSpeed(0);
+    }
+  }
+  public override bool Merge(StatusEffect e) {
+    var other = (FreezingEffect)e;
+    Frames = Math.Max(Frames, other.Frames);
+    return true;
+  }
+}
+
 // The recoil effect that pushes you back when you hit something.
 public class RecoilEffect : StatusEffect {
   static readonly float DRAG = 5f;
@@ -129,6 +172,7 @@ public class Status : MonoBehaviour {
   internal Upgrades Upgrades;
   internal CharacterController Controller;
   internal Optional<Animator> Animator;
+  internal Optional<Damage> Damage;
   Dictionary<AttributeTag, AttributeModifier> Modifiers = new();
   static AttributeModifier Zero = new() { Mult = 0 };
 
@@ -188,6 +232,7 @@ public class Status : MonoBehaviour {
     Upgrades = this.GetOrCreateComponent<Upgrades>();
     Controller = GetComponent<CharacterController>();
     Animator = GetComponent<Animator>();
+    Damage = GetComponent<Damage>();
   }
 
   private void FixedUpdate() {

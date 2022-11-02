@@ -10,13 +10,13 @@ public enum AttributeTag {
   MoveSpeed,
   TurnSpeed,
   AttackSpeed,
-  ObsoleteSlamDamage,
-  ObsoleteSuplexDamage,
   HasGravity,
   CanAttack,
   IsHittable,
   IsDamageable,
   GoldGain,
+  FreezingHits,
+  BurningHits,
 
   // Abilities
   AbilityStart = 1000,
