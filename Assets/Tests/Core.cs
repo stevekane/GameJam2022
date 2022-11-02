@@ -1,5 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
 /*
@@ -65,13 +68,302 @@ to equal processes.
 
 Every entity in the system is thus a state of disjoint commutative properties such that
 s_n
+
+Let's talk here about what we want to accomplish with a prototype.
+
+There are few ideas rolling around in my head that seem to ask for a proof of concept:
+
+  classes seem to provide several things:
+    1. synchronous function-like recieve/send behaviors
+    2. asynchronous processes that respond to various stimulii
+    3. notion of referential identity
+    4. guarantee that certain behaviors are observable to external messengers
+
+  think of a class as a process which went sent an alert sends back a set of channels
+  on which you can send it messages
+
+    new alert
+      | named Caller
+        new inquirer
+        new input
+        alert <- inquirer
+        inquirer -> method
+        method <- input
+        method -> output
+        P(output)
+      | named Class
+        repeat
+          new method
+          new output
+          alert -> other
+          other <- method
+          method -> input
+          method <- output
+
+  Let's perform the communication reductions by hand to see what happens to this system:
+
+    alert <- inquirer | alert -> other
+    ↓
+    inquirer -> method | inquirer <- method
+    ↓
+    method <- input | method -> input
+    ↓
+    method -> output | method <- output
+    ↓
+    P(output) | Class
+
+Another thing to understand, what is a mobile process?
+
+  P | Q is a process
+
+  (P|Q).R is also a process. P|Q are done when both P and Q are done
+
+  (P.Q.R)|T is a process. P Q R are sequentially children of the unnamed process in parallel with T
+
+  What does it mean to have a process that "spawns a child process outside its scope"?
+
+  Let's imagine you have a channel that connects to some outer process.
+  You send a token to that channel signaling it to spawn a process.
+  That is literally all...
+
+  νchannel
+  νmandate
+  νtimeout
+  -- begin the outer process here
+  | channel(token)
+    P(token)
+  | + mandate(notification)
+      channel<token>
+    + timeout(duration)
+
+  In other words, there must exist some connection between the process capable of spawning
+  the new process and the inner process that actually spawns the process.
+
+  Details like higher-order process variables and whatever don't really matter here because
+  you can imagine just passing a token which the recieving process understands to mean spawn
+  this particular process (a sort of defunctionalization).
+
+  So then, in general, the question is "Can we formulate in π-calculus an example system
+  that is NOT structured in the sense of having access only to containing scopes?
+  Let's elide the noise from creating channels for now.
+
+  νchannel
+  | channel<token>
+  | channel(token).P
+    ↓
+  νchannel.P
+
+  I think, after consideration, the problem here is that you have no guarantee that the process
+  you have just asked to run will actually run. For example, you could have this:
+
+  νc.c<t>
+
+  You are hoping here that there exists some other process listening on c which will cause your
+  desired process to start but there just isn't. You cannot KNOW that there isn't without essentially
+  understanding the entire structure of the program. Structured concurrency makes a stronger guarantee
+  by essentially ensuring that any scope you are given as a parameter must be available at the callsite
+  meaning it is guaranteed to be some existing process that has not yet completed.
+
+  One thing this does not allow, is for two concurrent processes to pass information between one
+  another causing them to spawn processes.
+
+  νc1
+  νc2
+  | repeat
+      + c1<t1>.ch1(t2)
+      + c2(t3).ch2<t4>
+  | repeat
+      + ...
+
+  The essential point here, is that you can imagine having two concurrently-running processes that then
+  exchange messages with one another causing each other to spawn processes. In fact, strictly speaking,
+  in π-calculus, EVERY recieved message "spawns a process" in that it is defined as a continuation of the form
+  c(t).P(t) where P(t) is some arbitrary process parameterized by the now-available t.
+
+  You can run child processes in your scope with access to your scope.
+
+  P_0 ≡ Q(0)_1 | R(0)_1
 */
 public class Core : MonoBehaviour {
-  void Start() {
+  /*
+  Task is a call-graph or syntax tree that may contain nested tasks.
+  Nested tasks come in two key varieties: Concurrent and Sequential.
+  P.Q
 
+  if P runs to completion then Q runs
+  if P is canceled then P.Q is canceled
+  if P.Q is canceled then either P or Q is canceled
+  if Q is canceled then P.Q is canceled
+
+  There is always exactly one child task active but it may itself
+  be a composite of sequential and parallel tasks! A failure from
+  this running child task is sent to the parent. A failure from the parent
+  is sent to its running child.
+
+  NOTE: The important thing here is ONLY that there is some kind of link
+  between any task and its context. The idea that the parent task somehow is
+  running the child task is just a mental model but is not actually part
+  of the programming model. These are ALL concurrent tasks executing but
+  the linkage that is created is a particular pattern that says that each
+  child task has additional listeners: Parent canceled/stopped and every
+  parent task has additional listeners: Child canceled/stopped.
+
+  You are free to define how this is handled however you so choose.
+
+  The fundamental thing we have is a context.
+  Context is linked to additional contexts.
+
+
+  KOTLIN JOB
+  New start Active
+  Active complete Completing
+  Active cancel Cancelling
+  Completing cancel Cancelling
+  Completing finish Completed
+  Cancelling finish Cancelled
+
+  eventually we send complete/cancel on result
+
+  νcancel
+  νresult
+  νcancelP
+  νresultP
+  νcancelQ
+  νresultP
+  | + P
+      resultP<complete>
+    + cancelP(_)
+      resultP<canceled>
+    + resultP<canceled>
+  | + Q
+      resultQ<complete>
+    + cancelQ(_)
+      resultQ<canceled>
+    + resultQ<canceled>
+  | cancel(_)
+    | cancelP<_>
+    | cancelQ<_>
+    ∧ resultP(_)
+    ∧ resultQ(_)
+    Cleanup
+    result<canceled>
+  | + ∧ resultP(completed)
+      ∧ resultQ(completed)
+      result<completed>
+    + ∧ resultP(canceled)
+      ∧ resultQ(_)
+      result<canceled>
+    + ∧ resultP(_)
+      ∧ resultQ(canceled)
+      result<canceled>
+
+  Challenge: Is it possible to "kill" a running process from the outside?
+
+    P|kill(P) ↓ 0
+
+  What about a lesser challenge: define a system in which a process may be killed
+  by itself.
+
+    P.0
+
+  Define a process that can kill itself with one of two names sent over a channel:
+
+    νc.
+    | c(status).if status = complete then P else Q
+    | c<complete> + c<canceled>
+
+  Define a system that terminates when such termination is requested from another process:
+
+    νc.
+    | !P + c(kill)
+    | c<kill>
+
+  Define a system that takes an arbitrary process P and runs it alongside a process:
+
+    CancellableProcess(c,P) ≡ c(stop) + P
+
+  This is an ATOM of the context of cancellable tasks.
+
+  If P itself contains multiple suspension points, every one of them must be placed in this atom:
+
+  Let P ≡ Wait(30).Q|P.channel(stop)
+  Let ? ≡ CancellableProcess(c)
+
+  To make P fully cancellable, we need to turn it into this:
+
+  ?P ≡
+    ?Wait(3)
+    ?(?Q|?P)
+    ?channel(stop)
+  */
+
+  class Job : IAsyncDisposable {
+    public List<Task> Tasks = new();
+    public CancellationTokenSource TokenSource;
+    public Job() {
+      TokenSource = new CancellationTokenSource();
+    }
+    public Job(CancellationTokenSource source) {
+      TokenSource = source;
+    }
+    ~Job() {
+      TokenSource?.Dispose();
+    }
+    public Task Run(Func<Task> t) {
+      async Task Canceled() => await Task.Yield();
+
+      if (!TokenSource.Token.IsCancellationRequested) {
+        var task = t();
+        Tasks.Add(task);
+        return task;
+      } else {
+        Debug.Log("Task canceled");
+        return Canceled();
+      }
+    }
+    public async ValueTask DisposeAsync() {
+      await Task.WhenAll(Tasks);
+      Tasks.Clear();
+      Debug.Log("Cleaned up");
+    }
   }
 
-  void Update() {
+  async Task Foo() {
+    async Task Shout(int i) {
+      await Task.Delay(1000*i);
+      Debug.Log($"Foo {i}");
+    }
 
+    await using (var job = new Job()) {
+      for (var i = 0; i < 5; i++) {
+        job.Run(() => Shout(i));
+      }
+    }
   }
+
+  async Task Bar() {
+    await Task.Delay(1000);
+    Debug.Log("Bar");
+  }
+
+  async Task Baz(Job parent) {
+    async Task InnerBaz() {
+      Debug.Log("INNER BAZ START");
+      await Task.Delay(5000);
+      Debug.Log("INNER BAZ STOP");
+    }
+    await Task.Delay(1000);
+    parent.Run(() => InnerBaz());
+  }
+
+  async Task Main() {
+    await using (var job = new Job()) {
+      await job.Run(() => Foo());
+      job.TokenSource.Cancel();
+      await job.Run(() => Baz(job));
+      await job.Run(() => Bar());
+    }
+  }
+
+  async void Start() => await Main();
 }
