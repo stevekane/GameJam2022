@@ -1,78 +1,73 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-/*
-action[t] ≡
-  WHEN inrange(t)
-  THEN F[t,aimTim]
-  ELSE M[t]
-
-I ≡
-  target(t)
-  action(t)
-
-M[t] ≡
-  EITHER
-    clock(dt)
-    WHEN inrange(t)
-    THEN
-      F[t,aimTime]
-    ELSE
-      moveTowards(dt,t)
-      M[t]
-  OR
-    death(t)
-    I
-
-F[t,r] ≡
-  WHEN remaining > 0
-  THEN
-    EITHER
-      clock(dt)
-      aim(dt,t)
-      F[t,r-dt]
-    OR
-      death(t)
-      I
-  ELSE
-    fire(t)
-    wait(recoveryTime)
-    Action[t]
-*/
 public class Sniper : MonoBehaviour {
+  public PortalAbility PortalAbility;
+  public AbilityManager AbilityManager;
+  public Status Status;
   public LayerMask TargetLayerMask;
+  public Transform Target;
   public float MinDistance;
   public float MaxDistance;
   public float EyeHeight;
-
-  public Transform Target;
-
-  void FixedUpdate() {
-    if (!Target) {
-      Target = FindObjectOfType<Player>().transform;
-    }
-    if (Target) {
-      var toTarget = Target.position.XZ()-transform.position.XZ();
-      var distanceToTarget = toTarget.magnitude;
-      var inRange = distanceToTarget >= MinDistance && distanceToTarget <= MaxDistance;
-      var eye = transform.position+Vector3.up*EyeHeight;
-      var ray = new Ray(eye, toTarget.normalized);
-      var didHit = Physics.Raycast(ray, out var hit, distanceToTarget, TargetLayerMask, QueryTriggerInteraction.Collide);
-      var hasClearShot = hit.transform && hit.transform.TryGetComponent(out Hurtbox hb) && hb.Defender.transform == Target;
-      if (hasClearShot) {
-        Debug.DrawRay(ray.origin, ray.direction*hit.distance, Color.green);
-        Debug.Log($"Hit hurtbox {hit.transform.name}");
-      } else {
-        Debug.DrawRay(ray.origin, ray.direction*distanceToTarget, Color.red);
+  public Bundle Bundle = new();
+  public Vector3 Eye { get => Vector3.up*EyeHeight+transform.position; }
+  public IEnumerable<Transform> VisibleTargets {
+    get {
+      var hitCount = Physics.OverlapSphereNonAlloc(
+        transform.position,
+        MaxDistance,
+        PhysicsBuffers.Colliders,
+        TargetLayerMask,
+        QueryTriggerInteraction.Collide);
+      for (var i = 0; i < hitCount; i++) {
+        var collider = PhysicsBuffers.Colliders[i];
+        var target = TryGetTarget(collider.transform);
+        if (target) {
+          var toTarget = collider.transform.position.XZ()-transform.position.XZ();
+          var distanceToTarget = toTarget.magnitude;
+          var ray = new Ray(Eye, toTarget);
+          var didHit = Physics.Raycast(
+            ray,
+            out var hit,
+            distanceToTarget,
+            TargetLayerMask,
+            QueryTriggerInteraction.Collide);
+          if (didHit) {
+            if (TryGetTarget(hit.transform) == target) {
+              yield return target;
+            }
+          }
+        }
       }
-      Debug.Log((inRange, hasClearShot) switch {
-        (true, true) => "good to go",
-        (true, false) => "safe distance no line of sight",
-        (false, true) => "not at safe distance",
-        (false, false) => "nothing is right"
-      });
-    } else {
-      Debug.Log("Do not have target");
-      // no target... what to do
     }
   }
+
+  Transform TryGetTarget(Transform t) => t.GetComponent<Hurtbox>()?.Defender.transform;
+
+  IEnumerator BaseBehavior() {
+    while (true) {
+      Target = null;
+      foreach (var target in VisibleTargets) {
+        Target = target;
+      }
+      if (Target) {
+        var toTarget = Target.position-transform.position;
+        var threat = 1-toTarget.magnitude/MaxDistance;
+        var opportunity = Vector3.Dot(transform.forward, toTarget.normalized);
+        Debug.Log("Trying to portal");
+        PortalAbility.ThreatPosition = Target.position;
+        AbilityManager.TryInvoke(PortalAbility.PortalStart);
+        yield return Fiber.Until(() => !PortalAbility.IsRunning);
+      } else {
+        Debug.Log("No visible targets");
+      }
+      yield return null;
+    }
+  }
+
+  void Start() => Bundle.StartRoutine(new Fiber(BaseBehavior()));
+  void OnDestroy() => Bundle.StopAll();
+  void FixedUpdate() => Bundle.Run();
 }

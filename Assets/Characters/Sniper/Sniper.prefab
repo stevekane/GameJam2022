@@ -1,5 +1,58 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5632020294629602251
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 862183666438482009}
+  - component: {fileID: 4834420936641874726}
+  m_Layer: 0
+  m_Name: PortalAbility
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &862183666438482009
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5632020294629602251}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6716735781350007436}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4834420936641874726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5632020294629602251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49ba9db43c877d54c979f3c0f18fc8a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TriggerConditions: []
+  Tags: 0
+  PortalPrefab: {fileID: 5879270679949479306, guid: dcd86b38a17b91e44b03255a5b679f45, type: 3}
+  ThreatPosition: {x: 0, y: 0, z: 0}
+  RotationSpeed: 360
+  PortalLaunchHeight: 2
+  WaitDuration:
+    Millis: 1000
+    TicksPerSecond: 30
 --- !u!1 &6716735781350007444
 GameObject:
   m_ObjectHideFlags: 0
@@ -12,6 +65,7 @@ GameObject:
   - component: {fileID: 3994227364641147600}
   - component: {fileID: 6716735781350007437}
   - component: {fileID: 6716735781350007434}
+  - component: {fileID: 6824248448383218094}
   - component: {fileID: 6716735781350007435}
   - component: {fileID: 6716735781350007432}
   - component: {fileID: 6716735781350007433}
@@ -38,6 +92,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6716735782081316431}
+  - {fileID: 862183666438482009}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -53,13 +108,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d67277123f69634a8b4f65ff81d43a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PortalAbility: {fileID: 4834420936641874726}
+  AbilityManager: {fileID: 6716735781350007437}
+  Status: {fileID: 6716735781350007432}
   TargetLayerMask:
     serializedVersion: 2
-    m_Bits: 81920
+    m_Bits: 81921
+  Target: {fileID: 0}
   MinDistance: 5
   MaxDistance: 15
   EyeHeight: 1
-  Target: {fileID: 0}
 --- !u!114 &6716735781350007437
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -88,6 +146,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Wave: 0
+--- !u!114 &6824248448383218094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6716735781350007444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Gravity: -200
 --- !u!114 &6716735781350007435
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100,6 +171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 004ed0f90de1a634aab5eefd8f1dea0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BaseAttributes: []
   BaseUpgrades: []
 --- !u!114 &6716735781350007432
 MonoBehaviour:
