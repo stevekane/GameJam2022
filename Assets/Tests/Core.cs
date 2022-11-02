@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 using UnityEngine;
 
 /*
@@ -184,186 +185,224 @@ Another thing to understand, what is a mobile process?
 
   P_0 ≡ Q(0)_1 | R(0)_1
 */
-public class Core : MonoBehaviour {
-  /*
-  Task is a call-graph or syntax tree that may contain nested tasks.
-  Nested tasks come in two key varieties: Concurrent and Sequential.
-  P.Q
 
-  if P runs to completion then Q runs
-  if P is canceled then P.Q is canceled
-  if P.Q is canceled then either P or Q is canceled
-  if Q is canceled then P.Q is canceled
+/*
+Task is a call-graph or syntax tree that may contain nested tasks.
+Nested tasks come in two key varieties: Concurrent and Sequential.
+P.Q
 
-  There is always exactly one child task active but it may itself
-  be a composite of sequential and parallel tasks! A failure from
-  this running child task is sent to the parent. A failure from the parent
-  is sent to its running child.
+if P runs to completion then Q runs
+if P is canceled then P.Q is canceled
+if P.Q is canceled then either P or Q is canceled
+if Q is canceled then P.Q is canceled
 
-  NOTE: The important thing here is ONLY that there is some kind of link
-  between any task and its context. The idea that the parent task somehow is
-  running the child task is just a mental model but is not actually part
-  of the programming model. These are ALL concurrent tasks executing but
-  the linkage that is created is a particular pattern that says that each
-  child task has additional listeners: Parent canceled/stopped and every
-  parent task has additional listeners: Child canceled/stopped.
+There is always exactly one child task active but it may itself
+be a composite of sequential and parallel tasks! A failure from
+this running child task is sent to the parent. A failure from the parent
+is sent to its running child.
 
-  You are free to define how this is handled however you so choose.
+NOTE: The important thing here is ONLY that there is some kind of link
+between any task and its context. The idea that the parent task somehow is
+running the child task is just a mental model but is not actually part
+of the programming model. These are ALL concurrent tasks executing but
+the linkage that is created is a particular pattern that says that each
+child task has additional listeners: Parent canceled/stopped and every
+parent task has additional listeners: Child canceled/stopped.
 
-  The fundamental thing we have is a context.
-  Context is linked to additional contexts.
+You are free to define how this is handled however you so choose.
+
+The fundamental thing we have is a context.
+Context is linked to additional contexts.
 
 
-  KOTLIN JOB
-  New start Active
-  Active complete Completing
-  Active cancel Cancelling
-  Completing cancel Cancelling
-  Completing finish Completed
-  Cancelling finish Cancelled
+KOTLIN JOB
+New start Active
+Active complete Completing
+Active cancel Cancelling
+Completing cancel Cancelling
+Completing finish Completed
+Cancelling finish Cancelled
 
-  eventually we send complete/cancel on result
+eventually we send complete/cancel on result
 
-  νcancel
-  νresult
-  νcancelP
-  νresultP
-  νcancelQ
-  νresultP
-  | + P
-      resultP<complete>
-    + cancelP(_)
-      resultP<canceled>
-    + resultP<canceled>
-  | + Q
-      resultQ<complete>
-    + cancelQ(_)
-      resultQ<canceled>
-    + resultQ<canceled>
-  | cancel(_)
-    | cancelP<_>
-    | cancelQ<_>
-    ∧ resultP(_)
+νcancel
+νresult
+νcancelP
+νresultP
+νcancelQ
+νresultP
+| + P
+    resultP<complete>
+  + cancelP(_)
+    resultP<canceled>
+  + resultP<canceled>
+| + Q
+    resultQ<complete>
+  + cancelQ(_)
+    resultQ<canceled>
+  + resultQ<canceled>
+| cancel(_)
+  | cancelP<_>
+  | cancelQ<_>
+  ∧ resultP(_)
+  ∧ resultQ(_)
+  Cleanup
+  result<canceled>
+| + ∧ resultP(completed)
+    ∧ resultQ(completed)
+    result<completed>
+  + ∧ resultP(canceled)
     ∧ resultQ(_)
-    Cleanup
     result<canceled>
-  | + ∧ resultP(completed)
-      ∧ resultQ(completed)
-      result<completed>
-    + ∧ resultP(canceled)
-      ∧ resultQ(_)
-      result<canceled>
-    + ∧ resultP(_)
-      ∧ resultQ(canceled)
-      result<canceled>
+  + ∧ resultP(_)
+    ∧ resultQ(canceled)
+    result<canceled>
 
-  Challenge: Is it possible to "kill" a running process from the outside?
+Challenge: Is it possible to "kill" a running process from the outside?
 
-    P|kill(P) ↓ 0
+  P|kill(P) ↓ 0
 
-  What about a lesser challenge: define a system in which a process may be killed
-  by itself.
+What about a lesser challenge: define a system in which a process may be killed
+by itself.
 
-    P.0
+  P.0
 
-  Define a process that can kill itself with one of two names sent over a channel:
+Define a process that can kill itself with one of two names sent over a channel:
 
-    νc.
-    | c(status).if status = complete then P else Q
-    | c<complete> + c<canceled>
+  νc.
+  | c(status).if status = complete then P else Q
+  | c<complete> + c<canceled>
 
-  Define a system that terminates when such termination is requested from another process:
+Define a system that terminates when such termination is requested from another process:
 
-    νc.
-    | !P + c(kill)
-    | c<kill>
+  νc.
+  | !P + c(kill)
+  | c<kill>
 
-  Define a system that takes an arbitrary process P and runs it alongside a process:
+Define a system that takes an arbitrary process P and runs it alongside a process:
 
-    CancellableProcess(c,P) ≡ c(stop) + P
+  CancellableProcess(c,P) ≡ c(stop) + P
 
-  This is an ATOM of the context of cancellable tasks.
+This is an ATOM of the context of cancellable tasks.
 
-  If P itself contains multiple suspension points, every one of them must be placed in this atom:
+If P itself contains multiple suspension points, every one of them must be placed in this atom:
 
-  Let P ≡ Wait(30).Q|P.channel(stop)
-  Let ? ≡ CancellableProcess(c)
+Let P ≡ Wait(30).Q|P.channel(stop)
+Let ? ≡ CancellableProcess(c)
 
-  To make P fully cancellable, we need to turn it into this:
+To make P fully cancellable, we need to turn it into this:
 
-  ?P ≡
-    ?Wait(3)
-    ?(?Q|?P)
-    ?channel(stop)
-  */
+?P ≡
+  ?Wait(3)
+  ?(?Q|?P)
+  ?channel(stop)
 
-  class Job : IAsyncDisposable {
-    public List<Task> Tasks = new();
-    public CancellationTokenSource TokenSource;
-    public Job() {
-      TokenSource = new CancellationTokenSource();
+Task<C> ≡
+  Task<A> >>= λ(a:A).Task<B> >>= λ(b:B).Task<T>
+
+Task<C> ≡ do
+  a <- Task<A>
+  b <- Task<B>(a)
+  Task<C>(b)
+
+Task<(A,B)> ≡ do
+  (a,b) -> Task<A> <*> Task<B>
+  pure (a,b)
+
+This all feels mostly correct except the details seem murky.
+
+a context defines the ability to run concurrent routines
+a context is done when all of its child routines are done
+
+a context is a job? if this is true, it would be one that supports two operations:
+  await aka sequential composition
+  run aka concurrent composition
+
+contexts are the only things that can run jobs
+jobs can
+*/
+
+static class ContextExtensions {
+  public static async Task Canceled() => await Task.Yield();
+  public static Task Launch(this Context ctx, Func<Task> continuation) {
+    if (!ctx.TokenSource.Token.IsCancellationRequested) {
+      var job = new Job { Task = continuation() };
+      ctx.Jobs.Add(job);
+      return job.Task;
+    } else {
+      return Canceled();
     }
-    public Job(CancellationTokenSource source) {
-      TokenSource = source;
-    }
-    ~Job() {
-      TokenSource?.Dispose();
-    }
-    public Task Run(Func<Task> t) {
-      async Task Canceled() => await Task.Yield();
+  }
+}
 
-      if (!TokenSource.Token.IsCancellationRequested) {
-        var task = t();
-        Tasks.Add(task);
-        return task;
-      } else {
-        Debug.Log("Task canceled");
-        return Canceled();
+class Context : IAsyncDisposable {
+  public List<Job> Jobs = new();
+  public CancellationTokenSource TokenSource = new CancellationTokenSource();
+  ~Context() => TokenSource?.Dispose();
+  public async ValueTask DisposeAsync() => await Task.WhenAll(Jobs.Select(j => j.Task));
+}
+
+class Job {
+  public Task Task;
+}
+
+public class Core : MonoBehaviour {
+  CancellationTokenSource TokenSource = new();
+
+  async Task Chatter() {
+    await using var ctx = new Context();
+    await ctx.Launch(() => Task.Delay(1000));
+    Debug.Log("Chatter");
+  }
+
+  async Task Thunk() {
+    await Task.Yield();
+    Debug.Log("Thunk");
+  }
+
+  async void Start() {
+    await using var ctx = new Context { TokenSource = TokenSource };
+    ctx.Launch(async () => {
+      while (!ctx.TokenSource.IsCancellationRequested) {
+        await ctx.Launch(Chatter);
       }
-    }
-    public async ValueTask DisposeAsync() {
-      await Task.WhenAll(Tasks);
-      Tasks.Clear();
-      Debug.Log("Cleaned up");
-    }
+    });
+    ctx.Launch(async () => {
+      await Task.Delay(1000);
+      Debug.Log("Ping");
+    });
+    ctx.Launch(async () => {
+      await Task.Delay(2000);
+      Debug.Log("Pong");
+    });
+    ctx.Launch(async () => {
+      await Task.Delay(3000);
+      ctx.TokenSource.Cancel();
+    });
   }
 
-  async Task Foo() {
-    async Task Shout(int i) {
-      await Task.Delay(1000*i);
-      Debug.Log($"Foo {i}");
-    }
+  // async void Start () {
+  //   async Task<string> Ping() {
+  //     await Task.Delay(1000);
+  //     return "ping";
+  //   }
+  //   async Task<string> Pong() {
+  //     await Task.Delay(2000);
+  //     return "pong";
+  //   }
+  //   async Task<int> Num() {
+  //     await Task.Yield();
+  //     return 1;
+  //   }
+  //   var stuff = await Task.WhenAll(Ping(), Pong());
+  //   Debug.Log(stuff[0]);
+  //   Debug.Log(stuff[1]);
+  //   var ping = Ping();
+  //   var num = Num();
+  //   await Task.WhenAll(ping, num);
+  //   Debug.Log(ping.Result);
+  //   Debug.Log(num.Result);
+  // }
 
-    await using (var job = new Job()) {
-      for (var i = 0; i < 5; i++) {
-        job.Run(() => Shout(i));
-      }
-    }
-  }
-
-  async Task Bar() {
-    await Task.Delay(1000);
-    Debug.Log("Bar");
-  }
-
-  async Task Baz(Job parent) {
-    async Task InnerBaz() {
-      Debug.Log("INNER BAZ START");
-      await Task.Delay(5000);
-      Debug.Log("INNER BAZ STOP");
-    }
-    await Task.Delay(1000);
-    parent.Run(() => InnerBaz());
-  }
-
-  async Task Main() {
-    await using (var job = new Job()) {
-      await job.Run(() => Foo());
-      job.TokenSource.Cancel();
-      await job.Run(() => Baz(job));
-      await job.Run(() => Bar());
-    }
-  }
-
-  async void Start() => await Main();
+  void OnDestroy() => TokenSource.Cancel();
 }
