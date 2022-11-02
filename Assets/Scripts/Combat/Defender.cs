@@ -23,7 +23,6 @@ public class HitConfig {
   }
 }
 
-[Serializable]
 public class HitParams {
   public float Damage;
   public float KnockbackStrength;
