@@ -20,6 +20,7 @@ public class SerializableEnum<T> : SerializableEnumBase, ISerializationCallbackR
   [SerializeField] string String;
 
   public static implicit operator T(SerializableEnum<T> e) => e.Value;
+  public override string ToString() => Value.ToString();
 
   public void OnAfterDeserialize() {
     if (!Enum.TryParse(String, out T value)) {
@@ -41,7 +42,7 @@ public class SerializableEnumPropertyDrawer : PropertyDrawer {
   public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
     var valueProp = property.FindPropertyRelative("Value");
     var strProp = property.FindPropertyRelative("String");
-    var newIndex = EditorGUI.Popup(position, valueProp.enumValueIndex, valueProp.enumDisplayNames);
+    var newIndex = EditorGUI.Popup(position, label.text, valueProp.enumValueIndex, valueProp.enumDisplayNames);
     if (newIndex == valueProp.enumValueIndex)
       return;
     valueProp.enumValueIndex = newIndex;

@@ -1,20 +1,19 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
+[Serializable]
 public class UpgradeAttributeListData : UpgradeData {
   public int CurrentLevel = 0;
 }
 
 [CreateAssetMenu(fileName = "Upgrade", menuName = "Upgrade/AttributeList")]
 public class UpgradeAttributeList : Upgrade {
-  [System.Serializable]
+  [Serializable]
   public class Level {
     public AttributeModifier Modifier;
     public int Cost = 0;
   }
-  public AttributeTag Attribute;
+  public SerializableEnum<AttributeTag> Attribute;
   public Level[] Levels;
   UpgradeAttributeListData GetData(Upgrades us) => us.FindUpgrade(ud => ud.Upgrade == this) as UpgradeAttributeListData;
   public override void Add(Upgrades us, bool purchase) {
