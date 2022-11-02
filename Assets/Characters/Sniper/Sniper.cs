@@ -56,12 +56,13 @@ public class Sniper : MonoBehaviour {
         var toTarget = Target.position-transform.position;
         var threat = 1-toTarget.magnitude/MaxDistance;
         var opportunity = Vector3.Dot(transform.forward, toTarget.normalized);
-        Debug.Log("Trying to portal");
         PortalAbility.ThreatPosition = Target.position;
         AbilityManager.TryInvoke(PortalAbility.PortalStart);
+        // TODO: THe FIRST throw is interupting itself but I am not entirely sure why
+        // I think something fishy is going on with the Until clause and Maybe even it only
+        // works because throws are chaining into themselves?
+        Debug.Log("Throwing");
         yield return Fiber.Until(() => !PortalAbility.IsRunning);
-      } else {
-        Debug.Log("No visible targets");
       }
       yield return null;
     }

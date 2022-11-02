@@ -46,10 +46,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TriggerConditions: []
   Tags: 0
+  PortalLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  QueryTriggerInteraction: 0
   PortalPrefab: {fileID: 5879270679949479306, guid: dcd86b38a17b91e44b03255a5b679f45, type: 3}
   ThreatPosition: {x: 0, y: 0, z: 0}
-  RotationSpeed: 360
+  RotationSpeed: 270
+  DirectionalThreshold: 0.95
   PortalLaunchHeight: 2
+  DirectionSamples: 8
+  FaceDuration:
+    Millis: 1000
+    TicksPerSecond: 30
   WaitDuration:
     Millis: 1000
     TicksPerSecond: 30
