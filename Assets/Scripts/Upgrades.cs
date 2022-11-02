@@ -19,7 +19,7 @@ public class Upgrades : MonoBehaviour {
   public AttributeModifier GetModifier(AttributeTag attrib) => Modifiers.GetValueOrDefault(attrib, null);
   public void AddAttributeModifier(AttributeTag attrib, AttributeModifier modifier) => AttributeModifier.Add(Modifiers, attrib, modifier);
   public void RemoveAttributeModifier(AttributeTag attrib, AttributeModifier modifier) => AttributeModifier.Remove(Modifiers, attrib, modifier);
-  public UpgradeData FindUpgrade(Predicate<UpgradeData> pred) => Active.Find(pred);
+  public UpgradeData FindUpgrade(Predicate<UpgradeData> pred) => Active.Find(pred) ?? Added.Find(pred);
   public void BuyUpgrade(UpgradeData upgrade, int cost, bool add) {
     Dirty = true;
     Gold -= cost;

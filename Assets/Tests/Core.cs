@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Linq;
 using UnityEngine;
 
+#if DISABLED_DUE_TO_WARNINGS
+
 /*
 The core of the game.
 
@@ -406,3 +408,5 @@ public class Core : MonoBehaviour {
 
   void OnDestroy() => TokenSource.Cancel();
 }
+
+#endif

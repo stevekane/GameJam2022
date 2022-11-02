@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
@@ -19,11 +20,25 @@ public class HitConfig {
       SFX = SFX,
       VFX = VFX,
       VFXOffset = VFXOffset,
+      OnHitEffects = ComputeOnHit(attacker),
     };
+  }
+  List<StatusEffect> ComputeOnHit(Attributes attacker) {
+    List<StatusEffect> effects = new();
+    if (attacker.GetValue(AttributeTag.BurningHits) is var dps && dps != 0)
+      effects.Add(new BurningEffect(dps));
+    if (attacker.GetValue(AttributeTag.FreezingHits) is var duration && duration != 0)
+      effects.Add(new FreezingEffect(Timeval.FromSeconds(duration).Frames));
+    return effects;
   }
 }
 
-[Serializable]
+[Flags]
+public enum HitFlags {
+  Freezing = 1<<0,
+  Burning = 1<<1,
+}
+
 public class HitParams {
   public float Damage;
   public float KnockbackStrength;
@@ -32,6 +47,7 @@ public class HitParams {
   public AudioClip SFX;
   public GameObject VFX;
   public Vector3 VFXOffset;
+  public List<StatusEffect> OnHitEffects;
 }
 
 public class Defender : MonoBehaviour {
@@ -66,8 +82,8 @@ public class Defender : MonoBehaviour {
     var knockBackDirection = KnockbackVector(hitTransform, transform, hit.KnockbackType);
     Status?.Value.Add(new HitStopEffect(knockBackDirection, .15f, hit.HitStopDuration.Frames),
       s => s.Add(new KnockbackEffect(knockBackDirection*power)));
-    if (Status?.Value.IsDamageable ?? true)
-      Damage.AddPoints(hit.Damage);
+    Damage.AddPoints(hit.Damage);
+    hit.OnHitEffects.ForEach(e => Status?.Value.Add(e));
   }
 
   public void Die() {

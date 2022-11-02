@@ -197,10 +197,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b25f034a0a2d6547bb601e0fe361f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HasGravity: 1
-  CanAttack: 1
-  IsHittable: 1
-  IsDamageable: 1
   Tags: 0
 --- !u!114 &6994602829365010295
 MonoBehaviour:
@@ -272,8 +268,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveSpeed: 20
-  TurnSpeed: 720
   Gravity: -10
 --- !u!114 &374224407259611018
 MonoBehaviour:
@@ -589,6 +583,18 @@ MonoBehaviour:
     Millis: 100
     TicksPerSecond: 30
   MaxRange: 20
+  HitConfig:
+    DamageModifier:
+      Base: 1
+      Mult: 1
+    HitStopDuration:
+      Millis: 33.333332
+      TicksPerSecond: 30
+    KnockbackStrength: 0
+    KnockbackType: 1
+    SFX: {fileID: 0}
+    VFX: {fileID: 0}
+    VFXOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &6106567879726095616
 GameObject:
   m_ObjectHideFlags: 0

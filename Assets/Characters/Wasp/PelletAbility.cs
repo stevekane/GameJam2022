@@ -10,7 +10,6 @@ public class PelletAbility : Ability {
   public Bullet BulletPrefab;
   public int NumBullets;
   public HitConfig HitConfig;
-  public HitParams HitParams;
   public GameObject FireVFX;
   public AudioClip FireSFX;
 
