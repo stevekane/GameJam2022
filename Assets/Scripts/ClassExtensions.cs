@@ -98,6 +98,10 @@ public static class AnimatorExtensions {
   }
 }
 
+public static class AnimationClipExtensions {
+  public static float Milliseconds(this AnimationClip clip) => clip.length*1000;
+}
+
 public static class ArrayLikeExtensions {
   public static void ForEach<T>(this IEnumerable<T> xs, Action<T> p) {
     foreach (var x in xs) {

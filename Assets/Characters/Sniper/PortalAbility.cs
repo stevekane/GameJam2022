@@ -27,16 +27,6 @@ public class PortalAbility : Ability {
     }
   }
 
-  /*
-  Basically, we want to find an ideal place to throw our projectile.
-  We have two criteria to consider:
-    how much "away" from the player is it
-    how likely are we to hit a wall and when
-    we will approximate the ending distance using Portal.Speed*WaitDuration
-  We will then look for the outcome that has the largest distance
-  We will sample at a fixed frequency
-  */
-
   float LikelyDistance(
   Vector3 position,
   Vector3 direction,
