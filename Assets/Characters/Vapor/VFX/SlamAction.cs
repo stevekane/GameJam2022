@@ -63,9 +63,7 @@ public class SlamAction : MonoBehaviour {
   }
 
   void OnContact(Transform other) {
-    Debug.Log($"Slam hit {other}");
-    if (other.TryGetComponent(out Defender defender)) {
+    if (other.TryGetComponent(out Defender defender))
       OnHit?.Invoke(transform, defender);
-    }
   }
 }

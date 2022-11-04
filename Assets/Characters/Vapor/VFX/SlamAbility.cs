@@ -66,6 +66,6 @@ public class SlamAbility : Ability {
   }
 
   void OnHit(Transform attacker, Defender defender) {
-    defender.OnHit(HitConfig.ComputeParams(attacker.GetComponent<Attributes>()), attacker.transform);
+    defender.OnHit(HitConfig.ComputeParams(Attributes), attacker.transform);
   }
 }
