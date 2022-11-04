@@ -9,11 +9,13 @@ public class PowerShotArrow : MonoBehaviour {
   int TargetsHit;
 
   void OnCollisionEnter(Collision c) {
+    Debug.Log($"COLLISION ENTER {c.transform.name}");
     VFXManager.Instance.TrySpawnEffect(DestructionPrefab, c.contacts[0].point);
     Destroy(gameObject);
   }
 
   void OnProjectileEnter(ProjectileCollision c) {
+    Debug.Log($"PROJECTILE ENTER {c.Collider.name}");
     if (c.Collider.TryGetComponent(out Hurtbox hurtbox)) {
       var hitParams = new HitParams {
         HitStopDuration = Timeval.FromMillis(100),

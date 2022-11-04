@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController), typeof(Status), typeof(AbilityManager))]
@@ -12,7 +13,17 @@ public class Mover : MonoBehaviour {
     desiredFacing = manager.GetAxis(AxisTag.Aim).XZ.TryGetDirection() ?? manager.transform.forward;
   }
 
-  [SerializeField] float Gravity;
+  public static IEnumerator Face(Transform t, Vector3 direction, float degreesPerSecond, float threshold) {
+    while (Vector3.Dot(t.forward, direction) < threshold) {
+      var current = t.forward.XZ();
+      var radiansPerSecond = degreesPerSecond*Mathf.Deg2Rad*Time.fixedDeltaTime;
+      var next = Vector3.RotateTowards(t.forward, direction, radiansPerSecond, 0);
+      t.rotation = Quaternion.LookRotation(next, Vector3.up);
+      yield return null;
+    }
+  }
+
+  public float Gravity;
 
   Vector3 Velocity;
 

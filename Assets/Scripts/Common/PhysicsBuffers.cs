@@ -10,9 +10,9 @@ public static class PhysicsBuffers {
   Vector3 position,
   Vector3 forward,
   Vector3 target,
-  float fov) {
+  float fieldOfView) {
     var angle = Vector3.Angle(forward, target - position);
-    var halfFOV = fov/2;
+    var halfFOV = fieldOfView/2;
     return angle >= -halfFOV || angle <= halfFOV;
   }
 
@@ -57,7 +57,7 @@ public static class PhysicsBuffers {
         position: position,
         forward: forward,
         target: candidate.transform.position,
-        fov: fieldOfView);
+        fieldOfView: fieldOfView);
       var isVisible = IsVisibleFrom(
         position: position,
         target: candidate.transform,
