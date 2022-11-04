@@ -12,6 +12,8 @@ public interface IStoppable {
   public void Stop();
 }
 
+public interface IStoppableValue<T> : IEnumerator, IStoppable, IValue<T> {}
+
 public class Bundle {
   List<Fiber> Fibers = new();
   List<Fiber> Added = new();
@@ -128,6 +130,39 @@ public class Selector : AbilityTask, IValue<int> {
   public int Value { get; internal set; }
 }
 
+public class TaskSelector : AbilityTask, IValue<IEnumerator> {
+  IEnumerator A;
+  IEnumerator B;
+  public TaskSelector(IEnumerator a, IEnumerator b) {
+    A = a;
+    B = b;
+    Enumerator = Routine();
+  }
+  ~TaskSelector() {
+    A = null;
+    B = null;
+    Enumerator = null;
+  }
+  public override IEnumerator Routine() {
+    var aFiber = new Fiber(A);
+    var bFiber = new Fiber(B);
+    while (true) {
+      var aActive = aFiber.MoveNext();
+      var bActive = bFiber.MoveNext();
+      if (!aActive) {
+        Value = A;
+        yield break;
+      } else if (!bActive) {
+        Value = B;
+        yield break;
+      } else {
+        yield return null;
+      }
+    }
+  }
+  public IEnumerator Value { get; internal set; }
+}
+
 // TODO: Take a look at this in light of the recent addition of the notion
 // of "runners" as well as IStoppable
 public class ScopedRunner : IDisposable {
@@ -237,9 +272,20 @@ public class Fiber : IEnumerator, IStoppable {
   public static All All(IEnumerator a, IEnumerator b) => new All(a, b);
   public static All All(IEnumerator a, IEnumerator b, params IEnumerator[] xs) => xs.Aggregate(All(a, b), All);
   public static Selector Select(IEnumerator a, IEnumerator b) => new Selector(a, b);
+  public static TaskSelector SelectTask(IEnumerator a, IEnumerator b) => new TaskSelector(a, b);
   public static Listener ListenFor(IEventSource source) => new Listener(source);
   public static Listener<T> ListenFor<T>(IEventSource<T> source) => new Listener<T>(source);
   public static ScopedRunner Scoped(Bundle bundle, IEnumerator routine) => new ScopedRunner(bundle, routine);
+  public static IEnumerator Repeat(Func<IEnumerator> continuation) {
+    while (true) {
+      yield return continuation();
+    }
+  }
+  public static IEnumerator Repeat<A>(Func<A, IEnumerator> continuation, A a) {
+    while (true) {
+      yield return continuation(a);
+    }
+  }
 
   Stack<IEnumerator> Stack;
   public Fiber(IEnumerator enumerator) {

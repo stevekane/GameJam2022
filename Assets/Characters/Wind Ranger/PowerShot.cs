@@ -15,7 +15,7 @@ public class PowerShot : Ability {
     var timer = new Timer();
     using var scoped = Scoped(Bundle, timer);
     yield return Any(windup, release);
-    var maxDuration = WindupClip.length*1000; // to ms
+    var maxDuration = WindupClip.Milliseconds();
     var duration = timer.Value.Millis;
     var arrow = Instantiate(ArrowPrefab, transform.position, transform.rotation);
     var damageMultiplier = DamageMultiplierFromDuration.Evaluate(duration/maxDuration);

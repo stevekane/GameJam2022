@@ -12,7 +12,7 @@ public class Mover : MonoBehaviour {
     desiredFacing = manager.GetAxis(AxisTag.Aim).XZ.TryGetDirection() ?? manager.transform.forward;
   }
 
-  [SerializeField] float Gravity;
+  public float Gravity;
 
   Vector3 Velocity;
 
