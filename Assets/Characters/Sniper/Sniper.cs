@@ -107,10 +107,23 @@ public class Sniper : MonoBehaviour {
     Mover.UpdateAxes(AbilityManager, move, direction);
   }
 
+  /*
+  A note on the relationship of this code to BehaviorTrees:
+
+  Root
+    Behaviors
+      Repeat(Lookaround)
+      AccquireTarget
+    Exit
+      Target && DistanceTo(Target) < Min -> Portal
+      Target && DistanceTo(Target) >= Min -> Fire
+
+  */
   IEnumerator BaseBehavior() {
     var accquireTarget = AcquireTarget();
     var lookAround = Fiber.Repeat(LookAround);
     yield return Fiber.Any(accquireTarget, lookAround);
+
     if (Target) {
       var toTarget = Target.position-transform.position;
       if (toTarget.magnitude < MinDistance) {
