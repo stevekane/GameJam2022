@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,6 +13,12 @@ public class TriggerCondition {
   //public AttributeTag[] RequiredOwnerAttribs = { };
 }
 
+public static class AbilityExtensions {
+  public static IEnumerator NotRunning(this Ability ability) {
+    while (ability.IsRunning) yield return null;
+  }
+}
+
 [Serializable]
 public abstract class Ability : MonoBehaviour {
   protected Bundle Bundle = new();
@@ -23,6 +30,11 @@ public abstract class Ability : MonoBehaviour {
   Dictionary<AbilityMethod, TriggerCondition> TriggerConditionsMap = new();
   [HideInInspector] public AbilityTag Tags; // Inherited from the Trigger when started
   public bool IsRunning { get => Bundle.IsRunning; }
+  public IEnumerator Running {
+    get {
+      while (IsRunning) yield return null;
+    }
+  }
   public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
   public void StopRoutine(Fiber routine) => Bundle.StopRoutine(routine);
   public T Using<T>(T d) where T : IDisposable {

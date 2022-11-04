@@ -1,19 +1,15 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
 public class ChooseRandomDirection : IStoppableValue<Vector3> {
-  public object Current { get => Value; }
-  public void Reset() {
-    IsRunning = true;
-    Value = default;
-  }
   public bool MoveNext() {
-    Value = UnityEngine.Random.insideUnitSphere.XZ().normalized;
     IsRunning = false;
+    Value = UnityEngine.Random.insideUnitSphere.XZ().normalized;
     return IsRunning;
   }
+  public void Reset() => IsRunning = true;
   public void Stop() => IsRunning = false;
+  public object Current { get => Value; }
   public bool IsRunning { get; internal set; } = true;
   public Vector3 Value { get; internal set; }
 }
@@ -26,7 +22,6 @@ public class SampleForSafestDirection : IStoppableValue<Vector3> {
   public float EstimatedTravelTime;
   public float EstimatedGravity;
   public int DirectionSamples;
-  public object Current { get => Value; }
   public bool MoveNext() {
     IsRunning = false;
     Value = SafestDirection();
@@ -34,6 +29,7 @@ public class SampleForSafestDirection : IStoppableValue<Vector3> {
   }
   public void Reset() => IsRunning = true;
   public void Stop() => IsRunning = false;
+  public object Current { get => Value; }
   public bool IsRunning { get; set; } = true;
   public Vector3 Value { get; internal set; }
 
@@ -46,7 +42,6 @@ public class SampleForSafestDirection : IStoppableValue<Vector3> {
       maxDistance,
       EnvironmentLayerMask);
     var finalPosition = didHit ? hit.point : maxDistance*direction;
-    Debug.DrawRay(Position, finalPosition, Color.grey, 2f);
     return Vector3.Distance(Position, finalPosition);
   }
 
@@ -71,8 +66,8 @@ public class Sniper : MonoBehaviour {
   public PortalAbility PortalAbility;
   public PowerShot PowerShotAbility;
   public AbilityManager AbilityManager;
-  public Status Status;
   public Attributes Attributes;
+  public Status Status;
   public Mover Mover;
   public LayerMask TargetLayerMask;
   public LayerMask EnvironmentLayerMask;
@@ -80,7 +75,6 @@ public class Sniper : MonoBehaviour {
   public float MinDistance;
   public float MaxDistance;
   public float EyeHeight;
-  [Tooltip("Degrees")]
   public float FieldOfView;
   public Bundle Bundle = new();
 
@@ -98,10 +92,7 @@ public class Sniper : MonoBehaviour {
         visibleTargetLayerMask: TargetLayerMask | EnvironmentLayerMask,
         visibleQueryTriggerInteraction: QueryTriggerInteraction.Collide,
         buffer: PhysicsBuffers.Colliders);
-      Target = null;
-      for (var i = 0; i < visibleTargetCount; i++) {
-        Target = TryGetTarget(PhysicsBuffers.Colliders[i].transform);
-      }
+      Target = visibleTargetCount > 0 ? PhysicsBuffers.Colliders[0].transform : null;
       if (Target) {
         var toTarget = Target.position-transform.position;
         if (toTarget.magnitude < MinDistance) {
@@ -115,7 +106,7 @@ public class Sniper : MonoBehaviour {
             DirectionSamples = 8
           };
           AbilityManager.TryInvoke(PortalAbility.PortalStart);
-          yield return Fiber.Until(() => !PortalAbility.IsRunning);
+          yield return PortalAbility.Running;
         } else {
           Mover.GetAxes(AbilityManager, out var desiredMove, out var desiredFacing);
           Mover.UpdateAxes(AbilityManager, desiredMove, toTarget.normalized);
@@ -123,7 +114,7 @@ public class Sniper : MonoBehaviour {
           var aimed = Fiber.Until(() => Vector3.Dot(transform.forward, toTarget.normalized) >= .98f);
           yield return Fiber.Any(aimingTimeout, aimed);
           AbilityManager.TryInvoke(PowerShotAbility.MakeRoutine);
-          yield return Fiber.Until(() => !PowerShotAbility.IsRunning);
+          yield return PowerShotAbility.Running;
         }
       } else {
         yield return null;

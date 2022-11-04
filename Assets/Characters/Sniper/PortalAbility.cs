@@ -14,11 +14,11 @@ public class PortalAbility : Ability {
     yield return GetPortalDirection;
     var direction = GetPortalDirection.Value;
     Mover.GetAxes(AbilityManager, out var desiredMove, out var desiredFacing);
-    Mover.UpdateAxes(AbilityManager, desiredMove, direction.normalized);
+    Mover.UpdateAxes(AbilityManager, desiredMove, direction);
     var aimingTimeout = Fiber.Wait(Timeval.FramesPerSecond*1);
-    var aimed = Fiber.Until(() => Vector3.Dot(transform.forward, direction.normalized) >= .98f);
+    var aimed = Fiber.Until(() => Vector3.Dot(transform.forward, direction) >= .98f);
     yield return Fiber.Any(aimingTimeout, aimed);
-    var portalPosition = trans.position;
+    var portalPosition = transform.position;
     var portalRotation = Quaternion.LookRotation(direction);
     Portal = Instantiate(PortalPrefab, portalPosition, portalRotation);
     yield return Fiber.Wait(WaitDuration.Frames);
