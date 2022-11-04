@@ -276,6 +276,16 @@ public class Fiber : IEnumerator, IStoppable {
   public static Listener ListenFor(IEventSource source) => new Listener(source);
   public static Listener<T> ListenFor<T>(IEventSource<T> source) => new Listener<T>(source);
   public static ScopedRunner Scoped(Bundle bundle, IEnumerator routine) => new ScopedRunner(bundle, routine);
+  public static IEnumerator Repeat(Func<IEnumerator> continuation) {
+    while (true) {
+      yield return continuation();
+    }
+  }
+  public static IEnumerator Repeat<A>(Func<A, IEnumerator> continuation, A a) {
+    while (true) {
+      yield return continuation(a);
+    }
+  }
 
   Stack<IEnumerator> Stack;
   public Fiber(IEnumerator enumerator) {

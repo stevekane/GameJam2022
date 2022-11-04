@@ -13,7 +13,7 @@ public static class PhysicsBuffers {
   float fieldOfView) {
     var angle = Vector3.Angle(forward, target - position);
     var halfFOV = fieldOfView/2;
-    return angle >= -halfFOV || angle <= halfFOV;
+    return -angle >= -halfFOV || angle <= halfFOV;
   }
 
   public static bool IsVisibleFrom(

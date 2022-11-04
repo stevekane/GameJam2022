@@ -80,8 +80,10 @@ public class Sniper : MonoBehaviour {
 
   Transform TryGetTarget(Transform t) => t.GetComponent<Hurtbox>()?.Defender.transform;
 
-  IEnumerator BaseBehavior() {
-    while (true) {
+  // TODO: This could be made a value-yielding routine
+  IEnumerator AcquireTarget() {
+    Target = null;
+    while (!Target) {
       var visibleTargetCount = PhysicsBuffers.VisibleTargets(
         position: transform.position+EyeHeight*Vector3.up,
         forward: transform.forward,
@@ -93,36 +95,44 @@ public class Sniper : MonoBehaviour {
         visibleQueryTriggerInteraction: QueryTriggerInteraction.Collide,
         buffer: PhysicsBuffers.Colliders);
       Target = visibleTargetCount > 0 ? PhysicsBuffers.Colliders[0].transform : null;
-      if (Target) {
-        var toTarget = Target.position-transform.position;
-        if (toTarget.magnitude < MinDistance) {
-          PortalAbility.GetPortalDirection = new SampleForSafestDirection {
-            EnvironmentLayerMask = EnvironmentLayerMask,
-            Position = transform.position,
-            InitialDirection = transform.forward,
-            ProjectileSpeed = PortalAbility.PortalPrefab.GetComponent<Projectile>().InitialSpeed,
-            EstimatedTravelTime = PortalAbility.WaitDuration.Seconds,
-            EstimatedGravity = GetComponent<Mover>().Gravity,
-            DirectionSamples = 8
-          };
-          AbilityManager.TryInvoke(PortalAbility.PortalStart);
-          yield return PortalAbility.Running;
-        } else {
-          Mover.GetAxes(AbilityManager, out var desiredMove, out var desiredFacing);
-          Mover.UpdateAxes(AbilityManager, desiredMove, toTarget.normalized);
-          var aimingTimeout = Fiber.Wait(Timeval.FramesPerSecond*1);
-          var aimed = Fiber.Until(() => Vector3.Dot(transform.forward, toTarget.normalized) >= .98f);
-          yield return Fiber.Any(aimingTimeout, aimed);
-          AbilityManager.TryInvoke(PowerShotAbility.MakeRoutine);
-          yield return PowerShotAbility.Running;
-        }
-      } else {
-        yield return null;
-      }
+      yield return null;
     }
   }
 
-  void Start() => Bundle.StartRoutine(new Fiber(BaseBehavior()));
+  IEnumerator LookAround() {
+    yield return Fiber.Wait(Timeval.FramesPerSecond);
+    var randXZ = UnityEngine.Random.insideUnitCircle;
+    var direction = new Vector3(randXZ.x, 0, randXZ.y);
+    Mover.GetAxes(AbilityManager, out var move, out var forward);
+    Mover.UpdateAxes(AbilityManager, move, direction);
+  }
+
+  IEnumerator BaseBehavior() {
+    var accquireTarget = AcquireTarget();
+    var lookAround = Fiber.Repeat(LookAround);
+    yield return Fiber.Any(accquireTarget, lookAround);
+    if (Target) {
+      var toTarget = Target.position-transform.position;
+      if (toTarget.magnitude < MinDistance) {
+        PortalAbility.GetPortalDirection = new ChooseRandomDirection();
+        AbilityManager.TryInvoke(PortalAbility.PortalStart);
+        yield return PortalAbility.Running;
+      } else {
+        Mover.GetAxes(AbilityManager, out var desiredMove, out var desiredFacing);
+        Mover.UpdateAxes(AbilityManager, desiredMove, toTarget.normalized);
+        var aimingTimeout = Fiber.Wait(Timeval.FramesPerSecond*1);
+        var aimed = Fiber.Until(() => Vector3.Dot(transform.forward, toTarget.normalized) >= .98f);
+        yield return Fiber.Any(aimingTimeout, aimed);
+        AbilityManager.TryInvoke(PowerShotAbility.MakeRoutine);
+        yield return PowerShotAbility.Running;
+      }
+    } else {
+      Debug.Log("No target");
+      yield return null;
+    }
+  }
+
+  void Start() => Bundle.StartRoutine(new Fiber(Fiber.Repeat(BaseBehavior)));
   void OnDestroy() => Bundle.StopAll();
   void FixedUpdate() => Bundle.Run();
 }
