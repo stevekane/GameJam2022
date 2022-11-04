@@ -13,12 +13,6 @@ public class TriggerCondition {
   //public AttributeTag[] RequiredOwnerAttribs = { };
 }
 
-public static class AbilityExtensions {
-  public static IEnumerator NotRunning(this Ability ability) {
-    while (ability.IsRunning) yield return null;
-  }
-}
-
 [Serializable]
 public abstract class Ability : MonoBehaviour {
   protected Bundle Bundle = new();
