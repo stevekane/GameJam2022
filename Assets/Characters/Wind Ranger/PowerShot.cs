@@ -20,6 +20,7 @@ public class PowerShot : Ability {
     var duration = timer.Value.Millis;
     var arrow = Instantiate(ArrowPrefab, transform.position, transform.rotation);
     arrow.HitParams = HitConfig.ComputeParams(Attributes);
+    arrow.HitParams.Damage *= DamageMultiplierFromDuration.Evaluate(duration/maxDuration);
     yield return Animator.Run(ReleaseClip);
     Stop();
   }
