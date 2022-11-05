@@ -5,6 +5,7 @@ public class PowerShotArrow : MonoBehaviour {
   public GameObject DestructionPrefab;
   public float DamageReductionPerTarget = .2f;
   public float Damage = 100;
+  public HitParams HitParams;
 
   int TargetsHit;
 
@@ -15,14 +16,9 @@ public class PowerShotArrow : MonoBehaviour {
 
   void OnProjectileEnter(ProjectileCollision c) {
     if (c.Collider.TryGetComponent(out Hurtbox hurtbox)) {
-      var hitParams = new HitParams {
-        HitStopDuration = Timeval.FromMillis(100),
-        Damage = Damage*Mathf.Pow(1-DamageReductionPerTarget, TargetsHit),
-        KnockbackStrength = 0,
-        KnockbackType = KnockBackType.Forward
-      };
+      HitParams.Damage *= Mathf.Pow(1-DamageReductionPerTarget, TargetsHit);
       TargetsHit++;
-      hurtbox.Defender.OnHit(hitParams, transform);
+      hurtbox.Defender.OnHit(HitParams, transform);
     }
   }
 }

@@ -8,6 +8,7 @@ public class PowerShot : Ability {
   public Animator Animator;
   public AnimationClip WindupClip;
   public AnimationClip ReleaseClip;
+  public HitConfig HitConfig;
 
   public IEnumerator MakeRoutine() {
     var windup = Animator.Run(WindupClip);
@@ -18,8 +19,7 @@ public class PowerShot : Ability {
     var maxDuration = WindupClip.Milliseconds();
     var duration = timer.Value.Millis;
     var arrow = Instantiate(ArrowPrefab, transform.position, transform.rotation);
-    var damageMultiplier = DamageMultiplierFromDuration.Evaluate(duration/maxDuration);
-    arrow.Damage *= damageMultiplier;
+    arrow.HitParams = HitConfig.ComputeParams(Attributes);
     yield return Animator.Run(ReleaseClip);
     Stop();
   }
