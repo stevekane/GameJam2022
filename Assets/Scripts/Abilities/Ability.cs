@@ -47,4 +47,5 @@ public abstract class Ability : MonoBehaviour {
   public void Init() => TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.GetMethod(this)] = c);
   public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
   void FixedUpdate() => Bundle.Run();
+  void OnDestroy() => Stop();
 }

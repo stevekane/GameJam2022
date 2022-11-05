@@ -78,8 +78,6 @@ public class Sniper : MonoBehaviour {
   public float FieldOfView;
   public Bundle Bundle = new();
 
-  Transform TryGetTarget(Transform t) => t.GetComponent<Hurtbox>()?.Defender.transform;
-
   // TODO: This could be made a value-yielding routine
   IEnumerator AcquireTarget() {
     Target = null;
