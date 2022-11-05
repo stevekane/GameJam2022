@@ -107,45 +107,19 @@ public class Sniper : MonoBehaviour {
     yield return Fiber.Wait(Timeval.FramesPerSecond);
   }
 
-  /*
-  What happens when something is hit
-  */
-
-  /*
-  A note on the relationship of this code to BehaviorTrees:
-
-  Root
-    Behaviors
-      Repeat(Lookaround)
-      AccquireTarget
-    Exit
-      Target && DistanceTo(Target) < Min -> Portal
-      Target && DistanceTo(Target) >= Min -> Fire
-
-  */
   IEnumerator BaseBehavior() {
     var accquireTarget = AcquireTarget();
     var lookAround = Fiber.Repeat(LookAround);
     yield return Fiber.Any(accquireTarget, lookAround);
-
-    if (Target) {
-      var toTarget = Target.position-transform.position;
-      if (toTarget.magnitude < MinDistance) {
-        PortalAbility.GetPortalDirection = new ChooseRandomDirection();
-        AbilityManager.TryInvoke(PortalAbility.PortalStart);
-        yield return PortalAbility.Running;
-      } else {
-        Mover.GetAxes(AbilityManager, out var desiredMove, out var desiredFacing);
-        Mover.UpdateAxes(AbilityManager, desiredMove, toTarget.normalized);
-        var aimingTimeout = Fiber.Wait(Timeval.FramesPerSecond*1);
-        var aimed = Fiber.Until(() => Vector3.Dot(transform.forward, toTarget.normalized) >= .98f);
-        yield return Fiber.Any(aimingTimeout, aimed);
-        AbilityManager.TryInvoke(PowerShotAbility.MakeRoutine);
-        yield return PowerShotAbility.Running;
-      }
+    var toTarget = Target.position-transform.position;
+    if (toTarget.magnitude < MinDistance) {
+      PortalAbility.GetPortalDirection = new ChooseRandomDirection();
+      AbilityManager.TryInvoke(PortalAbility.PortalStart);
+      yield return PortalAbility.Running;
     } else {
-      Debug.Log("No target");
-      yield return null;
+      yield return Mover.TryAimAt(toTarget.normalized, Timeval.FromSeconds(1));
+      AbilityManager.TryInvoke(PowerShotAbility.MakeRoutine);
+      yield return PowerShotAbility.Running;
     }
   }
 

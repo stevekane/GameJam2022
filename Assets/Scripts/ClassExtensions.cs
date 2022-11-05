@@ -50,6 +50,14 @@ public static class FlagLikeExtensions {
   public static bool HasAnyFlags(this AbilityTag tag, AbilityTag mask) => (tag & mask) != 0;
 }
 
+public static class GameObjectExtensions {
+  public static void Destroy(this GameObject go) {
+    if (go) {
+      GameObject.Destroy(go);
+    }
+  }
+}
+
 public static class MonoExtensions {
   // Returns the (first matching) requested component on this object, creating it first if necessary.
   public static T GetOrCreateComponent<T>(this MonoBehaviour self) where T : MonoBehaviour {

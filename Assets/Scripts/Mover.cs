@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController), typeof(Status), typeof(AbilityManager))]
@@ -33,6 +34,14 @@ public class Mover : MonoBehaviour {
     var desiredRotation = Quaternion.LookRotation(desiredForward);
     var degrees = speed * Time.fixedDeltaTime;
     return Quaternion.RotateTowards(currentRotation, desiredRotation, degrees);
+  }
+
+  public IEnumerator TryAimAt(Vector3 desired, Timeval MaxDuration, float tolerance = .95f) {
+    Mover.GetAxes(AbilityManager, out var desiredMove, out var desiredFacing);
+    Mover.UpdateAxes(AbilityManager, desiredMove, desired);
+    var aimingTimeout = Fiber.Wait(MaxDuration.Frames);
+    var aimed = Fiber.Until(() => Vector3.Dot(transform.forward, desired) >= tolerance);
+    yield return Fiber.Any(aimingTimeout, aimed);
   }
 
   void FixedUpdate() {
