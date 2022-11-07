@@ -707,7 +707,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4387966635076996215, guid: 41e6250a98a29bb4cbfecbb98fd8aa93, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -778,7 +778,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4387966635076996215, guid: 41e6250a98a29bb4cbfecbb98fd8aa93, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -1971,7 +1971,7 @@ MeshCollider:
   serializedVersion: 4
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 1341286262}
+  m_Mesh: {fileID: 1113356732}
 --- !u!33 &515492102
 MeshFilter:
   m_ObjectHideFlags: 10
@@ -1979,7 +1979,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 515492099}
-  m_Mesh: {fileID: 1341286262}
+  m_Mesh: {fileID: 1113356732}
 --- !u!23 &515492103
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2254,8 +2254,8 @@ MonoBehaviour:
     m_AreaError: 15
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
-  m_Mesh: {fileID: 1341286262}
-  m_VersionIndex: 659
+  m_Mesh: {fileID: 1113356732}
+  m_VersionIndex: 662
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -2930,13 +2930,13 @@ PrefabInstance:
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 5f096d0f2bb57fe499f963334c439b15, type: 3}
---- !u!43 &1341286262
+--- !u!43 &1113356732
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh31018
+  m_Name: pb_Mesh39502
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -5327,7 +5327,7 @@ PrefabInstance:
       objectReference: {fileID: 1899292709}
     - target: {fileID: 3441861468932765124, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
       propertyPath: m_Lens.m_SensorSize.x
-      value: 2.260454
+      value: 2.290909
       objectReference: {fileID: 0}
     - target: {fileID: 4912154605914978066, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
       propertyPath: m_Name
@@ -5387,7 +5387,7 @@ PrefabInstance:
       objectReference: {fileID: 2966178551707844508, guid: 551252ffe36257c46bb04806b3159ffd, type: 3}
     - target: {fileID: 7691937222385314386, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
       propertyPath: m_AmplitudeGain
-      value: 0.00000185239
+      value: 0.001661555
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -5504,10 +5504,6 @@ PrefabInstance:
       propertyPath: CollideMask.m_Bits
       value: 65536
       objectReference: {fileID: 0}
-    - target: {fileID: 3002947848983109568, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
-      propertyPath: TriggerConditions.Array.data[0].RequiredOwnerTags
-      value: -2147483648
-      objectReference: {fileID: 0}
     - target: {fileID: 3232894417174932624, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
       propertyPath: Blocks
       value: 1
@@ -5528,18 +5524,6 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 4460202280109117412, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
-      propertyPath: BaseUpgrades.Array.size
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 4460202280109117412, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
-      propertyPath: BaseUpgrades.Array.data[5]
-      value: 
-      objectReference: {fileID: 11400000, guid: ded75146e4c98c04daa0daa176322a51, type: 2}
-    - target: {fileID: 4460202280109117412, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
-      propertyPath: BaseUpgrades.Array.data[6]
-      value: 
-      objectReference: {fileID: 11400000, guid: d82614a23ffd86445a5a88ec04e124c0, type: 2}
     - target: {fileID: 4460202280109117412, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
       propertyPath: BaseValues.Values.Array.size
       value: 12
@@ -5755,10 +5739,6 @@ PrefabInstance:
     - target: {fileID: 7514659629534781941, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
       propertyPath: m_IsTrigger
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8522030806182356177, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
-      propertyPath: TriggerConditions.Array.data[0].RequiredOwnerTags
-      value: 1073741824
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []

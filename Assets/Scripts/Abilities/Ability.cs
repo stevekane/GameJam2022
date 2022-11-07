@@ -9,6 +9,7 @@ public class TriggerCondition {
   public AbilityMethodReferenceSelf Method;
   public AbilityTag Tags = 0;
   public AbilityTag RequiredOwnerTags = 0;
+  public float EnergyCost = 0f;
   public HashSet<AttributeTag> RequiredOwnerAttribs = new();
   //public AttributeTag[] RequiredOwnerAttribs = { };
 }

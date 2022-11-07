@@ -77,10 +77,12 @@ MonoBehaviour:
       MethodName: ChargeStart
     Tags: 19
     RequiredOwnerTags: 536870912
+    EnergyCost: 0
   - Method:
       MethodName: ChargeRelease
     Tags: 4
     RequiredOwnerTags: 536870912
+    EnergyCost: 0
   Tags: 0
   Index: 4
   Owner: {fileID: 0}
@@ -111,7 +113,6 @@ MonoBehaviour:
     Millis: 333.33334
     TicksPerSecond: 30
   SlamActionPrefab: {fileID: 6110290959185933350, guid: 457d44b88fdf4bd44a1a93c7fb4b858a, type: 3}
-  AttackScaling: 1.5
   HitConfig:
     DamageModifier:
       Base: 15
@@ -204,10 +205,12 @@ MonoBehaviour:
       MethodName: ChargeStart
     Tags: 3
     RequiredOwnerTags: 268435456
+    EnergyCost: 0
   - Method:
       MethodName: ChargeRelease
     Tags: 4
     RequiredOwnerTags: 268435456
+    EnergyCost: 0
   Tags: 0
   Index: 2
   Windup:
@@ -256,6 +259,7 @@ MonoBehaviour:
   HitDamage: 15
   HitTargetKnockbackStrength: 50
   HitRecoilStrength: 50
+  HitEnergyGain: 2
 --- !u!1 &2784476827323047724
 GameObject:
   m_ObjectHideFlags: 0
@@ -332,7 +336,8 @@ MonoBehaviour:
   - Method:
       MethodName: AttackStart
     Tags: 11
-    RequiredOwnerTags: 536870912
+    RequiredOwnerTags: -2147483648
+    EnergyCost: 0
   Tags: 0
   MoveSpeed: 40
   TargetDistance: 5
@@ -427,6 +432,7 @@ MonoBehaviour:
       MethodName: AttackStart
     Tags: 33
     RequiredOwnerTags: 0
+    EnergyCost: 0
   Tags: 0
   Index: 0
   Windup:
@@ -475,6 +481,7 @@ MonoBehaviour:
   HitDamage: 5
   HitTargetKnockbackStrength: 0
   HitRecoilStrength: 1
+  HitEnergyGain: 1
 --- !u!1 &5529297459764154501
 GameObject:
   m_ObjectHideFlags: 0
@@ -524,15 +531,18 @@ MonoBehaviour:
       MethodName: Begin
     Tags: 8
     RequiredOwnerTags: 0
+    EnergyCost: 5
   - Method:
       MethodName: Release
     Tags: 4
     RequiredOwnerTags: 0
+    EnergyCost: 0
   Tags: 0
   MoveSpeedFactor: 2.5
   Particles: {fileID: 4585268613483689328}
   AudioClip: {fileID: 8300000, guid: 0eda13886c86ca145936c7017a0dafa5, type: 3}
   AudioClipStartingTime: 0.25
+  EnergyDrainPerSec: 2
 --- !u!1 &5571416123097895008
 GameObject:
   m_ObjectHideFlags: 0
@@ -595,6 +605,7 @@ GameObject:
   - component: {fileID: 6662180119051599905}
   - component: {fileID: 4289594239830466653}
   - component: {fileID: 4460202280109117412}
+  - component: {fileID: 8984908938962208943}
   m_Layer: 10
   m_Name: Vapor
   m_TagString: Untagged
@@ -960,6 +971,22 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 73583ee841b78204ba64f804e5b0238d, type: 2}
   - {fileID: 11400000, guid: 4d16dd67b444ff54ca927ea9b501cadf, type: 2}
   - {fileID: 11400000, guid: f34bf434dd718a34b905f5ab25cd6f3e, type: 2}
+  - {fileID: 11400000, guid: ded75146e4c98c04daa0daa176322a51, type: 2}
+  - {fileID: 11400000, guid: d82614a23ffd86445a5a88ec04e124c0, type: 2}
+--- !u!114 &8984908938962208943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 803fd05d288d1c7449db697e26f7d9fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Points: 10
+  MaxPoints: 100
 --- !u!1 &5571416124901615635
 GameObject:
   m_ObjectHideFlags: 0
@@ -1083,7 +1110,8 @@ MonoBehaviour:
   - Method:
       MethodName: Begin
     Tags: 2
-    RequiredOwnerTags: 268435456
+    RequiredOwnerTags: 1073741824
+    EnergyCost: 10
   Tags: 0
   Duration:
     Millis: 10000
@@ -1171,6 +1199,7 @@ MonoBehaviour:
       MethodName: AttackStart
     Tags: 33
     RequiredOwnerTags: 0
+    EnergyCost: 0
   Tags: 0
   Index: 1
   Windup:
@@ -1219,6 +1248,7 @@ MonoBehaviour:
   HitDamage: 5
   HitTargetKnockbackStrength: 0
   HitRecoilStrength: 1
+  HitEnergyGain: 1
 --- !u!1 &9127015034591396752
 GameObject:
   m_ObjectHideFlags: 0
@@ -1268,6 +1298,7 @@ MonoBehaviour:
       MethodName: Attack
     Tags: 2
     RequiredOwnerTags: 0
+    EnergyCost: 0
   Tags: 0
   Abilities:
   - Ability: {fileID: 776304553845593926}

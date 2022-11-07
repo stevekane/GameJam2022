@@ -18,9 +18,10 @@ public class MeleeAttackAbility : Ability {
   public float HitDamage;
   public float HitTargetKnockbackStrength;
   public float HitRecoilStrength;
+  public float HitEnergyGain;
 
   void Start() {
-    Owner = GetComponentInParent<AbilityManager>().transform;
+    Owner = AbilityManager.transform;
     Animator = GetComponentInParent<Animator>();
   }
 
@@ -53,16 +54,17 @@ public class MeleeAttackAbility : Ability {
   }
 
   protected IEnumerator OnHit(List<Transform> targets, int stopFrames) {
-    Owner.GetComponent<Status>()?.Add(new HitStopEffect(Owner.forward, HitStopVibrationAmplitude, stopFrames));
+    Status.Add(new HitStopEffect(Owner.forward, HitStopVibrationAmplitude, stopFrames));
     CameraShaker.Instance.Shake(HitCameraShakeIntensity);
     var hitParams = HitConfig.ComputeParams(Attributes);
     targets.ForEach(target => {
       target.GetComponent<Defender>()?.OnHit(hitParams, Owner);
       Owner.transform.forward = (target.transform.position - Owner.transform.position).XZ().normalized;
     });
+    AbilityManager.Energy?.Value.Add(HitEnergyGain * targets.Count);
 
     yield return Fiber.Wait(stopFrames);
 
-    Owner.GetComponent<Status>()?.Add(new RecoilEffect(HitRecoilStrength * -Owner.forward));
+    Status.Add(new RecoilEffect(HitRecoilStrength * -Owner.forward));
   }
 }

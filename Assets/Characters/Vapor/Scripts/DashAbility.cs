@@ -6,6 +6,7 @@ public class DashAbility : Ability {
   [SerializeField] ParticleSystem Particles;
   [SerializeField] AudioClip AudioClip;
   [SerializeField] float AudioClipStartingTime;
+  [SerializeField] float EnergyDrainPerSec = 2f;
   Animator Animator;
   AudioSource AudioSource;
 
@@ -23,7 +24,8 @@ public class DashAbility : Ability {
 
   IEnumerator Dashing() {
     Vector3 lastPosition = AbilityManager.transform.position;
-    while (true) {
+    while (AbilityManager.Energy?.Value.Points > 0f) {
+      AbilityManager.Energy?.Value.Consume(EnergyDrainPerSec * Time.fixedDeltaTime);
       Vector3 delta = (AbilityManager.transform.position - lastPosition) / Time.fixedDeltaTime;
       lastPosition = AbilityManager.transform.position;
       if (Particles != null)

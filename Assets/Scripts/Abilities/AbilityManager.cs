@@ -12,6 +12,7 @@ public class AbilityManager : MonoBehaviour {
   [HideInInspector] public Ability[] Abilities;
   [HideInInspector] public List<Ability> Running = new();
   [HideInInspector] public List<Ability> ToAdd = new();
+  public Optional<Energy> Energy;
 
   Dictionary<AxisTag, AxisState> TagToAxis = new();
   Dictionary<AbilityMethod, EventRouter> MethodToEvent = new();
@@ -32,6 +33,7 @@ public class AbilityManager : MonoBehaviour {
     public void Unlisten(Action handler) => Action -= handler;
     public void Fire() {
       if (ShouldFire()) {
+        Ability.AbilityManager.Energy?.Value.Consume(Trigger.EnergyCost);
         Ability.Tags.AddFlags(Trigger.Tags);
         Action?.Invoke();
         var enumerator = Method();
@@ -50,6 +52,7 @@ public class AbilityManager : MonoBehaviour {
         _ when Trigger.Tags.HasAllFlags(AbilityTag.OnlyOne) && am.Running.Any(a => a.Tags.HasAllFlags(AbilityTag.OnlyOne) && !CanCancel(a)) => false,
         _ when Trigger.Tags.HasAllFlags(AbilityTag.BlockIfRunning) && Ability.IsRunning => false,
         _ when Trigger.Tags.HasAllFlags(AbilityTag.BlockIfNotRunning) && !Ability.IsRunning => false,
+        _ when Trigger.EnergyCost > Ability.AbilityManager.Energy?.Value.Points => false,
         _ => true,
       };
       return canRun;
@@ -88,6 +91,7 @@ public class AbilityManager : MonoBehaviour {
   void Awake() {
     Abilities = GetComponentsInChildren<Ability>();
     Abilities.ForEach(a => { a.AbilityManager = this; a.Init(); });
+    Energy = GetComponent<Energy>();
   }
   void OnDestroy() {
     Abilities.ForEach(a => a.AbilityManager = null);
