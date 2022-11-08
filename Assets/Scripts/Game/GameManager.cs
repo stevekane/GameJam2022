@@ -54,6 +54,7 @@ public class GameManager : MonoBehaviour {
       ProjectileManager.Instance = ProjectileManager;
       MobManager.Instance = MobManager;
       DontDestroyOnLoad(Instance.gameObject);
+      SetCountdownTextEnabled(CountdownText, isEnabled: false);
     }
   }
 

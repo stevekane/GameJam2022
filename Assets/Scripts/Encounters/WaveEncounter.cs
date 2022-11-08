@@ -28,8 +28,8 @@ public struct WaveConfig {
 }
 
 public class WaveEncounter : Encounter {
-  public int InitialCost;
-  public int CostPerWave;
+  public int InitialBudget;
+  public int BudgetPerWave;
   public int TotalWaveCount;
   public Timeval WavePeriod;
   public WaveConfig Config;
@@ -46,12 +46,12 @@ public class WaveEncounter : Encounter {
   IEnumerable<SpawnRequest> Wave(int budget, WaveConfig config) {
     var candidates = config.SpawnConfigs.OrderByDescending(sc => Cost(config.Costs, sc.Mob));
     var transforms = config.SpawnPoints;
-    var price = 0;
+    var remainingBudget = budget;
     foreach (var t in transforms) {
       foreach (var c in candidates) {
-        var nextPrice = Cost(config.Costs, c.Mob)+price;
-        if (nextPrice <= budget) {
-          price = nextPrice;
+        var nextBudget = remainingBudget - Cost(config.Costs, c.Mob);
+        if (nextBudget >= 0) {
+          remainingBudget = nextBudget;
           yield return new SpawnRequest { config = c, transform = t };
           break;
         }
@@ -70,12 +70,12 @@ public class WaveEncounter : Encounter {
 
   public override IEnumerator Run() {
     for (var waveNumber = 0; waveNumber < TotalWaveCount; waveNumber++) {
-      yield return Fiber.Wait(WavePeriod.Frames);
       var spawnAction = new MobSpawnAction { WaveNumber = waveNumber };
-      foreach (var wave in Wave(InitialCost+CostPerWave*waveNumber, Config)) {
+      foreach (var wave in Wave(InitialBudget+BudgetPerWave*waveNumber, Config)) {
         var spawn = new Fiber(Spawn(wave, spawnAction));
         Bundle.StartRoutine(spawn);
       }
+      yield return Fiber.Wait(WavePeriod.Frames);
     }
   }
 }
