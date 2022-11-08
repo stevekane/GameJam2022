@@ -53,7 +53,9 @@ public class HitParams {
 public class Defender : MonoBehaviour {
   Optional<Status> Status;
   Damage Damage;
+  bool PlayingFallSound;
 
+  public AudioClip FallSFX;
   public bool IsParrying;
   public bool IsBlocking;
 
@@ -101,6 +103,10 @@ public class Defender : MonoBehaviour {
 
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
+    if (transform.position.y < 0f && !PlayingFallSound) {
+      PlayingFallSound = true;
+      SFXManager.Instance.TryPlayOneShot(FallSFX);
+    }
     if (transform.position.y < -100f) {
       Die();
     }
