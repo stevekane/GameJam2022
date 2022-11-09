@@ -14,11 +14,9 @@ public class PowerShot : Ability {
     var windup = Animator.Run(WindupClip);
     var release = ListenFor(AbilityManager.GetEvent(Release));
     var timer = new Timer();
-    // Using(Scoped(Bundle, timer));
-    yield return Any(windup, release);
+    yield return Any(windup, release, timer);
     var maxDuration = WindupClip.Milliseconds();
-    // var duration = timer.Value.Millis;
-    var duration = maxDuration;
+    var duration = timer.Value.Millis;
     var arrow = Instantiate(ArrowPrefab, transform.position, transform.rotation);
     arrow.HitParams = HitConfig.ComputeParams(Attributes);
     arrow.HitParams.Damage *= DamageMultiplierFromDuration.Evaluate(duration/maxDuration);

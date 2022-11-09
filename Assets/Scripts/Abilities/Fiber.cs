@@ -191,7 +191,9 @@ public class ScopedRunner : IDisposable {
     Bundle.StartRoutine((Fiber = new Fiber(routine)));
   }
   public void Dispose() {
-    Fiber.Stop();
+    if (Fiber.IsRunning) {
+      Fiber.Stop();
+    }
     Bundle.StopRoutine(Fiber);
     Fiber = null;
   }

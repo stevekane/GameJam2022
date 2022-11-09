@@ -34,6 +34,11 @@ public abstract class Ability : MonoBehaviour, IStoppable {
     Disposables.Add(d);
     return d;
   }
+  public T Dispose<T>(T d) where T : IDisposable {
+    d.Dispose();
+    Disposables.Remove(d);
+    return d;
+  }
   public StatusEffect AddStatusEffect(StatusEffect effect, OnEffectComplete onComplete = null) {
     Status.Add(Using(effect), onComplete);
     return effect;
