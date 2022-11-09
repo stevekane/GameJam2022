@@ -17,7 +17,6 @@ public class PelletAbility : Ability {
     yield return Windup.Start(Animator, Index);
     yield return Fiber.All(ShootRoutine(), Active.Start(Animator, Index));
     yield return Recovery.Start(Animator, Index);
-    Stop();
   }
 
   IEnumerator ShootRoutine() {

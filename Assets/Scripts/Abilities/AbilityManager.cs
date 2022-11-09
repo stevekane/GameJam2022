@@ -94,6 +94,7 @@ public class AbilityManager : MonoBehaviour {
     Energy = GetComponent<Energy>();
   }
   void OnDestroy() {
+    Abilities.ForEach(a => a.Stop());
     Abilities.ForEach(a => a.AbilityManager = null);
     MethodToEvent.ForEach(kv => kv.Value.DisconnectSource());
   }

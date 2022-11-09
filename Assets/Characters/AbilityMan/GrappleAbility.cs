@@ -54,7 +54,6 @@ public class GrappleAbility : Ability {
       var pullComplete = PullTowards(Owner, contactPoint, HOOK_SPEED, HOOK_RELEASE_DISTANCE);
       yield return Any(pullWait, pullComplete);
     }
-    Stop();
   }
 
   public IEnumerator GrappleRelease() => null;

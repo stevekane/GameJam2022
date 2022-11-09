@@ -18,7 +18,6 @@ public class DashAbility : Ability {
     AudioSource.Play();
     AddStatusEffect(new SpeedFactorEffect(MoveSpeedFactor, 1f));
     yield return Fiber.Any(Dashing(), Fiber.ListenFor(AbilityManager.GetEvent(Release)));
-    Stop();
   }
   public IEnumerator Release() => null;
 

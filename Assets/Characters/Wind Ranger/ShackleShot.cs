@@ -11,6 +11,5 @@ public class ShackleShot : Ability {
     yield return Animator.Run(WindupClip);
     Instantiate(ShacklePrefab, transform.position, transform.rotation);
     yield return Animator.Run(ReleaseClip);
-    Stop();
   }
 }

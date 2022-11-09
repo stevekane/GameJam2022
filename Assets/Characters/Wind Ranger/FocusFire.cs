@@ -21,7 +21,6 @@ public class FocusFire : Ability {
       Target = target.transform;
       yield return Any(Wait(Duration.Frames), RapidFire(ShotCooldown.Frames));
     }
-    Stop();
   }
 
   IEnumerator RapidFire(int cooldown) {

@@ -37,6 +37,7 @@ public class AnimationTask : IEnumerator, IStoppable {
   ~AnimationTask() {
     ClipPlayable.Destroy();
     Graph.Destroy();
+    IsRunning = false;
   }
   public void Stop() {
     ClipPlayable.Destroy();
@@ -47,7 +48,7 @@ public class AnimationTask : IEnumerator, IStoppable {
   public object Current { get; }
   public void Reset() => throw new NotSupportedException();
   public bool MoveNext() {
-    if (!Graph.IsDone()) {
+    if (Graph.IsValid() && !Graph.IsDone()) {
       if (FrameEventTimeline != null && OnFrameEvent != null) {
         var clip = ClipPlayable.GetAnimationClip();
         var frames = clip.length*clip.frameRate+1;

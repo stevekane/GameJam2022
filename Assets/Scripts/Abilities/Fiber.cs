@@ -3,6 +3,10 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
+/*
+Currently,
+*/
+
 public interface IValue<T> {
   public T Value { get; }
 }
@@ -22,13 +26,19 @@ public class Bundle {
   public bool IsRunning { get => Fibers.Count > 0 || Added.Count > 0; }
   public bool IsRoutineRunning(Fiber f) => Fibers.Contains(f) || Added.Contains(f);
   public void StartRoutine(Fiber fiber) => Added.Add(fiber);
-  public void StopRoutine(Fiber fiber) => Removed.Add(fiber);
-  public void StopAll() => Removed.AddRange(Fibers);
+  public void StopRoutine(Fiber fiber) {
+    Removed.Add(fiber);
+    fiber.Stop();
+  }
+  public void StopAll() {
+    Removed.AddRange(Fibers);
+    Fibers.ForEach(f => f.Stop());
+  }
   public void Run() {
     Fibers.AddRange(Added);
     Added.Clear();
-    Removed.ForEach((f) => Fibers.Remove(f));
-    Fibers.ForEach((f) => { if (!f.MoveNext()) StopRoutine(f); });
+    Removed.ForEach(f => Fibers.Remove(f));
+    Fibers.ForEach(f => { if (!f.MoveNext()) StopRoutine(f); });
   }
 }
 
@@ -130,6 +140,8 @@ public class Selector : AbilityTask, IValue<int> {
   public int Value { get; internal set; }
 }
 
+// TODO: This does not need to be Ability Task. Just implement this as
+// a custom IEnumerator + IValue + IStoppable
 public class TaskSelector : AbilityTask, IValue<IEnumerator> {
   IEnumerator A;
   IEnumerator B;
@@ -294,8 +306,8 @@ public class Fiber : IEnumerator, IStoppable {
   }
   public void Stop() {
     Stack.ForEach(s => {
-      if (s is IStoppable) {
-        (s as IStoppable).Stop();
+      if (s is IStoppable ss) {
+        ss.Stop();
       }
     });
     Stack.Clear();
@@ -306,11 +318,17 @@ public class Fiber : IEnumerator, IStoppable {
   public bool MoveNext() {
     while (Stack.TryPeek(out IEnumerator top)) {
       if (!top.MoveNext()) {
-        // TODO: Possibly check if Stoppable and if Stopped and Stop?
-        Stack.Pop();
+        if (top is IStoppable ts && ts.IsRunning) {
+          if (Stack.Count > 0) {
+            ts.Stop();
+          }
+        }
+        if (Stack.Count > 0) {
+          Stack.Pop();
+        }
       } else {
-        if (top.Current is IEnumerator) {
-          Stack.Push(top.Current as IEnumerator);
+        if (top.Current is IEnumerator current) {
+          Stack.Push(current);
         } else {
           return true;
         }

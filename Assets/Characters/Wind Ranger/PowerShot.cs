@@ -14,7 +14,7 @@ public class PowerShot : Ability {
     var windup = Animator.Run(WindupClip);
     var release = ListenFor(AbilityManager.GetEvent(Release));
     var timer = new Timer();
-    using var scoped = Scoped(Bundle, timer);
+    Using(Scoped(Bundle, timer));
     yield return Any(windup, release);
     var maxDuration = WindupClip.Milliseconds();
     var duration = timer.Value.Millis;
@@ -22,7 +22,6 @@ public class PowerShot : Ability {
     arrow.HitParams = HitConfig.ComputeParams(Attributes);
     arrow.HitParams.Damage *= DamageMultiplierFromDuration.Evaluate(duration/maxDuration);
     yield return Animator.Run(ReleaseClip);
-    Stop();
   }
 
   public IEnumerator Release() => null;

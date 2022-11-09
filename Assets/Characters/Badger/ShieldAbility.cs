@@ -17,7 +17,6 @@ public class ShieldAbility : Ability {
     IsRaised = false;
     Animator.SetBool("Shielding", false);
     yield return Recovery.Start(Animator, Index);
-    Stop();
   }
 
   public IEnumerator HoldRelease() => null;
