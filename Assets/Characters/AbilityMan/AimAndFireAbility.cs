@@ -23,7 +23,6 @@ public class AimAndFireAbility : Ability {
     AddStatusEffect(new SpeedFactorEffect(1f, 0f));
     Animator.SetBool("Firing", true);
     yield return Any(new AimAt(Aimer, Target, TurnSpeed), NTimes(3, Fire));
-    Stop();
   }
 
   IEnumerator Fire() {

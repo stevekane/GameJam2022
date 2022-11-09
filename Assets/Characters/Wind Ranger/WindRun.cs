@@ -28,7 +28,6 @@ public class WindRun : Ability {
     WindRunBoostEffect = new WindRunBoostEffect();
     Status.Add(WindRunBoostEffect);
     yield return Any(SlowNearby(), Wait(Duration.Frames));
-    Stop();
   }
 
   public override void Stop() {

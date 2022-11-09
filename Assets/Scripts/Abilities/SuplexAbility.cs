@@ -35,7 +35,6 @@ public class SuplexAbility : Ability {
     var target = best.Item1.Defender;
     yield return MoveTo(target);
     yield return Toss(target);
-    Stop();
   }
   public IEnumerator MoveTo(Defender target) {
     Status.Add(Using(new ScriptedMovementEffect()));

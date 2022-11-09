@@ -17,11 +17,11 @@ public class PortalAbility : Ability {
     yield return Fiber.Wait(WaitDuration.Frames);
     var deltaXZ = (Portal.transform.position-AbilityManager.transform.position).XZ();
     AbilityManager.GetComponent<CharacterController>().Move(deltaXZ);
-    Stop();
   }
 
   public override void Stop() {
-    base.Stop();
+    Debug.Log("Portal stop called");
     Portal.Destroy();
+    base.Stop();
   }
 }

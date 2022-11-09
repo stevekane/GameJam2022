@@ -34,7 +34,6 @@ public class SlamAbility : Ability {
     SlamAction = null;
     yield return Active.Start(Animator, Index);
     yield return Recovery.Start(Animator, Index);
-    Stop();
   }
 
   public IEnumerator ChargeRelease() => null;

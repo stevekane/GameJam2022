@@ -27,7 +27,6 @@ public class MetamorphAbility : Ability {
       status.AddAttributeModifier(AttributeTag.Knockback, KnockbackModifier);
     }));
     yield return Fiber.Any(Fiber.Wait(Duration.Frames), Fiber.ListenFor(AbilityManager.GetEvent(End)));
-    Stop();
   }
 
   public IEnumerator End() => null;
