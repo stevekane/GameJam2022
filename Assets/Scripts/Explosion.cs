@@ -7,7 +7,7 @@ public class Explosion : MonoBehaviour {
     var numHits = Physics.OverlapSphereNonAlloc(transform.position, Radius, PhysicsBuffers.Colliders);
     for (int i = 0; i < numHits; i++) {
       if (PhysicsBuffers.Colliders[i].TryGetComponent(out Player player)) {
-        Debug.Log("Player go BOOM");
+        //Debug.Log("Player go BOOM");
       }
     }
     Destroy(gameObject, 2f);  // Assume animation is done before 2s.
