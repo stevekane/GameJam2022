@@ -44,10 +44,11 @@ public class MeleeAttackAbility : Ability {
     }
     yield return Active.Start(Animator, Index, OnHit);
     yield return Recovery.Start(Animator, Index);
-    Done();
+    Stop();
   }
 
-  public void Done() {
+  public override void Stop() {
+    base.Stop();
     Animator.SetBool("Attacking", false);
     Animator.SetInteger("AttackIndex", -1);
     Animator.SetFloat("AttackSpeed", 1);
