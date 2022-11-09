@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    Bundle.Run();
+    Bundle.MoveNext();
   }
 
   IEnumerator EncounterDefeated(Encounter encounter) {

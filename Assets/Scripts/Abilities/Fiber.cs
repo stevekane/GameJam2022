@@ -3,10 +3,6 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
-/*
-Currently,
-*/
-
 public interface IValue<T> {
   public T Value { get; }
 }
@@ -18,27 +14,34 @@ public interface IStoppable {
 
 public interface IStoppableValue<T> : IEnumerator, IStoppable, IValue<T> {}
 
-public class Bundle {
+public class Bundle : IEnumerator, IStoppable {
   List<Fiber> Fibers = new();
   List<Fiber> Added = new();
   List<Fiber> Removed = new();
 
+  public object Current { get => null; }
+  public void Reset() => throw new NotSupportedException();
   public bool IsRunning { get => Fibers.Count > 0 || Added.Count > 0; }
-  public bool IsRoutineRunning(Fiber f) => Fibers.Contains(f) || Added.Contains(f);
-  public void StartRoutine(Fiber fiber) => Added.Add(fiber);
+  public bool IsRoutineRunning(Fiber f) {
+    return Fibers.Contains(f) || Added.Contains(f);
+  }
+  public void StartRoutine(Fiber fiber) {
+    Added.Add(fiber);
+  }
   public void StopRoutine(Fiber fiber) {
     Removed.Add(fiber);
     fiber.Stop();
   }
-  public void StopAll() {
+  public void Stop() {
     Removed.AddRange(Fibers);
     Fibers.ForEach(f => f.Stop());
   }
-  public void Run() {
+  public bool MoveNext() {
     Fibers.AddRange(Added);
     Added.Clear();
     Removed.ForEach(f => Fibers.Remove(f));
     Fibers.ForEach(f => { if (!f.MoveNext()) StopRoutine(f); });
+    return IsRunning;
   }
 }
 
@@ -319,9 +322,7 @@ public class Fiber : IEnumerator, IStoppable {
     while (Stack.TryPeek(out IEnumerator top)) {
       if (!top.MoveNext()) {
         if (top is IStoppable ts && ts.IsRunning) {
-          if (Stack.Count > 0) {
-            ts.Stop();
-          }
+          ts.Stop();
         }
         if (Stack.Count > 0) {
           Stack.Pop();

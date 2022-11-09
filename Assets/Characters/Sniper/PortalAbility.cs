@@ -20,7 +20,6 @@ public class PortalAbility : Ability {
   }
 
   public override void Stop() {
-    Debug.Log("Portal stop called");
     Portal.Destroy();
     base.Stop();
   }

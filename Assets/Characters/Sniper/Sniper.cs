@@ -122,6 +122,6 @@ public class Sniper : MonoBehaviour {
   }
 
   void Start() => Bundle.StartRoutine(new Fiber(Fiber.Repeat(BaseBehavior)));
-  void OnDestroy() => Bundle.StopAll();
-  void FixedUpdate() => Bundle.Run();
+  void OnDestroy() => Bundle.Stop();
+  void FixedUpdate() => Bundle.MoveNext();
 }

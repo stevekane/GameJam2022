@@ -15,7 +15,7 @@ public class TriggerCondition {
 }
 
 [Serializable]
-public abstract class Ability : MonoBehaviour {
+public abstract class Ability : MonoBehaviour, IStoppable {
   protected Bundle Bundle = new();
   protected List<IDisposable> Disposables = new();
   public AbilityManager AbilityManager { get; set; }
@@ -26,9 +26,7 @@ public abstract class Ability : MonoBehaviour {
   [HideInInspector] public AbilityTag Tags; // Inherited from the Trigger when started
   public bool IsRunning { get => Bundle.IsRunning; }
   public IEnumerator Running {
-    get {
-      while (IsRunning) yield return null;
-    }
+    get => Bundle;
   }
   public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
   public void StopRoutine(Fiber routine) => Bundle.StopRoutine(routine);
@@ -42,12 +40,18 @@ public abstract class Ability : MonoBehaviour {
   }
   public virtual void Stop() {
     Tags = 0;
-    Bundle.StopAll();
+    Bundle.Stop();
     Disposables.ForEach(s => s.Dispose());
     Disposables.Clear();
   }
   public void Init() => TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.GetMethod(this)] = c);
   public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
-  void FixedUpdate() => Bundle.Run();
+  void FixedUpdate() {
+    var isRunning = Bundle.IsRunning;
+    var stillRunning = Bundle.MoveNext();
+    if (isRunning && !stillRunning) {
+      Stop();
+    }
+  }
   void OnDestroy() => Stop();
 }
