@@ -54,6 +54,7 @@ public class Defender : MonoBehaviour {
   Optional<Status> Status;
   Damage Damage;
   bool PlayingFallSound;
+  public Vector3? LastGroundedPosition { get; private set; }
 
   public AudioClip FallSFX;
   public bool IsParrying;
@@ -91,6 +92,7 @@ public class Defender : MonoBehaviour {
   public void Die() {
     // TODO: keep track of last attacker
     SendMessage("OnDeath");
+    LastGroundedPosition = LastGroundedPosition ?? transform.position;
     Destroy(gameObject, .01f);
   }
 
@@ -104,6 +106,7 @@ public class Defender : MonoBehaviour {
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
     if (transform.position.y < 0f && !PlayingFallSound) {
+      LastGroundedPosition = transform.position;
       PlayingFallSound = true;
       SFXManager.Instance.TryPlayOneShot(FallSFX);
     }

@@ -29,7 +29,6 @@ public class SliceDash : Ability {
     yield return Fiber.Any(Animator.Run(DashingClip), countdown, Move(dir.normalized, countdown));
     foreach (var h in Hits)
       h.OnHit(HitConfig.ComputeParams(Attributes), AbilityManager.transform);
-    //yield return Animator.Run(DoneClip);
   }
 
   public override void Stop() {

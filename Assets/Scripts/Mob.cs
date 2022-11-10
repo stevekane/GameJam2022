@@ -6,7 +6,7 @@ public class Mob : MonoBehaviour {
 
   public void DropGold() {
     var gold = (int)(Player.Get().GetComponent<Attributes>().GetValue(AttributeTag.GoldGain, Gold * Random.Range(.5f, 2f)));
-    Coin.SpawnCoins(transform.position, gold);
+    Coin.SpawnCoins(GetComponent<Defender>().LastGroundedPosition.Value.XZ() + new Vector3(0, 1f, 0), gold);
   }
 
   void OnDeath() {
