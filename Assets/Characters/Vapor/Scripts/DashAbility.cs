@@ -33,10 +33,9 @@ public class DashAbility : Ability {
     }
   }
 
-  public override void Stop() {
+  public override void OnStop() {
     Animator.SetBool("Dashing", false);
     AudioSource.Stop();
-    base.Stop();
   }
 
   void Awake() {

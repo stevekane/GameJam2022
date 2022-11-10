@@ -31,9 +31,8 @@ public class MetamorphAbility : Ability {
 
   public IEnumerator End() => null;
 
-  public override void Stop() {
+  public override void OnStop() {
     Animator.SetBool("Morph", false);
-    base.Stop();
   }
 
   void Awake() {

@@ -19,8 +19,7 @@ public class PortalAbility : Ability {
     AbilityManager.GetComponent<CharacterController>().Move(deltaXZ);
   }
 
-  public override void Stop() {
+  public override void OnStop() {
     Portal.Destroy();
-    base.Stop();
   }
 }

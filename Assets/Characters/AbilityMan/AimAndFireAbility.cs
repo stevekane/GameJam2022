@@ -14,9 +14,8 @@ public class AimAndFireAbility : Ability {
   public Timeval ShotCooldown;
   public Animator Animator;
 
-  public override void Stop() {
+  public override void OnStop() {
     Animator.SetBool("Firing", false);
-    base.Stop();
   }
 
   public IEnumerator AttackStart() {

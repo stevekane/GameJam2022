@@ -47,8 +47,7 @@ public class MeleeAttackAbility : Ability {
     Stop();
   }
 
-  public override void Stop() {
-    base.Stop();
+  public override void OnStop() {
     Animator.SetBool("Attacking", false);
     Animator.SetInteger("AttackIndex", -1);
     Animator.SetFloat("AttackSpeed", 1);

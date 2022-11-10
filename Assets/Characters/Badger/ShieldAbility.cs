@@ -21,12 +21,11 @@ public class ShieldAbility : Ability {
 
   public IEnumerator HoldRelease() => null;
 
-  public override void Stop() {
+  public override void OnStop() {
     IsRaised = false;
     Animator.SetBool("Attacking", false);
     Animator.SetInteger("AttackIndex", -1);
     Animator.SetFloat("AttackSpeed", 1);
     Animator.SetBool("Shielding", false);
-    base.Stop();
   }
 }
