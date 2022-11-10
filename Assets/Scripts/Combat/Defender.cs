@@ -91,9 +91,8 @@ public class Defender : MonoBehaviour {
 
   public void Die() {
     // TODO: keep track of last attacker
-    SendMessage("OnDeath");
     LastGroundedPosition = LastGroundedPosition ?? transform.position;
-    Destroy(gameObject, .01f);
+    SendMessage("OnDeath", SendMessageOptions.RequireReceiver);
   }
 
   void Awake() {

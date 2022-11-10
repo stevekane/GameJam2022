@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour {
   public List<Spawn> PlayerSpawns = new();
 
   Bundle Bundle = new Bundle();
-  GameObject Player;
+  Player Player;
 
   void Awake() {
     if (Instance) {
@@ -71,8 +71,8 @@ public class GameManager : MonoBehaviour {
     yield return Fiber.Until(() => MobManager.Instance.Mobs.Count <= 0);
   }
 
-  IEnumerator PlayerDeath(GameObject player) {
-    yield return Fiber.Until(() => player == null);
+  IEnumerator PlayerDeath(Player player) {
+    yield return Fiber.Until(() => player.Dead);
   }
 
   IEnumerator Run() {
@@ -82,7 +82,7 @@ public class GameManager : MonoBehaviour {
       var playerSpawn = PlayerSpawns[0];
       var p = playerSpawn.transform.position;
       var r = playerSpawn.transform.rotation;
-      Player = Instantiate(PlayerPrefab, p, r);
+      Player = Instantiate(PlayerPrefab, p, r).GetComponent<Player>();
       SaveData.LoadFromFile();
 
       // Setup camera to target the player
@@ -121,6 +121,8 @@ public class GameManager : MonoBehaviour {
         0 => "You win",
         _ => "You lose"
       });
+      SaveData.SaveToFile();
+      Destroy(Player.gameObject);
       InputManager.Instance.SetInputEnabled(false);
       yield return Fiber.Wait(Timeval.FramesPerSecond * 3);
       Debug.Log("POST GAMELOOP");
