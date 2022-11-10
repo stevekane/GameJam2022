@@ -55,6 +55,14 @@ public class Timer : IEnumerator, IValue<Timeval> {
   public void Reset() => Value.Millis = 0;
 }
 
+public class CountdownTimer : IEnumerator, IValue<Timeval> {
+  public Timeval Value { get; }
+  public CountdownTimer(Timeval duration) { Value = Timeval.FromMillis(duration.Millis); }
+  public bool MoveNext() => (--Value.Frames > 0);
+  public object Current { get => Value; }
+  public void Reset() => Value.Millis = 0;
+}
+
 public class Listener : IEnumerator, IStoppable {
   IEventSource Source;
 

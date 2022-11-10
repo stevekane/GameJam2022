@@ -355,6 +355,108 @@ MonoBehaviour:
     SFX: {fileID: 8300000, guid: f161f54138dc0314abdabf7ab71e3404, type: 3}
     VFX: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
     VFXOffset: {x: 0, y: 1, z: 0}
+--- !u!1 &4804604425537202661
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4306477954596025281}
+  - component: {fileID: 2677899398414593809}
+  - component: {fileID: 3794835855323818869}
+  - component: {fileID: 4440389021436948925}
+  m_Layer: 13
+  m_Name: SliceDash
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4306477954596025281
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4804604425537202661}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5571416123097895009}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &2677899398414593809
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4804604425537202661}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 4, y: 6, z: 1}
+  m_Center: {x: 0, y: 3, z: 0}
+--- !u!114 &3794835855323818869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4804604425537202661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e93db3e391a640243a06b63541cd965b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Collider: {fileID: 2677899398414593809}
+--- !u!114 &4440389021436948925
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4804604425537202661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd1dd10339dcb9548bcc5da85615d90f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TriggerConditions:
+  - Method:
+      MethodName: Execute
+    Tags: 9
+    RequiredOwnerTags: 0
+    EnergyCost: 0
+  Tags: 0
+  MoveSpeed: 120
+  WindupDuration:
+    Millis: 100
+    TicksPerSecond: 30
+  Duration:
+    Millis: 166.66667
+    TicksPerSecond: 30
+  WindupClip: {fileID: 7400000, guid: 2a60e9b2764640043a7ce8027822d075, type: 2}
+  DashingClip: {fileID: 7400000, guid: a41ecc2b2a8aa7a4e9a4647f0beb06dd, type: 2}
+  DoneClip: {fileID: 7400000, guid: 654d990bb8222c54ea70a2a9aa54ef2e, type: 2}
+  Hitbox: {fileID: 3794835855323818869}
+  HitConfig:
+    DamageModifier:
+      Base: 1
+      Mult: 1
+    HitStopDuration:
+      Millis: 133.33333
+      TicksPerSecond: 30
+    KnockbackStrength: 0
+    KnockbackType: 1
+    SFX: {fileID: 8300000, guid: 332a6114ed184a44188829a8f87db1a7, type: 3}
+    VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
+    VFXOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &4872877845196898822
 GameObject:
   m_ObjectHideFlags: 0
@@ -576,6 +678,7 @@ Transform:
   - {fileID: 232568689298950285}
   - {fileID: 7199471196977928480}
   - {fileID: 1922017593864157115}
+  - {fileID: 4306477954596025281}
   - {fileID: 371394410303385243}
   - {fileID: 7036988371491868621}
   - {fileID: 2784055462783592816}
@@ -892,12 +995,12 @@ MonoBehaviour:
     Entry:
       Ability: {fileID: 3232894417174932624}
       MethodName: ChargeRelease
-  - ButtonCode: 0
+  - ButtonCode: 8
     ButtonPressType: 0
     Entry:
       Ability: {fileID: 696150299245317217}
       MethodName: Begin
-  - ButtonCode: 0
+  - ButtonCode: 8
     ButtonPressType: 2
     Entry:
       Ability: {fileID: 696150299245317217}
@@ -922,6 +1025,11 @@ MonoBehaviour:
     Entry:
       Ability: {fileID: 5938650978471480679}
       MethodName: ChargeRelease
+  - ButtonCode: 0
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 4440389021436948925}
+      MethodName: Execute
   AxisMaps:
   - AxisCode: 0
     AxisTag: 0

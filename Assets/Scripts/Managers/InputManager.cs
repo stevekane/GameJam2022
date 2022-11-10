@@ -17,7 +17,8 @@ public enum ButtonCode {
   North,
   East,
   South,
-  West
+  West,
+  Unbound // Dummy value to easily unbind buttons
 }
 
 // TODO: Maybe don't need/want these? Maybe just use strings
@@ -99,6 +100,7 @@ public class InputManager : MonoBehaviour {
   }
 
   void BroadcastEvent(ButtonCode code, ButtonPressType type, IEventSource evt) {
+    if (code == ButtonCode.Unbound) return;
     Predicate<string> func = type switch {
       ButtonPressType.JustDown => Input.GetButtonDown,
       ButtonPressType.Down => Input.GetButton,
