@@ -77,13 +77,16 @@ AnimatorStateMachine:
     m_Position: {x: 260, y: -90, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 4476252981467089359}
-    m_Position: {x: 640, y: 40, z: 0}
+    m_Position: {x: 870, y: -90, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -3304685306812731543}
-    m_Position: {x: 675, y: 105, z: 0}
+    m_Position: {x: 920, y: 90, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1835669604937611056}
-    m_Position: {x: 710, y: 170, z: 0}
+    m_Position: {x: 920, y: 160, z: 0}
+  - serializedVersion: 1
+    m_State: {fileID: -2136988014783494751}
+    m_Position: {x: 920, y: 20, z: 0}
   m_ChildStateMachines:
   - serializedVersion: 1
     m_StateMachine: {fileID: 1673760671221947248}
@@ -401,7 +404,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 2a60e9b2764640043a7ce8027822d075, type: 2}
+  m_Motion: {fileID: 7400000, guid: a41ecc2b2a8aa7a4e9a4647f0beb06dd, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -459,6 +462,32 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!1102 &-2136988014783494751
+AnimatorState:
+  serializedVersion: 6
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Vapor_SliceDashWindup
+  m_Speed: 1
+  m_CycleOffset: 0
+  m_Transitions: []
+  m_StateMachineBehaviours: []
+  m_Position: {x: 50, y: 50, z: 0}
+  m_IKOnFeet: 0
+  m_WriteDefaultValues: 1
+  m_Mirror: 0
+  m_SpeedParameterActive: 0
+  m_MirrorParameterActive: 0
+  m_CycleOffsetParameterActive: 0
+  m_TimeParameterActive: 0
+  m_Motion: {fileID: 7400000, guid: 2a60e9b2764640043a7ce8027822d075, type: 2}
+  m_Tag: 
+  m_SpeedParameter: 
+  m_MirrorParameter: 
+  m_CycleOffsetParameter: 
+  m_TimeParameter: 
 --- !u!1107 &-1810153898727625618
 AnimatorStateMachine:
   serializedVersion: 6
