@@ -93,7 +93,7 @@ public class ChargedAttackPhase : AbilityTask {
 
 [Serializable]
 public class HitboxAttackPhase : AbilityTask {
-  public delegate IEnumerator OnHitFunc(List<Transform> hits, int stopFrames);
+  public delegate IEnumerator OnHitFunc(List<Transform> hits);
 
   int Index;
   Animator Animator;
@@ -130,7 +130,7 @@ public class HitboxAttackPhase : AbilityTask {
       if (Hits.Count > 0) {
         Hitbox.Collider.enabled = false;
         Hitbox.TriggerStay = null;
-        yield return OnHit(Hits, HitFreezeDuration.Frames);
+        yield return OnHit(Hits);
         Hitbox.Collider.enabled = true;
         Hitbox.TriggerStay = OnContact;
         Hits.Clear();

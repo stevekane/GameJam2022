@@ -23,6 +23,19 @@ public class HitConfig {
       OnHitEffects = ComputeOnHit(attacker),
     };
   }
+  // A variant for scaled damage and knockback for use with charged abilities.
+  public HitParams ComputeParamsScaled(Attributes attacker, float scale) {
+    return new() {
+      Damage = DamageModifier.Apply(attacker.GetValue(AttributeTag.Damage, 0f)) * scale,
+      KnockbackStrength = attacker.GetValue(AttributeTag.Knockback, KnockbackStrength) * scale,
+      KnockbackType = KnockbackType,
+      HitStopDuration = HitStopDuration,
+      SFX = SFX,
+      VFX = VFX,
+      VFXOffset = VFXOffset,
+      OnHitEffects = ComputeOnHit(attacker),
+    };
+  }
   List<StatusEffect> ComputeOnHit(Attributes attacker) {
     List<StatusEffect> effects = new();
     if (attacker.GetValue(AttributeTag.BurningHits) is var dps && dps != 0)

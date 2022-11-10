@@ -13,6 +13,7 @@ public class MeleeAttackAbility : Ability {
   public GameObject HitVFX;
   public AudioClip HitSFX;
   public Vector3 HitVFXOffset = Vector3.up;
+  public AnimationCurve ChargeScaling = AnimationCurve.Linear(0f, .5f, 1f, 1f);  // go from .5 to 1 over the range
   public float HitStopVibrationAmplitude;
   public float HitCameraShakeIntensity;
   public float HitDamage;
@@ -37,12 +38,15 @@ public class MeleeAttackAbility : Ability {
   }
 
   IEnumerator Routine(bool chargeable) {
+    var chargeScaling = 1f;
     if (chargeable) {
-      yield return Windup.StartWithCharge(Animator, Index);
+      var frameCounter = new Timer();
+      yield return Fiber.Any(frameCounter, Windup.StartWithCharge(Animator, Index));
+      chargeScaling = ChargeScaling.Evaluate(((float)frameCounter.Value.Frames) / (Windup.Duration.Frames * Windup.ChargeFrameMultiplier));
     } else {
       yield return Windup.Start(Animator, Index);
     }
-    yield return Active.Start(Animator, Index, OnHit);
+    yield return Active.Start(Animator, Index, ts => OnHit(ts, chargeScaling));
     yield return Recovery.Start(Animator, Index);
     Stop();
   }
@@ -53,17 +57,17 @@ public class MeleeAttackAbility : Ability {
     Animator.SetFloat("AttackSpeed", 1);
   }
 
-  protected IEnumerator OnHit(List<Transform> targets, int stopFrames) {
-    Status.Add(new HitStopEffect(Owner.forward, HitStopVibrationAmplitude, stopFrames));
+  protected IEnumerator OnHit(List<Transform> targets, float chargeScaling) {
+    Status.Add(new HitStopEffect(Owner.forward, HitStopVibrationAmplitude, Active.HitFreezeDuration.Frames));
     CameraShaker.Instance.Shake(HitCameraShakeIntensity);
-    var hitParams = HitConfig.ComputeParams(Attributes);
+    var hitParams = HitConfig.ComputeParamsScaled(Attributes, chargeScaling);
     targets.ForEach(target => {
       target.GetComponent<Defender>()?.OnHit(hitParams, Owner);
       Owner.transform.forward = (target.transform.position - Owner.transform.position).XZ().normalized;
     });
     AbilityManager.Energy?.Value.Add(HitEnergyGain * targets.Count);
 
-    yield return Fiber.Wait(stopFrames);
+    yield return Fiber.Wait(Active.HitFreezeDuration.Frames);
 
     Status.Add(new RecoilEffect(HitRecoilStrength * -Owner.forward));
   }
