@@ -16,13 +16,12 @@ public class GrappleAbility : Ability {
 
   GrapplingHook Hook;
 
-  public override void Stop() {
+  public override void OnStop() {
     if (Hook) {
       Destroy(Hook.gameObject);
     }
     Owner.GetComponent<Animator>().SetBool("Grappling", false);
     Owner.GetComponent<Animator>().SetInteger("GrappleState", -1);
-    base.Stop();
   }
 
   public IEnumerator GrappleStart() {

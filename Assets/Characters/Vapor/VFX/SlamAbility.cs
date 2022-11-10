@@ -38,8 +38,7 @@ public class SlamAbility : Ability {
 
   public IEnumerator ChargeRelease() => null;
 
-  public override void Stop() {
-    base.Stop();
+  public override void OnStop() {
     Animator.SetBool("Attacking", false);
     Animator.SetInteger("AttackIndex", -1);
     Animator.SetFloat("AttackSpeed", 1);

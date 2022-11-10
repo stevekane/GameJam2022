@@ -28,10 +28,9 @@ public class PelletAbility : Ability {
     }
   }
 
-  public override void Stop() {
+  public override void OnStop() {
     Animator.SetBool("Attacking", false);
     Animator.SetInteger("AttackIndex", -1);
     Animator.SetFloat("AttackSpeed", 1);
-    base.Stop();
   }
 }

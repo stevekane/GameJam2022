@@ -43,12 +43,14 @@ public abstract class Ability : MonoBehaviour, IStoppable {
     Status.Add(Using(effect), onComplete);
     return effect;
   }
-  public virtual void Stop() {
+  public void Stop() {
+    OnStop();
     Tags = 0;
     Bundle.Stop();
     Disposables.ForEach(s => s.Dispose());
     Disposables.Clear();
   }
+  public virtual void OnStop() { }
   public void Init() => TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.GetMethod(this)] = c);
   public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
   void FixedUpdate() {

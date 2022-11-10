@@ -29,14 +29,12 @@ public class SliceDash : Ability {
     yield return Fiber.Any(Animator.Run(DashingClip), countdown, Move(dir.normalized, countdown));
     foreach (var h in Hits)
       h.OnHit(HitConfig.ComputeParams(Attributes), AbilityManager.transform);
-    //yield return Animator.Run(DoneClip);
+    yield return Animator.Run(DoneClip);
   }
 
-  public override void Stop() {
-    base.Stop();
+  public override void OnStop() {
     Hitbox.Collider.enabled = false;
     Hitbox.TriggerEnter = null;
-    Bundle.StartRoutine(new Fiber(Animator.Run(DoneClip)));
   }
 
   public IEnumerator Move(Vector3 dir, CountdownTimer timer) {
