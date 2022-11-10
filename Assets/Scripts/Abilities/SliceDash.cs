@@ -42,6 +42,7 @@ public class SliceDash : Ability {
     Hitbox.Collider.enabled = true;
     Hitbox.TriggerEnter = OnContact;
     while (true) {
+      Status.transform.forward = dir;
       var move = MoveSpeed * Time.fixedDeltaTime * dir;
       var front = Status.transform.position + Status.transform.forward.XZ()*5f;
       foreach (var h in Hits) {
