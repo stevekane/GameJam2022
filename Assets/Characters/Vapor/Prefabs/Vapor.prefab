@@ -241,12 +241,12 @@ MonoBehaviour:
       TicksPerSecond: 30
   HitConfig:
     DamageModifier:
-      Base: 0
-      Mult: 1
+      Base: 5
+      Mult: 1.2
     HitStopDuration:
       Millis: 200
       TicksPerSecond: 30
-    KnockbackStrength: 50
+    KnockbackStrength: 20
     KnockbackType: 1
     SFX: {fileID: 8300000, guid: 36c57d13b5af16a4f9ab941571ef5c0f, type: 3}
     VFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
@@ -254,6 +254,30 @@ MonoBehaviour:
   HitVFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
   HitSFX: {fileID: 8300000, guid: 36c57d13b5af16a4f9ab941571ef5c0f, type: 3}
   HitVFXOffset: {x: 0, y: 2, z: 0}
+  ChargeScaling:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.5
+      inSlope: 0.5
+      outSlope: 0.5
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0.5
+      outSlope: 0.5
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   HitStopVibrationAmplitude: 0.2
   HitCameraShakeIntensity: 1
   HitDamage: 15
@@ -578,6 +602,12 @@ MonoBehaviour:
   HitVFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
   HitSFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
   HitVFXOffset: {x: 0, y: 2, z: 0}
+  ChargeScaling:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   HitStopVibrationAmplitude: 0.2
   HitCameraShakeIntensity: 1
   HitDamage: 5
@@ -818,6 +848,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38b5f85dc564c4f4fafa2b5115a61de1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Dead: 0
 --- !u!143 &5571416124093621160
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1352,6 +1383,12 @@ MonoBehaviour:
   HitVFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
   HitSFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
   HitVFXOffset: {x: 0, y: 2, z: 0}
+  ChargeScaling:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   HitStopVibrationAmplitude: 0.2
   HitCameraShakeIntensity: 1
   HitDamage: 5

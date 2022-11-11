@@ -11,6 +11,7 @@ public class Mob : MonoBehaviour {
 
   void OnDeath() {
     DropGold();
+    Destroy(gameObject, .01f);
   }
 
   void Awake() {
