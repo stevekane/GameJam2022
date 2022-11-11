@@ -54,7 +54,6 @@ public class SequencePlayable : PlayableBehaviour {
   PlayableGraph Graph;
   AnimationMixerPlayable Mixer;
   float Seeker;
-  int ClipIndex;
 
   public override void OnPlayableCreate(Playable owner) {
     owner.SetInputWeight(0, 1);
@@ -67,22 +66,21 @@ public class SequencePlayable : PlayableBehaviour {
   public void AddClip(AnimationClip clip) {
     var playableClip = AnimationClipPlayable.Create(Graph, clip);
     Owner.SetDuration(Owner.GetDuration()+clip.length);
-    Mixer.SetInputCount(ClipIndex+1);
-    Mixer.SetInputWeight(ClipIndex,0);
-    Graph.Connect(playableClip, 0, Mixer, ClipIndex);
+    Mixer.SetInputCount(Mixer.GetInputCount()+1);
+    Mixer.SetInputWeight(Mixer.GetInputCount()-1,0);
+    Graph.Connect(playableClip, 0, Mixer, Mixer.GetInputCount()-1);
     playableClip.SetTime(0);
     playableClip.Pause();
-    ClipIndex++;
   }
 
   public void SetSeeker(float v) => Seeker = v;
 
   public override void PrepareFrame(Playable playable, FrameData info) {
     var total = 0f;
-    for (var i = 0; i < ClipIndex; i++) {
+    for (var i = 0; i < Mixer.GetInputCount(); i++) {
       Mixer.SetInputWeight(i, 0);
     }
-    for (var i = 0; i < ClipIndex; i++) {
+    for (var i = 0; i < Mixer.GetInputCount(); i++) {
       var input = (AnimationClipPlayable)Mixer.GetInput(i);
       var clip = input.GetAnimationClip();
       var duration = clip.length;
