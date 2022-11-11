@@ -14,16 +14,27 @@ public interface IStoppable {
 
 public interface IStoppableValue<T> : IEnumerator, IStoppable, IValue<T> {}
 
+[Serializable]
 public class Bundle : IEnumerator, IStoppable {
-  List<Fiber> Fibers = new();
-  List<Fiber> Added = new();
-  List<Fiber> Removed = new();
+  public List<Fiber> Fibers = new();
+  public List<Fiber> Added = new();
+  public List<Fiber> Removed = new();
 
   public object Current { get => null; }
   public void Reset() => throw new NotSupportedException();
   public bool IsRunning { get => Fibers.Count > 0 || Added.Count > 0; }
   public bool IsRoutineRunning(Fiber f) {
     return Fibers.Contains(f) || Added.Contains(f);
+  }
+  public Fiber Run(Func<IEnumerator> continuation) {
+    var fiber = new Fiber(continuation());
+    StartRoutine(fiber);
+    return fiber;
+  }
+  public Fiber Run(IEnumerator routine) {
+    var fiber = new Fiber(routine);
+    StartRoutine(fiber);
+    return fiber;
   }
   public void StartRoutine(Fiber fiber) {
     Added.Add(fiber);
@@ -40,6 +51,7 @@ public class Bundle : IEnumerator, IStoppable {
     Fibers.AddRange(Added);
     Added.Clear();
     Removed.ForEach(f => Fibers.Remove(f));
+    Removed.Clear();
     Fibers.ForEach(f => { if (!f.MoveNext()) StopRoutine(f); });
     return IsRunning;
   }
@@ -273,6 +285,7 @@ public class All: IEnumerator, IStoppable {
   public bool IsRunning { get; internal set; }
 }
 
+[Serializable]
 public class Fiber : IEnumerator, IStoppable {
   public static IEnumerator Wait(int n) {
     for (var i = 0; i < n; i++) {

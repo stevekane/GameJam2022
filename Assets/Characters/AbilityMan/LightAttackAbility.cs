@@ -8,8 +8,7 @@ public class LightAttackAbility : Ability {
   public FrameEventTimeline FrameEventTimeline;
 
   public IEnumerator AttackStart() {
-    yield return new AnimationTask(Animator, Clip) {
-      FrameEventTimeline = FrameEventTimeline,
+    yield return new AnimationTask(Animator, Clip, FrameEventTimeline) {
       OnFrameEvent = OnFrameEvent
     };
   }
