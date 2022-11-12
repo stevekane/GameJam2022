@@ -26,7 +26,7 @@ public class AnimationTask : IEnumerator, IStoppable {
     Animator = animator;
     Graph = PlayableGraph.Create();
     ClipPlayable = AnimationClipPlayable.Create(Graph, clip);
-    ClipPlayable.SetDuration(clip.length);
+    ClipPlayable.SetDuration(clip.isLooping ? double.MaxValue : clip.length);
     FrameEventTimeline = timeline;
     Output = AnimationPlayableOutput.Create(Graph, clip.name, Animator);
     Output.SetSourcePlayable(ClipPlayable);
