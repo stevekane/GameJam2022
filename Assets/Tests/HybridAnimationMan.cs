@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 public class HybridAnimationMan : MonoBehaviour {
+  public float IdleThreshold = .1f;
   void Start() {
     InputManager.Instance.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Listen(PlayAction);
   }
@@ -34,13 +35,11 @@ public class HybridAnimationMan : MonoBehaviour {
     } else {
       velocity.y = gravitationalForce+controller.velocity.y;
     }
-    var forwardSpeed = Vector3.Dot(velocity, transform.forward)/moveSpeed;
-    var rightSpeed = Vector3.Dot(velocity, transform.right)/moveSpeed;
-    var moving = Mathf.Abs(forwardSpeed) > 0 || Mathf.Abs(rightSpeed) > 0;
+    var localVelocity = Quaternion.Inverse(transform.rotation)*velocity;
     controller.Move(Time.fixedDeltaTime*velocity);
-    animator.SetBool("Moving", moving);
-    animator.SetFloat("RightVelocity", rightSpeed);
-    animator.SetFloat("ForwardVelocity", forwardSpeed);
+    animator.SetBool("Moving", velocity.sqrMagnitude > IdleThreshold);
+    animator.SetFloat("RightVelocity", localVelocity.x/moveSpeed);
+    animator.SetFloat("ForwardVelocity", localVelocity.z/moveSpeed);
   }
 
   void PlayAction() {
