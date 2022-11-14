@@ -73,7 +73,7 @@ public class HollowKnight : MonoBehaviour {
   }
 
   void OnSouth() {
-    if (Condition.CanAct) {
+    if (Condition.CanMove) {
       JumpRequested = true;
     }
   }
@@ -82,7 +82,6 @@ public class HollowKnight : MonoBehaviour {
     if (Condition.CanAttack) {
       var x = InputManager.AxisLeft.XY.x;
       var y = InputManager.AxisLeft.XY.y;
-      var useY = Mathf.Abs(x) > Mathf.Abs(y);
       var destination = Vector2.zero;
 
       if (x == 0 && y == 0) {
