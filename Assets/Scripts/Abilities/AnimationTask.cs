@@ -17,6 +17,7 @@ public class AnimationTask : IEnumerator, IStoppable {
   PlayableGraph Graph;
   FrameEventTimeline FrameEventTimeline;
   int EventHead;
+  double DesiredSpeed = 1f;
 
   public Action<FrameEvent> OnFrameEvent;
   public EventSource<FrameEvent> FrameEventSource = new();
@@ -39,6 +40,7 @@ public class AnimationTask : IEnumerator, IStoppable {
   public object Current { get; }
   public void Reset() => throw new NotSupportedException();
   public bool MoveNext() {
+    ClipPlayable.SetSpeed(DesiredSpeed * Animator.speed);
     if (Graph.IsValid()) {
       BroadcastFrameEvents();
     }
@@ -47,23 +49,31 @@ public class AnimationTask : IEnumerator, IStoppable {
     }
     return IsRunning;
   }
+  public void SetSpeed(double speed) => DesiredSpeed = speed;
+  public IEnumerator PlayUntil(int frame) {
+    while (EventHead < frame && MoveNext()) {
+      UpdateEventHead();
+      yield return null;
+    }
+  }
+  void UpdateEventHead() {
+    var clip = ClipPlayable.GetAnimationClip();
+    var frames = (clip.length*clip.frameRate+1)/* / Animator.speed*/;
+    var time = ClipPlayable.GetTime();
+    var interpolant = (float)(time/clip.length);
+    EventHead = (int)Mathf.Lerp(0, frames, interpolant);
+  }
   void BroadcastFrameEvents() {
     if (FrameEventTimeline != null && OnFrameEvent != null) {
-      var clip = ClipPlayable.GetAnimationClip();
-      var frames = clip.length*clip.frameRate+1;
-      var time = ClipPlayable.GetTime();
-      var interpolant = (float)(time/clip.length);
-      var newHead = (int)Mathf.Lerp(0, frames, interpolant);
       var oldHead = EventHead;
-      for (var i = oldHead; i < newHead; i++) {
-        foreach (var e in FrameEventTimeline.Events) {
-          if (e.Frame == i) {
-            OnFrameEvent.Invoke(e);
-            FrameEventSource.Fire(e);
-          }
+      UpdateEventHead();
+      var newHead = EventHead;
+      foreach (var e in FrameEventTimeline.Events) {
+        if (e.Frame >= oldHead && e.Frame < newHead) {
+          OnFrameEvent.Invoke(e);
+          FrameEventSource.Fire(e);
         }
       }
-      EventHead = newHead;
     }
   }
 }
