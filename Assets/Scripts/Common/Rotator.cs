@@ -1,9 +1,10 @@
 using UnityEngine;
 
 public class Rotator : MonoBehaviour {
+  public Vector3 Axis = Vector3.up;
   public float DegreesPerSecond;
 
   void Update() {
-    transform.Rotate(transform.up, DegreesPerSecond*Time.deltaTime);
+    transform.RotateAround(transform.position, Axis, DegreesPerSecond*Time.deltaTime);
   }
 }
