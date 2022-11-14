@@ -1,12 +1,15 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 [Serializable]
 public class Condition {
   public bool CanMove;
   public bool CanTurn;
   public bool CanAttack;
-  public void Reset() => CanMove = CanTurn = CanAttack = true;
+  public bool CanAct;
+  public void Reset() => CanMove = CanTurn = CanAttack = CanAct = true;
 }
 
 [Serializable]
@@ -14,10 +17,12 @@ public class ConditionAccum {
    public int CanMoveCount { get; internal set; }
    public int CanTurnCount { get; internal set; }
    public int CanAttackCount { get; internal set; }
+   public int CanActCount { get; internal set; }
    public bool CanMove { set => CanMoveCount += value ? 1 : -1; }
    public bool CanTurn { set => CanTurnCount += value ? 1 : -1; }
    public bool CanAttack { set => CanAttackCount += value ? 1 : -1; }
-   public void Reset() => CanMoveCount = CanTurnCount = CanAttackCount = 0;
+   public bool CanAct { set => CanActCount += value ? 1 : -1; }
+   public void Reset() => CanMoveCount = CanTurnCount = CanAttackCount = CanActCount = 0;
 }
 
 public class HollowKnight : MonoBehaviour {
@@ -29,6 +34,7 @@ public class HollowKnight : MonoBehaviour {
   public float MoveSpeed = 10;
   public float MoveAcceleration = 10;
   public float SkinThickness = .05f;
+  public TextMeshProUGUI ActionText;
 
   [Header("State")]
   public Vector3 Velocity;
@@ -37,23 +43,28 @@ public class HollowKnight : MonoBehaviour {
   public ConditionAccum ConditionAccum = new();
   public Bundle Bundle;
 
-  InputManager InputManager;
   CharacterController2D Controller;
   SpriteRenderer SpriteRenderer;
+  InputManager InputManager;
+  Interactor Interactor;
   Animator Animator;
 
   void Awake() {
-    InputManager = FindObjectOfType<InputManager>();
-    SpriteRenderer = GetComponent<SpriteRenderer>();
     Controller = GetComponent<CharacterController2D>();
+    SpriteRenderer = GetComponent<SpriteRenderer>();
+    InputManager = FindObjectOfType<InputManager>();
+    Interactor = FindObjectOfType<Interactor>();
     Animator = GetComponent<Animator>();
     InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Listen(OnSouth);
     InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Listen(OnWest);
+    InputManager.ButtonEvent(ButtonCode.L2, ButtonPressType.JustDown).Listen(OnAct);
   }
 
   void OnDestroy() {
     InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Unlisten(OnSouth);
     InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Unlisten(OnWest);
+    InputManager.ButtonEvent(ButtonCode.L2, ButtonPressType.JustDown).Unlisten(OnAct);
+    Bundle.Stop();
   }
 
   void OnSouth() {
@@ -85,14 +96,27 @@ public class HollowKnight : MonoBehaviour {
     }
   }
 
+  void OnAct() {
+    if (Condition.CanAct && TryGetComponent(out Interactor i)) {
+      i.Target?.Interact(ConditionAccum, InputManager.ButtonEvent(ButtonCode.L2, ButtonPressType.JustDown));
+    }
+  }
+
   void FixedUpdate() {
     var stick = InputManager.AxisLeft.XY;
 
-    if (Controller.Collisions.Bottom && Velocity.y <= 0) {
-      Velocity.y = 0;
+    if (Condition.CanMove && Math.Abs(stick.x) > 0) {
+      Velocity.x = Mathf.Sign(stick.x)*MoveSpeed;
+    } else {
+      Velocity.x = 0;
     }
-    Velocity.x = Mathf.Abs(stick.x) > 0 ? Mathf.Sign(stick.x)*MoveSpeed : 0;
-    Velocity.y = Velocity.y+Physics2D.gravity.y*Time.fixedDeltaTime;
+
+    if (Controller.Collisions.Bottom && Velocity.y <= 0) {
+      Velocity.y = Physics2D.gravity.y*Time.fixedDeltaTime;
+    } else {
+      Velocity.y = Velocity.y+Physics2D.gravity.y*Time.fixedDeltaTime;
+    }
+
     Controller.Move(Velocity*Time.fixedDeltaTime);
 
     if (Condition.CanTurn) {
@@ -105,7 +129,7 @@ public class HollowKnight : MonoBehaviour {
     }
 
     if (Controller.Collisions.Bottom) {
-      if (stick.x == 0) {
+      if (Velocity.x == 0) {
         Animator.Play("HollowKnight Idle Animation");
       } else {
         Animator.Play("HollowKnight Run Animation");
@@ -114,13 +138,23 @@ public class HollowKnight : MonoBehaviour {
       Animator.Play("HollowKnight Jump Animation");
     }
 
-    // Process running abilities
+    if (Interactor.Target) {
+      ActionText.gameObject.SetActive(true);
+      if (Condition.CanAct) {
+        ActionText.text = Interactor.Target.InteractMessage + " (L2)";
+      } else {
+        ActionText.text = Interactor.Target.StopMessage + " (L2)";
+      }
+    } else {
+      ActionText.gameObject.SetActive(false);
+    }
+
     Bundle.MoveNext();
-    // Process condition accumulators into actual condition
     {
       Condition.CanMove = ConditionAccum.CanMoveCount >= 0;
       Condition.CanTurn = ConditionAccum.CanTurnCount >= 0;
       Condition.CanAttack = ConditionAccum.CanAttackCount >= 0;
+      Condition.CanAct = ConditionAccum.CanActCount >= 0;
       ConditionAccum.Reset();
     }
   }
