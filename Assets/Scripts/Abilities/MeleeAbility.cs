@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MeleeAbility2 : Ability {
+public class MeleeAbility : Ability {
   Animator Animator;
   Transform Owner;
   public AnimationClip Clip;
