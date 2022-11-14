@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 [Serializable]
@@ -29,6 +28,8 @@ public class HollowKnight : MonoBehaviour {
   [Header("Config")]
   public Animator SawPrefab;
   public Timeval BladeDuration = Timeval.FromMillis(250);
+  public Timeval CoyoteDuration = Timeval.FromMillis(100);
+  public Timeval JumpBufferDuration = Timeval.FromMillis(100);
   public float BladeHeight = .5f;
   public float JumpStrength = 10;
   public float MoveSpeed = 10;
@@ -39,9 +40,12 @@ public class HollowKnight : MonoBehaviour {
   [Header("State")]
   public Vector3 Velocity;
   public bool FacingLeft = false;
+  public bool JumpRequested = false;
   public Condition Condition = new();
   public ConditionAccum ConditionAccum = new();
   public Bundle Bundle;
+  public int CoyoteFramesRemaining;
+  public int JumpBufferRemaining;
 
   CharacterController2D Controller;
   SpriteRenderer SpriteRenderer;
@@ -68,8 +72,8 @@ public class HollowKnight : MonoBehaviour {
   }
 
   void OnSouth() {
-    if (Controller.Collisions.Bottom) {
-      Velocity.y = JumpStrength;
+    if (Condition.CanAct) {
+      JumpRequested = true;
     }
   }
 
@@ -104,17 +108,27 @@ public class HollowKnight : MonoBehaviour {
 
   void FixedUpdate() {
     var stick = InputManager.AxisLeft.XY;
+    var grounded = Controller.Collisions.Bottom && Velocity.y <= 0;
 
-    if (Condition.CanMove && Math.Abs(stick.x) > 0) {
-      Velocity.x = Mathf.Sign(stick.x)*MoveSpeed;
-    } else {
-      Velocity.x = 0;
-    }
+    Velocity.x = Condition.CanMove && Math.Abs(stick.x) > 0
+      ? Mathf.Sign(stick.x)*MoveSpeed
+      : 0;
+    Velocity.y = grounded
+      ? Physics2D.gravity.y*Time.fixedDeltaTime
+      : Velocity.y+Physics2D.gravity.y*Time.fixedDeltaTime;
+    CoyoteFramesRemaining = grounded
+      ? CoyoteDuration.Frames
+      : CoyoteFramesRemaining-1;
+    JumpBufferRemaining = JumpRequested
+      ? JumpBufferDuration.Frames
+      : JumpBufferRemaining-1;
+    JumpRequested = false;
 
-    if (Controller.Collisions.Bottom && Velocity.y <= 0) {
-      Velocity.y = Physics2D.gravity.y*Time.fixedDeltaTime;
-    } else {
-      Velocity.y = Velocity.y+Physics2D.gravity.y*Time.fixedDeltaTime;
+    if (CoyoteFramesRemaining > 0 && JumpBufferRemaining > 0) {
+      Debug.Log("Got here");
+      Velocity.y = JumpStrength;
+      JumpBufferRemaining = 0;
+      CoyoteFramesRemaining = 0;
     }
 
     Controller.Move(Velocity*Time.fixedDeltaTime);

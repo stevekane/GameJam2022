@@ -9,6 +9,7 @@ public class Interactable : MonoBehaviour {
     Animator Animator;
     public bool IsRunning { get; internal set; }
     public Open(ConditionAccum condition, IEventSource stopSource, Animator animator) {
+      AnimationClip clip;
       IsRunning = true;
       Animator = animator;
       Animator.Play("Open");
