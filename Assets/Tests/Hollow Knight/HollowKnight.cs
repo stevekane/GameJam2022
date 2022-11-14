@@ -144,12 +144,16 @@ public class HollowKnight : MonoBehaviour {
 
     if (Controller.Collisions.Bottom) {
       if (Velocity.x == 0) {
-        Animator.Play("HollowKnight Idle Animation");
+        Animator.Play("Idle");
       } else {
-        Animator.Play("HollowKnight Run Animation");
+        Animator.Play("Run");
       }
     } else {
-      Animator.Play("HollowKnight Jump Animation");
+      if (Velocity.y <= 0) {
+        Animator.Play("Fall");
+      } else {
+        Animator.Play("Jump");
+      }
     }
 
     if (Interactor.Target) {
