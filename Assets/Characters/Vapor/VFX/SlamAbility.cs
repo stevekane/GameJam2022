@@ -28,7 +28,7 @@ public class SlamAbility : Ability {
     Animation = new AnimationTask(Animator, Clip);
     AddStatusEffect(new SpeedFactorEffect(.5f, .5f));
     Animation.SetSpeed(ChargeSpeedFactor);
-    yield return Fiber.Any(Charging(), Animation.PlayUntil(WindupDuration.Ticks), Fiber.ListenFor(AbilityManager.GetEvent(ChargeRelease)));
+    yield return Fiber.Any(Charging(), Animation.PlayUntil(WindupDuration.Ticks));
     Animation.SetSpeed(1f);
     SlamAction.Activate();
     SFXManager.Instance.TryPlayOneShot(FireSFX);
@@ -37,7 +37,10 @@ public class SlamAbility : Ability {
     yield return Animation;
   }
 
-  public IEnumerator ChargeRelease() => null;
+  public IEnumerator ChargeRelease() {
+    Animation?.SetSpeed(1f);
+    yield return null;
+  }
 
   public override void OnStop() {
     Animation = null;
