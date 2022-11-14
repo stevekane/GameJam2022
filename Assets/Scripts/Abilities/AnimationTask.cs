@@ -49,6 +49,13 @@ public class AnimationTask : IEnumerator, IStoppable {
     }
     return IsRunning;
   }
+  public void ResetAnimation() {
+    if (Graph.IsValid()) {
+      Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
+      ClipPlayable.SetTime(0);
+      Graph.Play();
+    }
+  }
   public void SetSpeed(double speed) => DesiredSpeed = speed;
   public IEnumerator PlayUntil(int frame) {
     while (EventHead < frame && MoveNext()) {

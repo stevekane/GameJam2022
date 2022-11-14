@@ -67,6 +67,7 @@ public class MeleeAbility : Ability {
     Stop();
   }
   public override void OnStop() {
+    Animation?.ResetAnimation();
     Animation = null;
   }
 

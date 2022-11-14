@@ -43,6 +43,7 @@ public class SlamAbility : Ability {
   }
 
   public override void OnStop() {
+    Animation?.ResetAnimation();
     Animation = null;
     if (SlamAction != null) {
       Destroy(SlamAction.gameObject);
