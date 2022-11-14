@@ -36,6 +36,7 @@ public class HollowKnight : MonoBehaviour {
   public float MoveAcceleration = 10;
   public float SkinThickness = .05f;
   public TextMeshProUGUI ActionText;
+  public Transform Center;
 
   [Header("State")]
   public Vector3 Velocity;
@@ -82,20 +83,20 @@ public class HollowKnight : MonoBehaviour {
       var x = InputManager.AxisLeft.XY.x;
       var y = InputManager.AxisLeft.XY.y;
       var useY = Mathf.Abs(x) > Mathf.Abs(y);
-      var offset = Vector2.left;
+      var destination = Vector2.zero;
 
       if (x == 0 && y == 0) {
-        offset = BladeHeight*Vector2.up + (FacingLeft ? Vector2.left : Vector2.right);
+        destination = FacingLeft ? Vector2.left : Vector2.right;
       } else if (Mathf.Abs(x) > Mathf.Abs(y)) {
-        offset = BladeHeight*Vector2.up + (x < 0 ? Vector2.left : Vector2.right);
+        destination = x < 0 ? Vector2.left : Vector2.right;
       } else {
-        offset = y > 0 ? Vector2.up*1.5f : Vector2.down*.75f;
+        destination = y > 0 ? Vector2.up : Vector2.down;
       }
       Bundle.Run(new HollowKnightMeleeAttack(
-        transform,
+        Center,
         ConditionAccum,
         SawPrefab,
-        offset,
+        destination,
         BladeDuration));
     }
   }
@@ -125,7 +126,6 @@ public class HollowKnight : MonoBehaviour {
     JumpRequested = false;
 
     if (CoyoteFramesRemaining > 0 && JumpBufferRemaining > 0) {
-      Debug.Log("Got here");
       Velocity.y = JumpStrength;
       JumpBufferRemaining = 0;
       CoyoteFramesRemaining = 0;

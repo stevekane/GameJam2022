@@ -7,6 +7,8 @@ public class HollowKnightMeleeAttack : IEnumerator, IStoppable {
 
   public bool IsRunning => FramesRemaining > 0;
 
+  Vector3 Destination;
+  int TotalFrames;
   int FramesRemaining;
   Animator Saw;
 
@@ -14,12 +16,13 @@ public class HollowKnightMeleeAttack : IEnumerator, IStoppable {
   Transform owner,
   ConditionAccum condition,
   Animator sawPrefab,
-  Vector3 offset,
+  Vector3 destination,
   Timeval duration) {
     Condition = condition;
+    TotalFrames = duration.Frames;
     FramesRemaining = duration.Frames;
+    Destination = destination;
     Saw = GameObject.Instantiate(sawPrefab, owner);
-    Saw.transform.localPosition = offset;
     Saw.SetBool("Attacking", true);
   }
   public void Stop() {
@@ -33,9 +36,13 @@ public class HollowKnightMeleeAttack : IEnumerator, IStoppable {
   public void Reset() => throw new NotSupportedException();
   public bool MoveNext() {
     Condition.CanAttack = !IsRunning;
-    FramesRemaining--;
-    if (FramesRemaining == 0) {
-      Stop();
+    if (FramesRemaining > 0) {
+      FramesRemaining--;
+      var interpolant = (float)FramesRemaining/(float)TotalFrames;
+      Saw.transform.localPosition = Vector3.Lerp(Destination, Vector3.zero, interpolant);
+      if (FramesRemaining == 0) {
+        Stop();
+      }
     }
     return IsRunning;
   }

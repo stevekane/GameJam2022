@@ -508,6 +508,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1250112380}
   - {fileID: 1747162927}
   m_Father: {fileID: 0}
   m_RootOrder: 6
@@ -619,7 +620,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SawPrefab: {fileID: 5459170149380874347, guid: 2ccb352c1cc5338438421c301ce4e945, type: 3}
   BladeDuration:
-    Millis: 250
+    Millis: 200
     TicksPerSecond: 30
   CoyoteDuration:
     Millis: 200
@@ -633,6 +634,7 @@ MonoBehaviour:
   MoveAcceleration: 50
   SkinThickness: 0.05
   ActionText: {fileID: 267644266}
+  Center: {fileID: 1250112380}
   Velocity: {x: 0, y: 0, z: 0}
   FacingLeft: 0
   JumpRequested: 0
@@ -1777,6 +1779,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1250112379
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1250112380}
+  m_Layer: 10
+  m_Name: Center
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1250112380
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1250112379}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.25, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 304157547}
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1405142236
 PrefabInstance:
