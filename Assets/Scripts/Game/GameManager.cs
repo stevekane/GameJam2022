@@ -77,7 +77,6 @@ public class GameManager : MonoBehaviour {
 
   IEnumerator Run() {
     while (ManageGameLoop) {
-      Debug.Log("TOP");
       // Spawn and configure the player
       var playerSpawn = PlayerSpawns[0];
       var p = playerSpawn.transform.position;
@@ -89,26 +88,21 @@ public class GameManager : MonoBehaviour {
       PlayerVirtualCamera.Instance.Follow = Player.transform;
 
       // TODO: Eliminate this hack to allow loaded upgrades to apply before opening the shop
-      Debug.Log("PRE SHOP");
       yield return Fiber.Wait(2);
       // Wait for the player to purchase upgrades
       var shop = FindObjectOfType<Shop>();
       shop.Open();
       yield return Fiber.Until(() => !shop.IsOpen);
-      Debug.Log("POST SHOP");
 
       // Enter pre-game countdown
-      Debug.Log("PRE COUNTDOWN");
       InputManager.Instance.SetInputEnabled(false);
       SetCountdownTextEnabled(CountdownText, isEnabled: true);
       yield return Countdown(PingCountdown, CountdownDuration);
       SetCountdownTextEnabled(CountdownText, isEnabled: false);
       InputManager.Instance.SetInputEnabled(true);
-      Debug.Log("POST COUNTDOWN");
       // Exit pre-game countdown
 
       // Begin GameLoop
-      Debug.Log("PRE GAMELOOP");
       var encounter = FindObjectOfType<Encounter>();
       encounter.Bundle = Bundle;
       var encounterDefeated = EncounterDefeated(encounter);
@@ -125,18 +119,15 @@ public class GameManager : MonoBehaviour {
       Destroy(Player.gameObject);
       InputManager.Instance.SetInputEnabled(false);
       yield return Fiber.Wait(Timeval.FramesPerSecond * 3);
-      Debug.Log("POST GAMELOOP");
       // End GameLoop
 
       // Cleanup references and reload the scene
       yield return Await(SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name));
-      Debug.Log("BOT");
     }
   }
 
   void PingCountdown(int n) {
     var clip = CountdownClips[n%CountdownClips.Length];
-    Debug.Log($"Tried playing {clip.name}");
     SFXManager.Instance.TryPlayOneShot(clip);
     CountdownText.text = n.ToString();
   }

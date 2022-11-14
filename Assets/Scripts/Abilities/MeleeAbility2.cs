@@ -52,7 +52,6 @@ public class MeleeAbility2 : Ability {
       var extraFrames = frameCounter.Value.Frames - WindupDuration.Frames;
       var maxExtraFrames = WindupDuration.Frames / ChargeSpeedFactor - WindupDuration.Frames;
       chargeScaling = ChargeScaling.Evaluate(extraFrames / maxExtraFrames);
-      Debug.Log($"Charged for: {extraFrames} / {maxExtraFrames} = {chargeScaling}");
       Animation.SetSpeed(1);
     } else {
       yield return Animation.PlayUntil(WindupDuration.Ticks);
