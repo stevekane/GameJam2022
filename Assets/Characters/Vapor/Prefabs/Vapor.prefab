@@ -128,7 +128,7 @@ MonoBehaviour:
   FireVFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
   FireSFX: {fileID: 8300000, guid: d69edd942348f8b4892dac337d83ac38, type: 3}
   FireVFXOffset: {x: 0, y: 0, z: 0}
---- !u!1 &2769119998121042157
+--- !u!1 &1152305606910338959
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -136,10 +136,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7199471196977928480}
-  - component: {fileID: 846017969810757966}
-  - component: {fileID: 6497165714247605303}
-  - component: {fileID: 3232894417174932624}
+  - component: {fileID: 1393319189841350676}
+  - component: {fileID: 2907080039154792447}
+  - component: {fileID: 614107697933067398}
+  - component: {fileID: 7621250335256250255}
   m_Layer: 13
   m_Name: Heavy
   m_TagString: Untagged
@@ -147,13 +147,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7199471196977928480
+--- !u!4 &1393319189841350676
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2769119998121042157}
+  m_GameObject: {fileID: 1152305606910338959}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -162,42 +162,42 @@ Transform:
   m_Father: {fileID: 5571416123097895009}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &846017969810757966
+--- !u!65 &2907080039154792447
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2769119998121042157}
+  m_GameObject: {fileID: 1152305606910338959}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 4, y: 6, z: 5}
   m_Center: {x: 0, y: 3, z: 3}
---- !u!114 &6497165714247605303
+--- !u!114 &614107697933067398
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2769119998121042157}
+  m_GameObject: {fileID: 1152305606910338959}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e93db3e391a640243a06b63541cd965b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Collider: {fileID: 846017969810757966}
---- !u!114 &3232894417174932624
+  Collider: {fileID: 2907080039154792447}
+--- !u!114 &7621250335256250255
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2769119998121042157}
+  m_GameObject: {fileID: 1152305606910338959}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c05e2b324b7be2447826a43593dd3bf1, type: 3}
+  m_Script: {fileID: 11500000, guid: ace53603232be474b899eff41f216dc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
@@ -212,33 +212,19 @@ MonoBehaviour:
     RequiredOwnerTags: 268435456
     EnergyCost: 0
   Tags: 0
-  Index: 2
-  Windup:
-    Duration:
-      Millis: 333.33334
-      TicksPerSecond: 30
-    ClipDuration:
-      Millis: 333.33334
-      TicksPerSecond: 30
-    ChargeFrameMultiplier: 3
-  Active:
-    Hitbox: {fileID: 6497165714247605303}
-    Duration:
-      Millis: 33.333332
-      TicksPerSecond: 30
-    ClipDuration:
-      Millis: 33.333332
-      TicksPerSecond: 30
-    HitFreezeDuration:
-      Millis: 200
-      TicksPerSecond: 30
-  Recovery:
-    Duration:
-      Millis: 300
-      TicksPerSecond: 30
-    ClipDuration:
-      Millis: 300
-      TicksPerSecond: 30
+  Clip: {fileID: 7400000, guid: 85a52761ea78d3b45a73d96ee8df602e, type: 2}
+  WindupDuration:
+    Millis: 300
+    TicksPerSecond: 30
+  ActiveDuration:
+    Millis: 33.333332
+    TicksPerSecond: 30
+  HitFreezeDuration:
+    Millis: 200
+    TicksPerSecond: 30
+  RecoveryDuration:
+    Millis: 300
+    TicksPerSecond: 30
   HitConfig:
     DamageModifier:
       Base: 5
@@ -251,39 +237,36 @@ MonoBehaviour:
     SFX: {fileID: 8300000, guid: 36c57d13b5af16a4f9ab941571ef5c0f, type: 3}
     VFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
     VFXOffset: {x: 0, y: 2, z: 0}
-  HitVFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
-  HitSFX: {fileID: 8300000, guid: 36c57d13b5af16a4f9ab941571ef5c0f, type: 3}
-  HitVFXOffset: {x: 0, y: 2, z: 0}
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0.5
-      inSlope: 0.5
+      inSlope: 0
       outSlope: 0.5
-      tangentMode: 34
+      tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.33333334
+      outWeight: 0
     - serializedVersion: 3
       time: 1
       value: 1
       inSlope: 0.5
-      outSlope: 0.5
-      tangentMode: 34
+      outSlope: 0
+      tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
+      inWeight: 0
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
   HitStopVibrationAmplitude: 0.2
   HitCameraShakeIntensity: 1
-  HitDamage: 15
-  HitTargetKnockbackStrength: 50
-  HitRecoilStrength: 50
+  HitRecoilStrength: 25
   HitEnergyGain: 2
+  ChargeSpeedFactor: 0.3
+  Hitbox: {fileID: 614107697933067398}
 --- !u!1 &2784476827323047724
 GameObject:
   m_ObjectHideFlags: 0
@@ -599,9 +582,6 @@ MonoBehaviour:
     SFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
     VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
     VFXOffset: {x: 0, y: 2, z: 0}
-  HitVFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
-  HitSFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
-  HitVFXOffset: {x: 0, y: 2, z: 0}
   ChargeScaling:
     serializedVersion: 2
     m_Curve: []
@@ -610,8 +590,6 @@ MonoBehaviour:
     m_RotationOrder: 4
   HitStopVibrationAmplitude: 0.2
   HitCameraShakeIntensity: 1
-  HitDamage: 5
-  HitTargetKnockbackStrength: 0
   HitRecoilStrength: 1
   HitEnergyGain: 1
 --- !u!1 &5529297459764154501
@@ -706,7 +684,7 @@ Transform:
   - {fileID: 7905156309691345306}
   - {fileID: 9052555834542644548}
   - {fileID: 232568689298950285}
-  - {fileID: 7199471196977928480}
+  - {fileID: 1393319189841350676}
   - {fileID: 1922017593864157115}
   - {fileID: 4306477954596025281}
   - {fileID: 371394410303385243}
@@ -1016,16 +994,6 @@ MonoBehaviour:
     Entry:
       Ability: {fileID: 626726736180106372}
       MethodName: Attack
-  - ButtonCode: 3
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 3232894417174932624}
-      MethodName: ChargeStart
-  - ButtonCode: 3
-    ButtonPressType: 2
-    Entry:
-      Ability: {fileID: 3232894417174932624}
-      MethodName: ChargeRelease
   - ButtonCode: 8
     ButtonPressType: 0
     Entry:
@@ -1061,6 +1029,16 @@ MonoBehaviour:
     Entry:
       Ability: {fileID: 4440389021436948925}
       MethodName: Execute
+  - ButtonCode: 3
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 7621250335256250255}
+      MethodName: ChargeStart
+  - ButtonCode: 3
+    ButtonPressType: 2
+    Entry:
+      Ability: {fileID: 7621250335256250255}
+      MethodName: ChargeRelease
   AxisMaps:
   - AxisCode: 0
     AxisTag: 0
@@ -1380,9 +1358,6 @@ MonoBehaviour:
     SFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
     VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
     VFXOffset: {x: 0, y: 2, z: 0}
-  HitVFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
-  HitSFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
-  HitVFXOffset: {x: 0, y: 2, z: 0}
   ChargeScaling:
     serializedVersion: 2
     m_Curve: []
@@ -1391,8 +1366,6 @@ MonoBehaviour:
     m_RotationOrder: 4
   HitStopVibrationAmplitude: 0.2
   HitCameraShakeIntensity: 1
-  HitDamage: 5
-  HitTargetKnockbackStrength: 0
   HitRecoilStrength: 1
   HitEnergyGain: 1
 --- !u!1 &9127015034591396752

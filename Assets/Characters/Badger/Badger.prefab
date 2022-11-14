@@ -864,13 +864,32 @@ MonoBehaviour:
     SFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
     VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
     VFXOffset: {x: 0, y: 2, z: 0}
-  HitVFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
-  HitSFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
-  HitVFXOffset: {x: 0, y: 2, z: 0}
+  ChargeScaling:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.5
+      inSlope: 0
+      outSlope: 0.5
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0.5
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   HitStopVibrationAmplitude: 0.2
   HitCameraShakeIntensity: 1
-  HitDamage: 5
-  HitTargetKnockbackStrength: 15
   HitRecoilStrength: 5
   HitEnergyGain: 0
 --- !u!1 &5276269203500440461
@@ -1077,6 +1096,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5571416124093621163}
+  - component: {fileID: 7219340043180141366}
   - component: {fileID: 5571416124093621156}
   - component: {fileID: 5571416124093621157}
   - component: {fileID: 8521553832860402117}
@@ -1084,7 +1104,6 @@ GameObject:
   - component: {fileID: 5571416124093621160}
   - component: {fileID: 7727835182619467870}
   - component: {fileID: 1657031132205634076}
-  - component: {fileID: 7219340043180141366}
   - component: {fileID: 242195660756952769}
   - component: {fileID: 6204311958514039916}
   - component: {fileID: 318850341410133633}
@@ -1116,6 +1135,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7219340043180141366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4071ddb671e87845a206a5ccb097d6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AttackRange: 4
+  AttackDelay:
+    Millis: 2000
+    TicksPerSecond: 1
 --- !u!114 &5571416124093621156
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1238,22 +1273,6 @@ MonoBehaviour:
   FallSFX: {fileID: 8300000, guid: fe6b13c084178f441942a9885f9857db, type: 3}
   IsParrying: 0
   IsBlocking: 0
---- !u!114 &7219340043180141366
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571416124093621165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4071ddb671e87845a206a5ccb097d6f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  AttackRange: 4
-  AttackDelay:
-    Millis: 2000
-    TicksPerSecond: 1
 --- !u!114 &242195660756952769
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -10,14 +10,9 @@ public class MeleeAttackAbility : Ability {
   public HitboxAttackPhase Active;
   public InactiveAttackPhase Recovery;
   public HitConfig HitConfig;
-  public GameObject HitVFX;
-  public AudioClip HitSFX;
-  public Vector3 HitVFXOffset = Vector3.up;
   public AnimationCurve ChargeScaling = AnimationCurve.Linear(0f, .5f, 1f, 1f);  // go from .5 to 1 over the range
   public float HitStopVibrationAmplitude;
   public float HitCameraShakeIntensity;
-  public float HitDamage;
-  public float HitTargetKnockbackStrength;
   public float HitRecoilStrength;
   public float HitEnergyGain;
 
