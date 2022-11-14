@@ -23,6 +23,7 @@ public class ConditionAccum {
 public class HollowKnight : MonoBehaviour {
   [Header("Config")]
   public Animator SawPrefab;
+  public Timeval BladeDuration = Timeval.FromMillis(250);
   public float BladeHeight = .5f;
   public float JumpStrength = 10;
   public float MoveSpeed = 10;
@@ -68,7 +69,7 @@ public class HollowKnight : MonoBehaviour {
         ConditionAccum,
         SawPrefab,
         BladeHeight*Vector2.up + (FacingLeft ? Vector2.left : Vector2.right),
-        Timeval.FromMillis(500)));
+        BladeDuration));
     }
   }
 
