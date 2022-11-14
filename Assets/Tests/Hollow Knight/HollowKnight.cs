@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 [Serializable]
@@ -29,19 +28,25 @@ public class HollowKnight : MonoBehaviour {
   [Header("Config")]
   public Animator SawPrefab;
   public Timeval BladeDuration = Timeval.FromMillis(250);
+  public Timeval CoyoteDuration = Timeval.FromMillis(100);
+  public Timeval JumpBufferDuration = Timeval.FromMillis(100);
   public float BladeHeight = .5f;
   public float JumpStrength = 10;
   public float MoveSpeed = 10;
   public float MoveAcceleration = 10;
   public float SkinThickness = .05f;
   public TextMeshProUGUI ActionText;
+  public Transform Center;
 
   [Header("State")]
   public Vector3 Velocity;
   public bool FacingLeft = false;
+  public bool JumpRequested = false;
   public Condition Condition = new();
   public ConditionAccum ConditionAccum = new();
   public Bundle Bundle;
+  public int CoyoteFramesRemaining;
+  public int JumpBufferRemaining;
 
   CharacterController2D Controller;
   SpriteRenderer SpriteRenderer;
@@ -68,8 +73,8 @@ public class HollowKnight : MonoBehaviour {
   }
 
   void OnSouth() {
-    if (Controller.Collisions.Bottom) {
-      Velocity.y = JumpStrength;
+    if (Condition.CanAct) {
+      JumpRequested = true;
     }
   }
 
@@ -78,20 +83,20 @@ public class HollowKnight : MonoBehaviour {
       var x = InputManager.AxisLeft.XY.x;
       var y = InputManager.AxisLeft.XY.y;
       var useY = Mathf.Abs(x) > Mathf.Abs(y);
-      var offset = Vector2.left;
+      var destination = Vector2.zero;
 
       if (x == 0 && y == 0) {
-        offset = BladeHeight*Vector2.up + (FacingLeft ? Vector2.left : Vector2.right);
+        destination = FacingLeft ? Vector2.left : Vector2.right;
       } else if (Mathf.Abs(x) > Mathf.Abs(y)) {
-        offset = BladeHeight*Vector2.up + (x < 0 ? Vector2.left : Vector2.right);
+        destination = x < 0 ? Vector2.left : Vector2.right;
       } else {
-        offset = y > 0 ? Vector2.up*1.5f : Vector2.down*.75f;
+        destination = y > 0 ? Vector2.up : Vector2.down;
       }
       Bundle.Run(new HollowKnightMeleeAttack(
-        transform,
+        Center,
         ConditionAccum,
         SawPrefab,
-        offset,
+        destination,
         BladeDuration));
     }
   }
@@ -104,17 +109,26 @@ public class HollowKnight : MonoBehaviour {
 
   void FixedUpdate() {
     var stick = InputManager.AxisLeft.XY;
+    var grounded = Controller.Collisions.Bottom && Velocity.y <= 0;
 
-    if (Condition.CanMove && Math.Abs(stick.x) > 0) {
-      Velocity.x = Mathf.Sign(stick.x)*MoveSpeed;
-    } else {
-      Velocity.x = 0;
-    }
+    Velocity.x = Condition.CanMove && Math.Abs(stick.x) > 0
+      ? Mathf.Sign(stick.x)*MoveSpeed
+      : 0;
+    Velocity.y = grounded
+      ? Physics2D.gravity.y*Time.fixedDeltaTime
+      : Velocity.y+Physics2D.gravity.y*Time.fixedDeltaTime;
+    CoyoteFramesRemaining = grounded
+      ? CoyoteDuration.Frames
+      : CoyoteFramesRemaining-1;
+    JumpBufferRemaining = JumpRequested
+      ? JumpBufferDuration.Frames
+      : JumpBufferRemaining-1;
+    JumpRequested = false;
 
-    if (Controller.Collisions.Bottom && Velocity.y <= 0) {
-      Velocity.y = Physics2D.gravity.y*Time.fixedDeltaTime;
-    } else {
-      Velocity.y = Velocity.y+Physics2D.gravity.y*Time.fixedDeltaTime;
+    if (CoyoteFramesRemaining > 0 && JumpBufferRemaining > 0) {
+      Velocity.y = JumpStrength;
+      JumpBufferRemaining = 0;
+      CoyoteFramesRemaining = 0;
     }
 
     Controller.Move(Velocity*Time.fixedDeltaTime);
@@ -130,12 +144,16 @@ public class HollowKnight : MonoBehaviour {
 
     if (Controller.Collisions.Bottom) {
       if (Velocity.x == 0) {
-        Animator.Play("HollowKnight Idle Animation");
+        Animator.Play("Idle");
       } else {
-        Animator.Play("HollowKnight Run Animation");
+        Animator.Play("Run");
       }
     } else {
-      Animator.Play("HollowKnight Jump Animation");
+      if (Velocity.y <= 0) {
+        Animator.Play("Fall");
+      } else {
+        Animator.Play("Jump");
+      }
     }
 
     if (Interactor.Target) {
