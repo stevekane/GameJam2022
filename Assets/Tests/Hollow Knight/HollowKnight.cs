@@ -64,11 +64,23 @@ public class HollowKnight : MonoBehaviour {
 
   void OnWest() {
     if (Condition.CanAttack) {
+      var x = InputManager.AxisLeft.XY.x;
+      var y = InputManager.AxisLeft.XY.y;
+      var useY = Mathf.Abs(x) > Mathf.Abs(y);
+      var offset = Vector2.left;
+
+      if (x == 0 && y == 0) {
+        offset = BladeHeight*Vector2.up + (FacingLeft ? Vector2.left : Vector2.right);
+      } else if (Mathf.Abs(x) > Mathf.Abs(y)) {
+        offset = BladeHeight*Vector2.up + (x < 0 ? Vector2.left : Vector2.right);
+      } else {
+        offset = y > 0 ? Vector2.up*1.5f : Vector2.down*.75f;
+      }
       Bundle.Run(new HollowKnightMeleeAttack(
         transform,
         ConditionAccum,
         SawPrefab,
-        BladeHeight*Vector2.up + (FacingLeft ? Vector2.left : Vector2.right),
+        offset,
         BladeDuration));
     }
   }
