@@ -6,12 +6,9 @@ using UnityEngine;
 public delegate IEnumerator AbilityMethod();
 
 public class SlamAbility : Ability {
-  public int Index;
-  public Transform Owner;
-  public Animator Animator;
-  public ChargedAttackPhase Windup;
-  public InactiveAttackPhase Active;
-  public InactiveAttackPhase Recovery;
+  Animator Animator;
+  public AnimationClip Clip;
+  public Timeval WindupDuration;
   public Timeval SlamPiecePeriod;
   public GameObject SlamActionPrefab;
   SlamAction SlamAction;
@@ -19,29 +16,35 @@ public class SlamAbility : Ability {
   public GameObject FireVFX;
   public AudioClip FireSFX;
   public Vector3 FireVFXOffset;
+  public float ChargeSpeedFactor = 1f/6f;
+
+  AnimationTask Animation;
 
   void Start() {
-    Owner = GetComponentInParent<AbilityManager>().transform;
     Animator = GetComponentInParent<Animator>();
   }
 
   public IEnumerator ChargeStart() {
+    Animation = new AnimationTask(Animator, Clip);
     AddStatusEffect(new SpeedFactorEffect(.5f, .5f));
-    yield return Fiber.Any(Charging(), Windup.StartWithCharge(Animator, Index), Fiber.ListenFor(AbilityManager.GetEvent(ChargeRelease)));
+    Animation.SetSpeed(ChargeSpeedFactor);
+    yield return Fiber.Any(Charging(), Animation.PlayUntil(WindupDuration.Ticks));
+    Animation.SetSpeed(1f);
     SlamAction.Activate();
     SFXManager.Instance.TryPlayOneShot(FireSFX);
     VFXManager.Instance.TrySpawnEffect(FireVFX, SlamAction.Piece.transform.position + FireVFXOffset);
     SlamAction = null;
-    yield return Active.Start(Animator, Index);
-    yield return Recovery.Start(Animator, Index);
+    yield return Animation;
   }
 
-  public IEnumerator ChargeRelease() => null;
+  public IEnumerator ChargeRelease() {
+    Animation?.SetSpeed(1f);
+    yield return null;
+  }
 
   public override void OnStop() {
-    Animator.SetBool("Attacking", false);
-    Animator.SetInteger("AttackIndex", -1);
-    Animator.SetFloat("AttackSpeed", 1);
+    Animation?.ResetAnimation();
+    Animation = null;
     if (SlamAction != null) {
       Destroy(SlamAction.gameObject);
       SlamAction = null;

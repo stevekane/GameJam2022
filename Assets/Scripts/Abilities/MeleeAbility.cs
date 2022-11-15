@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MeleeAbility2 : Ability {
+public class MeleeAbility : Ability {
   Animator Animator;
   Transform Owner;
   public AnimationClip Clip;
@@ -52,7 +52,6 @@ public class MeleeAbility2 : Ability {
       var extraFrames = frameCounter.Value.Frames - WindupDuration.Frames;
       var maxExtraFrames = WindupDuration.Frames / ChargeSpeedFactor - WindupDuration.Frames;
       chargeScaling = ChargeScaling.Evaluate(extraFrames / maxExtraFrames);
-      Debug.Log($"Charged for: {extraFrames} / {maxExtraFrames} = {chargeScaling}");
       Animation.SetSpeed(1);
     } else {
       yield return Animation.PlayUntil(WindupDuration.Ticks);
@@ -68,6 +67,7 @@ public class MeleeAbility2 : Ability {
     Stop();
   }
   public override void OnStop() {
+    Animation?.ResetAnimation();
     Animation = null;
   }
 

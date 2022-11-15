@@ -13,7 +13,7 @@ public class Badger : MonoBehaviour {
   int WaitFrames = 0;
   int RecoveryFrames = 0;
   Ability CurrentAbility;
-  MeleeAttackAbility PunchAbility;
+  MeleeAbility PunchAbility;
   ShieldAbility ShieldAbility;
 
   public void Awake() {
@@ -23,7 +23,7 @@ public class Badger : MonoBehaviour {
     Defender = GetComponent<Defender>();
     Shield = GetComponentInChildren<Shield>();
     Abilities = GetComponent<AbilityManager>();
-    PunchAbility = GetComponentInChildren<MeleeAttackAbility>();
+    PunchAbility = GetComponentInChildren<MeleeAbility>();
     ShieldAbility = GetComponentInChildren<ShieldAbility>();
   }
 
