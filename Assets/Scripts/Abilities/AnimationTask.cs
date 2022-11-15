@@ -13,47 +13,44 @@ public static class AnimatorTastExtensions {
 public class AnimationTask : IEnumerator, IStoppable {
   Animator Animator;
   AnimationClipPlayable ClipPlayable;
+  AnimationLayerMixerPlayable Mixer;
   AnimationPlayableOutput Output;
-  PlayableGraph Graph;
-  FrameEventTimeline FrameEventTimeline;
   int EventHead;
   double DesiredSpeed = 1f;
 
-  public Action<FrameEvent> OnFrameEvent;
-  public EventSource<FrameEvent> FrameEventSource = new();
-
-  public AnimationTask(Animator animator, AnimationClip clip, FrameEventTimeline timeline = null) {
+  public AnimationTask(Animator animator, AnimationClip clip, bool additive = false) {
     EventHead = 0;
     Animator = animator;
-    Graph = PlayableGraph.Create();
-    ClipPlayable = AnimationClipPlayable.Create(Graph, clip);
+
+    ClipPlayable = AnimationClipPlayable.Create(animator.playableGraph, clip);
     ClipPlayable.SetDuration(clip.isLooping ? double.MaxValue : clip.length);
-    FrameEventTimeline = timeline;
-    Output = AnimationPlayableOutput.Create(Graph, clip.name, Animator);
-    Output.SetSourcePlayable(ClipPlayable);
-    Graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
-    Graph.Play();
+
+    Mixer = AnimationLayerMixerPlayable.Create(Animator.playableGraph, 1);
+    Mixer.SetLayerAdditive(0, additive);
+    Mixer.SetInputWeight(0, 1f);
+
+    Animator.playableGraph.Connect(ClipPlayable, 0, Mixer, 0);
+
+    Output = AnimationPlayableOutput.Create(animator.playableGraph, clip.name, Animator);
+    Output.SetSourcePlayable(Mixer);
   }
-  ~AnimationTask() => Graph.Destroy();
-  public void Stop() => Graph.Destroy();
-  public bool IsRunning { get => Graph.IsValid() && !Graph.IsDone(); }
+  ~AnimationTask() => Destroy();
+  public void Stop() => Destroy();
+  public bool IsRunning { get => ClipPlayable.IsValid() && !ClipPlayable.IsDone(); }
   public object Current { get; }
   public void Reset() => throw new NotSupportedException();
   public bool MoveNext() {
-    ClipPlayable.SetSpeed(DesiredSpeed * Animator.speed);
-    if (Graph.IsValid()) {
-      BroadcastFrameEvents();
-    }
-    if (Graph.IsDone()) {
-      Stop();
+    if (ClipPlayable.IsValid()) {
+      ClipPlayable.SetSpeed(DesiredSpeed * Animator.speed);
+      if (ClipPlayable.IsDone())
+        Stop();
     }
     return IsRunning;
   }
-  public void ResetAnimation() {
-    if (Graph.IsValid()) {
-      Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
-      ClipPlayable.SetTime(0);
-      Graph.Play();
+  void Destroy() {
+    if (ClipPlayable.IsValid()) {
+      Animator.playableGraph.DestroySubgraph(Mixer); // destroys inputs too
+      Animator.playableGraph.DestroyOutput(Output);
     }
   }
   public void SetSpeed(double speed) => DesiredSpeed = speed;
@@ -69,18 +66,5 @@ public class AnimationTask : IEnumerator, IStoppable {
     var time = ClipPlayable.GetTime();
     var interpolant = (float)(time/clip.length);
     EventHead = (int)Mathf.Lerp(0, frames, interpolant);
-  }
-  void BroadcastFrameEvents() {
-    if (FrameEventTimeline != null && OnFrameEvent != null) {
-      var oldHead = EventHead;
-      UpdateEventHead();
-      var newHead = EventHead;
-      foreach (var e in FrameEventTimeline.Events) {
-        if (e.Frame >= oldHead && e.Frame < newHead) {
-          OnFrameEvent.Invoke(e);
-          FrameEventSource.Fire(e);
-        }
-      }
-    }
   }
 }

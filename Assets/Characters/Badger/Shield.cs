@@ -5,10 +5,16 @@ using UnityEngine;
 public class Shield : MonoBehaviour {
   public float MaxDamage = 50f;
   public Animator Animator;
-  public bool Dead = false; // Set by ShieldDie animation
+  public AnimationClip DeathClip;
   Damage Damage;
   Collider Hurtbox;
+  Bundle Bundle = new();
   public Defender Defender { get; private set; }
+
+  IEnumerator Die() {
+    yield return new AnimationTask(Animator, DeathClip, true);
+    Destroy(gameObject, .01f);
+  }
 
   void Awake() {
     Damage = GetComponent<Damage>();
@@ -17,12 +23,10 @@ public class Shield : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    if (Damage.Points > MaxDamage) {
-      Animator.SetTrigger("ShieldDie");
+    if (Damage.Points > MaxDamage && Hurtbox.enabled) {
       Hurtbox.enabled = false;
+      Bundle.Run(Die());
     }
-    if (Dead) {
-      Destroy(gameObject);
-    }
+    Bundle.MoveNext();
   }
 }

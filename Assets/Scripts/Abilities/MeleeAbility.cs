@@ -64,10 +64,9 @@ public class MeleeAbility : Ability {
     Hitbox.Collider.enabled = false;
     // Recovery
     yield return Animation;
-    Stop();
   }
   public override void OnStop() {
-    Animation?.ResetAnimation();
+    Animation?.Stop();
     Animation = null;
   }
 
