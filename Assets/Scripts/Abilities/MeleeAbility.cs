@@ -47,9 +47,10 @@ public class MeleeAbility : Ability {
     var chargeScaling = 1f;
     if (chargeable) {
       Animation.SetSpeed(ChargeSpeedFactor);
-      var frameCounter = new Timer();
-      yield return Fiber.Any(frameCounter, Animation.PlayUntil(WindupDuration.Ticks));
-      var extraFrames = frameCounter.Value.Frames - WindupDuration.Frames;
+      var startFrame = Timeval.FrameCount;
+      yield return Animation.PlayUntil(WindupDuration.Ticks);
+      var numFrames = Timeval.FrameCount - startFrame;
+      var extraFrames = numFrames - WindupDuration.Frames;
       var maxExtraFrames = WindupDuration.Frames / ChargeSpeedFactor - WindupDuration.Frames;
       chargeScaling = ChargeScaling.Evaluate(extraFrames / maxExtraFrames);
       Animation.SetSpeed(1);
