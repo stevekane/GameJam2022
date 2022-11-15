@@ -3,38 +3,71 @@ using UnityEngine;
 using TMPro;
 
 [Serializable]
+public class PropertyBool {
+  bool Base = true;
+  int Count = 0;
+  public bool Current => Count >= 0;
+  public PropertyBool(bool b) => Base = b;
+  public void Set(bool b) => Count += b ? 1 : -1;
+  public void Reset() => Count = 0;
+}
+
+[Serializable]
+public class PropertyFloat {
+  [SerializeField] float Base;
+  float Added;
+  float Multiplied;
+  public float Current => (Base+Added)*Multiplied;
+  public PropertyFloat(float b) => Base = b;
+  public void Add(float v) => Added+=v;
+  public void Mul(float v) => Multiplied+=v;
+  public void Reset() {
+    Added = 0;
+    Multiplied = 1;
+  }
+}
+
+[Serializable]
 public class Condition {
   public bool CanMove;
-  public bool CanTurn;
-  public bool CanAttack;
+  public bool CanJump;
+  public bool CanFall;
   public bool CanAct;
-  public void Reset() => CanMove = CanTurn = CanAttack = CanAct = true;
+  public float MoveSpeed;
+  public float JumpSpeed;
+  public void Set(ConditionAccum accum) {
+    CanMove = accum.CanMove.Current;
+    CanJump = accum.CanJump.Current;
+    CanFall = accum.CanFall.Current;
+    CanAct = accum.CanAct.Current;
+    MoveSpeed = accum.MoveSpeed.Current;
+    JumpSpeed = accum.JumpSpeed.Current;
+  }
 }
 
 [Serializable]
 public class ConditionAccum {
-   public int CanMoveCount { get; internal set; }
-   public int CanTurnCount { get; internal set; }
-   public int CanAttackCount { get; internal set; }
-   public int CanActCount { get; internal set; }
-   public bool CanMove { set => CanMoveCount += value ? 1 : -1; }
-   public bool CanTurn { set => CanTurnCount += value ? 1 : -1; }
-   public bool CanAttack { set => CanAttackCount += value ? 1 : -1; }
-   public bool CanAct { set => CanActCount += value ? 1 : -1; }
-   public void Reset() => CanMoveCount = CanTurnCount = CanAttackCount = CanActCount = 0;
+  public PropertyBool CanMove = new(true);
+  public PropertyBool CanJump = new(true);
+  public PropertyBool CanFall = new(true);
+  public PropertyBool CanAct = new(true);
+  public PropertyFloat MoveSpeed = new(10);
+  public PropertyFloat JumpSpeed = new(10);
+  public void Reset() {
+    CanMove.Reset();
+    CanJump.Reset();
+    CanFall.Reset();
+    CanAct.Reset();
+    MoveSpeed.Reset();
+    JumpSpeed.Reset();
+  }
 }
 
 public class HollowKnight : MonoBehaviour {
   [Header("Config")]
   public Animator SawPrefab;
-  public Timeval BladeDuration = Timeval.FromMillis(250);
   public Timeval CoyoteDuration = Timeval.FromMillis(100);
   public Timeval JumpBufferDuration = Timeval.FromMillis(100);
-  public float BladeHeight = .5f;
-  public float JumpStrength = 10;
-  public float MoveSpeed = 10;
-  public float MoveAcceleration = 10;
-  public float SkinThickness = .05f;
   public TextMeshProUGUI ActionText;
   public Transform Center;
 
@@ -60,29 +93,37 @@ public class HollowKnight : MonoBehaviour {
     InputManager = FindObjectOfType<InputManager>();
     Interactor = FindObjectOfType<Interactor>();
     Animator = GetComponent<Animator>();
-    InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Listen(OnSouth);
-    InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Listen(OnWest);
+    InputManager.ButtonEvent(ButtonCode.R1, ButtonPressType.JustDown).Listen(OnDash);
+    InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Listen(OnJump);
+    InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Listen(OnAttack);
     InputManager.ButtonEvent(ButtonCode.L2, ButtonPressType.JustDown).Listen(OnAct);
   }
 
   void OnDestroy() {
-    InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Unlisten(OnSouth);
-    InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Unlisten(OnWest);
+    InputManager.ButtonEvent(ButtonCode.R1, ButtonPressType.JustDown).Unlisten(OnDash);
+    InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Unlisten(OnJump);
+    InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Unlisten(OnAttack);
     InputManager.ButtonEvent(ButtonCode.L2, ButtonPressType.JustDown).Unlisten(OnAct);
     Bundle.Stop();
   }
 
-  void OnSouth() {
+  void OnDash() {
     if (Condition.CanAct) {
+      var direction = FacingLeft ? Vector2.left : Vector2.right;
+      Bundle.Run(new HollowKnightDash(direction, ConditionAccum, Controller));
+    }
+  }
+
+  void OnJump() {
+    if (Condition.CanJump) {
       JumpRequested = true;
     }
   }
 
-  void OnWest() {
-    if (Condition.CanAttack) {
+  void OnAttack() {
+    if (Condition.CanAct) {
       var x = InputManager.AxisLeft.XY.x;
       var y = InputManager.AxisLeft.XY.y;
-      var useY = Mathf.Abs(x) > Mathf.Abs(y);
       var destination = Vector2.zero;
 
       if (x == 0 && y == 0) {
@@ -96,8 +137,7 @@ public class HollowKnight : MonoBehaviour {
         Center,
         ConditionAccum,
         SawPrefab,
-        destination,
-        BladeDuration));
+        destination));
     }
   }
 
@@ -112,11 +152,13 @@ public class HollowKnight : MonoBehaviour {
     var grounded = Controller.Collisions.Bottom && Velocity.y <= 0;
 
     Velocity.x = Condition.CanMove && Math.Abs(stick.x) > 0
-      ? Mathf.Sign(stick.x)*MoveSpeed
+      ? Mathf.Sign(stick.x)*Condition.MoveSpeed
       : 0;
-    Velocity.y = grounded
-      ? Physics2D.gravity.y*Time.fixedDeltaTime
-      : Velocity.y+Physics2D.gravity.y*Time.fixedDeltaTime;
+    Velocity.y = Condition.CanFall
+      ? grounded
+        ? Physics2D.gravity.y*Time.fixedDeltaTime
+        : Velocity.y+Physics2D.gravity.y*Time.fixedDeltaTime
+      : 0;
     CoyoteFramesRemaining = grounded
       ? CoyoteDuration.Frames
       : CoyoteFramesRemaining-1;
@@ -126,14 +168,14 @@ public class HollowKnight : MonoBehaviour {
     JumpRequested = false;
 
     if (CoyoteFramesRemaining > 0 && JumpBufferRemaining > 0) {
-      Velocity.y = JumpStrength;
+      Velocity.y = Condition.JumpSpeed;
       JumpBufferRemaining = 0;
       CoyoteFramesRemaining = 0;
     }
 
     Controller.Move(Velocity*Time.fixedDeltaTime);
 
-    if (Condition.CanTurn) {
+    if (Condition.CanMove) {
       FacingLeft = stick.x switch {
         < 0 => true,
         > 0 => false,
@@ -168,12 +210,7 @@ public class HollowKnight : MonoBehaviour {
     }
 
     Bundle.MoveNext();
-    {
-      Condition.CanMove = ConditionAccum.CanMoveCount >= 0;
-      Condition.CanTurn = ConditionAccum.CanTurnCount >= 0;
-      Condition.CanAttack = ConditionAccum.CanAttackCount >= 0;
-      Condition.CanAct = ConditionAccum.CanActCount >= 0;
-      ConditionAccum.Reset();
-    }
+    Condition.Set(ConditionAccum);
+    ConditionAccum.Reset();
   }
 }

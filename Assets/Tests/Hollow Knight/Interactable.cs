@@ -24,10 +24,9 @@ public class Interactable : MonoBehaviour {
     public object Current => null;
     public void Reset() => throw new NotSupportedException();
     public bool MoveNext() {
-      Condition.CanAct = false;
-      Condition.CanMove = false;
-      Condition.CanAttack = false;
-      Condition.CanTurn = false;
+      Condition.CanAct.Set(!IsRunning);
+      Condition.CanMove.Set(!IsRunning);
+      Condition.CanJump.Set(!IsRunning);
       return IsRunning;
     }
   }
