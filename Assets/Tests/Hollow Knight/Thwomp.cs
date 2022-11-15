@@ -18,19 +18,19 @@ public class Thwomp : MonoBehaviour {
   IEnumerator Routine;
 
   IEnumerator Tween(Transform t, Vector3 a, Vector3 b, Timeval duration, AnimationCurve curve) {
-    for (var i = 0; i < duration.Frames; i++) {
-      t.position = Vector3.Lerp(a,b,curve.Evaluate((float)i/(float)duration.Frames));
+    for (var i = 0; i < duration.Ticks; i++) {
+      t.position = Vector3.Lerp(a,b,curve.Evaluate((float)i/(float)duration.Ticks));
       yield return null;
     }
   }
 
   IEnumerator Cycle() {
-    yield return Fiber.Wait(StartDelay.Frames);
+    yield return Fiber.Wait(StartDelay.Ticks);
     while (true) {
-      yield return Fiber.Wait(StartDuration.Frames);
+      yield return Fiber.Wait(StartDuration.Ticks);
       yield return Tween(transform, StartPosition, EndPosition, StartToEndDuration, StartToEndCurve);
       CameraShaker.Instance.Shake(ImpactShakeMagnitude);
-      yield return Fiber.Wait(EndDuration.Frames);
+      yield return Fiber.Wait(EndDuration.Ticks);
       yield return Tween(transform, EndPosition, StartPosition, EndToStartDuration, EndToStartCurve);
     }
   }

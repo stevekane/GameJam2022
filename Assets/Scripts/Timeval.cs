@@ -1,31 +1,33 @@
 using System;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class Timeval {
-  public static int FramesPerSecond = 60;
+  public static int FixedUpdatePerSecond = 60;
   public static int FrameCount = 0;
 
   [SerializeField] public float Millis = 1;
-  [SerializeField] public int TicksPerSecond = 30;
+  [FormerlySerializedAs("TicksPerSecond")]
+  [SerializeField] public int FramesPerSecond = 30;
 
-  public static Timeval FromSeconds(float seconds, int ticksPerSecond = 30) {
-    return new Timeval { Millis = seconds*1000f, TicksPerSecond = ticksPerSecond };
+  public static Timeval FromSeconds(float seconds, int fps = 30) {
+    return new Timeval { Millis = seconds*1000f, FramesPerSecond = fps };
   }
-  public static Timeval FromMillis(float millis, int ticksPerSecond = 30) {
-    return new Timeval { Millis = millis, TicksPerSecond = ticksPerSecond };
+  public static Timeval FromMillis(float millis, int fps = 30) {
+    return new Timeval { Millis = millis, FramesPerSecond = fps };
   }
-  public static Timeval FromTicks(int ticks, int ticksPerSecond) {
-    return new Timeval { Millis = (float)ticks * 1000f / ticksPerSecond, TicksPerSecond = ticksPerSecond };
-  }
-  public int Frames {
-    set { Millis = value * 1000f / FramesPerSecond; }
-    get { return Mathf.RoundToInt(Millis * FramesPerSecond / 1000f); }
+  public static Timeval FromTicks(int ticks, int fps) {
+    return new Timeval { Millis = (float)ticks * 1000f / fps, FramesPerSecond = fps };
   }
   public int Ticks {
-    set { Millis = value * 1000f / TicksPerSecond; }
-    get { return Mathf.RoundToInt(Millis * TicksPerSecond / 1000f); }
+    set { Millis = value * 1000f / FixedUpdatePerSecond; }
+    get { return Mathf.RoundToInt(Millis * FixedUpdatePerSecond / 1000f); }
+  }
+  public int AnimFrames {
+    set { Millis = value * 1000f / FramesPerSecond; }
+    get { return Mathf.RoundToInt(Millis * FramesPerSecond / 1000f); }
   }
   public float Seconds {
     get { return Millis * .001f; }
@@ -43,13 +45,13 @@ public class TimevalDrawer : PropertyDrawer {
 
     EditorGUI.BeginChangeCheck();
     var millisProp = property.FindPropertyRelative("Millis");
-    var tpsProp = property.FindPropertyRelative("TicksPerSecond");
+    var tpsProp = property.FindPropertyRelative("FramesPerSecond");
     var timeval = Timeval.FromMillis(millisProp.floatValue, tpsProp.intValue);
 
     p.width /= 2;
-    var labels = new[] { new GUIContent("Ticks"), new GUIContent("tps") };
+    var labels = new[] { new GUIContent("Frames"), new GUIContent("fps") };
     EditorGUIUtility.labelWidth = EditorStyles.label.CalcSize(labels[0]).x;
-    var newTicks = EditorGUI.IntField(p, labels[0], timeval.Ticks);
+    var newTicks = EditorGUI.IntField(p, labels[0], timeval.AnimFrames);
     p.x += p.width;
     EditorGUIUtility.labelWidth = EditorStyles.label.CalcSize(labels[1]).x;
     var newTps = EditorGUI.IntField(p, labels[1], tpsProp.intValue);
@@ -57,7 +59,7 @@ public class TimevalDrawer : PropertyDrawer {
     if (EditorGUI.EndChangeCheck()) {
       timeval = Timeval.FromTicks(newTicks, newTps);
       millisProp.floatValue = timeval.Millis;
-      tpsProp.intValue = timeval.TicksPerSecond;
+      tpsProp.intValue = timeval.FramesPerSecond;
     }
 
     EditorGUI.indentLevel = indent;

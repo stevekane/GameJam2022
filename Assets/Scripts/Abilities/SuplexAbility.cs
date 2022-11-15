@@ -73,7 +73,7 @@ public class SuplexAbility : Ability {
       if (c.TryGetComponent(out Hurtbox hurtbox))
         hurtbox.Defender.OnHit(hitParams, transform);
     });
-    yield return Fiber.Wait(hitParams.HitStopDuration.Frames);
+    yield return Fiber.Wait(hitParams.HitStopDuration.Ticks);
     targetStatus.transform.up = -targetStatus.transform.up;
   }
 }

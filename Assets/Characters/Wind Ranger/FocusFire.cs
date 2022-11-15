@@ -19,7 +19,7 @@ public class FocusFire : Ability {
     var target = Targeting.StandardTarget(Owner, MaxRange, LayerMask, TriggerInteraction, PhysicsBuffers.Colliders);
     if (target) {
       Target = target.transform;
-      yield return Any(Wait(Duration.Frames), RapidFire(ShotCooldown.Frames));
+      yield return Any(Wait(Duration.Ticks), RapidFire(ShotCooldown.Ticks));
     }
   }
 
@@ -30,7 +30,7 @@ public class FocusFire : Ability {
         Owner.transform.LookAt(Target);
         var arrow = Instantiate(ArrowPrefab, transform.position, transform.rotation);
         arrow.HitParams = HitConfig.ComputeParams(Attributes);
-        yield return Wait(ShotCooldown.Frames);
+        yield return Wait(ShotCooldown.Ticks);
       } else {
         yield return null;
       }

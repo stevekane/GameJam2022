@@ -48,20 +48,20 @@ public class MeleeAbility : Ability {
     if (chargeable) {
       Animation.SetSpeed(ChargeSpeedFactor);
       var startFrame = Timeval.FrameCount;
-      yield return Animation.PlayUntil(WindupDuration.Ticks);
+      yield return Animation.PlayUntil(WindupDuration.AnimFrames);
       var numFrames = Timeval.FrameCount - startFrame;
-      var extraFrames = numFrames - WindupDuration.Frames;
-      var maxExtraFrames = WindupDuration.Frames / ChargeSpeedFactor - WindupDuration.Frames;
+      var extraFrames = numFrames - WindupDuration.Ticks;
+      var maxExtraFrames = WindupDuration.Ticks / ChargeSpeedFactor - WindupDuration.Ticks;
       chargeScaling = ChargeScaling.Evaluate(extraFrames / maxExtraFrames);
       Animation.SetSpeed(1);
     } else {
-      yield return Animation.PlayUntil(WindupDuration.Ticks);
+      yield return Animation.PlayUntil(WindupDuration.AnimFrames);
     }
     // Active
     Hitbox.Collider.enabled = true;
     PhaseHits.Clear();
     Hits.Clear();
-    yield return Fiber.Any(Animation.PlayUntil(WindupDuration.Ticks + ActiveDuration.Ticks), HandleHits(chargeScaling));
+    yield return Fiber.Any(Animation.PlayUntil(WindupDuration.AnimFrames + ActiveDuration.AnimFrames), HandleHits(chargeScaling));
     Hitbox.Collider.enabled = false;
     // Recovery
     yield return Animation;
@@ -74,11 +74,12 @@ public class MeleeAbility : Ability {
   IEnumerator HandleHits(float chargeScaling) {
     while (true) {
       if (Hits.Count != 0) {
-        Status.Add(new HitStopEffect(Owner.forward, HitStopVibrationAmplitude, HitFreezeDuration.Frames));
+        Status.Add(new HitStopEffect(Owner.forward, HitStopVibrationAmplitude, HitFreezeDuration.Ticks));
         CameraShaker.Instance.Shake(HitCameraShakeIntensity);
         var hitParams = HitConfig.ComputeParamsScaled(Attributes, chargeScaling);
         Hits.ForEach(target => {
           target.GetComponent<Defender>()?.OnHit(hitParams, Owner);
+          Debug.Log($"target={target}");
           Owner.transform.forward = (target.transform.position - Owner.transform.position).XZ().normalized;
         });
         AbilityManager.Energy?.Value.Add(HitEnergyGain * Hits.Count);

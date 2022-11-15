@@ -25,7 +25,7 @@ public class AimAndFireAbility : Ability {
   }
 
   IEnumerator Fire() {
-    yield return Wait(ShotCooldown.Frames);
+    yield return Wait(ShotCooldown.Ticks);
     Animator.SetTrigger("Fire");
     AudioSource.PlayOptionalOneShot(FireSound);
     Instantiate(ProjectilePrefab, Origin.transform.position, Aimer.transform.rotation)

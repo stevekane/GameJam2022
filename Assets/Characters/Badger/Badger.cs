@@ -64,11 +64,11 @@ public class Badger : MonoBehaviour {
       if (TargetIsAttacking && Shield) {
         Abilities.TryInvoke(ShieldAbility.HoldStart);
         CurrentAbility = Abilities.Abilities.FirstOrDefault((a) => a.IsRunning);
-        WaitFrames = Timeval.FromMillis(1000).Frames;
+        WaitFrames = Timeval.FromMillis(1000).Ticks;
       } else if (inRange) {
         Abilities.TryInvoke(PunchAbility.AttackStart);
         CurrentAbility = Abilities.Abilities.FirstOrDefault((a) => a.IsRunning);
-        WaitFrames = AttackDelay.Frames;
+        WaitFrames = AttackDelay.Ticks;
       }
     }
     if (CurrentAbility == ShieldAbility) {
@@ -76,7 +76,7 @@ public class Badger : MonoBehaviour {
         Abilities.TryInvoke(ShieldAbility.HoldRelease);
       } else {
         if (TargetIsAttacking)
-          WaitFrames = Timeval.FromMillis(1000).Frames;
+          WaitFrames = Timeval.FromMillis(1000).Ticks;
         if (WaitFrames <= 0) {
           Abilities.TryInvoke(ShieldAbility.HoldRelease);
         }
@@ -91,7 +91,7 @@ public class Badger : MonoBehaviour {
     if ((CurrentAbility == null || Defender.IsBlocking) && WaitFrames > 0)
       --WaitFrames;
     if (Status.Get<KnockbackEffect>() != null) {
-      RecoveryFrames = Timeval.FromMillis(1000).Frames;
+      RecoveryFrames = Timeval.FromMillis(1000).Ticks;
       ShieldAbility.Stop();
     } else if (RecoveryFrames > 0) {
       --RecoveryFrames;

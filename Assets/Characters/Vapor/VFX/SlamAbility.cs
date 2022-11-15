@@ -28,7 +28,7 @@ public class SlamAbility : Ability {
     Animation = new AnimationTask(Animator, Clip);
     AddStatusEffect(new SpeedFactorEffect(.5f, .5f));
     Animation.SetSpeed(ChargeSpeedFactor);
-    yield return Fiber.Any(Charging(), Animation.PlayUntil(WindupDuration.Ticks));
+    yield return Fiber.Any(Charging(), Animation.PlayUntil(WindupDuration.AnimFrames));
     Animation.SetSpeed(1f);
     SlamAction.Activate();
     SFXManager.Instance.TryPlayOneShot(FireSFX);
@@ -60,7 +60,7 @@ public class SlamAbility : Ability {
     while (true) {
       if (--frames <= 0) {
         SlamAction.AddPiece();
-        frames = SlamPiecePeriod.Frames;
+        frames = SlamPiecePeriod.Ticks;
       }
       yield return null;
     }

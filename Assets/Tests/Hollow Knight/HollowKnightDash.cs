@@ -15,7 +15,7 @@ public class HollowKnightDash : IEnumerator, IStoppable {
     Direction = direction;
     Condition = condition;
     Controller = controller;
-    FramesRemaining = Timeval.FromMillis(100).Frames;
+    FramesRemaining = Timeval.FromMillis(100).Ticks;
   }
 
   public void Stop() {

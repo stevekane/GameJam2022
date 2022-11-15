@@ -18,7 +18,7 @@ public class WindRun : Ability {
     while (true) {
       var hits = Physics.OverlapSphereNonAlloc(Position, Radius, Colliders, LayerMask, TriggerInteraction);
       for (var i = 0; i < hits; i++) {
-        TargetStatus(Colliders[i].gameObject)?.Add(new WindRunSlowEffect(SlowDuration.Frames));
+        TargetStatus(Colliders[i].gameObject)?.Add(new WindRunSlowEffect(SlowDuration.Ticks));
       }
       yield return null;
     }
@@ -27,7 +27,7 @@ public class WindRun : Ability {
   public IEnumerator MakeRoutine() {
     WindRunBoostEffect = new WindRunBoostEffect();
     Status.Add(WindRunBoostEffect);
-    yield return Any(SlowNearby(), Wait(Duration.Frames));
+    yield return Any(SlowNearby(), Wait(Duration.Ticks));
   }
 
   public override void OnStop() {

@@ -43,7 +43,7 @@ public class MyAbility : IEnumerator, IStoppable {
   }
   public IEnumerator OnStop() {
     for (var i = 0; i < 10; i++) {
-      yield return Fiber.Wait(Timeval.FramesPerSecond);
+      yield return Fiber.Wait(Timeval.FixedUpdatePerSecond);
       Debug.Log($"Burples {i}");
     }
   }

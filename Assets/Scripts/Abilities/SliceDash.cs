@@ -47,7 +47,7 @@ public class SliceDash : Ability {
       var front = Status.transform.position + Status.transform.forward.XZ()*5f;
       foreach (var h in Hits) {
         var delta = (front - h.transform.position).XZ();
-        h.GetComponent<Status>().Move(move + (1f / timer.Value.Frames) * delta);
+        h.GetComponent<Status>().Move(move + (1f / timer.Value.Ticks) * delta);
       }
       Status.Move(move);
       yield return null;

@@ -41,7 +41,7 @@ public class HitConfig {
     if (attacker.GetValue(AttributeTag.BurningHits) is var dps && dps != 0)
       effects.Add(new BurningEffect(dps));
     if (attacker.GetValue(AttributeTag.FreezingHits) is var duration && duration != 0)
-      effects.Add(new FreezingEffect(Timeval.FromSeconds(duration).Frames));
+      effects.Add(new FreezingEffect(Timeval.FromSeconds(duration).Ticks));
     return effects;
   }
 }
@@ -96,7 +96,7 @@ public class Defender : MonoBehaviour {
       return;
     var power = 5f * hit.KnockbackStrength * Mathf.Pow((Damage.Points+100f) / 100f, 2f);
     var knockBackDirection = KnockbackVector(hitTransform, transform, hit.KnockbackType);
-    Status?.Value.Add(new HitStopEffect(knockBackDirection, .15f, hit.HitStopDuration.Frames),
+    Status?.Value.Add(new HitStopEffect(knockBackDirection, .15f, hit.HitStopDuration.Ticks),
       s => s.Add(new KnockbackEffect(knockBackDirection*power)));
     Damage.AddPoints(hit.Damage);
     hit.OnHitEffects.ForEach(e => Status?.Value.Add(e));
