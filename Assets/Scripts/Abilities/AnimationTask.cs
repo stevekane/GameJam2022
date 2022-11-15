@@ -14,7 +14,6 @@ public class AnimationTask : IEnumerator, IStoppable {
   Animator Animator;
   AnimationClipPlayable ClipPlayable;
   AnimationPlayableOutput Output;
-  PlayableGraph Graph;
   FrameEventTimeline FrameEventTimeline;
   int EventHead;
   double DesiredSpeed = 1f;
@@ -25,35 +24,30 @@ public class AnimationTask : IEnumerator, IStoppable {
   public AnimationTask(Animator animator, AnimationClip clip, FrameEventTimeline timeline = null) {
     EventHead = 0;
     Animator = animator;
-    Graph = PlayableGraph.Create();
-    ClipPlayable = AnimationClipPlayable.Create(Graph, clip);
+    ClipPlayable = AnimationClipPlayable.Create(animator.playableGraph, clip);
     ClipPlayable.SetDuration(clip.isLooping ? double.MaxValue : clip.length);
     FrameEventTimeline = timeline;
-    Output = AnimationPlayableOutput.Create(Graph, clip.name, Animator);
+    Output = AnimationPlayableOutput.Create(animator.playableGraph, clip.name, Animator);
     Output.SetSourcePlayable(ClipPlayable);
-    Graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
-    Graph.Play();
   }
-  ~AnimationTask() => Graph.Destroy();
-  public void Stop() => Graph.Destroy();
-  public bool IsRunning { get => Graph.IsValid() && !Graph.IsDone(); }
+  ~AnimationTask() => Destroy();
+  public void Stop() => Destroy();
+  public bool IsRunning { get => ClipPlayable.IsValid() && !ClipPlayable.IsDone(); }
   public object Current { get; }
   public void Reset() => throw new NotSupportedException();
   public bool MoveNext() {
-    ClipPlayable.SetSpeed(DesiredSpeed * Animator.speed);
-    if (Graph.IsValid()) {
+    if (ClipPlayable.IsValid()) {
+      ClipPlayable.SetSpeed(DesiredSpeed * Animator.speed);
       BroadcastFrameEvents();
-    }
-    if (Graph.IsDone()) {
-      Stop();
+      if (ClipPlayable.IsDone())
+        Stop();
     }
     return IsRunning;
   }
-  public void ResetAnimation() {
-    if (Graph.IsValid()) {
-      Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
-      ClipPlayable.SetTime(0);
-      Graph.Play();
+  void Destroy() {
+    if (ClipPlayable.IsValid()) {
+      Animator.playableGraph.DestroySubgraph(ClipPlayable);
+      Animator.playableGraph.DestroyOutput(Output);
     }
   }
   public void SetSpeed(double speed) => DesiredSpeed = speed;
