@@ -117,7 +117,7 @@ public class Defender : MonoBehaviour {
 
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
-    if (transform.position.y < 0f && !PlayingFallSound) {
+    if (transform.position.y < -1f && !PlayingFallSound) {
       LastGroundedPosition = transform.position;
       PlayingFallSound = true;
       SFXManager.Instance.TryPlayOneShot(FallSFX);
