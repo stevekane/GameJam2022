@@ -5,6 +5,7 @@ using UnityEngine;
 public class Shield : MonoBehaviour {
   public float MaxDamage = 50f;
   public Animator Animator;
+  public bool Dead = false; // Set by ShieldDie animation
   Damage Damage;
   Collider Hurtbox;
   public Defender Defender { get; private set; }
@@ -16,11 +17,11 @@ public class Shield : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    if (Damage.Points > MaxDamage && Hurtbox.enabled) {
+    if (Damage.Points > MaxDamage) {
       Animator.SetTrigger("ShieldDie");
       Hurtbox.enabled = false;
     }
-    if (!gameObject.activeSelf) {
+    if (Dead) {
       Destroy(gameObject);
     }
   }
