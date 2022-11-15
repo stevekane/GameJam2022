@@ -13,22 +13,26 @@ public static class AnimatorTastExtensions {
 public class AnimationTask : IEnumerator, IStoppable {
   Animator Animator;
   AnimationClipPlayable ClipPlayable;
+  AnimationLayerMixerPlayable Mixer;
   AnimationPlayableOutput Output;
-  FrameEventTimeline FrameEventTimeline;
   int EventHead;
   double DesiredSpeed = 1f;
 
-  public Action<FrameEvent> OnFrameEvent;
-  public EventSource<FrameEvent> FrameEventSource = new();
-
-  public AnimationTask(Animator animator, AnimationClip clip, FrameEventTimeline timeline = null) {
+  public AnimationTask(Animator animator, AnimationClip clip, bool additive = false) {
     EventHead = 0;
     Animator = animator;
+
     ClipPlayable = AnimationClipPlayable.Create(animator.playableGraph, clip);
     ClipPlayable.SetDuration(clip.isLooping ? double.MaxValue : clip.length);
-    FrameEventTimeline = timeline;
+
+    Mixer = AnimationLayerMixerPlayable.Create(Animator.playableGraph, 1);
+    Mixer.SetLayerAdditive(0, additive);
+    Mixer.SetInputWeight(0, 1f);
+
+    Animator.playableGraph.Connect(ClipPlayable, 0, Mixer, 0);
+
     Output = AnimationPlayableOutput.Create(animator.playableGraph, clip.name, Animator);
-    Output.SetSourcePlayable(ClipPlayable);
+    Output.SetSourcePlayable(Mixer);
   }
   ~AnimationTask() => Destroy();
   public void Stop() => Destroy();
@@ -38,7 +42,6 @@ public class AnimationTask : IEnumerator, IStoppable {
   public bool MoveNext() {
     if (ClipPlayable.IsValid()) {
       ClipPlayable.SetSpeed(DesiredSpeed * Animator.speed);
-      BroadcastFrameEvents();
       if (ClipPlayable.IsDone())
         Stop();
     }
@@ -46,7 +49,7 @@ public class AnimationTask : IEnumerator, IStoppable {
   }
   void Destroy() {
     if (ClipPlayable.IsValid()) {
-      Animator.playableGraph.DestroySubgraph(ClipPlayable);
+      Animator.playableGraph.DestroySubgraph(Mixer); // destroys inputs too
       Animator.playableGraph.DestroyOutput(Output);
     }
   }
@@ -63,18 +66,5 @@ public class AnimationTask : IEnumerator, IStoppable {
     var time = ClipPlayable.GetTime();
     var interpolant = (float)(time/clip.length);
     EventHead = (int)Mathf.Lerp(0, frames, interpolant);
-  }
-  void BroadcastFrameEvents() {
-    if (FrameEventTimeline != null && OnFrameEvent != null) {
-      var oldHead = EventHead;
-      UpdateEventHead();
-      var newHead = EventHead;
-      foreach (var e in FrameEventTimeline.Events) {
-        if (e.Frame >= oldHead && e.Frame < newHead) {
-          OnFrameEvent.Invoke(e);
-          FrameEventSource.Fire(e);
-        }
-      }
-    }
   }
 }
