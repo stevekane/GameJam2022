@@ -31,12 +31,14 @@ public class PropertyFloat {
 public class Condition {
   public bool CanMove;
   public bool CanJump;
+  public bool CanFall;
   public bool CanAct;
   public float MoveSpeed;
   public float JumpSpeed;
   public void Set(ConditionAccum accum) {
     CanMove = accum.CanMove.Current;
     CanJump = accum.CanJump.Current;
+    CanFall = accum.CanFall.Current;
     CanAct = accum.CanAct.Current;
     MoveSpeed = accum.MoveSpeed.Current;
     JumpSpeed = accum.JumpSpeed.Current;
@@ -47,12 +49,14 @@ public class Condition {
 public class ConditionAccum {
   public PropertyBool CanMove = new(true);
   public PropertyBool CanJump = new(true);
+  public PropertyBool CanFall = new(true);
   public PropertyBool CanAct = new(true);
   public PropertyFloat MoveSpeed = new(10);
   public PropertyFloat JumpSpeed = new(10);
   public void Reset() {
     CanMove.Reset();
     CanJump.Reset();
+    CanFall.Reset();
     CanAct.Reset();
     MoveSpeed.Reset();
     JumpSpeed.Reset();
@@ -89,25 +93,34 @@ public class HollowKnight : MonoBehaviour {
     InputManager = FindObjectOfType<InputManager>();
     Interactor = FindObjectOfType<Interactor>();
     Animator = GetComponent<Animator>();
-    InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Listen(OnSouth);
-    InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Listen(OnWest);
+    InputManager.ButtonEvent(ButtonCode.R1, ButtonPressType.JustDown).Listen(OnDash);
+    InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Listen(OnJump);
+    InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Listen(OnAttack);
     InputManager.ButtonEvent(ButtonCode.L2, ButtonPressType.JustDown).Listen(OnAct);
   }
 
   void OnDestroy() {
-    InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Unlisten(OnSouth);
-    InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Unlisten(OnWest);
+    InputManager.ButtonEvent(ButtonCode.R1, ButtonPressType.JustDown).Unlisten(OnDash);
+    InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Unlisten(OnJump);
+    InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Unlisten(OnAttack);
     InputManager.ButtonEvent(ButtonCode.L2, ButtonPressType.JustDown).Unlisten(OnAct);
     Bundle.Stop();
   }
 
-  void OnSouth() {
+  void OnDash() {
+    if (Condition.CanAct) {
+      var direction = FacingLeft ? Vector2.left : Vector2.right;
+      Bundle.Run(new HollowKnightDash(direction, ConditionAccum, Controller));
+    }
+  }
+
+  void OnJump() {
     if (Condition.CanJump) {
       JumpRequested = true;
     }
   }
 
-  void OnWest() {
+  void OnAttack() {
     if (Condition.CanAct) {
       var x = InputManager.AxisLeft.XY.x;
       var y = InputManager.AxisLeft.XY.y;
@@ -138,15 +151,14 @@ public class HollowKnight : MonoBehaviour {
     var stick = InputManager.AxisLeft.XY;
     var grounded = Controller.Collisions.Bottom && Velocity.y <= 0;
 
-    Velocity.x =
-      Condition.CanMove
-        ? Math.Abs(stick.x) > 0
-          ? Mathf.Sign(stick.x)*Condition.MoveSpeed
-          : 0
-        : Velocity.x;
-    Velocity.y = grounded
-      ? Physics2D.gravity.y*Time.fixedDeltaTime
-      : Velocity.y+Physics2D.gravity.y*Time.fixedDeltaTime;
+    Velocity.x = Condition.CanMove && Math.Abs(stick.x) > 0
+      ? Mathf.Sign(stick.x)*Condition.MoveSpeed
+      : 0;
+    Velocity.y = Condition.CanFall
+      ? grounded
+        ? Physics2D.gravity.y*Time.fixedDeltaTime
+        : Velocity.y+Physics2D.gravity.y*Time.fixedDeltaTime
+      : 0;
     CoyoteFramesRemaining = grounded
       ? CoyoteDuration.Frames
       : CoyoteFramesRemaining-1;
