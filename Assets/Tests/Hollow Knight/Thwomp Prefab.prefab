@@ -73,6 +73,7 @@ GameObject:
   - component: {fileID: 50524218584682133}
   - component: {fileID: 50524218584682132}
   - component: {fileID: 50524218584682128}
+  - component: {fileID: 3400610638988057049}
   - component: {fileID: 50524218584682135}
   - component: {fileID: 50524218584682134}
   m_Layer: 0
@@ -97,7 +98,7 @@ Transform:
   - {fileID: 50524218382427124}
   - {fileID: 50524217232285866}
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &50524218584682132
 SpriteRenderer:
@@ -211,6 +212,15 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  StartDelay:
+    Millis: 0
+    TicksPerSecond: 30
+  StartDuration:
+    Millis: 1000
+    TicksPerSecond: 30
+  EndDuration:
+    Millis: 1000
+    TicksPerSecond: 30
   StartToEndDuration:
     Millis: 1000
     TicksPerSecond: 30
@@ -221,6 +231,19 @@ MonoBehaviour:
   EndTransform: {fileID: 50524217232285866}
   StartPosition: {x: 0, y: 0, z: 0}
   EndPosition: {x: 0, y: 0, z: 0}
+  ImpactShakeMagnitude: 0
+--- !u!114 &3400610638988057049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 50524218584682123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd449fe8cd3f0cd449471e19e7cd5bb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!61 &50524218584682135
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -231,7 +254,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -245,7 +268,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 2.0039062, y: 2}
+  m_Size: {x: 1.5, y: 1.5}
   m_EdgeRadius: 0
 --- !u!50 &50524218584682134
 Rigidbody2D:

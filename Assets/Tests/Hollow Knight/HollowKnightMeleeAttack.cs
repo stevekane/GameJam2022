@@ -3,21 +3,18 @@ using System.Collections;
 using UnityEngine;
 
 public class HollowKnightMeleeAttack : IEnumerator, IStoppable {
-  public ConditionAccum Condition;
-
-  public bool IsRunning => FramesRemaining > 0;
-
+  ConditionAccum Condition;
   Vector3 Destination;
+  Animator Saw;
   int TotalFrames;
   int FramesRemaining;
-  Animator Saw;
 
   public HollowKnightMeleeAttack(
   Transform owner,
   ConditionAccum condition,
   Animator sawPrefab,
-  Vector3 destination,
-  Timeval duration) {
+  Vector3 destination) {
+    var duration = Timeval.FromMillis(200);
     Condition = condition;
     TotalFrames = duration.Frames;
     FramesRemaining = duration.Frames;
@@ -27,15 +24,16 @@ public class HollowKnightMeleeAttack : IEnumerator, IStoppable {
   }
   public void Stop() {
     FramesRemaining = 0;
-    Condition.CanAttack = true;
+    Condition.CanAct.Set(true);
     Saw.SetBool("Attacking", false);
     Saw.gameObject.Destroy();
     Saw = null;
   }
+  public bool IsRunning => FramesRemaining > 0;
   public object Current => null;
   public void Reset() => throw new NotSupportedException();
   public bool MoveNext() {
-    Condition.CanAttack = !IsRunning;
+    Condition.CanAct.Set(!IsRunning);
     if (FramesRemaining > 0) {
       FramesRemaining--;
       var interpolant = (float)FramesRemaining/(float)TotalFrames;
