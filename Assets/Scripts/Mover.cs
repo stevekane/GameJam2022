@@ -16,7 +16,6 @@ public class Mover : MonoBehaviour {
   public float Gravity;
 
   Vector3 Velocity;
-
   CharacterController Controller;
   Attributes Attributes;
   Status Status;
