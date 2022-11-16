@@ -14,6 +14,7 @@ public class Thwomp : MonoBehaviour {
   public Vector3 StartPosition;
   public Vector3 EndPosition;
   public AudioClip[] GroundImpactClips;
+  public GameObject GroundImpactVFX;
   public float ImpactShakeMagnitude;
 
   IEnumerator Routine;
@@ -32,6 +33,7 @@ public class Thwomp : MonoBehaviour {
       yield return Tween(transform, StartPosition, EndPosition, StartToEndDuration, StartToEndCurve);
       CameraShaker.Instance.Shake(ImpactShakeMagnitude);
       AudioSource.PlayClipAtPoint(GroundImpactClips[UnityEngine.Random.Range(0,GroundImpactClips.Length)], transform.position);
+      Destroy(Instantiate(GroundImpactVFX, transform.position, transform.rotation), 5f);
       yield return Fiber.Wait(EndDuration.Ticks);
       yield return Tween(transform, EndPosition, StartPosition, EndToStartDuration, EndToStartCurve);
     }
