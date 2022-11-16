@@ -25,9 +25,7 @@ public abstract class Ability : MonoBehaviour, IStoppable {
   Dictionary<AbilityMethod, TriggerCondition> TriggerConditionsMap = new();
   [HideInInspector] public AbilityTag Tags; // Inherited from the Trigger when started
   public bool IsRunning { get => Bundle.IsRunning; }
-  public IEnumerator Running {
-    get => Bundle;
-  }
+  public IEnumerator Running => Bundle;
   public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
   public void StopRoutine(Fiber routine) => Bundle.StopRoutine(routine);
   public T Using<T>(T d) where T : IDisposable {
