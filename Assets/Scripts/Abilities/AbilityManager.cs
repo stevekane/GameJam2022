@@ -9,9 +9,9 @@ public enum AxisTag {
 }
 
 public class AbilityManager : MonoBehaviour {
-  [HideInInspector] public Ability[] Abilities;
-  [HideInInspector] public List<Ability> Running = new();
-  [HideInInspector] public List<Ability> ToAdd = new();
+  [HideInInspector] public IAbility[] Abilities;
+  [HideInInspector] public List<IAbility> Running = new();
+  [HideInInspector] public List<IAbility> ToAdd = new();
   public Optional<Energy> Energy;
 
   Dictionary<AxisTag, AxisState> TagToAxis = new();
@@ -22,10 +22,10 @@ public class AbilityManager : MonoBehaviour {
   class EventRouter : IEventSource {
     IEventSource EventSource;
     Action Action;
-    Ability Ability;
+    IAbility Ability;
     AbilityMethod Method;
     TriggerCondition Trigger;
-    public EventRouter(Ability ability, AbilityMethod method) =>
+    public EventRouter(IAbility ability, AbilityMethod method) =>
       (Ability, Method, Trigger) = (ability, method, ability.GetTriggerCondition(method));
     public void ConnectSource(IEventSource evt) => (EventSource = evt).Listen(Fire);
     public void DisconnectSource() => EventSource?.Unlisten(Fire);
@@ -33,8 +33,9 @@ public class AbilityManager : MonoBehaviour {
     public void Unlisten(Action handler) => Action -= handler;
     public void Fire() {
       if (ShouldFire()) {
+        var tags = Ability.Tags;
         Ability.AbilityManager.Energy?.Value.Consume(Trigger.EnergyCost);
-        Ability.Tags.AddFlags(Trigger.Tags);
+        Ability.Tags = tags.AddFlags(Trigger.Tags);
         Action?.Invoke();
         var enumerator = Method();
         if (enumerator != null) {  // Can be null for events that listen temporarily.
@@ -57,7 +58,7 @@ public class AbilityManager : MonoBehaviour {
       };
       return canRun;
     }
-    bool CanCancel(Ability other) => Trigger.Tags.HasAllFlags(AbilityTag.CancelOthers) && other.Tags.HasAllFlags(AbilityTag.Cancellable);
+    bool CanCancel(IAbility other) => Trigger.Tags.HasAllFlags(AbilityTag.CancelOthers) && other.Tags.HasAllFlags(AbilityTag.Cancellable);
   }
 
   public void InterruptAbilities() => Abilities.Where(a => a.IsRunning && !a.Tags.HasAllFlags(AbilityTag.Uninterruptible)).ForEach(a => a.Stop());
@@ -80,7 +81,7 @@ public class AbilityManager : MonoBehaviour {
     return evt;
   }
   public void TryInvoke(AbilityMethod method) => GetEvent(method).Fire();
-  EventRouter CreateRouter(AbilityMethod method) => MethodToEvent[method] = new EventRouter((Ability)method.Target, method);
+  EventRouter CreateRouter(AbilityMethod method) => MethodToEvent[method] = new EventRouter((IAbility)method.Target, method);
 
   void StackAdd<T>(List<T> target, List<T> additions) {
     target.Reverse();
@@ -90,7 +91,7 @@ public class AbilityManager : MonoBehaviour {
 
   void Awake() {
     Abilities = GetComponentsInChildren<Ability>();
-    Abilities.ForEach(a => { a.AbilityManager = this; a.Init(); });
+    Abilities.ForEach(a => a.AbilityManager = this);
     Energy = GetComponent<Energy>();
   }
   void OnDestroy() {

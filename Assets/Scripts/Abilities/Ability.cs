@@ -14,8 +14,18 @@ public class TriggerCondition {
   //public AttributeTag[] RequiredOwnerAttribs = { };
 }
 
+public interface IAbility : IStoppable, IEquatable<object> {
+  public AbilityManager AbilityManager { get; set; }
+  public Attributes Attributes { get; }
+  public Status Status { get; }
+  public AbilityTag Tags { get; set; }
+  public void StartRoutine(Fiber routine);
+  public void StopRoutine(Fiber routine);
+  public TriggerCondition GetTriggerCondition(AbilityMethod method);
+}
+
 [Serializable]
-public abstract class Ability : MonoBehaviour, IStoppable {
+public abstract class Ability : MonoBehaviour, IAbility {
   protected Bundle Bundle = new();
   protected List<IDisposable> Disposables = new();
   public AbilityManager AbilityManager { get; set; }
@@ -23,7 +33,7 @@ public abstract class Ability : MonoBehaviour, IStoppable {
   public Status Status { get => AbilityManager.GetComponent<Status>(); }
   public List<TriggerCondition> TriggerConditions = new();
   Dictionary<AbilityMethod, TriggerCondition> TriggerConditionsMap = new();
-  [HideInInspector] public AbilityTag Tags; // Inherited from the Trigger when started
+  [HideInInspector] public AbilityTag Tags { get; set; } // Inherited from the Trigger when started
   public bool IsRunning { get => Bundle.IsRunning; }
   public IEnumerator Running => Bundle;
   public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
@@ -49,7 +59,6 @@ public abstract class Ability : MonoBehaviour, IStoppable {
     Disposables.Clear();
   }
   public virtual void OnStop() { }
-  public void Init() => TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.GetMethod(this)] = c);
   public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
   void FixedUpdate() {
     var isRunning = Bundle.IsRunning;
@@ -58,5 +67,16 @@ public abstract class Ability : MonoBehaviour, IStoppable {
       Stop();
     }
   }
+  void Awake() => TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.GetMethod(this)] = c);
   void OnDestroy() => Stop();
+  public override bool Equals(object obj) {
+    if (obj == null || GetType() != obj.GetType()) {
+      return false;
+    } else {
+      return base.Equals(obj);
+    }
+  }
+  public override int GetHashCode() {
+    return base.GetHashCode();
+  }
 }

@@ -1719,6 +1719,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CenterOfArena: {fileID: 1334313964}
+  TargetLayerMask:
+    serializedVersion: 2
+    m_Bits: 16384
+  EnvironmentLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  EyeHeight: 1
+  MaxTargetingDistance: 50
 --- !u!114 &508513855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1744,9 +1752,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba179080412a6af41a99d021d690c5fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Abilities: []
-  Running: []
-  ToAdd: []
 --- !u!114 &508513857
 MonoBehaviour:
   m_ObjectHideFlags: 0

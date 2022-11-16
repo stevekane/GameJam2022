@@ -12,7 +12,7 @@ public class Badger : MonoBehaviour {
   Shield Shield;
   int WaitFrames = 0;
   int RecoveryFrames = 0;
-  Ability CurrentAbility;
+  IAbility CurrentAbility;
   MeleeAbility PunchAbility;
   ShieldAbility ShieldAbility;
 
