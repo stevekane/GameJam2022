@@ -101,9 +101,9 @@ public class HitStopEffect : StatusEffect {
 
 public class BurningEffect : StatusEffect {
   float DamagePerFrame = 1f;
-  int Frames = Timeval.FromSeconds(3f).Frames;
+  int Frames = Timeval.FromSeconds(3f).Ticks;
   public BurningEffect(float dps) {
-    DamagePerFrame = dps / Timeval.FramesPerSecond;
+    DamagePerFrame = dps / Timeval.FixedUpdatePerSecond;
   }
   public override void Apply(Status status) {
     if (--Frames <= 0) {

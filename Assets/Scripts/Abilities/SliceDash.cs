@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class SliceDash : Ability {
   public float MoveSpeed = 100f;
-  public Timeval WindupDuration = Timeval.FromTicks(2, 30);
+  public Timeval WindupDuration = Timeval.FromAnimFrames(2, 30);
   public Timeval Duration = Timeval.FromSeconds(.3f);
   public AnimationClip WindupClip;
   public AnimationClip DashingClip;
@@ -47,7 +47,7 @@ public class SliceDash : Ability {
       var front = Status.transform.position + Status.transform.forward.XZ()*5f;
       foreach (var h in Hits) {
         var delta = (front - h.transform.position).XZ();
-        h.GetComponent<Status>().Move(move + (1f / timer.Value.Frames) * delta);
+        h.GetComponent<Status>().Move(move + (1f / timer.Value.Ticks) * delta);
       }
       Status.Move(move);
       yield return null;

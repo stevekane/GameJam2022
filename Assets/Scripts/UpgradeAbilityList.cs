@@ -1,23 +1,30 @@
 using UnityEngine;
 
-[System.Serializable]
-public class UpgradeAbilityListData : UpgradeData {
-  public int CurrentLevel = 0;
-}
 
 [CreateAssetMenu(fileName = "Upgrade", menuName = "Upgrade/Ability")]
 public class UpgradeAbilityList : Upgrade {
+  [System.Serializable]
+  public class MyUpgradeData : UpgradeData {
+    public int CurrentLevel = 0;
+  }
   [System.Serializable]
   public class Level {
     public AbilityTag AbilityTag;
     public int Cost = 0;
   }
   public Level[] Levels;
-  UpgradeAbilityListData GetData(Upgrades us) => us.FindUpgrade(ud => ud.Upgrade == this) as UpgradeAbilityListData;
-  public override void Add(Upgrades us, bool purchase) {
-    var ud = GetData(us) ?? new UpgradeAbilityListData() { Upgrade = this, CurrentLevel = -1 };
-    var isNew = ++ud.CurrentLevel == 0;
-    us.BuyUpgrade(ud, purchase ? Levels[ud.CurrentLevel].Cost : 0, isNew);
+
+  MyUpgradeData GetData(Upgrades us) => us.GetUpgradeData(ud => ud.Upgrade == this) as MyUpgradeData;
+  public override int GetCost(Upgrades us) {
+    var levelidx = GetData(us)?.CurrentLevel ?? -1;
+    return Levels.GetIndexOrDefault(levelidx+1)?.Cost ?? int.MaxValue;
+  }
+  public override UpgradeData Add(Upgrades us) {
+    if (GetData(us) is MyUpgradeData ud) {
+      ++ud.CurrentLevel;
+      return null;
+    }
+    return new MyUpgradeData() { Upgrade = this, CurrentLevel = 0 };
   }
   public override void Apply(Upgrades us) => us.AbilityTags.AddFlags(Levels[GetData(us).CurrentLevel].AbilityTag);
 }

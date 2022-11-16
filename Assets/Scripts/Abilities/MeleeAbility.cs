@@ -47,20 +47,21 @@ public class MeleeAbility : Ability {
     var chargeScaling = 1f;
     if (chargeable) {
       Animation.SetSpeed(ChargeSpeedFactor);
-      var frameCounter = new Timer();
-      yield return Fiber.Any(frameCounter, Animation.PlayUntil(WindupDuration.Ticks));
-      var extraFrames = frameCounter.Value.Frames - WindupDuration.Frames;
-      var maxExtraFrames = WindupDuration.Frames / ChargeSpeedFactor - WindupDuration.Frames;
+      var startFrame = Timeval.TickCount;
+      yield return Animation.PlayUntil(WindupDuration.AnimFrames);
+      var numFrames = Timeval.TickCount - startFrame;
+      var extraFrames = numFrames - WindupDuration.Ticks;
+      var maxExtraFrames = WindupDuration.Ticks / ChargeSpeedFactor - WindupDuration.Ticks;
       chargeScaling = ChargeScaling.Evaluate(extraFrames / maxExtraFrames);
       Animation.SetSpeed(1);
     } else {
-      yield return Animation.PlayUntil(WindupDuration.Ticks);
+      yield return Animation.PlayUntil(WindupDuration.AnimFrames);
     }
     // Active
     Hitbox.Collider.enabled = true;
     PhaseHits.Clear();
     Hits.Clear();
-    yield return Fiber.Any(Animation.PlayUntil(WindupDuration.Ticks + ActiveDuration.Ticks), HandleHits(chargeScaling));
+    yield return Fiber.Any(Animation.PlayUntil(WindupDuration.AnimFrames + ActiveDuration.AnimFrames), HandleHits(chargeScaling));
     Hitbox.Collider.enabled = false;
     // Recovery
     yield return Animation;
@@ -73,7 +74,7 @@ public class MeleeAbility : Ability {
   IEnumerator HandleHits(float chargeScaling) {
     while (true) {
       if (Hits.Count != 0) {
-        Status.Add(new HitStopEffect(Owner.forward, HitStopVibrationAmplitude, HitFreezeDuration.Frames));
+        Status.Add(new HitStopEffect(Owner.forward, HitStopVibrationAmplitude, HitFreezeDuration.Ticks));
         CameraShaker.Instance.Shake(HitCameraShakeIntensity);
         var hitParams = HitConfig.ComputeParamsScaled(Attributes, chargeScaling);
         Hits.ForEach(target => {

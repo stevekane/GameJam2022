@@ -118,7 +118,7 @@ public class GameManager : MonoBehaviour {
       SaveData.SaveToFile();
       Destroy(Player.gameObject);
       InputManager.Instance.SetInputEnabled(false);
-      yield return Fiber.Wait(Timeval.FramesPerSecond * 3);
+      yield return Fiber.Wait(Timeval.FixedUpdatePerSecond * 3);
       // End GameLoop
 
       // Cleanup references and reload the scene
@@ -149,7 +149,7 @@ public class GameManager : MonoBehaviour {
   int seconds) {
     for (var i = seconds; i >= 0; i--) {
       f(i);
-      yield return Fiber.Wait(Timeval.FramesPerSecond);
+      yield return Fiber.Wait(Timeval.FixedUpdatePerSecond);
     }
   }
 

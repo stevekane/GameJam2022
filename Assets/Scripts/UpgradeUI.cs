@@ -58,7 +58,7 @@ public class UpgradeUI : MonoBehaviour {
   }
 
   public void OnChooseCard(Upgrade which) {
-    which.Buy(Player.Get().GetComponent<Upgrades>());
+    Player.Get().GetComponent<Upgrades>().BuyUpgrade(which);
     Show(UpgradeChoices);
   }
   public void OnExit() {

@@ -58,6 +58,9 @@ public class AttributeTagModifierPair {
 }
 
 public class Attributes : MonoBehaviour {
+  // These two are potentially confusing. They serve mostly as convenience. In general, the player will have a set of BaseUpgrades
+  // where level 0 of each represents the initial value for his attributes. Mobs will use BaseAttributes that represent their default
+  // values - only because that's an easier way to specify the values than creating a list of upgrades for each mob.
   public List<AttributeTagModifierPair> BaseAttributes;
   public List<Upgrade> BaseUpgrades;
   Dictionary<AttributeTag, AttributeModifier> BaseAttributesDict = new();
@@ -67,7 +70,7 @@ public class Attributes : MonoBehaviour {
     Upgrades = this.GetOrCreateComponent<Upgrades>();
     Status = GetComponent<Status>();
     Debug.Assert(BaseAttributes.Count == 0 || BaseUpgrades.Count == 0, "BaseUpgrades will add to BaseAttributes, you probably only want one of these");
-    BaseUpgrades.ForEach(u => u.Add(Upgrades, purchase: false));
+    BaseUpgrades.ForEach(u => Upgrades.AddUpgrade(u));
     BaseAttributes.ForEach(kv => BaseAttributesDict.Add(kv.Attribute, kv.Modifier));
   }
   AttributeModifier GetModifier(AttributeTag attrib) {

@@ -87,7 +87,7 @@ public class Smoke : MonoBehaviour {
     //}
 
     if (Status.Get<KnockbackEffect>() != null) {
-      RecoveryFrames = Timeval.FromMillis(1000).Frames;
+      RecoveryFrames = Timeval.FromMillis(1000).Ticks;
       if (AttackRoutine != null) {
         StopCoroutine(AttackRoutine);
         AttackRoutine = null;

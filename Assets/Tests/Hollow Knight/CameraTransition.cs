@@ -11,9 +11,9 @@ public class CameraTransition : MonoBehaviour {
   void Start() => Transition = MakeTransition();
 
   IEnumerator MakeTransition() {
-    for (var i = 0; i < TransitionDuration.Frames; i++) {
+    for (var i = 0; i < TransitionDuration.Ticks; i++) {
       var color = Overlay.color;
-      color.a = 1-(float)i/(float)TransitionDuration.Frames;
+      color.a = 1-(float)i/(float)TransitionDuration.Ticks;
       Overlay.color = color;
       yield return null;
     }

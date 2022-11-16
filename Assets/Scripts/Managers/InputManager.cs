@@ -80,7 +80,7 @@ public class InputManager : MonoBehaviour {
   }
 
   void Awake() {
-    Time.fixedDeltaTime = 1f / Timeval.FramesPerSecond;
+    Time.fixedDeltaTime = 1f / Timeval.FixedUpdatePerSecond;
   }
 
   Vector2 GetAxisFromKeyboard() {
@@ -145,7 +145,7 @@ public class InputManager : MonoBehaviour {
 
   void FixedUpdate() {
     Player = Player ?? FindObjectOfType<Player>();
-    Timeval.FrameCount++;
+    Timeval.TickCount++;
   }
 
   // TODO: Remove this testing junk.

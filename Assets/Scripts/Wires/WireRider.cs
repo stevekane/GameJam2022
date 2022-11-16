@@ -13,8 +13,8 @@ public class WireRider : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    if (Traveled < TravelTime.Frames) {
-      var distance = 1f-(float)Traveled/(float)TravelTime.Frames;
+    if (Traveled < TravelTime.Ticks) {
+      var distance = 1f-(float)Traveled/(float)TravelTime.Ticks;
       var pathData = Wire.Waypoints.ToWorldSpace(distance);
       transform.SetPositionAndRotation(pathData.Position, pathData.Rotation);
       Traveled++;

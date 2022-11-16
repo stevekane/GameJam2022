@@ -60,7 +60,7 @@ public class Bundle : IEnumerator, IStoppable {
 public class Timer : IEnumerator, IValue<Timeval> {
   public Timeval Value { get; } = Timeval.FromMillis(0);
   public bool MoveNext() {
-    Value.Frames++;
+    Value.Ticks++;
     return true;
   }
   public object Current { get => Value; }
@@ -70,7 +70,7 @@ public class Timer : IEnumerator, IValue<Timeval> {
 public class CountdownTimer : IEnumerator, IValue<Timeval> {
   public Timeval Value { get; }
   public CountdownTimer(Timeval duration) { Value = Timeval.FromMillis(duration.Millis); }
-  public bool MoveNext() => (--Value.Frames > 0);
+  public bool MoveNext() => (--Value.Ticks > 0);
   public object Current { get => Value; }
   public void Reset() => Value.Millis = 0;
 }

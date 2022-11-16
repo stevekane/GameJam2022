@@ -160,10 +160,10 @@ public class HollowKnight : MonoBehaviour {
         : Velocity.y+Physics2D.gravity.y*Time.fixedDeltaTime
       : 0;
     CoyoteFramesRemaining = grounded
-      ? CoyoteDuration.Frames
+      ? CoyoteDuration.Ticks
       : CoyoteFramesRemaining-1;
     JumpBufferRemaining = JumpRequested
-      ? JumpBufferDuration.Frames
+      ? JumpBufferDuration.Ticks
       : JumpBufferRemaining-1;
     JumpRequested = false;
 

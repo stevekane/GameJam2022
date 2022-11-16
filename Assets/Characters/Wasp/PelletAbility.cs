@@ -21,7 +21,7 @@ public class PelletAbility : Ability {
 
   IEnumerator ShootRoutine() {
     for (int i = 0; i < NumBullets; i++) {
-      yield return Fiber.Wait(Active.Duration.Frames / NumBullets);
+      yield return Fiber.Wait(Active.Duration.Ticks / NumBullets);
       VFXManager.Instance.TrySpawnEffect(FireVFX, transform.position);
       SFXManager.Instance.TryPlayOneShot(FireSFX);
       Bullet.Fire(BulletPrefab, transform.position, transform.forward, HitConfig.ComputeParams(GetComponentInParent<Attributes>()), gameObject.layer);

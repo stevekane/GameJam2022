@@ -38,7 +38,7 @@ public class Mover : MonoBehaviour {
   public IEnumerator TryAimAt(Vector3 desired, Timeval MaxDuration, float tolerance = .95f) {
     Mover.GetAxes(AbilityManager, out var desiredMove, out var desiredFacing);
     Mover.UpdateAxes(AbilityManager, desiredMove, desired);
-    var aimingTimeout = Fiber.Wait(MaxDuration.Frames);
+    var aimingTimeout = Fiber.Wait(MaxDuration.Ticks);
     var aimed = Fiber.Until(() => Vector3.Dot(transform.forward, desired) >= tolerance);
     yield return Fiber.Any(aimingTimeout, aimed);
   }
