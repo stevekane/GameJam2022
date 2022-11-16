@@ -140,8 +140,14 @@ public static class ArrayLikeExtensions {
     return sum;
   }
 
+  public static T GetIndexOrDefault<T>(this T[] xs, int i, T def = default(T)) {
+    if (i >= 0 && i < xs.Length) {
+      return xs[i];
+    } else {
+      return def;
+    }
+  }
   public static bool TryGetIndex<T>(this T[] xs, int i, out T t) {
-    var inBounds = i >= 0 && i < xs.Length;
     if (i >= 0 && i < xs.Length) {
       t = xs[i];
       return true;

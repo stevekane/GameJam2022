@@ -7,7 +7,9 @@ public class Pickup : MonoBehaviour {
       OnPickup(us);
   }
   void OnPickup(Upgrades us) {
-    Upgrade.Add(us, purchase: false);
+    // Dumb way to check if the upgrade is max level. This shouldn't really be a thing in the real game.
+    if (Upgrade.GetCost(us) < int.MaxValue)
+      us.AddUpgrade(Upgrade);
     Destroy(gameObject);
   }
 }

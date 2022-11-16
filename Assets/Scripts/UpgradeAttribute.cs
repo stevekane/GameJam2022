@@ -5,6 +5,7 @@ public class UpgradeAttribute : Upgrade {
   public SerializableEnum<AttributeTag> Attribute;
   public AttributeModifier Modifier;
   public int Cost;
-  public override void Add(Upgrades us, bool purchase) => us.BuyUpgrade(new() { Upgrade = this }, purchase ? Cost : 0, true);
+  public override int GetCost(Upgrades us) => Cost;
+  public override UpgradeData Add(Upgrades us) => new() { Upgrade = this };
   public override void Apply(Upgrades us) => us.AddAttributeModifier(Attribute, Modifier);
 }

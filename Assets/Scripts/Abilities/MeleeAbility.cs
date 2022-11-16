@@ -79,7 +79,6 @@ public class MeleeAbility : Ability {
         var hitParams = HitConfig.ComputeParamsScaled(Attributes, chargeScaling);
         Hits.ForEach(target => {
           target.GetComponent<Defender>()?.OnHit(hitParams, Owner);
-          Debug.Log($"target={target}");
           Owner.transform.forward = (target.transform.position - Owner.transform.position).XZ().normalized;
         });
         AbilityManager.Energy?.Value.Add(HitEnergyGain * Hits.Count);
