@@ -12,7 +12,6 @@ public class AnimatorSpeedTester : MonoBehaviour {
 
   void FixedUpdate() {
     if (FixedUpdateCount == FixedFreezeFrame) {
-      Time.timeScale = 0;
       Animator.speed = 0;
     } else {
       FixedUpdateCount++;
