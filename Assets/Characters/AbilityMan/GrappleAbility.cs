@@ -28,7 +28,7 @@ public class GrappleAbility : Ability {
     // Holding down the activation button
     Owner.GetComponent<Animator>().SetBool("Grappling", true);
     Owner.GetComponent<Animator>().SetInteger("GrappleState", (int)GrappleState.Holding);
-    var chargeWait = Wait(MAX_CHARGE_DURATION.Frames);
+    var chargeWait = Wait(MAX_CHARGE_DURATION.Ticks);
     var release = ListenFor(AbilityManager.GetEvent(GrappleRelease));
     yield return Any(chargeWait, release);
     // Create and throw the hook
@@ -40,7 +40,7 @@ public class GrappleAbility : Ability {
     Hook.OnHit.Listen(OnHit);
     Hook.GetComponent<Rigidbody>().AddForce(HOOK_SPEED*transform.forward, ForceMode.Impulse);
     var hookHit = ListenFor(Hook.OnHit);
-    var throwWait = Wait(MAX_THROW_DURATION.Frames);
+    var throwWait = Wait(MAX_THROW_DURATION.Ticks);
     var throwOutcome = Select(hookHit, throwWait);
     yield return throwOutcome;
     Hook.OnHit.Unlisten(OnHit);
@@ -49,7 +49,7 @@ public class GrappleAbility : Ability {
       Owner.GetComponent<Animator>().SetBool("Grappling", true);
       Owner.GetComponent<Animator>().SetInteger("GrappleState", (int)GrappleState.Pulling);
       var contactPoint = hookHit.Value.GetContact(0).point;
-      var pullWait = Wait(MAX_PULL_DURATION.Frames);
+      var pullWait = Wait(MAX_PULL_DURATION.Ticks);
       var pullComplete = PullTowards(Owner, contactPoint, HOOK_SPEED, HOOK_RELEASE_DISTANCE);
       yield return Any(pullWait, pullComplete);
     }

@@ -63,7 +63,7 @@ public class WaveEncounter : Encounter {
     var p = sr.transform.position;
     var r = sr.transform.rotation;
     VFXManager.Instance.SpawnEffect(sr.config.PreviewEffect, p, r);
-    yield return Fiber.Wait(sr.config.PreviewEffect.Duration.Frames);
+    yield return Fiber.Wait(sr.config.PreviewEffect.Duration.Ticks);
     VFXManager.Instance.SpawnEffect(sr.config.SpawnEffect, p, r);
     spawnAction?.OnSpawn(Instantiate(sr.config.Mob, p, r));
   }
@@ -75,7 +75,7 @@ public class WaveEncounter : Encounter {
         var spawn = new Fiber(Spawn(wave, spawnAction));
         Bundle.StartRoutine(spawn);
       }
-      yield return Fiber.Wait(WavePeriod.Frames);
+      yield return Fiber.Wait(WavePeriod.Ticks);
     }
   }
 }

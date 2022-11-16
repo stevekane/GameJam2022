@@ -14,7 +14,7 @@ public class PortalAbility : Ability {
     var direction = GetPortalDirection.Value;
     yield return AbilityManager.GetComponent<Mover>().TryAimAt(direction, FaceDuration);
     Portal = Instantiate(PortalPrefab, transform.position, transform.rotation);
-    yield return Fiber.Wait(WaitDuration.Frames);
+    yield return Fiber.Wait(WaitDuration.Ticks);
     var deltaXZ = (Portal.transform.position-AbilityManager.transform.position).XZ();
     AbilityManager.GetComponent<CharacterController>().Move(deltaXZ);
   }

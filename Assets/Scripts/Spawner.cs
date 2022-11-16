@@ -21,7 +21,7 @@ public class Spawner : MonoBehaviour {
   int FramesRemaining = 0;
 
   void Awake() {
-    FramesRemaining = SpawnPeriod.Frames;
+    FramesRemaining = SpawnPeriod.Ticks;
   }
 
   void FixedUpdate() {
@@ -33,7 +33,7 @@ public class Spawner : MonoBehaviour {
       spawn.transform.SetPositionAndRotation(transform.position, transform.rotation);
       ActiveSpawns.Add(spawn);
       spawn.AddComponent<DestroyNotifier>().DestroyCallback = ObjectDestroyed;
-      FramesRemaining = SpawnPeriod.Frames;
+      FramesRemaining = SpawnPeriod.Ticks;
     }
   }
 

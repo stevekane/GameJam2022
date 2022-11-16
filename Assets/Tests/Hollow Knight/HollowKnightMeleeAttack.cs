@@ -16,8 +16,8 @@ public class HollowKnightMeleeAttack : IEnumerator, IStoppable {
   Vector3 destination) {
     var duration = Timeval.FromMillis(200);
     Condition = condition;
-    TotalFrames = duration.Frames;
-    FramesRemaining = duration.Frames;
+    TotalFrames = duration.Ticks;
+    FramesRemaining = duration.Ticks;
     Destination = destination;
     Saw = GameObject.Instantiate(sawPrefab, owner);
     Saw.SetBool("Attacking", true);

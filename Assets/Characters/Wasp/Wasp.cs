@@ -70,7 +70,7 @@ public class Wasp : MonoBehaviour {
           desiredFacing = dir;
         } else {
           State = StateType.Idle;
-          FramesRemaining = ShootDelay.Frames;
+          FramesRemaining = ShootDelay.Ticks;
         }
         break;
       }

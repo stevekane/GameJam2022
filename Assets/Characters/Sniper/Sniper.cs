@@ -102,7 +102,7 @@ public class Sniper : MonoBehaviour {
     var direction = new Vector3(randXZ.x, 0, randXZ.y);
     Mover.GetAxes(AbilityManager, out var move, out var forward);
     Mover.UpdateAxes(AbilityManager, move, direction);
-    yield return Fiber.Wait(Timeval.FramesPerSecond);
+    yield return Fiber.Wait(Timeval.FixedUpdatePerSecond);
   }
 
   IEnumerator BaseBehavior() {

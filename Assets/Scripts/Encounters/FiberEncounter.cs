@@ -8,18 +8,18 @@ public class FiberEncounter : Encounter {
   public AudioSource MusicSource;
 
   [Header("Paramaters")]
-  public int InitialWaitFrames = Timeval.FramesPerSecond*4;
+  public int InitialWaitFrames = Timeval.FixedUpdatePerSecond*4;
   public AudioClip IntroMusicClip;
   public SpawnRequest MattParry1;
   public SpawnRequest MattParry2;
   public SpawnRequest Badger1;
-  public int WaspWaitFrames = Timeval.FramesPerSecond*2;
+  public int WaspWaitFrames = Timeval.FixedUpdatePerSecond*2;
   public SpawnRequest Wasp1;
   public SpawnRequest[] AutoRespawns;
   public SpawnRequest[] StaggeredSpawns;
   public SpawnRequest BossSpawn;
   public AudioClip IntenseMusicClip;
-  public int StaggerPeriod = Timeval.FramesPerSecond*1;
+  public int StaggerPeriod = Timeval.FixedUpdatePerSecond*1;
   public AudioClip NormalMusicClip;
 
   public class SpawnMob : IEnumerator, IValue<GameObject>, IStoppable {
@@ -38,7 +38,7 @@ public class FiberEncounter : Encounter {
       var p = sr.transform.position;
       var r = sr.transform.rotation;
       VFXManager.Instance.SpawnEffect(sr.config.PreviewEffect, p, r);
-      yield return Fiber.Wait(sr.config.PreviewEffect.Duration.Frames);
+      yield return Fiber.Wait(sr.config.PreviewEffect.Duration.Ticks);
       VFXManager.Instance.SpawnEffect(sr.config.SpawnEffect, p, r);
       Value = Instantiate(sr.config.Mob, p, r);
       Stop();

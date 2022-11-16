@@ -37,7 +37,7 @@ public class InactiveAttackPhase : AbilityTask {
     return this;
   }
   public override IEnumerator Routine() {
-    for (var i = 0; i < Duration.Frames; i++) {
+    for (var i = 0; i < Duration.Ticks; i++) {
       yield return null;
       var attackSpeed = ClipDuration.Millis/Duration.Millis;
       Animator.SetFloat("AttackSpeed", attackSpeed);
