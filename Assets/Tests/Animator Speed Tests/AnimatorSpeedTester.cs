@@ -3,7 +3,6 @@ using UnityEngine;
 public class AnimatorSpeedTester : MonoBehaviour {
   public Animator Animator;
   public int FixedUpdateCount;
-  public int UpdateCount;
   public int FixedFreezeFrame;
 
   void Start() {
@@ -11,14 +10,7 @@ public class AnimatorSpeedTester : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    if (FixedUpdateCount == FixedFreezeFrame) {
-      Animator.speed = 0;
-    } else {
-      FixedUpdateCount++;
-    }
-  }
-
-  void Update() {
-    UpdateCount++;
+    Animator.speed = FixedUpdateCount == FixedFreezeFrame ? 0 : Animator.speed;
+    FixedUpdateCount++;
   }
 }
