@@ -6,6 +6,7 @@ abstract class PigMossAbility : IAbility, IEnumerator {
   public AbilityManager AbilityManager { get; set; }
   public Attributes Attributes { get => AbilityManager.GetComponent<Attributes>(); }
   public Status Status { get => AbilityManager.GetComponent<Status>(); }
+  public Mover Mover { get => AbilityManager.GetComponent<Mover>(); }
   public AbilityTag Tags { get; set; }
   public void StartRoutine(Fiber routine) => Enumerator = routine;
   public void StopRoutine(Fiber routine) => Enumerator = null;
@@ -28,8 +29,6 @@ abstract class PigMossAbility : IAbility, IEnumerator {
   public abstract void OnStop();
   public IEnumerator Enumerator;
   public abstract IEnumerator Routine();
-  public override bool Equals(object obj) => base.Equals(obj);
-  public override int GetHashCode() => base.GetHashCode();
 }
 
 class DesolateDive : PigMossAbility {
@@ -48,17 +47,26 @@ class Bombard : PigMossAbility {
   }
 }
 
-class RadialBurst : PigMossAbility {
+[Serializable]
+class RadialBurstConfig {
   public Transform Owner;
+  public Vibrator Vibrator;
   public GameObject ProjectilePrefab;
   public AudioClip FireSFX;
   public Timeval ChargeDelay;
   public Timeval FireDelay;
-  public Vibrator Vibrator;
   public int Count;
   public int Rotations;
+}
 
+class RadialBurst : PigMossAbility {
+  RadialBurstConfig Config;
   StatusEffect StatusEffect;
+
+  public RadialBurst(AbilityManager manager, RadialBurstConfig config) {
+    AbilityManager = manager;
+    Config = config;
+  }
 
   public override void OnStop() {
     if (StatusEffect != null) {
@@ -72,44 +80,93 @@ class RadialBurst : PigMossAbility {
       status.CanRotate = false;
     });
     Status.Add(StatusEffect);
-    Vibrator.Vibrate(Vector3.up, ChargeDelay.Ticks, 1f);
-    yield return Fiber.Wait(ChargeDelay);
-    var rotationPerProjectile = Quaternion.Euler(0, 360/(float)Count, 0);
-    var halfRotationPerProjectile = Quaternion.Euler(0, 180/(float)Count, 0);
-    var delay = FireDelay.Ticks;
-    var direction = Owner.forward.XZ();
-    for (var j = 0; j < Rotations; j++) {
-      SFXManager.Instance.TryPlayOneShot(FireSFX);
-      for (var i = 0; i < Count; i++) {
+    Config.Vibrator.Vibrate(Vector3.up, Config.ChargeDelay.Ticks, 1f);
+    yield return Fiber.Wait(Config.ChargeDelay);
+    var rotationPerProjectile = Quaternion.Euler(0, 360/(float)Config.Count, 0);
+    var halfRotationPerProjectile = Quaternion.Euler(0, 180/(float)Config.Count, 0);
+    var delay = Config.FireDelay.Ticks;
+    var direction = Config.Owner.forward.XZ();
+    for (var j = 0; j < Config.Rotations; j++) {
+      SFXManager.Instance.TryPlayOneShot(Config.FireSFX);
+      for (var i = 0; i < Config.Count; i++) {
         direction = rotationPerProjectile*direction;
         var rotation = Quaternion.LookRotation(direction, Vector3.up);
         var radius = 5;
-        var position = Owner.position+radius*direction+Vector3.up;
-        GameObject.Instantiate(ProjectilePrefab, position, rotation);
+        var position = Config.Owner.position+radius*direction+Vector3.up;
+        GameObject.Instantiate(Config.ProjectilePrefab, position, rotation);
       }
-      yield return Fiber.Wait(FireDelay);
+      yield return Fiber.Wait(Config.FireDelay);
       direction = halfRotationPerProjectile*direction;
     }
   }
 }
 
-class BumRush : PigMossAbility {
-  public override void OnStop() {
+[Serializable]
+class BumRushConfig {
+  public Animator Animator;
+  public Timeval WindupDuration = Timeval.FromSeconds(1);
+  public Timeval RushDuration = Timeval.FromSeconds(.5f);
+  public Timeval RecoveryDuration = Timeval.FromSeconds(.5f);
+  public TriggerEvent SpikeTriggerEvent;
+  public HitParams SpikeHitParams;
+  public float RushSpeed = 100;
+}
 
+class BumRush : PigMossAbility {
+  new AbilityTag Tags = AbilityTag.Uninterruptible;
+
+  BumRushConfig Config;
+  Transform Target;
+  StatusEffect RushStatusEffect;
+
+  public BumRush(AbilityManager manager, BumRushConfig config, Transform target) {
+    AbilityManager = manager;
+    Config = config;
+    Target = target;
+  }
+  public override void OnStop() {
+    Status.Remove(RushStatusEffect);
+    Config.Animator.SetBool("Extended", false);
+  }
+  IEnumerator Rush() {
+    RushStatusEffect = new ScriptedMovementEffect();
+    Status.Add(RushStatusEffect);
+    var delta = Target.position-Mover.transform.position;
+    var direction = delta.normalized;
+    for (var tick = 0; tick < Config.RushDuration.Ticks; tick++) {
+      Status.Move(direction*Config.RushSpeed*Time.fixedDeltaTime);
+      yield return null;
+    }
+    Status.Remove(RushStatusEffect);
   }
   public override IEnumerator Routine() {
-    yield return null;
+    Config.Animator.SetBool("Extended", true);
+    yield return Fiber.Wait(Config.WindupDuration);
+    var rush = Rush();
+    var contact = Fiber.ListenFor(Config.SpikeTriggerEvent.OnTriggerEnterSource);
+    var outcome = Fiber.Select(contact, rush);
+    yield return outcome;
+    // hit target
+    if (outcome.Value == 0 && contact.Value.TryGetComponent(out Hurtbox hurtbox)) {
+      hurtbox.Defender.OnHit(Config.SpikeHitParams, AbilityManager.transform);
+    }
+    yield return Fiber.Wait(Config.RecoveryDuration);
+    Config.Animator.SetBool("Extended", false);
   }
 }
 
 public class PigMoss : MonoBehaviour {
-  [SerializeField] Transform CenterOfArena;
   [SerializeField] LayerMask TargetLayerMask;
   [SerializeField] LayerMask EnvironmentLayerMask;
-  [SerializeField] GameObject RadialBurstProjectilePrefab;
-  [SerializeField] AudioClip RadialBurstFireSFX;
+  [Header("Radial Burst")]
+  [SerializeField] RadialBurstConfig RadialBurstConfig;
+  [Header("Bum Rush")]
+  [SerializeField] BumRushConfig BumRushConfig;
+  [Header("Targeting")]
   [SerializeField] float EyeHeight;
   [SerializeField] float MaxTargetingDistance;
+  [Header("Navigation")]
+  [SerializeField] Transform CenterOfArena;
 
   IEnumerator Behavior;
   Transform Target;
@@ -162,30 +219,12 @@ public class PigMoss : MonoBehaviour {
   }
 
   IEnumerator MakeBehavior() {
-    yield return Fiber.Wait(Timeval.FromSeconds(3));
-    if (Target) {
-      var burst = new RadialBurst {
-        AbilityManager = AbilityManager,
-        Owner = transform,
-        ProjectilePrefab = RadialBurstProjectilePrefab,
-        FireSFX = RadialBurstFireSFX,
-        ChargeDelay = Timeval.FromMillis(1000),
-        FireDelay = Timeval.FromMillis(250),
-        Vibrator = Vibrator,
-        Count = 16,
-        Rotations = 5
-      };
-      AbilityManager.TryInvoke(burst.Routine); // TODO: awkward.
-      yield return burst;
-    } else {
-      var deltaToCenter = CenterOfArena.position-transform.position.XZ();
-      if (deltaToCenter.magnitude > 5) {
-        var toCenter = deltaToCenter.TryGetDirection() ?? transform.forward;
-        Mover.SetMove(AbilityManager, toCenter);
-      } else {
-        Mover.SetMove(AbilityManager, transform.forward);
-      }
-      yield return null;
-    }
+    Target = FindObjectOfType<Player>().transform;
+    var bumRush = new BumRush(AbilityManager, BumRushConfig, Target);
+    AbilityManager.TryInvoke(bumRush.Routine);
+    yield return bumRush;
+    var burst = new RadialBurst(AbilityManager, RadialBurstConfig);
+    AbilityManager.TryInvoke(burst.Routine); // TODO: awkward.
+    yield return burst;
   }
 }

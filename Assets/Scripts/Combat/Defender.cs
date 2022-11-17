@@ -52,6 +52,7 @@ public enum HitFlags {
   Burning = 1<<1,
 }
 
+[Serializable]
 public class HitParams {
   public float Damage;
   public float KnockbackStrength;
@@ -89,13 +90,16 @@ public class Defender : MonoBehaviour {
   }
 
   public void OnHit(HitParams hit, Transform hitTransform) {
-    SFXManager.Instance.TryPlayOneShot(hit.SFX);
-    VFXManager.Instance.TrySpawnEffect(hit.VFX, transform.position + hit.VFXOffset);
-
     if (IsBlocking || IsParrying || !(Status?.Value.IsHittable ?? true))
       return;
+
     var power = 5f * hit.KnockbackStrength * Mathf.Pow((Damage.Points+100f) / 100f, 2f);
     var knockBackDirection = KnockbackVector(hitTransform, transform, hit.KnockbackType);
+    var rotation = Quaternion.LookRotation(knockBackDirection);
+
+    SFXManager.Instance.TryPlayOneShot(hit.SFX);
+    VFXManager.Instance.TrySpawnEffect(hit.VFX, transform.position + hit.VFXOffset, rotation);
+
     Status?.Value.Add(new HitStopEffect(knockBackDirection, .15f, hit.HitStopDuration.Ticks),
       s => s.Add(new KnockbackEffect(knockBackDirection*power)));
     Damage.AddPoints(hit.Damage);

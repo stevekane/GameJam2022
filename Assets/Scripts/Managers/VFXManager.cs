@@ -6,10 +6,14 @@ public class VFXManager : MonoBehaviour {
   public Coin CoinPrefab;
 
   public bool TrySpawnEffect(GameObject prefab, Vector3 position) {
+    var rotation = MainCamera.Instance
+      ? Quaternion.LookRotation(MainCamera.Instance.transform.position)
+      : Quaternion.identity;
+    return TrySpawnEffect(prefab, position, rotation);
+  }
+
+  public bool TrySpawnEffect(GameObject prefab, Vector3 position, Quaternion rotation) {
     if (prefab) {
-      var rotation = MainCamera.Instance
-        ? Quaternion.LookRotation(MainCamera.Instance.transform.position)
-        : Quaternion.identity;
       var effect = Instantiate(prefab, position, rotation);
       Destroy(effect, 3);
       return true;
