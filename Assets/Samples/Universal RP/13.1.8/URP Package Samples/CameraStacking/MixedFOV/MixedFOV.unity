@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028414, g: 0.22571535, b: 0.3069227, a: 1}
+  m_IndirectSpecularColor: {r: 0.46169555, g: 0.51241773, b: 0.5899329, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -412,6 +412,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 1
+  m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -2176,6 +2177,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 2
     m_TransformParent: {fileID: 131481531}
     m_Modifications:
     - target: {fileID: 155458132493177538, guid: d5fa55a16b49d4da3a93a4958cdc3180, type: 3}
@@ -2277,6 +2279,7 @@ PrefabInstance:
         to have different Field of Views for the "Level" camera and the "Gun" camera.
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: d5fa55a16b49d4da3a93a4958cdc3180, type: 3}
 --- !u!224 &1739120311 stripped
 RectTransform:
@@ -2910,6 +2913,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 2
     m_TransformParent: {fileID: 1434764559}
     m_Modifications:
     - target: {fileID: 6958482038010098, guid: a380b55be3e354df6a4bffc3631467c0, type: 3}
@@ -3046,12 +3050,26 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 0889dee21b18543c087760abd0df15ec, type: 2}
     m_RemovedComponents:
     - {fileID: 6383575435370445604, guid: a380b55be3e354df6a4bffc3631467c0, type: 3}
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 6383575433952177525, guid: a380b55be3e354df6a4bffc3631467c0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1857608330}
+    - targetCorrespondingSourceObject: {fileID: 6383575433952177525, guid: a380b55be3e354df6a4bffc3631467c0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1490055365}
+    - targetCorrespondingSourceObject: {fileID: 6383575433952177525, guid: a380b55be3e354df6a4bffc3631467c0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 194942083}
+    - targetCorrespondingSourceObject: {fileID: 6383575433952177525, guid: a380b55be3e354df6a4bffc3631467c0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1188625083}
   m_SourcePrefab: {fileID: 100100000, guid: a380b55be3e354df6a4bffc3631467c0, type: 3}
 --- !u!1001 &8282558930070009747
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2148271877166492642, guid: 8089b5fe6d8304423814ff197221f77d, type: 3}
@@ -3127,6 +3145,10 @@ PrefabInstance:
       value: 100
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 3363522893988168260, guid: 8089b5fe6d8304423814ff197221f77d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1434764559}
   m_SourcePrefab: {fileID: 100100000, guid: 8089b5fe6d8304423814ff197221f77d, type: 3}
 --- !u!4 &8282558930070009748 stripped
 Transform:
