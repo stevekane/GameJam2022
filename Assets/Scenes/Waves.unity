@@ -683,12 +683,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55588c44c03f6994a9827ef9c6a39f7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InitialCost: 1
-  CostPerWave: 1
+  Bundle:
+    Fibers: []
+    Added: []
+    Removed: []
+  InitialBudget: 0
+  BudgetPerWave: 0
   TotalWaveCount: 5
   WavePeriod:
     Millis: 3000
-    TicksPerSecond: 1
+    FramesPerSecond: 30
   Config:
     SpawnPoints:
     - {fileID: 190460472}
@@ -1038,6 +1042,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ffab7732e48bb940bb91aa20c706886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Bundle:
+    Fibers: []
+    Added: []
+    Removed: []
   MusicSource: {fileID: 384477740}
   InitialWaitFrames: 60
   IntroMusicClip: {fileID: 8300000, guid: c122fc2666275ba4d9a01b68864b0748, type: 3}
