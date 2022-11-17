@@ -462,6 +462,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 433230649554147245}
   - {fileID: 6750085551106864666}
   - {fileID: 8872822986952010247}
   - {fileID: 8872822986732128203}
@@ -480,12 +481,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7e8a1e610d31d74593d54b54258014b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TargetLayerMask:
-    serializedVersion: 2
-    m_Bits: 16384
-  EnvironmentLayerMask:
-    serializedVersion: 2
-    m_Bits: 1
   RadialBurstConfig:
     Owner: {fileID: 8872822988582960447}
     Vibrator: {fileID: 8872822988582960448}
@@ -521,7 +516,17 @@ MonoBehaviour:
       SFX: {fileID: 8300000, guid: 05d0536a3eefc80438f95f9662331f52, type: 3}
       VFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
       VFXOffset: {x: 0, y: 1, z: 0}
+    Trail: {fileID: 433230649554147219}
+    RushSFX: {fileID: 8300000, guid: e38a7bb13c125d745b4b0c6361331870, type: 3}
     RushSpeed: 200
+  BuzzSawConfig:
+    SawSFX: {fileID: 0}
+  TargetLayerMask:
+    serializedVersion: 2
+    m_Bits: 16384
+  EnvironmentLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
   EyeHeight: 1
   MaxTargetingDistance: 50
   CenterOfArena: {fileID: 8872822986732128203}
@@ -739,6 +744,91 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!1001 &573465693535831759
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 2
+    m_TransformParent: {fileID: 8872822988582960447}
+    m_Modifications:
+    - target: {fileID: 141433446842962268, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+      propertyPath: InitialModule.maxNumParticles
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 141433446842962268, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+      propertyPath: EmissionModule.rateOverTime.scalar
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 141433446842962269, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+      propertyPath: m_Name
+      value: BumRushTrail Prefab
+      objectReference: {fileID: 0}
+    - target: {fileID: 141433446842962269, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 141433446842962274, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 141433446842962274, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.0000008866189
+      objectReference: {fileID: 0}
+    - target: {fileID: 141433446842962274, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 141433446842962274, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -4.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 141433446842962274, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.00000010430811
+      objectReference: {fileID: 0}
+    - target: {fileID: 141433446842962274, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 141433446842962274, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 141433446842962274, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 141433446842962274, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 141433446842962274, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 141433446842962274, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4150377232657049695, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_AddedGameObjects: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+--- !u!198 &433230649554147219 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 141433446842962268, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+  m_PrefabInstance: {fileID: 573465693535831759}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &433230649554147245 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 141433446842962274, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
+  m_PrefabInstance: {fileID: 573465693535831759}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8872822986710347122
 PrefabInstance:
   m_ObjectHideFlags: 0

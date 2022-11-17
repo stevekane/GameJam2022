@@ -31,10 +31,20 @@ abstract class PigMossAbility : IAbility, IEnumerator {
   public abstract IEnumerator Routine();
 }
 
-class DesolateDive : PigMossAbility {
+[Serializable]
+class BuzzSawConfig {
+  public AudioClip SawSFX;
+}
+
+class BuzzSaw : PigMossAbility {
+  BuzzSawConfig Config;
+  public BuzzSaw(AbilityManager manager, BuzzSawConfig config) {
+    AbilityManager = manager;
+  }
   public override void OnStop() {
   }
   public override IEnumerator Routine() {
+    Debug.Log("BuzzSaw");
     yield return null;
   }
 }
@@ -67,7 +77,6 @@ class RadialBurst : PigMossAbility {
     AbilityManager = manager;
     Config = config;
   }
-
   public override void OnStop() {
     if (StatusEffect != null) {
       Status.Remove(StatusEffect);
@@ -84,7 +93,6 @@ class RadialBurst : PigMossAbility {
     yield return Fiber.Wait(Config.ChargeDelay);
     var rotationPerProjectile = Quaternion.Euler(0, 360/(float)Config.Count, 0);
     var halfRotationPerProjectile = Quaternion.Euler(0, 180/(float)Config.Count, 0);
-    var delay = Config.FireDelay.Ticks;
     var direction = Config.Owner.forward.XZ();
     for (var j = 0; j < Config.Rotations; j++) {
       SFXManager.Instance.TryPlayOneShot(Config.FireSFX);
@@ -109,6 +117,8 @@ class BumRushConfig {
   public Timeval RecoveryDuration = Timeval.FromSeconds(.5f);
   public TriggerEvent SpikeTriggerEvent;
   public HitParams SpikeHitParams;
+  public ParticleSystem Trail;
+  public AudioClip RushSFX;
   public float RushSpeed = 100;
 }
 
@@ -127,16 +137,20 @@ class BumRush : PigMossAbility {
   public override void OnStop() {
     Status.Remove(RushStatusEffect);
     Config.Animator.SetBool("Extended", false);
+    Config.Trail.Stop();
   }
   IEnumerator Rush() {
     RushStatusEffect = new ScriptedMovementEffect();
     Status.Add(RushStatusEffect);
+    SFXManager.Instance.TryPlayOneShot(Config.RushSFX);
+    Config.Trail.Play();
     var delta = Target.position-Mover.transform.position;
     var direction = delta.normalized;
     for (var tick = 0; tick < Config.RushDuration.Ticks; tick++) {
       Status.Move(direction*Config.RushSpeed*Time.fixedDeltaTime);
       yield return null;
     }
+    Config.Trail.Stop();
     Status.Remove(RushStatusEffect);
   }
   public override IEnumerator Routine() {
@@ -156,13 +170,15 @@ class BumRush : PigMossAbility {
 }
 
 public class PigMoss : MonoBehaviour {
-  [SerializeField] LayerMask TargetLayerMask;
-  [SerializeField] LayerMask EnvironmentLayerMask;
   [Header("Radial Burst")]
   [SerializeField] RadialBurstConfig RadialBurstConfig;
   [Header("Bum Rush")]
   [SerializeField] BumRushConfig BumRushConfig;
+  [Header("Buzz Saw")]
+  [SerializeField] BuzzSawConfig BuzzSawConfig;
   [Header("Targeting")]
+  [SerializeField] LayerMask TargetLayerMask;
+  [SerializeField] LayerMask EnvironmentLayerMask;
   [SerializeField] float EyeHeight;
   [SerializeField] float MaxTargetingDistance;
   [Header("Navigation")]
@@ -226,5 +242,8 @@ public class PigMoss : MonoBehaviour {
     var burst = new RadialBurst(AbilityManager, RadialBurstConfig);
     AbilityManager.TryInvoke(burst.Routine); // TODO: awkward.
     yield return burst;
+    var buzzSaw = new BuzzSaw(AbilityManager, BuzzSawConfig);
+    AbilityManager.TryInvoke(buzzSaw.Routine); // TODO: awkward.
+    yield return buzzSaw;
   }
 }
