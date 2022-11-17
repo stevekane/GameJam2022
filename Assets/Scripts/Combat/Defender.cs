@@ -68,6 +68,7 @@ public class Defender : MonoBehaviour {
   Optional<Status> Status;
   Damage Damage;
   bool PlayingFallSound;
+  bool Died = false;
   public Vector3? LastGroundedPosition { get; private set; }
 
   public AudioClip FallSFX;
@@ -107,6 +108,9 @@ public class Defender : MonoBehaviour {
   }
 
   public void Die() {
+    if (Died)
+      return;
+    Died = true;
     // TODO: keep track of last attacker
     LastGroundedPosition = LastGroundedPosition ?? transform.position;
     SendMessage("OnDeath", SendMessageOptions.RequireReceiver);
