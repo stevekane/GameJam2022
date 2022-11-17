@@ -64,7 +64,7 @@ public class MeleeAbility : Ability {
     PhaseHits.Clear();
     Hits.Clear();
     SFXManager.Instance.TryPlayOneShot(AttackSFX);
-    VFXManager.Instance.TrySpawnEffect(AttackVFX, Owner.position + HitConfig.VFXOffset, -1);
+    VFXManager.Instance.TrySpawn2DEffect(AttackVFX, Owner.position + HitConfig.VFXOffset, Owner.rotation, -1);
     yield return Fiber.Any(Animation.PlayUntil(WindupDuration.AnimFrames + ActiveDuration.AnimFrames), HandleHits(chargeScaling));
     Hitbox.Collider.enabled = false;
     // Recovery
