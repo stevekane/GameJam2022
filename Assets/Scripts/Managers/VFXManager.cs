@@ -12,7 +12,7 @@ public class VFXManager : MonoBehaviour {
     return TrySpawnEffect(prefab, position, rotation);
   }
 
-  public bool TrySpawnEffect(GameObject prefab, Vector3 position, Quaternion rotation) {
+  public bool TrySpawnEffect(GameObject prefab, Vector3 position, Quaternion rotation, float lifetime = 3f) {
     if (prefab) {
       var effect = Instantiate(prefab, position, rotation);
       if (lifetime >= 0f)
