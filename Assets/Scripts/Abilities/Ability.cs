@@ -14,10 +14,11 @@ public class TriggerCondition {
   //public AttributeTag[] RequiredOwnerAttribs = { };
 }
 
-public interface IAbility : IStoppable, IEquatable<object> {
+public interface IAbility : IStoppable {
   public AbilityManager AbilityManager { get; set; }
   public Attributes Attributes { get; }
   public Status Status { get; }
+  public Mover Mover { get; }
   public AbilityTag Tags { get; set; }
   public void StartRoutine(Fiber routine);
   public void StopRoutine(Fiber routine);
@@ -31,6 +32,7 @@ public abstract class Ability : MonoBehaviour, IAbility {
   public AbilityManager AbilityManager { get; set; }
   public Attributes Attributes { get => AbilityManager.GetComponent<Attributes>(); }
   public Status Status { get => AbilityManager.GetComponent<Status>(); }
+  public Mover Mover { get => AbilityManager.GetComponent<Mover>(); }
   public List<TriggerCondition> TriggerConditions = new();
   Dictionary<AbilityMethod, TriggerCondition> TriggerConditionsMap = new();
   [HideInInspector] public AbilityTag Tags { get; set; } // Inherited from the Trigger when started
@@ -69,14 +71,4 @@ public abstract class Ability : MonoBehaviour, IAbility {
   }
   void Awake() => TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.GetMethod(this)] = c);
   void OnDestroy() => Stop();
-  public override bool Equals(object obj) {
-    if (obj == null || GetType() != obj.GetType()) {
-      return false;
-    } else {
-      return base.Equals(obj);
-    }
-  }
-  public override int GetHashCode() {
-    return base.GetHashCode();
-  }
 }
