@@ -33,19 +33,43 @@ abstract class PigMossAbility : IAbility, IEnumerator {
 
 [Serializable]
 class BuzzSawConfig {
-  public AudioClip SawSFX;
+  public AudioClip RevealedSFX;
+  public AudioClip ExtendedSFX;
+  public AudioClip HiddenSFX;
+  public Animator Animator;
+  public Timeval RevealedDuration;
+  public Timeval ExtendedDuration;
+  public TriggerEvent BladeTriggerEvent;
+  public HitParams BladeHitParams;
 }
 
 class BuzzSaw : PigMossAbility {
+  enum BladeState { Hidden = 0, Revealed = 1, Extended = 2 }
+
   BuzzSawConfig Config;
   public BuzzSaw(AbilityManager manager, BuzzSawConfig config) {
     AbilityManager = manager;
+    Config = config;
   }
   public override void OnStop() {
+    Config.Animator.SetInteger("State", (int)BladeState.Hidden);
   }
   public override IEnumerator Routine() {
-    Debug.Log("BuzzSaw");
-    yield return null;
+    SFXManager.Instance.TryPlayOneShot(Config.RevealedSFX);
+    Config.Animator.SetInteger("State", (int)BladeState.Revealed);
+    yield return Fiber.Wait(Config.RevealedDuration);
+    SFXManager.Instance.TryPlayOneShot(Config.ExtendedSFX);
+    Config.Animator.SetInteger("State", (int)BladeState.Extended);
+    var wait = Fiber.Wait(Config.ExtendedDuration);
+    var contact = Fiber.ListenFor(Config.BladeTriggerEvent.OnTriggerEnterSource);
+    var outcome = Fiber.Select(contact, wait);
+    yield return outcome;
+    // hit target
+    if (outcome.Value == 0 && contact.Value.TryGetComponent(out Hurtbox hurtbox)) {
+      hurtbox.Defender.OnHit(Config.BladeHitParams, AbilityManager.transform);
+    }
+    SFXManager.Instance.TryPlayOneShot(Config.HiddenSFX);
+    Config.Animator.SetInteger("State", (int)BladeState.Hidden);
   }
 }
 
