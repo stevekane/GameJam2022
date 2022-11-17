@@ -49,17 +49,29 @@ class Bombard : PigMossAbility {
 }
 
 class RadialBurst : PigMossAbility {
-  public GameObject Projectile;
-  public int Count;
-  public AnimationClip Animation;
+  public Transform Owner;
+  public GameObject ProjectilePrefab;
+  public Timeval ChargeDelay;
   public Timeval FireDelay;
+  public Vibrator Vibrator;
+  public int Count;
 
   public override void OnStop() {
 
   }
   public override IEnumerator Routine() {
-    Debug.Log("Radial BURST");
-    yield return Fiber.Wait(Timeval.FromSeconds(2));
+    Vibrator.Vibrate(Vector3.up, ChargeDelay.Ticks, .5f);
+    yield return Fiber.Wait(ChargeDelay);
+    var direction = Owner.forward.XZ();
+    var rotationPerProjectile = Quaternion.Euler(0, 1/(float)Count*360, 0);
+    for (var i = 0; i < Count; i++) {
+      direction = rotationPerProjectile*direction;
+      var rotation = Quaternion.LookRotation(direction, Vector3.up);
+      var radius = 7;
+      var position = Owner.position+radius*direction+Vector3.up;
+      GameObject.Instantiate(ProjectilePrefab, position, rotation);
+      yield return Fiber.Wait(FireDelay);
+    }
   }
 }
 
@@ -76,6 +88,7 @@ public class PigMoss : MonoBehaviour {
   [SerializeField] Transform CenterOfArena;
   [SerializeField] LayerMask TargetLayerMask;
   [SerializeField] LayerMask EnvironmentLayerMask;
+  [SerializeField] GameObject RadialBurstProjectilePrefab;
   [SerializeField] float EyeHeight;
   [SerializeField] float MaxTargetingDistance;
 
@@ -83,11 +96,13 @@ public class PigMoss : MonoBehaviour {
   Transform Target;
   Mover Mover;
   Animator Animator;
+  Vibrator Vibrator;
   AbilityManager AbilityManager;
 
   void Awake() {
     Mover = GetComponent<Mover>();
     Animator = GetComponent<Animator>();
+    Vibrator = GetComponent<Vibrator>();
     AbilityManager = GetComponent<AbilityManager>();
   }
   void Start() => Behavior = new Fiber(Fiber.Repeat(MakeBehavior));
@@ -120,16 +135,19 @@ public class PigMoss : MonoBehaviour {
     yield return Fiber.Wait(Timeval.FixedUpdatePerSecond);
   }
 
-  /*
-  If we are close to the edge, use ability to move us towards the center
-  If we have a target, favor trying to attack it
-  Otherwise, favor walking towards the center
-  */
   IEnumerator MakeBehavior() {
     yield return Fiber.Any(AcquireTarget(), LookAround());
     if (Target) {
-      var burst = new RadialBurst { AbilityManager = AbilityManager };
-      AbilityManager.TryInvoke(burst.Routine); // TODO: This is awkward but doing it here for the sake of the family
+      var burst = new RadialBurst {
+        AbilityManager = AbilityManager,
+        Owner = transform,
+        ProjectilePrefab = RadialBurstProjectilePrefab,
+        ChargeDelay = Timeval.FromMillis(500),
+        FireDelay = Timeval.FromMillis(50),
+        Vibrator = Vibrator,
+        Count = 16
+      };
+      AbilityManager.TryInvoke(burst.Routine); // TODO: awkward.
       yield return burst;
     } else {
       var deltaToCenter = CenterOfArena.position-transform.position.XZ();

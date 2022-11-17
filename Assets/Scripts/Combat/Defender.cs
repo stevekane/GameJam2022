@@ -99,7 +99,7 @@ public class Defender : MonoBehaviour {
     Status?.Value.Add(new HitStopEffect(knockBackDirection, .15f, hit.HitStopDuration.Ticks),
       s => s.Add(new KnockbackEffect(knockBackDirection*power)));
     Damage.AddPoints(hit.Damage);
-    hit.OnHitEffects.ForEach(e => Status?.Value.Add(e));
+    hit.OnHitEffects?.ForEach(e => Status?.Value.Add(e));
   }
 
   public void Die() {
