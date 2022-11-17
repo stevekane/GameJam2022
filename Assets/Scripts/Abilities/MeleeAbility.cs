@@ -21,6 +21,7 @@ public class MeleeAbility : Ability {
   public GameObject AttackVFX;
   public AttackHitbox Hitbox;
 
+  GameObject AttackVFXInstance;
   AnimationTask Animation;
   List<Transform> Hits = new List<Transform>(capacity: 4);
   List<Transform> PhaseHits = new List<Transform>(capacity: 4);
@@ -64,9 +65,15 @@ public class MeleeAbility : Ability {
     PhaseHits.Clear();
     Hits.Clear();
     SFXManager.Instance.TryPlayOneShot(AttackSFX);
-    VFXManager.Instance.TrySpawn2DEffect(AttackVFX, Owner.position + HitConfig.VFXOffset, Owner.rotation, -1);
-    yield return Fiber.Any(Animation.PlayUntil(WindupDuration.AnimFrames + ActiveDuration.AnimFrames), HandleHits(chargeScaling));
+    AttackVFXInstance = VFXManager.Instance.TrySpawn2DEffect(AttackVFX, Owner.position + HitConfig.VFXOffset, Owner.rotation, -1);
+    yield return Fiber.Any(Animation.PlayUntil(WindupDuration.AnimFrames + ActiveDuration.AnimFrames+1), HandleHits(chargeScaling));
     Hitbox.Collider.enabled = false;
+
+    // Hitstop
+    yield return Fiber.Until(() => Animator.speed != 0);
+    if (AttackVFXInstance && AttackVFXInstance.GetComponent<ParticleSystem>().main is var m)
+      m.simulationSpeed = 1f;
+
     // Recovery
     yield return Animation;
   }
@@ -78,6 +85,8 @@ public class MeleeAbility : Ability {
   IEnumerator HandleHits(float chargeScaling) {
     while (true) {
       if (Hits.Count != 0) {
+        if (AttackVFXInstance && AttackVFXInstance.GetComponent<ParticleSystem>().main is var m)
+          m.simulationSpeed = 0f;
         Status.Add(new HitStopEffect(Owner.forward, HitStopVibrationAmplitude, HitFreezeDuration.Ticks));
         CameraShaker.Instance.Shake(HitCameraShakeIntensity);
         var hitParams = HitConfig.ComputeParamsScaled(Attributes, chargeScaling);
@@ -86,7 +95,6 @@ public class MeleeAbility : Ability {
           Owner.transform.forward = (target.transform.position - Owner.transform.position).XZ().normalized;
         });
         AbilityManager.Energy?.Value.Add(HitEnergyGain * Hits.Count);
-
         Status.Add(new RecoilEffect(HitRecoilStrength * -Owner.forward));
         Hits.Clear();
       }
