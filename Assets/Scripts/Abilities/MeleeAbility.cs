@@ -17,6 +17,8 @@ public class MeleeAbility : Ability {
   public float HitRecoilStrength;
   public float HitEnergyGain;
   public float ChargeSpeedFactor = .3f;
+  public AudioClip AttackSFX;
+  public GameObject AttackVFX;
   public AttackHitbox Hitbox;
 
   AnimationTask Animation;
@@ -61,6 +63,8 @@ public class MeleeAbility : Ability {
     Hitbox.Collider.enabled = true;
     PhaseHits.Clear();
     Hits.Clear();
+    SFXManager.Instance.TryPlayOneShot(AttackSFX);
+    VFXManager.Instance.TrySpawnEffect(AttackVFX, Owner.position + HitConfig.VFXOffset, -1);
     yield return Fiber.Any(Animation.PlayUntil(WindupDuration.AnimFrames + ActiveDuration.AnimFrames), HandleHits(chargeScaling));
     Hitbox.Collider.enabled = false;
     // Recovery
