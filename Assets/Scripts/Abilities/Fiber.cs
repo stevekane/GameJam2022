@@ -330,6 +330,18 @@ public class Fiber : IEnumerator, IStoppable {
       yield return continuation(a);
     }
   }
+  public static IEnumerator Repeat(Action action) {
+    while (true) {
+      action();
+      yield return null;
+    }
+  }
+  public static IEnumerator Repeat<A>(Action<A> action, A a) {
+    while (true) {
+      action(a);
+      yield return null;
+    }
+  }
 
   Stack<IEnumerator> Stack;
   public Fiber(IEnumerator enumerator) {

@@ -17,6 +17,9 @@ public class BigFatSlowBoom : MonoBehaviour {
         VFX = VFXPrefab,
       };
       hurtbox.Defender.OnHit(hitParams, transform);
+    } else {
+      SFXManager.Instance.TryPlayOneShot(SFXClip);
+      VFXManager.Instance.TrySpawnEffect(VFXPrefab, transform.position);
     }
     Destroy(gameObject);
   }

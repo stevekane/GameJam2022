@@ -51,26 +51,44 @@ class Bombard : PigMossAbility {
 class RadialBurst : PigMossAbility {
   public Transform Owner;
   public GameObject ProjectilePrefab;
+  public AudioClip FireSFX;
   public Timeval ChargeDelay;
   public Timeval FireDelay;
   public Vibrator Vibrator;
   public int Count;
+  public int Rotations;
+
+  StatusEffect StatusEffect;
 
   public override void OnStop() {
-
+    if (StatusEffect != null) {
+      Status.Remove(StatusEffect);
+    }
+    StatusEffect = null;
   }
   public override IEnumerator Routine() {
-    Vibrator.Vibrate(Vector3.up, ChargeDelay.Ticks, .5f);
+    StatusEffect = new InlineEffect(status => {
+      status.CanMove = false;
+      status.CanRotate = false;
+    });
+    Status.Add(StatusEffect);
+    Vibrator.Vibrate(Vector3.up, ChargeDelay.Ticks, 1f);
     yield return Fiber.Wait(ChargeDelay);
+    var rotationPerProjectile = Quaternion.Euler(0, 360/(float)Count, 0);
+    var halfRotationPerProjectile = Quaternion.Euler(0, 180/(float)Count, 0);
+    var delay = FireDelay.Ticks;
     var direction = Owner.forward.XZ();
-    var rotationPerProjectile = Quaternion.Euler(0, 1/(float)Count*360, 0);
-    for (var i = 0; i < Count; i++) {
-      direction = rotationPerProjectile*direction;
-      var rotation = Quaternion.LookRotation(direction, Vector3.up);
-      var radius = 7;
-      var position = Owner.position+radius*direction+Vector3.up;
-      GameObject.Instantiate(ProjectilePrefab, position, rotation);
+    for (var j = 0; j < Rotations; j++) {
+      SFXManager.Instance.TryPlayOneShot(FireSFX);
+      for (var i = 0; i < Count; i++) {
+        direction = rotationPerProjectile*direction;
+        var rotation = Quaternion.LookRotation(direction, Vector3.up);
+        var radius = 5;
+        var position = Owner.position+radius*direction+Vector3.up;
+        GameObject.Instantiate(ProjectilePrefab, position, rotation);
+      }
       yield return Fiber.Wait(FireDelay);
+      direction = halfRotationPerProjectile*direction;
     }
   }
 }
@@ -89,6 +107,7 @@ public class PigMoss : MonoBehaviour {
   [SerializeField] LayerMask TargetLayerMask;
   [SerializeField] LayerMask EnvironmentLayerMask;
   [SerializeField] GameObject RadialBurstProjectilePrefab;
+  [SerializeField] AudioClip RadialBurstFireSFX;
   [SerializeField] float EyeHeight;
   [SerializeField] float MaxTargetingDistance;
 
@@ -105,7 +124,7 @@ public class PigMoss : MonoBehaviour {
     Vibrator = GetComponent<Vibrator>();
     AbilityManager = GetComponent<AbilityManager>();
   }
-  void Start() => Behavior = new Fiber(Fiber.Repeat(MakeBehavior));
+  void Start() => Behavior = new Fiber(Fiber.All(Fiber.Repeat(MakeBehavior), Fiber.Repeat(LookAtTarget)));
   void OnDestroy() => Behavior = null;
   void FixedUpdate() => Behavior?.MoveNext();
 
@@ -135,24 +154,37 @@ public class PigMoss : MonoBehaviour {
     yield return Fiber.Wait(Timeval.FixedUpdatePerSecond);
   }
 
+  void LookAtTarget() {
+    Target = FindObjectOfType<Player>().transform;
+    if (Target) {
+      Mover.SetAim(AbilityManager, (Target.position-transform.position).normalized);
+    }
+  }
+
   IEnumerator MakeBehavior() {
-    yield return Fiber.Any(AcquireTarget(), LookAround());
+    yield return Fiber.Wait(Timeval.FromSeconds(3));
     if (Target) {
       var burst = new RadialBurst {
         AbilityManager = AbilityManager,
         Owner = transform,
         ProjectilePrefab = RadialBurstProjectilePrefab,
-        ChargeDelay = Timeval.FromMillis(500),
-        FireDelay = Timeval.FromMillis(50),
+        FireSFX = RadialBurstFireSFX,
+        ChargeDelay = Timeval.FromMillis(1000),
+        FireDelay = Timeval.FromMillis(250),
         Vibrator = Vibrator,
-        Count = 16
+        Count = 16,
+        Rotations = 5
       };
       AbilityManager.TryInvoke(burst.Routine); // TODO: awkward.
       yield return burst;
     } else {
       var deltaToCenter = CenterOfArena.position-transform.position.XZ();
-      var toCenter = deltaToCenter.TryGetDirection() ?? transform.forward;
-      Mover.UpdateAxes(AbilityManager, deltaToCenter, toCenter);
+      if (deltaToCenter.magnitude > 5) {
+        var toCenter = deltaToCenter.TryGetDirection() ?? transform.forward;
+        Mover.SetMove(AbilityManager, toCenter);
+      } else {
+        Mover.SetMove(AbilityManager, transform.forward);
+      }
       yield return null;
     }
   }
