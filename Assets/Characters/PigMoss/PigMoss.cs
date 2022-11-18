@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 abstract class PigMossAbility : IAbility, IEnumerator {
@@ -47,6 +48,8 @@ class BuzzSaw : PigMossAbility {
   enum BladeState { Hidden = 0, Revealed = 1, Extended = 2 }
 
   BuzzSawConfig Config;
+  HashSet<Collider> Hits = new();
+
   public BuzzSaw(AbilityManager manager, BuzzSawConfig config) {
     AbilityManager = manager;
     Config = config;
@@ -60,16 +63,25 @@ class BuzzSaw : PigMossAbility {
     yield return Fiber.Wait(Config.RevealedDuration);
     SFXManager.Instance.TryPlayOneShot(Config.ExtendedSFX);
     Config.Animator.SetInteger("State", (int)BladeState.Extended);
-    var wait = Fiber.Wait(Config.ExtendedDuration);
-    var contact = Fiber.ListenFor(Config.BladeTriggerEvent.OnTriggerEnterSource);
-    var outcome = Fiber.Select(contact, wait);
-    yield return outcome;
-    // hit target
-    if (outcome.Value == 0 && contact.Value.TryGetComponent(out Hurtbox hurtbox)) {
-      hurtbox.Defender.OnHit(Config.BladeHitParams, AbilityManager.transform);
-    }
+    yield return Fiber.Any(Fiber.Wait(Config.ExtendedDuration), Fiber.Repeat(OnHit));
+    Hits.ForEach(ProcessHit);
     SFXManager.Instance.TryPlayOneShot(Config.HiddenSFX);
     Config.Animator.SetInteger("State", (int)BladeState.Hidden);
+  }
+  IEnumerator OnHit() {
+    var hitEvent = Fiber.ListenFor(Config.BladeTriggerEvent.OnTriggerStaySource);
+    yield return hitEvent;
+    var position = hitEvent.Value.transform.position;
+    var direction = (position-AbilityManager.transform.position).XZ().normalized;
+    var rotation = Quaternion.LookRotation(direction, Vector3.up);
+    SFXManager.Instance.TryPlayOneShot(Config.BladeHitParams.SFX);
+    VFXManager.Instance.TrySpawnEffect(Config.BladeHitParams.VFX, position, rotation);
+    Hits.Add(hitEvent.Value);
+  }
+  void ProcessHit(Collider c) {
+    if (c.TryGetComponent(out Hurtbox hurtbox)) {
+      hurtbox.Defender.OnHit(Config.BladeHitParams, AbilityManager.transform);
+    }
   }
 }
 
@@ -195,10 +207,13 @@ class BumRush : PigMossAbility {
 
 public class PigMoss : MonoBehaviour {
   [Header("Radial Burst")]
+  [SerializeField] bool UseRadialBurst = true;
   [SerializeField] RadialBurstConfig RadialBurstConfig;
   [Header("Bum Rush")]
+  [SerializeField] bool UseBumRush = true;
   [SerializeField] BumRushConfig BumRushConfig;
   [Header("Buzz Saw")]
+  [SerializeField] bool UseBuzzSaw = true;
   [SerializeField] BuzzSawConfig BuzzSawConfig;
   [Header("Targeting")]
   [SerializeField] LayerMask TargetLayerMask;
@@ -207,6 +222,7 @@ public class PigMoss : MonoBehaviour {
   [SerializeField] float MaxTargetingDistance;
   [Header("Navigation")]
   [SerializeField] Transform CenterOfArena;
+
 
   IEnumerator Behavior;
   Transform Target;
@@ -260,14 +276,21 @@ public class PigMoss : MonoBehaviour {
 
   IEnumerator MakeBehavior() {
     Target = FindObjectOfType<Player>().transform;
-    var bumRush = new BumRush(AbilityManager, BumRushConfig, Target);
-    AbilityManager.TryInvoke(bumRush.Routine);
-    yield return bumRush;
-    var burst = new RadialBurst(AbilityManager, RadialBurstConfig);
-    AbilityManager.TryInvoke(burst.Routine); // TODO: awkward.
-    yield return burst;
-    var buzzSaw = new BuzzSaw(AbilityManager, BuzzSawConfig);
-    AbilityManager.TryInvoke(buzzSaw.Routine); // TODO: awkward.
-    yield return buzzSaw;
+    if (UseBumRush) {
+      var bumRush = new BumRush(AbilityManager, BumRushConfig, Target);
+      AbilityManager.TryInvoke(bumRush.Routine);
+      yield return bumRush;
+    }
+    if (UseRadialBurst) {
+      var burst = new RadialBurst(AbilityManager, RadialBurstConfig);
+      AbilityManager.TryInvoke(burst.Routine); // TODO: awkward.
+      yield return burst;
+    }
+    if (UseBuzzSaw) {
+      var buzzSaw = new BuzzSaw(AbilityManager, BuzzSawConfig);
+      AbilityManager.TryInvoke(buzzSaw.Routine); // TODO: awkward.
+      yield return buzzSaw;
+    }
+    yield return Fiber.Wait(Timeval.FromSeconds(1));
   }
 }

@@ -93,7 +93,9 @@ GameObject:
   m_Component:
   - component: {fileID: 2155777000018846974}
   - component: {fileID: 9180482974246075427}
-  m_Layer: 0
+  - component: {fileID: 2762402574551594560}
+  - component: {fileID: 8773792274563917286}
+  m_Layer: 15
   m_Name: BuzzSaw
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -136,6 +138,32 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!136 &2762402574551594560
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3855028238383683661}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 1
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8773792274563917286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3855028238383683661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5668056689663596474
 GameObject:
   m_ObjectHideFlags: 0
@@ -584,7 +612,7 @@ MonoBehaviour:
     ExtendedDuration:
       Millis: 666.6667
       FramesPerSecond: 30
-    BladeTriggerEvent: {fileID: 1821715106172476758}
+    BladeTriggerEvent: {fileID: 8773792274563917286}
     BladeHitParams:
       Damage: 20
       KnockbackStrength: 15
@@ -829,8 +857,6 @@ GameObject:
   - component: {fileID: 2795885455047360051}
   - component: {fileID: 9136813743958556400}
   - component: {fileID: 3664697993468205542}
-  - component: {fileID: 6223361028730250650}
-  - component: {fileID: 1821715106172476758}
   m_Layer: 15
   m_Name: BuzzSawModel
   m_TagString: Untagged
@@ -903,32 +929,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &6223361028730250650
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9084480068648248668}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1821715106172476758
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9084480068648248668}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &573465693535831759
 PrefabInstance:
   m_ObjectHideFlags: 0
