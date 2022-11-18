@@ -36,6 +36,7 @@ abstract class PigMossAbility : IAbility, IEnumerator {
 class BuzzSawConfig {
   public AudioClip RevealedSFX;
   public AudioClip ExtendedSFX;
+  public GameObject ExtendedVFX;
   public AudioClip HiddenSFX;
   public Animator Animator;
   public Timeval RevealedDuration;
@@ -62,6 +63,7 @@ class BuzzSaw : PigMossAbility {
     Config.Animator.SetInteger("State", (int)BladeState.Revealed);
     yield return Fiber.Wait(Config.RevealedDuration);
     SFXManager.Instance.TryPlayOneShot(Config.ExtendedSFX);
+    VFXManager.Instance.TrySpawn2DEffect(Config.ExtendedVFX, AbilityManager.transform.position, AbilityManager.transform.rotation, Config.ExtendedDuration.Seconds);
     Config.Animator.SetInteger("State", (int)BladeState.Extended);
     yield return Fiber.Any(Fiber.Wait(Config.ExtendedDuration), Fiber.Repeat(OnHit));
     Hits.ForEach(ProcessHit);
