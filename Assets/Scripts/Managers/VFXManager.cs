@@ -5,21 +5,29 @@ public class VFXManager : MonoBehaviour {
 
   public Coin CoinPrefab;
 
-  public bool TrySpawnEffect(GameObject prefab, Vector3 position) {
+  public GameObject TrySpawnEffect(GameObject prefab, Vector3 position, float lifetime = 3f) {
     var rotation = MainCamera.Instance
       ? Quaternion.LookRotation(MainCamera.Instance.transform.position)
       : Quaternion.identity;
     return TrySpawnEffect(prefab, position, rotation);
   }
 
-  public bool TrySpawnEffect(GameObject prefab, Vector3 position, Quaternion rotation) {
+  public GameObject TrySpawnEffect(GameObject prefab, Vector3 position, Quaternion rotation, float lifetime = 3f) {
     if (prefab) {
       var effect = Instantiate(prefab, position, rotation);
-      Destroy(effect, 3);
-      return true;
+      if (lifetime >= 0f)
+        Destroy(effect, lifetime);
+      return effect;
     } else {
-      return false;
+      return null;
     }
+  }
+
+  public GameObject TrySpawn2DEffect(GameObject prefab, Vector3 position, Quaternion rotation, float lifetime = 3f) {
+    // This rotation trickery is an attempt to align a camera-facing spritesheet animation with the world-space orientation.
+    // I don't know if this is correct. World-space y rotation correspends to a negative z rotation, I guess, but the x rotation
+    // is black magic.
+    return TrySpawnEffect(prefab, position, Quaternion.Euler(90, 0, -rotation.eulerAngles[1]), lifetime);
   }
 
   public void SpawnEffect(Effect effect, Vector3 position, Quaternion rotation) {
