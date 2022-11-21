@@ -51,6 +51,20 @@ public class Mover : MonoBehaviour {
     yield return Fiber.Any(aimingTimeout, aimed);
   }
 
+  public void TryLookAt(Transform target) {
+    if (target) {
+      SetAim((target.position-transform.position).normalized);
+    }
+  }
+
+  public void SetMove(Vector3 v) {
+    AbilityManager.GetAxis(AxisTag.Move).Update(0, new Vector2(v.x, v.z));
+  }
+
+  public void SetAim(Vector3 v) {
+    AbilityManager.GetAxis(AxisTag.Aim).Update(0, new Vector2(v.x, v.z));
+  }
+
   void FixedUpdate() {
     GetAxes(AbilityManager, out var desiredMoveDir, out var desiredFacing);
 

@@ -68,8 +68,8 @@ public class SuplexAbility : Ability {
 
     CameraShaker.Instance.Shake(HitCameraShakeIntensity);
     var hitParams = HitConfig.ComputeParams(Attributes);
-    var hits = Physics.OverlapSphereNonAlloc(target.transform.position, HitRadius, PhysicsBuffers.Colliders, Layers.CollidesWith(gameObject.layer));
-    PhysicsBuffers.Colliders[..hits].ForEach(c => {
+    var hits = Physics.OverlapSphereNonAlloc(target.transform.position, HitRadius, PhysicsQuery.Colliders, Layers.CollidesWith(gameObject.layer));
+    PhysicsQuery.Colliders[..hits].ForEach(c => {
       if (c.TryGetComponent(out Hurtbox hurtbox))
         hurtbox.Defender.OnHit(hitParams, transform);
     });

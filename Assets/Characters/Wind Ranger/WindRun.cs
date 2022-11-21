@@ -10,7 +10,7 @@ public class WindRun : Ability {
   public float Radius;
 
   WindRunBoostEffect WindRunBoostEffect;
-  Collider[] Colliders { get => PhysicsBuffers.Colliders; }
+  Collider[] Colliders { get => PhysicsQuery.Colliders; }
   Vector3 Position { get => AbilityManager.transform.position; }
   Status TargetStatus(GameObject g) => g.GetComponent<Hurtbox>()?.Defender.GetComponent<Status>();
 

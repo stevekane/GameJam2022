@@ -4,9 +4,9 @@ public class Explosion : MonoBehaviour {
   float Radius { get => GetComponent<ParticleSystem>().main.startSize.constantMax*.5f; }
 
   void Start() {
-    var numHits = Physics.OverlapSphereNonAlloc(transform.position, Radius, PhysicsBuffers.Colliders);
+    var numHits = Physics.OverlapSphereNonAlloc(transform.position, Radius, PhysicsQuery.Colliders);
     for (int i = 0; i < numHits; i++) {
-      if (PhysicsBuffers.Colliders[i].TryGetComponent(out Player player)) {
+      if (PhysicsQuery.Colliders[i].TryGetComponent(out Player player)) {
         //Debug.Log("Player go BOOM");
       }
     }

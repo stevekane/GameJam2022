@@ -72,3 +72,36 @@ public abstract class Ability : MonoBehaviour, IAbility {
   void Awake() => TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.GetMethod(this)] = c);
   void OnDestroy() => Stop();
 }
+
+public abstract class FiberAbility : IAbility, IEnumerator {
+  public AbilityManager AbilityManager { get; set; }
+  public Attributes Attributes { get => AbilityManager.GetComponent<Attributes>(); }
+  public Status Status { get => AbilityManager.GetComponent<Status>(); }
+  public Mover Mover { get => AbilityManager.GetComponent<Mover>(); }
+  public AbilityTag Tags { get; set; }
+  public void StartRoutine(Fiber routine) => Enumerator = routine;
+  public void StopRoutine(Fiber routine) => Enumerator = null;
+  public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerCondition.Empty;
+  public object Current { get => Enumerator.Current; }
+  public void Reset() => throw new NotSupportedException();
+  public bool MoveNext() {
+    if (Enumerator != null) {
+      if (Enumerator.MoveNext()) {
+        return true;
+      } else {
+        Stop();
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+  public void Stop() {
+    Enumerator = null;
+    OnStop();
+  }
+  public bool IsRunning { get; set; }
+  public abstract void OnStop();
+  public IEnumerator Enumerator;
+  public abstract IEnumerator Routine();
+}

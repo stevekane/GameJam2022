@@ -16,7 +16,7 @@ public class FocusFire : Ability {
   public HitConfig HitConfig;
 
   public IEnumerator MakeRoutine() {
-    var target = Targeting.StandardTarget(Owner, MaxRange, LayerMask, TriggerInteraction, PhysicsBuffers.Colliders);
+    var target = Targeting.StandardTarget(Owner, MaxRange, LayerMask, TriggerInteraction, PhysicsQuery.Colliders);
     if (target) {
       Target = target.transform;
       yield return Any(Wait(Duration.Ticks), RapidFire(ShotCooldown.Ticks));

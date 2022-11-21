@@ -82,7 +82,7 @@ public class Sniper : MonoBehaviour {
   IEnumerator AcquireTarget() {
     Target = null;
     while (!Target) {
-      var visibleTargetCount = PhysicsBuffers.VisibleTargets(
+      var visibleTargetCount = PhysicsQuery.VisibleTargets(
         position: transform.position+EyeHeight*Vector3.up,
         forward: transform.forward,
         fieldOfView: 180,
@@ -91,8 +91,8 @@ public class Sniper : MonoBehaviour {
         targetQueryTriggerInteraction: QueryTriggerInteraction.Collide,
         visibleTargetLayerMask: TargetLayerMask | EnvironmentLayerMask,
         visibleQueryTriggerInteraction: QueryTriggerInteraction.Collide,
-        buffer: PhysicsBuffers.Colliders);
-      Target = visibleTargetCount > 0 ? PhysicsBuffers.Colliders[0].transform : null;
+        buffer: PhysicsQuery.Colliders);
+      Target = visibleTargetCount > 0 ? PhysicsQuery.Colliders[0].transform : null;
       yield return null;
     }
   }

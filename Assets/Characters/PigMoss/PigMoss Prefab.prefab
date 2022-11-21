@@ -523,8 +523,8 @@ GameObject:
   - component: {fileID: 8872822988582960453}
   - component: {fileID: 8872822988582960455}
   - component: {fileID: 8872822988582960444}
-  - component: {fileID: 8872822988582960449}
   - component: {fileID: 8872822988582960448}
+  - component: {fileID: 8872822988582960449}
   m_Layer: 10
   m_Name: PigMoss Prefab
   m_TagString: Untagged
@@ -563,7 +563,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7e8a1e610d31d74593d54b54258014b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  UseRadialBurst: 1
   RadialBurstConfig:
     Owner: {fileID: 8872822988582960447}
     Vibrator: {fileID: 8872822988582960448}
@@ -577,7 +576,6 @@ MonoBehaviour:
       FramesPerSecond: 30
     Count: 16
     Rotations: 5
-  UseBumRush: 1
   BumRushConfig:
     Animator: {fileID: 7946021538672475454}
     WindupDuration:
@@ -603,7 +601,6 @@ MonoBehaviour:
     Trail: {fileID: 433230649554147219}
     RushSFX: {fileID: 8300000, guid: e38a7bb13c125d745b4b0c6361331870, type: 3}
     RushSpeed: 200
-  UseBuzzSaw: 1
   BuzzSawConfig:
     RevealedSFX: {fileID: 8300000, guid: e4b229d1cd4c5954c982c44b6f42eb27, type: 3}
     ExtendedSFX: {fileID: 8300000, guid: e80d7d2490cf6ac45bffd0ae0656c910, type: 3}
@@ -627,14 +624,20 @@ MonoBehaviour:
       SFX: {fileID: 8300000, guid: 3df9bbbc130ccb344af5f3fc793a630f, type: 3}
       VFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
       VFXOffset: {x: 0, y: 1, z: 0}
-  TargetLayerMask:
-    serializedVersion: 2
-    m_Bits: 16384
-  EnvironmentLayerMask:
-    serializedVersion: 2
-    m_Bits: 1
-  EyeHeight: 1
-  MaxTargetingDistance: 50
+  TargetingConfig:
+    FieldOfView: 360
+    MaxDistance: 100
+    EyeOffset: {x: 0, y: 1, z: 0}
+    TargetQueryConfig:
+      LayerMask:
+        serializedVersion: 2
+        m_Bits: 16384
+      TriggerInteraction: 2
+    EnvironmentQueryConfig:
+      LayerMask:
+        serializedVersion: 2
+        m_Bits: 1
+      TriggerInteraction: 2
   CenterOfArena: {fileID: 8872822986732128203}
 --- !u!114 &8872822988582960446
 MonoBehaviour:
@@ -737,6 +740,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Gravity: -200
+--- !u!114 &8872822988582960448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8872822988582960440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d0cba5e795e3e24f94847040ed69f07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Target: {fileID: 8872822986732128203}
 --- !u!143 &8872822988582960449
 CharacterController:
   m_ObjectHideFlags: 0
@@ -755,19 +771,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8872822988582960448
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8872822988582960440}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d0cba5e795e3e24f94847040ed69f07, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Target: {fileID: 8872822986732128203}
 --- !u!1 &8955955708821358629
 GameObject:
   m_ObjectHideFlags: 0

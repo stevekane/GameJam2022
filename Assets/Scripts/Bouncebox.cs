@@ -45,8 +45,8 @@ public class Bouncebox : MonoBehaviour {
 
   // Finds the hit point and normal for the triggered collision. Has logic to ignore nearby walls that we didn't bump into at a sufficient angle.
   RaycastHit? FindCollisionPoint(Collider collider, Vector3 dir) {
-    var numHits = Physics.RaycastNonAlloc(transform.position, dir, PhysicsBuffers.RaycastHits, MaxDistance);
-    var idx = Array.FindIndex(PhysicsBuffers.RaycastHits[..numHits], h => h.collider == collider && Vector3.Dot(h.normal, dir) < 0f);
-    return idx >= 0 ? PhysicsBuffers.RaycastHits[idx] : null;
+    var numHits = Physics.RaycastNonAlloc(transform.position, dir, PhysicsQuery.RaycastHits, MaxDistance);
+    var idx = Array.FindIndex(PhysicsQuery.RaycastHits[..numHits], h => h.collider == collider && Vector3.Dot(h.normal, dir) < 0f);
+    return idx >= 0 ? PhysicsQuery.RaycastHits[idx] : null;
   }
 }

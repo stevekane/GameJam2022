@@ -16,7 +16,7 @@ public class ShackleShotShackle : MonoBehaviour {
     if (TryGetStatus(c.Collider.gameObject, out Status targetStatus)) {
       var rigidBody = GetComponent<Rigidbody>();
       var direction = rigidBody.velocity.normalized;
-      var colliders = PhysicsBuffers.Colliders;
+      var colliders = PhysicsQuery.Colliders;
       var origin = c.Collider.bounds.center;
       var hits = Physics.OverlapSphereNonAlloc(origin, Radius, colliders, LayerMask, TriggerInteraction);
       Status bestStatus = null;

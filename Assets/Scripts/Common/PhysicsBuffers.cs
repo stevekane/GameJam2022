@@ -1,6 +1,51 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
-public static class PhysicsBuffers {
+[Serializable]
+public class PhysicsQueryConfig {
+  public LayerMask LayerMask = new();
+  public QueryTriggerInteraction TriggerInteraction = QueryTriggerInteraction.Ignore;
+}
+
+[Serializable]
+public class TargetingConfig {
+  public float FieldOfView;
+  public float MaxDistance;
+  public Vector3 EyeOffset;
+  public PhysicsQueryConfig TargetQueryConfig;
+  public PhysicsQueryConfig EnvironmentQueryConfig;
+}
+
+[Serializable]
+public class AcquireTargets : IEnumerator, IValue<int> {
+  public int Value { get; private set; }
+  public object Current => Value;
+  public TargetingConfig Config;
+  public Transform Owner;
+  public Collider[] Colliders;
+  public AcquireTargets(Transform owner, TargetingConfig config, Collider[] colliders) {
+    Owner = owner;
+    Config = config;
+    Colliders = colliders;
+  }
+  public void Reset() => Value = 0;
+  public bool MoveNext() {
+    Value = PhysicsQuery.VisibleTargets(
+      position: Owner.position+Config.EyeOffset,
+      forward: Owner.forward,
+      fieldOfView: Config.FieldOfView,
+      maxDistance: Config.MaxDistance,
+      targetLayerMask: Config.TargetQueryConfig.LayerMask,
+      targetQueryTriggerInteraction: Config.TargetQueryConfig.TriggerInteraction,
+      visibleTargetLayerMask: Config.TargetQueryConfig.LayerMask | Config.EnvironmentQueryConfig.LayerMask,
+      visibleQueryTriggerInteraction: Config.EnvironmentQueryConfig.TriggerInteraction,
+      buffer: Colliders);
+    return Value == 0;
+  }
+}
+
+public static class PhysicsQuery {
   public static int MAX_COLLIDERS = 256;
   public static int MAX_RAYCAST_HITS = 256;
   public static Collider[] Colliders = new Collider[MAX_COLLIDERS];
