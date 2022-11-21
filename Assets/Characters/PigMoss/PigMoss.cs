@@ -15,11 +15,15 @@ abstract class PigMossAbility : IAbility, IEnumerator {
   public object Current { get => Enumerator.Current; }
   public void Reset() => throw new NotSupportedException();
   public bool MoveNext() {
-    if (Enumerator != null && !Enumerator.MoveNext()) {
-      Stop();
-      return false;
+    if (Enumerator != null) {
+      if (Enumerator.MoveNext()) {
+        return true;
+      } else {
+        Stop();
+        return false;
+      }
     } else {
-      return true;
+      return false;
     }
   }
   public void Stop() {
