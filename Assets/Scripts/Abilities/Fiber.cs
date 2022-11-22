@@ -263,14 +263,8 @@ public class Any : IEnumerator, IStoppable {
   public bool MoveNext() {
     if (IsRunning) {
       IsRunning = A.MoveNext() & B.MoveNext();
-      if (!IsRunning) {
-        if (A.IsRunning) {
-          A.Stop();
-        }
-        if (B.IsRunning) {
-          B.Stop();
-        }
-      }
+      if (!IsRunning)
+        Stop();
       return IsRunning;
     } else {
       return false;
@@ -296,14 +290,8 @@ public class All: IEnumerator, IStoppable {
   public bool MoveNext() {
     if (IsRunning) {
       IsRunning = A.MoveNext() | B.MoveNext();
-      if (!IsRunning) {
-        if (A.IsRunning) {
-          A.Stop();
-        }
-        if (B.IsRunning) {
-          B.Stop();
-        }
-      }
+      if (!IsRunning)
+        Stop();
       return IsRunning;
     } else {
       return false;
