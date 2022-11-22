@@ -51,12 +51,8 @@ namespace PigMoss {
       Status.Remove(RushStatusEffect);
     }
     public override IEnumerator Routine() {
-      // TODO: This is awkwardly-encoded.
-      // Ideally, you would say
-      // Windup.Success => Rush
-      // Windup.Failure = Stop
-      yield return Windup();
-      if (WindupSuccessful) {
+      yield return Fiber.Capture<bool>(out var result, Windup());
+      if (result.Value == true) {
         var rush = Rush();
         var contact = Fiber.ListenFor(Config.SpikeTriggerEvent.OnTriggerEnterSource);
         var outcome = Fiber.Select(contact, rush);
@@ -77,7 +73,7 @@ namespace PigMoss {
       var failure = Fiber.Until(() => Target == null);
       var windupOutcome = Fiber.SelectTask(success, failure);
       yield return windupOutcome;
-      WindupSuccessful = windupOutcome.Value == success;
+      yield return windupOutcome.Value == success;
     }
   }
 }

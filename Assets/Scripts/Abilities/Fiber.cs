@@ -2,9 +2,14 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 public interface IValue<T> {
   public T Value { get; }
+}
+
+public class ValueHolder<T> : IValue<T> {
+  public T Value { get; set; }
 }
 
 public interface IStoppable {
@@ -219,6 +224,30 @@ public class ScopedRunner : IDisposable {
   }
 }
 
+public class Capture<T> : IEnumerator, IStoppable {
+  Fiber Routine;
+  public ValueHolder<T> Result;
+
+  public Capture(out IValue<T> result, IEnumerator routine) {
+    result = Result = new();
+    Routine = routine as Fiber ?? new Fiber(routine);
+  }
+  public void Stop() => Routine.Stop();
+  public bool MoveNext() {
+    if (!IsRunning)
+      return false;
+    Routine.MoveNext();
+    // Should Fiber.Current do this unpacking of the enumerator at the top of its stack?
+    // Also: Does it make more sense to capture the value before MoveNext or after?
+    if (IsRunning && Routine.Current is IEnumerator e && e.Current is T result)
+      Result.Value = result;
+    return IsRunning;
+  }
+  public void Reset() => throw new NotSupportedException();
+  public object Current { get => null; }
+  public bool IsRunning { get => Routine.IsRunning; }
+}
+
 public class Any : IEnumerator, IStoppable {
   Fiber A;
   Fiber B;
@@ -315,6 +344,7 @@ public class Fiber : IEnumerator, IStoppable {
   public static Any Any(IEnumerator a, IEnumerator b, params IEnumerator[] xs) => xs.Aggregate(Any(a, b), Any);
   public static All All(IEnumerator a, IEnumerator b) => new All(a, b);
   public static All All(IEnumerator a, IEnumerator b, params IEnumerator[] xs) => xs.Aggregate(All(a, b), All);
+  public static Capture<T> Capture<T>(out IValue<T> result, IEnumerator routine) => new Capture<T>(out result, routine);
   public static Selector Select(IEnumerator a, IEnumerator b) => new Selector(a, b);
   public static TaskSelector SelectTask(IEnumerator a, IEnumerator b) => new TaskSelector(a, b);
   public static Listener ListenFor(IEventSource source) => new Listener(source);
