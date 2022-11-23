@@ -101,13 +101,7 @@ public static class AudioSourceExtensions {
 }
 
 public static class AnimatorExtensions {
-  [Serializable]
-  public struct AnimatorBoolSetting {
-    public string Key;
-    public bool Value;
-  }
   public static void SetSpeed(this Animator a, float s) => a.speed = s;
-  public static void Set(this Animator a, AnimatorBoolSetting s) => a.SetBool(s.Key, s.Value);
 }
 
 public static class AnimationClipExtensions {
