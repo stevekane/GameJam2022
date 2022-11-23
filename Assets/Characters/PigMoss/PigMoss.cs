@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace PigMoss {
   public class PigMoss : MonoBehaviour {
+    [SerializeField] Bombard Bombard;
     [SerializeField] RadialBurstConfig RadialBurstConfig;
     [SerializeField] BumRushConfig BumRushConfig;
     [SerializeField] BuzzSawConfig BuzzSawConfig;
@@ -13,15 +14,11 @@ namespace PigMoss {
     Fiber Behavior;
     Transform Target;
     Mover Mover;
-    Animator Animator;
-    Vibrator Vibrator;
     AbilityManager AbilityManager;
     int AbilityIndex;
 
     void Awake() {
       Mover = GetComponent<Mover>();
-      Animator = GetComponent<Animator>();
-      Vibrator = GetComponent<Vibrator>();
       AbilityManager = GetComponent<AbilityManager>();
     }
     void Start() => Behavior = new Fiber(Fiber.Repeat(MakeBehavior));
@@ -56,8 +53,12 @@ namespace PigMoss {
         var buzzSaw = new BuzzSaw(AbilityManager, BuzzSawConfig);
         AbilityManager.TryInvoke(buzzSaw.Routine); // TODO: awkward.
         yield return buzzSaw;
+      } else if (AbilityIndex == 3) {
+        Bombard.AbilityManager = AbilityManager;
+        AbilityManager.TryInvoke(Bombard.Routine);
+        yield return Bombard;
       }
-      AbilityIndex = (AbilityIndex+1)%3;
+      AbilityIndex = (AbilityIndex+1)%4;
     }
   }
 }

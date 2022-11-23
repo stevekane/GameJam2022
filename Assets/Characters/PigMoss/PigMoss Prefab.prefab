@@ -1,5 +1,66 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &144755647213447511
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4285581721056350619}
+  - component: {fileID: 7726524077543302298}
+  m_Layer: 0
+  m_Name: Missile Launchers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4285581721056350619
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 144755647213447511}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.25, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2398483810505613395}
+  - {fileID: 2044442397782744188}
+  - {fileID: 5301758828297461866}
+  - {fileID: 3310389425709817495}
+  - {fileID: 7156036498630557019}
+  - {fileID: 3983017169784103397}
+  - {fileID: 6802345167595132947}
+  - {fileID: 5589595382023781961}
+  - {fileID: 509989908185307024}
+  m_Father: {fileID: 8872822986732128203}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &7726524077543302298
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 144755647213447511}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 15c025ecb07784f4f9bcfc889cb82f84, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 1
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &3377252812057888244
 GameObject:
   m_ObjectHideFlags: 0
@@ -363,6 +424,7 @@ Transform:
   m_Children:
   - {fileID: 2011976718634940239}
   - {fileID: 2155777000018846974}
+  - {fileID: 4285581721056350619}
   m_Father: {fileID: 8872822988582960447}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -525,6 +587,7 @@ GameObject:
   - component: {fileID: 8872822988582960444}
   - component: {fileID: 8872822988582960448}
   - component: {fileID: 8872822988582960449}
+  - component: {fileID: 3634860187303144175}
   m_Layer: 10
   m_Name: PigMoss Prefab
   m_TagString: Untagged
@@ -563,6 +626,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7e8a1e610d31d74593d54b54258014b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Bombard:
+    ProjectilePrefab: {fileID: 4479709198012916195, guid: 41421b7d6e85e6748afb608a2a977365, type: 3}
+    LaunchSites:
+    - {fileID: 4591952213016696056}
+    - {fileID: 193538112889891031}
+    - {fileID: 6296988804715484353}
+    - {fileID: 3674965611537967676}
+    - {fileID: 9061133753140709872}
+    - {fileID: 3005661713389901134}
+    - {fileID: 4653921042060930232}
+    - {fileID: 6008645256406059746}
+    - {fileID: 1865367082945798971}
+    Windup:
+      Millis: 1000
+      FramesPerSecond: 30
+    ShotPeriod:
+      Millis: 100
+      FramesPerSecond: 30
+    Recovery:
+      Millis: 1000
+      FramesPerSecond: 30
+    MessageOptions: 1
   RadialBurstConfig:
     Owner: {fileID: 8872822988582960447}
     Vibrator: {fileID: 8872822988582960448}
@@ -639,6 +724,9 @@ MonoBehaviour:
         m_Bits: 1
       TriggerInteraction: 2
   CenterOfArena: {fileID: 8872822986732128203}
+  ActionCooldown:
+    Millis: 1
+    FramesPerSecond: 30
 --- !u!114 &8872822988582960446
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -771,6 +859,23 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3634860187303144175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8872822988582960440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec4021de67e0f29419dfac4629bedad7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WindupClip: {fileID: 8300000, guid: 4af54c965264a3a449e7e1127868e676, type: 3}
+  ShotClip: {fileID: 8300000, guid: 0e9bca6dd55d7e541a865752da6415f5, type: 3}
+  RecoveryClip: {fileID: 8300000, guid: 70c8c80c739dc744c92ad158212b921b, type: 3}
+  ShotEffect: {fileID: 1134129239631916, guid: 7e48ba6b1b968764490bbc70b66e3fe1, type: 3}
+  Animator: {fileID: 7726524077543302298}
 --- !u!1 &8955955708821358629
 GameObject:
   m_ObjectHideFlags: 0
@@ -936,6 +1041,75 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1001 &451254361551804263
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 2
+    m_TransformParent: {fileID: 4285581721056350619}
+    m_Modifications:
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_RootOrder
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 884545910871659140, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_Name
+      value: Misssile Launcher Silo Prefab_8
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_AddedGameObjects: []
+  m_SourcePrefab: {fileID: 100100000, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+--- !u!4 &509989908185307024 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 451254361551804263}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1865367082945798971 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2278874230438556764, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 451254361551804263}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &573465693535831759
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1020,6 +1194,558 @@ ParticleSystem:
 Transform:
   m_CorrespondingSourceObject: {fileID: 141433446842962274, guid: 0e3db9bd4f36b0a48966da8a4c16682e, type: 3}
   m_PrefabInstance: {fileID: 573465693535831759}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &2094074778411981963
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 2
+    m_TransformParent: {fileID: 4285581721056350619}
+    m_Modifications:
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_RootOrder
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 884545910871659140, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_Name
+      value: Misssile Launcher Silo Prefab_1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_AddedGameObjects: []
+  m_SourcePrefab: {fileID: 100100000, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+--- !u!4 &193538112889891031 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2278874230438556764, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 2094074778411981963}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2044442397782744188 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 2094074778411981963}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &2313113240000340132
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 2
+    m_TransformParent: {fileID: 4285581721056350619}
+    m_Modifications:
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_RootOrder
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 884545910871659140, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_Name
+      value: Misssile Launcher Silo Prefab
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_AddedGameObjects: []
+  m_SourcePrefab: {fileID: 100100000, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+--- !u!4 &2398483810505613395 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 2313113240000340132}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4591952213016696056 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2278874230438556764, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 2313113240000340132}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3215616078758272608
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 2
+    m_TransformParent: {fileID: 4285581721056350619}
+    m_Modifications:
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_RootOrder
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 884545910871659140, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_Name
+      value: Misssile Launcher Silo Prefab_3
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_AddedGameObjects: []
+  m_SourcePrefab: {fileID: 100100000, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+--- !u!4 &3310389425709817495 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 3215616078758272608}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &3674965611537967676 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2278874230438556764, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 3215616078758272608}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &3897427247825166610
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 2
+    m_TransformParent: {fileID: 4285581721056350619}
+    m_Modifications:
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_RootOrder
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 884545910871659140, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_Name
+      value: Misssile Launcher Silo Prefab_5
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_AddedGameObjects: []
+  m_SourcePrefab: {fileID: 100100000, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+--- !u!4 &3005661713389901134 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2278874230438556764, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 3897427247825166610}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &3983017169784103397 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 3897427247825166610}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &5243128938900316317
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 2
+    m_TransformParent: {fileID: 4285581721056350619}
+    m_Modifications:
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_RootOrder
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 884545910871659140, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_Name
+      value: Misssile Launcher Silo Prefab_2
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_AddedGameObjects: []
+  m_SourcePrefab: {fileID: 100100000, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+--- !u!4 &5301758828297461866 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 5243128938900316317}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6296988804715484353 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2278874230438556764, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 5243128938900316317}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &5531210957449051838
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 2
+    m_TransformParent: {fileID: 4285581721056350619}
+    m_Modifications:
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_RootOrder
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 884545910871659140, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_Name
+      value: Misssile Launcher Silo Prefab_7
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_AddedGameObjects: []
+  m_SourcePrefab: {fileID: 100100000, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+--- !u!4 &5589595382023781961 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 5531210957449051838}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6008645256406059746 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2278874230438556764, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 5531210957449051838}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &6860737664502798564
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 2
+    m_TransformParent: {fileID: 4285581721056350619}
+    m_Modifications:
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_RootOrder
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 884545910871659140, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_Name
+      value: Misssile Launcher Silo Prefab_6
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_AddedGameObjects: []
+  m_SourcePrefab: {fileID: 100100000, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+--- !u!4 &4653921042060930232 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2278874230438556764, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 6860737664502798564}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6802345167595132947 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 6860737664502798564}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7070560336353820076
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 2
+    m_TransformParent: {fileID: 4285581721056350619}
+    m_Modifications:
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_RootOrder
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 884545910871659140, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+      propertyPath: m_Name
+      value: Misssile Launcher Silo Prefab_4
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_AddedGameObjects: []
+  m_SourcePrefab: {fileID: 100100000, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+--- !u!4 &7156036498630557019 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 94844345052512503, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 7070560336353820076}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &9061133753140709872 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2278874230438556764, guid: ee0b8d4475f694646aaf112e2c0144b4, type: 3}
+  m_PrefabInstance: {fileID: 7070560336353820076}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8872822986710347122
 PrefabInstance:
