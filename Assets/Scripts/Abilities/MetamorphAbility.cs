@@ -35,7 +35,8 @@ public class MetamorphAbility : Ability {
     Animator.SetBool("Morph", false);
   }
 
-  void Awake() {
+  public override void Awake() {
+    base.Awake();
     Animator = GetComponentInParent<Animator>();
   }
 }
