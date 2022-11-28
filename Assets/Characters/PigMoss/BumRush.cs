@@ -6,7 +6,7 @@ namespace PigMoss {
   [Serializable]
   class BumRushConfig {
     public Animator Animator;
-   public Timeval WindupDuration = Timeval.FromSeconds(1);
+    public Timeval WindupDuration = Timeval.FromSeconds(1);
     public Timeval RushDuration = Timeval.FromSeconds(.5f);
     public Timeval RecoveryDuration = Timeval.FromSeconds(.5f);
     public TriggerEvent SpikeTriggerEvent;

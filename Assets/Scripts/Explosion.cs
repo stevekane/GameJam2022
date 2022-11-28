@@ -1,16 +1,17 @@
 using UnityEngine;
 
 public class Explosion : MonoBehaviour {
-  float Radius { get => GetComponent<ParticleSystem>().main.startSize.constantMax*.5f; }
+  public LayerMask LayerMask;
+  public float Radius = 1;
+  public HitParams HitParams;
 
   void Start() {
-    var numHits = Physics.OverlapSphereNonAlloc(transform.position, Radius, PhysicsQuery.Colliders);
+    var numHits = Physics.OverlapSphereNonAlloc(transform.position, Radius, PhysicsQuery.Colliders, LayerMask);
     for (int i = 0; i < numHits; i++) {
-      if (PhysicsQuery.Colliders[i].TryGetComponent(out Player player)) {
-        //Debug.Log("Player go BOOM");
+      if (PhysicsQuery.Colliders[i].TryGetComponent(out Hurtbox hurtbox)) {
+        hurtbox.Defender?.OnHit(HitParams, transform);
       }
     }
-    Destroy(gameObject, 2f);  // Assume animation is done before 2s.
   }
 
   public void OnDrawGizmos() {

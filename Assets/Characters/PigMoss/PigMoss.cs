@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace PigMoss {
   public class PigMoss : MonoBehaviour {
+    [SerializeField] SwordStrike SwordStrike;
     [SerializeField] Bombard Bombard;
     [SerializeField] RadialBurstConfig RadialBurstConfig;
     [SerializeField] BumRushConfig BumRushConfig;
@@ -25,6 +26,12 @@ namespace PigMoss {
     void OnDestroy() => Behavior.Stop();
     void FixedUpdate() => Behavior.MoveNext();
 
+    IEnumerator TryRun(FiberAbility ability) {
+      ability.AbilityManager = AbilityManager;
+      AbilityManager.TryInvoke(ability.Routine);
+      return ability;
+    }
+
     IEnumerator MakeBehavior() {
       yield return Fiber.Wait(ActionCooldown);
       var acquireTargets = new AcquireTargets(transform, TargetingConfig, PhysicsQuery.Colliders);
@@ -41,24 +48,16 @@ namespace PigMoss {
     }
 
     IEnumerator ChooseAction() {
-      if (AbilityIndex == 0) {
-        var bumRush = new BumRush(AbilityManager, BumRushConfig, Target);
-        AbilityManager.TryInvoke(bumRush.Routine);
-        yield return bumRush;
-      } else if (AbilityIndex == 1) {
-        var burst = new RadialBurst(AbilityManager, RadialBurstConfig);
-        AbilityManager.TryInvoke(burst.Routine); // TODO: awkward.
-        yield return burst;
-      } else if (AbilityIndex == 2) {
-        var buzzSaw = new BuzzSaw(AbilityManager, BuzzSawConfig);
-        AbilityManager.TryInvoke(buzzSaw.Routine); // TODO: awkward.
-        yield return buzzSaw;
-      } else if (AbilityIndex == 3) {
-        Bombard.AbilityManager = AbilityManager;
-        AbilityManager.TryInvoke(Bombard.Routine);
-        yield return Bombard;
-      }
-      AbilityIndex = (AbilityIndex+1)%4;
+      // var index = 4;
+      var index = (int)UnityEngine.Random.Range(0,5);
+      yield return index switch {
+        0 => TryRun(new BumRush(AbilityManager, BumRushConfig, Target)),
+        1 => TryRun(new RadialBurst(AbilityManager, RadialBurstConfig)),
+        2 => TryRun(new BuzzSaw(AbilityManager, BuzzSawConfig)),
+        3 => TryRun(Bombard),
+        4 => TryRun(SwordStrike),
+        _ => TryRun(SwordStrike)
+      };
     }
   }
 }

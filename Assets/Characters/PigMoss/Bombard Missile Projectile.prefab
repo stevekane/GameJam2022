@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1054393817461916879}
-  - component: {fileID: 5045261405447526997}
+  - component: {fileID: 5667205795771851015}
   - component: {fileID: 4185040301392971604}
   - component: {fileID: -3537154241294149886}
   - component: {fileID: 7465287502976337958}
@@ -38,7 +38,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5045261405447526997
+--- !u!114 &5667205795771851015
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -47,16 +47,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 4479709198012916195}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc46ea2e603222a43bdd7381cab6600a, type: 3}
+  m_Script: {fileID: 11500000, guid: 6bd04dfd4f2bfe64aa8891daffe982bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VFXPrefab: {fileID: 2433282508537954060, guid: 7b68f0f87eff9464e890d08895d2a042, type: 3}
-  SFXClip: {fileID: 8300000, guid: b7f539420fab41a41a7b378d2d3bda36, type: 3}
-  Damage: 15
-  KnockbackStrength: 15
-  HitStopDuration:
-    Millis: 200
+  PayloadPrefab: {fileID: 2474568288313605368, guid: 61c70ca45af6ecf40bcba50c2207cd6d, type: 3}
+  Duration:
+    Millis: 3000
     FramesPerSecond: 30
+  Target: {x: 0, y: 0, z: 0}
 --- !u!114 &4185040301392971604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71,10 +69,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LayerMask:
     serializedVersion: 2
-    m_Bits: 16384
-  TriggerInteraction: 2
+    m_Bits: 0
+  TriggerInteraction: 1
   PreviousPosition: {x: 0, y: 0, z: 0}
-  InitialSpeed: 100
+  InitialSpeed: 200
 --- !u!114 &-3537154241294149886
 MonoBehaviour:
   m_ObjectHideFlags: 0
