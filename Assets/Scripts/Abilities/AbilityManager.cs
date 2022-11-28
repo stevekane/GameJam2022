@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -82,6 +83,11 @@ public class AbilityManager : MonoBehaviour {
     return evt;
   }
   public void TryInvoke(AbilityMethod method) => GetEvent(method).Fire();
+  public IEnumerator TryRun(AbilityMethod method) {
+    var ability = (IAbility)method.Target;
+    GetEvent(method).Fire();
+    yield return Fiber.While(() => ability.IsRunning);
+  }
   EventRouter CreateRouter(AbilityMethod method) => MethodToEvent[method] = new EventRouter((IAbility)method.Target, method);
 
   void StackAdd<T>(List<T> target, List<T> additions) {
