@@ -71,9 +71,10 @@ public class Defender : MonoBehaviour {
   bool Died = false;
   public Vector3? LastGroundedPosition { get; private set; }
 
+  public EventSource<(HitParams, Transform)> HitEvent = new();
   public AudioClip FallSFX;
   public bool IsParrying;
-  public bool IsBlocking;
+  public bool IsBlocking;  // TODO: replace with StatusEffect
 
   public static Vector3 KnockbackVector(Transform attacker, Transform target, KnockBackType type) {
     var p0 = attacker.position.XZ();
@@ -91,6 +92,7 @@ public class Defender : MonoBehaviour {
   }
 
   public void OnHit(HitParams hit, Transform hitTransform) {
+    HitEvent.Fire((hit, hitTransform));
     if (IsBlocking || IsParrying || !(Status?.Value.IsHittable ?? true))
       return;
 

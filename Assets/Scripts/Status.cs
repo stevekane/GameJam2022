@@ -194,14 +194,15 @@ public class Status : MonoBehaviour {
   }
 
   List<StatusEffect> Added = new();
-  public void Add(StatusEffect effect, OnEffectComplete onComplete = null) {
+  public StatusEffect Add(StatusEffect effect, OnEffectComplete onComplete = null) {
     effect.Status = this;
     var count = Active.Count;
     var existing = Active.FirstOrDefault((e) => e.GetType() == effect.GetType());
-    if (existing == null || !existing.Merge(effect)) {
-      effect.OnComplete = onComplete;
-      Added.Add(effect);
-    }
+    if (existing != null && existing.Merge(effect))
+      return existing;
+    effect.OnComplete = onComplete;
+    Added.Add(effect);
+    return effect;
     // TODO: merge onComplete with existing.OnComplete?
   }
 

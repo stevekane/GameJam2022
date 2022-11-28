@@ -26,6 +26,8 @@ public enum AttributeTag {
 
 [Serializable]
 public class AttributeModifier {
+  public static AttributeModifier TimesZero = new() { Mult = 0 };
+
   public float Base = 0;
   public float Mult = 1;
   public float Apply(float baseValue) => (baseValue + Base) * Mult;

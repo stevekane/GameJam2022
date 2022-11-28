@@ -6,7 +6,7 @@ using UnityEngine;
 public class InlineEffect : StatusEffect {
   Action<Status> ApplyFunc;
   public InlineEffect(Action<Status> apply) => ApplyFunc = apply;
-  public override bool Merge(StatusEffect e) => true;
+  public override bool Merge(StatusEffect e) => false;
   public override void Apply(Status status) => ApplyFunc(status);
 }
 

@@ -13,7 +13,8 @@ public interface IStoppable {
   public void Stop();
 }
 
-public interface IStoppableValue<T> : IEnumerator, IStoppable, IValue<T> {}
+public interface IStoppableRoutine : IEnumerator, IStoppable {}
+public interface IStoppableValue<T> : IStoppableRoutine, IValue<T> {}
 
 [Serializable]
 public class Bundle : IEnumerator, IStoppable {
@@ -239,7 +240,27 @@ public class Capture<T> : IStoppableValue<T> {
   public void Reset() => throw new NotSupportedException();
   public object Current { get => null; }
   public bool IsRunning { get => Routine.IsRunning; }
-  public T Value { get; internal set; }
+  public T Value { get; private  set; }
+}
+
+public class Watcher<T> : IStoppableRoutine where T: class {
+  IEnumerator Enumerator;
+  Fiber Routine;
+  public Watcher(IEnumerator routine) {
+    Enumerator = routine;
+    Routine = routine as Fiber ?? new Fiber(routine);
+  }
+  public void Stop() => Routine.Stop();
+  public bool MoveNext() {
+    if (IsRunning && !Routine.MoveNext())
+      DidComplete = true;
+    return IsRunning;
+  }
+  public void Reset() => throw new NotSupportedException();
+  public object Current { get => null; }
+  public bool IsRunning { get => Routine.IsRunning; }
+  public bool DidComplete { get; private set; } = false;
+  public T Task { get => Enumerator as T; }
 }
 
 public class Any : IEnumerator, IStoppable {
@@ -310,6 +331,11 @@ public class Fiber : IEnumerator, IStoppable {
     }
   }
 
+  public static IEnumerator While(Func<bool> pred) {
+    while (pred())
+      yield return null;
+  }
+
   public static IEnumerator Until(Func<bool> pred) {
     while (!pred())
       yield return null;
@@ -328,6 +354,7 @@ public class Fiber : IEnumerator, IStoppable {
   public static All All(IEnumerator a, IEnumerator b, params IEnumerator[] xs) => xs.Aggregate(All(a, b), All);
   public static Capture<T> Capture<T>(IEnumerator routine) => new Capture<T>(routine);
   public static Capture<T> Capture<T>(out Capture<T> result, IEnumerator routine) => result = new Capture<T>(routine);
+  public static Watcher<T> Watch<T>(out Watcher<T> result, T routine) where T: class, IEnumerator => result = new Watcher<T>(routine);
   public static Selector Select(IEnumerator a, IEnumerator b) => new Selector(a, b);
   public static TaskSelector SelectTask(IEnumerator a, IEnumerator b) => new TaskSelector(a, b);
   public static Listener ListenFor(IEventSource source) => new Listener(source);

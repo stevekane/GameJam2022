@@ -13,6 +13,7 @@ public class AbilityManager : MonoBehaviour {
   [HideInInspector] public List<IAbility> Running = new();
   [HideInInspector] public List<IAbility> ToAdd = new();
   public Optional<Energy> Energy;
+  public Bundle Bundle = new();
 
   Dictionary<AxisTag, AxisState> TagToAxis = new();
   Dictionary<AbilityMethod, EventRouter> MethodToEvent = new();
@@ -95,6 +96,7 @@ public class AbilityManager : MonoBehaviour {
     Energy = GetComponent<Energy>();
   }
   void OnDestroy() {
+    Bundle.Stop();
     Abilities.ForEach(a => a.Stop());
     Abilities.ForEach(a => a.AbilityManager = null);
     MethodToEvent.ForEach(kv => kv.Value.DisconnectSource());
@@ -105,4 +107,5 @@ public class AbilityManager : MonoBehaviour {
     StackAdd(Running, ToAdd);
     ToAdd.Clear();
   }
+  void FixedUpdate() => Bundle.MoveNext();
 }

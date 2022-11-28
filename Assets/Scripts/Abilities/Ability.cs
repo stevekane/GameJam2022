@@ -49,10 +49,7 @@ public abstract class Ability : MonoBehaviour, IAbility {
     Disposables.Remove(d);
     return d;
   }
-  public StatusEffect AddStatusEffect(StatusEffect effect, OnEffectComplete onComplete = null) {
-    Status.Add(Using(effect), onComplete);
-    return effect;
-  }
+  public StatusEffect AddStatusEffect(StatusEffect effect, OnEffectComplete onComplete = null) => Status.Add(Using(effect), onComplete);
   public void Stop() {
     OnStop();
     Tags = 0;
