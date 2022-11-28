@@ -5,7 +5,8 @@ using static Fiber;
 
 [Serializable]
 public class Bombard : FiberAbility {
-  public GameObject ProjectilePrefab;
+  public float Radius;
+  public Missile MissilePrefab;
   public Transform[] LaunchSites;
   public Timeval Windup = Timeval.FromSeconds(1);
   public Timeval ShotPeriod = Timeval.FromSeconds(.1f);
@@ -20,8 +21,9 @@ public class Bombard : FiberAbility {
     AbilityManager.SendMessage("OnBombardWindup", MessageOptions);
     yield return Wait(Windup);
     foreach (var launchSite in LaunchSites) {
+      var missile = GameObject.Instantiate(MissilePrefab, launchSite.position, launchSite.rotation);
+      missile.Target = Radius*UnityEngine.Random.onUnitSphere.XZ();
       AbilityManager.SendMessage("OnBombardShot", launchSite, MessageOptions);
-      GameObject.Instantiate(ProjectilePrefab, launchSite.position, launchSite.rotation);
       yield return Wait(ShotPeriod);
     }
     AbilityManager.SendMessage("OnBombardRecovery", MessageOptions);
