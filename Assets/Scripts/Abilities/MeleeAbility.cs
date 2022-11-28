@@ -66,7 +66,7 @@ public class MeleeAbility : Ability {
     Hits.Clear();
     SFXManager.Instance.TryPlayOneShot(AttackSFX);
     AttackVFXInstance = VFXManager.Instance.TrySpawn2DEffect(AttackVFX, Owner.position + HitConfig.VFXOffset, Owner.rotation, ActiveDuration.Seconds);
-    yield return Fiber.Any(Animation.PlayUntil(WindupDuration.AnimFrames + ActiveDuration.AnimFrames+1), HandleHits(chargeScaling));
+    yield return Fiber.Any(Animation.PlayUntil(WindupDuration.AnimFrames + ActiveDuration.AnimFrames+1), Fiber.Repeat(HandleHits, chargeScaling));
     Hitbox.Collider.enabled = false;
 
     // Hitstop
@@ -82,23 +82,20 @@ public class MeleeAbility : Ability {
     Animation = null;
   }
 
-  IEnumerator HandleHits(float chargeScaling) {
-    while (true) {
-      if (Hits.Count != 0) {
-        if (AttackVFXInstance && AttackVFXInstance.GetComponent<ParticleSystem>().main is var m)
-          m.simulationSpeed = 0f;
-        Status.Add(new HitStopEffect(Owner.forward, HitStopVibrationAmplitude, HitFreezeDuration.Ticks));
-        CameraShaker.Instance.Shake(HitCameraShakeIntensity);
-        var hitParams = HitConfig.ComputeParamsScaled(Attributes, chargeScaling);
-        Hits.ForEach(target => {
-          target.GetComponent<Defender>()?.OnHit(hitParams, Owner);
-          Owner.transform.forward = (target.transform.position - Owner.transform.position).XZ().normalized;
-        });
-        AbilityManager.Energy?.Value.Add(HitEnergyGain * Hits.Count);
-        Status.Add(new RecoilEffect(HitRecoilStrength * -Owner.forward));
-        Hits.Clear();
-      }
-      yield return null;
+  void HandleHits(float chargeScaling) {
+    if (Hits.Count != 0) {
+      if (AttackVFXInstance && AttackVFXInstance.GetComponent<ParticleSystem>().main is var m)
+        m.simulationSpeed = 0f;
+      Status.Add(new HitStopEffect(Owner.forward, HitStopVibrationAmplitude, HitFreezeDuration.Ticks));
+      CameraShaker.Instance.Shake(HitCameraShakeIntensity);
+      var hitParams = HitConfig.ComputeParamsScaled(Attributes, chargeScaling);
+      Hits.ForEach(target => {
+        target.GetComponent<Defender>()?.OnHit(hitParams, Owner);
+        Owner.transform.forward = (target.transform.position - Owner.transform.position).XZ().normalized;
+      });
+      AbilityManager.Energy?.Value.Add(HitEnergyGain * Hits.Count);
+      Status.Add(new RecoilEffect(HitRecoilStrength * -Owner.forward));
+      Hits.Clear();
     }
   }
 

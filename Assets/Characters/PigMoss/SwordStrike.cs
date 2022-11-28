@@ -14,25 +14,28 @@ public class SwordStrike : FiberAbility {
   public GameObject SlashVFX;
   public AudioClip SlashSFX;
 
+  AnimationTask AnimationTask;
+
   public override void OnStop() {
+    AnimationTask?.Stop();
     Collider.enabled = false;
   }
 
   public override IEnumerator Routine() {
-    var animation = Animator.Run(Clip);
-    yield return animation.PlayUntil(ActiveFrameStart.Ticks);
+    AnimationTask = Animator.Run(Clip);
+    yield return AnimationTask.PlayUntil(ActiveFrameStart.Ticks);
     var slashPosition = AbilityManager.transform.position;
     var slashRotation = AbilityManager.transform.rotation;
     SFXManager.Instance.TryPlayOneShot(SlashSFX);
     VFXManager.Instance.TrySpawn2DEffect(SlashVFX, slashPosition, slashRotation);
     Collider.enabled = true;
     var contact = Fiber.ListenFor(Contact.OnTriggerStaySource);
-    var endActive = animation.PlayUntil(ActiveFrameEnd.Ticks);
-    yield return Fiber.Any(contact, endActive);
-    if (!contact.IsRunning && contact.Value && contact.Value.TryGetComponent(out Hurtbox hurtbox)) {
+    var endActive = AnimationTask.PlayUntil(ActiveFrameEnd.Ticks);
+    var activeOutcome = Fiber.SelectTask(contact, endActive);
+    if (activeOutcome.Value == contact && contact.Value.TryGetComponent(out Hurtbox hurtbox)) {
       hurtbox.Defender.OnHit(HitParams, AbilityManager.transform);
     }
     Collider.enabled = false;
-    yield return animation;
+    yield return AnimationTask;
   }
 }
