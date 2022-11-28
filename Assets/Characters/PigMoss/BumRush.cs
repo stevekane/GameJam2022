@@ -17,24 +17,20 @@ namespace PigMoss {
   }
 
   class BumRush : FiberAbility {
-    new AbilityTag Tags = AbilityTag.Uninterruptible;
-
     BumRushConfig Config;
     Transform Target;
     StatusEffect RushStatusEffect;
-    bool WindupSuccessful;
 
     public BumRush(AbilityManager manager, BumRushConfig config, Transform target) {
+      Tags = AbilityTag.Uninterruptible;
       AbilityManager = manager;
       Config = config;
       Target = target;
-      WindupSuccessful = false;
     }
     public override void OnStop() {
       Status.Remove(RushStatusEffect);
       Config.Animator.SetBool("Extended", false);
       Config.Trail.Stop();
-      WindupSuccessful = false;
     }
     IEnumerator Rush() {
       RushStatusEffect = new ScriptedMovementEffect();
