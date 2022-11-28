@@ -14,25 +14,25 @@ public class ParryDash : Ability {
   Animator Animator;
   Defender Defender;
 
-  public static InlineEffect ScriptedMove = new(s => {
-    s.HasGravity = false;
-    s.AddAttributeModifier(AttributeTag.MoveSpeed, AttributeModifier.TimesZero);
-    s.AddAttributeModifier(AttributeTag.TurnSpeed, AttributeModifier.TimesZero);
-  });
-  public static InlineEffect Invulnerable = new(s => {
-    s.IsDamageable = false;
-    s.IsHittable = false;
-  });
+  public static InlineEffect ScriptedMove { get => new(s => {
+      s.HasGravity = false;
+      s.AddAttributeModifier(AttributeTag.MoveSpeed, AttributeModifier.TimesZero);
+      s.AddAttributeModifier(AttributeTag.TurnSpeed, AttributeModifier.TimesZero);
+    });
+  }
+  public static InlineEffect Invulnerable { get => new(s => {
+      s.IsDamageable = false;
+      s.IsHittable = false;
+    });
+  }
 
   public IEnumerator Execute() {
     using (AddStatusEffect(Invulnerable)) {
       Animator.SetBool("Blocking", true);
-      yield return Fiber.Any(Fiber.Watch(out var didHit, Fiber.ListenFor(Defender.HitEvent)), new CountdownTimer(BlockDuration), Fiber.ListenFor(AbilityManager.GetEvent(Release)), Fiber.Until(() => AbilityManager.GetAxis(AxisTag.Move).XZ != Vector3.zero));
-      //var hitEvent = Fiber.ListenFor(Defender.HitEvent);
-      //var selector = Fiber.SelectTask(hitEvent, Fiber.Any(new CountdownTimer(BlockDuration), Fiber.ListenFor(AbilityManager.GetEvent(Release)), Fiber.Until(() => AbilityManager.GetAxis(AxisTag.Move).XZ != Vector3.zero)));
-      // yield return selector
+      var hitEvent = Fiber.ListenFor(Defender.HitEvent);
+      yield return Fiber.Any(hitEvent, new CountdownTimer(BlockDuration), Fiber.ListenFor(AbilityManager.GetEvent(Release)), Fiber.Until(() => AbilityManager.GetAxis(AxisTag.Move).XZ != Vector3.zero));
       Animator.SetBool("Blocking", false);
-      if (didHit.DidComplete) {
+      if (hitEvent.IsCompleted) {
         AbilityManager.Bundle.Run(Riposte());
         yield break;
       }
