@@ -9,22 +9,42 @@ public interface IValue<T> {
 }
 
 public interface IStoppable {
-  public bool IsRunning { get; }
   public void Stop();
+  public void Complete() => Stop();
+  public bool IsRunning { get; }
 }
 
-public interface IStoppableRoutine : IEnumerator, IStoppable {}
-public interface IStoppableValue<T> : IStoppableRoutine, IValue<T> {}
+public interface IStoppableValue<T> : IEnumerator, IStoppable, IValue<T> {}
+
+public class Stoppable : IStoppable {
+  protected enum States { Running, Cancelled, Completed }
+  protected virtual States State { get; set; } = States.Running;
+  public void Stop() {
+    State = States.Cancelled;
+    OnStop();
+  }
+  public void Complete() {
+    State = States.Completed;
+    OnStop();
+  }
+
+  public virtual void OnStop() { }
+  public bool IsRunning { get => State == States.Running; }
+  public bool IsCompleted { get => State == States.Completed; }
+  public bool IsCancelled { get => State == States.Cancelled; }
+}
 
 [Serializable]
-public class Bundle : IEnumerator, IStoppable {
+public class Bundle : Stoppable, IEnumerator {
   public List<Fiber> Fibers = new();
   public List<Fiber> Added = new();
   public List<Fiber> Removed = new();
 
   public object Current { get => null; }
   public void Reset() => throw new NotSupportedException();
-  public bool IsRunning { get => Fibers.Count > 0 || Added.Count > 0; }
+  // TODO: support Cancelled state?
+  protected override States State { get => Fibers.Count > 0 || Added.Count > 0 ? States.Running : States.Completed; }
+
   public bool IsRoutineRunning(Fiber f) {
     return Fibers.Contains(f) || Added.Contains(f);
   }
@@ -45,7 +65,7 @@ public class Bundle : IEnumerator, IStoppable {
     Removed.Add(fiber);
     fiber.Stop();
   }
-  public void Stop() {
+  public override void OnStop() {
     Removed.AddRange(Fibers);
     Fibers.ForEach(f => f.Stop());
   }
@@ -77,54 +97,35 @@ public class CountdownTimer : IEnumerator, IValue<Timeval> {
   public void Reset() => Value.Millis = 0;
 }
 
-public class Listener : IEnumerator, IStoppable {
+public class Listener : Stoppable, IEnumerator {
   IEventSource Source;
 
   public Listener(IEventSource source) {
-    IsRunning = true;
     Source = source;
     Source.Listen(Callback);
   }
-  ~Listener() {
-    Source.Unlisten(Callback);
-  }
-  public void Callback() {
-    IsRunning = false;
-    Source.Unlisten(Callback);
-  }
-  public void Stop() {
-    IsRunning = false;
-    Source.Unlisten(Callback);
-  }
-  public bool IsRunning { get; set; }
-  public void Reset() => throw new NotSupportedException();
+  ~Listener() => Stop();
+  public void Callback() => Complete();
+  public override void OnStop() => Source.Unlisten(Callback);
   public bool MoveNext() => IsRunning;
+  public void Reset() => throw new NotImplementedException();
   public object Current { get => null; }
 }
 
-public class Listener<T> : IEnumerator, IStoppable, IValue<T> {
+public class Listener<T> : Stoppable, IEnumerator, IValue<T> {
   IEventSource<T> Source;
 
   public Listener(IEventSource<T> source) {
-    IsRunning = true;
     Source = source;
     Source.Listen(Callback);
   }
-  ~Listener() {
-    IsRunning = false;
-    Source.Unlisten(Callback);
-  }
+  ~Listener() => Stop();
   public void Callback(T t) {
     Value = t;
-    IsRunning = false;
-    Source.Unlisten(Callback);
+    Complete();
   }
-  public void Stop() {
-    IsRunning = false;
-    Source.Unlisten(Callback);
-  }
-  public bool IsRunning { get; set; }
-  public void Reset() => IsRunning = true;
+  public override void OnStop() => Source.Unlisten(Callback);
+  public void Reset() => throw new NotImplementedException();
   public bool MoveNext() => IsRunning;
   public object Current { get => null; }
   public T Value { get; internal set; }
@@ -221,104 +222,75 @@ public class ScopedRunner : IDisposable {
   }
 }
 
-public class Capture<T> : IStoppableValue<T> {
+public class Capture<T> : Stoppable, IValue<T> {
   Fiber Routine;
   public Capture(IEnumerator routine) {
     Routine = routine as Fiber ?? new Fiber(routine);
   }
-  public void Stop() => Routine.Stop();
+  public override void OnStop() => Routine.Stop();
   public bool MoveNext() {
-    if (!IsRunning)
-      return false;
-    Routine.MoveNext();
-    // Should Fiber.Current do this unpacking of the enumerator at the top of its stack?
-    // Also: Does it make more sense to capture the value before MoveNext or after?
-    if (IsRunning && Routine.Current is IEnumerator e && e.Current is T result)
-      Value = result;
-    return IsRunning;
+    if (IsRunning) {
+      if (!Routine.MoveNext()) {
+        Complete();
+        // Should Fiber.Current do this unpacking of the enumerator at the top of its stack?
+        // Also: Does it make more sense to capture the value before MoveNext or after?
+      } else if (Routine.Current is IEnumerator e && e.Current is T result) {
+        Value = result;
+      }
+    }
+    return IsRunning && Routine.IsRunning;
   }
   public void Reset() => throw new NotSupportedException();
   public object Current { get => null; }
-  public bool IsRunning { get => Routine.IsRunning; }
   public T Value { get; private  set; }
 }
 
-public class Watcher<T> : IStoppableRoutine where T: class {
-  IEnumerator Enumerator;
-  Fiber Routine;
-  public Watcher(IEnumerator routine) {
-    Enumerator = routine;
-    Routine = routine as Fiber ?? new Fiber(routine);
+public class Any : Stoppable, IEnumerator {
+  Fiber A;
+  Fiber B;
+  public Any(IEnumerator a, IEnumerator b) {
+    A = a as Fiber ?? new Fiber(a);
+    B = b as Fiber ?? new Fiber(b);
   }
-  public void Stop() => Routine.Stop();
+  public override void OnStop() {
+    if (A.IsRunning) A.Stop();
+    if (B.IsRunning) B.Stop();
+  }
   public bool MoveNext() {
-    if (IsRunning && !Routine.MoveNext())
-      DidComplete = true;
+    if (IsRunning) {
+      if (!(A.MoveNext() & B.MoveNext()))
+        Complete();
+    }
     return IsRunning;
   }
   public void Reset() => throw new NotSupportedException();
   public object Current { get => null; }
-  public bool IsRunning { get => Routine.IsRunning; }
-  public bool DidComplete { get; private set; } = false;
-  public T Task { get => Enumerator as T; }
 }
 
-public class Any : IEnumerator, IStoppable {
-  Fiber A;
-  Fiber B;
-  public Any(IEnumerator a, IEnumerator b) {
-    IsRunning = true;
-    A = a as Fiber ?? new Fiber(a);
-    B = b as Fiber ?? new Fiber(b);
-  }
-  public void Stop() {
-    if (A.IsRunning) A.Stop();
-    if (B.IsRunning) B.Stop();
-  }
-  public bool MoveNext() {
-    if (IsRunning) {
-      IsRunning = A.MoveNext() & B.MoveNext();
-      if (!IsRunning)
-        Stop();
-      return IsRunning;
-    } else {
-      return false;
-    }
-  }
-  public void Reset() => throw new NotSupportedException();
-  public object Current { get => null; }
-  public bool IsRunning { get; internal set; }
-}
-
-public class All: IEnumerator, IStoppable {
+public class All : Stoppable, IEnumerator {
   Fiber A;
   Fiber B;
   public All(IEnumerator a, IEnumerator b) {
-    IsRunning = true;
     A = a as Fiber ?? new Fiber(a);
     B = b as Fiber ?? new Fiber(b);
   }
-  public void Stop() {
+  public override void OnStop() {
     if (A.IsRunning) A.Stop();
     if (B.IsRunning) B.Stop();
   }
   public bool MoveNext() {
     if (IsRunning) {
-      IsRunning = A.MoveNext() | B.MoveNext();
-      if (!IsRunning)
-        Stop();
-      return IsRunning;
-    } else {
-      return false;
+      if (!(A.MoveNext() | B.MoveNext()))
+        Complete();
     }
+    return IsRunning;
   }
   public void Reset() => throw new NotSupportedException();
   public object Current { get => null; }
-  public bool IsRunning { get; internal set; }
 }
 
 [Serializable]
-public class Fiber : IEnumerator, IStoppable {
+public class Fiber : Stoppable, IEnumerator {
   public static IEnumerator Wait(int n) {
     for (var i = 0; i < n; i++) {
       yield return null;
@@ -354,7 +326,6 @@ public class Fiber : IEnumerator, IStoppable {
   public static All All(IEnumerator a, IEnumerator b, params IEnumerator[] xs) => xs.Aggregate(All(a, b), All);
   public static Capture<T> Capture<T>(IEnumerator routine) => new Capture<T>(routine);
   public static Capture<T> Capture<T>(out Capture<T> result, IEnumerator routine) => result = new Capture<T>(routine);
-  public static Watcher<T> Watch<T>(out Watcher<T> result, T routine) where T: class, IEnumerator => result = new Watcher<T>(routine);
   public static Selector Select(IEnumerator a, IEnumerator b) => new Selector(a, b);
   public static TaskSelector SelectTask(IEnumerator a, IEnumerator b) => new TaskSelector(a, b);
   public static Listener ListenFor(IEventSource source) => new Listener(source);
@@ -388,7 +359,7 @@ public class Fiber : IEnumerator, IStoppable {
     Stack = new();
     Stack.Push(enumerator);
   }
-  public void Stop() {
+  public override void OnStop() {
     Stack.ForEach(s => {
       if (s is IStoppable ss) {
         ss.Stop();
@@ -396,14 +367,13 @@ public class Fiber : IEnumerator, IStoppable {
     });
     Stack.Clear();
   }
-  public bool IsRunning { get => Stack.Count > 0; }
   public object Current { get => Stack.Peek(); }
   public void Reset() => throw new NotSupportedException();
   public bool MoveNext() {
     while (Stack.TryPeek(out IEnumerator top)) {
       if (!top.MoveNext()) {
         if (top is IStoppable ts && ts.IsRunning) {
-          ts.Stop();
+          ts.Complete();
         }
         if (Stack.Count > 0) {
           Stack.Pop();
@@ -416,6 +386,7 @@ public class Fiber : IEnumerator, IStoppable {
         }
       }
     }
+    Complete();
     return false;
   }
 }

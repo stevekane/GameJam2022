@@ -30,9 +30,9 @@ public class ParryDash : Ability {
     using (AddStatusEffect(Invulnerable)) {
       Animator.SetBool("Blocking", true);
       var hitEvent = Fiber.ListenFor(Defender.HitEvent);
-      yield return Fiber.Any(Fiber.Watch(out var didHit, Fiber.ListenFor(Defender.HitEvent)), new CountdownTimer(BlockDuration), Fiber.ListenFor(AbilityManager.GetEvent(Release)), Fiber.Until(() => AbilityManager.GetAxis(AxisTag.Move).XZ != Vector3.zero));
+      yield return Fiber.Any(hitEvent, new CountdownTimer(BlockDuration), Fiber.ListenFor(AbilityManager.GetEvent(Release)), Fiber.Until(() => AbilityManager.GetAxis(AxisTag.Move).XZ != Vector3.zero));
       Animator.SetBool("Blocking", false);
-      if (didHit.DidComplete) {
+      if (hitEvent.IsCompleted) {
         AbilityManager.Bundle.Run(Riposte());
         yield break;
       }
