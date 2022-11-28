@@ -12,6 +12,7 @@ public class SwordStrike : FiberAbility {
   public Collider Collider;
   public TriggerEvent Contact;
   public GameObject SlashVFX;
+  public AudioClip SlashSFX;
 
   public override void OnStop() {
     Collider.enabled = false;
@@ -22,6 +23,7 @@ public class SwordStrike : FiberAbility {
     yield return animation.PlayUntil(ActiveFrameStart.Ticks);
     var slashPosition = AbilityManager.transform.position;
     var slashRotation = AbilityManager.transform.rotation;
+    SFXManager.Instance.TryPlayOneShot(SlashSFX);
     VFXManager.Instance.TrySpawn2DEffect(SlashVFX, slashPosition, slashRotation);
     Collider.enabled = true;
     var contact = Fiber.ListenFor(Contact.OnTriggerStaySource);
