@@ -59,7 +59,8 @@ public class SliceDash : Ability {
     }
   }
 
-  void Awake() {
+  public override void Awake() {
+    base.Awake();
     Animator = GetComponentInParent<Animator>();
   }
 }

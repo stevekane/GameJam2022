@@ -38,7 +38,8 @@ public class DashAbility : Ability {
     AudioSource.Stop();
   }
 
-  void Awake() {
+  public override void Awake() {
+    base.Awake();
     //Controller = GetComponent<CharacterController>();
     Animator = GetComponentInParent<Animator>();
     AudioSource = GetComponentInParent<AudioSource>();

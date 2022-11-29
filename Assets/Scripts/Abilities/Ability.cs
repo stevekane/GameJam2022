@@ -63,15 +63,15 @@ public abstract class Ability : MonoBehaviour, IAbility {
   }
   public virtual void OnStop() { }
   public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
-  void FixedUpdate() {
+  public virtual void FixedUpdate() {
     var isRunning = Bundle.IsRunning;
     var stillRunning = Bundle.MoveNext();
     if (isRunning && !stillRunning) {
       Stop();
     }
   }
-  void Awake() => TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.GetMethod(this)] = c);
-  void OnDestroy() => Stop();
+  public virtual void Awake() => TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.GetMethod(this)] = c);
+  public virtual void OnDestroy() => Stop();
 }
 
 public abstract class FiberAbility : MonoBehaviour, IAbility, IEnumerator, IScorable {

@@ -76,7 +76,15 @@ public class ParryDash : Ability {
     Animator.SetBool("Blocking", false);
   }
 
-  void Awake() {
+  public override void FixedUpdate() {
+    base.FixedUpdate();
+    // TODO: This is bad. Need a more generic gesture system.
+    if (Input.GetButton("L1") && AbilityManager.GetAxis(AxisTag.Move).XZ != Vector3.zero && !IsRunning) {
+      AbilityManager.TryInvoke(this.Execute);
+    }
+  }
+  public override void Awake() {
+    base.Awake();
     Animator = GetComponentInParent<Animator>();
     Defender = GetComponentInParent<Defender>();
   }
