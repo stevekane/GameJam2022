@@ -172,11 +172,11 @@ MonoBehaviour:
     DamageModifier:
       Base: 15
       Mult: 1.5
+    KnockbackStrength: 50
+    KnockbackType: 1
     HitStopDuration:
       Millis: 200
       FramesPerSecond: 30
-    KnockbackStrength: 50
-    KnockbackType: 1
     SFX: {fileID: 8300000, guid: 332a6114ed184a44188829a8f87db1a7, type: 3}
     VFX: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
     VFXOffset: {x: 0, y: 0, z: 0}
@@ -284,11 +284,11 @@ MonoBehaviour:
     DamageModifier:
       Base: 5
       Mult: 1.2
+    KnockbackStrength: 20
+    KnockbackType: 1
     HitStopDuration:
       Millis: 200
       FramesPerSecond: 30
-    KnockbackStrength: 20
-    KnockbackType: 1
     SFX: {fileID: 8300000, guid: d0f166575306db84091dc03fce0eff69, type: 3}
     VFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
     VFXOffset: {x: 0, y: 2, z: 0}
@@ -410,11 +410,11 @@ MonoBehaviour:
     DamageModifier:
       Base: 10
       Mult: 2
+    KnockbackStrength: 20
+    KnockbackType: 0
     HitStopDuration:
       Millis: 500
       FramesPerSecond: 30
-    KnockbackStrength: 20
-    KnockbackType: 0
     SFX: {fileID: 8300000, guid: f161f54138dc0314abdabf7ab71e3404, type: 3}
     VFX: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
     VFXOffset: {x: 0, y: 1, z: 0}
@@ -513,11 +513,11 @@ MonoBehaviour:
     DamageModifier:
       Base: 0
       Mult: 1
+    KnockbackStrength: 0
+    KnockbackType: 1
     HitStopDuration:
       Millis: 100
       FramesPerSecond: 30
-    KnockbackStrength: 0
-    KnockbackType: 1
     SFX: {fileID: 8300000, guid: 1f53a5fc6bd934e46a5d8cfa8fd27b64, type: 3}
     VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
     VFXOffset: {x: 0, y: 2, z: 0}
@@ -646,11 +646,11 @@ MonoBehaviour:
     DamageModifier:
       Base: 1
       Mult: 1
+    KnockbackStrength: 0
+    KnockbackType: 1
     HitStopDuration:
       Millis: 133.33333
       FramesPerSecond: 30
-    KnockbackStrength: 0
-    KnockbackType: 1
     SFX: {fileID: 8300000, guid: 332a6114ed184a44188829a8f87db1a7, type: 3}
     VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
     VFXOffset: {x: 0, y: 0, z: 0}
@@ -1107,12 +1107,22 @@ MonoBehaviour:
   - ButtonCode: 0
     ButtonPressType: 0
     Entry:
-      Ability: {fileID: 0}
+      Ability: {fileID: 3701212827919873877}
       MethodName: Execute
   - ButtonCode: 0
     ButtonPressType: 2
     Entry:
-      Ability: {fileID: 0}
+      Ability: {fileID: 3701212827919873877}
+      MethodName: Release
+  - ButtonCode: 0
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 2864923836562023574}
+      MethodName: Pressed
+  - ButtonCode: 0
+    ButtonPressType: 2
+    Entry:
+      Ability: {fileID: 2864923836562023574}
       MethodName: Release
   AxisMaps:
   - AxisCode: 0
@@ -1387,7 +1397,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions: []
-  MoveSpeed: 120
+  MaxMoveSpeed: 120
+  MinMoveSpeed: 60
   TurnSpeed: 60
   DashDuration:
     Millis: 200
@@ -1490,11 +1501,11 @@ MonoBehaviour:
     DamageModifier:
       Base: 5
       Mult: 1.2
+    KnockbackStrength: 20
+    KnockbackType: 0
     HitStopDuration:
       Millis: 200
       FramesPerSecond: 30
-    KnockbackStrength: 20
-    KnockbackType: 0
     SFX: {fileID: 8300000, guid: d0f166575306db84091dc03fce0eff69, type: 3}
     VFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
     VFXOffset: {x: 0, y: 2, z: 0}
@@ -1625,11 +1636,11 @@ MonoBehaviour:
     DamageModifier:
       Base: 0
       Mult: 1
+    KnockbackStrength: 0
+    KnockbackType: 1
     HitStopDuration:
       Millis: 100
       FramesPerSecond: 30
-    KnockbackStrength: 0
-    KnockbackType: 1
     SFX: {fileID: 8300000, guid: 1f53a5fc6bd934e46a5d8cfa8fd27b64, type: 3}
     VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
     VFXOffset: {x: 0, y: 2, z: 0}
