@@ -27,39 +27,39 @@ public class SmashDash : Ability {
   public IEnumerator Pressed() {
     yield return Fiber.Any(ListenFor(Release), Loop());
   }
-
   public IEnumerator Release() => null;
 
-  public IEnumerator Loop() {
-    yield return WaitForMoveAxisChange();
+  // Detect when the move axis is released and pressed again. This sort of thing probably belongs in a lower level system.
+  IEnumerator Loop() {
+    const float releaseThreshold = .1f;
+    const float activeThreshold = .5f;
+    bool moveAxisRelease() => AbilityManager.GetAxis(AxisTag.Move).XZ.sqrMagnitude < releaseThreshold*releaseThreshold;
+    bool moveAxisActive() => AbilityManager.GetAxis(AxisTag.Move).XZ.sqrMagnitude > activeThreshold*activeThreshold;
+
     while (true) {
-      yield return Fiber.All(Dash(), WaitForMoveAxisChange());
+      yield return Fiber.Until(moveAxisActive);
+      yield return Fiber.All(Dash(), Fiber.Until(moveAxisRelease));
     }
   }
 
-  // Detect when the move axis is released and pressed again. This sort of thing probably belongs in a lower level system.
-  public IEnumerator WaitForMoveAxisChange() {
-    const float releaseThreshold = .1f;
-    const float activeThreshold = .5f;
-    yield return Fiber.Until(() => AbilityManager.GetAxis(AxisTag.Move).XZ.sqrMagnitude < releaseThreshold*releaseThreshold);
-    yield return Fiber.Until(() => AbilityManager.GetAxis(AxisTag.Move).XZ.sqrMagnitude > activeThreshold*activeThreshold);
-  }
-
-  public IEnumerator Dash() {
-    var dir = AbilityManager.GetAxis(AxisTag.Move).XZ;
+  IEnumerator Dash() {
+    var dir = AbilityManager.GetAxis(AxisTag.Move).XZ.normalized;
     AddStatusEffect(ScriptedMove);
+    //using var final = Finally(() => Animator.Run(DoneClip));
     yield return Animator.Run(DashWindupClip);
     AddStatusEffect(Invulnerable);
-    yield return Fiber.Any(new CountdownTimer(DashDuration), Animator.Run(DashingClip), Move(dir.normalized));
+    yield return Fiber.Any(new CountdownTimer(DashDuration), Animator.Run(DashingClip), Move(dir));
     yield return Animator.Run(DoneClip);
+    //yield return final;
   }
 
-  public IEnumerator Move(Vector3 dir) {
+  IEnumerator Move(Vector3 dir) {
     while (true) {
-      // TODO: steering
+      //var desiredDir = AbilityManager.GetAxis(AxisTag.Move).XZ.normalized;
+      //var steerRotation = Mover.RotationFromDesired(dir, TurnSpeed, desiredDir);
+      //dir = steerRotation*dir;
       Status.transform.forward = dir;
-      var move = MoveSpeed * Time.fixedDeltaTime * dir;
-      Status.Move(move);
+      Status.Move(MoveSpeed * Time.fixedDeltaTime * dir);
       yield return null;
     }
   }

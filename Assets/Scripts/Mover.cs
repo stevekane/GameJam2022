@@ -4,21 +4,26 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController), typeof(Status), typeof(AbilityManager))]
 public class Mover : MonoBehaviour {
   public static void UpdateAxes(AbilityManager manager, Vector3 desiredMoveDir, Vector3 desiredFacing) {
-    manager.GetAxis(AxisTag.Move).Update(0f, new Vector2(desiredMoveDir.x, desiredMoveDir.z));
-    manager.GetAxis(AxisTag.Aim).Update(0f, new Vector2(desiredFacing.x, desiredFacing.z));
+    SetMove(manager, desiredMoveDir);
+    SetAim(manager, desiredFacing);
   }
-
   public static void SetMove(AbilityManager manager, Vector3 desiredMoveDir) {
     manager.GetAxis(AxisTag.Move).Update(0f, new Vector2(desiredMoveDir.x, desiredMoveDir.z));
   }
-
   public static void SetAim(AbilityManager manager, Vector3 desiredFacing) {
     manager.GetAxis(AxisTag.Aim).Update(0f, new Vector2(desiredFacing.x, desiredFacing.z));
   }
-
   public static void GetAxes(AbilityManager manager, out Vector3 desiredMoveDir, out Vector3 desiredFacing) {
     desiredMoveDir = manager.GetAxis(AxisTag.Move).XZ;
     desiredFacing = manager.GetAxis(AxisTag.Aim).XZ.TryGetDirection() ?? manager.transform.forward;
+  }
+
+  public static Quaternion RotationFromDesired(Vector3 forward, float speed, Vector3 desiredForward) =>
+    RotationFromDesired(Quaternion.LookRotation(forward), speed, desiredForward);
+  public static Quaternion RotationFromDesired(Quaternion rotation, float speed, Vector3 desiredForward) {
+    var desiredRotation = Quaternion.LookRotation(desiredForward);
+    var degrees = speed * Time.fixedDeltaTime;
+    return Quaternion.RotateTowards(rotation, desiredRotation, degrees);
   }
 
   public float Gravity;
@@ -34,13 +39,6 @@ public class Mover : MonoBehaviour {
     Attributes = GetComponent<Attributes>();
     Status = GetComponent<Status>();
     AbilityManager = GetComponent<AbilityManager>();
-  }
-
-  static Quaternion RotationFromDesired(Transform t, float speed, Vector3 desiredForward) {
-    var currentRotation = t.rotation;
-    var desiredRotation = Quaternion.LookRotation(desiredForward);
-    var degrees = speed * Time.fixedDeltaTime;
-    return Quaternion.RotateTowards(currentRotation, desiredRotation, degrees);
   }
 
   public IEnumerator TryAimAt(Vector3 desired, Timeval MaxDuration, float tolerance = .95f) {
@@ -76,6 +74,6 @@ public class Mover : MonoBehaviour {
       Velocity.y = 0f;
     Controller.Move(Time.fixedDeltaTime * Velocity);
 
-    transform.rotation = RotationFromDesired(transform, Attributes.GetValue(AttributeTag.TurnSpeed), desiredFacing);
+    transform.rotation = RotationFromDesired(transform.forward, Attributes.GetValue(AttributeTag.TurnSpeed), desiredFacing);
   }
 }
