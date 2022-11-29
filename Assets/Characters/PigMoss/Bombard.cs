@@ -12,26 +12,33 @@ namespace PigMoss {
     public Timeval Windup = Timeval.FromSeconds(1);
     public Timeval ShotPeriod = Timeval.FromSeconds(.1f);
     public Timeval Recovery = Timeval.FromSeconds(1);
-    public SendMessageOptions MessageOptions = SendMessageOptions.DontRequireReceiver;
+    public AudioClip WindupClip;
+    public AudioClip ShotClip;
+    public AudioClip RecoveryClip;
+    public GameObject ShotEffect;
+    public Animator Animator;
 
     public override float Score() {
       return Mathf.Clamp01(BlackBoard.DistanceScore/25f);
     }
 
     public override void OnStop() {
-      AbilityManager.SendMessage("OnBombardStop", MessageOptions);
+      Animator.SetBool("Extended", false);
     }
 
     public override IEnumerator Routine() {
-      AbilityManager.SendMessage("OnBombardWindup", MessageOptions);
+      SFXManager.Instance.TryPlayOneShot(WindupClip);
+      Animator.SetBool("Extended", true);
       yield return Wait(Windup);
       foreach (var launchSite in LaunchSites) {
         var missile = GameObject.Instantiate(MissilePrefab, launchSite.position, launchSite.rotation);
         missile.Target = Radius*UnityEngine.Random.onUnitSphere.XZ();
-        AbilityManager.SendMessage("OnBombardShot", launchSite, MessageOptions);
+        SFXManager.Instance.TryPlayOneShot(ShotClip);
+        VFXManager.Instance.TrySpawnEffect(ShotEffect, launchSite.position);
         yield return Wait(ShotPeriod);
       }
-      AbilityManager.SendMessage("OnBombardRecovery", MessageOptions);
+      SFXManager.Instance.TryPlayOneShot(RecoveryClip);
+      Animator.SetBool("Extended", false);
       yield return Wait(Recovery);
     }
   }

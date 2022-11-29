@@ -974,7 +974,11 @@ MonoBehaviour:
   Recovery:
     Millis: 1000
     FramesPerSecond: 30
-  MessageOptions: 1
+  WindupClip: {fileID: 8300000, guid: 4af54c965264a3a449e7e1127868e676, type: 3}
+  ShotClip: {fileID: 8300000, guid: 1e3312d22540aa14597a1fb4739f2782, type: 3}
+  RecoveryClip: {fileID: 8300000, guid: 70c8c80c739dc744c92ad158212b921b, type: 3}
+  ShotEffect: {fileID: 1134129239631916, guid: 7e48ba6b1b968764490bbc70b66e3fe1, type: 3}
+  Animator: {fileID: 7726524077543302298}
 --- !u!1 &8872822986732128199
 GameObject:
   m_ObjectHideFlags: 0
@@ -1173,7 +1177,6 @@ GameObject:
   - component: {fileID: 8872822988582960444}
   - component: {fileID: 8872822988582960448}
   - component: {fileID: 8872822988582960449}
-  - component: {fileID: 3634860187303144175}
   m_Layer: 10
   m_Name: PigMoss Prefab
   m_TagString: Untagged
@@ -1390,23 +1393,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3634860187303144175
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8872822988582960440}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec4021de67e0f29419dfac4629bedad7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  WindupClip: {fileID: 8300000, guid: 4af54c965264a3a449e7e1127868e676, type: 3}
-  ShotClip: {fileID: 8300000, guid: 0e9bca6dd55d7e541a865752da6415f5, type: 3}
-  RecoveryClip: {fileID: 8300000, guid: 70c8c80c739dc744c92ad158212b921b, type: 3}
-  ShotEffect: {fileID: 1134129239631916, guid: 7e48ba6b1b968764490bbc70b66e3fe1, type: 3}
-  Animator: {fileID: 7726524077543302298}
 --- !u!1 &8955955708821358629
 GameObject:
   m_ObjectHideFlags: 0
