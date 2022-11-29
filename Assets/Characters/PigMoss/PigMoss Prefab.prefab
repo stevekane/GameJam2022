@@ -258,6 +258,9 @@ MonoBehaviour:
     FramesPerSecond: 30
   SpikeTriggerEvent: {fileID: 7185035374616342134}
   SpikeHitParams:
+    DamageModifier:
+      Base: 15
+      Mult: 1
     Damage: 15
     KnockbackStrength: 15
     KnockbackType: 1
@@ -532,6 +535,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   HitParams:
+    DamageModifier:
+      Base: 15
+      Mult: 1
     Damage: 15
     KnockbackStrength: 15
     KnockbackType: 0
@@ -610,6 +616,9 @@ MonoBehaviour:
     FramesPerSecond: 30
   BladeTriggerEvent: {fileID: 8773792274563917286}
   BladeHitParams:
+    DamageModifier:
+      Base: 15
+      Mult: 1
     Damage: 15
     KnockbackStrength: 15
     KnockbackType: 0
@@ -1237,7 +1246,7 @@ MonoBehaviour:
         serializedVersion: 2
         m_Bits: 1
       TriggerInteraction: 2
-  CenterOfArena: {fileID: 8872822986732128203}
+  CenterOfArena: {fileID: 0}
   ActionCooldown:
     Millis: 1000
     FramesPerSecond: 30

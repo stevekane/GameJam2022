@@ -2,38 +2,39 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Configuration for HitParams. Use this to set values on an attack in the editor.
 [Serializable]
 public class HitConfig {
   public AttributeModifier DamageModifier;
-  public Timeval HitStopDuration;
   public float KnockbackStrength;
   public KnockBackType KnockbackType;
+  public Timeval HitStopDuration;
   public AudioClip SFX;
   public GameObject VFX;
   public Vector3 VFXOffset;
-  public HitParams ComputeParams(Attributes attacker) {
-    return new() {
-      Damage = DamageModifier.Apply(attacker.GetValue(AttributeTag.Damage, 0f)),
-      KnockbackStrength = attacker.GetValue(AttributeTag.Knockback, KnockbackStrength),
-      KnockbackType = KnockbackType,
-      HitStopDuration = HitStopDuration,
-      SFX = SFX,
-      VFX = VFX,
-      VFXOffset = VFXOffset,
-      OnHitEffects = ComputeOnHit(attacker),
-    };
+  public HitParams ComputeParamsDontUse() {
+    Debug.LogWarning($"Don't serialize HitParams directly. Use HitConfig, and call ComputeParams() with an attacker. Projectiles should be passed the computed params on spawn in case they outlive their attacker.");
+    return ComputeParams(DamageModifier.Apply(0f), KnockbackStrength, new());
   }
+  public HitParams ComputeParams(Attributes attacker) => ComputeParams(
+    DamageModifier.Apply(attacker.GetValue(AttributeTag.Damage, 0f)),
+    attacker.GetValue(AttributeTag.Knockback, KnockbackStrength),
+    ComputeOnHit(attacker));
   // A variant for scaled damage and knockback for use with charged abilities.
-  public HitParams ComputeParamsScaled(Attributes attacker, float scale) {
+  public HitParams ComputeParamsScaled(Attributes attacker, float scale) => ComputeParams(
+    DamageModifier.Apply(attacker.GetValue(AttributeTag.Damage, 0f)) * scale,
+    attacker.GetValue(AttributeTag.Knockback, KnockbackStrength) * scale,
+    ComputeOnHit(attacker));
+  HitParams ComputeParams(float damage, float knockbackStrength, List<StatusEffect> onHitEffects) {
     return new() {
-      Damage = DamageModifier.Apply(attacker.GetValue(AttributeTag.Damage, 0f)) * scale,
-      KnockbackStrength = attacker.GetValue(AttributeTag.Knockback, KnockbackStrength) * scale,
+      Damage = damage,
+      KnockbackStrength = knockbackStrength,
       KnockbackType = KnockbackType,
       HitStopDuration = HitStopDuration,
       SFX = SFX,
       VFX = VFX,
       VFXOffset = VFXOffset,
-      OnHitEffects = ComputeOnHit(attacker),
+      OnHitEffects = onHitEffects,
     };
   }
   List<StatusEffect> ComputeOnHit(Attributes attacker) {
@@ -46,13 +47,8 @@ public class HitConfig {
   }
 }
 
-[Flags]
-public enum HitFlags {
-  Freezing = 1<<0,
-  Burning = 1<<1,
-}
-
-[Serializable]
+// Per-hit data. Only create this via HitConfig.ComputeParams at the time the attack is initiated. Projectiles, etc
+// will want to store this until detonation.
 public class HitParams {
   public float Damage;
   public float KnockbackStrength;

@@ -14,7 +14,7 @@ namespace PigMoss {
     public Timeval RevealedDuration;
     public Timeval ExtendedDuration;
     public TriggerEvent BladeTriggerEvent;
-    public HitParams BladeHitParams;
+    public HitConfig BladeHitParams;
 
     HashSet<Collider> Hits = new();
 
@@ -60,7 +60,7 @@ namespace PigMoss {
 
     void ProcessHit(Collider c) {
       if (c.TryGetComponent(out Hurtbox hurtbox)) {
-        hurtbox.Defender.OnHit(BladeHitParams, AbilityManager.transform);
+        hurtbox.Defender.OnHit(BladeHitParams.ComputeParams(Attributes), AbilityManager.transform);
       }
     }
   }

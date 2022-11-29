@@ -5,7 +5,7 @@ using UnityEngine;
 namespace PigMoss {
   [Serializable]
   public class SwordStrike : FiberAbility {
-    public HitParams HitParams;
+    public HitConfig HitParams;
     public Timeval ActiveFrameStart;
     public Timeval ActiveFrameEnd;
     public AnimationClip Clip;
@@ -43,7 +43,7 @@ namespace PigMoss {
       var activeOutcome = Fiber.SelectTask(contact, endActive);
       yield return activeOutcome;
       if (activeOutcome.Value == contact && contact.Value.TryGetComponent(out Hurtbox hurtbox)) {
-        hurtbox.Defender.OnHit(HitParams, AbilityManager.transform);
+        hurtbox.Defender.OnHit(HitParams.ComputeParams(Attributes), AbilityManager.transform);
       }
       Collider.enabled = false;
       yield return animation;
