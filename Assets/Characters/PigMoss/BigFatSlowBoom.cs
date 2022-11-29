@@ -1,25 +1,15 @@
 using UnityEngine;
 
 public class BigFatSlowBoom : MonoBehaviour {
-  public GameObject VFXPrefab;
-  public AudioClip SFXClip;
-  public float Damage;
-  public float KnockbackStrength;
-  public Timeval HitStopDuration;
+  public HitParams HitParams;
+  public GameObject ContactVFX;
+  public AudioClip ContactSFX;
   void Detonate(GameObject target) {
     if (target.TryGetComponent(out Hurtbox hurtbox)) {
-      var hitParams = new HitParams {
-        Damage = Damage,
-        KnockbackType = KnockBackType.Delta,
-        KnockbackStrength = KnockbackStrength,
-        HitStopDuration = HitStopDuration,
-        SFX = SFXClip,
-        VFX = VFXPrefab,
-      };
-      hurtbox.Defender.OnHit(hitParams, transform);
+      hurtbox.Defender.OnHit(HitParams, transform);
     } else {
-      SFXManager.Instance.TryPlayOneShot(SFXClip);
-      VFXManager.Instance.TrySpawnEffect(VFXPrefab, transform.position);
+      SFXManager.Instance.TryPlayOneShot(ContactSFX);
+      VFXManager.Instance.TrySpawnEffect(ContactVFX, transform.position);
     }
     Destroy(gameObject);
   }

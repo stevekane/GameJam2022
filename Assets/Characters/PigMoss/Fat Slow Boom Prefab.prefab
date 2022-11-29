@@ -49,13 +49,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc46ea2e603222a43bdd7381cab6600a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VFXPrefab: {fileID: 2433282508537954060, guid: 7b68f0f87eff9464e890d08895d2a042, type: 3}
-  SFXClip: {fileID: 8300000, guid: b7f539420fab41a41a7b378d2d3bda36, type: 3}
-  Damage: 15
-  KnockbackStrength: 15
-  HitStopDuration:
-    Millis: 200
-    FramesPerSecond: 30
+  HitParams:
+    Damage: 15
+    KnockbackStrength: 15
+    KnockbackType: 0
+    HitStopDuration:
+      Millis: 100
+      FramesPerSecond: 30
+    SFX: {fileID: 8300000, guid: b7f539420fab41a41a7b378d2d3bda36, type: 3}
+    VFX: {fileID: 2433282508537954060, guid: 7b68f0f87eff9464e890d08895d2a042, type: 3}
+    VFXOffset: {x: 0, y: 1, z: 0}
+  ContactVFX: {fileID: 2433282508537954060, guid: 7b68f0f87eff9464e890d08895d2a042, type: 3}
+  ContactSFX: {fileID: 8300000, guid: 78850fd5336d0a54a9f85f580d94877d, type: 3}
 --- !u!114 &4185040301392971604
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -25,6 +25,10 @@ public interface IAbility : IStoppable {
   public TriggerCondition GetTriggerCondition(AbilityMethod method);
 }
 
+interface IScorable {
+  public float Score();
+}
+
 [Serializable]
 public abstract class Ability : MonoBehaviour, IAbility {
   protected Bundle Bundle = new();
@@ -70,11 +74,12 @@ public abstract class Ability : MonoBehaviour, IAbility {
   void OnDestroy() => Stop();
 }
 
-public abstract class FiberAbility : IAbility, IEnumerator {
+public abstract class FiberAbility : MonoBehaviour, IAbility, IEnumerator, IScorable {
   public AbilityManager AbilityManager { get; set; }
-  public Attributes Attributes { get => AbilityManager.GetComponent<Attributes>(); }
-  public Status Status { get => AbilityManager.GetComponent<Status>(); }
-  public Mover Mover { get => AbilityManager.GetComponent<Mover>(); }
+  public BlackBoard BlackBoard => AbilityManager.GetComponent<BlackBoard>();
+  public Attributes Attributes => AbilityManager.GetComponent<Attributes>();
+  public Status Status => AbilityManager.GetComponent<Status>();
+  public Mover Mover => AbilityManager.GetComponent<Mover>();
   public AbilityTag Tags { get; set; }
   public void StartRoutine(Fiber routine) => Enumerator = routine;
   public void StopRoutine(Fiber routine) => Enumerator = null;
@@ -101,4 +106,5 @@ public abstract class FiberAbility : IAbility, IEnumerator {
   public abstract void OnStop();
   public IEnumerator Enumerator;
   public abstract IEnumerator Routine();
+  public abstract float Score();
 }
