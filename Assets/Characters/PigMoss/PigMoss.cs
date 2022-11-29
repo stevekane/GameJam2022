@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections;
 using UnityEngine;
 
@@ -21,7 +22,9 @@ namespace PigMoss {
       // Targeting
       var acquireTargets = new AcquireTargets(transform, TargetingConfig, PhysicsQuery.Colliders);
       yield return acquireTargets;
+
       // Scoring
+      Abilities.ForEach(a => a.AbilityManager = AbilityManager);
       BlackBoard.Target = PhysicsQuery.Colliders[acquireTargets.Value-1].transform;
       if (BlackBoard.Target) {
         var delta = BlackBoard.Target.transform.position-transform.position;
@@ -32,11 +35,23 @@ namespace PigMoss {
         BlackBoard.DistanceScore = 0;
         BlackBoard.AngleScore = 0;
       }
+      var scores = Abilities.Select(a => a.Score()).ToArray();
+
       // Strategy
-      var index = UnityEngine.Random.Range(0, Abilities.Length);
+      var bestScore = 0f;
+      var index = 0;
+      for (var i = 0; i < scores.Length; i++) {
+        if (scores[i] > bestScore) {
+          bestScore = scores[i];
+          index = i;
+        }
+      }
       yield return TryRun(Abilities[index]);
+
       // Cooldown
-      yield return Fiber.Wait(ActionCooldown);
+      var cooldown = Fiber.Wait(ActionCooldown);
+      var lookAt = Fiber.Repeat(GetComponent<Mover>().TryLookAt, BlackBoard.Target);
+      yield return Fiber.Any(cooldown, lookAt);
     }
 
     IEnumerator TryRun(FiberAbility ability) {

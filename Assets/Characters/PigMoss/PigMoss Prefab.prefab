@@ -1163,13 +1163,13 @@ GameObject:
   m_Component:
   - component: {fileID: 8872822988582960447}
   - component: {fileID: 8872822988582960445}
+  - component: {fileID: 8872822988582960451}
   - component: {fileID: 8882405274179717399}
   - component: {fileID: 8872822988582960446}
+  - component: {fileID: 8872822988582960455}
   - component: {fileID: 8872822988582960450}
   - component: {fileID: 8872822988582960454}
-  - component: {fileID: 8872822988582960451}
   - component: {fileID: 8872822988582960453}
-  - component: {fileID: 8872822988582960455}
   - component: {fileID: 8872822988582960444}
   - component: {fileID: 8872822988582960448}
   - component: {fileID: 8872822988582960449}
@@ -1239,6 +1239,22 @@ MonoBehaviour:
     Millis: 1000
     FramesPerSecond: 30
   BlackBoard: {fileID: 8882405274179717399}
+--- !u!114 &8872822988582960451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8872822988582960440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba179080412a6af41a99d021d690c5fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Bundle:
+    Fibers: []
+    Added: []
+    Removed: []
 --- !u!114 &8882405274179717399
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1276,6 +1292,19 @@ MonoBehaviour:
       Base: 360
       Mult: 1
   BaseUpgrades: []
+--- !u!114 &8872822988582960455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8872822988582960440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 589031cb649129f4595d6562a2fa54c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _Points: 0
 --- !u!114 &8872822988582960450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1302,22 +1331,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AbilityTags: 0
---- !u!114 &8872822988582960451
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8872822988582960440}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba179080412a6af41a99d021d690c5fc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Bundle:
-    Fibers: []
-    Added: []
-    Removed: []
 --- !u!114 &8872822988582960453
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1333,19 +1346,6 @@ MonoBehaviour:
   FallSFX: {fileID: 8300000, guid: fe6b13c084178f441942a9885f9857db, type: 3}
   IsParrying: 0
   IsBlocking: 0
---- !u!114 &8872822988582960455
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8872822988582960440}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 589031cb649129f4595d6562a2fa54c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _Points: 0
 --- !u!114 &8872822988582960444
 MonoBehaviour:
   m_ObjectHideFlags: 0
