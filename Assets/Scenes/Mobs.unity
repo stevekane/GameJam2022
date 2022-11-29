@@ -729,6 +729,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 25
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &138892255 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2864923836562023574, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+  m_PrefabInstance: {fileID: 5571416124375894926}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5301ae49a295e7a469815bc941eb7035, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &163505793
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3864,7 +3875,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh38442
+  m_Name: pb_Mesh143490
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -4023,6 +4034,17 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!114 &1264826302 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3701212827919873877, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+  m_PrefabInstance: {fileID: 5571416124375894926}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e44283d3e846d94bac636040088735c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1305749595
 GameObject:
   m_ObjectHideFlags: 0
@@ -6768,7 +6790,7 @@ PrefabInstance:
       objectReference: {fileID: 1899292709}
     - target: {fileID: 3441861468932765124, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
       propertyPath: m_Lens.m_SensorSize.x
-      value: 2.034565
+      value: 2.1190476
       objectReference: {fileID: 0}
     - target: {fileID: 4912154605914978066, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
       propertyPath: m_Name
@@ -6820,7 +6842,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7691937222385314386, guid: 46bee508515e42b4f8720e9baaf02a27, type: 3}
       propertyPath: m_AmplitudeGain
-      value: 1e-45
+      value: 9.699027e-22
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -7192,6 +7214,42 @@ PrefabInstance:
     - target: {fileID: 7514659629534781941, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
       propertyPath: m_IsTrigger
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8130814572018751882, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: ButtonMaps.Array.size
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 8130814572018751882, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: ButtonMaps.Array.data[10].Entry.Ability
+      value: 
+      objectReference: {fileID: 1264826302}
+    - target: {fileID: 8130814572018751882, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: ButtonMaps.Array.data[11].Entry.Ability
+      value: 
+      objectReference: {fileID: 1264826302}
+    - target: {fileID: 8130814572018751882, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: ButtonMaps.Array.data[12].Entry.Ability
+      value: 
+      objectReference: {fileID: 138892255}
+    - target: {fileID: 8130814572018751882, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: ButtonMaps.Array.data[13].Entry.Ability
+      value: 
+      objectReference: {fileID: 138892255}
+    - target: {fileID: 8130814572018751882, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: ButtonMaps.Array.data[12].ButtonPressType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8130814572018751882, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: ButtonMaps.Array.data[13].ButtonPressType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8130814572018751882, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: ButtonMaps.Array.data[12].Entry.MethodName
+      value: Pressed
+      objectReference: {fileID: 0}
+    - target: {fileID: 8130814572018751882, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
+      propertyPath: ButtonMaps.Array.data[13].Entry.MethodName
+      value: Release
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
