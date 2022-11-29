@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace PigMoss {
@@ -35,23 +36,44 @@ namespace PigMoss {
         BlackBoard.DistanceScore = 0;
         BlackBoard.AngleScore = 0;
       }
-      var scores = Abilities.Select(a => a.Score()).ToArray();
 
-      // Strategy
-      var bestScore = 0f;
-      var index = 0;
+      // Strategy (like a shitty histogram)
+      var scores = Abilities.Select(a => a.Score()).ToArray();
+      List<int> indices = new();
       for (var i = 0; i < scores.Length; i++) {
-        if (scores[i] > bestScore) {
-          bestScore = scores[i];
-          index = i;
+        var score = scores[i];
+        var count = score switch {
+          > .75f => 4,
+          > .50f => 3,
+          > .25f => 2,
+          _ => 1
+        };
+        for (var j = 0; j < count; j++) {
+          indices.Add(i);
         }
       }
-      yield return TryRun(Abilities[index]);
+      AbilityIndex = indices[UnityEngine.Random.Range(0, indices.Count)];
+      yield return TryRun(Abilities[AbilityIndex]);
 
       // Cooldown
       var cooldown = Fiber.Wait(ActionCooldown);
-      var lookAt = Fiber.Repeat(GetComponent<Mover>().TryLookAt, BlackBoard.Target);
-      yield return Fiber.Any(cooldown, lookAt);
+      var pursue = Fiber.Repeat(PursueTarget);
+      yield return Fiber.Any(cooldown, pursue);
+      // TODO: This seems hacky? must be a nicer way to stop trying to move...
+      // I kinda feel like it should be set every frame or something
+      Mover.UpdateAxes(AbilityManager, Vector3.zero, transform.forward.XZ());
+    }
+
+    void PursueTarget() {
+      if (BlackBoard.Target) {
+        var delta = BlackBoard.Target.transform.position - transform.position;
+        var toTarget = delta.XZ().normalized;
+        if (delta.magnitude > 10) {
+          Mover.UpdateAxes(AbilityManager, toTarget, toTarget);
+        } else {
+          Mover.UpdateAxes(AbilityManager, Vector3.zero, transform.forward.XZ());
+        }
+      }
     }
 
     IEnumerator TryRun(FiberAbility ability) {
