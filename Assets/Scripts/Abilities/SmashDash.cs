@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SmashDash : Ability {
-  public float MoveSpeed = 120f;
+  public float MaxMoveSpeed = 120f;
+  public float MinMoveSpeed = 60f;
   public float TurnSpeed = 60f;
   public Timeval DashDuration = Timeval.FromSeconds(.3f);
   public AnimationClip DashWindupClip;
@@ -43,23 +44,23 @@ public class SmashDash : Ability {
   }
 
   IEnumerator Dash() {
-    var dir = AbilityManager.GetAxis(AxisTag.Move).XZ.normalized;
+    var dir = AbilityManager.GetAxis(AxisTag.Move).XZ;
     AddStatusEffect(ScriptedMove);
-    //using var final = Finally(() => Animator.Run(DoneClip));
+    using var final = Finally(() => Animator.Run(DoneClip));
     yield return Animator.Run(DashWindupClip);
     AddStatusEffect(Invulnerable);
-    yield return Fiber.Any(new CountdownTimer(DashDuration), Animator.Run(DashingClip), Move(dir));
-    yield return Animator.Run(DoneClip);
-    //yield return final;
+    yield return Fiber.Any(new CountdownTimer(DashDuration), Animator.Run(DashingClip), Move(dir.normalized));
+    yield return final;
   }
 
   IEnumerator Move(Vector3 dir) {
     while (true) {
-      //var desiredDir = AbilityManager.GetAxis(AxisTag.Move).XZ.normalized;
-      //var steerRotation = Mover.RotationFromDesired(dir, TurnSpeed, desiredDir);
-      //dir = steerRotation*dir;
+      var desiredDir = AbilityManager.GetAxis(AxisTag.Move).XZ;
+      var desiredSpeed = Mathf.SmoothStep(MinMoveSpeed, MaxMoveSpeed, desiredDir.magnitude);
+      var targetDir = desiredDir.TryGetDirection() ?? dir;
+      dir = Vector3.RotateTowards(dir, targetDir.normalized, TurnSpeed/360f, 0f);
       Status.transform.forward = dir;
-      Status.Move(MoveSpeed * Time.fixedDeltaTime * dir);
+      Status.Move(desiredSpeed * Time.fixedDeltaTime * dir);
       yield return null;
     }
   }

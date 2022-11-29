@@ -62,7 +62,6 @@ class CFinally : IFinally {
 
 [Serializable]
 public abstract class Ability : MonoBehaviour, IAbility {
-
   protected Bundle Bundle = new();
   protected List<IDisposable> Disposables = new();
   public AbilityManager AbilityManager { get; set; }
