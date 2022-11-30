@@ -54,6 +54,7 @@ public class SmashDash : Ability {
   }
 
   IEnumerator Dash() {
+    AbilityManager.CancelOthers(this);
     var dir = AbilityManager.GetAxis(AxisTag.Move).XZ;
     AddStatusEffect(ScriptedMove);
     yield return Animator.Run(DashWindupClip);
