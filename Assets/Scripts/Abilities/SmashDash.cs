@@ -17,12 +17,12 @@ public class SmashDash : Ability {
       s.HasGravity = false;
       s.AddAttributeModifier(AttributeTag.MoveSpeed, AttributeModifier.TimesZero);
       s.AddAttributeModifier(AttributeTag.TurnSpeed, AttributeModifier.TimesZero);
-    });
+    }, "DashMove");
   }
   public static InlineEffect Invulnerable { get => new(s => {
       s.IsDamageable = false;
       s.IsHittable = false;
-    });
+    }, "DashInvulnerable");
   }
 
   // Button press/release.

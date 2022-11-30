@@ -14,6 +14,17 @@ public abstract class StatusEffect : IDisposable {
   public void Dispose() => Status?.Remove(this);
 }
 
+public class InlineEffect : StatusEffect {
+  Action<Status> ApplyFunc;
+#if UNITY_EDITOR
+  string Name;
+#endif
+  public InlineEffect(Action<Status> apply, string name = "InlineEffect") => (ApplyFunc, Name) = (apply, name);
+  public override bool Merge(StatusEffect e) => false;
+  public override void Apply(Status status) => ApplyFunc(status);
+  public override string ToString() => Name;
+}
+
 public class SpeedFactorEffect : StatusEffect {
   AttributeModifier MoveSpeedModifier, TurnSpeedModifier;
   public SpeedFactorEffect(float move, float rotate) => (MoveSpeedModifier, TurnSpeedModifier) = (new() { Mult = move }, new() { Mult = rotate });
@@ -256,5 +267,14 @@ public class Status : MonoBehaviour {
     Modifiers.Clear();
 
     Active.ForEach(e => e.Apply(this));
+#if UNITY_EDITOR
+    DebugEffects.Clear();
+    Active.ForEach(e => DebugEffects.Add($"{e}"));
+#endif
   }
+
+#if UNITY_EDITOR
+  public List<string> DebugEffects = new();
+#endif
+
 }
