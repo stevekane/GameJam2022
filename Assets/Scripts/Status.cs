@@ -42,7 +42,7 @@ public class KnockbackEffect : StatusEffect {
     WallbounceTarget = wallbounceTarget;
   }
   public override bool Merge(StatusEffect e) {
-    Velocity += ((KnockbackEffect)e).Velocity;
+    Velocity = ((KnockbackEffect)e).Velocity;
     IsFirstFrame = true;
     return true;
   }
