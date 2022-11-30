@@ -33,6 +33,10 @@ public class SmashDash : Ability {
   }
   public IEnumerator Release() => null;
 
+  public override void OnStop() {
+    AbilityManager.Bundle.Run(Animator.Run(DoneClip));
+  }
+
   // Detect when the move axis is released and pressed again. This sort of thing probably belongs in a lower level system.
   IEnumerator WatchMoveAxis(Bundle bundle) {
     const float ReleaseThreshold = .1f, ActiveThreshold = .5f;
@@ -52,11 +56,10 @@ public class SmashDash : Ability {
   IEnumerator Dash() {
     var dir = AbilityManager.GetAxis(AxisTag.Move).XZ;
     AddStatusEffect(ScriptedMove);
-    using var final = Finally(() => Animator.Run(DoneClip));
     yield return Animator.Run(DashWindupClip);
     AddStatusEffect(Invulnerable);
     yield return Fiber.Any(new CountdownTimer(DashDuration), Animator.Run(DashingClip), Move(dir.normalized));
-    yield return final;
+    yield return Animator.Run(DoneClip);
   }
 
   IEnumerator Move(Vector3 dir) {

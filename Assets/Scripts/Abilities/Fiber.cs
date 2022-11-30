@@ -45,9 +45,6 @@ public class Bundle : Stoppable, IEnumerator {
   // TODO: support Cancelled state?
   protected override States State { get => Fibers.Count > 0 || Added.Count > 0 ? States.Running : States.Completed; }
 
-  public bool IsRoutineRunning(Fiber f) {
-    return Fibers.Contains(f) || Added.Contains(f);
-  }
   public Fiber Run(Func<IEnumerator> continuation) {
     var fiber = new Fiber(continuation());
     StartRoutine(fiber);
@@ -201,27 +198,6 @@ public class TaskSelector : AbilityTask, IValue<IEnumerator> {
   public IEnumerator Value { get; internal set; }
 }
 
-// TODO: Take a look at this in light of the recent addition of the notion
-// of "runners" as well as IStoppable
-public class ScopedRunner : IDisposable {
-  Bundle Bundle;
-  Fiber Fiber;
-
-  // TODO: could just test Fiber.IsRunning?
-  public bool IsRunning { get => Bundle.IsRoutineRunning(Fiber); }
-  public ScopedRunner(Bundle bundle, IEnumerator routine) {
-    Bundle = bundle;
-    Bundle.StartRoutine((Fiber = new Fiber(routine)));
-  }
-  public void Dispose() {
-    if (Fiber.IsRunning) {
-      Fiber.Stop();
-    }
-    Bundle.StopRoutine(Fiber);
-    Fiber = null;
-  }
-}
-
 public class Capture<T> : Stoppable, IValue<T> {
   Fiber Routine;
   public Capture(IEnumerator routine) {
@@ -335,7 +311,6 @@ public class Fiber : Stoppable, IEnumerator {
   public static TaskSelector SelectTask(IEnumerator a, IEnumerator b) => new TaskSelector(a, b);
   public static Listener ListenFor(IEventSource source) => new Listener(source);
   public static Listener<T> ListenFor<T>(IEventSource<T> source) => new Listener<T>(source);
-  public static ScopedRunner Scoped(Bundle bundle, IEnumerator routine) => new ScopedRunner(bundle, routine);
   public static IEnumerator Repeat(Func<IEnumerator> continuation) {
     while (true) {
       yield return continuation();

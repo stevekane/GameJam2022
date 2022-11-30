@@ -29,37 +29,6 @@ interface IScorable {
   public float Score();
 }
 
-// Mechanism to simulate try/finally with using statements. Intended for Ability cleanup code.
-// Given an IEnumerator routine, yields that same routine in normal exeuction, or runs it asynchronously
-// in a bundle when disposed. Example usage:
-//   AbilityMethod() {
-//     var cleanup = Finally(() => Animator.Run(ResetClip));
-//     ...
-//     yield return cleanup;
-//   }
-// This will run the cleanup code synchronously in the normal case, or asynchronously in Ability.OnStop
-// using the parent (AbilityManager) Bundle.
-public interface IFinally : IDisposable, IEnumerator { }
-class CFinally : IFinally {
-  public Bundle Bundle;
-  public Func<IEnumerator> OnDispose;
-  IEnumerator Routine;
-  IEnumerator MakeRoutine() {
-    Routine = OnDispose();
-    OnDispose = null;
-    return Routine;
-  }
-  public void Dispose() {
-    if (OnDispose != null) Bundle.Run(MakeRoutine());
-  }
-  public object Current => null;
-  public void Reset() => throw new NotImplementedException();
-  public bool MoveNext() {
-    if (OnDispose != null) MakeRoutine();
-    return Routine.MoveNext();
-  }
-}
-
 [Serializable]
 public abstract class Ability : MonoBehaviour, IAbility {
   protected Bundle Bundle = new();
@@ -79,7 +48,6 @@ public abstract class Ability : MonoBehaviour, IAbility {
     Disposables.Add(d);
     return d;
   }
-  public IFinally Finally(Func<IEnumerator> func) => Using(new CFinally() { OnDispose = func, Bundle = AbilityManager.Bundle });
   public StatusEffect AddStatusEffect(StatusEffect effect, OnEffectComplete onComplete = null) => Status.Add(Using(effect), onComplete);
   public Listener ListenFor(IEventSource evt) => Fiber.ListenFor(evt);
   public Listener<T> ListenFor<T>(IEventSource<T> evt) => Fiber.ListenFor(evt);
