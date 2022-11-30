@@ -88,7 +88,7 @@ public class Badger : MonoBehaviour {
       desiredMoveDir = (desiredPos - transform.position).XZ().normalized;
     Mover.UpdateAxes(Abilities, desiredMoveDir, desiredFacing);
 
-    if ((CurrentAbility == null || Defender.IsBlocking) && WaitFrames > 0)
+    if ((CurrentAbility == null || CurrentAbility == ShieldAbility) && WaitFrames > 0)
       --WaitFrames;
     if (Status.Get<KnockbackEffect>() != null) {
       RecoveryFrames = Timeval.FromMillis(1000).Ticks;
@@ -96,9 +96,5 @@ public class Badger : MonoBehaviour {
     } else if (RecoveryFrames > 0) {
       --RecoveryFrames;
     }
-
-    Defender.IsBlocking = ShieldAbility.IsRaised;
-    if (Shield)
-      Shield.Defender.IsBlocking = !Defender.IsBlocking;
   }
 }

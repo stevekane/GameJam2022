@@ -7,11 +7,11 @@ public class Shield : MonoBehaviour {
   public Animator Animator;
   public AnimationClip DeathClip;
   Damage Damage;
-  Collider Hurtbox;
   Bundle Bundle = new();
   public Defender Defender { get; private set; }
 
-  IEnumerator Die() {
+  IEnumerator WatchDamage() {
+    yield return Fiber.While(() => Damage.Points < MaxDamage);
     yield return new AnimationTask(Animator, DeathClip, true);
     Destroy(gameObject, .01f);
   }
@@ -19,14 +19,8 @@ public class Shield : MonoBehaviour {
   void Awake() {
     Damage = GetComponent<Damage>();
     Defender = GetComponent<Defender>();
-    Hurtbox = GetComponentInChildren<Hurtbox>().GetComponent<Collider>();
+    Bundle.StartRoutine(WatchDamage());
   }
 
-  void FixedUpdate() {
-    if (Damage.Points > MaxDamage && Hurtbox.enabled) {
-      Hurtbox.enabled = false;
-      Bundle.StartRoutine(Die());
-    }
-    Bundle.MoveNext();
-  }
+  void FixedUpdate() => Bundle.MoveNext();
 }

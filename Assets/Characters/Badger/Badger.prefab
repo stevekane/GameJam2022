@@ -172,7 +172,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions: []
-  Tags: 0
   Clip: {fileID: 7400000, guid: 42c859a6e4f668249a46f4725d25c611, type: 2}
   WindupDuration:
     Millis: 333.33334
@@ -190,11 +189,11 @@ MonoBehaviour:
     DamageModifier:
       Base: 0
       Mult: 1
+    KnockbackStrength: 50
+    KnockbackType: 1
     HitStopDuration:
       Millis: 200
       FramesPerSecond: 30
-    KnockbackStrength: 50
-    KnockbackType: 1
     SFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
     VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
     VFXOffset: {x: 0, y: 0, z: 0}
@@ -227,6 +226,8 @@ MonoBehaviour:
   HitRecoilStrength: 5
   HitEnergyGain: 0
   ChargeSpeedFactor: 0.3
+  AttackSFX: {fileID: 0}
+  AttackVFX: {fileID: 0}
   Hitbox: {fileID: 2269490404334418148}
 --- !u!1 &1381238120982410781
 GameObject:
@@ -544,7 +545,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions: []
-  Tags: 0
   Index: 1
   Animator: {fileID: 7727835182619467870}
   Windup:
@@ -568,7 +568,7 @@ MonoBehaviour:
     ClipDuration:
       Millis: 100
       FramesPerSecond: 30
-  IsRaised: 0
+  Shield: {fileID: 6634509084361045966}
 --- !u!1 &5014731968964829092
 GameObject:
   m_ObjectHideFlags: 0
@@ -1165,6 +1165,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Tags: 0
+  DebugEffects: []
 --- !u!114 &8521553832860402117
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1273,9 +1274,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba179080412a6af41a99d021d690c5fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Abilities: []
-  Running: []
-  ToAdd: []
+  Bundle:
+    Fibers: []
+    Added: []
+    Removed: []
 --- !u!114 &6204311958514039916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1539,81 +1541,6 @@ Transform:
   m_Father: {fileID: 5571416124093621163}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &8238925104914904724
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 797231352385422694}
-  - component: {fileID: 3240772970309566021}
-  - component: {fileID: 1569862632181212565}
-  - component: {fileID: 8756642742789983821}
-  m_Layer: 16
-  m_Name: HurtBox
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &797231352385422694
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8238925104914904724}
-  m_LocalRotation: {x: -0, y: 0.00000038743013, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.25, y: 1, z: 1.25}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5913138946058709077}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3240772970309566021
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8238925104914904724}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ce0c9e24a5611d40b8628b31748e2d6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!65 &1569862632181212565
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8238925104914904724}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 6, z: 1}
-  m_Center: {x: 0, y: 1, z: 0}
---- !u!54 &8756642742789983821
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8238925104914904724}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 112
-  m_CollisionDetection: 2
 --- !u!1 &9165858341678505272
 GameObject:
   m_ObjectHideFlags: 0
@@ -1648,8 +1575,7 @@ Transform:
   m_LocalPosition: {x: -0.75, y: 0.5, z: 0.5}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 797231352385422694}
+  m_Children: []
   m_Father: {fileID: 2758245753487164443}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

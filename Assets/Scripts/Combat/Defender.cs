@@ -76,8 +76,6 @@ public class Defender : MonoBehaviour {
 
   public EventSource<(HitParams, Transform)> HitEvent = new();
   public AudioClip FallSFX;
-  public bool IsParrying;
-  public bool IsBlocking;  // TODO: replace with StatusEffect
 
   public static Vector3 KnockbackVector(Transform attacker, Transform target, KnockBackType type) {
     var p0 = attacker.position.XZ();
@@ -96,7 +94,7 @@ public class Defender : MonoBehaviour {
 
   public void OnHit(HitParams hit, Transform hitTransform) {
     HitEvent.Fire((hit, hitTransform));
-    if (IsBlocking || IsParrying || !(Status?.Value.IsHittable ?? true))
+    if (!(Status?.Value.IsHittable ?? true))
       return;
 
     var power = 5f * hit.KnockbackStrength * Mathf.Pow((Damage.Points+100f) / 100f, 2f);
