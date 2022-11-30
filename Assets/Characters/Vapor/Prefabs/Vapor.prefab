@@ -1396,7 +1396,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5301ae49a295e7a469815bc941eb7035, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TriggerConditions: []
+  TriggerConditions:
+  - Method:
+      MethodName: Pressed
+    Tags: 2
+    RequiredOwnerTags: 0
+    EnergyCost: 0
   MaxMoveSpeed: 120
   MinMoveSpeed: 60
   TurnSpeed: 60
