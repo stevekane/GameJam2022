@@ -10,14 +10,16 @@ public class ParryAbility : Ability {
   public static InlineEffect Invulnerable { get => new(s => {
       s.IsDamageable = false;
       s.IsHittable = false;
-    });
+    }, "ParryInvulnerable");
   }
 
   public IEnumerator Execute() {
+    if (AbilityManager.GetAxis(AxisTag.Move).XZ.sqrMagnitude > 0f)
+      yield break;
     using (AddStatusEffect(Invulnerable)) {
       Animator.SetBool("Blocking", true);
       var hitEvent = Fiber.ListenFor(Defender.HitEvent);
-      yield return Fiber.Any(hitEvent, new CountdownTimer(BlockDuration), Fiber.ListenFor(AbilityManager.GetEvent(Release)), Fiber.Until(() => AbilityManager.GetAxis(AxisTag.Move).XZ != Vector3.zero));
+      yield return Fiber.Any(hitEvent, new CountdownTimer(BlockDuration), ListenFor(Release));
       Animator.SetBool("Blocking", false);
       if (hitEvent.IsCompleted) {
         AbilityManager.Bundle.StartRoutine(Riposte);

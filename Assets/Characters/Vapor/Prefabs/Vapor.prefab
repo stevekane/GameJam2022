@@ -72,7 +72,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e44283d3e846d94bac636040088735c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TriggerConditions: []
+  TriggerConditions:
+  - Method:
+      MethodName: Execute
+    Tags: 18
+    RequiredOwnerTags: 0
+    EnergyCost: 0
   BlockDuration:
     Millis: 500
     FramesPerSecond: 30
@@ -259,7 +264,7 @@ MonoBehaviour:
   TriggerConditions:
   - Method:
       MethodName: ChargeStart
-    Tags: 3
+    Tags: 35
     RequiredOwnerTags: 268435456
     EnergyCost: 0
   - Method:
@@ -865,6 +870,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Tags: 0
+  DebugEffects: []
 --- !u!114 &5571416124093621161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1396,7 +1402,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5301ae49a295e7a469815bc941eb7035, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TriggerConditions: []
+  TriggerConditions:
+  - Method:
+      MethodName: Pressed
+    Tags: 34
+    RequiredOwnerTags: 0
+    EnergyCost: 0
   MaxMoveSpeed: 120
   MinMoveSpeed: 60
   TurnSpeed: 60

@@ -3,13 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InlineEffect : StatusEffect {
-  Action<Status> ApplyFunc;
-  public InlineEffect(Action<Status> apply) => ApplyFunc = apply;
-  public override bool Merge(StatusEffect e) => false;
-  public override void Apply(Status status) => ApplyFunc(status);
-}
-
 public class MetamorphAbility : Ability {
   public Timeval Duration = Timeval.FromSeconds(10f);
   public AttributeModifier DamageModifier = new() { Mult = 2 };

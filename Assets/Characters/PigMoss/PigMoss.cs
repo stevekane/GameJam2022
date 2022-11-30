@@ -25,7 +25,7 @@ namespace PigMoss {
       yield return acquireTargets;
 
       // Scoring
-      Abilities.ForEach(a => a.AbilityManager = AbilityManager);
+      AbilityManager.InitAbilities(Abilities);
       BlackBoard.Target = PhysicsQuery.Colliders[acquireTargets.Value-1].transform;
       if (BlackBoard.Target) {
         var delta = BlackBoard.Target.transform.position-transform.position;

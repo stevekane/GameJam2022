@@ -17,46 +17,55 @@ public class SmashDash : Ability {
       s.HasGravity = false;
       s.AddAttributeModifier(AttributeTag.MoveSpeed, AttributeModifier.TimesZero);
       s.AddAttributeModifier(AttributeTag.TurnSpeed, AttributeModifier.TimesZero);
-    });
+    }, "DashMove");
   }
   public static InlineEffect Invulnerable { get => new(s => {
       s.IsDamageable = false;
       s.IsHittable = false;
-    });
+    }, "DashInvulnerable");
   }
 
   // Button press/release.
+  bool IsPressed = false;
   public IEnumerator Pressed() {
-    Bundle bundle = new();
-    bundle.StartRoutine(Fiber.Any(ListenFor(Release), WatchMoveAxis(bundle)));
-    yield return bundle;
+    IsPressed = true;
+    yield return InputLoop();
   }
-  public IEnumerator Release() => null;
+  public IEnumerator Release() {
+    IsPressed = false;
+    yield return null;
+  }
+
+  public override void OnStop() {
+    AbilityManager.Bundle.StartRoutine(Animator.Run(DoneClip));
+  }
 
   // Detect when the move axis is released and pressed again. This sort of thing probably belongs in a lower level system.
-  IEnumerator WatchMoveAxis(Bundle bundle) {
-    const float ReleaseThreshold = .1f, ActiveThreshold = .5f;
-    bool MoveAxisReleased() => AbilityManager.GetAxis(AxisTag.Move).XZ.sqrMagnitude < ReleaseThreshold*ReleaseThreshold;
-    bool MoveAxisActive() => AbilityManager.GetAxis(AxisTag.Move).XZ.sqrMagnitude > ActiveThreshold*ActiveThreshold;
-
-    if (!MoveAxisReleased())
-      yield break;
-
-    while (true) {
-      yield return Fiber.Until(MoveAxisActive);
-      var dash = bundle.StartRoutine(Dash);
-      yield return Fiber.All(Fiber.WhileRunning(dash), Fiber.Until(MoveAxisReleased));
+  IEnumerator InputLoop() {
+    while (IsPressed) {
+      var outcome = Fiber.Select(ListenForMoveAction(), ListenFor(Release));
+      yield return outcome;
+      if (outcome.Value == 0)
+        yield return Dash();
     }
   }
 
+  IEnumerator ListenForMoveAction() {
+    const float ReleaseThreshold = .1f, ActiveThreshold = .5f;
+    bool MoveAxisReleased() => AbilityManager.GetAxis(AxisTag.Move).XZ.sqrMagnitude < ReleaseThreshold*ReleaseThreshold;
+    bool MoveAxisActive() => AbilityManager.GetAxis(AxisTag.Move).XZ.sqrMagnitude > ActiveThreshold*ActiveThreshold;
+    yield return Fiber.Until(MoveAxisReleased);
+    yield return Fiber.Until(MoveAxisActive);
+  }
+
   IEnumerator Dash() {
+    AbilityManager.CancelOthers(this);
     var dir = AbilityManager.GetAxis(AxisTag.Move).XZ;
     AddStatusEffect(ScriptedMove);
-    using var final = Finally(() => Animator.Run(DoneClip));
     yield return Animator.Run(DashWindupClip);
     AddStatusEffect(Invulnerable);
     yield return Fiber.Any(new CountdownTimer(DashDuration), Animator.Run(DashingClip), Move(dir.normalized));
-    yield return final;
+    yield return Animator.Run(DoneClip);
   }
 
   IEnumerator Move(Vector3 dir) {
