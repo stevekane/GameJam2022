@@ -2,6 +2,8 @@ using System.Collections;
 using UnityEngine;
 
 public class HybridAnimationMan : MonoBehaviour {
+  [SerializeField] Animator Animator;
+
   public float IdleThreshold = .1f;
   void Start() {
     InputManager.Instance.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Listen(PlayAction);
@@ -21,12 +23,11 @@ public class HybridAnimationMan : MonoBehaviour {
   void FixedUpdate() {
     var xz = InputManager.Instance.AxisLeft.XZ;
     var aim = InputManager.Instance.AxisRight.XZ.TryGetDirection() ?? transform.forward;
-    var animator = GetComponent<Animator>();
     var attributes = GetComponent<Attributes>();
     var controller = GetComponent<CharacterController>();
     var moveSpeed = attributes.GetValue(AttributeTag.MoveSpeed);
     var turnSpeed = attributes.GetValue(AttributeTag.TurnSpeed);
-    var velocity = moveSpeed*xz;
+    var velocity = moveSpeed*xz.normalized;
     var gravitationalForce = Time.fixedDeltaTime*Physics.gravity.y;
     var rotation = RotationFromDesired(transform, turnSpeed, aim);
     transform.rotation = rotation;
@@ -37,9 +38,9 @@ public class HybridAnimationMan : MonoBehaviour {
     }
     var localVelocity = Quaternion.Inverse(transform.rotation)*velocity;
     controller.Move(Time.fixedDeltaTime*velocity);
-    animator.SetBool("Moving", velocity.sqrMagnitude > IdleThreshold);
-    animator.SetFloat("RightVelocity", localVelocity.x/moveSpeed);
-    animator.SetFloat("ForwardVelocity", localVelocity.z/moveSpeed);
+    Animator.SetBool("Moving", velocity.sqrMagnitude > IdleThreshold);
+    Animator.SetFloat("RightVelocity", localVelocity.x/moveSpeed);
+    Animator.SetFloat("ForwardVelocity", localVelocity.z/moveSpeed);
   }
 
   void PlayAction() {
