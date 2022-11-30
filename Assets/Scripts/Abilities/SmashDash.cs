@@ -25,21 +25,27 @@ public class SmashDash : Ability {
     });
   }
 
+  // Button press/release.
   public IEnumerator Pressed() {
-    yield return Fiber.Any(ListenFor(Release), Loop());
+    Bundle bundle = new();
+    bundle.Run(Fiber.Any(ListenFor(Release), WatchMoveAxis(bundle)));
+    yield return bundle;
   }
   public IEnumerator Release() => null;
 
   // Detect when the move axis is released and pressed again. This sort of thing probably belongs in a lower level system.
-  IEnumerator Loop() {
-    const float releaseThreshold = .1f;
-    const float activeThreshold = .5f;
-    bool moveAxisRelease() => AbilityManager.GetAxis(AxisTag.Move).XZ.sqrMagnitude < releaseThreshold*releaseThreshold;
-    bool moveAxisActive() => AbilityManager.GetAxis(AxisTag.Move).XZ.sqrMagnitude > activeThreshold*activeThreshold;
+  IEnumerator WatchMoveAxis(Bundle bundle) {
+    const float ReleaseThreshold = .1f, ActiveThreshold = .5f;
+    bool MoveAxisReleased() => AbilityManager.GetAxis(AxisTag.Move).XZ.sqrMagnitude < ReleaseThreshold*ReleaseThreshold;
+    bool MoveAxisActive() => AbilityManager.GetAxis(AxisTag.Move).XZ.sqrMagnitude > ActiveThreshold*ActiveThreshold;
+
+    if (!MoveAxisReleased())
+      yield break;
 
     while (true) {
-      yield return Fiber.Until(moveAxisActive);
-      yield return Fiber.All(Dash(), Fiber.Until(moveAxisRelease));
+      yield return Fiber.Until(MoveAxisActive);
+      var dash = bundle.Run(Dash());
+      yield return Fiber.All(Fiber.WhileRunning(dash), Fiber.Until(MoveAxisReleased));
     }
   }
 

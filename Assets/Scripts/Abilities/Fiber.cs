@@ -303,6 +303,11 @@ public class Fiber : Stoppable, IEnumerator {
     }
   }
 
+  public static IEnumerator WhileRunning(IStoppable stoppable) {
+    while (stoppable.IsRunning)
+      yield return null;
+  }
+
   public static IEnumerator While(Func<bool> pred) {
     while (pred())
       yield return null;
