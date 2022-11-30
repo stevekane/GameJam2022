@@ -26,7 +26,7 @@ public class Bouncebox : MonoBehaviour {
 
     var k = Status.Get<KnockbackEffect>();
     if (k != null && FindCollisionPoint(other, k.Velocity.normalized) is var hit && hit != null) {
-      if (Damage.Points > 100f && false) {
+      if (Damage.Points > 100f) {
         Status.Remove(k);
         Instantiate(Explosion, transform.position, Quaternion.identity);
         if (Damage.TryGetComponent(out Defender d))
