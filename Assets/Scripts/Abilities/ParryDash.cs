@@ -33,7 +33,7 @@ public class ParryDash : Ability {
       yield return Fiber.Any(hitEvent, new CountdownTimer(BlockDuration), Fiber.ListenFor(AbilityManager.GetEvent(Release)), Fiber.Until(() => AbilityManager.GetAxis(AxisTag.Move).XZ != Vector3.zero));
       Animator.SetBool("Blocking", false);
       if (hitEvent.IsCompleted) {
-        AbilityManager.Bundle.Run(Riposte());
+        AbilityManager.Bundle.StartRoutine(Riposte());
         yield break;
       }
     }

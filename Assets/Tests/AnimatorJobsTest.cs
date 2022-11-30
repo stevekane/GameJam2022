@@ -25,14 +25,14 @@ public class MyAbility : IEnumerator, IStoppable {
 
   public void Stop() {
     Bundle.Stop();
-    ParentBundle.Run(OnStop);
+    ParentBundle.StartRoutine(OnStop);
   }
   public MyAbility(AbilityParams abilityParams, Animator animator, Bundle parentBundle) {
     AbilityParams = abilityParams;
     Animator = animator;
     ParentBundle = parentBundle;
     Bundle = new Bundle();
-    Bundle.Run(Run);
+    Bundle.StartRoutine(Run);
   }
   public IEnumerator Run() {
     for (var i = 0; i < 10; i++) {
@@ -145,7 +145,7 @@ public class AnimatorJobsTest : MonoBehaviour {
   }
 
   [ContextMenu("Run Job")]
-  public void RunJob() => Bundle.Run(new MyAbility(AbilityParams, Animator, Bundle));
+  public void RunJob() => Bundle.StartRoutine(new MyAbility(AbilityParams, Animator, Bundle));
   [ContextMenu("Stop")]
   public void Stop() {
     Bundle.Stop();

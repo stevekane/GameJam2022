@@ -49,7 +49,7 @@ public class Interactable : MonoBehaviour {
   }
 
   public void Interact(ConditionAccum condition, IEventSource stopSource) {
-    Bundle.Run(new Open(condition, stopSource, Openable));
+    Bundle.StartRoutine(new Open(condition, stopSource, Openable));
   }
 
   void OnDestroy() {

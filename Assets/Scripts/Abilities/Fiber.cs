@@ -48,18 +48,11 @@ public class Bundle : Stoppable, IEnumerator {
   public bool IsRoutineRunning(Fiber f) {
     return Fibers.Contains(f) || Added.Contains(f);
   }
-  public Fiber Run(Func<IEnumerator> continuation) {
-    var fiber = new Fiber(continuation());
-    StartRoutine(fiber);
-    return fiber;
-  }
-  public Fiber Run(IEnumerator routine) {
-    var fiber = new Fiber(routine);
-    StartRoutine(fiber);
-    return fiber;
-  }
-  public void StartRoutine(Fiber fiber) {
+  public Fiber StartRoutine(Func<IEnumerator> continuation) => StartRoutine(new Fiber(continuation()));
+  public Fiber StartRoutine(IEnumerator routine) => StartRoutine(new Fiber(routine));
+  public Fiber StartRoutine(Fiber fiber) {
     Added.Add(fiber);
+    return fiber;
   }
   public void StopRoutine(Fiber fiber) {
     Removed.Add(fiber);
