@@ -14,18 +14,23 @@ public class HitConfig {
   public Vector3 VFXOffset;
   public HitParams ComputeParamsDontUse() {
     Debug.LogWarning($"Don't serialize HitParams directly. Use HitConfig, and call ComputeParams() with an attacker. Projectiles should be passed the computed params on spawn in case they outlive their attacker.");
-    return ComputeParams(DamageModifier.Apply(0f), KnockbackStrength, new());
+    return ComputeParams(DamageModifier.Apply(0f), KnockbackStrength, new(), null);
   }
   public HitParams ComputeParams(Attributes attacker) => ComputeParams(
     DamageModifier.Apply(attacker.GetValue(AttributeTag.Damage, 0f)),
     attacker.GetValue(AttributeTag.Knockback, KnockbackStrength),
-    ComputeOnHit(attacker));
+    ComputeOnHit(attacker),
+    Bouncebox.ComputeWallbounceTarget(attacker.transform)
+    );
   // A variant for scaled damage and knockback for use with charged abilities.
   public HitParams ComputeParamsScaled(Attributes attacker, float scale) => ComputeParams(
     DamageModifier.Apply(attacker.GetValue(AttributeTag.Damage, 0f)) * scale,
     attacker.GetValue(AttributeTag.Knockback, KnockbackStrength) * scale,
-    ComputeOnHit(attacker));
-  HitParams ComputeParams(float damage, float knockbackStrength, List<StatusEffect> onHitEffects) {
+    ComputeOnHit(attacker),
+    Bouncebox.ComputeWallbounceTarget(attacker.transform)
+    );
+
+  HitParams ComputeParams(float damage, float knockbackStrength, List<StatusEffect> onHitEffects, Vector3? wallbounceTarget) {
     return new() {
       Damage = damage,
       KnockbackStrength = knockbackStrength,
@@ -35,6 +40,7 @@ public class HitConfig {
       VFX = VFX,
       VFXOffset = VFXOffset,
       OnHitEffects = onHitEffects,
+      WallbounceTarget = wallbounceTarget,
     };
   }
   List<StatusEffect> ComputeOnHit(Attributes attacker) {
@@ -58,6 +64,7 @@ public class HitParams {
   public GameObject VFX;
   public Vector3 VFXOffset;
   public List<StatusEffect> OnHitEffects;
+  public Vector3? WallbounceTarget;
 }
 
 public class Defender : MonoBehaviour {
@@ -100,7 +107,7 @@ public class Defender : MonoBehaviour {
     VFXManager.Instance.TrySpawnEffect(hit.VFX, transform.position + hit.VFXOffset, rotation);
 
     Status?.Value.Add(new HitStopEffect(knockBackDirection, .15f, hit.HitStopDuration.Ticks),
-      s => s.Add(new KnockbackEffect(knockBackDirection*power)));
+      s => s.Add(new KnockbackEffect(knockBackDirection*power, hit.WallbounceTarget)));
     Damage.AddPoints(hit.Damage);
     hit.OnHitEffects?.ForEach(e => Status?.Value.Add(e));
   }

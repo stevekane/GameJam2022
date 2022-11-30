@@ -47,7 +47,7 @@ public class MeleeAbility : Ability {
     Animation = new AnimationTask(Animator, Clip);
 
     // Windup
-    var chargeScaling = 1f;
+    HitParams hitParams;
     if (chargeable) {
       Animation.SetSpeed(ChargeSpeedFactor);
       var startFrame = Timeval.TickCount;
@@ -55,10 +55,12 @@ public class MeleeAbility : Ability {
       var numFrames = Timeval.TickCount - startFrame;
       var extraFrames = numFrames - WindupDuration.Ticks;
       var maxExtraFrames = WindupDuration.Ticks / ChargeSpeedFactor - WindupDuration.Ticks;
-      chargeScaling = ChargeScaling.Evaluate(extraFrames / maxExtraFrames);
+      var chargeScaling = ChargeScaling.Evaluate(extraFrames / maxExtraFrames);
       Animation.SetSpeed(1);
+      hitParams = HitConfig.ComputeParamsScaled(Attributes, chargeScaling);
     } else {
       yield return Animation.PlayUntil(WindupDuration.AnimFrames);
+      hitParams = HitConfig.ComputeParams(Attributes);
     }
     // Active
     Hitbox.Collider.enabled = true;
@@ -66,7 +68,7 @@ public class MeleeAbility : Ability {
     Hits.Clear();
     SFXManager.Instance.TryPlayOneShot(AttackSFX);
     AttackVFXInstance = VFXManager.Instance.TrySpawn2DEffect(AttackVFX, Owner.position + HitConfig.VFXOffset, Owner.rotation, ActiveDuration.Seconds);
-    yield return Fiber.Any(Animation.PlayUntil(WindupDuration.AnimFrames + ActiveDuration.AnimFrames+1), Fiber.Repeat(HandleHits, chargeScaling));
+    yield return Fiber.Any(Animation.PlayUntil(WindupDuration.AnimFrames + ActiveDuration.AnimFrames+1), Fiber.Repeat(HandleHits, hitParams));
     Hitbox.Collider.enabled = false;
 
     // Hitstop
@@ -82,13 +84,12 @@ public class MeleeAbility : Ability {
     Animation = null;
   }
 
-  void HandleHits(float chargeScaling) {
+  void HandleHits(HitParams hitParams) {
     if (Hits.Count != 0) {
       if (AttackVFXInstance && AttackVFXInstance.GetComponent<ParticleSystem>().main is var m)
         m.simulationSpeed = 0f;
       Status.Add(new HitStopEffect(Owner.forward, HitStopVibrationAmplitude, HitFreezeDuration.Ticks));
       CameraShaker.Instance.Shake(HitCameraShakeIntensity);
-      var hitParams = HitConfig.ComputeParamsScaled(Attributes, chargeScaling);
       Hits.ForEach(target => {
         target.GetComponent<Defender>()?.OnHit(hitParams, Owner);
         Owner.transform.forward = (target.transform.position - Owner.transform.position).XZ().normalized;

@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using UnityEngine;
 
 public class Bouncebox : MonoBehaviour {
@@ -27,8 +26,7 @@ public class Bouncebox : MonoBehaviour {
 
     var k = Status.Get<KnockbackEffect>();
     if (k != null && FindCollisionPoint(other, k.Velocity.normalized) is var hit && hit != null) {
-      var dot = Vector3.Dot(k.Velocity, hit.Value.normal);
-      if (Damage.Points > 100f) {
+      if (Damage.Points > 100f && false) {
         Status.Remove(k);
         Instantiate(Explosion, transform.position, Quaternion.identity);
         if (Damage.TryGetComponent(out Defender d))
@@ -36,9 +34,16 @@ public class Bouncebox : MonoBehaviour {
       } else {
         SFXManager.Instance.TryPlayOneShot(AudioClip);
         VFXManager.Instance.TrySpawnEffect(Effect, hit.Value.point);
-        var bounceVel = Vector3.Reflect(k.Velocity, hit.Value.normal.XZ());
+        Vector3 bounceVel;
+        if (k.WallbounceTarget.HasValue) {
+          var bounceDelta = k.WallbounceTarget.Value - hit.Value.point;
+          bounceVel = KnockbackEffect.GetSpeedToTravelDistance(bounceDelta.magnitude) * bounceDelta.normalized;
+        } else {
+          bounceVel = Vector3.Reflect(k.Velocity, hit.Value.normal.XZ());
+        }
         Status.Remove(k);
-        Status.Add(new HitStopEffect(transform.right, .15f, Duration.Ticks), (s) => s.Add(new KnockbackEffect(bounceVel)));
+        // Note we drop WallbounceTarget for the new knockback. If it bounces again, we use normal reflection to avoid getting stuck.
+        Status.Add(new HitStopEffect(transform.right, .15f, Duration.Ticks), (s) => s.Add(new KnockbackEffect(bounceVel, null)));
       }
     }
   }
@@ -48,5 +53,16 @@ public class Bouncebox : MonoBehaviour {
     var numHits = Physics.RaycastNonAlloc(transform.position, dir, PhysicsQuery.RaycastHits, MaxDistance);
     var idx = Array.FindIndex(PhysicsQuery.RaycastHits[..numHits], h => h.collider == collider && Vector3.Dot(h.normal, dir) < 0f);
     return idx >= 0 ? PhysicsQuery.RaycastHits[idx] : null;
+  }
+
+  // Find a point near the attacker to bounce his victim towards (pre-computed and referenced when wallbounce occurs).
+  public static Vector3 ComputeWallbounceTarget(Transform attacker) {
+    var randAngle = UnityEngine.Random.Range(0, 360f);
+    var dir = Quaternion.AngleAxis(randAngle, Vector3.up) * attacker.forward;
+    var distance = 6f;
+    var targetPos = attacker.position + distance*dir;
+    if (Physics.Raycast(attacker.position, dir, distance, Layers.EnvironmentMask, QueryTriggerInteraction.Ignore))
+      targetPos = attacker.position;  // There's a wall in the way, just use the attacker's position.
+    return targetPos;
   }
 }
