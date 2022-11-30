@@ -50,7 +50,7 @@ class CFinally : IFinally {
     return Routine;
   }
   public void Dispose() {
-    if (OnDispose != null) Bundle.Run(MakeRoutine());
+    if (OnDispose != null) Bundle.StartRoutine(MakeRoutine);
   }
   public object Current => null;
   public void Reset() => throw new NotImplementedException();
