@@ -17,8 +17,8 @@ public class Timeval {
   public static Timeval FromMillis(float millis, int fps = 30) {
     return new Timeval { Millis = millis, FramesPerSecond = fps };
   }
-  public static Timeval FromAnimFrames(int ticks, int fps) {
-    return new Timeval { Millis = (float)ticks * 1000f / fps, FramesPerSecond = fps };
+  public static Timeval FromAnimFrames(int frames, int fps) {
+    return new Timeval { Millis = (float)frames * 1000f / fps, FramesPerSecond = fps };
   }
   public int Ticks {
     set { Millis = value * 1000f / FixedUpdatePerSecond; }

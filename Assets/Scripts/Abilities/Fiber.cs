@@ -265,13 +265,7 @@ public class Fiber : Stoppable, IEnumerator {
       yield return null;
     }
   }
-  public static IEnumerator Wait(Timeval t) {
-    var n = t.Ticks;
-    for (var i = 0; i < n; i++) {
-      yield return null;
-    }
-  }
-
+  public static IEnumerator Wait(Timeval t) => Wait(t.Ticks);
   public static IEnumerator WhileRunning(IStoppable stoppable) {
     while (stoppable.IsRunning)
       yield return null;

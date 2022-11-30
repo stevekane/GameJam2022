@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 
@@ -10,11 +12,10 @@ public class Badger : MonoBehaviour {
   AbilityManager Abilities;
   AbilityManager TargetAbilities;
   Shield Shield;
-  int WaitFrames = 0;
-  int RecoveryFrames = 0;
-  IAbility CurrentAbility;
   MeleeAbility PunchAbility;
   ShieldAbility ShieldAbility;
+  Bundle Bundle = new();
+  bool WasHit = false;
 
   public void Awake() {
     Target = GameObject.FindObjectOfType<Player>().transform;
@@ -25,6 +26,7 @@ public class Badger : MonoBehaviour {
     Abilities = GetComponent<AbilityManager>();
     PunchAbility = GetComponentInChildren<MeleeAbility>();
     ShieldAbility = GetComponentInChildren<ShieldAbility>();
+    Defender.HitEvent.Listen((_) => WasHit = true);
   }
 
   // TODO: What about dash?
@@ -46,55 +48,62 @@ public class Badger : MonoBehaviour {
     return delta.sqrMagnitude < .1f;
   }
 
-  void FixedUpdate() {
-    if (Target == null)
-      return;
+  void Start() => Bundle.StartRoutine(Fiber.Repeat(Behavior));
+  void FixedUpdate() => Bundle.MoveNext();
 
-    if (!CurrentAbility?.IsRunning ?? false)
-      CurrentAbility = null;
+  IEnumerator Behavior() {
+    if (Target == null) {
+      Bundle.Stop();
+      yield break;
+    }
 
     var desiredPos = ChoosePosition();
     var desiredFacing = (Target.position - transform.position).XZ().normalized;
     var inRange = IsInRange(desiredPos);
 
-    if (Shield && !Shield.isActiveAndEnabled)
-      Shield = null;
-
-    if (Status.CanAttack && CurrentAbility == null && RecoveryFrames <= 0) {
-      if (TargetIsAttacking && Shield) {
-        Abilities.TryInvoke(ShieldAbility.HoldStart);
-        CurrentAbility = Abilities.Abilities.FirstOrDefault((a) => a.IsRunning);
-        WaitFrames = Timeval.FromMillis(1000).Ticks;
-      } else if (inRange) {
-        Abilities.TryInvoke(PunchAbility.AttackStart);
-        CurrentAbility = Abilities.Abilities.FirstOrDefault((a) => a.IsRunning);
-        WaitFrames = AttackDelay.Ticks;
-      }
-    }
-    if (CurrentAbility == ShieldAbility) {
-      if (!Shield) {
-        Abilities.TryInvoke(ShieldAbility.HoldRelease);
-      } else {
-        if (TargetIsAttacking)
-          WaitFrames = Timeval.FromMillis(1000).Ticks;
-        if (WaitFrames <= 0) {
-          Abilities.TryInvoke(ShieldAbility.HoldRelease);
+    IEnumerator MaybeAttack() {
+      if (Status.CanAttack) {
+        if (TargetIsAttacking && Shield) {
+          Abilities.TryInvoke(ShieldAbility.HoldStart);
+          // Hold shield until .5s after target stops attacking, or it dies.
+          yield return Fiber.Any(
+            TrueForDuration(Timeval.FromSeconds(.5f), () => !TargetIsAttacking),
+            Fiber.While(() => Shield != null));
+          yield return Abilities.TryRun(ShieldAbility.HoldRelease);
+        } else if (inRange) {
+          yield return Abilities.TryRun(PunchAbility.AttackStart);
+          yield return Fiber.Wait(AttackDelay.Ticks);
         }
       }
     }
 
-    var desiredMoveDir = Vector3.zero;
-    if (!inRange && CurrentAbility == null && WaitFrames <= 0 && RecoveryFrames <= 0)
-      desiredMoveDir = (desiredPos - transform.position).XZ().normalized;
-    Mover.UpdateAxes(Abilities, desiredMoveDir, desiredFacing);
+    IEnumerator Move() {
+      var desiredMoveDir = Vector3.zero;
+      if (!inRange)
+        desiredMoveDir = (desiredPos - transform.position).XZ().normalized;
+      Mover.UpdateAxes(Abilities, desiredMoveDir, desiredFacing);
+      yield return null;
+    }
 
-    if ((CurrentAbility == null || CurrentAbility == ShieldAbility) && WaitFrames > 0)
-      --WaitFrames;
-    if (Status.Get<KnockbackEffect>() != null) {
-      RecoveryFrames = Timeval.FromMillis(1000).Ticks;
+    Mover.UpdateAxes(Abilities, Vector3.zero, transform.forward.XZ());
+
+    if (WasHit) {
+      WasHit = false;
       ShieldAbility.Stop();
-    } else if (RecoveryFrames > 0) {
-      --RecoveryFrames;
+      yield return Fiber.Wait(Timeval.FromSeconds(.5f));
+      yield break;
+    }
+
+    yield return MaybeAttack();
+    yield return Move();
+  }
+
+  IEnumerator TrueForDuration(Timeval waitTime, Func<bool> pred) {
+    var ticks = waitTime.Ticks;
+    while (ticks-- > 0) {
+      if (!pred())
+        ticks = waitTime.Ticks;
+      yield return null;
     }
   }
 }
