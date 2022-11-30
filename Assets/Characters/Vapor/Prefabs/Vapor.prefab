@@ -1,5 +1,82 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &455014676872832096
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3593214799004536109}
+  - component: {fileID: 8272709399070511171}
+  - component: {fileID: 8749858681566227193}
+  - component: {fileID: 3701212827919873877}
+  m_Layer: 13
+  m_Name: Parry
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3593214799004536109
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 455014676872832096}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5571416123097895009}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &8272709399070511171
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 455014676872832096}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 4, y: 6, z: 1}
+  m_Center: {x: 0, y: 3, z: 0}
+--- !u!114 &8749858681566227193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 455014676872832096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e93db3e391a640243a06b63541cd965b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Collider: {fileID: 8272709399070511171}
+--- !u!114 &3701212827919873877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 455014676872832096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e44283d3e846d94bac636040088735c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TriggerConditions: []
+  BlockDuration:
+    Millis: 500
+    FramesPerSecond: 30
+  RiposteAbility: {fileID: 2050944083627034018}
 --- !u!1 &613207555671957474
 GameObject:
   m_ObjectHideFlags: 0
@@ -95,11 +172,11 @@ MonoBehaviour:
     DamageModifier:
       Base: 15
       Mult: 1.5
+    KnockbackStrength: 50
+    KnockbackType: 1
     HitStopDuration:
       Millis: 200
       FramesPerSecond: 30
-    KnockbackStrength: 50
-    KnockbackType: 1
     SFX: {fileID: 8300000, guid: 332a6114ed184a44188829a8f87db1a7, type: 3}
     VFX: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
     VFXOffset: {x: 0, y: 0, z: 0}
@@ -207,11 +284,11 @@ MonoBehaviour:
     DamageModifier:
       Base: 5
       Mult: 1.2
+    KnockbackStrength: 20
+    KnockbackType: 1
     HitStopDuration:
       Millis: 200
       FramesPerSecond: 30
-    KnockbackStrength: 20
-    KnockbackType: 1
     SFX: {fileID: 8300000, guid: d0f166575306db84091dc03fce0eff69, type: 3}
     VFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
     VFXOffset: {x: 0, y: 2, z: 0}
@@ -333,11 +410,11 @@ MonoBehaviour:
     DamageModifier:
       Base: 10
       Mult: 2
+    KnockbackStrength: 20
+    KnockbackType: 0
     HitStopDuration:
       Millis: 500
       FramesPerSecond: 30
-    KnockbackStrength: 20
-    KnockbackType: 0
     SFX: {fileID: 8300000, guid: f161f54138dc0314abdabf7ab71e3404, type: 3}
     VFX: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
     VFXOffset: {x: 0, y: 1, z: 0}
@@ -436,11 +513,11 @@ MonoBehaviour:
     DamageModifier:
       Base: 0
       Mult: 1
+    KnockbackStrength: 0
+    KnockbackType: 1
     HitStopDuration:
       Millis: 100
       FramesPerSecond: 30
-    KnockbackStrength: 0
-    KnockbackType: 1
     SFX: {fileID: 8300000, guid: 1f53a5fc6bd934e46a5d8cfa8fd27b64, type: 3}
     VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
     VFXOffset: {x: 0, y: 2, z: 0}
@@ -569,11 +646,11 @@ MonoBehaviour:
     DamageModifier:
       Base: 1
       Mult: 1
+    KnockbackStrength: 0
+    KnockbackType: 1
     HitStopDuration:
       Millis: 133.33333
       FramesPerSecond: 30
-    KnockbackStrength: 0
-    KnockbackType: 1
     SFX: {fileID: 8300000, guid: 332a6114ed184a44188829a8f87db1a7, type: 3}
     VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
     VFXOffset: {x: 0, y: 0, z: 0}
@@ -675,6 +752,7 @@ Transform:
   - {fileID: 371394410303385243}
   - {fileID: 2784055462783592816}
   - {fileID: 157862679751154873}
+  - {fileID: 3593214799004536109}
   - {fileID: 4305932507244731561}
   m_Father: {fileID: 5571416124093621163}
   m_RootOrder: -1
@@ -1029,12 +1107,22 @@ MonoBehaviour:
   - ButtonCode: 0
     ButtonPressType: 0
     Entry:
-      Ability: {fileID: 8527452219008912157}
+      Ability: {fileID: 3701212827919873877}
       MethodName: Execute
   - ButtonCode: 0
     ButtonPressType: 2
     Entry:
-      Ability: {fileID: 8527452219008912157}
+      Ability: {fileID: 3701212827919873877}
+      MethodName: Release
+  - ButtonCode: 0
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 2864923836562023574}
+      MethodName: Pressed
+  - ButtonCode: 0
+    ButtonPressType: 2
+    Entry:
+      Ability: {fileID: 2864923836562023574}
       MethodName: Release
   AxisMaps:
   - AxisCode: 0
@@ -1247,9 +1335,9 @@ GameObject:
   - component: {fileID: 157862679751154873}
   - component: {fileID: 5826462408574355203}
   - component: {fileID: 6103407455608674437}
-  - component: {fileID: 8527452219008912157}
+  - component: {fileID: 2864923836562023574}
   m_Layer: 13
-  m_Name: ParryDash
+  m_Name: SmashDash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1296,7 +1384,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Collider: {fileID: 5826462408574355203}
---- !u!114 &8527452219008912157
+--- !u!114 &2864923836562023574
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1305,22 +1393,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 7015652889397584723}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e44283d3e846d94bac636040088735c, type: 3}
+  m_Script: {fileID: 11500000, guid: 5301ae49a295e7a469815bc941eb7035, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions: []
-  MoveSpeed: 120
-  BlockDuration:
-    Millis: 500
-    FramesPerSecond: 30
+  MaxMoveSpeed: 120
+  MinMoveSpeed: 60
+  TurnSpeed: 60
   DashDuration:
-    Millis: 166.66667
+    Millis: 200
     FramesPerSecond: 30
-  BlockClip: {fileID: 0}
   DashWindupClip: {fileID: 7400000, guid: 2a60e9b2764640043a7ce8027822d075, type: 2}
   DashingClip: {fileID: 7400000, guid: a41ecc2b2a8aa7a4e9a4647f0beb06dd, type: 2}
   DoneClip: {fileID: 7400000, guid: 654d990bb8222c54ea70a2a9aa54ef2e, type: 2}
-  RiposteAbility: {fileID: 2050944083627034018}
 --- !u!1 &7203950085718089985
 GameObject:
   m_ObjectHideFlags: 0
@@ -1399,7 +1484,7 @@ MonoBehaviour:
     Tags: 3
     RequiredOwnerTags: 0
     EnergyCost: 0
-  Clip: {fileID: 7400000, guid: b9d79d4ea8efe8d4f959e845de696b68, type: 2}
+  Clip: {fileID: 7400000, guid: 1b025aa438c5e1741a2dd59ec5848134, type: 2}
   WindupDuration:
     Millis: 33.333332
     FramesPerSecond: 30
@@ -1416,11 +1501,11 @@ MonoBehaviour:
     DamageModifier:
       Base: 5
       Mult: 1.2
+    KnockbackStrength: 20
+    KnockbackType: 0
     HitStopDuration:
       Millis: 200
       FramesPerSecond: 30
-    KnockbackStrength: 20
-    KnockbackType: 0
     SFX: {fileID: 8300000, guid: d0f166575306db84091dc03fce0eff69, type: 3}
     VFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
     VFXOffset: {x: 0, y: 2, z: 0}
@@ -1454,7 +1539,7 @@ MonoBehaviour:
   HitEnergyGain: 2
   ChargeSpeedFactor: 0.3
   AttackSFX: {fileID: 0}
-  AttackVFX: {fileID: 7226583673155636401, guid: 21c6b51d75be0554b9d09aca74522e2e, type: 3}
+  AttackVFX: {fileID: 7226583673155636401, guid: 67c8e7d5d38369645a9629e0bc4ea132, type: 3}
   Hitbox: {fileID: 2235355344487846090}
 --- !u!1 &7848055432845249743
 GameObject:
@@ -1551,11 +1636,11 @@ MonoBehaviour:
     DamageModifier:
       Base: 0
       Mult: 1
+    KnockbackStrength: 0
+    KnockbackType: 1
     HitStopDuration:
       Millis: 100
       FramesPerSecond: 30
-    KnockbackStrength: 0
-    KnockbackType: 1
     SFX: {fileID: 8300000, guid: 1f53a5fc6bd934e46a5d8cfa8fd27b64, type: 3}
     VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
     VFXOffset: {x: 0, y: 2, z: 0}

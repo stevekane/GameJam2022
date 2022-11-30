@@ -4,6 +4,7 @@ using UnityEngine;
 
 public static class Layers {
   private static Dictionary<int, LayerMask> MasksByLayer = new();
+  public static LayerMask EnvironmentMask = 1<<0;
 
   public static void Init() {
     for (int i = 0; i < 32; i++) {

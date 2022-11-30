@@ -4,6 +4,7 @@ public class VFXManager : MonoBehaviour {
   public static VFXManager Instance;
 
   public Coin CoinPrefab;
+  public GameObject DebugIndicatorPrefab;
 
   public GameObject TrySpawnEffect(GameObject prefab, Vector3 position, float lifetime = 3f) {
     var rotation = MainCamera.Instance

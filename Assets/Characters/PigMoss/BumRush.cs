@@ -9,7 +9,8 @@ namespace PigMoss {
     public Timeval RushDuration = Timeval.FromSeconds(.5f);
     public Timeval RecoveryDuration = Timeval.FromSeconds(.5f);
     public TriggerEvent SpikeTriggerEvent;
-    public HitParams SpikeHitParams;
+    public HitConfig SpikeHitParams;
+    public HitParams Foo;
     public ParticleSystem Trail;
     public AudioClip RushSFX;
     public float RushSpeed = 100;
@@ -42,7 +43,7 @@ namespace PigMoss {
         var outcome = Fiber.SelectTask(contact, rush);
         yield return outcome;
         if (outcome.Value == contact && contact.Value.TryGetComponent(out Hurtbox hurtbox)) {
-          hurtbox.Defender.OnHit(SpikeHitParams, AbilityManager.transform);
+          hurtbox.Defender.OnHit(SpikeHitParams.ComputeParams(Attributes), AbilityManager.transform);
         }
         yield return Fiber.Wait(RecoveryDuration);
         Animator.SetBool("Extended", false);

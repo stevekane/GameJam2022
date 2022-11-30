@@ -30,11 +30,16 @@ public class KnockbackEffect : StatusEffect {
   static readonly float AIRBORNE_SPEED = 100f;
   static readonly float DONE_SPEED = 5f;
 
+  // Returns the speed needed to cover the given distance with exponential decay due to drag.
+  public static float GetSpeedToTravelDistance(float distance) => DRAG*distance;
+
   public Vector3 Velocity;
+  public Vector3? WallbounceTarget;
   public bool IsAirborne = false;
   bool IsFirstFrame = true; // Hacky way to ensure we have a hitflinch+cancel effect when a defender is first hit
-  public KnockbackEffect(Vector3 velocity) {
+  public KnockbackEffect(Vector3 velocity, Vector3? wallbounceTarget) {
     Velocity = velocity;
+    WallbounceTarget = wallbounceTarget;
   }
   public override bool Merge(StatusEffect e) {
     Velocity += ((KnockbackEffect)e).Velocity;
