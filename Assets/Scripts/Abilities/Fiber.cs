@@ -45,18 +45,11 @@ public class Bundle : Stoppable, IEnumerator {
   // TODO: support Cancelled state?
   protected override States State { get => Fibers.Count > 0 || Added.Count > 0 ? States.Running : States.Completed; }
 
-  public Fiber Run(Func<IEnumerator> continuation) {
-    var fiber = new Fiber(continuation());
-    StartRoutine(fiber);
-    return fiber;
-  }
-  public Fiber Run(IEnumerator routine) {
-    var fiber = new Fiber(routine);
-    StartRoutine(fiber);
-    return fiber;
-  }
-  public void StartRoutine(Fiber fiber) {
+  public Fiber StartRoutine(Func<IEnumerator> continuation) => StartRoutine(new Fiber(continuation()));
+  public Fiber StartRoutine(IEnumerator routine) => StartRoutine(new Fiber(routine));
+  public Fiber StartRoutine(Fiber fiber) {
     Added.Add(fiber);
+    return fiber;
   }
   public void StopRoutine(Fiber fiber) {
     Removed.Add(fiber);

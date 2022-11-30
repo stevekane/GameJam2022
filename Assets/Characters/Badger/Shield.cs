@@ -25,7 +25,7 @@ public class Shield : MonoBehaviour {
   void FixedUpdate() {
     if (Damage.Points > MaxDamage && Hurtbox.enabled) {
       Hurtbox.enabled = false;
-      Bundle.Run(Die());
+      Bundle.StartRoutine(Die());
     }
     Bundle.MoveNext();
   }

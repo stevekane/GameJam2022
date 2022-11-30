@@ -110,7 +110,7 @@ public class HollowKnight : MonoBehaviour {
   void OnDash() {
     if (Condition.CanAct) {
       var direction = FacingLeft ? Vector2.left : Vector2.right;
-      Bundle.Run(new HollowKnightDash(direction, ConditionAccum, Controller));
+      Bundle.StartRoutine(new HollowKnightDash(direction, ConditionAccum, Controller));
     }
   }
 
@@ -133,7 +133,7 @@ public class HollowKnight : MonoBehaviour {
       } else {
         destination = y > 0 ? Vector2.up : Vector2.down;
       }
-      Bundle.Run(new HollowKnightMeleeAttack(
+      Bundle.StartRoutine(new HollowKnightMeleeAttack(
         Center,
         ConditionAccum,
         SawPrefab,

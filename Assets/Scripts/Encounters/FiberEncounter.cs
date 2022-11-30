@@ -68,7 +68,7 @@ public class FiberEncounter : Encounter {
     yield return Fiber.Wait(WaspWaitFrames);
     yield return new SpawnMob(Wasp1);
     var autoRespawns = AutoRespawns.Select(ar => new Fiber(AutoRevive(ar)));
-    autoRespawns.ForEach(Bundle.StartRoutine);
+    autoRespawns.ForEach(r => Bundle.StartRoutine(r));
     yield return Fiber.Until(() => IsDead(firstBadger.Value));
     var staggeredSpawns = new List<GameObject>(StaggeredSpawns.Length);
     foreach (var sr in StaggeredSpawns) {

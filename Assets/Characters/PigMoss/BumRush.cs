@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -57,10 +58,9 @@ namespace PigMoss {
       SFXManager.Instance.TryPlayOneShot(RushSFX);
       Trail.Play();
       var direction = AbilityManager.transform.forward.XZ();
-      for (var tick = 0; tick < RushDuration.Ticks; tick++) {
-        Status.Move(direction*RushSpeed*Time.fixedDeltaTime);
-        yield return null;
-      }
+      var wait = Fiber.Wait(RushDuration);
+      var move = Fiber.Repeat(Status.Move, direction*RushSpeed*Time.fixedDeltaTime);
+      yield return Fiber.Any(wait, move);
       Trail.Stop();
       Status.Remove(RushStatusEffect);
     }

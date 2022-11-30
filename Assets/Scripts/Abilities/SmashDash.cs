@@ -28,7 +28,7 @@ public class SmashDash : Ability {
   // Button press/release.
   public IEnumerator Pressed() {
     Bundle bundle = new();
-    bundle.Run(Fiber.Any(ListenFor(Release), WatchMoveAxis(bundle)));
+    bundle.StartRoutine(Fiber.Any(ListenFor(Release), WatchMoveAxis(bundle)));
     yield return bundle;
   }
   public IEnumerator Release() => null;
@@ -48,7 +48,7 @@ public class SmashDash : Ability {
 
     while (true) {
       yield return Fiber.Until(MoveAxisActive);
-      var dash = bundle.Run(Dash());
+      var dash = bundle.StartRoutine(Dash);
       yield return Fiber.All(Fiber.WhileRunning(dash), Fiber.Until(MoveAxisReleased));
     }
   }
