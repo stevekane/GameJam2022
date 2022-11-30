@@ -6,30 +6,40 @@ using UnityEngine;
 using static Fiber;
 
 namespace Core {
-  class Dodge : FiberAbility {
-    public EventSource Release;
-    public EventSource StickAction;
-    public override void OnStop() {}
-    public override float Score() => 1;
-    public override IEnumerator Routine() {
-      Bundle bundle = new Bundle();
-      IEnumerator dash = null;
-      void HandleDashRequest() {
-        if (dash == null) {
-          dash = Dash();
-          bundle.StartRoutine(dash);
+  class Dodge : IEnumerator {
+    IEnumerator Enumerator;
+    public IEventSource Release;
+    public IEventSource Action;
+    public object Current => Enumerator.Current;
+    public void Reset() => throw new NotSupportedException();
+    public bool MoveNext() => Enumerator.MoveNext();
+    public Dodge(IEventSource release, IEventSource action) {
+      Release = release;
+      Action = action;
+      Enumerator = Routine();
+    }
+    public IEnumerator Routine() {
+      bool held = true;
+      IEnumerator Dash() {
+        while (held) {
+          var onRelease = Until(() => !held);
+          var onDash = ListenFor(Action);
+          var outcome = SelectTask(onRelease, onDash);
+          yield return outcome;
+          if (outcome.Value == onDash) {
+            Debug.Log("Dash begun");
+            yield return Wait(Timeval.FromSeconds(5f));
+            Debug.Log("Dash complete");
+          }
         }
       }
-      IEnumerator Dash() {
-        yield return Wait(Timeval.FromSeconds(0.5f));
-        dash = null;
+      IEnumerator HandleRelease() {
+        yield return ListenFor(Release);
+        Debug.Log("Release");
+        held = false;
       }
-      IEnumerator HandleStickAction() {
-        yield return ListenFor(StickAction);
-        HandleDashRequest();
-      }
-      bundle.StartRoutine(Any(Repeat(HandleStickAction), ListenFor(Release)));
-      yield return bundle;
+      yield return All(Dash(), HandleRelease());
+      Debug.Log("Ability ended");
     }
   }
 
@@ -50,8 +60,18 @@ namespace Core {
 
   public class Core : MonoBehaviour {
     public bool CancelImmediately;
+    public InputManager InputManager;
 
-    async void Start() => await Root();
+    Fiber Routine;
+
+    // async void Start() => await Root();
+    void Start() {
+      var release = InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown);
+      var action = InputManager.ButtonEvent(ButtonCode.R2, ButtonPressType.JustDown);
+      var dodge = new Dodge(release, action);
+      Routine = new Fiber(dodge);
+    }
+    void FixedUpdate() => Routine.MoveNext();
 
     async Task Sentinel(CancellationToken a, CancellationTokenSource b) {
       while (!a.IsCancellationRequested) {
