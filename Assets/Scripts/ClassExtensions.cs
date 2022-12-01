@@ -1,6 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations;
+using UnityEngine.Playables;
 
 public static class VectorExtensions {
   // Projects a Vector3 to the XZ plane. Used when we only care about horizontal movement.
@@ -86,6 +89,12 @@ public static class MonoExtensions {
     var distance = delta.magnitude;
     var didHit = Physics.Raycast(p, direction, out RaycastHit hit, distance, layerMask, triggerInteraction);
     return didHit && hit.transform == t;
+  }
+}
+
+public static class PlayableExtensions {
+  public static IEnumerator UntilDone(this AnimationClipPlayable playable) {
+    return Fiber.Until(() => playable.IsDone());
   }
 }
 
