@@ -42,6 +42,8 @@ public class HybridAnimationMan : MonoBehaviour {
     clipPlayable.Destroy();
   }
 
+  void PlayAction() => StartCoroutine(Attack());
+
   IEnumerator Attack() {
     var disableMovementEffect = new ScriptedMovementEffect();
     Status.Add(disableMovementEffect);
@@ -70,7 +72,4 @@ public class HybridAnimationMan : MonoBehaviour {
     Animator.SetFloat("ForwardVelocity", localVelocity.z/moveSpeed);
   }
 
-  void PlayAction() {
-    StartCoroutine(Attack());
-  }
 }
