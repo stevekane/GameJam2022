@@ -180,7 +180,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ad980451443d70438faac0bc6c235a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_TrackedObjectOffset: {x: -0.09078462, y: 0.4238531, z: 0.42987734}
+  m_TrackedObjectOffset: {x: -0.3631381, y: 1.6954119, z: 1.7195085}
   m_LookaheadTime: 0
   m_LookaheadSmoothing: 0
   m_LookaheadIgnoreY: 0
@@ -190,7 +190,7 @@ MonoBehaviour:
   m_TargetMovementOnly: 1
   m_ScreenX: 0.5
   m_ScreenY: 0.5
-  m_CameraDistance: 11.090788
+  m_CameraDistance: 14.363148
   m_DeadZoneWidth: 0
   m_DeadZoneHeight: 0
   m_DeadZoneDepth: 0
@@ -337,6 +337,7 @@ GameObject:
   - component: {fileID: 364122205}
   - component: {fileID: 364122207}
   - component: {fileID: 364122208}
+  - component: {fileID: 364122210}
   - component: {fileID: 364122209}
   m_Layer: 0
   m_Name: Hybrid Animated Man
@@ -373,7 +374,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f16879722b1ca5b4194c06c80fc52e60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AttackClip: {fileID: -203655887218126122, guid: af0bf64ef18fa114cade04973e8523b1, type: 3}
   Animator: {fileID: 1991202311}
+  Status: {fileID: 364122210}
+  Attributes: {fileID: 364122208}
+  Controller: {fileID: 364122209}
   IdleThreshold: 0.1
 --- !u!114 &364122208
 MonoBehaviour:
@@ -415,6 +420,20 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.75, z: 0}
+--- !u!114 &364122210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 364122204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b25f034a0a2d6547bb601e0fe361f46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Tags: 0
+  DebugEffects: []
 --- !u!1001 &447536725
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -545,7 +564,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 583777037}
   m_LocalRotation: {x: 0.60876125, y: -0, z: -0, w: 0.7933535}
-  m_LocalPosition: {x: -0.09078462, y: 11.236732, z: -2.4406345}
+  m_LocalPosition: {x: -0.3631381, y: 15.669147, z: -1.9979534}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -632,7 +651,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1325853189}
   m_LocalRotation: {x: 0.60876125, y: 0, z: 0, w: 0.7933535}
-  m_LocalPosition: {x: -0.09078462, y: 11.236732, z: -2.4406345}
+  m_LocalPosition: {x: -0.3631381, y: 15.669147, z: -1.9979534}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -855,6 +874,58 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8021001004253913084, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8021001004253913084, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8021001004253913084, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8021001004253913084, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8021001004253913084, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -3480699329000672020, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 4.2558305e-12
+      objectReference: {fileID: 0}
+    - target: {fileID: -3480699329000672020, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.101824366
+      objectReference: {fileID: 0}
+    - target: {fileID: -3480699329000672020, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -3.9690472e-17
+      objectReference: {fileID: 0}
+    - target: {fileID: -3480699329000672020, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.99678236
+      objectReference: {fileID: 0}
+    - target: {fileID: -3480699329000672020, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.08015572
+      objectReference: {fileID: 0}
+    - target: {fileID: -3480699329000672020, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -1.6597016e-24
+      objectReference: {fileID: 0}
+    - target: {fileID: -3480699329000672020, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.0000002480681
+      objectReference: {fileID: 0}
+    - target: {fileID: -3480699329000672020, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
       propertyPath: m_Name
       value: X Bot
@@ -870,6 +941,13 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
       propertyPath: m_CullingMode
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'mixamorig:Spine'\n\tFrom animation clip
+        'Lean Forward'"
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
       propertyPath: m_ApplyRootMotion
