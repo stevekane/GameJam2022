@@ -12,6 +12,7 @@ public class PlayableAnimation {
 }
 
 public class HybridAnimationMan : MonoBehaviour {
+  [SerializeField] ButtonCode AttackButtonCode;
   [SerializeField] PlayableAnimation AttackAnimation;
   [SerializeField] GameObject AttackVFX;
   [SerializeField] AudioClip AttackSFX;
@@ -25,14 +26,12 @@ public class HybridAnimationMan : MonoBehaviour {
 
   void Start() {
     AnimationGraph = PlayableGraph.Create("Actions");
-    InputManager.Instance.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Listen(PlayAction);
-    InputManager.Instance.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Listen(PlayRunningAction);
+    InputManager.Instance.ButtonEvent(AttackButtonCode, ButtonPressType.JustDown).Listen(PlayAttack);
   }
 
   void OnDestroy() {
     AnimationGraph.Destroy();
-    InputManager.Instance.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Unlisten(PlayAction);
-    InputManager.Instance.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Unlisten(PlayAction);
+    InputManager.Instance.ButtonEvent(AttackButtonCode, ButtonPressType.JustDown).Unlisten(PlayAttack);
   }
 
   static Quaternion RotationFromDesired(Transform t, float speed, Vector3 desiredForward) {
@@ -54,11 +53,6 @@ public class HybridAnimationMan : MonoBehaviour {
     clipPlayable.Destroy();
   }
 
-  /*
-  AnimController -
-                  |- mixer (with mask) - Animator
-  Clip -----------
-  */
   static IEnumerator BlendAnimation(Animator animator, PlayableGraph graph, PlayableAnimation animation) {
     var output = AnimationPlayableOutput.Create(graph, animation.Clip.name, animator);
     var clipPlayable = AnimationClipPlayable.Create(graph, animation.Clip);
@@ -78,17 +72,9 @@ public class HybridAnimationMan : MonoBehaviour {
     animatorPlayable.Destroy();
   }
 
-  void PlayAction() => StartCoroutine(Attack());
-  void PlayRunningAction() => StartCoroutine(RunningAttack());
+  void PlayAttack() => StartCoroutine(Attack());
 
   IEnumerator Attack() {
-    var disableMovementEffect = new ScriptedMovementEffect();
-    Status.Add(disableMovementEffect);
-    yield return PlayAnimation(Animator, AnimationGraph, AttackAnimation);
-    Status.Remove(disableMovementEffect);
-  }
-
-  IEnumerator RunningAttack() {
     SFXManager.Instance.TryPlayOneShot(AttackSFX);
     VFXManager.Instance.TrySpawn2DEffect(AttackVFX, transform.position+Vector3.up, transform.rotation, 1);
     yield return BlendAnimation(Animator, AnimationGraph, AttackAnimation);
