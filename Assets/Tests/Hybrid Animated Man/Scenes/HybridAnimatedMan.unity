@@ -382,6 +382,7 @@ MonoBehaviour:
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
   Animator: {fileID: 1991202311}
+  AnimationDriver: {fileID: 1991202312}
   Status: {fileID: 364122210}
   Attributes: {fileID: 364122208}
   Controller: {fileID: 364122209}
@@ -553,7 +554,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.777027, y: 1}
+    m_SensorSize: {x: 1.7776524, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -578,6 +579,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 75, y: 0, z: 0}
+--- !u!1 &806276072 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
+  m_PrefabInstance: {fileID: 1991202309}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1325853189
 GameObject:
   m_ObjectHideFlags: 0
@@ -969,3 +975,15 @@ Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
   m_PrefabInstance: {fileID: 1991202309}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1991202312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 806276072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5858cd79c3bb37845b5d44f08793d81e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -94,7 +94,7 @@ public static class MonoExtensions {
 
 public static class PlayableExtensions {
   public static IEnumerator UntilDone(this AnimationClipPlayable playable) {
-    return Fiber.Until(() => playable.IsDone());
+    return Fiber.Until(() => !playable.IsValid() || playable.IsDone());
   }
 }
 

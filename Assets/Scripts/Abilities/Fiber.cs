@@ -260,6 +260,8 @@ public class All : Stoppable, IEnumerator {
 
 [Serializable]
 public class Fiber : Stoppable, IEnumerator {
+  public static IEnumerator Noop => null;
+  public static Fiber Done => new Fiber(Noop);
   public static IEnumerator Wait(int n) {
     for (var i = 0; i < n; i++) {
       yield return null;

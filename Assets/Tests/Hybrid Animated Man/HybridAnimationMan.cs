@@ -1,15 +1,5 @@
-using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Playables;
-using UnityEngine.Animations;
-
-[Serializable]
-public class PlayableAnimation {
-  public AnimationClip Clip;
-  public AvatarMask Mask = null;
-  public float Speed = 1;
-}
 
 public class HybridAnimationMan : MonoBehaviour {
   [SerializeField] ButtonCode AttackButtonCode;
@@ -17,21 +7,19 @@ public class HybridAnimationMan : MonoBehaviour {
   [SerializeField] GameObject AttackVFX;
   [SerializeField] AudioClip AttackSFX;
   [SerializeField] Animator Animator;
+  [SerializeField] AnimationDriver AnimationDriver;
   [SerializeField] Status Status;
   [SerializeField] Attributes Attributes;
   [SerializeField] CharacterController Controller;
   [SerializeField] float IdleThreshold = .1f;
 
-  PlayableGraph AnimationGraph;
-
   void Start() {
-    AnimationGraph = PlayableGraph.Create("Actions");
     InputManager.Instance.ButtonEvent(AttackButtonCode, ButtonPressType.JustDown).Listen(PlayAttack);
   }
 
   void OnDestroy() {
-    AnimationGraph.Destroy();
     InputManager.Instance.ButtonEvent(AttackButtonCode, ButtonPressType.JustDown).Unlisten(PlayAttack);
+    StopAllCoroutines();
   }
 
   static Quaternion RotationFromDesired(Transform t, float speed, Vector3 desiredForward) {
@@ -41,43 +29,12 @@ public class HybridAnimationMan : MonoBehaviour {
     return Quaternion.RotateTowards(currentRotation, desiredRotation, degrees);
   }
 
-  static IEnumerator PlayAnimation(Animator animator, PlayableGraph graph, PlayableAnimation animation) {
-    var clipPlayable = AnimationClipPlayable.Create(graph, animation.Clip);
-    var output = AnimationPlayableOutput.Create(graph, animation.Clip.name, animator);
-    clipPlayable.SetSpeed(animation.Speed);
-    clipPlayable.SetDuration(animation.Clip.length);
-    output.SetSourcePlayable(clipPlayable);
-    graph.Play();
-    yield return clipPlayable.UntilDone();
-    graph.Stop();
-    clipPlayable.Destroy();
-  }
-
-  static IEnumerator BlendAnimation(Animator animator, PlayableGraph graph, PlayableAnimation animation) {
-    var output = AnimationPlayableOutput.Create(graph, animation.Clip.name, animator);
-    var clipPlayable = AnimationClipPlayable.Create(graph, animation.Clip);
-    var animatorPlayable = AnimatorControllerPlayable.Create(graph, animator.runtimeAnimatorController);
-    var mixerPlayable = AnimationLayerMixerPlayable.Create(graph, 2);
-    mixerPlayable.ConnectInput(0, animatorPlayable, 0, 1);
-    mixerPlayable.ConnectInput(1, clipPlayable, 0, 1); // TODO: Probably should animate this mix level to crossfade
-    mixerPlayable.SetLayerMaskFromAvatarMask(1, animation.Mask);
-    clipPlayable.SetSpeed(animation.Speed);
-    clipPlayable.SetDuration(animation.Clip.length);
-    output.SetSourcePlayable(mixerPlayable);
-    graph.Play();
-    yield return clipPlayable.UntilDone();
-    graph.Stop();
-    clipPlayable.Destroy();
-    mixerPlayable.Destroy();
-    animatorPlayable.Destroy();
-  }
-
   void PlayAttack() => StartCoroutine(Attack());
 
   IEnumerator Attack() {
     SFXManager.Instance.TryPlayOneShot(AttackSFX);
     VFXManager.Instance.TrySpawn2DEffect(AttackVFX, transform.position+Vector3.up, transform.rotation, 1);
-    yield return BlendAnimation(Animator, AnimationGraph, AttackAnimation);
+    yield return AnimationDriver.Play(AttackAnimation);
   }
 
   void FixedUpdate() {
