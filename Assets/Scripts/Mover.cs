@@ -25,8 +25,17 @@ public class Mover : MonoBehaviour {
     var degrees = speed * Time.fixedDeltaTime;
     return Quaternion.RotateTowards(rotation, desiredRotation, degrees);
   }
+  static Quaternion RotationFromDesired(Transform t, float speed, Vector3 desiredForward) {
+    var currentRotation = t.rotation;
+    var desiredRotation = Quaternion.LookRotation(desiredForward);
+    var degrees = speed * Time.fixedDeltaTime;
+    return Quaternion.RotateTowards(currentRotation, desiredRotation, degrees);
+  }
 
   public float Gravity;
+
+  [SerializeField] Animator Animator;
+  [SerializeField] float IdleThreshold = 0.1f;
 
   Vector3 Velocity;
   CharacterController Controller;
@@ -65,7 +74,6 @@ public class Mover : MonoBehaviour {
 
   void FixedUpdate() {
     GetAxes(AbilityManager, out var desiredMoveDir, out var desiredFacing);
-
     var moveVelocity = Attributes.GetValue(AttributeTag.MoveSpeed) * desiredMoveDir;
     Velocity.SetXZ(moveVelocity);
     var gravity = Time.fixedDeltaTime * Gravity;
@@ -73,7 +81,13 @@ public class Mover : MonoBehaviour {
     if (!Status.HasGravity)
       Velocity.y = 0f;
     Controller.Move(Time.fixedDeltaTime * Velocity);
-
     transform.rotation = RotationFromDesired(transform.forward, Attributes.GetValue(AttributeTag.TurnSpeed), desiredFacing);
+    if (Animator) {
+      var moveSpeed = Attributes.GetValue(AttributeTag.MoveSpeed);
+      var localVelocity = Quaternion.Inverse(transform.rotation)*Velocity;
+      Animator.SetBool("Moving", Velocity.sqrMagnitude > IdleThreshold);
+      Animator.SetFloat("RightVelocity", localVelocity.x/moveSpeed);
+      Animator.SetFloat("ForwardVelocity", localVelocity.z/moveSpeed);
+    }
   }
 }
