@@ -55,7 +55,7 @@ public class HitStop : CoroutineJob {
     Status.CanRotate = true;
     Status.CanAttack = true;
     Animator.SetSpeed(1);
-    AnimationDriver.SetSpeed(1);
+    AnimationDriver.Resume();
   }
   public override IEnumerator MakeRoutine() {
     yield return Fiber.Any(Fiber.Wait(Duration), Fiber.Repeat(OnTick));
@@ -65,7 +65,7 @@ public class HitStop : CoroutineJob {
     Status.CanRotate = false;
     Status.CanAttack = false;
     Animator.SetSpeed(0);
-    AnimationDriver.SetSpeed(0);
+    AnimationDriver.Pause();
     Vibrator.VibrateThisFrame(Axis, Amplitude);
   }
 }

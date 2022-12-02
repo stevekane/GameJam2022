@@ -48,8 +48,12 @@ public class AnimationDriver : MonoBehaviour {
     }
   }
 
-  public void SetSpeed(float speed) {
-    Clip?.SetSpeed(speed);
+  public void Pause() {
+    Clip?.Pause();
+  }
+
+  public void Resume() {
+    Clip?.Play();
   }
 
   public IEnumerator Play(PlayableAnimation animation) {
