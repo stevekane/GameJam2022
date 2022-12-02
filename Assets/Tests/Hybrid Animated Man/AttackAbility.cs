@@ -83,6 +83,8 @@ public class AttackAbility : Ability {
   [SerializeField] GameObject AttackVFX;
   [SerializeField] AudioClip AttackSFX;
 
+  Collider[] Hits = new Collider[16];
+
   public override void OnStop() {
     HitBox.enabled = false;
   }
@@ -102,15 +104,15 @@ public class AttackAbility : Ability {
   }
 
   IEnumerator OnHit(HitParams hitParams) {
-    var hitEvent = ListenFor(TriggerEvent.OnTriggerStaySource);
-    yield return hitEvent;
-    var attacker = AbilityManager.transform;
-    var target = hitEvent.Value;
-    var toTarget = target.transform.position-attacker.position;
-    var axis = toTarget.normalized;
+    var hitDetection = Fiber.ListenForAll(TriggerEvent.OnTriggerStaySource, Hits);
+    yield return hitDetection;
     CameraShaker.Instance.Shake(HitCameraShakeIntensity);
-    target.GetComponent<Hurtbox>()?.Defender.OnHit(hitParams, attacker);
-    yield return new HitStop(axis, hitParams.HitStopDuration, Status, Animator, AnimationDriver, Vibrator);
+    var hitCount = hitDetection.Value;
+    var attacker = AbilityManager.transform;
+    for (var i = 0; i < hitCount; i++) {
+      Hits[i].GetComponent<Hurtbox>()?.Defender.OnHit(hitParams, attacker);
+    }
+    yield return new HitStop(-transform.forward, hitParams.HitStopDuration, Status, Animator, AnimationDriver, Vibrator);
     // TODO: Upgrade the way Recoil Status is applied with new system
     Status.Add(new RecoilEffect(HitRecoilStrength * -attacker.forward));
     Stop();

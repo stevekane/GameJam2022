@@ -118,7 +118,30 @@ public class Listener<T> : Stoppable, IEnumerator, IValue<T> {
   public void Reset() => throw new NotImplementedException();
   public bool MoveNext() => IsRunning;
   public object Current { get => null; }
-  public T Value { get; internal set; }
+  public T Value { get; private set; }
+}
+
+public class ConcurrentListener<T> : Stoppable, IEnumerator, IValue<int> {
+  IEventSource<T> Source;
+  T[] Array;
+
+  public ConcurrentListener(IEventSource<T> source, T[] array) {
+    Source = source;
+    Array = array;
+    Source.Listen(Callback);
+  }
+  ~ConcurrentListener() {
+    Stop();
+  }
+  public override void OnStop() => Source.Unlisten(Callback);
+  public void Reset() {
+    Source.Listen(Callback);
+    Value = 0;
+  }
+  public bool MoveNext() => Value == 0;
+  public object Current => Value;
+  public int Value { get; private set; }
+  void Callback(T t) => Array[Value++] = t;
 }
 
 // TODO: This does not need to be Ability Task. Just implement this as
@@ -306,6 +329,7 @@ public class Fiber : Stoppable, IEnumerator {
   public static TaskSelector SelectTask(IEnumerator a, IEnumerator b) => new TaskSelector(a, b);
   public static Listener ListenFor(IEventSource source) => new Listener(source);
   public static Listener<T> ListenFor<T>(IEventSource<T> source) => new Listener<T>(source);
+  public static ConcurrentListener<T> ListenForAll<T>(IEventSource<T> source, T[] array) => new ConcurrentListener<T>(source, array);
   public static IEnumerator Repeat(Func<IEnumerator> continuation) {
     while (true) {
       yield return continuation();
