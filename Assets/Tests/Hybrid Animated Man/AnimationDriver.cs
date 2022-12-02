@@ -48,6 +48,10 @@ public class AnimationDriver : MonoBehaviour {
     }
   }
 
+  public void SetSpeed(float speed) {
+    Clip?.SetSpeed(speed);
+  }
+
   public IEnumerator Play(PlayableAnimation animation) {
     Stop();
     Fiber = new Fiber(InnerPlay(animation));

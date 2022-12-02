@@ -206,6 +206,7 @@ GameObject:
   - component: {fileID: 869648123590668608}
   - component: {fileID: 4692194450172351924}
   - component: {fileID: 704825919502182732}
+  - component: {fileID: 1749337360117157023}
   - component: {fileID: 4661272542552748758}
   m_Layer: 17
   m_Name: Matt Parry
@@ -268,13 +269,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b25f034a0a2d6547bb601e0fe361f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CanMove: 1
-  CanRotate: 1
-  CanAttack: 1
-  IsHittable: 1
-  IsDamageable: 1
-  MoveSpeedFactor: 1
-  RotateSpeedFactor: 1
+  Tags: 0
+  DebugEffects: []
 --- !u!114 &869648123590668608
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -300,8 +296,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c806621753f76840a91b87e3c0d2fc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsParrying: 0
-  IsBlocking: 0
+  FallSFX: {fileID: 0}
 --- !u!114 &704825919502182732
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -315,6 +310,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _Points: 0
+--- !u!114 &1749337360117157023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4692194450172351927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 004ed0f90de1a634aab5eefd8f1dea0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BaseAttributes: []
+  BaseUpgrades: []
 --- !u!95 &4661272542552748758
 Animator:
   serializedVersion: 4

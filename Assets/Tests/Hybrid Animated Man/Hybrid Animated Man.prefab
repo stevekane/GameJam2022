@@ -1,5 +1,63 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1036002593728990814
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8436203457050284136}
+  - component: {fileID: 2142175249341189539}
+  - component: {fileID: 7852998007072357547}
+  m_Layer: 13
+  m_Name: Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8436203457050284136
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1036002593728990814}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 1.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6761219406680722472}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2142175249341189539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1036002593728990814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!65 &7852998007072357547
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1036002593728990814}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 3, y: 1, z: 3}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1198816323167767759
 GameObject:
   m_ObjectHideFlags: 0
@@ -28,7 +86,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 8436203457050284136}
   m_Father: {fileID: 3735475313303821151}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -50,11 +109,29 @@ MonoBehaviour:
     Tags: 1
     RequiredOwnerTags: 0
     EnergyCost: 0
+  HitCameraShakeIntensity: 10
+  HitRecoilStrength: 20
+  HitConfig:
+    DamageModifier:
+      Base: 0
+      Mult: 1
+    KnockbackStrength: 5
+    KnockbackType: 0
+    HitStopDuration:
+      Millis: 333.33334
+      FramesPerSecond: 30
+    SFX: {fileID: 8300000, guid: 7cbd6cd765888ff418d01d98bd1ce9c2, type: 3}
+    VFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
+    VFXOffset: {x: 0, y: 1, z: 0}
+  Vibrator: {fileID: 5304582540807413855}
+  Animator: {fileID: 5212549685019403348}
   AnimationDriver: {fileID: 1818372311869774280}
   AttackAnimation:
     Clip: {fileID: -203655887218126122, guid: 1dcd260fba944eb4fb6ede78ef0946c9, type: 3}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
     Speed: 3
+  TriggerEvent: {fileID: 2142175249341189539}
+  HitBox: {fileID: 7852998007072357547}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
 --- !u!1 &1818372311317487516

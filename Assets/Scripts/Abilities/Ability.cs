@@ -106,34 +106,3 @@ public abstract class FiberAbility : MonoBehaviour, IAbility, IEnumerator, IScor
   public abstract IEnumerator Routine();
   public abstract float Score();
 }
-
-// TODO: Experiment in-progress... possibly delete
-public abstract class CoroutineJob : IEnumerator, IStoppable {
-  public abstract void OnStart();
-  public abstract void OnStop();
-  public abstract void OnCancel();
-  public object Current => Coroutine?.Current;
-  public void Reset() => throw new NotSupportedException();
-  public bool MoveNext() {
-    if (Coroutine != null) {
-      if (Coroutine.MoveNext()) {
-        return true;
-      } else {
-        Stop();
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-  public bool IsRunning => Coroutine != null;
-  public void Stop() {
-    Coroutine = null;
-    OnStop();
-  }
-  public void Cancel() {
-    Coroutine = null;
-    OnCancel();
-  }
-  IEnumerator Coroutine;
-}
