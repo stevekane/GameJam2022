@@ -29,8 +29,16 @@ public class AnimationJob : IEnumerator, IStoppable {
     Mixer = AnimationLayerMixerPlayable.Create(Graph, 2);
   }
 
-  public void Pause() => Clip.Pause();
-  public void Resume() => Clip.Play();
+  public void Pause() {
+    if (Clip.IsValid() && Clip.IsNull() && Clip.GetPlayState() == PlayState.Playing) {
+      Clip.Pause();
+    }
+  }
+  public void Resume() {
+    if (Clip.IsValid() && !Clip.IsNull() && Clip.GetPlayState() == PlayState.Paused) {
+      Clip.Play();
+    }
+  }
 
   public void Start() {
     IsRunning = true;
