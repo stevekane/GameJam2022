@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class CoroutineJob : IEnumerator, IStoppable {
@@ -71,8 +72,9 @@ public class HitStop : CoroutineJob {
 }
 
 public class AttackAbility : Ability {
-  [SerializeField] float HitCameraShakeIntensity = 1f;
-  [SerializeField] float HitRecoilStrength = 2f;
+  [SerializeField] Timeval WindupEnd;
+  [SerializeField] Timeval ActiveEnd;
+  [SerializeField] Timeval RecoveryEnd;
   [SerializeField] HitConfig HitConfig;
   [SerializeField] Vibrator Vibrator;
   [SerializeField] Animator Animator;
@@ -83,34 +85,50 @@ public class AttackAbility : Ability {
   [SerializeField] GameObject AttackVFX;
   [SerializeField] AudioClip AttackSFX;
 
+  HashSet<Collider> PhaseHits = new();
   Collider[] Hits = new Collider[16];
+  AnimationJobFacade Animation;
 
   public override void OnStop() {
     HitBox.enabled = false;
+    PhaseHits.Clear();
+    Animation.OnFrame.Unlisten(OnFrame);
   }
 
   public IEnumerator Attack() {
-    SFXManager.Instance.TryPlayOneShot(AttackSFX);
-    VFXManager.Instance.TrySpawn2DEffect(AttackVFX, transform.position+Vector3.up, transform.rotation);
-    var hitParams = HitConfig.ComputeParams(Attributes);
-    var handleHits = Fiber.Repeat(OnHit, hitParams);
-    var play = AnimationDriver.Play(AttackAnimation);
-    HitBox.enabled = true;
-    yield return Fiber.Any(play, handleHits);
+    var handleHits = Fiber.Repeat(OnHit);
+    Animation = AnimationDriver.Play(AttackAnimation);
+    Animation.OnFrame.Listen(OnFrame);
+    yield return Fiber.Any(Animation, handleHits);
   }
 
-  IEnumerator OnHit(HitParams hitParams) {
+  void OnFrame(int frame) {
+    HitBox.enabled = frame >= WindupEnd.AnimFrames && frame <= ActiveEnd.AnimFrames;
+    if (frame == WindupEnd.AnimFrames) {
+      SFXManager.Instance.TryPlayOneShot(AttackSFX);
+      VFXManager.Instance.TrySpawn2DEffect(AttackVFX, transform.position+Vector3.up, transform.rotation);
+    }
+  }
+
+  IEnumerator OnHit() {
     var hitDetection = Fiber.ListenForAll(TriggerEvent.OnTriggerStaySource, Hits);
     yield return hitDetection;
-    CameraShaker.Instance.Shake(HitCameraShakeIntensity);
     var hitCount = hitDetection.Value;
     var attacker = AbilityManager.transform;
+    var newHits = false;
+    var hitParams = HitConfig.ComputeParams(Attributes);
     for (var i = 0; i < hitCount; i++) {
-      Hits[i].GetComponent<Hurtbox>()?.Defender.OnHit(hitParams, attacker);
+      var hit = Hits[i];
+      if (!PhaseHits.Contains(hit)) {
+        hit.GetComponent<Hurtbox>()?.Defender.OnHit(hitParams, attacker);
+        PhaseHits.Add(hit);
+        newHits = true;
+      }
     }
-    yield return new HitStop(-transform.forward, hitParams.HitStopDuration, Status, Animator, AnimationDriver, Vibrator);
-    // TODO: Upgrade the way Recoil Status is applied with new system
-    Status.Add(new RecoilEffect(HitRecoilStrength * -attacker.forward));
-    Stop();
+    if (newHits) {
+      CameraShaker.Instance.Shake(HitConfig.CameraShakeStrength);
+      yield return new HitStop(-transform.forward, hitParams.HitStopDuration, Status, Animator, AnimationDriver, Vibrator);
+      Status.Add(new RecoilEffect(HitConfig.RecoilStrength * -attacker.forward));
+    }
   }
 }

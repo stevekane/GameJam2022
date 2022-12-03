@@ -8,6 +8,8 @@ public class HitConfig {
   public AttributeModifier DamageModifier;
   public float KnockbackStrength;
   public KnockBackType KnockbackType;
+  public float RecoilStrength;
+  public float CameraShakeStrength;
   public Timeval HitStopDuration;
   public AudioClip SFX;
   public GameObject VFX;
@@ -59,6 +61,8 @@ public class HitParams {
   public float Damage;
   public float KnockbackStrength;
   public KnockBackType KnockbackType;
+  public float RecoilStrength;
+  public float CameraShakeStrength;
   public Timeval HitStopDuration;
   public AudioClip SFX;
   public GameObject VFX;

@@ -109,16 +109,25 @@ MonoBehaviour:
     Tags: 1
     RequiredOwnerTags: 0
     EnergyCost: 0
-  HitCameraShakeIntensity: 10
-  HitRecoilStrength: 20
+  WindupEnd:
+    Millis: 458.33334
+    FramesPerSecond: 24
+  ActiveEnd:
+    Millis: 500
+    FramesPerSecond: 24
+  RecoveryEnd:
+    Millis: 791.6667
+    FramesPerSecond: 24
   HitConfig:
     DamageModifier:
       Base: 0
       Mult: 1
     KnockbackStrength: 5
     KnockbackType: 0
+    RecoilStrength: 10
+    CameraShakeStrength: 1
     HitStopDuration:
-      Millis: 333.33334
+      Millis: 200
       FramesPerSecond: 30
     SFX: {fileID: 8300000, guid: 7cbd6cd765888ff418d01d98bd1ce9c2, type: 3}
     VFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}

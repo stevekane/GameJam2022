@@ -18,7 +18,8 @@ public class AnimationJob : IEnumerator, IStoppable {
   public AnimationDriver Driver;
   public AnimationLayerMixerPlayable Mixer;
   public AnimationClipPlayable Clip;
-  public int EventHead { get; private set; }
+  public int EventHead { get; private set; } = -1;
+  public EventSource<int> OnFrame = new();
 
   public AnimationJob(AnimationDriver driver, PlayableGraph graph, AnimationJobConfig animation) {
     Graph = graph;
@@ -56,8 +57,13 @@ public class AnimationJob : IEnumerator, IStoppable {
   public bool IsRunning { get; private set; }
   public bool MoveNext() {
     if (IsRunning) {
-      if (Clip.IsNull() || !Clip.IsValid() || Clip.IsDone()) {
+      if (Clip.IsNull() || !Clip.IsValid()) {
         Stop();
+      } else {
+        UpdateEventHead();
+        if (Clip.IsDone()) {
+          Stop();
+        }
       }
     }
     return IsRunning;
@@ -68,7 +74,13 @@ public class AnimationJob : IEnumerator, IStoppable {
     var clip = Clip.GetAnimationClip();
     var frames = (clip.length*clip.frameRate+1)/* / Animator.speed*/;
     var interpolant = (float)(time/clip.length);
-    EventHead = (int)Mathf.Lerp(0, frames, interpolant);
+    var eventHead = (int)Mathf.Lerp(0, frames, interpolant);
+    if (eventHead > EventHead) {
+      for (var i = EventHead+1; i <= eventHead; i++) {
+        OnFrame.Fire(i);
+      }
+    }
+    EventHead = eventHead;
   }
 }
 
@@ -80,6 +92,7 @@ public class AnimationJobFacade : IEnumerator, IStoppable {
     Job = job;
   }
 
+  public EventSource<int> OnFrame => Job.OnFrame;
   public void Pause() => Job.Pause();
   public void Resume() => Job.Resume();
   public void Reset() => Job.Reset();
