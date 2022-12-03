@@ -5,7 +5,7 @@ using UnityEngine.Animations;
 using UnityEngine.Playables;
 
 [Serializable]
-public class PlayableAnimation {
+public class AnimationJobConfig {
   public AnimationClip Clip;
   public AvatarMask Mask = null;
   public float Speed = 1;
@@ -14,13 +14,13 @@ public class PlayableAnimation {
 [Serializable]
 public class AnimationJob : IEnumerator, IStoppable {
   public PlayableGraph Graph;
-  public PlayableAnimation Animation;
+  public AnimationJobConfig Animation;
   public AnimationDriver Driver;
   public AnimationLayerMixerPlayable Mixer;
   public AnimationClipPlayable Clip;
   public int EventHead { get; private set; }
 
-  public AnimationJob(AnimationDriver driver, PlayableGraph graph, PlayableAnimation animation) {
+  public AnimationJob(AnimationDriver driver, PlayableGraph graph, AnimationJobConfig animation) {
     Graph = graph;
     Driver = driver;
     Animation = animation;
@@ -80,6 +80,8 @@ public class AnimationJobFacade : IEnumerator, IStoppable {
     Job = job;
   }
 
+  public void Pause() => Job.Pause();
+  public void Resume() => Job.Resume();
   public void Reset() => Job.Reset();
   public void Stop() => Job.Stop();
   public bool MoveNext() => IsRunning;
@@ -125,7 +127,7 @@ public class AnimationDriver : MonoBehaviour {
     Output.SetSourcePlayable(AnimatorController);
   }
 
-  public AnimationJobFacade Play(PlayableAnimation animation) {
+  public AnimationJobFacade Play(AnimationJobConfig animation) {
     Job?.Stop();
     Job = new AnimationJob(this, Graph, animation);
     Job.Start();

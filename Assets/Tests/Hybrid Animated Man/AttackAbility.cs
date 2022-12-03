@@ -77,7 +77,7 @@ public class AttackAbility : Ability {
   [SerializeField] Vibrator Vibrator;
   [SerializeField] Animator Animator;
   [SerializeField] AnimationDriver AnimationDriver;
-  [SerializeField] PlayableAnimation AttackAnimation;
+  [SerializeField] AnimationJobConfig AttackAnimation;
   [SerializeField] TriggerEvent TriggerEvent;
   [SerializeField] Collider HitBox;
   [SerializeField] GameObject AttackVFX;
