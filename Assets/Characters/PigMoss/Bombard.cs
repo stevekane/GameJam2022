@@ -7,6 +7,7 @@ namespace PigMoss {
   [Serializable]
   public class Bombard : FiberAbility {
     public float Radius;
+    public HitConfig HitConfig;
     public Missile MissilePrefab;
     public Transform[] LaunchSites;
     public Timeval Windup = Timeval.FromSeconds(1);
@@ -30,9 +31,11 @@ namespace PigMoss {
       SFXManager.Instance.TryPlayOneShot(WindupClip);
       Animator.SetBool("Extended", true);
       yield return Wait(Windup);
+      var hitParams = HitConfig.ComputeParams(Attributes);
       foreach (var launchSite in LaunchSites) {
         var missile = GameObject.Instantiate(MissilePrefab, launchSite.position, launchSite.rotation);
         missile.Target = Radius*UnityEngine.Random.onUnitSphere.XZ();
+        missile.HitParams = hitParams;
         SFXManager.Instance.TryPlayOneShot(ShotClip);
         VFXManager.Instance.TrySpawnEffect(ShotEffect, launchSite.position);
         yield return Wait(ShotPeriod);

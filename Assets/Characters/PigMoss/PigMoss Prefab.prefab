@@ -261,9 +261,10 @@ MonoBehaviour:
     DamageModifier:
       Base: 15
       Mult: 1
-    Damage: 15
     KnockbackStrength: 15
     KnockbackType: 1
+    RecoilStrength: 0
+    CameraShakeStrength: 0
     HitStopDuration:
       Millis: 100
       FramesPerSecond: 30
@@ -538,9 +539,10 @@ MonoBehaviour:
     DamageModifier:
       Base: 15
       Mult: 1
-    Damage: 15
     KnockbackStrength: 15
     KnockbackType: 0
+    RecoilStrength: 0
+    CameraShakeStrength: 0
     HitStopDuration:
       Millis: 100
       FramesPerSecond: 30
@@ -619,9 +621,10 @@ MonoBehaviour:
     DamageModifier:
       Base: 15
       Mult: 1
-    Damage: 15
     KnockbackStrength: 15
     KnockbackType: 0
+    RecoilStrength: 0
+    CameraShakeStrength: 0
     HitStopDuration:
       Millis: 1
       FramesPerSecond: 30
@@ -963,6 +966,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Radius: 30
+  HitConfig:
+    DamageModifier:
+      Base: 0
+      Mult: 1
+    KnockbackStrength: 10
+    KnockbackType: 0
+    RecoilStrength: 0
+    CameraShakeStrength: 1
+    HitStopDuration:
+      Millis: 100
+      FramesPerSecond: 30
+    SFX: {fileID: 8300000, guid: 8ba1ce15e8593064aa781b941381f053, type: 3}
+    VFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
+    VFXOffset: {x: 0, y: 1, z: 0}
   MissilePrefab: {fileID: 5667205795771851015, guid: 41421b7d6e85e6748afb608a2a977365, type: 3}
   LaunchSites:
   - {fileID: 4591952213016696056}
@@ -1330,6 +1347,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Tags: 0
+  DebugEffects: []
 --- !u!114 &8872822988582960454
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1356,8 +1374,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FallSFX: {fileID: 8300000, guid: fe6b13c084178f441942a9885f9857db, type: 3}
-  IsParrying: 0
-  IsBlocking: 0
 --- !u!114 &8872822988582960444
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1371,6 +1387,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Gravity: -200
+  Animator: {fileID: 0}
+  IdleThreshold: 0.1
 --- !u!114 &8872822988582960448
 MonoBehaviour:
   m_ObjectHideFlags: 0

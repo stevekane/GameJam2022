@@ -92,7 +92,7 @@ public class AttackAbility : Ability {
   public override void OnStop() {
     HitBox.enabled = false;
     PhaseHits.Clear();
-    Animation.OnFrame.Unlisten(OnFrame);
+    Animation?.OnFrame.Unlisten(OnFrame);
   }
 
   public IEnumerator Attack() {

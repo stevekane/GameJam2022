@@ -12,6 +12,7 @@ public class TargetedStrike : MonoBehaviour {
   public AnimationCurve Alpha = AnimationCurve.Constant(0,1,1);
   public Timeval Duration = Timeval.FromSeconds(1);
   public DecalProjector Projector;
+  public HitParams HitParams { get; set; }
 
   IEnumerator Start() {
     const float MAX_PROJECTION_DEPTH = 10;
@@ -24,7 +25,9 @@ public class TargetedStrike : MonoBehaviour {
       Projector.size = new Vector3(radius, radius, MAX_PROJECTION_DEPTH);
       yield return null;
     }
-    Destroy(Instantiate(SpawnPrefab, transform.position, transform.rotation), 5);
+    var explosion = Instantiate(SpawnPrefab, transform.position, transform.rotation);
+    explosion.GetComponent<Explosion>().HitParams = HitParams;
+    Destroy(explosion, 5);
     Destroy(gameObject);
   }
 }

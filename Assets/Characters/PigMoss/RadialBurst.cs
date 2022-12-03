@@ -43,7 +43,7 @@ namespace PigMoss {
           var rotation = Quaternion.LookRotation(direction, Vector3.up);
           var radius = 5;
           var position = AbilityManager.transform.position+radius*direction+Vector3.up;
-          GameObject.Instantiate(ProjectilePrefab, position, rotation);
+          var projectile = GameObject.Instantiate(ProjectilePrefab, position, rotation);
         }
         yield return Fiber.Wait(FireDelay);
         direction = halfRotationPerProjectile*direction;
