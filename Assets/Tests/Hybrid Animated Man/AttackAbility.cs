@@ -96,10 +96,6 @@ public class AttackAbility : Ability {
     var handleHits = Fiber.Repeat(OnHit, hitParams);
     var play = AnimationDriver.Play(AttackAnimation);
     HitBox.enabled = true;
-    // TODO: This will NOT work for multiple targets currently. You need a ListenForMultiple or ListenForAll type of thing...
-    // TODO: Atm this is subtely wrong. HandleHits gets canceled prematurely because AnimationJob ends first
-    // This is another instance of the example in Core where two jobs must communicate through some shared state
-    // to determine when they should terminate
     yield return Fiber.Any(play, handleHits);
   }
 
