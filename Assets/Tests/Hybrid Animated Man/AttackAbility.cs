@@ -105,8 +105,10 @@ public class AttackAbility : Ability {
   void OnFrame(int frame) {
     HitBox.enabled = frame >= WindupEnd.AnimFrames && frame <= ActiveEnd.AnimFrames;
     if (frame == WindupEnd.AnimFrames) {
+      var position = AbilityManager.transform.position;
+      var rotation = AbilityManager.transform.rotation;
       SFXManager.Instance.TryPlayOneShot(AttackSFX);
-      VFXManager.Instance.TrySpawn2DEffect(AttackVFX, transform.position+Vector3.up, transform.rotation);
+      VFXManager.Instance.TrySpawn2DEffect(AttackVFX, position+Vector3.up, rotation);
     }
   }
 
