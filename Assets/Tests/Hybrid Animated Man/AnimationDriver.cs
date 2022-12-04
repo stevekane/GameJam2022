@@ -30,13 +30,13 @@ public class AnimationJob : IEnumerator, IStoppable {
   }
 
   public void Pause() {
-    if (Clip.IsValid() && Clip.IsNull() && Clip.GetPlayState() == PlayState.Playing) {
+    if (Clip.IsValid() && !Clip.IsNull()) {
       Clip.Pause();
     }
   }
   public void Resume() {
-    if (Clip.IsValid() && !Clip.IsNull() && Clip.GetPlayState() == PlayState.Paused) {
-      Clip.Play();
+    Clip.Play();
+    if (Clip.IsValid() && !Clip.IsNull()) {
     }
   }
 

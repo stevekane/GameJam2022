@@ -84,6 +84,8 @@ public class AttackAbility : Ability {
   [SerializeField] Collider HitBox;
   [SerializeField] GameObject AttackVFX;
   [SerializeField] AudioClip AttackSFX;
+  [SerializeField] GameObject AttackHitVFX;
+  [SerializeField] AudioClip AttackHitSFX;
 
   HashSet<Collider> PhaseHits = new();
   Collider[] Hits = new Collider[16];
@@ -121,13 +123,17 @@ public class AttackAbility : Ability {
     var hitParams = HitConfig.ComputeParams(Attributes);
     for (var i = 0; i < hitCount; i++) {
       var hit = Hits[i];
+      var contact = hit.transform.position;
+      var rotation = AbilityManager.transform.rotation;
       if (!PhaseHits.Contains(hit)) {
+        VFXManager.Instance.TrySpawn2DEffect(AttackHitVFX, contact+Vector3.up, rotation);
         hit.GetComponent<Hurtbox>()?.Defender.OnHit(hitParams, attacker);
         PhaseHits.Add(hit);
         newHits = true;
       }
     }
     if (newHits) {
+      SFXManager.Instance.TryPlayOneShot(AttackHitSFX);
       CameraShaker.Instance.Shake(HitConfig.CameraShakeStrength);
       yield return new HitStop(-transform.forward, hitParams.HitStopDuration, Status, Animator, AnimationDriver, Vibrator);
       Status.Add(new RecoilEffect(HitConfig.RecoilStrength * -attacker.forward));

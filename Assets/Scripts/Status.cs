@@ -168,10 +168,12 @@ public class RecoilEffect : StatusEffect {
     Velocity = velocity;
   }
   public override bool Merge(StatusEffect e) {
+    Debug.Log("Help");
     Velocity += ((RecoilEffect)e).Velocity;
     return true;
   }
   public override void Apply(Status status) {
+    Debug.Log("Applied");
     Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * DRAG);
     status.Move(Velocity*Time.fixedDeltaTime);
     status.CanMove = false;
