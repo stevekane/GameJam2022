@@ -1,25 +1,12 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
-using static Fiber;
 
 namespace Core {
-  public class TaskCleanupContext : IDisposable {
-    List<Action> CancelList;
-    Action OnCancel;
-    public void Dispose() => CancelList.Remove(OnCancel);
-    public TaskCleanupContext(List<Action> list, Action onCancel) {
-      (CancelList, OnCancel) = (list, onCancel);
-      CancelList.Add(OnCancel);
-    }
-  }
-
   public class TaskContext {
     CancellationTokenSource Source = new();
-    List<Action> OnCancel = new();
+    Action OnCancel;
     public Task Run(Action action) => Task.Run(action, Source.Token);
     public Task Delay(int ms) => Task.Delay(ms, Source.Token);
     public Task Any(Action a, Action b) => Task.WhenAny(new Task[] { Run(a), Run(b) });
@@ -29,16 +16,28 @@ namespace Core {
       Source.Cancel();
     }
     public void DidCancel() {
-      OnCancel.ForEach(a => a.Invoke());
-      OnCancel.Clear();
+      OnCancel?.Invoke();
+      OnCancel = null;
     }
-    public TaskCleanupContext WithCleanup(Action cleanup) {
-      return new TaskCleanupContext(OnCancel, cleanup);
+    public IDisposable WithCleanup(Action cleanup) {
+      return new TaskCleanupContext(this, cleanup);
     }
     public void IfCancelledThrow() {
       if (Source.Token.IsCancellationRequested)
         throw new Exception();
     }
+
+    class TaskCleanupContext : IDisposable {
+      TaskContext Context;
+      Action OnCancel;
+      public void Dispose() => Context.UnregisterOnCancel(OnCancel);
+      public TaskCleanupContext(TaskContext context, Action onCancel) {
+        (Context, OnCancel) = (context, onCancel);
+        Context.RegisterOnCancel(OnCancel);
+      }
+    }
+    void RegisterOnCancel(Action oncancel) => OnCancel += oncancel;
+    void UnregisterOnCancel(Action oncancel) => OnCancel -= oncancel;
   }
 
   public class TaskContextTest : MonoBehaviour {
