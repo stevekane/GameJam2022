@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -7,9 +8,9 @@ namespace Core {
   public class TaskContext {
     CancellationTokenSource Source = new();
     Action OnCancel;
-    public Task Run(Action action) => Task.Run(action, Source.Token);
+    public Task Run(Func<Task> action) => Task.Run(action, Source.Token);
     public Task Delay(int ms) => Task.Delay(ms, Source.Token);
-    public Task Any(Action a, Action b) => Task.WhenAny(new Task[] { Run(a), Run(b) });
+    public Task Any(params Func<Task>[] xs) => Task.WhenAny(xs.Select(x => Run(x)));
 
     public void Cancel() {
       DidCancel();
@@ -50,23 +51,24 @@ namespace Core {
     async Task Root2() {
       Debug.Log("Root Start");
       using var cleanup = Jobs.WithCleanup(() => Debug.Log("Root cancel"));
-      await Jobs.Any(Child1, Child2);
+      await Jobs.Any(Child1, Child2, () => CancelAfter(1050));
       Debug.Log("Root Stop");
     }
 
-    async void Child1() {
+    async Task Child1() {
       Debug.Log("Child1 start");
       using var cleanup = Jobs.WithCleanup(() => Debug.Log("Child1 cancel"));
       await Jobs.Delay(2000);
       Debug.Log("Child1 stop");
     }
 
-    async void Child2() {
+    async Task Child2() {
       Debug.Log("Child2 start");
       using var cleanupOuter = Jobs.WithCleanup(() => Debug.Log("Child2 cancel outer"));
       {
         using var cleanup = Jobs.WithCleanup(() => Debug.Log("Child2 cancel inner"));
-        //await GrandChild2();
+        //Jobs.Cancel();
+        await GrandChild2();
         await Jobs.Delay(1000);
       }
       Jobs.Cancel();
@@ -74,10 +76,18 @@ namespace Core {
       Debug.Log("Child2 stop");
     }
 
+    async Task CancelAfter(int ms) {
+      await Jobs.Delay(ms);
+      Debug.Log("Cancelling");
+      Jobs.Cancel();
+    }
+
     async Task GrandChild2() {
       try {
         Jobs.IfCancelledThrow();
         await Task.Yield();
+      } catch (Exception) {
+        Debug.Log("GrandChild2 cancelled");
       } finally {
         Debug.Log("GrandChild2 cleaned up");
       }
