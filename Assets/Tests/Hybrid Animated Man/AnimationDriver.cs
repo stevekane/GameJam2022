@@ -35,8 +35,8 @@ public class AnimationJob : IEnumerator, IStoppable {
     }
   }
   public void Resume() {
-    Clip.Play();
     if (Clip.IsValid() && !Clip.IsNull()) {
+      Clip.Play();
     }
   }
 
