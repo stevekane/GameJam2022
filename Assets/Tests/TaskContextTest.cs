@@ -11,6 +11,10 @@ namespace Core {
     public Task Run(Func<Task> action) => Task.Run(action, Source.Token);
     public Task Delay(int ms) => Task.Delay(ms, Source.Token);
     public Task Any(params Func<Task>[] xs) => Task.WhenAny(xs.Select(x => Run(x)));
+    public async Task Yield() {
+      IfCancelledThrow();
+      await Task.Yield();
+    }
 
     public void Cancel() {
       DidCancel();
@@ -83,9 +87,11 @@ namespace Core {
     }
 
     async Task GrandChild2() {
+      Debug.Log("GrandChild2 start");
       try {
-        Jobs.IfCancelledThrow();
-        await Task.Yield();
+        //Jobs.Cancel();
+        await Jobs.Yield();
+        Debug.Log("GrandChild2 finished");
       } catch (Exception) {
         Debug.Log("GrandChild2 cancelled");
       } finally {
