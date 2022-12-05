@@ -41,7 +41,9 @@ namespace Core {
     }
 
     void OnDestroy() {
-      MainContext.Source.Cancel();
+      if (!MainContext.Source.IsCancellationRequested) {
+        MainContext.Source.Cancel();
+      }
     }
   }
 }

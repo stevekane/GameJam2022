@@ -82,6 +82,7 @@ public class AttackAbility : Ability {
   [SerializeField] AnimationJobConfig AttackAnimation;
   [SerializeField] TriggerEvent TriggerEvent;
   [SerializeField] Collider HitBox;
+  [SerializeField] Vector3 AttackVFXOffset;
   [SerializeField] GameObject AttackVFX;
   [SerializeField] AudioClip AttackSFX;
   [SerializeField] GameObject AttackHitVFX;
@@ -109,8 +110,9 @@ public class AttackAbility : Ability {
     if (frame == WindupEnd.AnimFrames) {
       var position = AbilityManager.transform.position;
       var rotation = AbilityManager.transform.rotation;
+      var vfxOrigin = AbilityManager.transform.TransformPoint(AttackVFXOffset);
       SFXManager.Instance.TryPlayOneShot(AttackSFX);
-      VFXManager.Instance.TrySpawn2DEffect(AttackVFX, position+Vector3.up, rotation);
+      VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
     }
   }
 

@@ -262,10 +262,4 @@ public class JobsTests : MonoBehaviour {
   void FixedUpdate() {
     Proc.MoveNext();
   }
-
-  /*
-  A monad is a way to pass along implict "stuff" with some computation.
-
-  We could create a
-  */
 }
