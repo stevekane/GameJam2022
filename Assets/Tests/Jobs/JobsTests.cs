@@ -69,10 +69,14 @@ public class JobsTests : MonoBehaviour {
     public Sleep Sleep;
     public G() => (Complete, Sleep) = (false, new Sleep(1000));
     public G(bool complete, Sleep sleep) => (Complete, Sleep) = (complete, sleep);
-    public static G Run(G state) => state switch {
-      G { Complete: false, Sleep: Sleep { Complete: true } } => new (true, state.Sleep),
-      _                                                      => state
-    };
+    public static G Run(G state) {
+      switch (state) {
+        case G { Complete: false, Sleep: Sleep { Complete: true } }:
+          return new (true, state.Sleep);
+        default:
+          return state;
+      }
+    }
   }
 
   class F : ITask {
@@ -258,4 +262,10 @@ public class JobsTests : MonoBehaviour {
   void FixedUpdate() {
     Proc.MoveNext();
   }
+
+  /*
+  A monad is a way to pass along implict "stuff" with some computation.
+
+  We could create a
+  */
 }
