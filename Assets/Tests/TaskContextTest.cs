@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Core {
-  public class TaskCancelled : Exception { }
   public class TaskContext {
     CancellationTokenSource Source = new();
     Action OnCancel;
@@ -18,7 +17,16 @@ namespace Core {
       IfCancelledThrow();
     }
     public async Task Any(params Func<Task>[] xs) {
-      await Task.WhenAny(xs.Select(x => Run(x)));
+      TaskContext context = new();
+      try {
+        // Ah we need to run every descendent task in this new context. This is no good.
+        await Task.WhenAny(xs.Select(x => context.Run(x)));
+      } catch (TaskCanceledException) {
+        Debug.Log("Any cancelled");
+      } finally {
+        Debug.Log("Any finally");
+        context.Cancel();
+      }
       IfCancelledThrow();
     }
     public async Task Yield() {
@@ -36,7 +44,7 @@ namespace Core {
     }
     public void IfCancelledThrow() {
       if (Source.Token.IsCancellationRequested)
-        throw new TaskCancelled();
+        throw new TaskCanceledException();
     }
 
     // Exception-handling seems like a better pattern for cancellation/cleanup
@@ -57,7 +65,8 @@ namespace Core {
   }
 
   public class TaskContextTest : MonoBehaviour {
-    public bool CancelImmediately;
+    public int CancelAfterMs = 10000;
+    public bool CancelInGrandchild;
     public InputManager InputManager;
     TaskContext Jobs = new();
 
@@ -66,8 +75,8 @@ namespace Core {
     async Task Root2() {
       Debug.Log("Root Start");
       try {
-        await Jobs.Any(Child1, Child2, () => CancelAfter(1050));
-      } catch (TaskCancelled) {
+        await Jobs.Any(Child1, Child2, () => CancelAfter(CancelAfterMs));
+      } catch (TaskCanceledException) {
         Debug.Log("Root cancel");
       }
       Debug.Log("Root Stop");
@@ -76,10 +85,12 @@ namespace Core {
     async Task Child1() {
       Debug.Log("Child1 start");
       try {
-        await Jobs.Delay(2000);
+        await Jobs.Delay(1000);
         Debug.Log("Child1 done");
-      } catch (TaskCancelled) {
-        Debug.Log("Child1 cancel");
+      } catch (TaskCanceledException) {
+        Debug.Log($"Child1 cancel");
+      } finally {
+        Debug.Log("Child1 cleanup");
       }
     }
 
@@ -87,14 +98,13 @@ namespace Core {
       Debug.Log("Child2 start");
 
       try {
-        //Jobs.Cancel();
         await GrandChild2();
-        await Jobs.Delay(1000);
-        //Jobs.Cancel();
-        await Jobs.Delay(1000);
+        await Jobs.Delay(5000);
         Debug.Log("Child2 done");
-      } catch (TaskCancelled) {
+      } catch (TaskCanceledException) {
         Debug.Log("Child2 cancel");
+      } finally {
+        Debug.Log("Child2 cleanup");
       }
     }
 
@@ -107,10 +117,11 @@ namespace Core {
     async Task GrandChild2() {
       Debug.Log("GrandChild2 start");
       try {
-        Jobs.Cancel();
+        if (CancelInGrandchild)
+          Jobs.Cancel();
         await Jobs.Yield();
         Debug.Log("GrandChild2 done");
-      } catch (TaskCancelled) {
+      } catch (TaskCanceledException) {
         Debug.Log("GrandChild2 cancelled");
       } finally {
         Debug.Log("GrandChild2 cleaned up");
