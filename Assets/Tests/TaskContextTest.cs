@@ -1,55 +1,59 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Core {
+  public class TaskCancelled : Exception { }
   public class TaskContext {
     CancellationTokenSource Source = new();
     Action OnCancel;
-    public Task Run(Func<Task> action) => Task.Run(action, Source.Token);
-    public Task Delay(int ms) => Task.Delay(ms, Source.Token);
-    public Task Any(Func<Task> a, Func<Task> b) => Task.WhenAny(new Task[] { Run(a), Run(b) });
-    public async Task First(Func<Task> fa, Func<Task> fb) {
-      var context = new TaskContext();
-      try {
-        await Task.WhenAny(new Task[2] {
-          context.Run(fa),
-          context.Run(fb)
-        });
-      } finally {
-        context.Cancel();
-        context.Source.Dispose(); // TODO: Could make contexts IDisposable (or IAsyncDisposable?)
-      }
+    public async Task Run(Func<Task> action) {
+      await Task.Run(action, Source.Token);
+      IfCancelledThrow();
+    }
+    public async Task Delay(int ms) {
+      await Task.Delay(ms, Source.Token);
+      IfCancelledThrow();
+    }
+    public async Task Any(params Func<Task>[] xs) {
+      await Task.WhenAny(xs.Select(x => Run(x)));
+      IfCancelledThrow();
+    }
+    public async Task Yield() {
+      await Task.Yield();
+      IfCancelledThrow();
     }
 
     public void Cancel() {
-      DidCancel();
+      DidCancel();  // must come first
       Source.Cancel();
     }
     public void DidCancel() {
       OnCancel?.Invoke();
       OnCancel = null;
     }
-    public IDisposable WithCleanup(Action cleanup) {
-      return new TaskCleanupContext(this, cleanup);
-    }
     public void IfCancelledThrow() {
       if (Source.Token.IsCancellationRequested)
-        throw new Exception();
+        throw new TaskCancelled();
     }
 
-    class TaskCleanupContext : IDisposable {
-      TaskContext Context;
-      Action OnCancel;
-      public void Dispose() => Context.UnregisterOnCancel(OnCancel);
-      public TaskCleanupContext(TaskContext context, Action onCancel) {
-        (Context, OnCancel) = (context, onCancel);
-        Context.RegisterOnCancel(OnCancel);
-      }
-    }
-    void RegisterOnCancel(Action oncancel) => OnCancel += oncancel;
-    void UnregisterOnCancel(Action oncancel) => OnCancel -= oncancel;
+    // Exception-handling seems like a better pattern for cancellation/cleanup
+    //public IDisposable WithCleanup(Action cleanup) {
+    //  return new TaskCleanupContext(this, cleanup);
+    //}
+    //class TaskCleanupContext : IDisposable {
+    //  TaskContext Context;
+    //  Action OnCancel;
+    //  public void Dispose() => Context.UnregisterOnCancel(OnCancel);
+    //  public TaskCleanupContext(TaskContext context, Action onCancel) {
+    //    (Context, OnCancel) = (context, onCancel);
+    //    Context.RegisterOnCancel(OnCancel);
+    //  }
+    //}
+    //void RegisterOnCancel(Action oncancel) => OnCancel += oncancel;
+    //void UnregisterOnCancel(Action oncancel) => OnCancel -= oncancel;
   }
 
   public class TaskContextTest : MonoBehaviour {
@@ -61,35 +65,53 @@ namespace Core {
 
     async Task Root2() {
       Debug.Log("Root Start");
-      using var cleanup = Jobs.WithCleanup(() => Debug.Log("Root cancel"));
-      await Jobs.First(Child1, Child2);
+      try {
+        await Jobs.Any(Child1, Child2, () => CancelAfter(1050));
+      } catch (TaskCancelled) {
+        Debug.Log("Root cancel");
+      }
       Debug.Log("Root Stop");
     }
 
     async Task Child1() {
       Debug.Log("Child1 start");
-      using var cleanup = Jobs.WithCleanup(() => Debug.Log("Child1 cancel"));
-      await Jobs.Delay(2000);
-      Debug.Log("Child1 stop");
+      try {
+        await Jobs.Delay(2000);
+        Debug.Log("Child1 done");
+      } catch (TaskCancelled) {
+        Debug.Log("Child1 cancel");
+      }
     }
 
     async Task Child2() {
       Debug.Log("Child2 start");
-      using var cleanupOuter = Jobs.WithCleanup(() => Debug.Log("Child2 cancel outer"));
-      {
-        using var cleanup = Jobs.WithCleanup(() => Debug.Log("Child2 cancel inner"));
+
+      try {
+        //Jobs.Cancel();
         await GrandChild2();
         await Jobs.Delay(1000);
+        //Jobs.Cancel();
+        await Jobs.Delay(1000);
+        Debug.Log("Child2 done");
+      } catch (TaskCancelled) {
+        Debug.Log("Child2 cancel");
       }
-      // Jobs.Cancel();
-      await Jobs.Delay(1000);
-      Debug.Log("Child2 stop");
+    }
+
+    async Task CancelAfter(int ms) {
+      await Jobs.Delay(ms);
+      Debug.Log("Cancelling");
+      Jobs.Cancel();
     }
 
     async Task GrandChild2() {
+      Debug.Log("GrandChild2 start");
       try {
-        Jobs.IfCancelledThrow();
-        await Task.Yield();
+        Jobs.Cancel();
+        await Jobs.Yield();
+        Debug.Log("GrandChild2 done");
+      } catch (TaskCancelled) {
+        Debug.Log("GrandChild2 cancelled");
       } finally {
         Debug.Log("GrandChild2 cleaned up");
       }
