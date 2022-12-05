@@ -8,15 +8,15 @@ namespace Core {
   public class TaskContext {
     CancellationTokenSource Source = new();
     Action OnCancel;
-    public async Task Run(Func<Task> action) {
-      await Task.Run(action, Source.Token);
+    public async Task Run(Func<TaskContext, Task> action) {
+      await Task.Run(() => action(this), Source.Token);
       IfCancelledThrow();
     }
     public async Task Delay(int ms) {
       await Task.Delay(ms, Source.Token);
       IfCancelledThrow();
     }
-    public async Task Any(params Func<Task>[] xs) {
+    public async Task Any(params Func<TaskContext, Task>[] xs) {
       TaskContext context = new();
       try {
         // Ah we need to run every descendent task in this new context. This is no good.
@@ -75,17 +75,17 @@ namespace Core {
     async Task Root2() {
       Debug.Log("Root Start");
       try {
-        await Jobs.Any(Child1, Child2, () => CancelAfter(CancelAfterMs));
+        await Jobs.Any(Child1, Child2, (ctx) => CancelAfter(ctx, CancelAfterMs));
       } catch (TaskCanceledException) {
         Debug.Log("Root cancel");
       }
       Debug.Log("Root Stop");
     }
 
-    async Task Child1() {
+    async Task Child1(TaskContext ctx) {
       Debug.Log("Child1 start");
       try {
-        await Jobs.Delay(1000);
+        await ctx.Delay(1000);
         Debug.Log("Child1 done");
       } catch (TaskCanceledException) {
         Debug.Log($"Child1 cancel");
@@ -94,12 +94,12 @@ namespace Core {
       }
     }
 
-    async Task Child2() {
+    async Task Child2(TaskContext ctx) {
       Debug.Log("Child2 start");
 
       try {
-        await GrandChild2();
-        await Jobs.Delay(5000);
+        await GrandChild2(ctx);
+        await ctx.Delay(5000);
         Debug.Log("Child2 done");
       } catch (TaskCanceledException) {
         Debug.Log("Child2 cancel");
@@ -108,18 +108,18 @@ namespace Core {
       }
     }
 
-    async Task CancelAfter(int ms) {
-      await Jobs.Delay(ms);
+    async Task CancelAfter(TaskContext ctx, int ms) {
+      await ctx.Delay(ms);
       Debug.Log("Cancelling");
-      Jobs.Cancel();
+      ctx.Cancel();
     }
 
-    async Task GrandChild2() {
+    async Task GrandChild2(TaskContext ctx) {
       Debug.Log("GrandChild2 start");
       try {
         if (CancelInGrandchild)
-          Jobs.Cancel();
-        await Jobs.Yield();
+          ctx.Cancel();
+        await ctx.Yield();
         Debug.Log("GrandChild2 done");
       } catch (TaskCanceledException) {
         Debug.Log("GrandChild2 cancelled");
