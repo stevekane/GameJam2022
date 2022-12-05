@@ -7,9 +7,21 @@ namespace Core {
   public class TaskContext {
     CancellationTokenSource Source = new();
     Action OnCancel;
-    public Task Run(Action action) => Task.Run(action, Source.Token);
+    public Task Run(Func<Task> action) => Task.Run(action, Source.Token);
     public Task Delay(int ms) => Task.Delay(ms, Source.Token);
-    public Task Any(Action a, Action b) => Task.WhenAny(new Task[] { Run(a), Run(b) });
+    public Task Any(Func<Task> a, Func<Task> b) => Task.WhenAny(new Task[] { Run(a), Run(b) });
+    public async Task First(Func<Task> fa, Func<Task> fb) {
+      var context = new TaskContext();
+      try {
+        await Task.WhenAny(new Task[2] {
+          context.Run(fa),
+          context.Run(fb)
+        });
+      } finally {
+        context.Cancel();
+        context.Source.Dispose(); // TODO: Could make contexts IDisposable (or IAsyncDisposable?)
+      }
+    }
 
     public void Cancel() {
       DidCancel();
@@ -50,26 +62,26 @@ namespace Core {
     async Task Root2() {
       Debug.Log("Root Start");
       using var cleanup = Jobs.WithCleanup(() => Debug.Log("Root cancel"));
-      await Jobs.Any(Child1, Child2);
+      await Jobs.First(Child1, Child2);
       Debug.Log("Root Stop");
     }
 
-    async void Child1() {
+    async Task Child1() {
       Debug.Log("Child1 start");
       using var cleanup = Jobs.WithCleanup(() => Debug.Log("Child1 cancel"));
       await Jobs.Delay(2000);
       Debug.Log("Child1 stop");
     }
 
-    async void Child2() {
+    async Task Child2() {
       Debug.Log("Child2 start");
       using var cleanupOuter = Jobs.WithCleanup(() => Debug.Log("Child2 cancel outer"));
       {
         using var cleanup = Jobs.WithCleanup(() => Debug.Log("Child2 cancel inner"));
-        //await GrandChild2();
+        await GrandChild2();
         await Jobs.Delay(1000);
       }
-      Jobs.Cancel();
+      // Jobs.Cancel();
       await Jobs.Delay(1000);
       Debug.Log("Child2 stop");
     }

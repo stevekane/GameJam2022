@@ -1,55 +1,9 @@
 using System;
-using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
-using static Fiber;
 
 namespace Core {
-  class Dodge : IEnumerator {
-    IEnumerator Enumerator;
-    public IEventSource Release;
-    public IEventSource Action;
-    public object Current => Enumerator.Current;
-    public void Reset() => throw new NotSupportedException();
-    public bool MoveNext() => Enumerator.MoveNext();
-    public Dodge(IEventSource release, IEventSource action) {
-      Release = release;
-      Action = action;
-      Enumerator = Routine();
-    }
-    public IEnumerator Routine() {
-      bool held = true;
-      IEnumerator Dash() {
-        while (held) {
-          var onRelease = Until(() => !held);
-          var onDash = ListenFor(Action);
-          var outcome = SelectTask(onRelease, onDash);
-          yield return outcome;
-          if (outcome.Value == onDash) {
-            Debug.Log("Dash begun");
-            yield return Wait(Timeval.FromSeconds(5f));
-            Debug.Log("Dash complete");
-          }
-        }
-      }
-      IEnumerator HandleRelease() {
-        yield return ListenFor(Release);
-        Debug.Log("Release");
-        held = false;
-      }
-      yield return All(Dash(), HandleRelease());
-      Debug.Log("Ability ended");
-    }
-  }
-
-  class Cleanup: IDisposable {
-    Action OnDispose;
-    public void Dispose() => OnDispose.Invoke();
-    public Cleanup(Action onDispose) => OnDispose = onDispose;
-    public static Cleanup With(Action onDispose) => new Cleanup(onDispose);
-  }
-
   public static class CancellationTokenExtensions {
     public static void IfCancelledThrow(this CancellationToken token, string message) {
       if (token.IsCancellationRequested) {
@@ -58,75 +12,73 @@ namespace Core {
     }
   }
 
+  public class JobContext : IDisposable {
+    CancellationTokenSource Source;
+    public JobContext() => Source = new();
+    public JobContext(JobContext parent) => Source = parent.Source;
+    public void Cancel() => Source.Cancel();
+    public Task Run(Func<Task> f) => Task.Run(f, Source.Token);
+    public Task Delay(int ms) => Task.Delay(ms, Source.Token);
+    public async Task Sentinel() {
+      while (!Source.Token.IsCancellationRequested) {
+        await Task.Yield();
+      }
+    }
+    public async Task Any(Func<JobContext, Task> fa, Func<JobContext,Task> fb) {
+      using var context = new JobContext();
+      try {
+        await Task.WhenAny(new Task[3] {
+          Sentinel(),
+          context.Run(() => fa(context)),
+          context.Run(() => fb(context)),
+        });
+      } finally {
+        context.Cancel();
+      }
+    }
+    public void Dispose() => Source.Dispose();
+  }
+
   public class Core : MonoBehaviour {
-    public bool CancelImmediately;
-    public InputManager InputManager;
+    [SerializeField] InputManager InputManager;
 
-    Fiber Routine;
-
-    // async void Start() => await Root();
-    void Start() {
-      var release = InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown);
-      var action = InputManager.ButtonEvent(ButtonCode.R2, ButtonPressType.JustDown);
-      var dodge = new Dodge(release, action);
-      Routine = new Fiber(dodge);
+    async Task G(JobContext ctx, int ms) {
+      await ctx.Delay(ms);
     }
-    void FixedUpdate() => Routine.MoveNext();
 
-    async Task Sentinel(CancellationToken a, CancellationTokenSource b) {
-      while (!a.IsCancellationRequested) {
-        await Task.Yield();
+    async Task F(JobContext ctx, bool flipflop, int ms) {
+      while (true) {
+        await ctx.Run(() => G(ctx, ms));
+        Debug.Log(flipflop);
+        flipflop = !flipflop;
       }
-      b.Cancel();
     }
 
-    async Task Either(
-    Func<CancellationToken,Task> fa,
-    Func<CancellationToken,Task> fb,
-    CancellationToken token) {
-      using var source = new CancellationTokenSource();
+    JobContext MainContext = new();
+
+    async Task Wait(JobContext ctx, int ms) {
       try {
-        var tasks = new Task[3];
-        tasks[0] = fa(source.Token);
-        tasks[1] = fb(source.Token);
-        tasks[2] = Sentinel(token, source);
-        await Task.WhenAny(tasks);
+        await ctx.Delay(ms);
+      } catch (Exception e) {
+        Debug.LogWarning($"Wait{ms} Error {e.Message}");
       } finally {
-        source.Cancel();
+        Debug.Log($"Wait{ms} finally");
       }
     }
 
-    async Task Root() {
-      Debug.Log("Root Start");
-      using var source = new CancellationTokenSource();
+    async void Start() {
       try {
-        if (CancelImmediately) {
-          source.Cancel();
-        }
-        await Either(Child1, Child2, source.Token);
-      } finally {
-        Debug.Log("Root Stop");
+        InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Listen(MainContext.Cancel);
+        await MainContext.Any((JobContext ctx) => Wait(ctx, 5000), (JobContext ctx) => Wait(ctx, 10000));
+      } catch (Exception e) {
+        Debug.Log($"Start {e.Message}");
       }
     }
 
-    async Task Child1(CancellationToken token) {
-      await Task.Delay(2000, token);
-      Debug.Log("End of child1");
-    }
-
-    async Task Child2(CancellationToken token) {
-      await GrandChild2(token);
-      await Task.Delay(1000, token);
-      Debug.Log("End of child2");
-    }
-
-    async Task GrandChild2(CancellationToken token) {
-      try {
-        token.IfCancelledThrow("GrandChild2 aborted");
-        await Task.Yield();
-      } finally {
-        Debug.Log("GrandChild2 cleaned up");
-      }
+    void OnDestroy() {
+      InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Unlisten(MainContext.Cancel);
+      MainContext.Cancel();
+      MainContext.Dispose();
     }
   }
 }
