@@ -51,8 +51,12 @@ public class AnimationJob : IEnumerator, IStoppable {
 
   public void Stop() {
     IsRunning = false;
-    Clip.Destroy();
-    Mixer.Destroy();
+    if (!Clip.IsNull() && Clip.IsValid()) {
+      Clip.Destroy();
+    }
+    if (!Mixer.IsNull() && Mixer.IsValid()) {
+      Mixer.Destroy();
+    }
     Driver.Disconnect(this);
   }
 

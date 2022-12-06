@@ -51,6 +51,7 @@ public class HurtFlash : MonoBehaviour {
         }
       }
     }
+    Materials.Clear();
     foreach (var skinnedMeshrenderer in SkinnedMeshRenderers) {
       skinnedMeshrenderer.GetMaterials(Materials);
       foreach (var material in Materials) {
