@@ -635,7 +635,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 69484b8b9ba62774ab286ee8e8b18d86, type: 2}
+  - {fileID: 2100000, guid: e1ab4aa470f4dd04a87aab6f21ab9cc3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1323,13 +1323,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ColorName: _EmissionColor
   FlashColor: {r: 4, g: 4, b: 4, a: 1}
-  MeshRenderers:
-  - {fileID: 0}
+  Renderers:
+  - {fileID: 2077024099784888656}
   - {fileID: 576771833511476786}
   - {fileID: 7226594029644046785}
   - {fileID: 6539316134859821109}
   - {fileID: 4914273281486157195}
-  SkinnedMeshRenderers: []
+  - {fileID: 7437944918136718727}
+  - {fileID: 1294691833948066240}
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0
@@ -1821,9 +1822,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ColorName: _EmissionColor
   FlashColor: {r: 4, g: 4, b: 4, a: 1}
-  MeshRenderers:
+  Renderers:
   - {fileID: 2077024099784888656}
-  SkinnedMeshRenderers: []
 --- !u!114 &7724858517802715910
 MonoBehaviour:
   m_ObjectHideFlags: 0

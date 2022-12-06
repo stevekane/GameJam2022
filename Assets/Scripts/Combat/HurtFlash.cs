@@ -6,8 +6,7 @@ public class HurtFlash : MonoBehaviour {
   public string ColorName = "_EmissionColor";
   [ColorUsage(showAlpha: true, hdr: true)]
   public Color FlashColor = Color.white;
-  public List<MeshRenderer> MeshRenderers;
-  public List<SkinnedMeshRenderer> SkinnedMeshRenderers;
+  public List<Renderer> Renderers;
   List<Material> Materials = new();
   Dictionary<Material, Color> PreviousColors = new();
 
@@ -43,17 +42,8 @@ public class HurtFlash : MonoBehaviour {
   void StorePreviousColors() {
     Materials.Clear();
     PreviousColors.Clear();
-    foreach (var meshRenderer in MeshRenderers) {
+    foreach (var meshRenderer in Renderers) {
       meshRenderer.GetMaterials(Materials);
-      foreach (var material in Materials) {
-        if (material.HasColor(ColorName)) {
-          PreviousColors.Add(material, material.GetVector(ColorName));
-        }
-      }
-    }
-    Materials.Clear();
-    foreach (var skinnedMeshrenderer in SkinnedMeshRenderers) {
-      skinnedMeshrenderer.GetMaterials(Materials);
       foreach (var material in Materials) {
         if (material.HasColor(ColorName)) {
           PreviousColors.Add(material, material.GetVector(ColorName));
