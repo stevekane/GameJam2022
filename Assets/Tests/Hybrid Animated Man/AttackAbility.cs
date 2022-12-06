@@ -35,20 +35,17 @@ public class HitStop : CoroutineJob {
   public Status Status;
   public Animator Animator;
   public AnimationDriver AnimationDriver;
-  public Vibrator Vibrator;
   public HitStop(
   Vector3 axis,
   Timeval duration,
   Status status,
   Animator animator,
-  AnimationDriver animationDriver,
-  Vibrator vibrator) {
+  AnimationDriver animationDriver) {
     Axis = axis;
     Duration = duration;
     Status = status;
     Animator = animator;
     AnimationDriver = animationDriver;
-    Vibrator = vibrator;
     Routine = MakeRoutine();
   }
   public override void OnStop() {
@@ -67,7 +64,6 @@ public class HitStop : CoroutineJob {
     Status.CanAttack = false;
     Animator.SetSpeed(0);
     AnimationDriver.Pause();
-    Vibrator.VibrateThisFrame(Axis, Amplitude);
   }
 }
 
@@ -88,9 +84,9 @@ public class AttackAbility : Ability {
   [SerializeField] GameObject AttackHitVFX;
   [SerializeField] AudioClip AttackHitSFX;
 
-  HashSet<Collider> PhaseHits = new();
-  Collider[] Hits = new Collider[16];
-  AnimationJobFacade Animation;
+  [NonSerialized] HashSet<Collider> PhaseHits = new();
+  [NonSerialized] Collider[] Hits = new Collider[16];
+  [NonSerialized] AnimationJobFacade Animation = null;
 
   public override void OnStop() {
     HitBox.enabled = false;
@@ -140,7 +136,7 @@ public class AttackAbility : Ability {
     if (newHits) {
       SFXManager.Instance.TryPlayOneShot(AttackHitSFX);
       CameraShaker.Instance.Shake(HitConfig.CameraShakeStrength);
-      yield return new HitStop(-transform.forward, hitParams.HitStopDuration, Status, Animator, AnimationDriver, Vibrator);
+      yield return new HitStop(-transform.forward, hitParams.HitStopDuration, Status, Animator, AnimationDriver);
       Status.Add(new RecoilEffect(HitConfig.RecoilStrength * -attacker.forward));
     }
   }

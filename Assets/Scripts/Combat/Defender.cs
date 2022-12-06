@@ -112,6 +112,7 @@ public class Defender : MonoBehaviour {
       s => s.Add(new KnockbackEffect(knockBackDirection*power, hit.WallbounceTarget)));
     Damage.AddPoints(hit.Damage);
     hit.OnHitEffects?.ForEach(e => Status?.Value.Add(e));
+    gameObject.SendMessage("OnDamage", hit, SendMessageOptions.DontRequireReceiver);
   }
 
   public void Die() {

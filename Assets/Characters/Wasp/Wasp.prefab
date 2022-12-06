@@ -415,7 +415,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions: []
-  Tags: 0
+  CurrentTags: 0
   Index: 0
   Animator: {fileID: 7727835182619467870}
   Windup:
@@ -445,11 +445,13 @@ MonoBehaviour:
     DamageModifier:
       Base: 5
       Mult: 1
+    KnockbackStrength: 2
+    KnockbackType: 1
+    RecoilStrength: 0
+    CameraShakeStrength: 0
     HitStopDuration:
       Millis: 33.333332
       FramesPerSecond: 30
-    KnockbackStrength: 2
-    KnockbackType: 1
     SFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
     VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
     VFXOffset: {x: 0, y: 0, z: 0}
@@ -823,8 +825,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13cd3e0535f940e429713993be49d243, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShootRadius: 30
-  MoveSpeed: 10
+  ShootRadius: 15
+  MoveSpeed: 5
   ShootDelay:
     Millis: 3000
     FramesPerSecond: 1
@@ -854,6 +856,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Tags: 0
+  DebugEffects: []
 --- !u!114 &4848494605274439972
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -948,8 +951,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FallSFX: {fileID: 8300000, guid: fe6b13c084178f441942a9885f9857db, type: 3}
-  IsParrying: 0
-  IsBlocking: 0
 --- !u!114 &4362511970478309579
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -962,9 +963,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba179080412a6af41a99d021d690c5fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Abilities: []
-  Running: []
-  ToAdd: []
+  Bundle:
+    Fibers: []
+    Added: []
+    Removed: []
 --- !u!114 &7227641143467178568
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -978,6 +980,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Gravity: -200
+  Animator: {fileID: 0}
+  IdleThreshold: 0.1
 --- !u!114 &491125434464353236
 MonoBehaviour:
   m_ObjectHideFlags: 0
