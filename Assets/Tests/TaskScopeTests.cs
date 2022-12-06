@@ -76,6 +76,7 @@ public class TaskScope : IDisposable {
   }
 
   // More involved combinators.
+
   public async Task<int> Any(params TaskFunc[] fs) {
     Source.Token.ThrowIfCancellationRequested();
     using TaskScope scope = new(this);
@@ -117,6 +118,24 @@ public class TaskScope : IDisposable {
       evt.Listen(callback);
       await Until(() => eventFired);
       return eventResult;
+    } finally {
+      evt.Unlisten(callback);
+      Source.Token.ThrowIfCancellationRequested();
+    }
+  }
+  public async Task<int> ListenForAll<T>(IEventSource<T> evt, T[] results) {
+    Source.Token.ThrowIfCancellationRequested();
+    int eventFired = 0;
+    int resultCount = 0;
+    void callback(T v) {
+      results[resultCount++] = v; eventFired = Timeval.TickCount;
+    }
+    try {
+      evt.Listen(callback);
+      // This is a hack to ensure we gather results for a full FixedUpdate tick.
+      var startTick = Timeval.TickCount;
+      await Until(() => eventFired > startTick);
+      return resultCount;
     } finally {
       evt.Unlisten(callback);
       Source.Token.ThrowIfCancellationRequested();
