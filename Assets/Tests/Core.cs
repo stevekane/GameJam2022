@@ -1,49 +1,95 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Core {
-  public class Job {
-    public JobContext Context;
-    public Task Task;
-    public Job(JobContext context, Task task) => (Context, Task) = (context, task);
-    public void Cancel() => Context.Source.Cancel();
-  }
-
-  public class JobContext : IDisposable {
-    public CancellationTokenSource Source = new();
+  public class TaskScope : IDisposable {
+    public List<Task> Tasks = new();
+    public Task Join => Task.Run(() => Task.WhenAll(Tasks), Source.Token);
+    public readonly CancellationTokenSource Source = new();
+    public void Cancel() => Source.Cancel();
     public void Dispose() => Source.Dispose();
-    public Job Async<T>(Func<Task<T>> f) => new Job(this, Task.Run(f, Source.Token));
-    public Job Run(Func<Task> f) => new Job(this, Task.Run(f, Source.Token));
-    public Job Delay(int ms) => new Job(this, Task.Delay(ms, Source.Token));
+    public Task Async<T>(Func<TaskScope, Task<T>> f) {
+      var task = Task.Run(() => f(this), Source.Token);
+      Tasks.Add(task);
+      return task;
+    }
+    public Task Run(Func<TaskScope, Task> f) {
+      var task = Task.Run(() => f(this), Source.Token);
+      Tasks.Add(task);
+      return task;
+    }
+    public Task SubRun(Func<TaskScope, Task> f, out TaskScope innerctx) {
+      var ctx = new TaskScope();
+      innerctx = ctx;
+      var task = Task.Run(async delegate { await f(ctx); ctx.Dispose(); }, Source.Token);
+      Tasks.Add(task);
+      return task;
+    }
+    public Task Delay(int ms) => Task.Delay(ms, Source.Token);
+    public async Task Any(params Func<TaskScope, Task>[] fs) {
+      using var ctx = new TaskScope();
+      try {
+        Source.Token.ThrowIfCancellationRequested();
+        await Task.WhenAny(fs.Select(f => f(ctx)));
+      } finally {
+        ctx.Cancel();
+      }
+    }
+    public async Task All(params Func<TaskScope, Task>[] fs) {
+      using var ctx = new TaskScope();
+      try {
+        Source.Token.ThrowIfCancellationRequested();
+        await Task.WhenAll(fs.Select(f => f(ctx)));
+      } finally {
+        ctx.Cancel();
+      }
+    }
+    public async Task All(params Task[] tasks) {
+      using var ctx = new TaskScope();
+      try {
+        await Task.WhenAll(tasks);
+      } finally {
+        ctx.Cancel();
+      }
+    }
   }
 
   public class Core : MonoBehaviour {
-    JobContext MainContext = new();
-    async void Start() {
-      using var context = MainContext;
-      var job = MainContext.Run(async delegate {
+    TaskScope MainContext = new();
+
+    public static async Task Dash(TaskScope ctx) {
+      await ctx.Run(async delegate {
         try {
-          Debug.Log("Start");
-          await MainContext.Delay(5000).Task;
-          Debug.Log("End");
+          Debug.Log("DashStart");
+          await ctx.Delay(1000);
+          Debug.Log("DashEnd");
+          await ctx.Delay(500);
+          Debug.Log("DashRecovery");
         } catch (Exception e) {
-          Debug.Log("Canceled");
+          Debug.Log("Dash Cancel");
+        } finally {
+          Debug.Log("Disable dash effects");
         }
       });
-      MainContext.Run(async delegate {
-        await MainContext.Delay(2000).Task;
-        job.Cancel();
+    }
+
+    void Start() {
+      var job = MainContext.SubRun(Dash, out var dashCtx);
+      var can = MainContext.Run(async delegate {
+        await MainContext.Delay(1000);
+        dashCtx.Cancel();
       });
-      await job.Task;
-      Debug.Log($"{Time.time} seconds elapsed");
     }
 
     void OnDestroy() {
       if (!MainContext.Source.IsCancellationRequested) {
         MainContext.Source.Cancel();
       }
+      MainContext.Dispose();
     }
   }
 }
