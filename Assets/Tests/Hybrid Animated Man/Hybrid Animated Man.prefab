@@ -153,7 +153,7 @@ MonoBehaviour:
   TriggerConditions:
   - Method:
       MethodName: Attack
-    Tags: 1
+    Tags: 33
     RequiredOwnerTags: 0
     EnergyCost: 0
   CurrentTags: 0
@@ -302,6 +302,7 @@ GameObject:
   - component: {fileID: 5304582540807413855}
   - component: {fileID: 9187999352642821986}
   - component: {fileID: 1818372311317487521}
+  - component: {fileID: 4537402110254462160}
   m_Layer: 0
   m_Name: Hybrid Animated Man
   m_TagString: Untagged
@@ -449,7 +450,7 @@ MonoBehaviour:
   - ButtonCode: 2
     ButtonPressType: 0
     Entry:
-      Ability: {fileID: 2296086977565652357}
+      Ability: {fileID: 2994083438686922390}
       MethodName: Attack
   AxisMaps:
   - AxisCode: 0
@@ -531,6 +532,19 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.75, z: 0}
+--- !u!114 &4537402110254462160
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1818372311317487516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38b5f85dc564c4f4fafa2b5115a61de1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Dead: 0
 --- !u!1 &3029934277970986301
 GameObject:
   m_ObjectHideFlags: 0
@@ -606,6 +620,153 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
+--- !u!1 &4501309787067979342
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4834979387869787649}
+  - component: {fileID: 7947747547223287464}
+  - component: {fileID: 957228509015920023}
+  m_Layer: 13
+  m_Name: Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4834979387869787649
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4501309787067979342}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 2.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6953022511117550157}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7947747547223287464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4501309787067979342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!65 &957228509015920023
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4501309787067979342}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Size: {x: 5, y: 1, z: 5}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &5129191513308143239
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6953022511117550157}
+  - component: {fileID: 2994083438686922390}
+  m_Layer: 0
+  m_Name: AttackTask
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6953022511117550157
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5129191513308143239}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4834979387869787649}
+  m_Father: {fileID: 3735475313303821151}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2994083438686922390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5129191513308143239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a37b963004c28f4facd7211d042f0ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TriggerConditions:
+  - Method:
+      MethodName: Attack
+    Tags: 1
+    RequiredOwnerTags: 0
+    EnergyCost: 0
+  CurrentTags: 0
+  WindupEnd:
+    Millis: 166.66667
+    FramesPerSecond: 24
+  ActiveEnd:
+    Millis: 208.33333
+    FramesPerSecond: 24
+  RecoveryEnd:
+    Millis: 416.66666
+    FramesPerSecond: 24
+  HitConfig:
+    DamageModifier:
+      Base: 0
+      Mult: 1
+    KnockbackStrength: 3
+    KnockbackType: 0
+    RecoilStrength: 12
+    CameraShakeStrength: 1
+    HitStopDuration:
+      Millis: 100
+      FramesPerSecond: 30
+    SFX: {fileID: 8300000, guid: 7cbd6cd765888ff418d01d98bd1ce9c2, type: 3}
+    VFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
+    VFXOffset: {x: 0, y: 1, z: 0}
+  Vibrator: {fileID: 5304582540807413855}
+  Animator: {fileID: 5212549685019403348}
+  AnimationDriver: {fileID: 1818372311869774280}
+  AttackAnimation:
+    Clip: {fileID: 7400000, guid: 62766a0642318924eaec6b6094e7cf70, type: 2}
+    Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
+    Speed: 3
+  TriggerEvent: {fileID: 7947747547223287464}
+  HitBox: {fileID: 957228509015920023}
+  AttackVFXOffset: {x: 0, y: 1, z: 2.5}
+  AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
+  AttackSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
+  AttackHitVFX: {fileID: 7177991128484655659, guid: 22bfcb7aff64e6f4ead46853d68775c3, type: 3}
+  AttackHitSFX: {fileID: 8300000, guid: 1e3312d22540aa14597a1fb4739f2782, type: 3}
 --- !u!1 &5835676500048211975
 GameObject:
   m_ObjectHideFlags: 0
@@ -635,6 +796,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6761219406680722472}
+  - {fileID: 6953022511117550157}
   m_Father: {fileID: 1818372311317487517}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
