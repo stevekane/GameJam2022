@@ -1,73 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public abstract class CoroutineJob : IEnumerator, IStoppable {
-  public IEnumerator Routine;
-  public object Current => Routine?.Current;
-  public void Reset() => throw new NotSupportedException();
-  public bool MoveNext() {
-    if (Routine != null) {
-      if (Routine.MoveNext()) {
-        return true;
-      } else {
-        Stop();
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-  public bool IsRunning => Routine != null;
-  public void Stop() {
-    Routine = null;
-    OnStop();
-  }
-  public abstract void OnStop();
-  public abstract IEnumerator MakeRoutine();
-}
-
-public class HitStop : CoroutineJob {
-  public float Amplitude = .1f;
-  public Vector3 Axis;
-  public Timeval Duration;
-  public Status Status;
-  public Animator Animator;
-  public AnimationDriver AnimationDriver;
-  public HitStop(
-  Vector3 axis,
-  Timeval duration,
-  Status status,
-  Animator animator,
-  AnimationDriver animationDriver) {
-    Axis = axis;
-    Duration = duration;
-    Status = status;
-    Animator = animator;
-    AnimationDriver = animationDriver;
-    Routine = MakeRoutine();
-  }
-  public override void OnStop() {
-    Status.CanMove = true;
-    Status.CanRotate = true;
-    Status.CanAttack = true;
-    Animator.SetSpeed(1);
-    AnimationDriver.Resume();
-  }
-  public override IEnumerator MakeRoutine() {
-    yield return Fiber.Any(Fiber.Wait(Duration), Fiber.Repeat(OnTick));
-  }
-  void OnTick() {
-    Status.CanMove = false;
-    Status.CanRotate = false;
-    Status.CanAttack = false;
-    Animator.SetSpeed(0);
-    AnimationDriver.Pause();
-  }
-}
-
-public class AttackAbility : Ability {
+public class AttackAbilityTask : Ability {
   [SerializeField] Timeval WindupEnd;
   [SerializeField] Timeval ActiveEnd;
   [SerializeField] Timeval RecoveryEnd;
@@ -94,17 +31,29 @@ public class AttackAbility : Ability {
     Animation?.OnFrame.Unlisten(OnFrame);
   }
 
+  // Fiber -> Task adapter, ignore this.
   public IEnumerator Attack() {
-    var handleHits = Fiber.Repeat(OnHit);
+    bool done = false;
+    var task = new Task(async () => {
+      using TaskScope scope = new();
+      await AttackTask(scope);
+      done = true;
+    });
+    task.Start(TaskScheduler.FromCurrentSynchronizationContext());
+    while (!done)
+      yield return null;
+  }
+
+  // Task entry point.
+  async Task AttackTask(TaskScope scope) {
     Animation = AnimationDriver.Play(AttackAnimation);
     Animation.OnFrame.Listen(OnFrame);
-    yield return Fiber.Any(Animation, handleHits);
+    await scope.Any(c => c.While(() => Animation.IsRunning), c => c.Repeat(OnHit));
   }
 
   void OnFrame(int frame) {
     HitBox.enabled = frame >= WindupEnd.AnimFrames && frame <= ActiveEnd.AnimFrames;
     if (frame == WindupEnd.AnimFrames) {
-      var position = AbilityManager.transform.position;
       var rotation = AbilityManager.transform.rotation;
       var vfxOrigin = AbilityManager.transform.TransformPoint(AttackVFXOffset);
       SFXManager.Instance.TryPlayOneShot(AttackSFX);
@@ -115,10 +64,8 @@ public class AttackAbility : Ability {
     }
   }
 
-  IEnumerator OnHit() {
-    var hitDetection = Fiber.ListenForAll(TriggerEvent.OnTriggerStaySource, Hits);
-    yield return hitDetection;
-    var hitCount = hitDetection.Value;
+  async Task OnHit(TaskScope scope) {
+    var hitCount = await scope.ListenForAll(TriggerEvent.OnTriggerStaySource, Hits);
     var attacker = AbilityManager.transform;
     var newHits = false;
     var hitParams = HitConfig.ComputeParams(Attributes);
@@ -136,7 +83,8 @@ public class AttackAbility : Ability {
     if (newHits) {
       SFXManager.Instance.TryPlayOneShot(AttackHitSFX);
       CameraShaker.Instance.Shake(HitConfig.CameraShakeStrength);
-      yield return new HitStop(-transform.forward, hitParams.HitStopDuration, Status, Animator, AnimationDriver);
+      Status.Add(new HitStopEffect(attacker.forward, .1f, hitParams.HitStopDuration.Ticks));
+      await scope.Ticks(hitParams.HitStopDuration.Ticks);
       Status.Add(new RecoilEffect(HitConfig.RecoilStrength * -attacker.forward));
     }
   }
