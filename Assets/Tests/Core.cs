@@ -69,7 +69,7 @@ namespace Core {
           Debug.Log("DashEnd");
           await ctx.Delay(500);
           Debug.Log("DashRecovery");
-        } catch (Exception e) {
+        } catch (Exception) {
           Debug.Log("Dash Cancel");
         } finally {
           Debug.Log("Disable dash effects");
