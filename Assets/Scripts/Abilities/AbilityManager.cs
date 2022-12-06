@@ -25,7 +25,8 @@ public class AbilityManager : MonoBehaviour {
   }
 
   public void InterruptAbilities() => Abilities.Where(a => a.IsRunning && !a.Tags.HasAllFlags(AbilityTag.Uninterruptible)).ForEach(a => a.Stop());
-  public void CancelOthers(IAbility self) => Abilities.Where(a => a.IsRunning && a != self && a.Tags.HasAllFlags(AbilityTag.Cancellable)).ForEach(a => a.Stop());
+  public void CancelOthers() => Abilities.Where(a => a.IsRunning && a.Tags.HasAllFlags(AbilityTag.Cancellable)).ForEach(a => a.Stop());
+  public void CancelOthers(IAbility except) => Abilities.Where(a => a.IsRunning && a != except && a.Tags.HasAllFlags(AbilityTag.Cancellable)).ForEach(a => a.Stop());
 
   public void RegisterAxis(AxisTag tag, AxisState axis) {
     TagToAxis[tag] = axis;
@@ -89,7 +90,7 @@ public class AbilityManager : MonoBehaviour {
           Ability.StartRoutine(new Fiber(enumerator));
         }
         if (Trigger.Tags.HasAllFlags(AbilityTag.CancelOthers))
-          Ability.AbilityManager.CancelOthers(Ability);
+          Ability.AbilityManager.CancelOthers();
       }
     }
     bool ShouldFire() {
