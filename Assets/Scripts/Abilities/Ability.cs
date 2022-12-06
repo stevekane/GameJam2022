@@ -39,7 +39,8 @@ public abstract class Ability : MonoBehaviour, IAbility {
   public Mover Mover { get => AbilityManager.GetComponent<Mover>(); }
   public List<TriggerCondition> TriggerConditions = new();
   Dictionary<AbilityMethod, TriggerCondition> TriggerConditionsMap = new();
-  [HideInInspector] public AbilityTag Tags { get; set; } // Inherited from the Trigger when started
+  [HideInInspector] public AbilityTag Tags { get => CurrentTags; set => CurrentTags = value; } // Inherited from the Trigger when started
+  [HideInInspector] public AbilityTag CurrentTags;
   public bool IsRunning { get => Bundle.IsRunning; }
   public IEnumerator Running => Bundle;
   public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
