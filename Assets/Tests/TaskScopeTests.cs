@@ -44,6 +44,10 @@ public class TaskScope : IDisposable {
     await Task.Yield();
   }
   public async Task Ticks(int ticks) {
+    // Maybe this should be Repeat(ticks, ListenFor(FixedUpdateEvent)) ?
+    // Cons: that might break if 2 events fire in a single Yield?
+    // Pros: It guarantees to finish *after* N calls to FixedUpdate, whereas this version will terminate at any
+    // point in the frame.
     int endTick = Timeval.TickCount + ticks;
     while (Timeval.TickCount < endTick)
       await Yield();
