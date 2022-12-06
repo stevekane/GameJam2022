@@ -775,16 +775,17 @@ GameObject:
   m_Component:
   - component: {fileID: 5571416124093621163}
   - component: {fileID: 6865395085482706047}
+  - component: {fileID: 491125434464353236}
   - component: {fileID: 5571416124093621156}
   - component: {fileID: 5571416124093621157}
   - component: {fileID: 4848494605274439972}
-  - component: {fileID: 5571416124093621161}
   - component: {fileID: 5571416124093621160}
   - component: {fileID: 7727835182619467870}
   - component: {fileID: 1657031132205634076}
   - component: {fileID: 4362511970478309579}
   - component: {fileID: 7227641143467178568}
-  - component: {fileID: 491125434464353236}
+  - component: {fileID: 5571416124093621161}
+  - component: {fileID: 922338563387012078}
   m_Layer: 10
   m_Name: Wasp
   m_TagString: Untagged
@@ -830,6 +831,19 @@ MonoBehaviour:
   ShootDelay:
     Millis: 3000
     FramesPerSecond: 1
+--- !u!114 &491125434464353236
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65cced279f9613b45973ba06b4520d5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Wave: 0
 --- !u!114 &5571416124093621156
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -887,19 +901,6 @@ MonoBehaviour:
       Base: 20
       Mult: 1
   BaseUpgrades: []
---- !u!114 &5571416124093621161
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571416124093621165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d0cba5e795e3e24f94847040ed69f07, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Target: {fileID: 5571416123647958240}
 --- !u!143 &5571416124093621160
 CharacterController:
   m_ObjectHideFlags: 0
@@ -982,7 +983,7 @@ MonoBehaviour:
   Gravity: -200
   Animator: {fileID: 0}
   IdleThreshold: 0.1
---- !u!114 &491125434464353236
+--- !u!114 &5571416124093621161
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -991,10 +992,29 @@ MonoBehaviour:
   m_GameObject: {fileID: 5571416124093621165}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65cced279f9613b45973ba06b4520d5f, type: 3}
+  m_Script: {fileID: 11500000, guid: 1d0cba5e795e3e24f94847040ed69f07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Wave: 0
+  Target: {fileID: 5571416123647958240}
+--- !u!114 &922338563387012078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f970a829f86019441a549e1a5005231c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ColorName: _EmissionColor
+  FlashColor: {r: 4, g: 4, b: 4, a: 1}
+  MeshRenderers:
+  - {fileID: 7226594029644046785}
+  - {fileID: 6539316134859821109}
+  - {fileID: 4914273281486157195}
+  SkinnedMeshRenderers: []
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0

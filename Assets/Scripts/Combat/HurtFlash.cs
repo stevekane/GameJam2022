@@ -46,13 +46,17 @@ public class HurtFlash : MonoBehaviour {
     foreach (var meshRenderer in MeshRenderers) {
       meshRenderer.GetMaterials(Materials);
       foreach (var material in Materials) {
-        PreviousColors.Add(material, material.GetVector(ColorName));
+        if (material.HasColor(ColorName)) {
+          PreviousColors.Add(material, material.GetVector(ColorName));
+        }
       }
     }
     foreach (var skinnedMeshrenderer in SkinnedMeshRenderers) {
       skinnedMeshrenderer.GetMaterials(Materials);
       foreach (var material in Materials) {
-        PreviousColors.Add(material, material.GetVector(ColorName));
+        if (material.HasColor(ColorName)) {
+          PreviousColors.Add(material, material.GetVector(ColorName));
+        }
       }
     }
   }
