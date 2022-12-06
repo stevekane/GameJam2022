@@ -114,6 +114,9 @@ public class AttackAbility : Ability {
       SFXManager.Instance.TryPlayOneShot(AttackSFX);
       VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
     }
+    if (frame >= ActiveEnd.AnimFrames) {
+      CurrentTags.AddFlags(AbilityTag.Cancellable);
+    }
   }
 
   IEnumerator OnHit() {
