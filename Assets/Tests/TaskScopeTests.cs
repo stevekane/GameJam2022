@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -284,7 +283,6 @@ public class TaskScopeTests : MonoBehaviour {
       },
       ExpectedOutput = "cool;end"
     },
-
     new() {
       Name = "listen",
       Test = async (TaskScope main) => {
@@ -305,7 +303,6 @@ public class TaskScopeTests : MonoBehaviour {
       },
       ExpectedOutput = "received;fired;end"
     },
-
     new() {
       Name = "listenValue",
       Test = async (TaskScope main) => {
@@ -326,7 +323,6 @@ public class TaskScopeTests : MonoBehaviour {
       },
       ExpectedOutput = "received foo;fired;end"
     },
-
     new() {
       Name = "listenAll",
       Test = async (TaskScope main) => {

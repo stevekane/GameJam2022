@@ -33,19 +33,7 @@ public class AttackAbilityTask : Ability {
   }
 
   // Fiber -> Task adapter, ignore this.
-  public IEnumerator Attack() {
-    bool done = false;
-    var task = new Task(async () => {
-      using TaskScope scope = new();
-      await AttackTask(scope);
-      done = true;
-    });
-    task.Start(TaskScheduler.FromCurrentSynchronizationContext());
-    while (!done)
-      yield return null;
-  }
-
-  // Task entry point.
+  public IEnumerator Attack() => RunTask(AttackTask);
   async Task AttackTask(TaskScope scope) {
     Animation = AnimationDriver.Play(AttackAnimation);
     Animation.OnFrame.Listen(OnFrame);

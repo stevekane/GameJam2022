@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using UnityEngine;
 
 public delegate Task TaskFunc(TaskScope scope);
 public delegate Task<T> TaskFunc<T>(TaskScope scope);
