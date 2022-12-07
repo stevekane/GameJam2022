@@ -19,24 +19,19 @@ public class TaskScope : IDisposable {
     Source.Dispose();
   }
 
-  // Note: Only tasks invoked via Run() and RunChild() will be waited upon here. E.g. Any() will not.
-  List<Task> JoinTasks = new();
-  public Task Join => Task.Run(() => Task.WhenAll(JoinTasks), Source.Token);
-  T AddTask<T>(T task) where T : Task {
-    Source.Token.ThrowIfCancellationRequested();
-    JoinTasks.Add(task);
-    return task;
-  }
-
   // Child task spawning.
   CancellationTokenSource NewChildToken() => CancellationTokenSource.CreateLinkedTokenSource(Source.Token);
-  public Task Run(TaskFunc f) => AddTask(f(this));
-  public Task<T> Run<T>(TaskFunc<T> f) => AddTask(f(this));
+  public Task Run(TaskFunc f) => CheckTask(f(this));
+  public Task<T> Run<T>(TaskFunc<T> f) => CheckTask(f(this));
   public Task RunChild(out TaskScope childScope, TaskFunc f) {
     Source.Token.ThrowIfCancellationRequested();
     childScope = new(this);
     var scope = childScope;
-    return AddTask(f(scope));
+    return CheckTask(f(scope));
+  }
+  T CheckTask<T>(T task) where T : Task {
+    Source.Token.ThrowIfCancellationRequested();
+    return task;
   }
 
   // Basic control flow.
@@ -78,6 +73,11 @@ public class TaskScope : IDisposable {
   }
 
   // More involved combinators.
+  public async Task<int> Any(params Task[] tasks) {
+    Source.Token.ThrowIfCancellationRequested();
+    var which = await Task.WhenAny(tasks);
+    return tasks.IndexOf(which);
+  }
   public async Task<int> Any(params TaskFunc[] fs) {
     Source.Token.ThrowIfCancellationRequested();
     using TaskScope scope = new(this);
@@ -88,6 +88,10 @@ public class TaskScope : IDisposable {
     } finally {
       Source.Token.ThrowIfCancellationRequested();
     }
+  }
+  public async Task All(params Task[] tasks) {
+    Source.Token.ThrowIfCancellationRequested();
+    await Task.WhenAll(tasks);
   }
   public async Task All(params TaskFunc[] fs) {
     Source.Token.ThrowIfCancellationRequested();
