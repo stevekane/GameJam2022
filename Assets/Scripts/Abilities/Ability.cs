@@ -47,12 +47,18 @@ public abstract class Ability : MonoBehaviour, IAbility {
   public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
   public void StopRoutine(Fiber routine) => Bundle.StopRoutine(routine);
   // Adapter to run a Task using Fiber tech. Temporary.
+  // TODO: if/when this goes away, we'll need a Task-only notion of IsRunning. Should we keep track of active tasks somehow?
+  TaskScope MainScope = new();
   public IEnumerator RunTask(TaskFunc func) {
     bool done = false;
     var task = new Task(async () => {
-      using TaskScope scope = new();
-      await func(scope);
-      done = true;
+      using TaskScope scope = new(MainScope);
+      try {
+        await func(scope);
+      } catch {
+      } finally {
+        done = true;
+      }
     });
     task.Start(TaskScheduler.FromCurrentSynchronizationContext());
     while (!done)
@@ -72,9 +78,14 @@ public abstract class Ability : MonoBehaviour, IAbility {
     Bundle.Stop();
     Disposables.ForEach(s => s.Dispose());
     Disposables.Clear();
+    MainScope.Dispose();
+    MainScope = new();
   }
   public virtual void OnStop() { }
   public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
+  void Start() {
+    MainScope = new();
+  }
   public virtual void FixedUpdate() {
     var isRunning = Bundle.IsRunning;
     var stillRunning = Bundle.MoveNext();
