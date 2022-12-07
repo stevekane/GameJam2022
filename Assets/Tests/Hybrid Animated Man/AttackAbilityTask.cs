@@ -74,9 +74,9 @@ public class AttackAbilityTask : Ability {
       var hit = Hits[i];
       var contact = hit.transform.position;
       var rotation = AbilityManager.transform.rotation;
-      if (!PhaseHits.Contains(hit)) {
+      if (!PhaseHits.Contains(hit) && hit.TryGetComponent(out Hurtbox hurtbox)) {
         VFXManager.Instance.TrySpawn2DEffect(AttackHitVFX, contact+Vector3.up, rotation);
-        hit.GetComponent<Hurtbox>()?.Defender.OnHit(hitParams, attacker);
+        hurtbox.Defender.OnHit(hitParams, attacker);
         PhaseHits.Add(hit);
         newHits = true;
       }
