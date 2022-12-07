@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class HurtFlash : MonoBehaviour {
+  public float DamageMultiplier = 150;
   public string ColorName = "_EmissionColor";
   [ColorUsage(showAlpha: true, hdr: true)]
   public Color FlashColor = Color.white;
@@ -21,10 +22,10 @@ public class HurtFlash : MonoBehaviour {
   }
   #endif
 
-  void OnDamage(HitParams hitParams) {
+  void OnDamage(DamageInfo info) {
     UnFlash();
     StopAllCoroutines();
-    StartCoroutine(FlashRoutine(Timeval.FromMillis(hitParams.HitStopDuration.Ticks*100)));
+    StartCoroutine(FlashRoutine(Timeval.FromMillis(info.Damage*DamageMultiplier)));
   }
 
   void Flash(Timeval duration) {
@@ -43,10 +44,12 @@ public class HurtFlash : MonoBehaviour {
     Materials.Clear();
     PreviousColors.Clear();
     foreach (var meshRenderer in Renderers) {
-      meshRenderer.GetMaterials(Materials);
-      foreach (var material in Materials) {
-        if (material.HasColor(ColorName)) {
-          PreviousColors.Add(material, material.GetVector(ColorName));
+      if (meshRenderer) {
+        meshRenderer.GetMaterials(Materials);
+        foreach (var material in Materials) {
+          if (material.HasColor(ColorName)) {
+            PreviousColors.Add(material, material.GetVector(ColorName));
+          }
         }
       }
     }

@@ -786,6 +786,7 @@ GameObject:
   - component: {fileID: 7227641143467178568}
   - component: {fileID: 5571416124093621161}
   - component: {fileID: 922338563387012078}
+  - component: {fileID: 684509208939476254}
   m_Layer: 10
   m_Name: Wasp
   m_TagString: Untagged
@@ -996,6 +997,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Target: {fileID: 5571416123647958240}
+  DamageDuration:
+    Millis: 200
+    FramesPerSecond: 30
+  DamageAmplitude: 0.2
 --- !u!114 &922338563387012078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1008,12 +1013,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f970a829f86019441a549e1a5005231c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DamageMultiplier: 50
   ColorName: _EmissionColor
   FlashColor: {r: 4, g: 4, b: 4, a: 1}
   Renderers:
   - {fileID: 7226594029644046785}
   - {fileID: 6539316134859821109}
   - {fileID: 4914273281486157195}
+--- !u!114 &684509208939476254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54a8dc9d177837d4188e84b84d044b24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  VFXOffset: {x: 0, y: 1, z: 0}
+  VFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
+  Clip: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0

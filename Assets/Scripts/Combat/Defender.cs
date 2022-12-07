@@ -71,6 +71,12 @@ public class HitParams {
   public Vector3? WallbounceTarget;
 }
 
+public class DamageInfo {
+  public float Damage;
+  public float KnockbackStrength;
+  public Transform Attacker;
+}
+
 public class Defender : MonoBehaviour {
   Optional<Status> Status;
   Damage Damage;
@@ -104,15 +110,17 @@ public class Defender : MonoBehaviour {
     var power = 5f * hit.KnockbackStrength * Mathf.Pow((Damage.Points+100f) / 100f, 2f);
     var knockBackDirection = KnockbackVector(hitTransform, transform, hit.KnockbackType);
     var rotation = Quaternion.LookRotation(knockBackDirection);
+    var damageInfo = new DamageInfo {
+      Attacker = hitTransform,
+      Damage = hit.Damage,
+      KnockbackStrength = hit.KnockbackStrength
+    };
 
-    SFXManager.Instance.TryPlayOneShot(hit.SFX);
-    VFXManager.Instance.TrySpawnEffect(hit.VFX, transform.position + hit.VFXOffset, rotation);
-
+    gameObject.SendMessage("OnDamage", damageInfo, SendMessageOptions.DontRequireReceiver);
     Status?.Value.Add(new HitStopEffect(knockBackDirection, .15f, hit.HitStopDuration.Ticks),
       s => s.Add(new KnockbackEffect(knockBackDirection*power, hit.WallbounceTarget)));
     Damage.AddPoints(hit.Damage);
     hit.OnHitEffects?.ForEach(e => Status?.Value.Add(e));
-    gameObject.SendMessage("OnDamage", hit, SendMessageOptions.DontRequireReceiver);
   }
 
   public void Die() {
