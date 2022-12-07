@@ -12,7 +12,7 @@ public class TaskScope : IDisposable {
   CancellationTokenSource Source;
 
   public TaskScope() => Source = new();
-  public TaskScope(TaskScope parent) => Source = CancellationTokenSource.CreateLinkedTokenSource(parent.Source.Token);
+  public TaskScope(TaskScope parent) => Source = parent.NewChildToken();
 
   public void Cancel() => Source.Cancel();
   public void Dispose() {
@@ -30,6 +30,7 @@ public class TaskScope : IDisposable {
   }
 
   // Child task spawning.
+  CancellationTokenSource NewChildToken() => CancellationTokenSource.CreateLinkedTokenSource(Source.Token);
   public Task Run(TaskFunc f) => AddTask(f(this));
   public Task<T> Run<T>(TaskFunc<T> f) => AddTask(f(this));
   public Task RunChild(out TaskScope childScope, TaskFunc f) {
@@ -44,17 +45,18 @@ public class TaskScope : IDisposable {
     Source.Token.ThrowIfCancellationRequested();
     await Task.Yield();
   }
+  public Task Tick() => ListenFor(Timeval.TickEvent);
   public async Task Ticks(int ticks) {
-    // Maybe this should be Repeat(ticks, ListenFor(FixedUpdateEvent)) ?
-    // Cons: that might break if 2 events fire in a single Yield?
-    // Pros: It guarantees to finish *after* N calls to FixedUpdate, whereas this version will terminate at any
-    // point in the frame.
+    // Maybe this should be Repeat(ticks, Tick()) ?
+    // Cons: more allocations that way.
+    // Pros: fewer yields, and it guarantees to finish *after* N calls to FixedUpdate, whereas this
+    // version will terminate at any point in the frame.
     int endTick = Timeval.TickCount + ticks;
     while (Timeval.TickCount < endTick)
       await Yield();
   }
   public Task Millis(int ms) => Task.Delay(ms, Source.Token);
-  public Task Delay(Timeval t) => Ticks(t.Ticks);
+  public Task Delay(Timeval t) => Millis((int)t.Millis);
 
   // Conditional control flow.
   public async Task While(Func<bool> pred) {
@@ -77,7 +79,6 @@ public class TaskScope : IDisposable {
   }
 
   // More involved combinators.
-
   public async Task<int> Any(params TaskFunc[] fs) {
     Source.Token.ThrowIfCancellationRequested();
     using TaskScope scope = new(this);
@@ -100,11 +101,12 @@ public class TaskScope : IDisposable {
   }
   public async Task ListenFor(IEventSource evt) {
     Source.Token.ThrowIfCancellationRequested();
-    bool eventFired = false;
-    void callback() { eventFired = true; };
+    var done = NewChildToken();
+    void callback() { done.Cancel(); }
     try {
       evt.Listen(callback);
-      await Until(() => eventFired);
+      await Task.Delay(-1, done.Token);
+    } catch {
     } finally {
       evt.Unlisten(callback);
       Source.Token.ThrowIfCancellationRequested();
@@ -112,12 +114,14 @@ public class TaskScope : IDisposable {
   }
   public async Task<T> ListenFor<T>(IEventSource<T> evt) {
     Source.Token.ThrowIfCancellationRequested();
-    bool eventFired = false;
+    var done = NewChildToken();
     T eventResult = default;
-    void callback(T v) { eventResult = v; eventFired = true; };
+    void callback(T value) { eventResult = value; done.Cancel(); }
     try {
       evt.Listen(callback);
-      await Until(() => eventFired);
+      await Task.Delay(-1, done.Token);
+      throw new Exception(); // not reached
+    } catch {
       return eventResult;
     } finally {
       evt.Unlisten(callback);
@@ -126,16 +130,11 @@ public class TaskScope : IDisposable {
   }
   public async Task<int> ListenForAll<T>(IEventSource<T> evt, T[] results) {
     Source.Token.ThrowIfCancellationRequested();
-    int eventFired = 0;
     int resultCount = 0;
-    void callback(T v) {
-      results[resultCount++] = v; eventFired = Timeval.TickCount;
-    }
+    void callback(T value) { results[resultCount++] = value; }
     try {
       evt.Listen(callback);
-      // This is a hack to ensure we gather results for a full FixedUpdate tick.
-      var startTick = Timeval.TickCount;
-      await Until(() => eventFired > startTick);
+      await Tick();
       return resultCount;
     } finally {
       evt.Unlisten(callback);

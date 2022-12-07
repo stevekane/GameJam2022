@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -302,7 +303,7 @@ public class TaskScopeTests : MonoBehaviour {
         output += "end";
         return output;
       },
-      ExpectedOutput = "fired;received;end"
+      ExpectedOutput = "received;fired;end"
     },
 
     new() {
@@ -323,7 +324,32 @@ public class TaskScopeTests : MonoBehaviour {
         output += "end";
         return output;
       },
-      ExpectedOutput = "fired;received foo;end"
+      ExpectedOutput = "received foo;fired;end"
     },
-    };
+
+    new() {
+      Name = "listenAll",
+      Test = async (TaskScope main) => {
+        var output = "";
+        EventSource<string> evt = new();
+        await main.All(
+          async (child) => {
+            var results = new string[16];
+            var count = await child.ListenForAll(evt, results);
+            output += $"received {string.Join(",", results.Take(count))};";
+          },
+          async (child) => {
+            evt.Fire("1");
+            evt.Fire("2");
+            evt.Fire("3");
+            await child.Tick();
+            evt.Fire("4");
+            output += "fired;";
+          });
+        output += "end";
+        return output;
+      },
+      ExpectedOutput = "received 1,2,3;fired;end"
+    },
+  };
 }

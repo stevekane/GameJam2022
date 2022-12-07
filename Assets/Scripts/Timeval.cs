@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -7,6 +6,7 @@ using UnityEngine;
 public class Timeval {
   public static int FixedUpdatePerSecond = 60;
   public static int TickCount = 0;
+  public static EventSource TickEvent = new();
 
   [SerializeField] public float Millis = 1;
   [SerializeField] public int FramesPerSecond = 30;
