@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [Serializable]
@@ -45,6 +46,18 @@ public abstract class Ability : MonoBehaviour, IAbility {
   public IEnumerator Running => Bundle;
   public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
   public void StopRoutine(Fiber routine) => Bundle.StopRoutine(routine);
+  // Adapter to run a Task using Fiber tech. Temporary.
+  public IEnumerator RunTask(TaskFunc func) {
+    bool done = false;
+    var task = new Task(async () => {
+      using TaskScope scope = new();
+      await func(scope);
+      done = true;
+    });
+    task.Start(TaskScheduler.FromCurrentSynchronizationContext());
+    while (!done)
+      yield return null;
+  }
   public T Using<T>(T d) where T : IDisposable {
     Disposables.Add(d);
     return d;
