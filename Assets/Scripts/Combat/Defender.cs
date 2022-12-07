@@ -11,9 +11,6 @@ public class HitConfig {
   public float RecoilStrength;
   public float CameraShakeStrength;
   public Timeval HitStopDuration;
-  public AudioClip SFX;
-  public GameObject VFX;
-  public Vector3 VFXOffset;
   public HitParams ComputeParamsDontUse() {
     Debug.LogWarning($"Don't serialize HitParams directly. Use HitConfig, and call ComputeParams() with an attacker. Projectiles should be passed the computed params on spawn in case they outlive their attacker.");
     return ComputeParams(DamageModifier.Apply(0f), KnockbackStrength, new(), null);
@@ -38,9 +35,6 @@ public class HitConfig {
       KnockbackStrength = knockbackStrength,
       KnockbackType = KnockbackType,
       HitStopDuration = HitStopDuration,
-      SFX = SFX,
-      VFX = VFX,
-      VFXOffset = VFXOffset,
       OnHitEffects = onHitEffects,
       WallbounceTarget = wallbounceTarget,
     };
@@ -64,11 +58,14 @@ public class HitParams {
   public float RecoilStrength;
   public float CameraShakeStrength;
   public Timeval HitStopDuration;
-  public AudioClip SFX;
-  public GameObject VFX;
-  public Vector3 VFXOffset;
   public List<StatusEffect> OnHitEffects;
   public Vector3? WallbounceTarget;
+}
+
+public class DamageInfo {
+  public float Damage;
+  public float KnockbackStrength;
+  public Transform Attacker;
 }
 
 public class Defender : MonoBehaviour {
@@ -104,15 +101,17 @@ public class Defender : MonoBehaviour {
     var power = 5f * hit.KnockbackStrength * Mathf.Pow((Damage.Points+100f) / 100f, 2f);
     var knockBackDirection = KnockbackVector(hitTransform, transform, hit.KnockbackType);
     var rotation = Quaternion.LookRotation(knockBackDirection);
+    var damageInfo = new DamageInfo {
+      Attacker = hitTransform,
+      Damage = hit.Damage,
+      KnockbackStrength = hit.KnockbackStrength
+    };
 
-    SFXManager.Instance.TryPlayOneShot(hit.SFX);
-    VFXManager.Instance.TrySpawnEffect(hit.VFX, transform.position + hit.VFXOffset, rotation);
-
+    gameObject.SendMessage("OnDamage", damageInfo, SendMessageOptions.DontRequireReceiver);
     Status?.Value.Add(new HitStopEffect(knockBackDirection, .15f, hit.HitStopDuration.Ticks),
       s => s.Add(new KnockbackEffect(knockBackDirection*power, hit.WallbounceTarget)));
     Damage.AddPoints(hit.Damage);
     hit.OnHitEffects?.ForEach(e => Status?.Value.Add(e));
-    gameObject.SendMessage("OnDamage", hit, SendMessageOptions.DontRequireReceiver);
   }
 
   public void Die() {

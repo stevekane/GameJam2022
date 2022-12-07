@@ -15,6 +15,8 @@ namespace PigMoss {
     public Timeval ExtendedDuration;
     public TriggerEvent BladeTriggerEvent;
     public HitConfig BladeHitParams;
+    public AudioClip BladeContactSFX;
+    public GameObject BladeContactVFX;
 
     HashSet<Collider> Hits = new();
 
@@ -53,8 +55,8 @@ namespace PigMoss {
       var position = hitEvent.Value.transform.position;
       var direction = (position-AbilityManager.transform.position).XZ().normalized;
       var rotation = Quaternion.LookRotation(direction, Vector3.up);
-      SFXManager.Instance.TryPlayOneShot(BladeHitParams.SFX);
-      VFXManager.Instance.TrySpawnEffect(BladeHitParams.VFX, position, rotation);
+      SFXManager.Instance.TryPlayOneShot(BladeContactSFX);
+      VFXManager.Instance.TrySpawnEffect(BladeContactVFX, position, rotation);
       Hits.Add(hitEvent.Value);
     }
 

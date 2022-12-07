@@ -203,11 +203,12 @@ GameObject:
   - component: {fileID: 4692194450172351925}
   - component: {fileID: 2682167282304232492}
   - component: {fileID: 2793019997782131147}
-  - component: {fileID: 869648123590668608}
   - component: {fileID: 4692194450172351924}
   - component: {fileID: 704825919502182732}
   - component: {fileID: 1749337360117157023}
+  - component: {fileID: 869648123590668608}
   - component: {fileID: 3638369707078671088}
+  - component: {fileID: 5333389084626594778}
   - component: {fileID: 4661272542552748758}
   m_Layer: 17
   m_Name: Matt Parry
@@ -272,19 +273,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Tags: 0
   DebugEffects: []
---- !u!114 &869648123590668608
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4692194450172351927}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d0cba5e795e3e24f94847040ed69f07, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Target: {fileID: 4692194449273915251}
 --- !u!114 &4692194450172351924
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -325,6 +313,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BaseAttributes: []
   BaseUpgrades: []
+--- !u!114 &869648123590668608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4692194450172351927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d0cba5e795e3e24f94847040ed69f07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Target: {fileID: 4692194449273915251}
+  DamageDuration:
+    Millis: 200
+    FramesPerSecond: 30
+  DamageAmplitude: 0.2
 --- !u!114 &3638369707078671088
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -337,6 +342,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f970a829f86019441a549e1a5005231c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DamageMultiplier: 50
   ColorName: _EmissionColor
   FlashColor: {r: 4, g: 4, b: 4, a: 1}
   Renderers:
@@ -345,6 +351,21 @@ MonoBehaviour:
   - {fileID: 564178839081872252}
   - {fileID: 3520445131642449497}
   - {fileID: 15829785122268897}
+--- !u!114 &5333389084626594778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4692194450172351927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54a8dc9d177837d4188e84b84d044b24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  VFXOffset: {x: 0, y: 0, z: 0}
+  VFX: {fileID: 1750940742320366, guid: ec1383a81f8b26e41bd5795fba065567, type: 3}
+  Clip: {fileID: 8300000, guid: a715ddf00ff7f24469c72404e8df85e9, type: 3}
 --- !u!95 &4661272542552748758
 Animator:
   serializedVersion: 4

@@ -1,8 +1,9 @@
 using UnityEngine;
 
 public class Vibrator : MonoBehaviour {
-  [SerializeField]
-  Transform Target;
+  [SerializeField] Transform Target;
+  [SerializeField] Timeval DamageDuration = Timeval.FromMillis(200);
+  [SerializeField] float DamageAmplitude = .2f;
 
   Vector3 Axis;
   Vector3 LocalPosition;
@@ -26,8 +27,8 @@ public class Vibrator : MonoBehaviour {
     LocalPosition = Target.transform.localPosition;
   }
 
-  void OnDamage(HitParams hitParams) {
-    Vibrate(transform.forward, hitParams.HitStopDuration.Ticks, .2f);
+  void OnDamage(DamageInfo info) {
+    Vibrate(transform.forward, DamageDuration.Ticks, DamageAmplitude);
   }
 
   void FixedUpdate() {

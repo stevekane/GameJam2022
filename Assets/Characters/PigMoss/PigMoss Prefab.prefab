@@ -268,9 +268,6 @@ MonoBehaviour:
     HitStopDuration:
       Millis: 100
       FramesPerSecond: 30
-    SFX: {fileID: 8300000, guid: 3df9bbbc130ccb344af5f3fc793a630f, type: 3}
-    VFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
-    VFXOffset: {x: 0, y: 1, z: 0}
   Trail: {fileID: 433230649554147219}
   RushSFX: {fileID: 8300000, guid: f161f54138dc0314abdabf7ab71e3404, type: 3}
   RushSpeed: 150
@@ -547,9 +544,6 @@ MonoBehaviour:
     HitStopDuration:
       Millis: 100
       FramesPerSecond: 30
-    SFX: {fileID: 8300000, guid: 3df9bbbc130ccb344af5f3fc793a630f, type: 3}
-    VFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
-    VFXOffset: {x: 0, y: 1, z: 0}
   ActiveFrameStart:
     Millis: 1000
     FramesPerSecond: 60
@@ -629,9 +623,8 @@ MonoBehaviour:
     HitStopDuration:
       Millis: 1
       FramesPerSecond: 30
-    SFX: {fileID: 8300000, guid: 7cbd6cd765888ff418d01d98bd1ce9c2, type: 3}
-    VFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
-    VFXOffset: {x: 0, y: 1, z: 0}
+  BladeContactSFX: {fileID: 8300000, guid: 7cbd6cd765888ff418d01d98bd1ce9c2, type: 3}
+  BladeContactVFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
 --- !u!1 &5167855472314673310
 GameObject:
   m_ObjectHideFlags: 0
@@ -839,9 +832,6 @@ MonoBehaviour:
     HitStopDuration:
       Millis: 200
       FramesPerSecond: 30
-    SFX: {fileID: 8300000, guid: 78850fd5336d0a54a9f85f580d94877d, type: 3}
-    VFX: {fileID: 2433282508537954060, guid: 7b68f0f87eff9464e890d08895d2a042, type: 3}
-    VFXOffset: {x: 0, y: 1, z: 0}
   Vibrator: {fileID: 8872822988582960448}
   ProjectilePrefab: {fileID: 4479709198012916195, guid: f3d478ee9ca7d9c49a05bde556e18179, type: 3}
   FireSFX: {fileID: 8300000, guid: da396a16a7f24f64cbb0054f5a56b46a, type: 3}
@@ -992,9 +982,6 @@ MonoBehaviour:
     HitStopDuration:
       Millis: 100
       FramesPerSecond: 30
-    SFX: {fileID: 8300000, guid: 8ba1ce15e8593064aa781b941381f053, type: 3}
-    VFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
-    VFXOffset: {x: 0, y: 1, z: 0}
   MissilePrefab: {fileID: 5667205795771851015, guid: 41421b7d6e85e6748afb608a2a977365, type: 3}
   LaunchSites:
   - {fileID: 4591952213016696056}
@@ -1217,6 +1204,8 @@ GameObject:
   - component: {fileID: 8872822988582960453}
   - component: {fileID: 8872822988582960444}
   - component: {fileID: 8872822988582960448}
+  - component: {fileID: 5139664284198015280}
+  - component: {fileID: 1865207496726280096}
   - component: {fileID: 8872822988582960449}
   m_Layer: 10
   m_Name: PigMoss Prefab
@@ -1417,6 +1406,42 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Target: {fileID: 8872822986732128203}
+  DamageDuration:
+    Millis: 200
+    FramesPerSecond: 30
+  DamageAmplitude: 0.2
+--- !u!114 &5139664284198015280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8872822988582960440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54a8dc9d177837d4188e84b84d044b24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  VFXOffset: {x: 0, y: 5, z: 0}
+  VFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
+  Clip: {fileID: 8300000, guid: 8ea80b2fc3df7bf4fb901ad8ab246604, type: 3}
+--- !u!114 &1865207496726280096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8872822988582960440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f970a829f86019441a549e1a5005231c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DamageMultiplier: 50
+  ColorName: _EmissionColor
+  FlashColor: {r: 11.984314, g: 11.984314, b: 11.984314, a: 1}
+  Renderers:
+  - {fileID: 8872822986732128197}
 --- !u!143 &8872822988582960449
 CharacterController:
   m_ObjectHideFlags: 0

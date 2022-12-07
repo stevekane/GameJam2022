@@ -1100,6 +1100,7 @@ GameObject:
   - component: {fileID: 6204311958514039916}
   - component: {fileID: 5571416124093621161}
   - component: {fileID: 7528539421826735949}
+  - component: {fileID: 8368468838265768088}
   m_Layer: 10
   m_Name: Badger
   m_TagString: Untagged
@@ -1309,6 +1310,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Target: {fileID: 5571416123647958240}
+  DamageDuration:
+    Millis: 200
+    FramesPerSecond: 30
+  DamageAmplitude: 0.2
 --- !u!114 &7528539421826735949
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1321,6 +1326,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f970a829f86019441a549e1a5005231c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DamageMultiplier: 50
   ColorName: _EmissionColor
   FlashColor: {r: 4, g: 4, b: 4, a: 1}
   Renderers:
@@ -1331,6 +1337,21 @@ MonoBehaviour:
   - {fileID: 4914273281486157195}
   - {fileID: 7437944918136718727}
   - {fileID: 1294691833948066240}
+--- !u!114 &8368468838265768088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54a8dc9d177837d4188e84b84d044b24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  VFXOffset: {x: 0, y: 1, z: 0}
+  VFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
+  Clip: {fileID: 8300000, guid: 958550d8003fc15489eb7911ad4a4bcc, type: 3}
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0
@@ -1583,7 +1604,9 @@ GameObject:
   - component: {fileID: 5663181172083944414}
   - component: {fileID: 2380015099070688244}
   - component: {fileID: 1345878861977264778}
+  - component: {fileID: 5183340763790620841}
   - component: {fileID: 1559827699249489055}
+  - component: {fileID: 265498748960670154}
   - component: {fileID: 7724858517802715910}
   m_Layer: 0
   m_Name: Left Fist
@@ -1808,6 +1831,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Damage: {fileID: 2380015099070688244}
+--- !u!114 &5183340763790620841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943414322764006362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d0cba5e795e3e24f94847040ed69f07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Target: {fileID: 2225150380419525868}
+  DamageDuration:
+    Millis: 200
+    FramesPerSecond: 30
+  DamageAmplitude: 0.2
 --- !u!114 &1559827699249489055
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1820,10 +1860,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f970a829f86019441a549e1a5005231c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DamageMultiplier: 50
   ColorName: _EmissionColor
   FlashColor: {r: 4, g: 4, b: 4, a: 1}
   Renderers:
   - {fileID: 2077024099784888656}
+--- !u!114 &265498748960670154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943414322764006362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54a8dc9d177837d4188e84b84d044b24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  VFXOffset: {x: 0, y: 0, z: 0}
+  VFX: {fileID: 1995403933065894, guid: bf3228cec72bf65469800c0e55477fbd, type: 3}
+  Clip: {fileID: 8300000, guid: bf6d0fc332bf08041bfde4741cb7230a, type: 3}
 --- !u!114 &7724858517802715910
 MonoBehaviour:
   m_ObjectHideFlags: 0
