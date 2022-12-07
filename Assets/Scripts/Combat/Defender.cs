@@ -69,7 +69,7 @@ public class DamageInfo {
 }
 
 public class Defender : MonoBehaviour {
-  Optional<Status> Status;
+  Status Status;
   Damage Damage;
   bool PlayingFallSound;
   bool Died = false;
@@ -94,24 +94,28 @@ public class Defender : MonoBehaviour {
   }
 
   public void OnHit(HitParams hit, Transform hitTransform) {
-    HitEvent.Fire((hit, hitTransform));
-    if (!(Status?.Value.IsHittable ?? true))
+    if (Status != null && !Status.IsHittable)
       return;
 
-    var power = 5f * hit.KnockbackStrength * Mathf.Pow((Damage.Points+100f) / 100f, 2f);
-    var knockBackDirection = KnockbackVector(hitTransform, transform, hit.KnockbackType);
-    var rotation = Quaternion.LookRotation(knockBackDirection);
-    var damageInfo = new DamageInfo {
-      Attacker = hitTransform,
-      Damage = hit.Damage,
-      KnockbackStrength = hit.KnockbackStrength
-    };
-
-    gameObject.SendMessage("OnDamage", damageInfo, SendMessageOptions.DontRequireReceiver);
-    Status?.Value.Add(new HitStopEffect(knockBackDirection, .15f, hit.HitStopDuration.Ticks),
-      s => s.Add(new KnockbackEffect(knockBackDirection*power, hit.WallbounceTarget)));
-    Damage.AddPoints(hit.Damage);
-    hit.OnHitEffects?.ForEach(e => Status?.Value.Add(e));
+    if (Status) {
+      var power = 5f * hit.KnockbackStrength * Mathf.Pow((Damage.Points+100f) / 100f, 2f);
+      var knockBackDirection = KnockbackVector(hitTransform, transform, hit.KnockbackType);
+      var rotation = Quaternion.LookRotation(knockBackDirection);
+      Status.Add(new HitStopEffect(knockBackDirection, .15f, hit.HitStopDuration.Ticks),
+        s => s.Add(new KnockbackEffect(knockBackDirection*power, hit.WallbounceTarget)));
+      hit.OnHitEffects?.ForEach(e => Status.Add(e));
+    }
+    if (Damage) {
+      Debug.Log("Damage detected");
+      var damageInfo = new DamageInfo {
+        Attacker = hitTransform,
+        Damage = hit.Damage,
+        KnockbackStrength = hit.KnockbackStrength
+      };
+      gameObject.SendMessage("OnDamage", damageInfo, SendMessageOptions.DontRequireReceiver);
+      Damage.AddPoints(hit.Damage);
+    }
+    HitEvent.Fire((hit, hitTransform));
   }
 
   public void Die() {
@@ -124,8 +128,6 @@ public class Defender : MonoBehaviour {
   }
 
   void Awake() {
-    // Note: GetComponentInParent is probably wrong. Badger's shield has a Defender so it can be destructible, but it's missing
-    // a bunch of other components like Status and Animator.
     Status = GetComponent<Status>();
     Damage = GetComponent<Damage>();
   }
