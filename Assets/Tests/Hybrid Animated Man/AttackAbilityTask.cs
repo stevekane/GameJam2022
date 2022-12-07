@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using static TaskExtensionsForOlSteve;
 
 public class AttackAbilityTask : Ability {
   [SerializeField] Timeval WindupEnd;
@@ -48,7 +49,7 @@ public class AttackAbilityTask : Ability {
   async Task AttackTask(TaskScope scope) {
     Animation = AnimationDriver.Play(AttackAnimation);
     Animation.OnFrame.Listen(OnFrame);
-    await scope.Any(c => c.While(() => Animation.IsRunning), c => c.Repeat(OnHit));
+    await scope.Any(While(() => Animation.IsRunning), Repeat(OnHit));
   }
 
   void OnFrame(int frame) {

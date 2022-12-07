@@ -24,18 +24,19 @@ public class TaskScope : IDisposable {
   List<Task> JoinTasks = new();
   public Task Join => Task.Run(() => Task.WhenAll(JoinTasks), Source.Token);
   T AddTask<T>(T task) where T : Task {
+    Source.Token.ThrowIfCancellationRequested();
     JoinTasks.Add(task);
     return task;
   }
 
   // Child task spawning.
-  public Task Run(TaskFunc f) => AddTask(Task.Run(() => f(this), Source.Token));
-  public Task<T> Run<T>(TaskFunc<T> f) => AddTask(Task.Run(() => f(this), Source.Token));
+  public Task Run(TaskFunc f) => AddTask(f(this));
+  public Task<T> Run<T>(TaskFunc<T> f) => AddTask(f(this));
   public Task RunChild(out TaskScope childScope, TaskFunc f) {
     Source.Token.ThrowIfCancellationRequested();
     childScope = new(this);
     var scope = childScope;
-    return AddTask(Task.Run(() => f(scope), Source.Token));
+    return AddTask(f(scope));
   }
 
   // Basic control flow.
@@ -141,4 +142,14 @@ public class TaskScope : IDisposable {
       Source.Token.ThrowIfCancellationRequested();
     }
   }
+}
+
+public class TaskExtensionsForOlSteve {
+  public static TaskFunc While(Func<bool> pred) => s => s.While(pred);
+  public static TaskFunc Until(Func<bool> pred) => s => s.Until(pred);
+  public static TaskFunc Repeat(TaskFunc f) => s => s.Repeat(f);
+  public static TaskFunc Repeat(int n, TaskFunc f) => s => s.Repeat(n, f);
+  public static TaskFunc ListenFor(IEventSource evt) => s => s.ListenFor(evt);
+  public static TaskFunc<T> ListenFor<T>(IEventSource<T> evt) => s => s.ListenFor(evt);
+  public static TaskFunc<int> ListenForAll<T>(IEventSource<T> evt, T[] results) => s => s.ListenForAll(evt, results);
 }
