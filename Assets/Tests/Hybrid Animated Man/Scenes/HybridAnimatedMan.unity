@@ -231,7 +231,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_NoiseProfile: {fileID: 11400000, guid: 69ce8388f6785dd4c8c39915efece2f4, type: 2}
   m_PivotOffset: {x: 0, y: 0, z: 0}
-  m_AmplitudeGain: 1e-45
+  m_AmplitudeGain: 3.659e-42
   m_FrequencyGain: 10
   mNoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!1 &133811131
@@ -893,6 +893,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: bf3f367c6df14294a91d31e141d74127, type: 3}
+--- !u!95 &1318998045 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 2347714126523969063, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+  m_PrefabInstance: {fileID: 1818372311507013568}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1325853189
 GameObject:
   m_ObjectHideFlags: 0
@@ -1216,6 +1221,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2144158158 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6705401411987309461, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+  m_PrefabInstance: {fileID: 1818372311507013568}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e9997aea4cb76a40b3d780e39f9cec3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1818372311507013568
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1292,6 +1308,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1818372311317487525, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+      propertyPath: ButtonMaps.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1818372311317487525, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+      propertyPath: ButtonMaps.Array.data[1].ButtonCode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1818372311317487525, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+      propertyPath: ButtonMaps.Array.data[1].Entry.Ability
+      value: 
+      objectReference: {fileID: 2144158158}
+    - target: {fileID: 1818372311317487525, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+      propertyPath: ButtonMaps.Array.data[1].Entry.MethodName
+      value: Activate
+      objectReference: {fileID: 0}
     - target: {fileID: 2433174380011465399, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
       propertyPath: m_Name
       value: Model
@@ -1303,6 +1335,14 @@ PrefabInstance:
     - target: {fileID: 5505813242816752702, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6705401411987309461, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+      propertyPath: Animator
+      value: 
+      objectReference: {fileID: 1318998045}
+    - target: {fileID: 6705401411987309461, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+      propertyPath: DashDuration.Millis
+      value: 133.33333
       objectReference: {fileID: 0}
     - target: {fileID: 7852998007072357547, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
       propertyPath: m_Enabled

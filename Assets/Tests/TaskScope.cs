@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,6 +32,18 @@ public class TaskScope : IDisposable {
   T CheckTask<T>(T task) where T : Task {
     Source.Token.ThrowIfCancellationRequested();
     return task;
+  }
+
+  // Fiber adapter.
+  public async Task RunFiber(IEnumerator routine) {
+    Source.Token.ThrowIfCancellationRequested();
+    Fiber f = routine as Fiber ?? new Fiber(routine);
+    try {
+      while (f.MoveNext())
+        await Tick();
+    } catch {
+      f.Stop();
+    }
   }
 
   // Basic control flow.
