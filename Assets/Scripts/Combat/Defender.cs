@@ -11,9 +11,6 @@ public class HitConfig {
   public float RecoilStrength;
   public float CameraShakeStrength;
   public Timeval HitStopDuration;
-  public AudioClip SFX;
-  public GameObject VFX;
-  public Vector3 VFXOffset;
   public HitParams ComputeParamsDontUse() {
     Debug.LogWarning($"Don't serialize HitParams directly. Use HitConfig, and call ComputeParams() with an attacker. Projectiles should be passed the computed params on spawn in case they outlive their attacker.");
     return ComputeParams(DamageModifier.Apply(0f), KnockbackStrength, new(), null);
@@ -38,9 +35,6 @@ public class HitConfig {
       KnockbackStrength = knockbackStrength,
       KnockbackType = KnockbackType,
       HitStopDuration = HitStopDuration,
-      SFX = SFX,
-      VFX = VFX,
-      VFXOffset = VFXOffset,
       OnHitEffects = onHitEffects,
       WallbounceTarget = wallbounceTarget,
     };
@@ -64,9 +58,6 @@ public class HitParams {
   public float RecoilStrength;
   public float CameraShakeStrength;
   public Timeval HitStopDuration;
-  public AudioClip SFX;
-  public GameObject VFX;
-  public Vector3 VFXOffset;
   public List<StatusEffect> OnHitEffects;
   public Vector3? WallbounceTarget;
 }
