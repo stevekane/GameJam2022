@@ -24,18 +24,19 @@ public class TaskScope : IDisposable {
   List<Task> JoinTasks = new();
   public Task Join => Task.Run(() => Task.WhenAll(JoinTasks), Source.Token);
   T AddTask<T>(T task) where T : Task {
+    Source.Token.ThrowIfCancellationRequested();
     JoinTasks.Add(task);
     return task;
   }
 
   // Child task spawning.
-  public Task Run(TaskFunc f) => AddTask(Task.Run(() => f(this), Source.Token));
-  public Task<T> Run<T>(TaskFunc<T> f) => AddTask(Task.Run(() => f(this), Source.Token));
+  public Task Run(TaskFunc f) => AddTask(f(this));
+  public Task<T> Run<T>(TaskFunc<T> f) => AddTask(f(this));
   public Task RunChild(out TaskScope childScope, TaskFunc f) {
     Source.Token.ThrowIfCancellationRequested();
     childScope = new(this);
     var scope = childScope;
-    return AddTask(Task.Run(() => f(scope), Source.Token));
+    return AddTask(f(scope));
   }
 
   // Basic control flow.

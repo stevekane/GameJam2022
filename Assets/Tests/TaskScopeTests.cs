@@ -44,11 +44,12 @@ public class TaskScopeTests : MonoBehaviour {
           async (main) => {
             output += "start;";
             try {
+              await main.Ticks(1);
               main.Cancel();
-              output += "beforeYield;";
+              output += "before yield;";
               await main.Yield();
-              output += "afterYield;";
-            } catch (Exception) {
+              output += "after yield;";
+            } catch {
               output += "exception;";
             } finally {
               output += "finally;";
@@ -58,7 +59,7 @@ public class TaskScopeTests : MonoBehaviour {
         output += "end";
         return output;
       },
-      ExpectedOutput = "start;beforeYield;exception;finally;end"
+      ExpectedOutput = "start;before yield;exception;finally;end"
     },
 
     new() {
@@ -193,7 +194,7 @@ public class TaskScopeTests : MonoBehaviour {
           },
           async (child) => {
             try {
-              await child.Ticks(3);
+              await child.Ticks(4);
               output += "child2;";
             } catch {
               output += "child2 cancel;";
