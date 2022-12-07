@@ -11,10 +11,6 @@ public class HitConfig {
   public float RecoilStrength;
   public float CameraShakeStrength;
   public Timeval HitStopDuration;
-  public HitParams ComputeParamsDontUse() {
-    Debug.LogWarning($"Don't serialize HitParams directly. Use HitConfig, and call ComputeParams() with an attacker. Projectiles should be passed the computed params on spawn in case they outlive their attacker.");
-    return ComputeParams(DamageModifier.Apply(0f), KnockbackStrength, new(), null);
-  }
   public HitParams ComputeParams(Attributes attacker) => ComputeParams(
     DamageModifier.Apply(attacker.GetValue(AttributeTag.Damage, 0f)),
     attacker.GetValue(AttributeTag.Knockback, KnockbackStrength),
@@ -75,6 +71,7 @@ public class Defender : MonoBehaviour {
   bool Died = false;
   public Vector3? LastGroundedPosition { get; private set; }
 
+  public Hurtbox[] Hurtboxes;
   public EventSource<(HitParams, Transform)> HitEvent = new();
   public AudioClip FallSFX;
 
@@ -93,10 +90,50 @@ public class Defender : MonoBehaviour {
     };
   }
 
-  public void OnHit(HitParams hit, Transform hitTransform) {
-    if (Status != null && !Status.IsHittable)
-      return;
+  /*
+  TODO:
+  HitConfig/Params should include vfx/sfx which are spawned here if the target is hittable
+  HurtBox fires its HitEventSource
+    defender and any other components interested should Listen
+  Status may require Attributes currently? Investigate
+  Single HitEffects Component
+    Flash
+    HitFX
+    HurtFX
+    Vibrate
 
+  Params should calculate and store KB vector from KBConfig
+  HitEvent should broadcast only HitParams (no transform)
+
+  if Status.IsHittable
+    enable hurtboxes
+
+  When a status effect is set various components use that status to make decisions
+    Mover does or does not move
+    AbilityManager?
+
+  On Successful Hit
+    spawn hit effects
+    spawn hurt effects
+    hurt flash
+    vibrate
+
+  Defender
+    If Status
+      knockback
+      hitstop
+      apply hiteffects
+    If Damage
+      deal damage
+  */
+  public void OnHit(HitParams hit, Transform hitTransform) {
+    var damageInfo = new DamageInfo {
+      Attacker = hitTransform,
+      Damage = hit.Damage,
+      KnockbackStrength = hit.KnockbackStrength
+    };
+    gameObject.SendMessage("OnDamage", damageInfo, SendMessageOptions.DontRequireReceiver);
+    HitEvent.Fire((hit, hitTransform));
     if (Status) {
       var power = 5f * hit.KnockbackStrength * Mathf.Pow((Damage.Points+100f) / 100f, 2f);
       var knockBackDirection = KnockbackVector(hitTransform, transform, hit.KnockbackType);
@@ -106,16 +143,8 @@ public class Defender : MonoBehaviour {
       hit.OnHitEffects?.ForEach(e => Status.Add(e));
     }
     if (Damage) {
-      Debug.Log("Damage detected");
-      var damageInfo = new DamageInfo {
-        Attacker = hitTransform,
-        Damage = hit.Damage,
-        KnockbackStrength = hit.KnockbackStrength
-      };
-      gameObject.SendMessage("OnDamage", damageInfo, SendMessageOptions.DontRequireReceiver);
       Damage.AddPoints(hit.Damage);
     }
-    HitEvent.Fire((hit, hitTransform));
   }
 
   public void Die() {
@@ -134,6 +163,9 @@ public class Defender : MonoBehaviour {
 
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
+    if (Status) {
+      Hurtboxes.ForEach(hb => hb.enabled = Status.IsHittable);
+    }
     if (transform.position.y < -1f && !PlayingFallSound) {
       LastGroundedPosition = transform.position;
       PlayingFallSound = true;

@@ -86,7 +86,6 @@ GameObject:
   - component: {fileID: 7099279732817842499}
   - component: {fileID: 7099279732817842520}
   - component: {fileID: 7099279732817842498}
-  - component: {fileID: 7099279732817842503}
   - component: {fileID: 7099279732817842511}
   - component: {fileID: 7099279732817842496}
   - component: {fileID: 7099279732817842500}
@@ -112,7 +111,7 @@ Transform:
   - {fileID: 7099279732708566833}
   - {fileID: 7099279733034412651}
   m_Father: {fileID: 0}
-  m_RootOrder: 14
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7099279732817842520
 MonoBehaviour:
@@ -140,20 +139,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c806621753f76840a91b87e3c0d2fc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Hurtboxes:
+  - {fileID: 7099279732708566836}
   FallSFX: {fileID: 0}
---- !u!114 &7099279732817842503
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7099279732817842510}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 589031cb649129f4595d6562a2fa54c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _Points: 0
 --- !u!114 &7099279732817842511
 MonoBehaviour:
   m_ObjectHideFlags: 0
