@@ -18,7 +18,7 @@ public class Defender : MonoBehaviour {
 
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
-    Hurtboxes.ForEach(hb => hb.enabled = Status.IsHittable);
+    Hurtboxes.ForEach(hb => hb.gameObject.SetActive(Status.IsHittable));
     if (transform.position.y < -1f && !PlayingFallSound) {
       LastGroundedPosition = transform.position;
       PlayingFallSound = true;
@@ -30,10 +30,6 @@ public class Defender : MonoBehaviour {
   }
 
   void OnHit(HitParams hitParams) {
-    // DEPRECATE
-    gameObject.SendMessage("OnDamage", hitParams, SendMessageOptions.DontRequireReceiver);
-    // PROBABLY DEPRECATE?
-    // HitEvent.Fire((hit, hitTransform));
     // STATUS STUFF
     var power = 5f * hitParams.KnockbackStrength * Mathf.Pow((Damage.Points+100f) / 100f, 2f);
     var rotation = Quaternion.LookRotation(hitParams.KnockbackVector);
