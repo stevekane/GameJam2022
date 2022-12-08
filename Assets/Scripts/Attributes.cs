@@ -75,15 +75,26 @@ public class Attributes : MonoBehaviour {
     BaseUpgrades.ForEach(u => Upgrades.AddUpgrade(u));
     BaseAttributes.ForEach(kv => BaseAttributesDict.Add(kv.Attribute, kv.Modifier));
   }
+  AttributeModifier MaybeMerge(AttributeModifier modifier, AttributeModifier toMerge) => toMerge != null ? modifier.Merge(toMerge) : modifier;
   AttributeModifier GetModifier(AttributeTag attrib) {
     AttributeModifier modifier = new();
-    if (BaseAttributesDict.GetValueOrDefault(attrib, null) is var mb && mb != null)
-      modifier.Merge(mb);
-    if (Upgrades.GetModifier(attrib) is var mu && mu != null)
-      modifier.Merge(mu);
-    if (Status?.Value.GetModifier(attrib) is var ms && ms != null)
-      modifier.Merge(ms);
+    MaybeMerge(modifier, BaseAttributesDict.GetValueOrDefault(attrib, null));
+    MaybeMerge(modifier, Upgrades.GetModifier(attrib));
+    MaybeMerge(modifier, Status?.Value.GetModifier(attrib));
     return modifier;
   }
   public float GetValue(AttributeTag attrib, float baseValue = 0f) => GetModifier(attrib).Apply(baseValue);
+
+  // Serialized version of attributes is a snapshot of the current state of an entity's Attributes, including default
+  // values for unset modifiers. Can be used to compute attribute values after an entity dies.
+  public class Serialized {
+    Dictionary<AttributeTag, AttributeModifier> Attributes = new();
+    AttributeModifier GetModifier(AttributeTag attrib) => Attributes[attrib];
+
+    public Serialized(Attributes attributes) {
+      foreach (AttributeTag a in Enum.GetValues(typeof(AttributeTag)))
+        Attributes.Add(a, attributes.GetModifier(a));
+    }
+    public float GetValue(AttributeTag attrib, float baseValue = 0f) => GetModifier(attrib).Apply(baseValue);
+  }
 }
