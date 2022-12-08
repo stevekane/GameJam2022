@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -10,7 +11,8 @@ public class SimpleDash : Ability {
   public AnimationClip DashWindupClip;
   public AnimationClip DashingClip;
   public AnimationClip DoneClip;
-  public Animator Animator;
+  [SerializeField] Animator Animator;
+  [SerializeField] AnimationDriver AnimationDriver;
 
   public static InlineEffect ScriptedMove { get => new(s => {
       s.HasGravity = false;
@@ -24,29 +26,26 @@ public class SimpleDash : Ability {
     }, "DashInvulnerable");
   }
 
-  /*
-  public override void OnStop() {
-    // TODO: gross
-    AbilityManager.Bundle.StartRoutine(Animator.Run(DoneClip));
-  }
-  */
-
   // Button press/release.
   public IEnumerator Activate() => RunTask(ActivateTask);
   async Task ActivateTask(TaskScope scope) {
-    var dir = AbilityManager.GetAxis(AxisTag.Move).XZ;
-    if (dir == Vector3.zero) {
-      dir = AbilityManager.transform.forward;
+    try {
+      var dir = AbilityManager.GetAxis(AxisTag.Move).XZ;
+      if (dir == Vector3.zero) {
+        dir = AbilityManager.transform.forward;
+      }
+      AddStatusEffect(ScriptedMove);
+      await AnimationDriver.Play(scope, DashWindupClip).WaitDone(scope);
+      AddStatusEffect(Invulnerable);
+      AnimationDriver.Play(scope, DashingClip); // don't wait
+      await scope.Any(
+        s => s.Delay(DashDuration),
+        s => Move(s, dir.normalized),
+        s => MakeCancellable(s));
+    } finally {
+      // TODO: is this needed?
+      await AnimationDriver.Play(new(), DoneClip).WaitDone(scope);
     }
-    AddStatusEffect(ScriptedMove);
-    await scope.RunFiber(Animator.Run(DashWindupClip));
-    AddStatusEffect(Invulnerable);
-    await scope.Any(
-      s => s.Delay(DashDuration),
-      s => s.RunFiber(Animator.Run(DashingClip)),
-      s => Move(s, dir.normalized),
-      s => MakeCancellable(s));
-    await scope.RunFiber(Animator.Run(DoneClip));
   }
 
   async Task Move(TaskScope scope, Vector3 dir) {

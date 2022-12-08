@@ -9,7 +9,7 @@ using UnityEngine.Playables;
 public class AnimationJobConfig {
   public AnimationClip Clip;
   public AvatarMask Mask = null;
-  public float Speed = 1;  // TODO: what's this for?
+  public float Speed = 1;
 }
 
 // TODO: rename
@@ -54,12 +54,13 @@ public class AnimationJobTask {
 
   // TDO: condense start/run?
   public void Start() {
-    IsRunning = true;
     Clip.SetSpeed(DesiredSpeed * Animation.Speed * Driver.speed);
     Clip.SetDuration(Animation.Clip.length);
     Mixer.ConnectInput(1, Clip, 0, 1);
-    Mixer.SetLayerMaskFromAvatarMask(1, Animation.Mask);
+    if (Animation.Mask)
+      Mixer.SetLayerMaskFromAvatarMask(1, Animation.Mask);
     Driver.Connect(this);
+    IsRunning = true;
   }
 
   public void Stop() {
@@ -251,11 +252,13 @@ public class AnimationDriver : MonoBehaviour {
     return new AnimationJobFacade(Job);
   }
 
+  public AnimationJobTask Play(TaskScope scope, AnimationClip clip) => Play(scope, new AnimationJobConfig() { Clip = clip });
   public AnimationJobTask Play(TaskScope scope, AnimationJobConfig animation) {
     Task?.Stop();
-    Task = new AnimationJobTask(this, Graph, animation);
+    var task = new AnimationJobTask(this, Graph, animation);
+    Task = task;
     _ = Run(scope);
-    return Task;
+    return task;
   }
 
   async Task Run(TaskScope scope) {

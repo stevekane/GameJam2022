@@ -55,7 +55,9 @@ public abstract class Ability : MonoBehaviour, IAbility {
       using TaskScope scope = new(MainScope);
       try {
         await func(scope);
-      } catch {
+      } catch (OperationCanceledException) {
+      } catch (Exception e) {
+        Debug.LogError($"Exception during Ability {this}: {e}");
       } finally {
         done = true;
       }
