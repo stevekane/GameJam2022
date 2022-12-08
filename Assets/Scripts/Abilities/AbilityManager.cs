@@ -81,16 +81,18 @@ public class AbilityManager : MonoBehaviour {
     public void Unlisten(Action handler) => Action -= handler;
     public void Fire() {
       if (ShouldFire()) {
-        var tags = Ability.Tags;
+        if (Trigger.Tags.HasAllFlags(AbilityTag.CancelOthers))
+          Ability.AbilityManager.CancelOthers();
+
         Ability.AbilityManager.Energy?.Value.Consume(Trigger.EnergyCost);
+
+        var tags = Ability.Tags;
         Ability.Tags = tags.AddFlags(Trigger.Tags);
         Action?.Invoke();
         var enumerator = Method();
-        if (enumerator != null) {  // Can be null for events that listen temporarily.
+        if (enumerator != null) {  // Can be null if used only for event listeners.
           Ability.StartRoutine(new Fiber(enumerator));
         }
-        if (Trigger.Tags.HasAllFlags(AbilityTag.CancelOthers))
-          Ability.AbilityManager.CancelOthers();
       }
     }
     bool ShouldFire() {

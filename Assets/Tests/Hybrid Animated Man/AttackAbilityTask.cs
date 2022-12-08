@@ -22,32 +22,35 @@ public class AttackAbilityTask : Ability {
 
   [NonSerialized] HashSet<Collider> PhaseHits = new();
   [NonSerialized] Collider[] Hits = new Collider[16];
-  [NonSerialized] AnimationJobFacade Animation = null;
+  [NonSerialized] AnimationJobTask Animation = null;
 
   public override void OnStop() {
     HitBox.enabled = false;
     PhaseHits.Clear();
-    Animation?.OnFrame.Unlisten(OnFrame);
   }
 
   // Fiber -> Task adapter, ignore this.
   public IEnumerator Attack() => RunTask(AttackTask);
   async Task AttackTask(TaskScope scope) {
-    Animation = AnimationDriver.Play(AttackAnimation);
-    Animation.OnFrame.Listen(OnFrame);
-    await scope.Any(While(() => Animation.IsRunning), Repeat(OnHit));
+    HitBox.enabled = false;
+    await scope.Any(PlayAnim, Repeat(OnHit));
   }
 
-  void OnFrame(int frame) {
-    HitBox.enabled = frame >= WindupEnd.AnimFrames && frame <= ActiveEnd.AnimFrames;
-    if (frame == WindupEnd.AnimFrames) {
+  async Task PlayAnim(TaskScope scope) {
+    try {
+      Animation = AnimationDriver.Play(scope, AttackAnimation);
+      await Animation.WaitFrame(scope, WindupEnd.AnimFrames);
+      HitBox.enabled = true;
       var rotation = AbilityManager.transform.rotation;
       var vfxOrigin = AbilityManager.transform.TransformPoint(AttackVFXOffset);
       SFXManager.Instance.TryPlayOneShot(AttackSFX);
       VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
-    }
-    if (frame >= ActiveEnd.AnimFrames) {
+      await Animation.WaitFrame(scope, ActiveEnd.AnimFrames);
+      HitBox.enabled = false;
       CurrentTags.AddFlags(AbilityTag.Cancellable);
+      await Animation.WaitDone(scope);
+    } finally {
+      Animation.Stop();  // TODO: I think this is not needed since the job itself does this
     }
   }
 
