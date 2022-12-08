@@ -27,7 +27,7 @@ public class Vibrator : MonoBehaviour {
     LocalPosition = Target.transform.localPosition;
   }
 
-  void OnDamage(DamageInfo info) {
+  void OnHit(HitParams hitParams) {
     Vibrate(transform.forward, DamageDuration.Ticks, DamageAmplitude);
   }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace PigMoss {
   class BumRush : FiberAbility {
@@ -9,7 +10,8 @@ namespace PigMoss {
     public Timeval RushDuration = Timeval.FromSeconds(.5f);
     public Timeval RecoveryDuration = Timeval.FromSeconds(.5f);
     public TriggerEvent SpikeTriggerEvent;
-    public HitConfig SpikeHitParams;
+    [FormerlySerializedAs("SpikeHitParams")]
+    public HitConfig HitConfig;
     public HitParams Foo;
     public ParticleSystem Trail;
     public AudioClip RushSFX;
@@ -43,7 +45,7 @@ namespace PigMoss {
         var outcome = Fiber.SelectTask(contact, rush);
         yield return outcome;
         if (outcome.Value == contact && contact.Value.TryGetComponent(out Hurtbox hurtbox)) {
-          hurtbox.Defender.OnHit(SpikeHitParams.ComputeParams(Attributes), AbilityManager.transform);
+          hurtbox.TryAttack(Attributes, HitConfig);
         }
         yield return Fiber.Wait(RecoveryDuration);
         Animator.SetBool("Extended", false);

@@ -276,5 +276,4 @@ public class Status : MonoBehaviour {
 #if UNITY_EDITOR
   public List<string> DebugEffects = new();
 #endif
-
 }

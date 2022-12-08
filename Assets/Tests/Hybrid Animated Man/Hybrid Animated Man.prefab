@@ -120,11 +120,13 @@ MonoBehaviour:
     Millis: 416.66666
     FramesPerSecond: 24
   HitConfig:
+    VFX: {fileID: 7177991128484655659, guid: 22bfcb7aff64e6f4ead46853d68775c3, type: 3}
+    SFX: {fileID: 8300000, guid: 1e3312d22540aa14597a1fb4739f2782, type: 3}
     DamageModifier:
       Base: 0
       Mult: 1
-    KnockbackStrength: 3
     KnockbackType: 0
+    KnockbackStrength: 3
     RecoilStrength: 12
     CameraShakeStrength: 1
     HitStopDuration:
@@ -142,8 +144,6 @@ MonoBehaviour:
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
-  AttackHitVFX: {fileID: 7177991128484655659, guid: 22bfcb7aff64e6f4ead46853d68775c3, type: 3}
-  AttackHitSFX: {fileID: 8300000, guid: 1e3312d22540aa14597a1fb4739f2782, type: 3}
 --- !u!1 &1818372311317487516
 GameObject:
   m_ObjectHideFlags: 0
@@ -387,11 +387,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f970a829f86019441a549e1a5005231c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DamageMultiplier: 50
+  Duration:
+    Millis: 500
+    FramesPerSecond: 30
   ColorName: _EmissionColor
   FlashColor: {r: 4, g: 4, b: 4, a: 1}
   Renderers:
-  - {fileID: 2317601553386863323}
+  - {fileID: 3821682744183528888}
 --- !u!114 &4273006357362056656
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -471,6 +473,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ce0c9e24a5611d40b8628b31748e2d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Owner: {fileID: 1818372311317487516}
 --- !u!65 &2165771200980245803
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -753,13 +756,15 @@ MonoBehaviour:
     Millis: 416.66666
     FramesPerSecond: 24
   HitConfig:
+    VFX: {fileID: 7177991128484655659, guid: 22bfcb7aff64e6f4ead46853d68775c3, type: 3}
+    SFX: {fileID: 8300000, guid: 1e3312d22540aa14597a1fb4739f2782, type: 3}
     DamageModifier:
       Base: 0
       Mult: 1
-    KnockbackStrength: 3
     KnockbackType: 0
+    KnockbackStrength: 3
     RecoilStrength: 12
-    CameraShakeStrength: 1
+    CameraShakeStrength: 4
     HitStopDuration:
       Millis: 100
       FramesPerSecond: 30
@@ -775,8 +780,6 @@ MonoBehaviour:
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
-  AttackHitVFX: {fileID: 7177991128484655659, guid: 22bfcb7aff64e6f4ead46853d68775c3, type: 3}
-  AttackHitSFX: {fileID: 8300000, guid: 1e3312d22540aa14597a1fb4739f2782, type: 3}
 --- !u!1 &5427116711340342850
 GameObject:
   m_ObjectHideFlags: 0
@@ -828,11 +831,11 @@ MonoBehaviour:
     RequiredOwnerTags: 0
     EnergyCost: 0
   CurrentTags: 0
-  MaxMoveSpeed: 120
+  MaxMoveSpeed: 60
   MinMoveSpeed: 60
   TurnSpeed: 60
   DashDuration:
-    Millis: 133.33333
+    Millis: 100
     FramesPerSecond: 30
   DashWindupClip: {fileID: 7400000, guid: 2a60e9b2764640043a7ce8027822d075, type: 2}
   DashingClip: {fileID: 7400000, guid: a41ecc2b2a8aa7a4e9a4647f0beb06dd, type: 2}
@@ -1092,7 +1095,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1273899336410696, guid: 5aed7f791a03c2a4ba0040d2fa161639, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1344322093280860, guid: 5aed7f791a03c2a4ba0040d2fa161639, type: 3}
       propertyPath: m_IsActive
@@ -1188,11 +1191,6 @@ PrefabInstance:
       insertIndex: 0
       addedObject: {fileID: 2191405259511413937}
   m_SourcePrefab: {fileID: 100100000, guid: 5aed7f791a03c2a4ba0040d2fa161639, type: 3}
---- !u!137 &2317601553386863323 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 137836590951148656, guid: 5aed7f791a03c2a4ba0040d2fa161639, type: 3}
-  m_PrefabInstance: {fileID: 2432075685820749483}
-  m_PrefabAsset: {fileID: 0}
 --- !u!95 &2347714126523969063 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 95902137545226380, guid: 5aed7f791a03c2a4ba0040d2fa161639, type: 3}

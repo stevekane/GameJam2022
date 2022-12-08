@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class HurtFlash : MonoBehaviour {
-  public float DamageMultiplier = 150;
+  public Timeval Duration = Timeval.FromMillis(500);
   public string ColorName = "_EmissionColor";
   [ColorUsage(showAlpha: true, hdr: true)]
   public Color FlashColor = Color.white;
@@ -22,10 +22,10 @@ public class HurtFlash : MonoBehaviour {
   }
   #endif
 
-  void OnDamage(DamageInfo info) {
+  void OnHit(HitParams hitParams) {
     UnFlash();
     StopAllCoroutines();
-    StartCoroutine(FlashRoutine(Timeval.FromMillis(info.Damage*DamageMultiplier)));
+    StartCoroutine(FlashRoutine(Duration));
   }
 
   void Flash(Timeval duration) {

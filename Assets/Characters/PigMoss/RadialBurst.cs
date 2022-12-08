@@ -37,7 +37,6 @@ namespace PigMoss {
       var rotationPerProjectile = Quaternion.Euler(0, 360/(float)Count, 0);
       var halfRotationPerProjectile = Quaternion.Euler(0, 180/(float)Count, 0);
       var direction = AbilityManager.transform.forward.XZ();
-      var hitParams = HitConfig.ComputeParams(Attributes);
       for (var j = 0; j < Rotations; j++) {
         SFXManager.Instance.TryPlayOneShot(FireSFX);
         for (var i = 0; i < Count; i++) {
@@ -46,7 +45,6 @@ namespace PigMoss {
           var radius = 5;
           var position = AbilityManager.transform.position+radius*direction+Vector3.up;
           var projectile = GameObject.Instantiate(ProjectilePrefab, position, rotation);
-          projectile.GetComponent<BigFatSlowBoom>().HitParams = hitParams;
         }
         yield return Fiber.Wait(FireDelay);
         direction = halfRotationPerProjectile*direction;

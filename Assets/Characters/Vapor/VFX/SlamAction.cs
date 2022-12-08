@@ -7,7 +7,7 @@ public class SlamAction : MonoBehaviour {
   public GameObject Piece;
   public float PieceLength = 1;
   public Timeval PieceActivateDelay;
-  public Action<Transform, Defender> OnHit;
+  public Action<Hurtbox> OnHit;
   float NextPieceZ = 0;
   List<GameObject> Pieces;
   bool DoneRaising;
@@ -62,8 +62,7 @@ public class SlamAction : MonoBehaviour {
       DoneRaising = true;
   }
 
-  void OnContact(Transform other) {
-    if (other.TryGetComponent(out Defender defender))
-      OnHit?.Invoke(transform, defender);
+  void OnContact(Hurtbox hurtbox) {
+    OnHit?.Invoke(hurtbox);
   }
 }

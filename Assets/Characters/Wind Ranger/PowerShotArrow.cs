@@ -2,10 +2,10 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody), typeof(Collider))]
 public class PowerShotArrow : MonoBehaviour {
+  [SerializeField] Attributes Attributes;
+  [SerializeField] HitConfig HitConfig;
   public GameObject DestructionPrefab;
   public float DamageReductionPerTarget = .2f;
-  public float Damage = 100;
-  public HitParams HitParams;
 
   int TargetsHit;
 
@@ -16,9 +16,10 @@ public class PowerShotArrow : MonoBehaviour {
 
   void OnProjectileEnter(ProjectileCollision c) {
     if (c.Collider.TryGetComponent(out Hurtbox hurtbox)) {
-      HitParams.Damage *= Mathf.Pow(1-DamageReductionPerTarget, TargetsHit);
+      var scaling = Mathf.Pow(1-DamageReductionPerTarget, TargetsHit);
+      var hitConfig = HitConfig.Scale(HitConfig, scaling);
       TargetsHit++;
-      hurtbox.Defender.OnHit(HitParams, transform);
+      hurtbox.TryAttack(Attributes, hitConfig);
     }
   }
 }

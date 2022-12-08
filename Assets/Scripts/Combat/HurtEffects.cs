@@ -5,10 +5,9 @@ public class HurtEffects : MonoBehaviour {
   [SerializeField] GameObject VFX;
   [SerializeField] AudioClip Clip;
 
-  void OnDamage(DamageInfo info) {
+  void OnHit(HitParams hitParams) {
     var position = transform.position+transform.TransformVector(VFXOffset);
-    var delta = (transform.position-info.Attacker.position).XZ();
-    var rotation = Quaternion.LookRotation(delta.normalized);
+    var rotation = Quaternion.LookRotation(hitParams.KnockbackVector.normalized);
     VFXManager.Instance.TrySpawnEffect(VFX, position, rotation);
     SFXManager.Instance.TryPlayOneShot(Clip);
   }

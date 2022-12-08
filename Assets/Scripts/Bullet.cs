@@ -1,23 +1,23 @@
-using System;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour {
   public enum BulletType { STUN, NET }
-  public BulletType Type;
-  public Vector3 Direction;
-  public float Speed = 5;
-  int CollisionLayer;
-  HitParams HitParams;
+  [SerializeField] Attributes Attributes;
+  [SerializeField] HitConfig HitConfig;
+  [SerializeField] BulletType Type;
+  [SerializeField] Vector3 Direction;
+  [SerializeField] float Speed = 5;
+  [SerializeField] Rigidbody Body;
 
-  Rigidbody Body;
+  int CollisionLayer;
 
   public void Awake() {
     Body = GetComponent<Rigidbody>();
   }
 
-  public static Bullet Fire(Bullet prefab, Vector3 position, Vector3 direction, HitParams hitparams, int layer) {
+  public static Bullet Fire(Bullet prefab, Vector3 position, Vector3 direction, int layer) {
     var bullet = Instantiate(prefab, position, Quaternion.FromToRotation(Vector3.forward, direction));
-    bullet.HitParams = hitparams;
+    bullet.gameObject.SetActive(true);
     bullet.Direction = direction;
     bullet.CollisionLayer = layer;
     return bullet;
@@ -33,7 +33,7 @@ public class Bullet : MonoBehaviour {
     if (collider.TryGetComponent(out Hurtbox hurtbox)) {
       if (Physics.GetIgnoreLayerCollision(CollisionLayer, hurtbox.gameObject.layer))
         return;  // TODO: I forgot the point of this
-      hurtbox.Defender.OnHit(HitParams, transform);
+      hurtbox.TryAttack(Attributes, HitConfig);
     }
     Destroy(gameObject, .01f);
   }

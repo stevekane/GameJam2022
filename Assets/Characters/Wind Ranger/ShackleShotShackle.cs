@@ -8,7 +8,7 @@ public class ShackleShotShackle : MonoBehaviour {
   public float Radius;
   public float Radians;
 
-  bool TryGetStatus(GameObject g, out Status status) => status = g.GetComponent<Hurtbox>()?.Defender.GetComponent<Status>();
+  bool TryGetStatus(GameObject g, out Status status) => status = g.GetComponent<Hurtbox>()?.Owner.GetComponent<Status>();
   void Stop() => Destroy(gameObject);
   void OnDestroy() => Stop();
   void OnCollisionEnter(Collision c) => Stop();

@@ -13,7 +13,6 @@ public class FocusFire : Ability {
   public Timeval Duration = Timeval.FromMillis(10000);
   public Timeval ShotCooldown = Timeval.FromMillis(100);
   public float MaxRange = 5;
-  public HitConfig HitConfig;
 
   public IEnumerator MakeRoutine() {
     var target = Targeting.StandardTarget(Owner, MaxRange, LayerMask, TriggerInteraction, PhysicsQuery.Colliders);
@@ -28,8 +27,7 @@ public class FocusFire : Ability {
       if (Target && Vector3.Distance(Owner.position, Target.position) < MaxRange) {
         yield return Animator.Run(FireClip);
         Owner.transform.LookAt(Target);
-        var arrow = Instantiate(ArrowPrefab, transform.position, transform.rotation);
-        arrow.HitParams = HitConfig.ComputeParams(Attributes);
+        Instantiate(ArrowPrefab, transform.position, transform.rotation);
         yield return Wait(ShotCooldown.Ticks);
       } else {
         yield return null;

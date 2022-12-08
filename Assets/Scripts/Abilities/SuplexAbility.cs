@@ -32,11 +32,11 @@ public class SuplexAbility : Ability {
       Debug.Log($"No Targets found: {best.Item1} {best.Item2}");
       yield break;
     }
-    var target = best.Item1.Defender;
+    var target = best.Item1.Owner.transform;
     yield return MoveTo(target);
     yield return Toss(target);
   }
-  public IEnumerator MoveTo(Defender target) {
+  public IEnumerator MoveTo(Transform target) {
     Status.Add(Using(new ScriptedMovementEffect()));
     while (true) {
       var delta = target.transform.position - Status.transform.position;
@@ -46,7 +46,7 @@ public class SuplexAbility : Ability {
       yield return null;
     }
   }
-  public IEnumerator Toss(Defender target) {
+  public IEnumerator Toss(Transform target) {
     var targetStatus = target.GetComponent<Status>();
     targetStatus.Add(Using(new ScriptedMovementEffect()));
     var air = transform.position + new Vector3(0f, 25f, 0f) + transform.forward*3f;
@@ -67,13 +67,12 @@ public class SuplexAbility : Ability {
     }
 
     CameraShaker.Instance.Shake(HitCameraShakeIntensity);
-    var hitParams = HitConfig.ComputeParams(Attributes);
     var hits = Physics.OverlapSphereNonAlloc(target.transform.position, HitRadius, PhysicsQuery.Colliders, Layers.CollidesWith(gameObject.layer));
     PhysicsQuery.Colliders[..hits].ForEach(c => {
       if (c.TryGetComponent(out Hurtbox hurtbox))
-        hurtbox.Defender.OnHit(hitParams, transform);
+        hurtbox.TryAttack(Attributes, HitConfig);
     });
-    yield return Fiber.Wait(hitParams.HitStopDuration.Ticks);
+    yield return Fiber.Wait(HitConfig.HitStopDuration.Ticks);
     targetStatus.transform.up = -targetStatus.transform.up;
   }
 }

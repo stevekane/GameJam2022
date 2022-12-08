@@ -5,9 +5,9 @@ public class Shield : MonoBehaviour {
   public float MaxDamage = 50f;
   public Animator Animator;
   public AnimationClip DeathClip;
+  public Hurtbox Hurtbox;
   Damage Damage;
   Bundle Bundle = new();
-  public Defender Defender { get; private set; }
 
   IEnumerator WatchDamage() {
     yield return Fiber.While(() => Damage.Points < MaxDamage);
@@ -17,7 +17,6 @@ public class Shield : MonoBehaviour {
 
   void Awake() {
     Damage = GetComponent<Damage>();
-    Defender = GetComponent<Defender>();
     Bundle.StartRoutine(WatchDamage());
   }
 

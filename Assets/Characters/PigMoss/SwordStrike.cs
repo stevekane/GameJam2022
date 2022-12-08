@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace PigMoss {
   [Serializable]
   public class SwordStrike : FiberAbility {
-    public HitConfig HitParams;
+    [FormerlySerializedAs("HitParams")]
+    public HitConfig HitConfig;
     public Timeval ActiveFrameStart;
     public Timeval ActiveFrameEnd;
     public AnimationClip Clip;
@@ -43,7 +45,7 @@ namespace PigMoss {
       var activeOutcome = Fiber.SelectTask(contact, endActive);
       yield return activeOutcome;
       if (activeOutcome.Value == contact && contact.Value.TryGetComponent(out Hurtbox hurtbox)) {
-        hurtbox.Defender.OnHit(HitParams.ComputeParams(Attributes), AbilityManager.transform);
+        hurtbox.TryAttack(Attributes, HitConfig);
       }
       Collider.enabled = false;
       yield return animation;

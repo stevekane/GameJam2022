@@ -24,8 +24,8 @@ public class MeleeAbility : Ability {
 
   GameObject AttackVFXInstance;
   AnimationTask Animation;
-  List<Transform> Hits = new List<Transform>(capacity: 4);
-  List<Transform> PhaseHits = new List<Transform>(capacity: 4);
+  List<Hurtbox> Hits = new(capacity: 16);
+  HashSet<Hurtbox> PhaseHits = new(capacity: 16);
 
   void Start() {
     Animator = GetComponentInParent<Animator>();
@@ -48,7 +48,7 @@ public class MeleeAbility : Ability {
     Animation = new AnimationTask(Animator, Clip);
 
     // Windup
-    HitParams hitParams;
+    HitConfig hitConfig = HitConfig;
     if (chargeable) {
       Animation.SetSpeed(ChargeSpeedFactor);
       var startFrame = Timeval.TickCount;
@@ -58,10 +58,9 @@ public class MeleeAbility : Ability {
       var maxExtraFrames = WindupDuration.Ticks / ChargeSpeedFactor - WindupDuration.Ticks;
       var chargeScaling = ChargeScaling.Evaluate(extraFrames / maxExtraFrames);
       Animation.SetSpeed(1);
-      hitParams = HitConfig.ComputeParamsScaled(Attributes, chargeScaling);
+      hitConfig = HitConfig.Scale(hitConfig, chargeScaling);
     } else {
       yield return Animation.PlayUntil(WindupDuration.AnimFrames);
-      hitParams = HitConfig.ComputeParams(Attributes);
     }
     // Active
     Hitbox.Collider.enabled = true;
@@ -69,7 +68,7 @@ public class MeleeAbility : Ability {
     Hits.Clear();
     SFXManager.Instance.TryPlayOneShot(AttackSFX);
     AttackVFXInstance = VFXManager.Instance.TrySpawn2DEffect(AttackVFX, Owner.position + VFXOffset, Owner.rotation, ActiveDuration.Seconds);
-    yield return Fiber.Any(Animation.PlayUntil(WindupDuration.AnimFrames + ActiveDuration.AnimFrames+1), Fiber.Repeat(HandleHits, hitParams));
+    yield return Fiber.Any(Animation.PlayUntil(WindupDuration.AnimFrames + ActiveDuration.AnimFrames+1), Fiber.Repeat(HandleHits, hitConfig));
     Hitbox.Collider.enabled = false;
 
     // Hitstop
@@ -85,14 +84,14 @@ public class MeleeAbility : Ability {
     Animation = null;
   }
 
-  void HandleHits(HitParams hitParams) {
+  void HandleHits(HitConfig config) {
     if (Hits.Count != 0) {
       if (AttackVFXInstance && AttackVFXInstance.GetComponent<ParticleSystem>().main is var m)
         m.simulationSpeed = 0f;
       Status.Add(new HitStopEffect(Owner.forward, HitStopVibrationAmplitude, HitFreezeDuration.Ticks));
       CameraShaker.Instance.Shake(HitCameraShakeIntensity);
       Hits.ForEach(target => {
-        target.GetComponent<Defender>()?.OnHit(hitParams, Owner);
+        target.TryAttack(Attributes, config);
         Owner.transform.forward = (target.transform.position - Owner.transform.position).XZ().normalized;
       });
       AbilityManager.Energy?.Value.Add(HitEnergyGain * Hits.Count);
@@ -101,10 +100,10 @@ public class MeleeAbility : Ability {
     }
   }
 
-  void OnContact(Transform target) {
-    if (!PhaseHits.Contains(target)) {
-      Hits.Add(target);
-      PhaseHits.Add(target);
+  void OnContact(Hurtbox hurtbox) {
+    if (!PhaseHits.Contains(hurtbox)) {
+      Hits.Add(hurtbox);
+      PhaseHits.Add(hurtbox);
     }
   }
 }

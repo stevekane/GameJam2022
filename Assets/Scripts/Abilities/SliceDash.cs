@@ -11,7 +11,7 @@ public class SliceDash : Ability {
   public AnimationClip DoneClip;
   public AttackHitbox Hitbox;
   public HitConfig HitConfig;
-  List<Defender> Hits = new();
+  List<Hurtbox> Hits = new();
   Animator Animator;
 
   public IEnumerator Execute() {
@@ -27,7 +27,7 @@ public class SliceDash : Ability {
     var countdown = new CountdownTimer(Duration);
     yield return Fiber.Any(Animator.Run(DashingClip), countdown, Move(dir.normalized, countdown));
     foreach (var h in Hits)
-      h.OnHit(HitConfig.ComputeParams(Attributes), AbilityManager.transform);
+      h.TryAttack(Attributes, HitConfig);
     yield return Animator.Run(DoneClip);
   }
 
@@ -52,10 +52,10 @@ public class SliceDash : Ability {
       yield return null;
     }
   }
-  public void OnContact(Transform target) {
-    if (target.TryGetComponent(out Defender d) && !Hits.Contains(d)) {
-      d.GetComponent<Status>().Add(Using(new ScriptedMovementEffect()));
-      Hits.Add(d);
+  public void OnContact(Hurtbox hurtbox) {
+    if (!Hits.Contains(hurtbox) && hurtbox.Owner.TryGetComponent(out Status status)) {
+      status.Add(Using(new ScriptedMovementEffect()));
+      Hits.Add(hurtbox);
     }
   }
 

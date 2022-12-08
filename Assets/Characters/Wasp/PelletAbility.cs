@@ -9,7 +9,6 @@ public class PelletAbility : Ability {
   public InactiveAttackPhase Recovery;
   public Bullet BulletPrefab;
   public int NumBullets;
-  public HitConfig HitConfig;
   public GameObject FireVFX;
   public AudioClip FireSFX;
 
@@ -24,7 +23,7 @@ public class PelletAbility : Ability {
       yield return Fiber.Wait(Active.Duration.Ticks / NumBullets);
       VFXManager.Instance.TrySpawnEffect(FireVFX, transform.position);
       SFXManager.Instance.TryPlayOneShot(FireSFX);
-      Bullet.Fire(BulletPrefab, transform.position, transform.forward, HitConfig.ComputeParams(GetComponentInParent<Attributes>()), gameObject.layer);
+      Bullet.Fire(BulletPrefab, transform.position, transform.forward, gameObject.layer);
     }
   }
 

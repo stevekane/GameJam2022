@@ -162,6 +162,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ce0c9e24a5611d40b8628b31748e2d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Owner: {fileID: 4692194450172351927}
 --- !u!65 &4692194449579004220
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -201,10 +202,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4692194450172351818}
   - component: {fileID: 4692194450172351925}
-  - component: {fileID: 2682167282304232492}
   - component: {fileID: 2793019997782131147}
-  - component: {fileID: 4692194450172351924}
-  - component: {fileID: 704825919502182732}
   - component: {fileID: 1749337360117157023}
   - component: {fileID: 869648123590668608}
   - component: {fileID: 3638369707078671088}
@@ -246,19 +244,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ad6469a979949144ad1604c35ccf83b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2682167282304232492
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4692194450172351927}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1d9f7493e521df49a7af36797d00810, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Animator: {fileID: 4661272542552748758}
 --- !u!114 &2793019997782131147
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -273,32 +258,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Tags: 0
   DebugEffects: []
---- !u!114 &4692194450172351924
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4692194450172351927}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c806621753f76840a91b87e3c0d2fc3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  FallSFX: {fileID: 0}
---- !u!114 &704825919502182732
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4692194450172351927}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 589031cb649129f4595d6562a2fa54c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _Points: 0
 --- !u!114 &1749337360117157023
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -363,9 +322,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54a8dc9d177837d4188e84b84d044b24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VFXOffset: {x: 0, y: 0, z: 0}
-  VFX: {fileID: 1750940742320366, guid: ec1383a81f8b26e41bd5795fba065567, type: 3}
-  Clip: {fileID: 8300000, guid: a715ddf00ff7f24469c72404e8df85e9, type: 3}
+  VFXOffset: {x: 0, y: 1, z: 0}
+  VFX: {fileID: 1995403933065894, guid: bf3228cec72bf65469800c0e55477fbd, type: 3}
+  Clip: {fileID: 8300000, guid: 332a6114ed184a44188829a8f87db1a7, type: 3}
 --- !u!95 &4661272542552748758
 Animator:
   serializedVersion: 4

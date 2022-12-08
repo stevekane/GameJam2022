@@ -19,27 +19,24 @@ public class ShieldAbility : Ability {
   public IEnumerator HoldStart() {
     Animator.SetBool("Shielding", true);
     yield return Windup.Start(Animator, Index);
-    using (AddStatusEffect(Invulnerable)) {
-      yield return Fiber.Any(Fiber.Repeat(HandleHits), ListenFor(HoldRelease));
-    }
+    Shield.Hurtbox.gameObject.SetActive(true);
+    var invuln = AddStatusEffect(Invulnerable);
+    Using(invuln);
+    yield return ListenFor(HoldRelease);
+    invuln.Dispose();
+    Disposables.Remove(invuln);
+    Shield.Hurtbox.gameObject.SetActive(false);
     Animator.SetBool("Shielding", false);
     yield return Recovery.Start(Animator, Index);
   }
 
   public IEnumerator HoldRelease() => null;
 
-  IEnumerator HandleHits() {
-    var hitEvent = Fiber.ListenFor(Status.GetComponent<Defender>().HitEvent);
-    yield return hitEvent;
-    (var hit, var hitTransform) = hitEvent.Value;
-    if (Shield != null)
-      Shield.GetComponent<Defender>().OnHit(hit, hitTransform);
-  }
-
   public override void OnStop() {
     Animator.SetBool("Attacking", false);
     Animator.SetInteger("AttackIndex", -1);
     Animator.SetFloat("AttackSpeed", 1);
     Animator.SetBool("Shielding", false);
+    Shield.Hurtbox.gameObject.SetActive(false);
   }
 }

@@ -26,17 +26,20 @@ public class SimpleDash : Ability {
     }, "DashInvulnerable");
   }
 
+  /*
   public override void OnStop() {
     // TODO: gross
     AbilityManager.Bundle.StartRoutine(Animator.Run(DoneClip));
   }
+  */
 
   // Button press/release.
   public IEnumerator Activate() => RunTask(ActivateTask);
   async Task ActivateTask(TaskScope scope) {
     var dir = AbilityManager.GetAxis(AxisTag.Move).XZ;
-    if (dir == Vector3.zero)
-      return;
+    if (dir == Vector3.zero) {
+      dir = AbilityManager.transform.forward;
+    }
     AddStatusEffect(ScriptedMove);
     await scope.RunFiber(Animator.Run(DashWindupClip));
     AddStatusEffect(Invulnerable);

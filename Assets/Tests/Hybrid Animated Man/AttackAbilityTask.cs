@@ -19,8 +19,6 @@ public class AttackAbilityTask : Ability {
   [SerializeField] Vector3 AttackVFXOffset;
   [SerializeField] GameObject AttackVFX;
   [SerializeField] AudioClip AttackSFX;
-  [SerializeField] GameObject AttackHitVFX;
-  [SerializeField] AudioClip AttackHitSFX;
 
   [NonSerialized] HashSet<Collider> PhaseHits = new();
   [NonSerialized] Collider[] Hits = new Collider[16];
@@ -57,24 +55,22 @@ public class AttackAbilityTask : Ability {
     var hitCount = await scope.ListenForAll(TriggerEvent.OnTriggerStaySource, Hits);
     var attacker = AbilityManager.transform;
     var newHits = false;
-    var hitParams = HitConfig.ComputeParams(Attributes);
     for (var i = 0; i < hitCount; i++) {
       var hit = Hits[i];
       var contact = hit.transform.position;
       var rotation = AbilityManager.transform.rotation;
       if (!PhaseHits.Contains(hit) && hit.TryGetComponent(out Hurtbox hurtbox)) {
-        VFXManager.Instance.TrySpawn2DEffect(AttackHitVFX, contact+Vector3.up, rotation);
-        hurtbox.Defender.OnHit(hitParams, attacker);
+        hurtbox.TryAttack(Attributes, HitConfig);
         PhaseHits.Add(hit);
         newHits = true;
       }
     }
+    // TODO: Does this belong here? Should this happen in HurtBox or something after hit is confirmed?
     if (newHits) {
-      SFXManager.Instance.TryPlayOneShot(AttackHitSFX);
       CameraShaker.Instance.Shake(HitConfig.CameraShakeStrength);
-      Status.Add(new HitStopEffect(attacker.forward, .1f, hitParams.HitStopDuration.Ticks));
-      await scope.Ticks(hitParams.HitStopDuration.Ticks);
-      Status.Add(new RecoilEffect(HitConfig.RecoilStrength * -attacker.forward));
+      Status.Add(new HitStopEffect(attacker.forward, .1f, HitConfig.HitStopDuration.Ticks), s => {
+        s.Add(new RecoilEffect(HitConfig.RecoilStrength * -attacker.forward));
+      });
     }
   }
 }
