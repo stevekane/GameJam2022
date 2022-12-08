@@ -123,7 +123,7 @@ public class TaskScope : IDisposable {
     try {
       evt.Listen(callback);
       await Task.Delay(-1, done.Token);
-    } catch {
+    } catch (OperationCanceledException) {
     } finally {
       evt.Unlisten(callback);
       ThrowIfCancelled();
@@ -138,7 +138,7 @@ public class TaskScope : IDisposable {
       evt.Listen(callback);
       await Task.Delay(-1, done.Token);
       throw new Exception(); // not reached
-    } catch {
+    } catch (OperationCanceledException) {
       return eventResult;
     } finally {
       evt.Unlisten(callback);
@@ -154,7 +154,7 @@ public class TaskScope : IDisposable {
       evt.Listen(callback);
       await Task.Delay(-1, done.Token);
       throw new Exception(); // not reached
-    } catch {
+    } catch (OperationCanceledException) {
       return resultCount;
     } finally {
       evt.Unlisten(callback);

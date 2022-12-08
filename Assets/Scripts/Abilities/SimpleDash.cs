@@ -11,7 +11,6 @@ public class SimpleDash : Ability {
   public AnimationClip DashWindupClip;
   public AnimationClip DashingClip;
   public AnimationClip DoneClip;
-  [SerializeField] Animator Animator;
   [SerializeField] AnimationDriver AnimationDriver;
 
   public static InlineEffect ScriptedMove { get => new(s => {

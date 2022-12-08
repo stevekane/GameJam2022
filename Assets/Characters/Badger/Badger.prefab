@@ -173,6 +173,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TriggerConditions: []
   CurrentTags: 0
+  AnimationDriver: {fileID: 2801194829688342324}
   Clip: {fileID: 7400000, guid: 42c859a6e4f668249a46f4725d25c611, type: 2}
   WindupDuration:
     Millis: 333.33334
@@ -1175,6 +1176,7 @@ GameObject:
   - component: {fileID: 4107459485230753281}
   - component: {fileID: 7727835182619467870}
   - component: {fileID: 5571416124093621160}
+  - component: {fileID: 2801194829688342324}
   m_Layer: 10
   m_Name: Badger
   m_TagString: Untagged
@@ -1244,7 +1246,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 589031cb649129f4595d6562a2fa54c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _Points: 0
+  <Points>k__BackingField: 0
 --- !u!114 &5571416124093621157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1432,6 +1434,18 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 3, z: 0}
+--- !u!114 &2801194829688342324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5858cd79c3bb37845b5d44f08793d81e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0
@@ -1885,7 +1899,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 589031cb649129f4595d6562a2fa54c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _Points: 0
+  <Points>k__BackingField: 0
 --- !u!114 &1345878861977264778
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class MeleeAbility : Ability {
-  Animator Animator;
+  [SerializeField] AnimationDriver AnimationDriver;
   Transform Owner;
   public AnimationClip Clip;
   public Timeval WindupDuration;
@@ -23,36 +24,32 @@ public class MeleeAbility : Ability {
   public AttackHitbox Hitbox;
 
   GameObject AttackVFXInstance;
-  AnimationTask Animation;
+  AnimationJobTask Animation;
   List<Hurtbox> Hits = new(capacity: 16);
   HashSet<Hurtbox> PhaseHits = new(capacity: 16);
 
   void Start() {
-    Animator = GetComponentInParent<Animator>();
     Owner = Status.transform;
     Hitbox.TriggerStay = OnContact;
   }
 
-  public IEnumerator AttackStart() {
-    yield return Routine(false);
-  }
-  public IEnumerator ChargeStart() {
-    yield return Routine(true);
-  }
-  public IEnumerator ChargeRelease() {
+  public IEnumerator AttackStart() => RunTask(s => Routine(s, false));
+  public IEnumerator ChargeStart() => RunTask(s => Routine(s, true));
+  public IEnumerator ChargeRelease() => RunTask(ChargeReleaseTask);
+  async Task ChargeReleaseTask(TaskScope scope) {
     Animation?.SetSpeed(1);
-    yield return null;
+    await scope.Yield();
   }
 
-  IEnumerator Routine(bool chargeable) {
-    Animation = new AnimationTask(Animator, Clip);
+  async Task Routine(TaskScope scope, bool chargeable) {
+    Animation = AnimationDriver.Play(scope, Clip);
 
     // Windup
     HitConfig hitConfig = HitConfig;
     if (chargeable) {
       Animation.SetSpeed(ChargeSpeedFactor);
       var startFrame = Timeval.TickCount;
-      yield return Animation.PlayUntil(WindupDuration.AnimFrames);
+      await Animation.WaitFrame(scope, WindupDuration.AnimFrames);
       var numFrames = Timeval.TickCount - startFrame;
       var extraFrames = numFrames - WindupDuration.Ticks;
       var maxExtraFrames = WindupDuration.Ticks / ChargeSpeedFactor - WindupDuration.Ticks;
@@ -60,7 +57,7 @@ public class MeleeAbility : Ability {
       Animation.SetSpeed(1);
       hitConfig = hitConfig.Scale(chargeScaling);
     } else {
-      yield return Animation.PlayUntil(WindupDuration.AnimFrames);
+      await Animation.WaitFrame(scope, WindupDuration.AnimFrames);
     }
     // Active
     Hitbox.Collider.enabled = true;
@@ -68,23 +65,24 @@ public class MeleeAbility : Ability {
     Hits.Clear();
     SFXManager.Instance.TryPlayOneShot(AttackSFX);
     AttackVFXInstance = VFXManager.Instance.TrySpawn2DEffect(AttackVFX, Owner.position + VFXOffset, Owner.rotation, ActiveDuration.Seconds);
-    yield return Fiber.Any(Animation.PlayUntil(WindupDuration.AnimFrames + ActiveDuration.AnimFrames+1), Fiber.Repeat(HandleHits, hitConfig));
+    await scope.Any(s => Animation.WaitFrame(s, WindupDuration.AnimFrames + ActiveDuration.AnimFrames+1), s => s.Repeat(s => HandleHits(s, hitConfig)));
     Hitbox.Collider.enabled = false;
 
-    // Hitstop
-    yield return Fiber.Until(() => Animator.speed != 0);
-    if (AttackVFXInstance && AttackVFXInstance.GetComponent<ParticleSystem>().main is var m)
-      m.simulationSpeed = 1f;
+    // Hitstop -- this code sucks and is probably not necessary
+    //yield return Fiber.Until(() => Animator.speed != 0);
+    //if (AttackVFXInstance && AttackVFXInstance.GetComponent<ParticleSystem>().main is var m)
+    //  m.simulationSpeed = 1f;
 
     // Recovery
-    yield return Animation;
-  }
-  public override void OnStop() {
-    Animation?.Stop();
-    Animation = null;
+    await Animation.WaitDone(scope);
   }
 
-  void HandleHits(HitConfig config) {
+  //public override void OnStop() {
+  //  Animation?.Stop();
+  //  Animation = null;
+  //}
+
+  async Task HandleHits(TaskScope s, HitConfig config) {
     if (Hits.Count != 0) {
       Hits.ForEach(target => {
         target.TryAttack(new HitParams(config, Attributes.serialized, Attributes.gameObject));
@@ -93,6 +91,7 @@ public class MeleeAbility : Ability {
       AbilityManager.Energy?.Value.Add(HitEnergyGain * Hits.Count);
       Hits.Clear();
     }
+    await s.Tick();
   }
 
   void OnContact(Hurtbox hurtbox) {
