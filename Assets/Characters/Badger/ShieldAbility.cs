@@ -21,11 +21,9 @@ public class ShieldAbility : Ability {
     yield return Windup.Start(Animator, Index);
     if (Shield != null)
       Shield.Hurtbox.gameObject.SetActive(true);
-    var invuln = AddStatusEffect(Invulnerable);
-    Using(invuln);
-    yield return ListenFor(HoldRelease);
-    invuln.Dispose();
-    Disposables.Remove(invuln);
+    using (var invuln = AddStatusEffect(Invulnerable)) {
+      yield return ListenFor(HoldRelease);
+    }
     if (Shield != null)
       Shield.Hurtbox.gameObject.SetActive(false);
     Animator.SetBool("Shielding", false);
