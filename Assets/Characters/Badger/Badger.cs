@@ -8,6 +8,7 @@ public class Badger : MonoBehaviour {
   public Timeval AttackDelay = Timeval.FromMillis(1000);
   Status Status;
   Defender Defender;
+  Hurtbox Hurtbox;
   Transform Target;
   AbilityManager Abilities;
   AbilityManager TargetAbilities;
@@ -22,11 +23,12 @@ public class Badger : MonoBehaviour {
     TargetAbilities = Target.GetComponent<AbilityManager>();
     Status = GetComponent<Status>();
     Defender = GetComponent<Defender>();
+    Hurtbox = GetComponentInChildren<Hurtbox>();
     Shield = GetComponentInChildren<Shield>();
     Abilities = GetComponent<AbilityManager>();
     PunchAbility = GetComponentInChildren<MeleeAbility>();
     ShieldAbility = GetComponentInChildren<ShieldAbility>();
-    Defender.HitEvent.Listen((_) => WasHit = true);
+    Hurtbox.OnHit.Listen((_) => WasHit = true);
   }
 
   // TODO: What about dash?
