@@ -415,7 +415,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b19c15c6473ec504da9b3e539be45d59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TriggerConditions: []
+  TriggerConditions:
+  - Method:
+      MethodName: AttackStart
+    Tags: 1
+    RequiredOwnerTags: 0
+    EnergyCost: 0
   CurrentTags: 0
   Index: 0
   Animator: {fileID: 7727835182619467870}
@@ -953,6 +958,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba179080412a6af41a99d021d690c5fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Energy:
+    Value: {fileID: 0}
   Bundle:
     Fibers: []
     Added: []
@@ -1001,7 +1008,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f970a829f86019441a549e1a5005231c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DamageMultiplier: 50
+  Duration:
+    Millis: 500
+    FramesPerSecond: 30
   ColorName: _EmissionColor
   FlashColor: {r: 4, g: 4, b: 4, a: 1}
   Renderers:

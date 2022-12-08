@@ -4,7 +4,6 @@ using System;
 //   Optional<Animator> animator = GetComponent<Animator>();
 //   Animator?.Value.SetBool("Walking");
 // If there is no animator component, Animator will be null and the second statement will be a no-op.
-[Serializable]
 public class Optional<T> where T : UnityEngine.Object {
   public T Value = null;
   Optional(T value) => Value = value;
