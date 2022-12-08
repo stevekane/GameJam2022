@@ -7,6 +7,7 @@
 - Store reference instance for Bullet on PelletAbility with HitConfig and Attributes ref
 - ShieldAbility should work by toggle isHittable status of Badger while enabling the shield HurtBox
 - Add hit SFX/VFX to hit configs on all relevant abilities... fuck me
+- TODO: Badger Shield does not need Defender/Status but needs to take Damage... Should move Damage Logic to damage component
 
 ## Defender changes
 
@@ -59,3 +60,9 @@
 
 -- Removed HitParams
 -- Has HitConfig and reference to owner's Attributes
+
+## Bullet changes
+
+-- Has reference to Attributes of Owner
+-- Owns HitConfig
+-- Fire no longer is passed HitParams
