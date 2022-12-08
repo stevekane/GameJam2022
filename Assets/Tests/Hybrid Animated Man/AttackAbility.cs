@@ -82,8 +82,8 @@ public class AttackAbility : Ability {
   [SerializeField] GameObject AttackVFX;
   [SerializeField] AudioClip AttackSFX;
 
-  [NonSerialized] HashSet<Collider> PhaseHits = new();
   [NonSerialized] Collider[] Hits = new Collider[16];
+  [NonSerialized] HashSet<Collider> PhaseHits = new();
   [NonSerialized] AnimationJobFacade Animation = null;
 
   public override void OnStop() {

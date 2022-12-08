@@ -28,7 +28,7 @@ public class Badger : MonoBehaviour {
     Abilities = GetComponent<AbilityManager>();
     PunchAbility = GetComponentInChildren<MeleeAbility>();
     ShieldAbility = GetComponentInChildren<ShieldAbility>();
-    Hurtbox.OnHit.Listen((_) => WasHit = true);
+    Hurtbox.OnHurt.Listen((_) => WasHit = true);
   }
 
   // TODO: What about dash?

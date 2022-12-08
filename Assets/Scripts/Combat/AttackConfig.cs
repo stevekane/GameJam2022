@@ -12,6 +12,23 @@ public enum KnockBackType {
   Down
 }
 
+public static class KnockBackTypeExtensions {
+  public static Vector3 KnockbackVector(this KnockBackType type, Transform attacker, Transform target) {
+    var p0 = attacker.position.XZ();
+    var p1 = target.position.XZ();
+    return type switch {
+      KnockBackType.Delta => p0.TryGetDirection(p1) ?? attacker.forward,
+      KnockBackType.Forward => attacker.forward,
+      KnockBackType.Back => -attacker.forward,
+      KnockBackType.Right => attacker.right,
+      KnockBackType.Left => -attacker.right,
+      KnockBackType.Up => attacker.up,
+      KnockBackType.Down => -attacker.up,
+      _ => attacker.forward,
+    };
+  }
+}
+
 [CreateAssetMenu(fileName = "AttackConfig", menuName = "Attack/Config")]
 public class AttackConfig : ScriptableObject {
   [Header("Animation Clip")]

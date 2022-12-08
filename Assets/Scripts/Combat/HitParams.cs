@@ -1,15 +1,26 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class HitParams {
-  public GameObject VFX;
-  public AudioClip SFX;
-  public Vector3 KnockbackVector;
-  public float KnockbackStrength;
-  public float Damage;
-  public float RecoilStrength;
-  public float CameraShakeStrength;
-  public Timeval HitStopDuration;
-  public List<StatusEffect> OnHitEffects;
-  public Vector3? WallbounceTarget;
+  public HitConfig HitConfig;
+  public SerializedAttributes AttackerAttributes;
+  public GameObject Attacker;
+  public GameObject Source;
+  public GameObject Defender;
+  public SerializedAttributes DefenderAttributes;
+
+  public HitParams(
+  HitConfig hitConfig,
+  SerializedAttributes attackerAttributes,
+  GameObject attacker,
+  GameObject source) {
+    HitConfig = hitConfig;
+    AttackerAttributes = attackerAttributes;
+    Attacker = attacker;
+    Source = source;
+  }
+
+  public void WithDefender(GameObject defender, SerializedAttributes defenderAttributes) {
+    Defender = defender;
+    DefenderAttributes = defenderAttributes;
+  }
 }

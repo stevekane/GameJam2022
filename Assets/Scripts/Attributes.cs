@@ -87,3 +87,7 @@ public class Attributes : MonoBehaviour {
   }
   public float GetValue(AttributeTag attrib, float baseValue = 0f) => GetModifier(attrib).Apply(baseValue);
 }
+
+public class SerializedAttributes {
+
+}
