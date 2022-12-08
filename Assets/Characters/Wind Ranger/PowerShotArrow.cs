@@ -17,9 +17,9 @@ public class PowerShotArrow : MonoBehaviour {
   void OnProjectileEnter(ProjectileCollision c) {
     if (c.Collider.TryGetComponent(out Hurtbox hurtbox)) {
       var scaling = Mathf.Pow(1-DamageReductionPerTarget, TargetsHit);
-      var hitConfig = HitConfig.Scale(HitConfig, scaling);
+      var hitConfig = HitConfig.Scale(scaling);
       TargetsHit++;
-      hurtbox.TryAttack(Attributes, hitConfig);
+      hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject, gameObject));
     }
   }
 }

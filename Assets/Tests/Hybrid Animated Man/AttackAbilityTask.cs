@@ -54,23 +54,14 @@ public class AttackAbilityTask : Ability {
   async Task OnHit(TaskScope scope) {
     var hitCount = await scope.ListenForAll(TriggerEvent.OnTriggerStaySource, Hits);
     var attacker = AbilityManager.transform;
-    var newHits = false;
     for (var i = 0; i < hitCount; i++) {
       var hit = Hits[i];
       var contact = hit.transform.position;
       var rotation = AbilityManager.transform.rotation;
       if (!PhaseHits.Contains(hit) && hit.TryGetComponent(out Hurtbox hurtbox)) {
-        hurtbox.TryAttack(Attributes, HitConfig);
+        hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject));
         PhaseHits.Add(hit);
-        newHits = true;
       }
-    }
-    // TODO: Does this belong here? Should this happen in HurtBox or something after hit is confirmed?
-    if (newHits) {
-      CameraShaker.Instance.Shake(HitConfig.CameraShakeStrength);
-      Status.Add(new HitStopEffect(attacker.forward, .1f, HitConfig.HitStopDuration.Ticks), s => {
-        s.Add(new RecoilEffect(HitConfig.RecoilStrength * -attacker.forward));
-      });
     }
   }
 }

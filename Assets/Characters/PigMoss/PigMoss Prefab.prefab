@@ -257,12 +257,12 @@ MonoBehaviour:
     Millis: 500
     FramesPerSecond: 30
   SpikeTriggerEvent: {fileID: 7185035374616342134}
-  SpikeHitParams:
+  HitConfig:
     DamageModifier:
       Base: 15
       Mult: 1
-    KnockbackStrength: 15
     KnockbackType: 1
+    KnockbackStrength: 15
     RecoilStrength: 0
     CameraShakeStrength: 0
     HitStopDuration:
@@ -533,12 +533,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dba5ddd30894a745abee15fc3efd262, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HitParams:
+  HitConfig:
     DamageModifier:
       Base: 15
       Mult: 1
-    KnockbackStrength: 15
     KnockbackType: 0
+    KnockbackStrength: 15
     RecoilStrength: 0
     CameraShakeStrength: 0
     HitStopDuration:
@@ -616,8 +616,8 @@ MonoBehaviour:
     DamageModifier:
       Base: 15
       Mult: 1
-    KnockbackStrength: 15
     KnockbackType: 0
+    KnockbackStrength: 15
     RecoilStrength: 0
     CameraShakeStrength: 0
     HitStopDuration:
@@ -825,8 +825,8 @@ MonoBehaviour:
     DamageModifier:
       Base: 0
       Mult: 1
-    KnockbackStrength: 10
     KnockbackType: 0
+    KnockbackStrength: 10
     RecoilStrength: 10
     CameraShakeStrength: 10
     HitStopDuration:
@@ -971,17 +971,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Radius: 30
-  HitConfig:
-    DamageModifier:
-      Base: 0
-      Mult: 1
-    KnockbackStrength: 10
-    KnockbackType: 0
-    RecoilStrength: 0
-    CameraShakeStrength: 1
-    HitStopDuration:
-      Millis: 100
-      FramesPerSecond: 30
   MissilePrefab: {fileID: 5667205795771851015, guid: 41421b7d6e85e6748afb608a2a977365, type: 3}
   LaunchSites:
   - {fileID: 4591952213016696056}
@@ -1155,6 +1144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ce0c9e24a5611d40b8628b31748e2d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Owner: {fileID: 8872822988582960440}
 --- !u!54 &8872822986952010246
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1179,7 +1169,7 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8872822986952010240}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 4
   m_Height: 1
@@ -1204,8 +1194,8 @@ GameObject:
   - component: {fileID: 8872822988582960453}
   - component: {fileID: 8872822988582960444}
   - component: {fileID: 8872822988582960448}
-  - component: {fileID: 5139664284198015280}
   - component: {fileID: 1865207496726280096}
+  - component: {fileID: 3305535208296012917}
   - component: {fileID: 8872822988582960449}
   m_Layer: 10
   m_Name: PigMoss Prefab
@@ -1249,9 +1239,7 @@ MonoBehaviour:
   AbilityManager: {fileID: 8872822988582960451}
   Abilities:
   - {fileID: 6335438832184794161}
-  - {fileID: 6730046083905293372}
   - {fileID: 4071896892811268994}
-  - {fileID: 4635285229209771243}
   - {fileID: 8751152005629255508}
   TargetingConfig:
     FieldOfView: 360
@@ -1337,7 +1325,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 589031cb649129f4595d6562a2fa54c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _Points: 0
+  <Points>k__BackingField: 0
 --- !u!114 &8872822988582960450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1377,6 +1365,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c806621753f76840a91b87e3c0d2fc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Hurtboxes: []
   FallSFX: {fileID: 8300000, guid: fe6b13c084178f441942a9885f9857db, type: 3}
 --- !u!114 &8872822988582960444
 MonoBehaviour:
@@ -1410,21 +1399,6 @@ MonoBehaviour:
     Millis: 200
     FramesPerSecond: 30
   DamageAmplitude: 0.2
---- !u!114 &5139664284198015280
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8872822988582960440}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54a8dc9d177837d4188e84b84d044b24, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  VFXOffset: {x: 0, y: 5, z: 0}
-  VFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
-  Clip: {fileID: 8300000, guid: 8ea80b2fc3df7bf4fb901ad8ab246604, type: 3}
 --- !u!114 &1865207496726280096
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1437,11 +1411,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f970a829f86019441a549e1a5005231c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DamageMultiplier: 50
+  Duration:
+    Millis: 500
+    FramesPerSecond: 30
   ColorName: _EmissionColor
   FlashColor: {r: 11.984314, g: 11.984314, b: 11.984314, a: 1}
   Renderers:
   - {fileID: 8872822986732128197}
+--- !u!114 &3305535208296012917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8872822988582960440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12696007f0177044dbd28057089e4be9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  VFXOffset: {x: 0, y: 4, z: 0}
+  OnHurtVFX: {fileID: 1995403933065894, guid: bf3228cec72bf65469800c0e55477fbd, type: 3}
+  OnHurtSFX: {fileID: 8300000, guid: ffb650e702f24544587dc358727c7d80, type: 3}
+  OnHitVFX: {fileID: 0}
+  OnHitSFX: {fileID: 0}
 --- !u!143 &8872822988582960449
 CharacterController:
   m_ObjectHideFlags: 0

@@ -67,6 +67,6 @@ public class SlamAbility : Ability {
   }
 
   void OnHit(Hurtbox hurtbox) {
-    hurtbox.TryAttack(Attributes, HitConfig);
+    hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject));
   }
 }

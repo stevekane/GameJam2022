@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HurtFlash : MonoBehaviour {
+public class Flash : MonoBehaviour {
   public Timeval Duration = Timeval.FromMillis(500);
   public string ColorName = "_EmissionColor";
   [ColorUsage(showAlpha: true, hdr: true)]
@@ -15,26 +15,26 @@ public class HurtFlash : MonoBehaviour {
   [ContextMenu("Test Flash")]
   public void TestFlash() {
     if (Application.IsPlaying(this)) {
-      UnFlash();
+      EndFlash();
       StopAllCoroutines();
       StartCoroutine(FlashRoutine(Timeval.FromMillis(1000)));
     }
   }
   #endif
 
-  void OnHit(HitParams hitParams) {
-    UnFlash();
+  void OnHurt(HitParams hitParams) {
+    EndFlash();
     StopAllCoroutines();
     StartCoroutine(FlashRoutine(Duration));
   }
 
-  void Flash(Timeval duration) {
+  void StartFlash(Timeval duration) {
     foreach (var material in PreviousColors.Keys) {
       material.SetVector(ColorName, FlashColor);
     }
   }
 
-  void UnFlash() {
+  void EndFlash() {
     foreach (var pair in PreviousColors) {
       pair.Key.SetVector(ColorName, pair.Value);
     }
@@ -63,8 +63,8 @@ public class HurtFlash : MonoBehaviour {
 
   IEnumerator FlashRoutine(Timeval duration) {
     StorePreviousColors();
-    Flash(duration);
+    StartFlash(duration);
     yield return StartCoroutine(WaitNTicks(duration.Ticks));
-    UnFlash();
+    EndFlash();
   }
 }

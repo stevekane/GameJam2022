@@ -58,7 +58,7 @@ public class MeleeAbility : Ability {
       var maxExtraFrames = WindupDuration.Ticks / ChargeSpeedFactor - WindupDuration.Ticks;
       var chargeScaling = ChargeScaling.Evaluate(extraFrames / maxExtraFrames);
       Animation.SetSpeed(1);
-      hitConfig = HitConfig.Scale(hitConfig, chargeScaling);
+      hitConfig = hitConfig.Scale(chargeScaling);
     } else {
       yield return Animation.PlayUntil(WindupDuration.AnimFrames);
     }
@@ -86,16 +86,11 @@ public class MeleeAbility : Ability {
 
   void HandleHits(HitConfig config) {
     if (Hits.Count != 0) {
-      if (AttackVFXInstance && AttackVFXInstance.GetComponent<ParticleSystem>().main is var m)
-        m.simulationSpeed = 0f;
-      Status.Add(new HitStopEffect(Owner.forward, HitStopVibrationAmplitude, HitFreezeDuration.Ticks));
-      CameraShaker.Instance.Shake(HitCameraShakeIntensity);
       Hits.ForEach(target => {
-        target.TryAttack(Attributes, config);
+        target.TryAttack(new HitParams(config, Attributes.serialized, Attributes.gameObject));
         Owner.transform.forward = (target.transform.position - Owner.transform.position).XZ().normalized;
       });
       AbilityManager.Energy?.Value.Add(HitEnergyGain * Hits.Count);
-      Status.Add(new RecoilEffect(HitRecoilStrength * -Owner.forward));
       Hits.Clear();
     }
   }

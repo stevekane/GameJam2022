@@ -78,6 +78,8 @@ MonoBehaviour:
     Tags: 18
     RequiredOwnerTags: 0
     EnergyCost: 0
+  CurrentTags: 0
+  Hurtbox: {fileID: 5571416124901615663}
   BlockDuration:
     Millis: 500
     FramesPerSecond: 30
@@ -165,6 +167,7 @@ MonoBehaviour:
     Tags: 4
     RequiredOwnerTags: 536870912
     EnergyCost: 0
+  CurrentTags: 0
   Clip: {fileID: 7400000, guid: 1fe47d56f543a9a41a54f10408f923f1, type: 2}
   WindupDuration:
     Millis: 300
@@ -177,14 +180,13 @@ MonoBehaviour:
     DamageModifier:
       Base: 15
       Mult: 1.5
-    KnockbackStrength: 50
     KnockbackType: 1
+    KnockbackStrength: 50
+    RecoilStrength: 0
+    CameraShakeStrength: 0
     HitStopDuration:
       Millis: 200
       FramesPerSecond: 30
-    SFX: {fileID: 8300000, guid: 332a6114ed184a44188829a8f87db1a7, type: 3}
-    VFX: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
-    VFXOffset: {x: 0, y: 0, z: 0}
   FireVFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
   FireSFX: {fileID: 8300000, guid: d69edd942348f8b4892dac337d83ac38, type: 3}
   FireVFXOffset: {x: 0, y: 0, z: 0}
@@ -272,6 +274,7 @@ MonoBehaviour:
     Tags: 4
     RequiredOwnerTags: 268435456
     EnergyCost: 0
+  CurrentTags: 0
   Clip: {fileID: 7400000, guid: b9d79d4ea8efe8d4f959e845de696b68, type: 2}
   WindupDuration:
     Millis: 300
@@ -289,14 +292,13 @@ MonoBehaviour:
     DamageModifier:
       Base: 5
       Mult: 1.2
-    KnockbackStrength: 20
     KnockbackType: 1
+    KnockbackStrength: 20
+    RecoilStrength: 0
+    CameraShakeStrength: 0
     HitStopDuration:
       Millis: 200
       FramesPerSecond: 30
-    SFX: {fileID: 8300000, guid: d0f166575306db84091dc03fce0eff69, type: 3}
-    VFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
-    VFXOffset: {x: 0, y: 2, z: 0}
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -328,6 +330,7 @@ MonoBehaviour:
   ChargeSpeedFactor: 0.3
   AttackSFX: {fileID: 8300000, guid: c266e86e5ec11e344bf66dede26cbc46, type: 3}
   AttackVFX: {fileID: 0}
+  VFXOffset: {x: 0, y: 1, z: 0}
   Hitbox: {fileID: 614107697933067398}
 --- !u!1 &2784476827323047724
 GameObject:
@@ -407,6 +410,7 @@ MonoBehaviour:
     Tags: 11
     RequiredOwnerTags: -2147483648
     EnergyCost: 0
+  CurrentTags: 0
   MoveSpeed: 40
   TargetDistance: 5
   HitRadius: 10
@@ -415,14 +419,13 @@ MonoBehaviour:
     DamageModifier:
       Base: 10
       Mult: 2
-    KnockbackStrength: 20
     KnockbackType: 0
+    KnockbackStrength: 20
+    RecoilStrength: 0
+    CameraShakeStrength: 0
     HitStopDuration:
       Millis: 500
       FramesPerSecond: 30
-    SFX: {fileID: 8300000, guid: f161f54138dc0314abdabf7ab71e3404, type: 3}
-    VFX: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
-    VFXOffset: {x: 0, y: 1, z: 0}
 --- !u!1 &3135922338557306933
 GameObject:
   m_ObjectHideFlags: 0
@@ -501,6 +504,7 @@ MonoBehaviour:
     Tags: 33
     RequiredOwnerTags: 0
     EnergyCost: 0
+  CurrentTags: 0
   Clip: {fileID: 7400000, guid: 513455d72952b384f8a7a6e6c6cf9b5f, type: 2}
   WindupDuration:
     Millis: 33.333332
@@ -518,14 +522,13 @@ MonoBehaviour:
     DamageModifier:
       Base: 0
       Mult: 1
-    KnockbackStrength: 0
     KnockbackType: 1
+    KnockbackStrength: 0
+    RecoilStrength: 0
+    CameraShakeStrength: 0
     HitStopDuration:
       Millis: 100
       FramesPerSecond: 30
-    SFX: {fileID: 8300000, guid: 1f53a5fc6bd934e46a5d8cfa8fd27b64, type: 3}
-    VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
-    VFXOffset: {x: 0, y: 2, z: 0}
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -557,6 +560,7 @@ MonoBehaviour:
   ChargeSpeedFactor: 1
   AttackSFX: {fileID: 8300000, guid: 482611fe6bc559142a00be6e726b4862, type: 3}
   AttackVFX: {fileID: 7226583673155636401, guid: 21c6b51d75be0554b9d09aca74522e2e, type: 3}
+  VFXOffset: {x: 0, y: 1, z: 0}
   Hitbox: {fileID: 4191209124205267904}
 --- !u!1 &4804604425537202661
 GameObject:
@@ -636,6 +640,7 @@ MonoBehaviour:
     Tags: 9
     RequiredOwnerTags: 0
     EnergyCost: 0
+  CurrentTags: 0
   MoveSpeed: 120
   WindupDuration:
     Millis: 66.666664
@@ -651,14 +656,13 @@ MonoBehaviour:
     DamageModifier:
       Base: 1
       Mult: 1
-    KnockbackStrength: 0
     KnockbackType: 1
+    KnockbackStrength: 0
+    RecoilStrength: 0
+    CameraShakeStrength: 0
     HitStopDuration:
       Millis: 133.33333
       FramesPerSecond: 30
-    SFX: {fileID: 8300000, guid: 332a6114ed184a44188829a8f87db1a7, type: 3}
-    VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
-    VFXOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &5529297459764154501
 GameObject:
   m_ObjectHideFlags: 0
@@ -714,6 +718,7 @@ MonoBehaviour:
     Tags: 4
     RequiredOwnerTags: 0
     EnergyCost: 0
+  CurrentTags: 0
   MoveSpeedFactor: 2.5
   Particles: {fileID: 4585268613483689328}
   AudioClip: {fileID: 8300000, guid: 0eda13886c86ca145936c7017a0dafa5, type: 3}
@@ -772,20 +777,22 @@ GameObject:
   m_Component:
   - component: {fileID: 5571416124093621163}
   - component: {fileID: 5571416124093621162}
+  - component: {fileID: 5571416124093621159}
   - component: {fileID: 5758432820797294223}
   - component: {fileID: 5571416124093621156}
   - component: {fileID: 5571416124093621157}
-  - component: {fileID: 5571416124093621161}
-  - component: {fileID: 5571416124093621159}
-  - component: {fileID: 5571416124093621160}
-  - component: {fileID: 7727835182619467870}
-  - component: {fileID: 4599928758009979224}
   - component: {fileID: 2218451550939315152}
   - component: {fileID: 8130814572018751882}
   - component: {fileID: 6662180119051599905}
   - component: {fileID: 4289594239830466653}
   - component: {fileID: 4460202280109117412}
   - component: {fileID: 8984908938962208943}
+  - component: {fileID: 5571416124093621161}
+  - component: {fileID: 4152063555031946022}
+  - component: {fileID: 8813896830615475978}
+  - component: {fileID: 5571416124093621160}
+  - component: {fileID: 7727835182619467870}
+  - component: {fileID: 4599928758009979224}
   m_Layer: 10
   m_Name: Vapor
   m_TagString: Untagged
@@ -829,6 +836,19 @@ MonoBehaviour:
     Millis: 666.6667
     FramesPerSecond: 30
   PunchCycleIndex: 0
+--- !u!114 &5571416124093621159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38b5f85dc564c4f4fafa2b5115a61de1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Dead: 0
 --- !u!114 &5758432820797294223
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -841,9 +861,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c806621753f76840a91b87e3c0d2fc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Hurtboxes: []
   FallSFX: {fileID: 8300000, guid: fe6b13c084178f441942a9885f9857db, type: 3}
-  IsParrying: 0
-  IsBlocking: 0
 --- !u!114 &5571416124093621156
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -856,7 +875,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 589031cb649129f4595d6562a2fa54c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _Points: 0
+  <Points>k__BackingField: 0
 --- !u!114 &5571416124093621157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -871,6 +890,173 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Tags: 0
   DebugEffects: []
+--- !u!114 &2218451550939315152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba179080412a6af41a99d021d690c5fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Bundle:
+    Fibers: []
+    Added: []
+    Removed: []
+--- !u!114 &8130814572018751882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8704b5fdcd5dad4cbc42e869b75d29f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ButtonMaps:
+  - ButtonCode: 2
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 626726736180106372}
+      MethodName: Attack
+  - ButtonCode: 8
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 696150299245317217}
+      MethodName: Begin
+  - ButtonCode: 8
+    ButtonPressType: 2
+    Entry:
+      Ability: {fileID: 696150299245317217}
+      MethodName: Release
+  - ButtonCode: 1
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 8522030806182356177}
+      MethodName: Begin
+  - ButtonCode: 1
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 3002947848983109568}
+      MethodName: AttackStart
+  - ButtonCode: 3
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 5938650978471480679}
+      MethodName: ChargeStart
+  - ButtonCode: 3
+    ButtonPressType: 2
+    Entry:
+      Ability: {fileID: 5938650978471480679}
+      MethodName: ChargeRelease
+  - ButtonCode: 8
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 4440389021436948925}
+      MethodName: Execute
+  - ButtonCode: 3
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 7621250335256250255}
+      MethodName: ChargeStart
+  - ButtonCode: 3
+    ButtonPressType: 2
+    Entry:
+      Ability: {fileID: 7621250335256250255}
+      MethodName: ChargeRelease
+  - ButtonCode: 0
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 3701212827919873877}
+      MethodName: Execute
+  - ButtonCode: 0
+    ButtonPressType: 2
+    Entry:
+      Ability: {fileID: 3701212827919873877}
+      MethodName: Release
+  - ButtonCode: 0
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 2864923836562023574}
+      MethodName: Pressed
+  - ButtonCode: 0
+    ButtonPressType: 2
+    Entry:
+      Ability: {fileID: 2864923836562023574}
+      MethodName: Release
+  AxisMaps:
+  - AxisCode: 0
+    AxisTag: 0
+  - AxisCode: 1
+    AxisTag: 1
+--- !u!114 &6662180119051599905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Gravity: -200
+  Animator: {fileID: 0}
+  IdleThreshold: 0.1
+--- !u!114 &4289594239830466653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1f3dc6e42599844c94575d78a654130, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AbilityTags: 0
+--- !u!114 &4460202280109117412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 004ed0f90de1a634aab5eefd8f1dea0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BaseAttributes: []
+  BaseUpgrades:
+  - {fileID: 11400000, guid: eeb227d5a03ae7c469f518f08fe5d373, type: 2}
+  - {fileID: 11400000, guid: dc80687754ecb424f854f46614676ec5, type: 2}
+  - {fileID: 11400000, guid: 73583ee841b78204ba64f804e5b0238d, type: 2}
+  - {fileID: 11400000, guid: 4d16dd67b444ff54ca927ea9b501cadf, type: 2}
+  - {fileID: 11400000, guid: f34bf434dd718a34b905f5ab25cd6f3e, type: 2}
+  - {fileID: 11400000, guid: ded75146e4c98c04daa0daa176322a51, type: 2}
+  - {fileID: 11400000, guid: d82614a23ffd86445a5a88ec04e124c0, type: 2}
+--- !u!114 &8984908938962208943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 803fd05d288d1c7449db697e26f7d9fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Points: 10
+  MaxPoints: 100
 --- !u!114 &5571416124093621161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -884,7 +1070,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Target: {fileID: 5571416123647958240}
---- !u!114 &5571416124093621159
+  DamageDuration:
+    Millis: 200
+    FramesPerSecond: 30
+  DamageAmplitude: 0.2
+--- !u!114 &4152063555031946022
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -893,10 +1083,32 @@ MonoBehaviour:
   m_GameObject: {fileID: 5571416124093621165}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38b5f85dc564c4f4fafa2b5115a61de1, type: 3}
+  m_Script: {fileID: 11500000, guid: f970a829f86019441a549e1a5005231c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Dead: 0
+  Duration:
+    Millis: 500
+    FramesPerSecond: 30
+  ColorName: _EmissionColor
+  FlashColor: {r: 4, g: 4, b: 4, a: 1}
+  Renderers: []
+--- !u!114 &8813896830615475978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12696007f0177044dbd28057089e4be9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  VFXOffset: {x: 0, y: 0, z: 0}
+  OnHurtVFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
+  OnHurtSFX: {fileID: 8300000, guid: 7cbd6cd765888ff418d01d98bd1ce9c2, type: 3}
+  OnHitVFX: {fileID: 0}
+  OnHitSFX: {fileID: 0}
 --- !u!143 &5571416124093621160
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1031,171 +1243,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &2218451550939315152
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571416124093621165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba179080412a6af41a99d021d690c5fc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Bundle:
-    Fibers: []
-    Added: []
-    Removed: []
---- !u!114 &8130814572018751882
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571416124093621165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8704b5fdcd5dad4cbc42e869b75d29f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ButtonMaps:
-  - ButtonCode: 2
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 626726736180106372}
-      MethodName: Attack
-  - ButtonCode: 8
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 696150299245317217}
-      MethodName: Begin
-  - ButtonCode: 8
-    ButtonPressType: 2
-    Entry:
-      Ability: {fileID: 696150299245317217}
-      MethodName: Release
-  - ButtonCode: 1
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 8522030806182356177}
-      MethodName: Begin
-  - ButtonCode: 1
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 3002947848983109568}
-      MethodName: AttackStart
-  - ButtonCode: 3
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 5938650978471480679}
-      MethodName: ChargeStart
-  - ButtonCode: 3
-    ButtonPressType: 2
-    Entry:
-      Ability: {fileID: 5938650978471480679}
-      MethodName: ChargeRelease
-  - ButtonCode: 8
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 4440389021436948925}
-      MethodName: Execute
-  - ButtonCode: 3
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 7621250335256250255}
-      MethodName: ChargeStart
-  - ButtonCode: 3
-    ButtonPressType: 2
-    Entry:
-      Ability: {fileID: 7621250335256250255}
-      MethodName: ChargeRelease
-  - ButtonCode: 0
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 3701212827919873877}
-      MethodName: Execute
-  - ButtonCode: 0
-    ButtonPressType: 2
-    Entry:
-      Ability: {fileID: 3701212827919873877}
-      MethodName: Release
-  - ButtonCode: 0
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 2864923836562023574}
-      MethodName: Pressed
-  - ButtonCode: 0
-    ButtonPressType: 2
-    Entry:
-      Ability: {fileID: 2864923836562023574}
-      MethodName: Release
-  AxisMaps:
-  - AxisCode: 0
-    AxisTag: 0
-  - AxisCode: 1
-    AxisTag: 1
---- !u!114 &6662180119051599905
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571416124093621165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Gravity: -200
---- !u!114 &4289594239830466653
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571416124093621165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1f3dc6e42599844c94575d78a654130, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  AbilityTags: 0
---- !u!114 &4460202280109117412
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571416124093621165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 004ed0f90de1a634aab5eefd8f1dea0d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  BaseAttributes: []
-  BaseUpgrades:
-  - {fileID: 11400000, guid: eeb227d5a03ae7c469f518f08fe5d373, type: 2}
-  - {fileID: 11400000, guid: dc80687754ecb424f854f46614676ec5, type: 2}
-  - {fileID: 11400000, guid: 73583ee841b78204ba64f804e5b0238d, type: 2}
-  - {fileID: 11400000, guid: 4d16dd67b444ff54ca927ea9b501cadf, type: 2}
-  - {fileID: 11400000, guid: f34bf434dd718a34b905f5ab25cd6f3e, type: 2}
-  - {fileID: 11400000, guid: ded75146e4c98c04daa0daa176322a51, type: 2}
-  - {fileID: 11400000, guid: d82614a23ffd86445a5a88ec04e124c0, type: 2}
---- !u!114 &8984908938962208943
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571416124093621165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 803fd05d288d1c7449db697e26f7d9fc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Points: 10
-  MaxPoints: 100
 --- !u!1 &5571416124901615635
 GameObject:
   m_ObjectHideFlags: 0
@@ -1242,6 +1289,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ce0c9e24a5611d40b8628b31748e2d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Owner: {fileID: 0}
 --- !u!65 &5571416124901615662
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1321,6 +1369,7 @@ MonoBehaviour:
     Tags: 2
     RequiredOwnerTags: 1073741824
     EnergyCost: 10
+  CurrentTags: 0
   Duration:
     Millis: 10000
     FramesPerSecond: 30
@@ -1408,6 +1457,7 @@ MonoBehaviour:
     Tags: 34
     RequiredOwnerTags: 0
     EnergyCost: 0
+  CurrentTags: 0
   MaxMoveSpeed: 120
   MinMoveSpeed: 60
   TurnSpeed: 60
@@ -1495,6 +1545,7 @@ MonoBehaviour:
     Tags: 3
     RequiredOwnerTags: 0
     EnergyCost: 0
+  CurrentTags: 0
   Clip: {fileID: 7400000, guid: 1b025aa438c5e1741a2dd59ec5848134, type: 2}
   WindupDuration:
     Millis: 33.333332
@@ -1512,14 +1563,13 @@ MonoBehaviour:
     DamageModifier:
       Base: 5
       Mult: 1.2
-    KnockbackStrength: 20
     KnockbackType: 0
+    KnockbackStrength: 20
+    RecoilStrength: 0
+    CameraShakeStrength: 0
     HitStopDuration:
       Millis: 200
       FramesPerSecond: 30
-    SFX: {fileID: 8300000, guid: d0f166575306db84091dc03fce0eff69, type: 3}
-    VFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
-    VFXOffset: {x: 0, y: 2, z: 0}
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -1551,6 +1601,7 @@ MonoBehaviour:
   ChargeSpeedFactor: 0.3
   AttackSFX: {fileID: 0}
   AttackVFX: {fileID: 7226583673155636401, guid: 67c8e7d5d38369645a9629e0bc4ea132, type: 3}
+  VFXOffset: {x: 0, y: 1, z: 0}
   Hitbox: {fileID: 2235355344487846090}
 --- !u!1 &7848055432845249743
 GameObject:
@@ -1630,6 +1681,7 @@ MonoBehaviour:
     Tags: 33
     RequiredOwnerTags: 0
     EnergyCost: 0
+  CurrentTags: 0
   Clip: {fileID: 7400000, guid: 976e876ec99a2d34584d30aa83e78b19, type: 2}
   WindupDuration:
     Millis: 33.333332
@@ -1647,14 +1699,13 @@ MonoBehaviour:
     DamageModifier:
       Base: 0
       Mult: 1
-    KnockbackStrength: 0
     KnockbackType: 1
+    KnockbackStrength: 0
+    RecoilStrength: 0
+    CameraShakeStrength: 0
     HitStopDuration:
       Millis: 100
       FramesPerSecond: 30
-    SFX: {fileID: 8300000, guid: 1f53a5fc6bd934e46a5d8cfa8fd27b64, type: 3}
-    VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
-    VFXOffset: {x: 0, y: 2, z: 0}
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -1686,6 +1737,7 @@ MonoBehaviour:
   ChargeSpeedFactor: 1
   AttackSFX: {fileID: 8300000, guid: 4d4ef7516a431934681038a3dc391e55, type: 3}
   AttackVFX: {fileID: 7226583673155636401, guid: 21c6b51d75be0554b9d09aca74522e2e, type: 3}
+  VFXOffset: {x: 0, y: 1, z: 0}
   Hitbox: {fileID: 5980368241445658472}
 --- !u!1 &9127015034591396752
 GameObject:
@@ -1737,6 +1789,7 @@ MonoBehaviour:
     Tags: 2
     RequiredOwnerTags: 0
     EnergyCost: 0
+  CurrentTags: 0
   Abilities:
   - Ability: {fileID: 5074622147386750202}
     MethodName: AttackStart

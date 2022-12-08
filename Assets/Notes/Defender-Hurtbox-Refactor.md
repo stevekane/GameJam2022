@@ -2,12 +2,6 @@
 
 ## TODO
 
-- Store reference instance for BigfatSlowBoom on the ability itself with HitConfig and Attributes ref
-- Store reference instance for Explosion on Bombard Ability with HitConfig and Attributes ref
-- Add hit SFX/VFX to hit configs on all relevant abilities... fuck me
-- Consider moving ALL OnHit behaviors to something after hurtbox... unsure exactly how this works
-- Currently, AttackAbility and MeleeAbility spawn OnHit VFX/SFX CameraShake and Status Effects
-
 ## Defender changes
 
 - Defender.FixedUpdate disables Hurtboxes if !Status.IsHittable

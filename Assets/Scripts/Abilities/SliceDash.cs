@@ -27,7 +27,7 @@ public class SliceDash : Ability {
     var countdown = new CountdownTimer(Duration);
     yield return Fiber.Any(Animator.Run(DashingClip), countdown, Move(dir.normalized, countdown));
     foreach (var h in Hits)
-      h.TryAttack(Attributes, HitConfig);
+      h.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject));
     yield return Animator.Run(DoneClip);
   }
 

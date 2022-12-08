@@ -84,6 +84,7 @@ public class Attributes : MonoBehaviour {
     return modifier;
   }
   public float GetValue(AttributeTag attrib, float baseValue = 0f) => GetModifier(attrib).Apply(baseValue);
+  public Serialized serialized => new Serialized(this);
 
   // Serialized version of attributes is a snapshot of the current state of an entity's Attributes, including default
   // values for unset modifiers. Can be used to compute attribute values after an entity dies.
@@ -97,8 +98,4 @@ public class Attributes : MonoBehaviour {
     }
     public float GetValue(AttributeTag attrib, float baseValue = 0f) => GetModifier(attrib).Apply(baseValue);
   }
-}
-
-public class SerializedAttributes {
-
 }

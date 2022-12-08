@@ -187,8 +187,6 @@ MonoBehaviour:
     Millis: 300
     FramesPerSecond: 30
   HitConfig:
-    VFX: {fileID: 7226583673155636401, guid: a2ab56839e1c9504ea9d141e95d0b16b, type: 3}
-    SFX: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
     DamageModifier:
       Base: 0
       Mult: 1
@@ -1169,14 +1167,14 @@ GameObject:
   - component: {fileID: 5571416124093621156}
   - component: {fileID: 5571416124093621157}
   - component: {fileID: 8521553832860402117}
-  - component: {fileID: 5571416124093621160}
-  - component: {fileID: 7727835182619467870}
   - component: {fileID: 1657031132205634076}
   - component: {fileID: 242195660756952769}
   - component: {fileID: 6204311958514039916}
   - component: {fileID: 5571416124093621161}
   - component: {fileID: 7528539421826735949}
-  - component: {fileID: 8368468838265768088}
+  - component: {fileID: 4107459485230753281}
+  - component: {fileID: 7727835182619467870}
+  - component: {fileID: 5571416124093621160}
   m_Layer: 10
   m_Name: Badger
   m_TagString: Untagged
@@ -1291,44 +1289,6 @@ MonoBehaviour:
       Base: 40
       Mult: 1
   BaseUpgrades: []
---- !u!143 &5571416124093621160
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571416124093621165}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Height: 6
-  m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 3, z: 0}
---- !u!95 &7727835182619467870
-Animator:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571416124093621165}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: ad4ec6634f8684d409a43e49e857f215, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 1
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &1657031132205634076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1356,8 +1316,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba179080412a6af41a99d021d690c5fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Energy:
-    Value: {fileID: 0}
   Bundle:
     Fibers: []
     Added: []
@@ -1419,7 +1377,7 @@ MonoBehaviour:
   - {fileID: 4914273281486157195}
   - {fileID: 7437944918136718727}
   - {fileID: 1294691833948066240}
---- !u!114 &8368468838265768088
+--- !u!114 &4107459485230753281
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1428,12 +1386,52 @@ MonoBehaviour:
   m_GameObject: {fileID: 5571416124093621165}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54a8dc9d177837d4188e84b84d044b24, type: 3}
+  m_Script: {fileID: 11500000, guid: 12696007f0177044dbd28057089e4be9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   VFXOffset: {x: 0, y: 1, z: 0}
-  VFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
-  Clip: {fileID: 8300000, guid: 958550d8003fc15489eb7911ad4a4bcc, type: 3}
+  OnHurtVFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
+  OnHurtSFX: {fileID: 8300000, guid: 1f53a5fc6bd934e46a5d8cfa8fd27b64, type: 3}
+  OnHitVFX: {fileID: 0}
+  OnHitSFX: {fileID: 0}
+--- !u!95 &7727835182619467870
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ad4ec6634f8684d409a43e49e857f215, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 1
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!143 &5571416124093621160
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 6
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 3, z: 0}
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0
@@ -1688,8 +1686,8 @@ GameObject:
   - component: {fileID: 1345878861977264778}
   - component: {fileID: 5183340763790620841}
   - component: {fileID: 1559827699249489055}
-  - component: {fileID: 265498748960670154}
   - component: {fileID: 7724858517802715910}
+  - component: {fileID: 8198378086573534737}
   m_Layer: 0
   m_Name: Left Fist
   m_TagString: Untagged
@@ -1937,21 +1935,6 @@ MonoBehaviour:
   FlashColor: {r: 4, g: 4, b: 4, a: 1}
   Renderers:
   - {fileID: 2077024099784888656}
---- !u!114 &265498748960670154
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5943414322764006362}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54a8dc9d177837d4188e84b84d044b24, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  VFXOffset: {x: 0, y: 0, z: 0}
-  VFX: {fileID: 1995403933065894, guid: bf3228cec72bf65469800c0e55477fbd, type: 3}
-  Clip: {fileID: 8300000, guid: bf6d0fc332bf08041bfde4741cb7230a, type: 3}
 --- !u!114 &7724858517802715910
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1968,6 +1951,23 @@ MonoBehaviour:
   Animator: {fileID: 7727835182619467870}
   DeathClip: {fileID: 7400000, guid: b7ae6f0bce86d7040beedea994af7458, type: 2}
   Hurtbox: {fileID: 5257354684457295591}
+--- !u!114 &8198378086573534737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943414322764006362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12696007f0177044dbd28057089e4be9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  VFXOffset: {x: 0, y: 2, z: 0}
+  OnHurtVFX: {fileID: 1995403933065894, guid: bf3228cec72bf65469800c0e55477fbd, type: 3}
+  OnHurtSFX: {fileID: 8300000, guid: 36c57d13b5af16a4f9ab941571ef5c0f, type: 3}
+  OnHitVFX: {fileID: 0}
+  OnHitSFX: {fileID: 0}
 --- !u!1001 &4326579795788830989
 PrefabInstance:
   m_ObjectHideFlags: 0

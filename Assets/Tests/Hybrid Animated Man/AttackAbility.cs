@@ -118,22 +118,14 @@ public class AttackAbility : Ability {
     yield return hitDetection;
     var hitCount = hitDetection.Value;
     var attacker = AbilityManager.transform;
-    var newHits = false;
     for (var i = 0; i < hitCount; i++) {
       var hit = Hits[i];
       var contact = hit.transform.position;
       var rotation = AbilityManager.transform.rotation;
       if (!PhaseHits.Contains(hit) && hit.TryGetComponent(out Hurtbox hurtbox)) {
-        hurtbox.TryAttack(Attributes, HitConfig);
+        hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject));
         PhaseHits.Add(hit);
-        newHits = true;
       }
-    }
-    // TODO: Does this make sense here? Should this stuff be handled after a hit is confirmed in the hurtbox?
-    if (newHits) {
-      CameraShaker.Instance.Shake(HitConfig.CameraShakeStrength);
-      yield return new HitStop(-transform.forward, HitConfig.HitStopDuration, Status, Animator, AnimationDriver);
-      Status.Add(new RecoilEffect(HitConfig.RecoilStrength * -attacker.forward));
     }
   }
 }

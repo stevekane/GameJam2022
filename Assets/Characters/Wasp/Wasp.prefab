@@ -778,7 +778,7 @@ GameObject:
   - component: {fileID: 7227641143467178568}
   - component: {fileID: 5571416124093621161}
   - component: {fileID: 922338563387012078}
-  - component: {fileID: 684509208939476254}
+  - component: {fileID: 1236578800506907486}
   m_Layer: 10
   m_Name: Wasp
   m_TagString: Untagged
@@ -958,8 +958,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba179080412a6af41a99d021d690c5fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Energy:
-    Value: {fileID: 0}
   Bundle:
     Fibers: []
     Added: []
@@ -1017,7 +1015,7 @@ MonoBehaviour:
   - {fileID: 7226594029644046785}
   - {fileID: 6539316134859821109}
   - {fileID: 4914273281486157195}
---- !u!114 &684509208939476254
+--- !u!114 &1236578800506907486
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1026,12 +1024,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 5571416124093621165}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54a8dc9d177837d4188e84b84d044b24, type: 3}
+  m_Script: {fileID: 11500000, guid: 12696007f0177044dbd28057089e4be9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VFXOffset: {x: 0, y: 1, z: 0}
-  VFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
-  Clip: {fileID: 8300000, guid: c5b75dfff628a8c40b86b7a2882bc801, type: 3}
+  VFXOffset: {x: 0, y: 0, z: 0}
+  OnHurtVFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
+  OnHurtSFX: {fileID: 8300000, guid: 05d0536a3eefc80438f95f9662331f52, type: 3}
+  OnHitVFX: {fileID: 0}
+  OnHitSFX: {fileID: 0}
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0
@@ -1323,10 +1323,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1315075950411549743, guid: b8cc40c600c2d9446b5b190fe0ca5f17, type: 3}
-      propertyPath: Body
-      value: 
-      objectReference: {fileID: 6574932385410231194}
-    - target: {fileID: 1315075950411549743, guid: b8cc40c600c2d9446b5b190fe0ca5f17, type: 3}
       propertyPath: Attributes
       value: 
       objectReference: {fileID: 4848494605274439972}
@@ -1357,11 +1353,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec28127ffda911d4699772a7b9578ab5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!54 &6574932385410231194 stripped
-Rigidbody:
-  m_CorrespondingSourceObject: {fileID: 8206206140561105052, guid: b8cc40c600c2d9446b5b190fe0ca5f17, type: 3}
-  m_PrefabInstance: {fileID: 3088509655128771334}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7669133497856878183
 PrefabInstance:
   m_ObjectHideFlags: 0

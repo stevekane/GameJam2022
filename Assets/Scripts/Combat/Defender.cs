@@ -7,7 +7,6 @@ public class Defender : MonoBehaviour {
   bool Died = false;
   public Vector3? LastGroundedPosition { get; private set; }
   public Hurtbox[] Hurtboxes;
-  public EventSource<(HitParams, Transform)> HitEvent = new();
   public AudioClip FallSFX;
 
   void Awake() {

@@ -8,7 +8,7 @@ public class BigFatSlowBoom : MonoBehaviour {
 
   void Detonate(GameObject target) {
     if (target.TryGetComponent(out Hurtbox hurtbox)) {
-      hurtbox.TryAttack(Attributes, HitConfig);
+      hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject, gameObject));
     } else {
       SFXManager.Instance.TryPlayOneShot(ContactSFX);
       VFXManager.Instance.TrySpawnEffect(ContactVFX, transform.position);

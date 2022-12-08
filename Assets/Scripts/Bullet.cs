@@ -33,7 +33,7 @@ public class Bullet : MonoBehaviour {
     if (collider.TryGetComponent(out Hurtbox hurtbox)) {
       if (Physics.GetIgnoreLayerCollision(CollisionLayer, hurtbox.gameObject.layer))
         return;  // TODO: I forgot the point of this
-      hurtbox.TryAttack(Attributes, HitConfig);
+      hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject, gameObject));
     }
     Destroy(gameObject, .01f);
   }

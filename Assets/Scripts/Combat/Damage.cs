@@ -1,30 +1,30 @@
 using UnityEngine;
 
 public class Damage : MonoBehaviour {
+  [field:SerializeField] public float Points { get; private set; }
   Status Status;
-  [SerializeField] float _Points;
-  public float Points { get => _Points; private set => _Points = value; }
 
   void Awake() {
     Status = GetComponent<Status>();
   }
 
   void OnHurt(HitParams hitParams) {
-    Debug.LogWarning("Calculate damage and apply in Damage.OnHurt");
-    // AddPoints(hitParams.Damage);
+    AddPoints(hitParams.Damage);
     if (Status != null) {
-      var power = 5f * hitParams.HitConfig.KnockbackStrength * Mathf.Pow((Points+100f) / 100f, 2f);
-      var attacker = hitParams.Attacker.transform;
-      var defender = hitParams.Defender.transform;
-      var knockbackType = hitParams.HitConfig.KnockbackType;
-      var knockbackVector = knockbackType.KnockbackVector(attacker, defender);
-      Debug.LogWarning("Calculate scaled knockbackstrength in Damage.OnHurt using SerializedAttributes");
-      var knockbackStrength = hitParams.HitConfig.KnockbackStrength;
+      var source = hitParams.Source.transform;
+      var knockbackVector = hitParams.KnockbackVector;
+      var knockbackStrength = 5f * hitParams.KnockbackStrength * Mathf.Pow((Points+100f) / 100f, 2f);
       var rotation = Quaternion.LookRotation(knockbackVector);
-      var bounceboxTarget = Bouncebox.ComputeWallbounceTarget(attacker);
+      var bounceboxTarget = Bouncebox.ComputeWallbounceTarget(source);
       Status.Add(new HitStopEffect(knockbackVector, .15f, hitParams.HitConfig.HitStopDuration.Ticks),
         s => s.Add(new KnockbackEffect(knockbackVector*knockbackStrength, bounceboxTarget)));
     }
+  }
+
+  void OnHit(HitParams hitParams) {
+    Status.Add(new HitStopEffect(hitParams.Source.transform.forward, .1f, hitParams.HitConfig.HitStopDuration.Ticks), s => {
+      s.Add(new RecoilEffect(hitParams.HitConfig.RecoilStrength * -hitParams.Source.transform.forward));
+    });
   }
 
   public void AddPoints(float dp) {

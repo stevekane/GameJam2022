@@ -45,7 +45,7 @@ namespace PigMoss {
       var activeOutcome = Fiber.SelectTask(contact, endActive);
       yield return activeOutcome;
       if (activeOutcome.Value == contact && contact.Value.TryGetComponent(out Hurtbox hurtbox)) {
-        hurtbox.TryAttack(Attributes, HitConfig);
+        hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject));
       }
       Collider.enabled = false;
       yield return animation;

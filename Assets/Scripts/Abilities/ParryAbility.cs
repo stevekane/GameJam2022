@@ -2,8 +2,9 @@ using System.Collections;
 using UnityEngine;
 
 public class ParryAbility : Ability {
-  public Timeval BlockDuration = Timeval.FromAnimFrames(15, 30);
-  public MeleeAbility RiposteAbility;
+  [SerializeField] Hurtbox Hurtbox;
+  [SerializeField] Timeval BlockDuration = Timeval.FromAnimFrames(15, 30);
+  [SerializeField] MeleeAbility RiposteAbility;
   Animator Animator;
   Defender Defender;
 
@@ -18,10 +19,11 @@ public class ParryAbility : Ability {
       yield break;
     using (AddStatusEffect(Invulnerable)) {
       Animator.SetBool("Blocking", true);
-      var hitEvent = Fiber.ListenFor(Defender.HitEvent);
-      yield return Fiber.Any(hitEvent, new CountdownTimer(BlockDuration), ListenFor(Release));
+      Debug.LogWarning("Fix up Parry Ability to listen for hurtbox event");
+      var onHurt = Fiber.ListenFor(Hurtbox.OnHurt);
+      yield return Fiber.Any(onHurt, new CountdownTimer(BlockDuration), ListenFor(Release));
       Animator.SetBool("Blocking", false);
-      if (hitEvent.IsCompleted) {
+      if (onHurt.IsCompleted) {
         AbilityManager.Bundle.StartRoutine(Riposte);
         yield break;
       }

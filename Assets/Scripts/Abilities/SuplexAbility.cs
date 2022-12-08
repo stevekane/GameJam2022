@@ -70,7 +70,7 @@ public class SuplexAbility : Ability {
     var hits = Physics.OverlapSphereNonAlloc(target.transform.position, HitRadius, PhysicsQuery.Colliders, Layers.CollidesWith(gameObject.layer));
     PhysicsQuery.Colliders[..hits].ForEach(c => {
       if (c.TryGetComponent(out Hurtbox hurtbox))
-        hurtbox.TryAttack(Attributes, HitConfig);
+        hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject));
     });
     yield return Fiber.Wait(HitConfig.HitStopDuration.Ticks);
     targetStatus.transform.up = -targetStatus.transform.up;

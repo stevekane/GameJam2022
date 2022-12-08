@@ -21,7 +21,7 @@ public class ShieldAbility : Ability {
     yield return Windup.Start(Animator, Index);
     if (Shield != null)
       Shield.Hurtbox.gameObject.SetActive(true);
-    using (var invuln = AddStatusEffect(Invulnerable)) {
+    using (AddStatusEffect(Invulnerable)) {
       yield return ListenFor(HoldRelease);
     }
     if (Shield != null)

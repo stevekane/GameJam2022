@@ -31,6 +31,10 @@ public class Vibrator : MonoBehaviour {
     Vibrate(transform.forward, DamageDuration.Ticks, DamageAmplitude);
   }
 
+  void OnHurt(HitParams hitParams) {
+    Vibrate(transform.forward, DamageDuration.Ticks, DamageAmplitude);
+  }
+
   void FixedUpdate() {
     if (FramesRemaining > 0) {
       Sign = Sign == -1 ? 1 : -1;
