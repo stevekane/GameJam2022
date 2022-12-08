@@ -11,6 +11,7 @@ public class Shield : MonoBehaviour {
 
   IEnumerator WatchDamage() {
     yield return Fiber.While(() => Damage.Points < MaxDamage);
+    Destroy(Hurtbox.gameObject);
     yield return new AnimationTask(Animator, DeathClip, true);
     Destroy(gameObject, .01f);
   }

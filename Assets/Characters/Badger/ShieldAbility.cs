@@ -19,13 +19,15 @@ public class ShieldAbility : Ability {
   public IEnumerator HoldStart() {
     Animator.SetBool("Shielding", true);
     yield return Windup.Start(Animator, Index);
-    Shield.Hurtbox.gameObject.SetActive(true);
+    if (Shield != null)
+      Shield.Hurtbox.gameObject.SetActive(true);
     var invuln = AddStatusEffect(Invulnerable);
     Using(invuln);
     yield return ListenFor(HoldRelease);
     invuln.Dispose();
     Disposables.Remove(invuln);
-    Shield.Hurtbox.gameObject.SetActive(false);
+    if (Shield != null)
+      Shield.Hurtbox.gameObject.SetActive(false);
     Animator.SetBool("Shielding", false);
     yield return Recovery.Start(Animator, Index);
   }
@@ -37,6 +39,7 @@ public class ShieldAbility : Ability {
     Animator.SetInteger("AttackIndex", -1);
     Animator.SetFloat("AttackSpeed", 1);
     Animator.SetBool("Shielding", false);
-    Shield.Hurtbox.gameObject.SetActive(false);
+    if (Shield != null)
+      Shield.Hurtbox.gameObject.SetActive(false);
   }
 }
