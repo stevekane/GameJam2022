@@ -18,25 +18,26 @@ public class TaskScope : IDisposable {
     Source.Cancel();
     Source.Dispose();
   }
+  public void ThrowIfCancelled() => Source.Token.ThrowIfCancellationRequested();
 
   // Child task spawning.
   CancellationTokenSource NewChildToken() => CancellationTokenSource.CreateLinkedTokenSource(Source.Token);
   public Task Run(TaskFunc f) => CheckTask(f(this));
   public Task<T> Run<T>(TaskFunc<T> f) => CheckTask(f(this));
   public Task RunChild(out TaskScope childScope, TaskFunc f) {
-    Source.Token.ThrowIfCancellationRequested();
+    ThrowIfCancelled();
     childScope = new(this);
     var scope = childScope;
     return CheckTask(f(scope));
   }
   T CheckTask<T>(T task) where T : Task {
-    Source.Token.ThrowIfCancellationRequested();
+    ThrowIfCancelled();
     return task;
   }
 
   // Fiber adapter.
   public async Task RunFiber(IEnumerator routine) {
-    Source.Token.ThrowIfCancellationRequested();
+    ThrowIfCancelled();
     Fiber f = routine as Fiber ?? new Fiber(routine);
     try {
       while (f.MoveNext())
@@ -48,7 +49,7 @@ public class TaskScope : IDisposable {
 
   // Basic control flow.
   public async Task Yield() {
-    Source.Token.ThrowIfCancellationRequested();
+    ThrowIfCancelled();
     await Task.Yield();
   }
   public Task Tick() => ListenFor(Timeval.TickEvent);
@@ -86,36 +87,36 @@ public class TaskScope : IDisposable {
 
   // More involved combinators.
   public async Task<int> Any(params Task[] tasks) {
-    Source.Token.ThrowIfCancellationRequested();
+    ThrowIfCancelled();
     var which = await Task.WhenAny(tasks);
     return tasks.IndexOf(which);
   }
   public async Task<int> Any(params TaskFunc[] fs) {
-    Source.Token.ThrowIfCancellationRequested();
+    ThrowIfCancelled();
     using TaskScope scope = new(this);
     try {
       var tasks = fs.Select(f => f(scope)).ToArray();
       var which = await Task.WhenAny(tasks);
       return tasks.IndexOf(which);
     } finally {
-      Source.Token.ThrowIfCancellationRequested();
+      ThrowIfCancelled();
     }
   }
   public async Task All(params Task[] tasks) {
-    Source.Token.ThrowIfCancellationRequested();
+    ThrowIfCancelled();
     await Task.WhenAll(tasks);
   }
   public async Task All(params TaskFunc[] fs) {
-    Source.Token.ThrowIfCancellationRequested();
+    ThrowIfCancelled();
     using TaskScope scope = new(this);
     try {
       await Task.WhenAll(fs.Select(f => f(scope)));
     } finally {
-      Source.Token.ThrowIfCancellationRequested();
+      ThrowIfCancelled();
     }
   }
   public async Task ListenFor(IEventSource evt) {
-    Source.Token.ThrowIfCancellationRequested();
+    ThrowIfCancelled();
     var done = NewChildToken();
     void callback() { done.Cancel(); }
     try {
@@ -124,11 +125,11 @@ public class TaskScope : IDisposable {
     } catch {
     } finally {
       evt.Unlisten(callback);
-      Source.Token.ThrowIfCancellationRequested();
+      ThrowIfCancelled();
     }
   }
   public async Task<T> ListenFor<T>(IEventSource<T> evt) {
-    Source.Token.ThrowIfCancellationRequested();
+    ThrowIfCancelled();
     var done = NewChildToken();
     T eventResult = default;
     void callback(T value) { eventResult = value; done.Cancel(); }
@@ -140,20 +141,23 @@ public class TaskScope : IDisposable {
       return eventResult;
     } finally {
       evt.Unlisten(callback);
-      Source.Token.ThrowIfCancellationRequested();
+      ThrowIfCancelled();
     }
   }
   public async Task<int> ListenForAll<T>(IEventSource<T> evt, T[] results) {
-    Source.Token.ThrowIfCancellationRequested();
+    ThrowIfCancelled();
+    var done = NewChildToken();
     int resultCount = 0;
-    void callback(T value) { results[resultCount++] = value; }
+    async void callback(T value) { results[resultCount++] = value; await Tick(); done.Cancel(); }
     try {
       evt.Listen(callback);
-      await Tick();
+      await Task.Delay(-1, done.Token);
+      throw new Exception(); // not reached
+    } catch {
       return resultCount;
     } finally {
       evt.Unlisten(callback);
-      Source.Token.ThrowIfCancellationRequested();
+      ThrowIfCancelled();
     }
   }
 }
