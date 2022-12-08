@@ -41,7 +41,11 @@ public class SimpleDash : Ability {
     AddStatusEffect(ScriptedMove);
     await scope.RunFiber(Animator.Run(DashWindupClip));
     AddStatusEffect(Invulnerable);
-    await scope.Any(s => s.Delay(DashDuration), s => s.RunFiber(Animator.Run(DashingClip)), s => Move(s, dir.normalized));
+    await scope.Any(
+      s => s.Delay(DashDuration),
+      s => s.RunFiber(Animator.Run(DashingClip)),
+      s => Move(s, dir.normalized),
+      s => MakeCancellable(s));
     await scope.RunFiber(Animator.Run(DoneClip));
   }
 
@@ -55,6 +59,12 @@ public class SimpleDash : Ability {
       Status.Move(desiredSpeed * Time.fixedDeltaTime * dir);
       await scope.Tick();
     }
+  }
+
+  async Task MakeCancellable(TaskScope scope) {
+    await scope.Millis((int)(DashDuration.Millis / 3));
+    CurrentTags.AddFlags(AbilityTag.Cancellable);
+    await scope.Forever();
   }
 
   public override void Awake() {

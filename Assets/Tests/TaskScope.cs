@@ -63,6 +63,7 @@ public class TaskScope : IDisposable {
       await Yield();
   }
   public Task Millis(int ms) => Task.Delay(ms, Source.Token);
+  public Task Forever() => Task.Delay(-1, Source.Token);
   public Task Delay(Timeval t) => Millis((int)t.Millis);
 
   // Conditional control flow.
