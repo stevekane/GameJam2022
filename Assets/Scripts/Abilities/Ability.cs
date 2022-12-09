@@ -44,13 +44,14 @@ public abstract class Ability : MonoBehaviour, IAbility {
   Dictionary<object, TriggerCondition> TriggerConditionsMap = new();
   [HideInInspector] public AbilityTag Tags { get => CurrentTags; set => CurrentTags = value; } // Inherited from the Trigger when started
   [HideInInspector] public AbilityTag CurrentTags;
-  public bool IsRunning { get => Bundle.IsRunning; }
+  public bool IsRunning { get => Bundle.IsRunning || ActiveTasks.Count > 0; }
   public IEnumerator Running => Bundle;
   public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
   public void StopRoutine(Fiber routine) => Bundle.StopRoutine(routine);
   // Adapter to run a Task using Fiber tech. Temporary.
   // TODO: if/when this goes away, we'll need a Task-only notion of IsRunning. Should we keep track of active tasks somehow?
   TaskScope MainScope = new();
+  List<AbilityMethodTask> ActiveTasks = new();  // TODO(task): could just be a refcount instead?
   public void MaybeStartTask(AbilityMethodTask func) {
     var task = new Task(async () => {
       using TaskScope scope = new(MainScope);
@@ -59,26 +60,12 @@ public abstract class Ability : MonoBehaviour, IAbility {
       } catch (OperationCanceledException) {
       } catch (Exception e) {
         Debug.LogError($"Exception during Ability {this}: {e}");
-      }
-    });
-    task.Start(TaskScheduler.FromCurrentSynchronizationContext());
-  }
-  public IEnumerator RunTask(AbilityMethodTask func) {
-    bool done = false;
-    var task = new Task(async () => {
-      using TaskScope scope = new(MainScope);
-      try {
-        await func(scope);
-      } catch (OperationCanceledException) {
-      } catch (Exception e) {
-        Debug.LogError($"Exception during Ability {this}: {e}");
       } finally {
-        done = true;
+        ActiveTasks.Remove(func);
       }
     });
+    ActiveTasks.Add(func);
     task.Start(TaskScheduler.FromCurrentSynchronizationContext());
-    while (!done)
-      yield return null;
   }
   public T Using<T>(T d) where T : IDisposable {
     Disposables.Add(d);

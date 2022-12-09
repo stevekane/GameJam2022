@@ -26,8 +26,7 @@ public class SimpleDash : Ability {
   }
 
   // Button press/release.
-  public IEnumerator Activate() => RunTask(ActivateTask);
-  async Task ActivateTask(TaskScope scope) {
+  public async Task Activate(TaskScope scope) {
     try {
       var dir = AbilityManager.GetAxis(AxisTag.Move).XZ;
       if (dir == Vector3.zero) {

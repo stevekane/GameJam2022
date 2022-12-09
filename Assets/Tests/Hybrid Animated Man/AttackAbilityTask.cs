@@ -23,13 +23,12 @@ public class AttackAbilityTask : Ability {
   [NonSerialized] HashSet<Collider> PhaseHits = new();
   [NonSerialized] AnimationJobTask Animation = null;
 
-  public override void OnStop() {
-    HitBox.enabled = false;
-  }
+  //public override void OnStop() {
+  //  HitBox.enabled = false;
+  //}
 
   // Fiber -> Task adapter, ignore this.
-  public IEnumerator Attack() => RunTask(AttackTask);
-  async Task AttackTask(TaskScope scope) {
+  async Task Attack(TaskScope scope) {
     HitBox.enabled = false;
     await scope.Any(PlayAnim, Repeat(OnHit));
   }

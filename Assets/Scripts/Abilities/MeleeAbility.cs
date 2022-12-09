@@ -33,10 +33,9 @@ public class MeleeAbility : Ability {
     Hitbox.TriggerStay = OnContact;
   }
 
-  public IEnumerator AttackStart() => RunTask(s => Routine(s, false));
-  public IEnumerator ChargeStart() => RunTask(s => Routine(s, true));
-  public IEnumerator ChargeRelease() => RunTask(ChargeReleaseTask);
-  async Task ChargeReleaseTask(TaskScope scope) {
+  public Task AttackStart(TaskScope scope) => Routine(scope, false);
+  public Task ChargeStart(TaskScope scope) => Routine(scope, true);
+  public async Task ChargeRelease(TaskScope scope) {
     Animation?.SetSpeed(1);
     await scope.Yield();
   }

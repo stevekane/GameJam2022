@@ -50,8 +50,20 @@ public class AbilityManager : MonoBehaviour {
       evt = CreateRouter(method);
     return evt;
   }
+  public IEventSource GetEvent(AbilityMethodTask method) {
+    if (!MethodToEvent.TryGetValue(method, out EventRouter evt))
+      evt = CreateRouter(method);
+    return evt;
+  }
   public void TryInvoke(AbilityMethod method) => GetEvent(method).Fire();
+  public void TryInvoke(AbilityMethodTask method) => GetEvent(method).Fire();
   public IEnumerator TryRun(AbilityMethod method) {
+    var ability = (IAbility)method.Target;
+    GetEvent(method).Fire();
+    yield return Fiber.While(() => ability.IsRunning);
+  }
+  // TODO(task): Task version
+  public IEnumerator TryRun(AbilityMethodTask method) {
     var ability = (IAbility)method.Target;
     GetEvent(method).Fire();
     yield return Fiber.While(() => ability.IsRunning);
