@@ -10,7 +10,6 @@ public class AttackAbility : Ability {
   [SerializeField] HitConfig HitConfig;
   [SerializeField] Vibrator Vibrator;
   [SerializeField] Animator Animator;
-  [SerializeField] AnimationDriver AnimationDriver;
   [SerializeField] AnimationJobConfig AttackAnimation;
   [SerializeField] TriggerEvent TriggerEvent;
   [SerializeField] Collider HitBox;

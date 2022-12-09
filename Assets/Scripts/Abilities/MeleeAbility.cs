@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public class MeleeAbility : Ability {
-  [SerializeField] AnimationDriver AnimationDriver;
   Transform Owner;
   public AnimationClip Clip;
   public Timeval WindupDuration;
