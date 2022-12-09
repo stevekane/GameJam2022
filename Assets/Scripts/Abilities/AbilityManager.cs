@@ -17,7 +17,8 @@ public class AbilityManager : MonoBehaviour {
   public IEnumerable<IAbility> Running { get => Abilities.Where(a => a.IsRunning); }
 
   Dictionary<AxisTag, AxisState> TagToAxis = new();
-  Dictionary<AbilityMethod, EventRouter> MethodToEvent = new();
+  // TODO(Task): object => AbilityMethodTask
+  Dictionary<object, EventRouter> MethodToEvent = new();
 
   public void InitAbilities(IAbility[] abilities) {
     Abilities = abilities;
@@ -32,6 +33,10 @@ public class AbilityManager : MonoBehaviour {
     TagToAxis[tag] = axis;
   }
   public void RegisterEvent(AbilityMethod method, IEventSource evt) {
+    var router = CreateRouter(method);
+    router.ConnectSource(evt);
+  }
+  public void RegisterEvent(AbilityMethodTask method, IEventSource evt) {
     var router = CreateRouter(method);
     router.ConnectSource(evt);
   }
@@ -52,6 +57,7 @@ public class AbilityManager : MonoBehaviour {
     yield return Fiber.While(() => ability.IsRunning);
   }
   EventRouter CreateRouter(AbilityMethod method) => MethodToEvent[method] = new EventRouter((IAbility)method.Target, method);
+  EventRouter CreateRouter(AbilityMethodTask method) => MethodToEvent[method] = new EventRouter((IAbility)method.Target, method);
 
   void Awake() {
     InitAbilities(GetComponentsInChildren<Ability>());
@@ -72,9 +78,12 @@ public class AbilityManager : MonoBehaviour {
     Action Action;
     IAbility Ability;
     AbilityMethod Method;
+    AbilityMethodTask MethodTask;
     TriggerCondition Trigger;
     public EventRouter(IAbility ability, AbilityMethod method) =>
       (Ability, Method, Trigger) = (ability, method, ability.GetTriggerCondition(method));
+    public EventRouter(IAbility ability, AbilityMethodTask method) =>
+      (Ability, MethodTask, Trigger) = (ability, method, ability.GetTriggerCondition(method));
     public void ConnectSource(IEventSource evt) => (EventSource = evt).Listen(Fire);
     public void DisconnectSource() => EventSource?.Unlisten(Fire);
     public void Listen(Action handler) => Action += handler;
@@ -89,9 +98,15 @@ public class AbilityManager : MonoBehaviour {
         var tags = Ability.Tags;
         Ability.Tags = tags.AddFlags(Trigger.Tags);
         Action?.Invoke();
-        var enumerator = Method();
-        if (enumerator != null) {  // Can be null if used only for event listeners.
-          Ability.StartRoutine(new Fiber(enumerator));
+        if (Method != null) {
+          var enumerator = Method();
+          if (enumerator != null) {  // Can be null if used only for event listeners.
+            Ability.StartRoutine(new Fiber(enumerator));
+          }
+        } else if (MethodTask != null) {
+          Ability.MaybeStartTask(MethodTask);
+        } else {
+          Debug.LogError($"{Ability} has no Method!");
         }
       }
     }
