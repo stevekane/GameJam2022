@@ -75,7 +75,7 @@ MonoBehaviour:
   TriggerConditions:
   - Method:
       MethodName: Execute
-    Tags: 18
+    Tags: 19
     RequiredOwnerTags: 0
     EnergyCost: 0
   CurrentTags: 0
@@ -1073,10 +1073,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Target: {fileID: 5571416123647958240}
-  DamageDuration:
+  HitDuration:
     Millis: 200
     FramesPerSecond: 30
-  DamageAmplitude: 0.2
+  HurtDuration:
+    Millis: 300
+    FramesPerSecond: 30
+  HitAmplitude: 0.1
+  HurtAmplitude: 0.2
 --- !u!114 &4152063555031946022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1258,6 +1262,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5858cd79c3bb37845b5d44f08793d81e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Animator: {fileID: 7727835182619467870}
 --- !u!1 &5571416124901615635
 GameObject:
   m_ObjectHideFlags: 0
@@ -1469,7 +1474,7 @@ MonoBehaviour:
   TriggerConditions:
   - Method:
       MethodName: Pressed
-    Tags: 34
+    Tags: 2
     RequiredOwnerTags: 0
     EnergyCost: 0
   CurrentTags: 0
@@ -1525,7 +1530,7 @@ SphereCollider:
   m_GameObject: {fileID: 7203950085718089985}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 9
   m_Center: {x: 0, y: 3, z: 0}

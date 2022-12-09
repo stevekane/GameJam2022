@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public enum AxisTag {
@@ -62,11 +63,15 @@ public class AbilityManager : MonoBehaviour {
     GetEvent(method).Fire();
     yield return Fiber.While(() => ability.IsRunning);
   }
-  // TODO(task): Task version
   public IEnumerator TryRun(AbilityMethodTask method) {
     var ability = (IAbility)method.Target;
     GetEvent(method).Fire();
     yield return Fiber.While(() => ability.IsRunning);
+  }
+  public async Task TryRun(TaskScope scope, AbilityMethodTask method) {
+    var ability = (IAbility)method.Target;
+    GetEvent(method).Fire();
+    await scope.While(() => ability.IsRunning);
   }
   EventRouter CreateRouter(AbilityMethod method) => MethodToEvent[method] = new EventRouter((IAbility)method.Target, method);
   EventRouter CreateRouter(AbilityMethodTask method) => MethodToEvent[method] = new EventRouter((IAbility)method.Target, method);

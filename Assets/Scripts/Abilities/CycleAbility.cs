@@ -1,21 +1,19 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using System.Threading.Tasks;
 
 public class CycleAbility : Ability {
   public List<AbilityMethodReference> Abilities;
-  AbilityMethod[] AbilityMethods;
+  AbilityMethodTask[] AbilityMethods;
   int CycleIndex = 0;
 
-  public IEnumerator Attack() {
+  public async Task Attack(TaskScope scope) {
     var (ability, method) = (Abilities[CycleIndex].Ability, AbilityMethods[CycleIndex]);
     CycleIndex = (CycleIndex + 1) % AbilityMethods.Length;
-    AbilityManager.TryInvoke(method);
-    yield return Fiber.Until(() => !ability.IsRunning);
+    await AbilityManager.TryRun(scope, method);
   }
 
   void Start() {
-    AbilityMethods = Abilities.Select(a => a.GetMethod()).ToArray();
+    AbilityMethods = Abilities.Select(a => a.GetMethodTask()).ToArray();
   }
 }

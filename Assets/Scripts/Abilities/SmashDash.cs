@@ -36,9 +36,9 @@ public class SmashDash : Ability {
     yield return null;
   }
 
-  public override void OnStop() {
-    AbilityManager.Bundle.StartRoutine(Animator.Run(DoneClip));
-  }
+  //public override void OnStop() {
+  //  AbilityManager.Bundle.StartRoutine(Animator.Run(DoneClip));
+  //}
 
   // Detect when the move axis is released and pressed again. This sort of thing probably belongs in a lower level system.
   IEnumerator InputLoop() {
