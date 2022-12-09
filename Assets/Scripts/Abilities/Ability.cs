@@ -75,9 +75,9 @@ public abstract class Ability : MonoBehaviour, IAbility {
     return d;
   }
   public StatusEffect AddStatusEffect(StatusEffect effect, OnEffectComplete onComplete = null) => Status.Add(Using(effect), onComplete);
-  public Listener ListenFor(IEventSource evt) => Fiber.ListenFor(evt);
-  public Listener<T> ListenFor<T>(IEventSource<T> evt) => Fiber.ListenFor(evt);
-  public Listener ListenFor(AbilityMethod method) => Fiber.ListenFor(AbilityManager.GetEvent(method));
+  public Listener FiberListenFor(IEventSource evt) => Fiber.ListenFor(evt);
+  public Listener<T> FiberListenFor<T>(IEventSource<T> evt) => Fiber.ListenFor(evt);
+  public Listener FiberListenFor(AbilityMethod method) => Fiber.ListenFor(AbilityManager.GetEvent(method));
   public void Stop() {
     OnStop();
     Tags = 0;

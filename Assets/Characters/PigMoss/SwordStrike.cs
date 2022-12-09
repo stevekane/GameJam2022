@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Serialization;
 
+using static TaskExtensionsForOlSteve;
+
 namespace PigMoss {
   [Serializable]
   public class SwordStrike : Ability {
@@ -35,8 +37,8 @@ namespace PigMoss {
     public async Task Routine(TaskScope scope) {
       var animation = AnimationDriver.Play(scope, Clip);
       // Args to Any need the child scope, so they need to be TaskFunc lambdas rather than basic Tasks.
-      TaskFunc windup = s => animation.WaitFrame(s, ActiveFrameStart.AnimFrames);
-      TaskFunc lookAt = s => s.Repeat(() => Mover.TryLookAt(BlackBoard.Target));
+      var windup = animation.WaitFrame(ActiveFrameStart.AnimFrames);
+      var lookAt = Repeat(Mover.TryLookAt, BlackBoard.Target);
       await scope.Any(windup, lookAt);
       var slashPosition = AbilityManager.transform.position;
       var slashRotation = AbilityManager.transform.rotation;
@@ -47,9 +49,9 @@ namespace PigMoss {
       // ReturnDefault wraps a Task to have it return default(T) to match the other return types.
       // Alternatively we could probably have a version of ListenFor that gives you an object containing the result,
       // similar to Fiber.Listener.
-      TaskFunc<Collider> contact = s => s.ListenFor(Contact.OnTriggerStaySource);
-      TaskFunc<Collider> endActive = s => s.ReturnDefault<Collider>(animation.WaitFrame(s, ActiveFrameEnd.AnimFrames));
-      var activeOutcome = await scope.Any(contact, endActive);
+      var contact = ListenFor(Contact.OnTriggerStaySource);
+      var endActive = animation.WaitFrame(ActiveFrameEnd.AnimFrames);
+      var activeOutcome = await scope.Any(contact, ReturnDefault<Collider>(endActive));
       if (activeOutcome != null && activeOutcome.TryGetComponent(out Hurtbox hurtbox)) {
         hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject));
       }

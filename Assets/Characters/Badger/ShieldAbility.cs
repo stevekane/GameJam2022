@@ -22,7 +22,7 @@ public class ShieldAbility : Ability {
     if (Shield != null)
       Shield.Hurtbox.gameObject.SetActive(true);
     using (AddStatusEffect(Invulnerable)) {
-      yield return ListenFor(HoldRelease);
+      yield return FiberListenFor(HoldRelease);
     }
     if (Shield != null)
       Shield.Hurtbox.gameObject.SetActive(false);

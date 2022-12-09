@@ -42,11 +42,12 @@ public class AnimationJobTask {
       Clip.Play();
   }
 
+  public TaskFunc WaitFrame(int frame) => s => WaitFrame(s, frame);
   public async Task WaitFrame(TaskScope scope, int frame) {
     while (CurrentFrame < frame && IsRunning)
       await scope.Yield();  // tick or yield?
   }
-
+  public TaskFunc WaitDone() => s => WaitDone(s);
   public async Task WaitDone(TaskScope scope) {
     while (IsRunning)
       await scope.Yield();
