@@ -7,14 +7,20 @@ namespace PigMoss {
   public class PigMoss : MonoBehaviour {
     [SerializeField] AbilityManager AbilityManager;
     [SerializeField] FiberAbility[] Abilities;
+    [SerializeField] Ability[] TaskAbilities;
     [SerializeField] TargetingConfig TargetingConfig;
     [SerializeField] Transform CenterOfArena;
     [SerializeField] Timeval ActionCooldown;
     [SerializeField] BlackBoard BlackBoard;
+    IAbility[] IAbilities;
 
     Fiber Behavior;
     int AbilityIndex;
 
+    void Awake() {
+      IAbilities = Abilities;
+      IAbilities = IAbilities.Concat(TaskAbilities).ToArray();
+    }
     void Start() => Behavior = new Fiber(Fiber.Repeat(MakeBehavior));
     void OnDestroy() => Behavior.Stop();
     void FixedUpdate() => Behavior.MoveNext();
@@ -25,7 +31,7 @@ namespace PigMoss {
       yield return acquireTargets;
 
       // Scoring
-      AbilityManager.InitAbilities(Abilities);
+      AbilityManager.InitAbilities(IAbilities);
       BlackBoard.Target = PhysicsQuery.Colliders[acquireTargets.Value-1].transform;
       if (BlackBoard.Target) {
         var delta = BlackBoard.Target.transform.position-transform.position;
@@ -38,7 +44,7 @@ namespace PigMoss {
       }
 
       // Strategy (like a shitty histogram)
-      var scores = Abilities.Select(a => a.Score()).ToArray();
+      var scores = IAbilities.Select(a => a.Score()).ToArray();
       List<int> indices = new();
       for (var i = 0; i < scores.Length; i++) {
         var score = scores[i];
@@ -53,7 +59,7 @@ namespace PigMoss {
         }
       }
       AbilityIndex = indices[UnityEngine.Random.Range(0, indices.Count)];
-      yield return TryRun(Abilities[AbilityIndex]);
+      yield return TryRun(IAbilities[AbilityIndex]);
 
       // Cooldown
       var cooldown = Fiber.Wait(ActionCooldown);
@@ -76,10 +82,17 @@ namespace PigMoss {
       }
     }
 
-    IEnumerator TryRun(FiberAbility ability) {
+    IEnumerator TryRun(IAbility ability) {
       ability.AbilityManager = AbilityManager;
-      AbilityManager.TryInvoke(ability.Routine);
-      return ability;
+      if (ability is FiberAbility fability) {
+        AbilityManager.TryInvoke(fability.Routine);
+        return fability;
+      } else if (ability is SwordStrike sability) {
+        //return AbilityManager.TryRun(sability.Routine);
+        AbilityManager.TryInvoke(sability.Routine);
+        return sability;
+      }
+      return null;
     }
   }
 }

@@ -25,6 +25,7 @@ public interface IAbility : IStoppable {
   public void MaybeStartTask(AbilityMethodTask func) { }
   public TriggerCondition GetTriggerCondition(AbilityMethod method);
   public TriggerCondition GetTriggerCondition(AbilityMethodTask method) => null;
+  public float Score() => 0;
 }
 
 interface IScorable {
