@@ -22,6 +22,9 @@ public enum AttributeTag {
   AbilityStart = 1000,
   AbilityHeavyActive,
   AbilitySlamActive,
+
+  // States
+  LocalTimeScale
 }
 
 [Serializable]

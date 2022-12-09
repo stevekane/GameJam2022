@@ -50,6 +50,7 @@ public class AnimationJobTask {
   public async Task WaitDone(TaskScope scope) {
     while (IsRunning)
       await scope.Yield();
+      // await scope.Tick();
   }
 
   // TDO: condense start/run?
@@ -79,6 +80,7 @@ public class AnimationJobTask {
         UpdateCurrentFrame();
         if (Clip.IsDone())
           break;
+        // await scope.Tick();
         await scope.Yield(); // tick or yield?
       }
     } finally {
@@ -199,7 +201,7 @@ public class AnimationJobFacade : IEnumerator, IStoppable {
 
 [RequireComponent(typeof(Animator))]
 public class AnimationDriver : MonoBehaviour {
-  Animator Animator;
+  public Animator Animator;
   PlayableGraph Graph;
   AnimatorControllerPlayable AnimatorController;
   AnimationPlayableOutput Output;
@@ -208,7 +210,6 @@ public class AnimationDriver : MonoBehaviour {
   AnimationJobTask Task = null;
 
   void Awake() {
-    Animator = GetComponent<Animator>();
     Graph = PlayableGraph.Create("Animation Driver");
     Output = AnimationPlayableOutput.Create(Graph, "Animation Driver", Animator);
     AnimatorController = AnimatorControllerPlayable.Create(Graph, Animator.runtimeAnimatorController);

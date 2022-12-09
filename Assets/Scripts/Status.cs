@@ -64,7 +64,8 @@ public class KnockbackEffect : StatusEffect {
     status.CanMove = !IsAirborne;
     status.CanRotate = !IsAirborne;
     status.CanAttack = !IsAirborne;
-    status.Animator?.Value.SetBool("HitFlinch", IsAirborne);
+    if (status.AnimationDriver.Animator)
+      status.AnimationDriver.Animator.SetBool("HitFlinch", IsAirborne);
     if (!status.CanAttack) {
       status.GetComponent<AbilityManager>()?.InterruptAbilities();
     }
@@ -73,7 +74,8 @@ public class KnockbackEffect : StatusEffect {
     IsFirstFrame = false;
   }
   public override void OnRemoved(Status status) {
-    status.Animator?.Value.SetBool("HitFlinch", false);
+    if (status.AnimationDriver.Animator)
+      status.AnimationDriver.Animator.SetBool("HitFlinch", false);
   }
 }
 
@@ -106,10 +108,9 @@ public class HitStopEffect : StatusEffect {
       status.CanMove = false;
       status.CanRotate = false;
       status.CanAttack = false;
-      status.Animator?.Value.SetSpeed(0);
+      status.AddAttributeModifier(AttributeTag.LocalTimeScale, AttributeModifier.TimesZero);
       Frames++;
     } else {
-      status.Animator?.Value.SetSpeed(1);
       status.Remove(this);
     }
   }
@@ -148,7 +149,7 @@ public class FreezingEffect : StatusEffect {
       status.CanMove = false;
       status.CanRotate = false;
       status.CanAttack = false;
-      status.Animator?.Value.SetSpeed(0);
+      status.AddAttributeModifier(AttributeTag.LocalTimeScale, AttributeModifier.TimesZero);
     }
   }
   public override bool Merge(StatusEffect e) {
@@ -184,10 +185,10 @@ public class RecoilEffect : StatusEffect {
 
 public class Status : MonoBehaviour {
   public List<StatusEffect> Active = new();
+  internal AnimationDriver AnimationDriver;
   internal Attributes Attributes;
   internal Upgrades Upgrades;
   internal CharacterController Controller;
-  internal Optional<Animator> Animator;
   internal Optional<Damage> Damage;
   Dictionary<AttributeTag, AttributeModifier> Modifiers = new();
   static AttributeModifier Zero = new() { Mult = 0 };
@@ -248,7 +249,7 @@ public class Status : MonoBehaviour {
     Attributes = this.GetOrCreateComponent<Attributes>();
     Upgrades = this.GetOrCreateComponent<Upgrades>();
     Controller = GetComponent<CharacterController>();
-    Animator = GetComponent<Animator>();
+    AnimationDriver = GetComponent<AnimationDriver>();
     Damage = GetComponent<Damage>();
   }
 
@@ -258,6 +259,14 @@ public class Status : MonoBehaviour {
     IsHittable = true;
     IsDamageable = true;
     Tags = Upgrades.AbilityTags;
+
+    // Steve - This currently uses localtimescale to pause/resume AnimationDriver. I think this should move...
+    var localSpeed = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
+    if (localSpeed < 1) {
+      AnimationDriver.Pause();
+    } else {
+      AnimationDriver.Resume();
+    }
 
     // TODO: differentiate between cancelled and completed?
     Removed.ForEach(e => { e.OnComplete?.Invoke(this); e.OnRemoved(this); e.Status = null; Active.Remove(e); });
