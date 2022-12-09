@@ -103,6 +103,7 @@ public class AnimationJob : IEnumerator, IStoppable {
   public AnimationDriver Driver;
   public AnimationLayerMixerPlayable Mixer;
   public AnimationClipPlayable Clip;
+  public double BaseSpeed { get; private set; }
   public int EventHead { get; private set; } = -1;
   public EventSource<int> OnFrame = new();
 
@@ -112,6 +113,7 @@ public class AnimationJob : IEnumerator, IStoppable {
     Animation = animation;
     Clip = AnimationClipPlayable.Create(Graph, Animation.Clip);
     Mixer = AnimationLayerMixerPlayable.Create(Graph, 2);
+    BaseSpeed = Clip.GetSpeed();
   }
 
   public void Pause() {
@@ -122,6 +124,12 @@ public class AnimationJob : IEnumerator, IStoppable {
   public void Resume() {
     if (Clip.IsValid() && !Clip.IsNull()) {
       Clip.Play();
+    }
+  }
+
+  public void SetSpeed(float speed) {
+    if (Clip.IsValid() && !Clip.IsNull()) {
+      Clip.SetSpeed(speed);
     }
   }
 
@@ -201,6 +209,8 @@ public class AnimationJobFacade : IEnumerator, IStoppable {
 
 public class AnimationDriver : MonoBehaviour {
   public Animator Animator;
+  public float BaseSpeed { get; private set; }
+  public double speed => Animator.speed;
   PlayableGraph Graph;
   AnimatorControllerPlayable AnimatorController;
   AnimationPlayableOutput Output;
@@ -214,18 +224,76 @@ public class AnimationDriver : MonoBehaviour {
     AnimatorController = AnimatorControllerPlayable.Create(Graph, Animator.runtimeAnimatorController);
     Output.SetSourcePlayable(AnimatorController);
     Graph.Play();
+    BaseSpeed = Animator.speed;
+
+    RunBlankTask();
+    StartCoroutine(RunBlankCoroutine());
+    Fiber = new Fiber(RunBlankFiber());
   }
+
+  // BEGIN TESTS
+  Fiber Fiber;
+
+  async System.Threading.Tasks.Task RunBlankTask() {
+    Debug.Log($"Task Start {Timeval.TickCount}");
+    async System.Threading.Tasks.Task BlankTask(int n) {
+      Debug.Log($"Task Start Blank {Timeval.TickCount}");
+      if (n > 0) {
+        await System.Threading.Tasks.Task.Yield();
+      }
+    }
+    await BlankTask(0);
+    Debug.Log($"Task End {Timeval.TickCount}");
+  }
+
+  IEnumerator RunBlankFiber() {
+    Debug.Log($"Fiber Start {Timeval.TickCount}");
+    IEnumerator BlankFiber(int n) {
+      Debug.Log($"Fiber Start Blank {Timeval.TickCount}");
+      if (n > 0) {
+        yield return null;
+      }
+    }
+    yield return BlankFiber(0);
+    Debug.Log($"Fiber End {Timeval.TickCount}");
+  }
+
+  IEnumerator RunBlankCoroutine() {
+    Debug.Log($"Coroutine Start {Timeval.TickCount}");
+    IEnumerator BlankCoroutine(int n) {
+      Debug.Log($"Coroutine Start Blank {Timeval.TickCount}");
+      if (n > 0) {
+        yield return null;
+      }
+    }
+    yield return StartCoroutine(BlankCoroutine(0));
+    Debug.Log($"Coroutine End {Timeval.TickCount}");
+  }
+  // END TESTS
+
   void OnDestroy() => Graph.Destroy();
 
   void FixedUpdate() {
+    Fiber?.MoveNext();
     if (Job != null && !Job.MoveNext()) {
       Job = null;
     }
   }
 
-  public void Pause() { Job?.Pause(); Animator.SetSpeed(0); }
-  public void Resume() { Job?.Resume(); Animator.SetSpeed(1); }
-  public double speed => Animator.speed;
+  public void SetSpeed(float speed) {
+    Job?.SetSpeed(speed);
+    Animator.SetSpeed(speed);
+  }
+
+  public void Pause() {
+    Job?.Pause();
+    Animator.SetSpeed(0);
+  }
+
+  public void Resume() {
+    Job?.Resume();
+    Animator.SetSpeed(BaseSpeed);
+  }
 
   public void Connect(AnimationJob animationJob) {
     animationJob.Mixer.ConnectInput(0, AnimatorController, 0, 1);

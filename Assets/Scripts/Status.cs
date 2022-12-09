@@ -260,15 +260,15 @@ public class Status : MonoBehaviour {
     IsDamageable = true;
     Tags = Upgrades.AbilityTags;
 
-    // Steve - This currently uses localtimescale to pause/resume AnimationDriver. I think this should move...
+    // Steve - This currently uses localtimescale to slow the AnimationDriver
     var localSpeed = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
     if (localSpeed < 1) {
       if (AnimationDriver) {
-        AnimationDriver.Pause();
+        AnimationDriver.SetSpeed(0);
       }
     } else {
       if (AnimationDriver) {
-        AnimationDriver.Resume();
+        AnimationDriver.SetSpeed(AnimationDriver.BaseSpeed);
       }
     }
 
