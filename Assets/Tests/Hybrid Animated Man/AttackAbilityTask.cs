@@ -25,7 +25,6 @@ public class AttackAbilityTask : Ability {
 
   public override void OnStop() {
     HitBox.enabled = false;
-    PhaseHits.Clear();
   }
 
   // Fiber -> Task adapter, ignore this.
@@ -39,29 +38,28 @@ public class AttackAbilityTask : Ability {
     try {
       Animation = AnimationDriver.Play(scope, AttackAnimation);
       await Animation.WaitFrame(scope, WindupEnd.AnimFrames);
+      PhaseHits.Clear();
       HitBox.enabled = true;
       var rotation = AbilityManager.transform.rotation;
       var vfxOrigin = AbilityManager.transform.TransformPoint(AttackVFXOffset);
       SFXManager.Instance.TryPlayOneShot(AttackSFX);
       VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
-      await Animation.WaitFrame(scope, ActiveEnd.AnimFrames);
+      await Animation.WaitFrame(scope, ActiveEnd.AnimFrames+1);
       HitBox.enabled = false;
       CurrentTags.AddFlags(AbilityTag.Cancellable);
       await Animation.WaitDone(scope);
     } finally {
-      Animation.Stop();  // TODO: I think this is not needed since the job itself does this
+      HitBox.enabled = false;
+      Debug.Assert(!Animation.IsRunning);
     }
   }
 
   async Task OnHit(TaskScope scope) {
     var hitCount = await scope.ListenForAll(TriggerEvent.OnTriggerStaySource, Hits);
-    var attacker = AbilityManager.transform;
     for (var i = 0; i < hitCount; i++) {
       var hit = Hits[i];
-      var contact = hit.transform.position;
-      var rotation = AbilityManager.transform.rotation;
       if (!PhaseHits.Contains(hit) && hit.TryGetComponent(out Hurtbox hurtbox)) {
-        hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject));
+        hurtbox.TryAttack(new HitParams(HitConfig, Attributes));
         PhaseHits.Add(hit);
       }
     }

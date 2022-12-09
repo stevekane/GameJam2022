@@ -20,7 +20,7 @@ public class AnimationJobTask {
   public AnimationLayerMixerPlayable Mixer;
   AnimationClipPlayable Clip;
   double DesiredSpeed = 1;
-  bool IsRunning = false;
+  public bool IsRunning { get; private set; } = false;
   public int CurrentFrame { get; private set; } = -1;
 
   public AnimationJobTask(AnimationDriver driver, PlayableGraph graph, AnimationJobConfig animation) {

@@ -112,7 +112,7 @@ public class HitStopEffect : StatusEffect {
       var localTimeScale = Frames <= SlowdownFrames
         ? Defaults.Instance.HitStopLocalTime.Evaluate((float)Frames/(float)SlowdownFrames)
         : 0;
-      Debug.Log(localTimeScale);
+      //Debug.Log(localTimeScale);
       var localTimeScaleMod = new AttributeModifier { Mult = localTimeScale };
       status.AddAttributeModifier(AttributeTag.LocalTimeScale, localTimeScaleMod);
       Frames++;
