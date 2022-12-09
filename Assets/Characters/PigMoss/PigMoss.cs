@@ -88,9 +88,7 @@ namespace PigMoss {
         AbilityManager.TryInvoke(fability.Routine);
         return fability;
       } else if (ability is SwordStrike sability) {
-        //return AbilityManager.TryRun(sability.Routine);
-        AbilityManager.TryInvoke(sability.Routine);
-        return sability;
+        return AbilityManager.TryRun(sability.Routine);
       }
       return null;
     }

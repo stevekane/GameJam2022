@@ -1,11 +1,12 @@
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace PigMoss {
   [Serializable]
-  public class SwordStrike : FiberAbility {
+  public class SwordStrike : Ability {
     [FormerlySerializedAs("HitParams")]
     public HitConfig HitConfig;
     public Timeval ActiveFrameStart;
@@ -16,6 +17,7 @@ namespace PigMoss {
     public TriggerEvent Contact;
     public GameObject SlashVFX;
     public AudioClip SlashSFX;
+    public new AnimationDriver AnimationDriver;
 
     public override float Score() {
       var distanceScore = BlackBoard.DistanceScore < 5 ? 1 : 0;
@@ -30,25 +32,29 @@ namespace PigMoss {
       Collider.enabled = false;
     }
 
-    public override IEnumerator Routine() {
-      var animation = Animator.Run(Clip);
-      var windup = animation.PlayUntil(ActiveFrameStart.Ticks);
-      var lookAt = Fiber.Repeat(Mover.TryLookAt, BlackBoard.Target);
-      yield return Fiber.Any(windup, lookAt);
+    public async Task Routine(TaskScope scope) {
+      var animation = AnimationDriver.Play(scope, Clip);
+      // Args to Any need the child scope, so they need to be TaskFunc lambdas rather than basic Tasks.
+      TaskFunc windup = s => animation.WaitFrame(s, ActiveFrameStart.AnimFrames);
+      TaskFunc lookAt = s => s.Repeat(() => Mover.TryLookAt(BlackBoard.Target));
+      await scope.Any(windup, lookAt);
       var slashPosition = AbilityManager.transform.position;
       var slashRotation = AbilityManager.transform.rotation;
       SFXManager.Instance.TryPlayOneShot(SlashSFX);
       VFXManager.Instance.TrySpawn2DEffect(SlashVFX, slashPosition, slashRotation);
       Collider.enabled = true;
-      var contact = Fiber.ListenFor(Contact.OnTriggerStaySource);
-      var endActive = animation.PlayUntil(ActiveFrameEnd.Ticks);
-      var activeOutcome = Fiber.SelectTask(contact, endActive);
-      yield return activeOutcome;
-      if (activeOutcome.Value == contact && contact.Value.TryGetComponent(out Hurtbox hurtbox)) {
+      // Any(x,y) can return the result of the first to complete, but they need to have the same return type.
+      // ReturnDefault wraps a Task to have it return default(T) to match the other return types.
+      // Alternatively we could probably have a version of ListenFor that gives you an object containing the result,
+      // similar to Fiber.Listener.
+      TaskFunc<Collider> contact = s => s.ListenFor(Contact.OnTriggerStaySource);
+      TaskFunc<Collider> endActive = s => s.ReturnDefault<Collider>(animation.WaitFrame(s, ActiveFrameEnd.AnimFrames));
+      var activeOutcome = await scope.Any(contact, endActive);
+      if (activeOutcome != null && activeOutcome.TryGetComponent(out Hurtbox hurtbox)) {
         hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject));
       }
       Collider.enabled = false;
-      yield return animation;
+      await animation.WaitDone(scope);
     }
   }
 }

@@ -25,7 +25,7 @@ public interface IAbility : IStoppable {
   public void MaybeStartTask(AbilityMethodTask func) { }
   public TriggerCondition GetTriggerCondition(AbilityMethod method);
   public TriggerCondition GetTriggerCondition(AbilityMethodTask method) => null;
-  public float Score() => 0;
+  public float Score();
 }
 
 interface IScorable {
@@ -102,6 +102,11 @@ public abstract class Ability : MonoBehaviour, IAbility {
   }
   public virtual void Awake() => TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.IsTask(this) ? c.Method.GetMethodTask(this) : c.Method.GetMethod(this)] = c);
   public virtual void OnDestroy() => Stop();
+
+  // FiberAbility stuff
+  public AnimationDriver AnimationDriver => AbilityManager.GetComponent<AnimationDriver>();
+  public BlackBoard BlackBoard => AbilityManager.GetComponent<BlackBoard>();
+  public virtual float Score() => 0;
 }
 
 public abstract class FiberAbility : MonoBehaviour, IAbility, IEnumerator, IScorable {

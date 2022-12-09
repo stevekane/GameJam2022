@@ -75,6 +75,12 @@ public class TaskScope : IDisposable {
     while (!pred())
       await Yield();
   }
+  public async Task Repeat(Action f) {
+    while (true) {
+      f();
+      await Yield();
+    }
+  }
   public async Task Repeat(TaskFunc f) {
     while (true) {
       await f(this);
@@ -87,7 +93,12 @@ public class TaskScope : IDisposable {
   }
 
   // More involved combinators.
-  public async Task<int> Any(params Task[] tasks) {
+  public async Task<T> ReturnDefault<T>(Task f) {
+    ThrowIfCancelled();
+    await f;
+    return default(T);
+  }
+  public async Task<int> AnyTask(params Task[] tasks) {
     ThrowIfCancelled();
     var which = await Task.WhenAny(tasks);
     return tasks.IndexOf(which);
@@ -103,7 +114,18 @@ public class TaskScope : IDisposable {
       ThrowIfCancelled();
     }
   }
-  public async Task All(params Task[] tasks) {
+  public async Task<T> Any<T>(params TaskFunc<T>[] fs) {
+    ThrowIfCancelled();
+    using TaskScope scope = new(this);
+    try {
+      var tasks = fs.Select(f => f(scope)).ToArray();
+      var result = await Task.WhenAny(tasks);
+      return await result;
+    } finally {
+      ThrowIfCancelled();
+    }
+  }
+  public async Task AllTask(params Task[] tasks) {
     ThrowIfCancelled();
     await Task.WhenAll(tasks);
   }
