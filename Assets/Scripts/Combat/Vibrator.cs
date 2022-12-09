@@ -2,8 +2,10 @@ using UnityEngine;
 
 public class Vibrator : MonoBehaviour {
   [SerializeField] Transform Target;
-  [SerializeField] Timeval DamageDuration = Timeval.FromMillis(200);
-  [SerializeField] float DamageAmplitude = .2f;
+  [SerializeField] Timeval HitDuration = Timeval.FromMillis(200);
+  [SerializeField] Timeval HurtDuration = Timeval.FromMillis(300);
+  [SerializeField] float HitAmplitude = .1f;
+  [SerializeField] float HurtAmplitude = .2f;
 
   Vector3 Axis;
   Vector3 LocalPosition;
@@ -28,11 +30,11 @@ public class Vibrator : MonoBehaviour {
   }
 
   void OnHit(HitParams hitParams) {
-    Vibrate(transform.forward, DamageDuration.Ticks, DamageAmplitude);
+    Vibrate(hitParams.KnockbackVector, HitDuration.Ticks, HitAmplitude);
   }
 
   void OnHurt(HitParams hitParams) {
-    Vibrate(transform.forward, DamageDuration.Ticks, DamageAmplitude);
+    Vibrate(hitParams.KnockbackVector, HurtDuration.Ticks, HurtAmplitude);
   }
 
   void FixedUpdate() {

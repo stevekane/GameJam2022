@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour {
   public bool ManageGameLoop = true;
 
   [Header("Subsystems")]
+  public Defaults Defaults;
   public InputManager InputManager;
   public SFXManager SFXManager;
   public VFXManager VFXManager;
@@ -48,6 +49,7 @@ public class GameManager : MonoBehaviour {
       Destroy(gameObject);
     } else {
       Instance = this;
+      Defaults.Instance = Defaults;
       InputManager.Instance = InputManager;
       SFXManager.Instance = SFXManager;
       VFXManager.Instance = VFXManager;

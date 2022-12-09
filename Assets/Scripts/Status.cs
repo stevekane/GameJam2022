@@ -85,6 +85,7 @@ public class HitStopEffect : StatusEffect {
   public float Amplitude;
   public int TotalFrames;
   public int Frames;
+  public int SlowdownFrames = 3;
 
   public HitStopEffect(Vector3 axis, float amplitude, int totalFrames) {
     Frames = 0;
@@ -108,7 +109,12 @@ public class HitStopEffect : StatusEffect {
       status.CanMove = false;
       status.CanRotate = false;
       status.CanAttack = false;
-      status.AddAttributeModifier(AttributeTag.LocalTimeScale, AttributeModifier.TimesZero);
+      var localTimeScale = Frames <= SlowdownFrames
+        ? Defaults.Instance.HitStopLocalTime.Evaluate((float)Frames/(float)SlowdownFrames)
+        : 0;
+      Debug.Log(localTimeScale);
+      var localTimeScaleMod = new AttributeModifier { Mult = localTimeScale };
+      status.AddAttributeModifier(AttributeTag.LocalTimeScale, localTimeScaleMod);
       Frames++;
     } else {
       status.Remove(this);
@@ -264,7 +270,7 @@ public class Status : MonoBehaviour {
     var localSpeed = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
     if (localSpeed < 1) {
       if (AnimationDriver) {
-        AnimationDriver.SetSpeed(0);
+        AnimationDriver.SetSpeed(localSpeed);
       }
     } else {
       if (AnimationDriver) {

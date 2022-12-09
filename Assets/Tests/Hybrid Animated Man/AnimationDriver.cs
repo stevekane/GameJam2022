@@ -162,6 +162,7 @@ public class AnimationJob : IEnumerator, IStoppable {
   public bool IsRunning { get; private set; }
   public bool MoveNext() {
     if (IsRunning) {
+      Clip.SetSpeed(BaseSpeed*Animation.Speed*Driver.speed);
       if (Clip.IsNull() || !Clip.IsValid()) {
         Stop();
       } else {
@@ -225,63 +226,17 @@ public class AnimationDriver : MonoBehaviour {
     Output.SetSourcePlayable(AnimatorController);
     Graph.Play();
     BaseSpeed = Animator.speed;
-
-    RunBlankTask();
-    StartCoroutine(RunBlankCoroutine());
-    Fiber = new Fiber(RunBlankFiber());
   }
-
-  // BEGIN TESTS
-  Fiber Fiber;
-
-  async System.Threading.Tasks.Task RunBlankTask() {
-    Debug.Log($"Task Start {Timeval.TickCount}");
-    async System.Threading.Tasks.Task BlankTask(int n) {
-      Debug.Log($"Task Start Blank {Timeval.TickCount}");
-      if (n > 0) {
-        await System.Threading.Tasks.Task.Yield();
-      }
-    }
-    await BlankTask(0);
-    Debug.Log($"Task End {Timeval.TickCount}");
-  }
-
-  IEnumerator RunBlankFiber() {
-    Debug.Log($"Fiber Start {Timeval.TickCount}");
-    IEnumerator BlankFiber(int n) {
-      Debug.Log($"Fiber Start Blank {Timeval.TickCount}");
-      if (n > 0) {
-        yield return null;
-      }
-    }
-    yield return BlankFiber(0);
-    Debug.Log($"Fiber End {Timeval.TickCount}");
-  }
-
-  IEnumerator RunBlankCoroutine() {
-    Debug.Log($"Coroutine Start {Timeval.TickCount}");
-    IEnumerator BlankCoroutine(int n) {
-      Debug.Log($"Coroutine Start Blank {Timeval.TickCount}");
-      if (n > 0) {
-        yield return null;
-      }
-    }
-    yield return StartCoroutine(BlankCoroutine(0));
-    Debug.Log($"Coroutine End {Timeval.TickCount}");
-  }
-  // END TESTS
 
   void OnDestroy() => Graph.Destroy();
 
   void FixedUpdate() {
-    Fiber?.MoveNext();
     if (Job != null && !Job.MoveNext()) {
       Job = null;
     }
   }
 
   public void SetSpeed(float speed) {
-    Job?.SetSpeed(speed);
     Animator.SetSpeed(speed);
   }
 
