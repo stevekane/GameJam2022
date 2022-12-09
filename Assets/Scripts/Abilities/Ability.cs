@@ -62,6 +62,8 @@ public abstract class Ability : MonoBehaviour, IAbility {
         Debug.LogError($"Exception during Ability {this}: {e}");
       } finally {
         ActiveTasks.Remove(func);
+        if (ActiveTasks.Count == 0)
+          Stop(); // TODO: Don't think this is right.. in the cancellation case, this will be called twice.
       }
     });
     ActiveTasks.Add(func);

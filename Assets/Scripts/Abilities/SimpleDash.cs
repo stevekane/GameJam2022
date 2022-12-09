@@ -42,7 +42,7 @@ public class SimpleDash : Ability {
         s => MakeCancellable(s));
     } finally {
       // TODO: is this needed?
-      await AnimationDriver.Play(new(), DoneClip).WaitDone(scope);
+      //await AnimationDriver.Play(new(), DoneClip).WaitDone(scope);
     }
   }
 
