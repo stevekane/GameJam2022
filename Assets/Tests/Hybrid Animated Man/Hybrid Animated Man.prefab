@@ -166,7 +166,6 @@ GameObject:
   - component: {fileID: 9187999352642821986}
   - component: {fileID: 3421196645973245207}
   - component: {fileID: 1818372311317487521}
-  - component: {fileID: 5942916073849122377}
   m_Layer: 0
   m_Name: Hybrid Animated Man
   m_TagString: Untagged
@@ -343,7 +342,7 @@ MonoBehaviour:
     ButtonPressType: 0
     Entry:
       Ability: {fileID: 2296086977565652357}
-      MethodName: Activate
+      MethodName: Attack
   AxisMaps:
   - AxisCode: 0
     AxisTag: 0
@@ -447,26 +446,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.75, z: 0}
---- !u!95 &5942916073849122377
-Animator:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1818372311317487516}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &3029934277970986301
 GameObject:
   m_ObjectHideFlags: 0
@@ -1202,10 +1181,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 95902137545226380, guid: 5aed7f791a03c2a4ba0040d2fa161639, type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 9100000, guid: bda6920ca65f22d4ab820fcc766debc1, type: 2}
     - target: {fileID: 95902137545226380, guid: 5aed7f791a03c2a4ba0040d2fa161639, type: 3}
       propertyPath: m_UpdateMode
       value: 1

@@ -1174,9 +1174,9 @@ GameObject:
   - component: {fileID: 5571416124093621161}
   - component: {fileID: 7528539421826735949}
   - component: {fileID: 4107459485230753281}
+  - component: {fileID: 2801194829688342324}
   - component: {fileID: 7727835182619467870}
   - component: {fileID: 5571416124093621160}
-  - component: {fileID: 2801194829688342324}
   m_Layer: 10
   m_Name: Badger
   m_TagString: Untagged
@@ -1396,6 +1396,19 @@ MonoBehaviour:
   OnHurtSFX: {fileID: 8300000, guid: 1f53a5fc6bd934e46a5d8cfa8fd27b64, type: 3}
   OnHitVFX: {fileID: 0}
   OnHitSFX: {fileID: 0}
+--- !u!114 &2801194829688342324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5858cd79c3bb37845b5d44f08793d81e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 7727835182619467870}
 --- !u!95 &7727835182619467870
 Animator:
   serializedVersion: 4
@@ -1434,18 +1447,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 3, z: 0}
---- !u!114 &2801194829688342324
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571416124093621165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5858cd79c3bb37845b5d44f08793d81e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0

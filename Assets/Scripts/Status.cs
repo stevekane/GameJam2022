@@ -64,7 +64,7 @@ public class KnockbackEffect : StatusEffect {
     status.CanMove = !IsAirborne;
     status.CanRotate = !IsAirborne;
     status.CanAttack = !IsAirborne;
-    if (status.AnimationDriver.Animator)
+    if (status.AnimationDriver && status.AnimationDriver.Animator)
       status.AnimationDriver.Animator.SetBool("HitFlinch", IsAirborne);
     if (!status.CanAttack) {
       status.GetComponent<AbilityManager>()?.InterruptAbilities();
@@ -74,7 +74,7 @@ public class KnockbackEffect : StatusEffect {
     IsFirstFrame = false;
   }
   public override void OnRemoved(Status status) {
-    if (status.AnimationDriver.Animator)
+    if (status.AnimationDriver && status.AnimationDriver.Animator)
       status.AnimationDriver.Animator.SetBool("HitFlinch", false);
   }
 }
@@ -263,9 +263,13 @@ public class Status : MonoBehaviour {
     // Steve - This currently uses localtimescale to pause/resume AnimationDriver. I think this should move...
     var localSpeed = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
     if (localSpeed < 1) {
-      AnimationDriver.Pause();
+      if (AnimationDriver) {
+        AnimationDriver.Pause();
+      }
     } else {
-      AnimationDriver.Resume();
+      if (AnimationDriver) {
+        AnimationDriver.Resume();
+      }
     }
 
     // TODO: differentiate between cancelled and completed?

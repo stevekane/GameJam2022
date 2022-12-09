@@ -771,14 +771,15 @@ GameObject:
   - component: {fileID: 5571416124093621156}
   - component: {fileID: 5571416124093621157}
   - component: {fileID: 4848494605274439972}
-  - component: {fileID: 5571416124093621160}
-  - component: {fileID: 7727835182619467870}
   - component: {fileID: 1657031132205634076}
   - component: {fileID: 4362511970478309579}
   - component: {fileID: 7227641143467178568}
   - component: {fileID: 5571416124093621161}
   - component: {fileID: 922338563387012078}
   - component: {fileID: 1236578800506907486}
+  - component: {fileID: 697709969000364981}
+  - component: {fileID: 7727835182619467870}
+  - component: {fileID: 5571416124093621160}
   m_Layer: 10
   m_Name: Wasp
   m_TagString: Untagged
@@ -894,44 +895,6 @@ MonoBehaviour:
       Base: 20
       Mult: 1
   BaseUpgrades: []
---- !u!143 &5571416124093621160
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571416124093621165}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Height: 6
-  m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 3, z: 0}
---- !u!95 &7727835182619467870
-Animator:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571416124093621165}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: f3a6633acffa05141b7c1feaaa6623a6, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 1
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &1657031132205634076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1032,6 +995,57 @@ MonoBehaviour:
   OnHurtSFX: {fileID: 8300000, guid: 05d0536a3eefc80438f95f9662331f52, type: 3}
   OnHitVFX: {fileID: 0}
   OnHitSFX: {fileID: 0}
+--- !u!114 &697709969000364981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5858cd79c3bb37845b5d44f08793d81e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 7727835182619467870}
+--- !u!95 &7727835182619467870
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f3a6633acffa05141b7c1feaaa6623a6, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 1
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!143 &5571416124093621160
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571416124093621165}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 6
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 3, z: 0}
 --- !u!1 &5571416124367791817
 GameObject:
   m_ObjectHideFlags: 0

@@ -199,7 +199,6 @@ public class AnimationJobFacade : IEnumerator, IStoppable {
   public object Current => Job.Current;
 }
 
-[RequireComponent(typeof(Animator))]
 public class AnimationDriver : MonoBehaviour {
   public Animator Animator;
   PlayableGraph Graph;
