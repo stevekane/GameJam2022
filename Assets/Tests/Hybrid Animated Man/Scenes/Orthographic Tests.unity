@@ -226,7 +226,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_NoiseProfile: {fileID: 11400000, guid: 69ce8388f6785dd4c8c39915efece2f4, type: 2}
   m_PivotOffset: {x: 0, y: 0, z: 0}
-  m_AmplitudeGain: 1e-45
+  m_AmplitudeGain: 1.921437e-33
   m_FrequencyGain: 10
   mNoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!1 &133811131
@@ -415,6 +415,63 @@ PrefabInstance:
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: ab129e03610f14f4bbeeea02c0119926, type: 3}
+--- !u!1 &236876020 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3868233834690514958, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+  m_PrefabInstance: {fileID: 1818372311507013568}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &236876021 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9116239451998349720, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+  m_PrefabInstance: {fileID: 1818372311507013568}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &236876022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 236876020}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdb90b913935e644baaa86c076d788e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Weight: 1
+  m_Data:
+    m_ConstrainedObject: {fileID: 1719694449}
+    m_SourceObjects:
+      m_Length: 1
+      m_Item0:
+        transform: {fileID: 236876021}
+        weight: 1
+      m_Item1:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item2:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item3:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item4:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item5:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item6:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item7:
+        transform: {fileID: 0}
+        weight: 0
+    m_Offset: {x: 0, y: 0, z: 0}
+    m_ConstrainedAxes:
+      x: 1
+      y: 1
+      z: 1
+    m_MaintainOffset: 0
 --- !u!4 &364122205 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1818372311317487517, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
@@ -1262,7 +1319,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 583777037}
   m_LocalRotation: {x: 0.38268346, y: 0.000000059604645, z: 0.000000014901161, w: 0.9238796}
-  m_LocalPosition: {x: -0.000002802259, y: 16.516764, z: -16.416761}
+  m_LocalPosition: {x: -0.0000028023542, y: 16.516764, z: -16.416761}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2920,7 +2977,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1325853189}
   m_LocalRotation: {x: 0.38268346, y: 0.000000059604645, z: 0.000000014901161, w: 0.9238796}
-  m_LocalPosition: {x: -0.000002802259, y: 16.516764, z: -16.416761}
+  m_LocalPosition: {x: -0.0000028023542, y: 16.516764, z: -16.416761}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3506,6 +3563,11 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!4 &1719694449 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2436384012515545311, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+  m_PrefabInstance: {fileID: 1818372311507013568}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1720779130 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2435938055566059399, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
@@ -4747,6 +4809,10 @@ PrefabInstance:
     - target: {fileID: 3190141033397718553, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3868233834690514958, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+      propertyPath: m_Name
+      value: Torso Rotation
       objectReference: {fileID: 0}
     - target: {fileID: 3870568683664493446, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
       propertyPath: m_Name
