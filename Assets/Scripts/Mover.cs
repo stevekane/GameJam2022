@@ -74,20 +74,33 @@ public class Mover : MonoBehaviour {
 
   void FixedUpdate() {
     GetAxes(AbilityManager, out var desiredMoveDir, out var desiredFacing);
-    var moveVelocity = Attributes.GetValue(AttributeTag.MoveSpeed) * desiredMoveDir;
-    Velocity.SetXZ(moveVelocity);
+    var localTimeScale = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
+    var velocity = Attributes.GetValue(AttributeTag.MoveSpeed) * desiredMoveDir;
+    var localVelocity = localTimeScale * velocity;
+    Velocity.SetXZ(localVelocity);
     var gravity = Time.fixedDeltaTime * Gravity;
+    var localGravity = localTimeScale * gravity;
     Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
     if (!Status.HasGravity)
       Velocity.y = 0f;
     Controller.Move(Time.fixedDeltaTime * Velocity);
-    transform.rotation = RotationFromDesired(transform.forward, Attributes.GetValue(AttributeTag.TurnSpeed), desiredFacing);
+    var turnSpeed = Attributes.GetValue(AttributeTag.TurnSpeed);
+    var localTurnSpeed = localTimeScale * turnSpeed;
+    transform.rotation = RotationFromDesired(transform.forward, localTurnSpeed, desiredFacing);
     if (Animator) {
+      var orientedVelocity = Quaternion.Inverse(transform.rotation)*Velocity;
       var moveSpeed = Attributes.GetValue(AttributeTag.MoveSpeed);
-      var localVelocity = Quaternion.Inverse(transform.rotation)*Velocity;
-      Animator.SetBool("Moving", Velocity.sqrMagnitude > IdleThreshold);
-      Animator.SetFloat("RightVelocity", localVelocity.x/moveSpeed);
-      Animator.SetFloat("ForwardVelocity", localVelocity.z/moveSpeed);
+      // THIS IS NONSCALED VELOCITY!
+      // We want to continue to animate as if we were not slowed
+      if (moveSpeed > 0 && velocity.XZ().magnitude > IdleThreshold) {
+        Animator.SetBool("Moving", true);
+        Animator.SetFloat("RightVelocity", orientedVelocity.x/moveSpeed);
+        Animator.SetFloat("ForwardVelocity", orientedVelocity.z/moveSpeed);
+      } else {
+        Animator.SetBool("Moving", false);
+        Animator.SetFloat("RightVelocity", 0);
+        Animator.SetFloat("ForwardVelocity", 0);
+      }
     }
   }
 }
