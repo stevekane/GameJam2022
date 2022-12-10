@@ -103,8 +103,6 @@ public class HitStopEffect : StatusEffect {
         v.Vibrate(Axis, TotalFrames, Amplitude);
     }
     if (Frames <= TotalFrames) {
-      // status.CanMove = false;
-      // status.CanRotate = false;
       status.CanAttack = false;
       var localTimeScale = Defaults.Instance.HitStopLocalTime.Evaluate((float)Frames/(float)TotalFrames);
       var localTimeScaleMod = new AttributeModifier { Mult = localTimeScale };
