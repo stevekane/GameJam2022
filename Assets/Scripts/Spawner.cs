@@ -1,9 +1,7 @@
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 public class DestroyNotifier : MonoBehaviour {
-  //public UnityEvent</*GameObject*/> DestroyEvent;
   public delegate void DestroyCallbackFunc(GameObject obj);
   public DestroyCallbackFunc DestroyCallback;
 
@@ -26,8 +24,7 @@ public class Spawner : MonoBehaviour {
 
   void FixedUpdate() {
     if (ActiveSpawns.Count < MaxActiveSpawns && --FramesRemaining <= 0) {
-      var spawn = PrefabUtility.InstantiatePrefab(Spawn) as GameObject;
-      spawn = spawn ? spawn : Instantiate(Spawn);
+      var spawn = Instantiate(Spawn);
       spawn.SetActive(true);
       spawn.transform.SetParent(transform, false);
       spawn.transform.SetPositionAndRotation(transform.position, transform.rotation);
