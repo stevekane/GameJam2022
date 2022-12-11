@@ -6,16 +6,8 @@ using UnityEngine.SceneManagement;
 using TMPro;
 
 public class GameManager : MonoBehaviour {
-  public class AsyncEvent : IEventSource<AsyncOperation> {
-    public AsyncOperation Operation;
-    public AsyncEvent(AsyncOperation operation) => Operation = operation;
-    public void Listen(Action<AsyncOperation> handler) => Operation.completed += handler;
-    public void Unlisten(Action<AsyncOperation> handler) => Operation.completed -= handler;
-    public void Fire(AsyncOperation op) {}
-  }
-
   public static IEnumerator Await(AsyncOperation op) {
-    yield return Fiber.ListenFor(new AsyncEvent(op));
+    yield return Fiber.ListenFor(new AsyncOperationEventSource(op));
   }
 
   public static GameManager Instance;

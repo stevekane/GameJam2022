@@ -74,7 +74,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 2, z: 1}
+  m_Size: {x: 0.5, y: 2, z: 0.5}
   m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &7099279732817842510
 GameObject:
@@ -140,10 +140,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Target: {fileID: 7099279733034412651}
-  DamageDuration:
-    Millis: 400
+  HitDuration:
+    Millis: 200
     FramesPerSecond: 30
-  DamageAmplitude: 0.1
+  HurtDuration:
+    Millis: 300
+    FramesPerSecond: 30
+  HitAmplitude: 0.1
+  HurtAmplitude: 0.2
 --- !u!114 &7099279732817842496
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -207,7 +211,7 @@ Transform:
   m_GameObject: {fileID: 7099279733034412650}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 1, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7099279732817842499}

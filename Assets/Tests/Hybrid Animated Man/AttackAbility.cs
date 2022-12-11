@@ -41,7 +41,8 @@ public class AttackAbility : Ability {
       var rotation = AbilityManager.transform.rotation;
       var vfxOrigin = AbilityManager.transform.TransformPoint(AttackVFXOffset);
       SFXManager.Instance.TryPlayOneShot(AttackSFX);
-      VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
+      var vfx = VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
+      vfx.transform.SetParent(AbilityManager.transform, true);
     }
     if (frame >= ActiveEnd.AnimFrames) {
       CurrentTags.AddFlags(AbilityTag.Cancellable);

@@ -16,9 +16,7 @@ public abstract class StatusEffect : IDisposable {
 
 public class InlineEffect : StatusEffect {
   Action<Status> ApplyFunc;
-#if UNITY_EDITOR
   string Name;
-#endif
   public InlineEffect(Action<Status> apply, string name = "InlineEffect") => (ApplyFunc, Name) = (apply, name);
   public override bool Merge(StatusEffect e) => false;
   public override void Apply(Status status) => ApplyFunc(status);
@@ -85,7 +83,6 @@ public class HitStopEffect : StatusEffect {
   public float Amplitude;
   public int TotalFrames;
   public int Frames;
-  public int SlowdownFrames = 3;
 
   public HitStopEffect(Vector3 axis, float amplitude, int totalFrames) {
     Frames = 0;
@@ -106,13 +103,8 @@ public class HitStopEffect : StatusEffect {
         v.Vibrate(Axis, TotalFrames, Amplitude);
     }
     if (Frames <= TotalFrames) {
-      status.CanMove = false;
-      status.CanRotate = false;
       status.CanAttack = false;
-      var localTimeScale = Frames <= SlowdownFrames
-        ? Defaults.Instance.HitStopLocalTime.Evaluate((float)Frames/(float)SlowdownFrames)
-        : 0;
-      //Debug.Log(localTimeScale);
+      var localTimeScale = Defaults.Instance.HitStopLocalTime.Evaluate((float)Frames/(float)TotalFrames);
       var localTimeScaleMod = new AttributeModifier { Mult = localTimeScale };
       status.AddAttributeModifier(AttributeTag.LocalTimeScale, localTimeScaleMod);
       Frames++;
@@ -279,7 +271,12 @@ public class Status : MonoBehaviour {
     }
 
     // TODO: differentiate between cancelled and completed?
-    Removed.ForEach(e => { e.OnComplete?.Invoke(this); e.OnRemoved(this); e.Status = null; Active.Remove(e); });
+    Removed.ForEach(e => {
+      e.OnComplete?.Invoke(this);
+      e.OnRemoved(this);
+      e.Status = null;
+      Active.Remove(e);
+    });
     Removed.Clear();
     Added.ForEach(e => Active.Add(e));
     Added.Clear();
