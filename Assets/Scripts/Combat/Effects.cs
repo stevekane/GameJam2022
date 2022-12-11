@@ -22,7 +22,7 @@ public class Effects : MonoBehaviour {
   }
 
   void OnHit(HitParams hitParams) {
-    var position = transform.position+transform.TransformVector(VFXOffset);
+    var position = hitParams.Defender.transform.position+transform.TransformVector(VFXOffset);
     var direction = hitParams.KnockbackVector;
     var rotation = Quaternion.LookRotation(direction.normalized);
     VFXManager.Instance.TrySpawnEffect(OnHitVFX, position, rotation);
