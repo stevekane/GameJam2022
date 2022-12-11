@@ -21,7 +21,7 @@ public class ParryAbility : Ability {
       Animator.SetBool("Blocking", true);
       Debug.LogWarning("Fix up Parry Ability to listen for hurtbox event");
       var onHurt = Fiber.ListenFor(Hurtbox.OnHurt);
-      yield return Fiber.Any(onHurt, new CountdownTimer(BlockDuration), ListenFor(Release));
+      yield return Fiber.Any(onHurt, new CountdownTimer(BlockDuration), FiberListenFor(Release));
       Animator.SetBool("Blocking", false);
       if (onHurt.IsCompleted) {
         AbilityManager.Bundle.StartRoutine(Riposte);

@@ -235,7 +235,7 @@ public class TaskScopeTests : MonoBehaviour {
           await main.Ticks(1);
           output += "cancel;";
         });
-        await main.All(sub, cancel);
+        await main.AllTask(sub, cancel);
         output += "end";
         return output;
       },
@@ -260,7 +260,7 @@ public class TaskScopeTests : MonoBehaviour {
           await main.Ticks(1);
           output += "main;";
         });
-        await main.All(sub, cancel);
+        await main.AllTask(sub, cancel);
         output += "end";
         return output;
       },

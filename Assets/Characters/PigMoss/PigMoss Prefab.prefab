@@ -246,6 +246,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b11d3d8b1bcc61e44b4f1bc8d6ca4d84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TriggerConditions: []
+  CurrentTags: 0
   Animator: {fileID: 7946021538672475454}
   WindupDuration:
     Millis: 1000
@@ -499,6 +501,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5404058064401259225}
   - component: {fileID: 6335438832184794161}
+  - component: {fileID: 1051587543}
   m_Layer: 10
   m_Name: SwordStrike
   m_TagString: Untagged
@@ -533,6 +536,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dba5ddd30894a745abee15fc3efd262, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TriggerConditions: []
+  CurrentTags: 0
   HitConfig:
     DamageModifier:
       Base: 15
@@ -556,6 +561,20 @@ MonoBehaviour:
   Contact: {fileID: 5336060164262087107}
   SlashVFX: {fileID: 7226583673155636401, guid: 4f43e32c5f807114da89aa0434ab75ed, type: 3}
   SlashSFX: {fileID: 8300000, guid: 4af54c965264a3a449e7e1127868e676, type: 3}
+  AnimationDriver: {fileID: 1051587543}
+--- !u!114 &1051587543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4069261157340341339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5858cd79c3bb37845b5d44f08793d81e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 614668181600687344}
 --- !u!1 &4994150184242493775
 GameObject:
   m_ObjectHideFlags: 0
@@ -600,6 +619,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6d05d77cbf0fde4194a25d9c95de5ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TriggerConditions: []
+  CurrentTags: 0
   RevealedSFX: {fileID: 8300000, guid: b67fa46733ef5324496f5c62b2bb7013, type: 3}
   ExtendedSFX: {fileID: 8300000, guid: 4af54c965264a3a449e7e1127868e676, type: 3}
   ExtendedVFX: {fileID: 7226583673155636401, guid: 51809e144c845de418382df0a1b0b9b6, type: 3}
@@ -1238,8 +1259,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AbilityManager: {fileID: 8872822988582960451}
   Abilities:
-  - {fileID: 6335438832184794161}
-  - {fileID: 4071896892811268994}
+  - {fileID: 4635285229209771243}
+  - {fileID: 6730046083905293372}
+  TaskAbilities:
   - {fileID: 8751152005629255508}
   TargetingConfig:
     FieldOfView: 360
@@ -1395,10 +1417,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Target: {fileID: 8872822986732128203}
-  DamageDuration:
+  HitDuration:
     Millis: 200
     FramesPerSecond: 30
-  DamageAmplitude: 0.2
+  HurtDuration:
+    Millis: 300
+    FramesPerSecond: 30
+  HitAmplitude: 0.1
+  HurtAmplitude: 0.2
 --- !u!114 &1865207496726280096
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace PigMoss {
-  class BuzzSaw : FiberAbility {
+  class BuzzSaw : Ability {
     enum BladeState { Hidden = 0, Revealed = 1, Extended = 2 }
 
     public AudioClip RevealedSFX;
@@ -28,36 +29,34 @@ namespace PigMoss {
       }
     }
 
-    public override void OnStop() {
-      Animator.SetInteger("State", (int)BladeState.Hidden);
+    public async Task Routine(TaskScope scope) {
+      try {
+        Animator.SetInteger("State", (int)BladeState.Revealed);
+        SFXManager.Instance.TryPlayOneShot(RevealedSFX);
+        await scope.Delay(RevealedDuration);
+        SFXManager.Instance.TryPlayOneShot(ExtendedSFX);
+        VFXManager.Instance.TrySpawn2DEffect(
+          ExtendedVFX,
+          AbilityManager.transform.position,
+          AbilityManager.transform.rotation,
+          ExtendedDuration.Seconds);
+        Animator.SetInteger("State", (int)BladeState.Extended);
+        await scope.Any(Waiter.Delay(ExtendedDuration), Waiter.Repeat(OnHit));
+        Hits.ForEach(ProcessHit);
+        SFXManager.Instance.TryPlayOneShot(HiddenSFX);
+      } finally {
+        Animator.SetInteger("State", (int)BladeState.Hidden);
+      }
     }
 
-    public override IEnumerator Routine() {
-      Animator.SetInteger("State", (int)BladeState.Revealed);
-      SFXManager.Instance.TryPlayOneShot(RevealedSFX);
-      yield return Fiber.Wait(RevealedDuration);
-      SFXManager.Instance.TryPlayOneShot(ExtendedSFX);
-      VFXManager.Instance.TrySpawn2DEffect(
-        ExtendedVFX,
-        AbilityManager.transform.position,
-        AbilityManager.transform.rotation,
-        ExtendedDuration.Seconds);
-      Animator.SetInteger("State", (int)BladeState.Extended);
-      yield return Fiber.Any(Fiber.Wait(ExtendedDuration), Fiber.Repeat(OnHit));
-      Hits.ForEach(ProcessHit);
-      SFXManager.Instance.TryPlayOneShot(HiddenSFX);
-      Animator.SetInteger("State", (int)BladeState.Hidden);
-    }
-
-    IEnumerator OnHit() {
-      var hitEvent = Fiber.ListenFor(BladeTriggerEvent.OnTriggerStaySource);
-      yield return hitEvent;
-      var position = hitEvent.Value.transform.position;
+    async Task OnHit(TaskScope scope) {
+      var hit = await scope.ListenFor(BladeTriggerEvent.OnTriggerStaySource);
+      var position = hit.transform.position;
       var direction = (position-AbilityManager.transform.position).XZ().normalized;
       var rotation = Quaternion.LookRotation(direction, Vector3.up);
       SFXManager.Instance.TryPlayOneShot(BladeContactSFX);
       VFXManager.Instance.TrySpawnEffect(BladeContactVFX, position, rotation);
-      Hits.Add(hitEvent.Value);
+      Hits.Add(hit);
     }
 
     void ProcessHit(Collider c) {
