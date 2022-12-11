@@ -84,6 +84,7 @@ public class Mover : MonoBehaviour {
     if (!Status.HasGravity)
       Velocity.y = 0f;
     Controller.Move(Time.fixedDeltaTime * Velocity);
+    Status.IsGrounded = Controller.isGrounded;
     var turnSpeed = Attributes.GetValue(AttributeTag.TurnSpeed);
     var localTurnSpeed = localTimeScale * turnSpeed;
     transform.rotation = RotationFromDesired(transform.forward, localTurnSpeed, desiredFacing);
@@ -102,5 +103,7 @@ public class Mover : MonoBehaviour {
         Animator.SetFloat("ForwardVelocity", 0);
       }
     }
+    Animator.SetBool("IsGrounded", Status.IsGrounded);
+    Animator.SetBool("IsHurt", Status.IsHurt);
   }
 }

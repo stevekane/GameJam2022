@@ -197,6 +197,8 @@ public class Status : MonoBehaviour {
   public bool CanAttack { get => GetBoolean(AttributeTag.CanAttack); set => SetBoolean(AttributeTag.CanAttack, value); }
   public bool IsHittable { get => GetBoolean(AttributeTag.IsHittable); set => SetBoolean(AttributeTag.IsHittable, value); }
   public bool IsDamageable { get => GetBoolean(AttributeTag.IsDamageable); set => SetBoolean(AttributeTag.IsDamageable, value); }
+  public bool IsGrounded { get => GetBoolean(AttributeTag.IsGrounded); set => SetBoolean(AttributeTag.IsGrounded, value); }
+  public bool IsHurt { get => GetBoolean(AttributeTag.IsHurt); set => SetBoolean(AttributeTag.IsHurt, value); }
   public AbilityTag Tags = 0;
 
   bool GetBoolean(AttributeTag attrib) => Attributes.GetValue(attrib, 1f) > 0f;

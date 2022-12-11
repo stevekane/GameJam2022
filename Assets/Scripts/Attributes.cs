@@ -14,7 +14,11 @@ public enum AttributeTag {
   CanAttack,
   IsHittable,
   IsDamageable,
+  IsGrounded,
+  IsHurt,
+
   GoldGain,
+
   FreezingHits,
   BurningHits,
 

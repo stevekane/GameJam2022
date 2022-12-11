@@ -153,15 +153,15 @@ GameObject:
   - component: {fileID: 1818372311317487517}
   - component: {fileID: 1818372311317487519}
   - component: {fileID: 5877782677189505306}
+  - component: {fileID: 1818372311317487523}
+  - component: {fileID: 1818372311317487525}
+  - component: {fileID: 818558083157508650}
   - component: {fileID: 1818372311317487524}
   - component: {fileID: 1818372311317487520}
   - component: {fileID: 1818372311317487522}
-  - component: {fileID: 818558083157508650}
   - component: {fileID: 8257678576461921902}
-  - component: {fileID: 1818372311317487523}
-  - component: {fileID: 1818372311317487525}
-  - component: {fileID: 4191692288166557497}
   - component: {fileID: 2917109330806928520}
+  - component: {fileID: 4191692288166557497}
   - component: {fileID: 5304582540807413855}
   - component: {fileID: 9187999352642821986}
   - component: {fileID: 3421196645973245207}
@@ -206,6 +206,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f16879722b1ca5b4194c06c80fc52e60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Status: {fileID: 1818372311317487522}
+  Duration:
+    Millis: 500
+    FramesPerSecond: 30
 --- !u!114 &5877782677189505306
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -219,6 +223,67 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Dead: 0
+--- !u!114 &1818372311317487523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1818372311317487516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Gravity: -24
+  Animator: {fileID: 2347714126523969063}
+  IdleThreshold: 0.1
+--- !u!114 &1818372311317487525
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1818372311317487516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8704b5fdcd5dad4cbc42e869b75d29f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ButtonMaps:
+  - ButtonCode: 0
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 6705401411987309461}
+      MethodName: Activate
+  - ButtonCode: 2
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 2994083438686922390}
+      MethodName: Attack
+  - ButtonCode: 3
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 2296086977565652357}
+      MethodName: Attack
+  AxisMaps:
+  - AxisCode: 0
+    AxisTag: 0
+  - AxisCode: 1
+    AxisTag: 1
+--- !u!114 &818558083157508650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1818372311317487516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5858cd79c3bb37845b5d44f08793d81e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 2347714126523969063}
 --- !u!114 &1818372311317487524
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -275,19 +340,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Tags: 0
   DebugEffects: []
---- !u!114 &818558083157508650
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1818372311317487516}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5858cd79c3bb37845b5d44f08793d81e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Animator: {fileID: 2347714126523969063}
 --- !u!114 &8257678576461921902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -301,67 +353,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AbilityTags: 0
---- !u!114 &1818372311317487523
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1818372311317487516}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Gravity: -24
-  Animator: {fileID: 2347714126523969063}
-  IdleThreshold: 0.1
---- !u!114 &1818372311317487525
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1818372311317487516}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8704b5fdcd5dad4cbc42e869b75d29f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ButtonMaps:
-  - ButtonCode: 0
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 6705401411987309461}
-      MethodName: Activate
-  - ButtonCode: 2
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 2994083438686922390}
-      MethodName: Attack
-  - ButtonCode: 3
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 2296086977565652357}
-      MethodName: Attack
-  AxisMaps:
-  - AxisCode: 0
-    AxisTag: 0
-  - AxisCode: 1
-    AxisTag: 1
---- !u!114 &4191692288166557497
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1818372311317487516}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 589031cb649129f4595d6562a2fa54c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <Points>k__BackingField: 0
 --- !u!114 &2917109330806928520
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -376,6 +367,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Hurtboxes: []
   FallSFX: {fileID: 8300000, guid: fe6b13c084178f441942a9885f9857db, type: 3}
+--- !u!114 &4191692288166557497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1818372311317487516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 589031cb649129f4595d6562a2fa54c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Points>k__BackingField: 0
 --- !u!114 &5304582540807413855
 MonoBehaviour:
   m_ObjectHideFlags: 0
