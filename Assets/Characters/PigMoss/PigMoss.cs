@@ -13,6 +13,7 @@ namespace PigMoss {
     [SerializeField] Timeval ActionCooldown;
     [SerializeField] BlackBoard BlackBoard;
     IAbility[] IAbilities;
+    Dictionary<IAbility, AbilityMethodTask> TaskAbilityMethods = new();
 
     Fiber Behavior;
     int AbilityIndex;
@@ -20,6 +21,8 @@ namespace PigMoss {
     void Awake() {
       IAbilities = Abilities;
       IAbilities = IAbilities.Concat(TaskAbilities).ToArray();
+      foreach (var a in TaskAbilities)
+        TaskAbilityMethods[a] = new AbilityMethodReference() { Ability = a, MethodName = "Routine" }.GetMethodTask();
     }
     void Start() => Behavior = new Fiber(Fiber.Repeat(MakeBehavior));
     void OnDestroy() => Behavior.Stop();
@@ -83,14 +86,13 @@ namespace PigMoss {
     }
 
     IEnumerator TryRun(IAbility ability) {
-      ability.AbilityManager = AbilityManager;
       if (ability is FiberAbility fability) {
         AbilityManager.TryInvoke(fability.Routine);
         return fability;
-      } else if (ability is SwordStrike sability) {
-        return AbilityManager.TryRun(sability.Routine);
-      } else if (ability is BumRush rability) {
-        return AbilityManager.TryRun(rability.Routine);
+      } else if (TaskAbilityMethods.TryGetValue(ability, out var method)) {
+        return AbilityManager.TryRun(method);
+      } else {
+        Debug.LogError($"Not sure how to handle {ability}");
       }
       return null;
     }
