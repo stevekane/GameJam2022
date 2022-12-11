@@ -25,6 +25,7 @@ public interface IAbility : IStoppable {
   public void MaybeStartTask(AbilityMethodTask func) { }
   public TriggerCondition GetTriggerCondition(AbilityMethod method);
   public TriggerCondition GetTriggerCondition(AbilityMethodTask method) => null;
+  public float Score();
 }
 
 interface IScorable {
@@ -74,9 +75,9 @@ public abstract class Ability : MonoBehaviour, IAbility {
     return d;
   }
   public StatusEffect AddStatusEffect(StatusEffect effect, OnEffectComplete onComplete = null) => Status.Add(Using(effect), onComplete);
-  public Listener ListenFor(IEventSource evt) => Fiber.ListenFor(evt);
-  public Listener<T> ListenFor<T>(IEventSource<T> evt) => Fiber.ListenFor(evt);
-  public Listener ListenFor(AbilityMethod method) => Fiber.ListenFor(AbilityManager.GetEvent(method));
+  public Listener FiberListenFor(IEventSource evt) => Fiber.ListenFor(evt);
+  public Listener<T> FiberListenFor<T>(IEventSource<T> evt) => Fiber.ListenFor(evt);
+  public Listener FiberListenFor(AbilityMethod method) => Fiber.ListenFor(AbilityManager.GetEvent(method));
   public void Stop() {
     OnStop();
     Tags = 0;
@@ -101,6 +102,11 @@ public abstract class Ability : MonoBehaviour, IAbility {
   }
   public virtual void Awake() => TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.IsTask(this) ? c.Method.GetMethodTask(this) : c.Method.GetMethod(this)] = c);
   public virtual void OnDestroy() => Stop();
+
+  // FiberAbility stuff
+  public AnimationDriver AnimationDriver => AbilityManager.GetComponent<AnimationDriver>();
+  public BlackBoard BlackBoard => AbilityManager.GetComponent<BlackBoard>();
+  public virtual float Score() => 0;
 }
 
 public abstract class FiberAbility : MonoBehaviour, IAbility, IEnumerator, IScorable {

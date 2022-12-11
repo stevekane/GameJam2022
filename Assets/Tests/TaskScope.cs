@@ -75,6 +75,12 @@ public class TaskScope : IDisposable {
     while (!pred())
       await Yield();
   }
+  public async Task Repeat(Action f) {
+    while (true) {
+      f();
+      await Yield();
+    }
+  }
   public async Task Repeat(TaskFunc f) {
     while (true) {
       await f(this);
@@ -87,7 +93,12 @@ public class TaskScope : IDisposable {
   }
 
   // More involved combinators.
-  public async Task<int> Any(params Task[] tasks) {
+  public async Task<T> Return<T>(Task f, T result = default) {
+    ThrowIfCancelled();
+    await f;
+    return result;
+  }
+  public async Task<int> AnyTask(params Task[] tasks) {
     ThrowIfCancelled();
     var which = await Task.WhenAny(tasks);
     return tasks.IndexOf(which);
@@ -103,7 +114,18 @@ public class TaskScope : IDisposable {
       ThrowIfCancelled();
     }
   }
-  public async Task All(params Task[] tasks) {
+  public async Task<T> Any<T>(params TaskFunc<T>[] fs) {
+    ThrowIfCancelled();
+    using TaskScope scope = new(this);
+    try {
+      var tasks = fs.Select(f => f(scope)).ToArray();
+      var result = await Task.WhenAny(tasks);
+      return await result;
+    } finally {
+      ThrowIfCancelled();
+    }
+  }
+  public async Task AllTask(params Task[] tasks) {
     ThrowIfCancelled();
     await Task.WhenAll(tasks);
   }
@@ -163,12 +185,18 @@ public class TaskScope : IDisposable {
   }
 }
 
-public class TaskExtensionsForOlSteve {
+public static class Waiter {
+  public static TaskFunc Millis(int ms) => s => s.Millis(ms);
+  public static TaskFunc Forever() => s => s.Forever();
+  public static TaskFunc Delay(Timeval t) => s => s.Delay(t);
   public static TaskFunc While(Func<bool> pred) => s => s.While(pred);
   public static TaskFunc Until(Func<bool> pred) => s => s.Until(pred);
+  public static TaskFunc Repeat(Action f) => s => s.Repeat(f);
+  public static TaskFunc Repeat<T>(Action<T> f, T arg) => s => s.Repeat(() => f(arg));
   public static TaskFunc Repeat(TaskFunc f) => s => s.Repeat(f);
   public static TaskFunc Repeat(int n, TaskFunc f) => s => s.Repeat(n, f);
   public static TaskFunc ListenFor(IEventSource evt) => s => s.ListenFor(evt);
   public static TaskFunc<T> ListenFor<T>(IEventSource<T> evt) => s => s.ListenFor(evt);
   public static TaskFunc<int> ListenForAll<T>(IEventSource<T> evt, T[] results) => s => s.ListenForAll(evt, results);
+  public static TaskFunc<T> Return<T>(TaskFunc f, T t = default) => s => s.Return<T>(f(s), t);
 }

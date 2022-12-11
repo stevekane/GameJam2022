@@ -1,14 +1,17 @@
 using UnityEngine;
 
 public class BigFatSlowBoom : MonoBehaviour {
-  [SerializeField] Attributes Attributes;
-  [SerializeField] HitConfig HitConfig;
   [SerializeField] GameObject ContactVFX;
   [SerializeField] AudioClip ContactSFX;
+  HitParams HitParams;
+
+  public void InitHitParams(HitConfig hitConfig, Attributes attacker) {
+    HitParams = new HitParams(hitConfig, attacker.serialized, attacker.gameObject, gameObject);
+  }
 
   void Detonate(GameObject target) {
     if (target.TryGetComponent(out Hurtbox hurtbox)) {
-      hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject, gameObject));
+      hurtbox.TryAttack(HitParams.Clone());
     } else {
       SFXManager.Instance.TryPlayOneShot(ContactSFX);
       VFXManager.Instance.TrySpawnEffect(ContactVFX, transform.position);

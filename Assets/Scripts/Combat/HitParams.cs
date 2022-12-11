@@ -11,6 +11,17 @@ public class HitParams {
   public float KnockbackStrength => AttackerAttributes.GetValue(AttributeTag.Knockback, HitConfig.KnockbackStrength);
   public float Damage => HitConfig.DamageModifier.Apply(AttackerAttributes.GetValue(AttributeTag.Damage, 0));
 
+  // Useful if HitParams are reused for multiple calls to Hurtbox.TryAttack(), which will reset the Defender.
+  public HitParams Clone() => new() {
+    HitConfig = HitConfig,
+    AttackerAttributes = AttackerAttributes,
+    Attacker = Attacker,
+    Source = Source,
+    Defender = Defender,
+    DefenderAttributes = DefenderAttributes,
+  };
+
+  HitParams() { }
   public HitParams(HitConfig hitConfig, Attributes.Serialized attackerAttributes, GameObject attacker, GameObject source) {
     HitConfig = hitConfig;
     AttackerAttributes = attackerAttributes;

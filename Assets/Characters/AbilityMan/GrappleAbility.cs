@@ -29,7 +29,7 @@ public class GrappleAbility : Ability {
     Owner.GetComponent<Animator>().SetBool("Grappling", true);
     Owner.GetComponent<Animator>().SetInteger("GrappleState", (int)GrappleState.Holding);
     var chargeWait = Wait(MAX_CHARGE_DURATION.Ticks);
-    var release = ListenFor(AbilityManager.GetEvent(GrappleRelease));
+    var release = FiberListenFor(AbilityManager.GetEvent(GrappleRelease));
     yield return Any(chargeWait, release);
     // Create and throw the hook
     Owner.GetComponent<Animator>().SetBool("Grappling", true);
@@ -39,7 +39,7 @@ public class GrappleAbility : Ability {
     Hook.Origin = transform;
     Hook.OnHit.Listen(OnHit);
     Hook.GetComponent<Rigidbody>().AddForce(HOOK_SPEED*transform.forward, ForceMode.Impulse);
-    var hookHit = ListenFor(Hook.OnHit);
+    var hookHit = FiberListenFor(Hook.OnHit);
     var throwWait = Wait(MAX_THROW_DURATION.Ticks);
     var throwOutcome = Select(hookHit, throwWait);
     yield return throwOutcome;

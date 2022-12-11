@@ -1,18 +1,17 @@
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace PigMoss {
-  class RadialBurst : FiberAbility {
+  class RadialBurst : Ability {
     public HitConfig HitConfig;
     public Vibrator Vibrator;
-    public GameObject ProjectilePrefab;
+    public BigFatSlowBoom ProjectilePrefab;
     public AudioClip FireSFX;
     public Timeval ChargeDelay;
     public Timeval FireDelay;
     public int Count;
     public int Rotations;
-
-    StatusEffect StatusEffect;
 
     public override float Score() {
       if (BlackBoard.DistanceScore < 25 && BlackBoard.DistanceScore > 5) {
@@ -22,18 +21,13 @@ namespace PigMoss {
       }
     }
 
-    public override void OnStop() {
-      Status.Remove(StatusEffect);
-    }
-
-    public override IEnumerator Routine() {
-      StatusEffect = new InlineEffect(status => {
+    public async Task Routine(TaskScope scope) {
+      using var effect = AddStatusEffect(new InlineEffect(status => {
         status.CanMove = false;
         status.CanRotate = false;
-      });
-      Status.Add(StatusEffect);
+      }));
       Vibrator.Vibrate(Vector3.up, ChargeDelay.Ticks, 1f);
-      yield return Fiber.Wait(ChargeDelay);
+      await scope.Delay(ChargeDelay);
       var rotationPerProjectile = Quaternion.Euler(0, 360/(float)Count, 0);
       var halfRotationPerProjectile = Quaternion.Euler(0, 180/(float)Count, 0);
       var direction = AbilityManager.transform.forward.XZ();
@@ -45,8 +39,9 @@ namespace PigMoss {
           var radius = 5;
           var position = AbilityManager.transform.position+radius*direction+Vector3.up;
           var projectile = GameObject.Instantiate(ProjectilePrefab, position, rotation);
+          projectile.InitHitParams(HitConfig, GetComponentInParent<Attributes>());
         }
-        yield return Fiber.Wait(FireDelay);
+        await scope.Delay(FireDelay);
         direction = halfRotationPerProjectile*direction;
       }
     }

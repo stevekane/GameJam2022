@@ -43,7 +43,7 @@ public class SmashDash : Ability {
   // Detect when the move axis is released and pressed again. This sort of thing probably belongs in a lower level system.
   IEnumerator InputLoop() {
     while (IsPressed) {
-      var outcome = Fiber.Select(ListenForMoveAction(), ListenFor(Release));
+      var outcome = Fiber.Select(ListenForMoveAction(), FiberListenFor(Release));
       yield return outcome;
       if (outcome.Value == 0)
         yield return Dash();
