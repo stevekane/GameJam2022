@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -47,7 +48,7 @@ public class MeleeAbility : Ability {
     if (chargeable) {
       Animation.SetSpeed(ChargeSpeedFactor);
       var startFrame = Timeval.TickCount;
-      await Animation.WaitFrame(scope, WindupDuration.AnimFrames);
+      await Animation.WaitFrame(WindupDuration.AnimFrames)(scope);
       var numFrames = Timeval.TickCount - startFrame;
       var extraFrames = numFrames - WindupDuration.Ticks;
       var maxExtraFrames = WindupDuration.Ticks / ChargeSpeedFactor - WindupDuration.Ticks;
@@ -63,7 +64,9 @@ public class MeleeAbility : Ability {
     Hits.Clear();
     SFXManager.Instance.TryPlayOneShot(AttackSFX);
     AttackVFXInstance = VFXManager.Instance.TrySpawn2DEffect(AttackVFX, Owner.position + VFXOffset, Owner.rotation, ActiveDuration.Seconds);
-    await scope.Any(s => Animation.WaitFrame(s, WindupDuration.AnimFrames + ActiveDuration.AnimFrames+1), s => s.Repeat(s => HandleHits(s, hitConfig)));
+    await scope.Any(
+      Animation.WaitFrame(WindupDuration.AnimFrames + ActiveDuration.AnimFrames+1),
+      Waiter.Repeat(HandleHits(hitConfig)));
     Hitbox.Collider.enabled = false;
 
     // Hitstop -- this code sucks and is probably not necessary
@@ -72,7 +75,7 @@ public class MeleeAbility : Ability {
     //  m.simulationSpeed = 1f;
 
     // Recovery
-    await Animation.WaitDone(scope);
+    await Animation.WaitDone()(scope);
   }
 
   //public override void OnStop() {
@@ -80,7 +83,7 @@ public class MeleeAbility : Ability {
   //  Animation = null;
   //}
 
-  async Task HandleHits(TaskScope s, HitConfig config) {
+  TaskFunc HandleHits(HitConfig config) => async (TaskScope scope) => {
     if (Hits.Count != 0) {
       Hits.ForEach(target => {
         target.TryAttack(new HitParams(config, Attributes.serialized, Attributes.gameObject));
@@ -89,8 +92,8 @@ public class MeleeAbility : Ability {
       AbilityManager.Energy?.Value.Add(HitEnergyGain * Hits.Count);
       Hits.Clear();
     }
-    await s.Tick();
-  }
+    await scope.Tick();
+  };
 
   void OnContact(Hurtbox hurtbox) {
     if (!PhaseHits.Contains(hurtbox)) {

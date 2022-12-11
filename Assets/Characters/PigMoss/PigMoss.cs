@@ -89,6 +89,8 @@ namespace PigMoss {
         return fability;
       } else if (ability is SwordStrike sability) {
         return AbilityManager.TryRun(sability.Routine);
+      } else if (ability is BumRush rability) {
+        return AbilityManager.TryRun(rability.Routine);
       }
       return null;
     }

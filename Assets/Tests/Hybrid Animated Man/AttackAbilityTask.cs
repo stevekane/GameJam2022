@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using static TaskExtensionsForOlSteve;
 
 public class AttackAbilityTask : Ability {
   [SerializeField] Timeval WindupEnd;
@@ -22,25 +20,25 @@ public class AttackAbilityTask : Ability {
   [NonSerialized] HashSet<Collider> PhaseHits = new();
   [NonSerialized] AnimationJobTask Animation = null;
 
-  async Task Attack(TaskScope scope) {
+  public async Task Attack(TaskScope scope) {
     HitBox.enabled = false;
-    await scope.Any(PlayAnim, Repeat(OnHit));
+    await scope.Any(PlayAnim, Waiter.Repeat(OnHit));
   }
 
   async Task PlayAnim(TaskScope scope) {
     try {
       Animation = AnimationDriver.Play(scope, AttackAnimation);
-      await Animation.WaitFrame(scope, WindupEnd.AnimFrames);
+      await Animation.WaitFrame(WindupEnd.AnimFrames)(scope);
       PhaseHits.Clear();
       HitBox.enabled = true;
       var rotation = AbilityManager.transform.rotation;
       var vfxOrigin = AbilityManager.transform.TransformPoint(AttackVFXOffset);
       SFXManager.Instance.TryPlayOneShot(AttackSFX);
       VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
-      await Animation.WaitFrame(scope, ActiveEnd.AnimFrames+1);
+      await Animation.WaitFrame(ActiveEnd.AnimFrames+1)(scope);
       HitBox.enabled = false;
       CurrentTags.AddFlags(AbilityTag.Cancellable);
-      await Animation.WaitDone(scope);
+      await Animation.WaitDone()(scope);
     } finally {
       HitBox.enabled = false;
       Debug.Assert(!Animation.IsRunning);

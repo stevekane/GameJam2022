@@ -51,7 +51,6 @@ public class AnimationJobTask {
   public async Task WaitDone(TaskScope scope) {
     while (IsRunning)
       await scope.Yield();
-      // await scope.Tick();
   }
 
   // TDO: condense start/run?
