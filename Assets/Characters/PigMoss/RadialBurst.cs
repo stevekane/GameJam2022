@@ -5,7 +5,7 @@ namespace PigMoss {
   class RadialBurst : FiberAbility {
     public HitConfig HitConfig;
     public Vibrator Vibrator;
-    public GameObject ProjectilePrefab;
+    public BigFatSlowBoom ProjectilePrefab;
     public AudioClip FireSFX;
     public Timeval ChargeDelay;
     public Timeval FireDelay;
@@ -45,6 +45,7 @@ namespace PigMoss {
           var radius = 5;
           var position = AbilityManager.transform.position+radius*direction+Vector3.up;
           var projectile = GameObject.Instantiate(ProjectilePrefab, position, rotation);
+          projectile.InitHitParams(HitConfig, GetComponentInParent<Attributes>());
         }
         yield return Fiber.Wait(FireDelay);
         direction = halfRotationPerProjectile*direction;
