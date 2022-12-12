@@ -1,11 +1,10 @@
 using System;
-using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
-using static Fiber;
 
 namespace PigMoss {
   [Serializable]
-  public class Bombard : FiberAbility {
+  public class Bombard : Ability {
     public float Radius;
     public Missile MissilePrefab;
     public Transform[] LaunchSites;
@@ -26,20 +25,20 @@ namespace PigMoss {
       Animator.SetBool("Extended", false);
     }
 
-    public override IEnumerator Routine() {
+    public async Task Routine(TaskScope scope) {
       SFXManager.Instance.TryPlayOneShot(WindupClip);
       Animator.SetBool("Extended", true);
-      yield return Wait(Windup);
+      await scope.Delay(Windup);
       foreach (var launchSite in LaunchSites) {
         var missile = GameObject.Instantiate(MissilePrefab, launchSite.position, launchSite.rotation);
         missile.Target = Radius*UnityEngine.Random.onUnitSphere.XZ();
         SFXManager.Instance.TryPlayOneShot(ShotClip);
         VFXManager.Instance.TrySpawnEffect(ShotEffect, launchSite.position);
-        yield return Wait(ShotPeriod);
+        await scope.Delay(ShotPeriod);
       }
       SFXManager.Instance.TryPlayOneShot(RecoveryClip);
       Animator.SetBool("Extended", false);
-      yield return Wait(Recovery);
+      await scope.Delay(Recovery);
     }
   }
 }

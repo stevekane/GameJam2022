@@ -1,7 +1,6 @@
 using UnityEngine;
 
 public class Explosion : MonoBehaviour {
-  [SerializeField] Attributes Attributes;
   [SerializeField] HitConfig HitConfig;
   [SerializeField] LayerMask LayerMask;
   [SerializeField] float Radius = 1;
@@ -10,7 +9,7 @@ public class Explosion : MonoBehaviour {
     var numHits = Physics.OverlapSphereNonAlloc(transform.position, Radius, PhysicsQuery.Colliders, LayerMask);
     for (int i = 0; i < numHits; i++) {
       if (PhysicsQuery.Colliders[i].TryGetComponent(out Hurtbox hurtbox)) {
-        hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject, gameObject));
+        hurtbox.TryAttack(new HitParams(HitConfig, Attributes.Serialized.EmptyDontUse, gameObject));
       }
     }
   }
