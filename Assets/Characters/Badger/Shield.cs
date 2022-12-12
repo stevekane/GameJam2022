@@ -23,5 +23,5 @@ public class Shield : MonoBehaviour {
     AnimationDriver = GetComponentInParent<AnimationDriver>();
     Scope.Start(WatchDamage);
   }
-  void OnDestroy() => Scope.Dispose();
+  void OnDestroy() => Scope.Cancel();
 }
