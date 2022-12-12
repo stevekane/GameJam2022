@@ -247,7 +247,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions: []
-  CurrentTags: 0
+  Tags: 0
   Animator: {fileID: 7946021538672475454}
   WindupDuration:
     Millis: 1000
@@ -269,6 +269,9 @@ MonoBehaviour:
     CameraShakeStrength: 0
     HitStopDuration:
       Millis: 100
+      FramesPerSecond: 30
+    StunDuration:
+      Millis: 500
       FramesPerSecond: 30
   Trail: {fileID: 433230649554147219}
   RushSFX: {fileID: 8300000, guid: f161f54138dc0314abdabf7ab71e3404, type: 3}
@@ -537,7 +540,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions: []
-  CurrentTags: 0
+  Tags: 0
   HitConfig:
     DamageModifier:
       Base: 15
@@ -548,6 +551,9 @@ MonoBehaviour:
     CameraShakeStrength: 0
     HitStopDuration:
       Millis: 100
+      FramesPerSecond: 30
+    StunDuration:
+      Millis: 500
       FramesPerSecond: 30
   ActiveFrameStart:
     Millis: 1000
@@ -620,7 +626,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions: []
-  CurrentTags: 0
+  Tags: 0
   RevealedSFX: {fileID: 8300000, guid: b67fa46733ef5324496f5c62b2bb7013, type: 3}
   ExtendedSFX: {fileID: 8300000, guid: 4af54c965264a3a449e7e1127868e676, type: 3}
   ExtendedVFX: {fileID: 7226583673155636401, guid: 51809e144c845de418382df0a1b0b9b6, type: 3}
@@ -643,6 +649,9 @@ MonoBehaviour:
     CameraShakeStrength: 0
     HitStopDuration:
       Millis: 1
+      FramesPerSecond: 30
+    StunDuration:
+      Millis: 500
       FramesPerSecond: 30
   BladeContactSFX: {fileID: 8300000, guid: 7cbd6cd765888ff418d01d98bd1ce9c2, type: 3}
   BladeContactVFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
@@ -842,19 +851,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 677aa18819d846b488b35bf340849599, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TriggerConditions: []
+  Tags: 0
   HitConfig:
     DamageModifier:
       Base: 0
       Mult: 1
-    KnockbackType: 0
+    KnockbackType: 1
     KnockbackStrength: 10
-    RecoilStrength: 10
-    CameraShakeStrength: 10
+    RecoilStrength: 0
+    CameraShakeStrength: 1
     HitStopDuration:
       Millis: 200
       FramesPerSecond: 30
+    StunDuration:
+      Millis: 500
+      FramesPerSecond: 30
   Vibrator: {fileID: 8872822988582960448}
-  ProjectilePrefab: {fileID: 4479709198012916195, guid: f3d478ee9ca7d9c49a05bde556e18179, type: 3}
+  ProjectilePrefab: {fileID: 5045261405447526997, guid: f3d478ee9ca7d9c49a05bde556e18179, type: 3}
   FireSFX: {fileID: 8300000, guid: da396a16a7f24f64cbb0054f5a56b46a, type: 3}
   ChargeDelay:
     Millis: 1000
@@ -991,6 +1005,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cc9d71d4ad742744954c5ea4fc7a191, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TriggerConditions: []
+  Tags: 0
   Radius: 30
   MissilePrefab: {fileID: 5667205795771851015, guid: 41421b7d6e85e6748afb608a2a977365, type: 3}
   LaunchSites:
@@ -1243,7 +1259,7 @@ Transform:
   - {fileID: 433230649554147245}
   - {fileID: 8872822986732128203}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 31
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8872822988582960445
 MonoBehaviour:
@@ -1259,9 +1275,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AbilityManager: {fileID: 8872822988582960451}
   Abilities:
-  - {fileID: 4635285229209771243}
+  - {fileID: 6335438832184794161}
   - {fileID: 6730046083905293372}
-  TaskAbilities:
+  - {fileID: 4071896892811268994}
+  - {fileID: 4635285229209771243}
   - {fileID: 8751152005629255508}
   TargetingConfig:
     FieldOfView: 360
@@ -1294,6 +1311,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba179080412a6af41a99d021d690c5fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Abilities: []
   Bundle:
     Fibers: []
     Added: []
