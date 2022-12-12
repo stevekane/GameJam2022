@@ -1,25 +1,27 @@
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class Shield : MonoBehaviour {
   public float MaxDamage = 50f;
-  public Animator Animator;
   public AnimationClip DeathClip;
   public Hurtbox Hurtbox;
+  AnimationDriver AnimationDriver;
   Damage Damage;
-  Bundle Bundle = new();
+  TaskScope Scope = new();
 
-  IEnumerator WatchDamage() {
-    yield return Fiber.While(() => Damage.Points < MaxDamage);
+  async Task WatchDamage(TaskScope scope) {
+    await scope.While(() => Damage.Points < MaxDamage);
     Destroy(Hurtbox.gameObject);
-    yield return new AnimationTask(Animator, DeathClip, true);
+    var job = AnimationDriver.Play(scope, DeathClip);
+    await job.WaitDone(scope);
     Destroy(gameObject, .01f);
   }
 
   void Awake() {
     Damage = GetComponent<Damage>();
-    Bundle.StartRoutine(WatchDamage());
+    AnimationDriver = GetComponentInParent<AnimationDriver>();
+    Scope.Start(WatchDamage);
   }
-
-  void FixedUpdate() => Bundle.MoveNext();
+  void OnDestroy() => Scope.Dispose();
 }

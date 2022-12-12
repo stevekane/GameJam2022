@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class ShieldAbility : Ability {
@@ -9,28 +10,25 @@ public class ShieldAbility : Ability {
   public InactiveAttackPhase Recovery;
   public Shield Shield;
 
-  public static InlineEffect Invulnerable {
-    get => new(s => {
+  public static InlineEffect Invulnerable => new(s => {
       s.IsDamageable = false;
       s.IsHittable = false;
     }, "ShieldInvulnerable");
-  }
 
-  public IEnumerator HoldStart() {
+  public async Task HoldStart(TaskScope scope) {
     Animator.SetBool("Shielding", true);
-    yield return Windup.Start(Animator, Index);
+    await Windup.Start(scope, Animator, Index);
     if (Shield && Shield.Hurtbox)
       Shield.Hurtbox.gameObject.SetActive(true);
     using (AddStatusEffect(Invulnerable)) {
-      yield return FiberListenFor(HoldRelease);
+      await scope.ListenFor(AbilityManager.GetEvent(HoldRelease));
     }
     if (Shield && Shield.Hurtbox)
       Shield.Hurtbox.gameObject.SetActive(false);
     Animator.SetBool("Shielding", false);
-    yield return Recovery.Start(Animator, Index);
+    await Recovery.Start(scope, Animator, Index);
   }
-
-  public IEnumerator HoldRelease() => null;
+  public Task HoldRelease(TaskScope _) => null;
 
   public override void OnStop() {
     Animator.SetBool("Attacking", false);

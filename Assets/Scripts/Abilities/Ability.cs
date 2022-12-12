@@ -57,7 +57,10 @@ public abstract class Ability : MonoBehaviour, IAbility {
     var task = new Task(async () => {
       using TaskScope scope = new(MainScope);
       try {
-        await func(scope);
+        scope.ThrowIfCancelled();
+        var result = func(scope);
+        if (result != null)
+          await result;
       } catch (OperationCanceledException) {
       } catch (Exception e) {
         Debug.LogError($"Exception during Ability {this}: {e}");
@@ -68,7 +71,7 @@ public abstract class Ability : MonoBehaviour, IAbility {
       }
     });
     ActiveTasks.Add(func);
-    task.Start(TaskScheduler.FromCurrentSynchronizationContext());
+    TaskScope.Start(task);
   }
   public T Using<T>(T d) where T : IDisposable {
     Disposables.Add(d);
