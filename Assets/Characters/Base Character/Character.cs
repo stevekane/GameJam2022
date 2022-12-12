@@ -41,5 +41,17 @@ public class Character : MonoBehaviour {
     animator.SetBool("IsHurt", Status.IsHurt);
     TorsoRotationConstraint.weight = Mathf.MoveTowards(TorsoRotationConstraint.weight, Status.IsHurt ? 0 : 1, 1/(float)ConstraintBlendFrames);
     HeadAimConstraint.weight = 0;
+    // Use localtimescale to slow the AnimationDriver
+    var localSpeed = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
+    if (localSpeed < 1) {
+      if (AnimationDriver) {
+        AnimationDriver.SetSpeed(localSpeed);
+      }
+    } else {
+      if (AnimationDriver) {
+        AnimationDriver.SetSpeed(AnimationDriver.BaseSpeed);
+      }
+    }
+
   }
 }

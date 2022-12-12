@@ -1,5 +1,53 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3349244326420405707
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4872782981642719983}
+  - component: {fileID: 789495431736042158}
+  m_Layer: 0
+  m_Name: Knockback Smoke
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4872782981642719983
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3349244326420405707}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3974881696480685260}
+  m_Father: {fileID: 8540507123274114197}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &789495431736042158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3349244326420405707}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17d7ae1e6d714ab48bbe0a37bf948fb4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Status: {fileID: 8540507123274114192}
+  Controller: {fileID: 8540507123274114196}
+  ParticleSystem: {fileID: 3974881696494840204}
 --- !u!1 &8540507123161146150
 GameObject:
   m_ObjectHideFlags: 0
@@ -75,6 +123,7 @@ Transform:
   - {fileID: 8540507124197434726}
   - {fileID: 8540507124290307038}
   - {fileID: 8540507124463013526}
+  - {fileID: 4872782981642719983}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -100,6 +149,7 @@ MonoBehaviour:
   <TorsoRotationConstraint>k__BackingField: {fileID: 0}
   <HeadAimConstraint>k__BackingField: {fileID: 0}
   IdleThreshold: 0.1
+  ConstraintBlendFrames: 4
 --- !u!114 &8540507123274114198
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112,6 +162,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba179080412a6af41a99d021d690c5fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Abilities: []
   Bundle:
     Fibers: []
     Added: []
@@ -529,3 +580,73 @@ Transform:
   m_Father: {fileID: 8540507124463013526}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &5695848924627043072
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 2
+    m_TransformParent: {fileID: 4872782981642719983}
+    m_Modifications:
+    - target: {fileID: 8656522925563801548, guid: c1f341430e06e1745844c9664dc09613, type: 3}
+      propertyPath: m_RootOrder
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8656522925563801548, guid: c1f341430e06e1745844c9664dc09613, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8656522925563801548, guid: c1f341430e06e1745844c9664dc09613, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8656522925563801548, guid: c1f341430e06e1745844c9664dc09613, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8656522925563801548, guid: c1f341430e06e1745844c9664dc09613, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8656522925563801548, guid: c1f341430e06e1745844c9664dc09613, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8656522925563801548, guid: c1f341430e06e1745844c9664dc09613, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8656522925563801548, guid: c1f341430e06e1745844c9664dc09613, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8656522925563801548, guid: c1f341430e06e1745844c9664dc09613, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8656522925563801548, guid: c1f341430e06e1745844c9664dc09613, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8656522925563801548, guid: c1f341430e06e1745844c9664dc09613, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8656522925564163052, guid: c1f341430e06e1745844c9664dc09613, type: 3}
+      propertyPath: m_Name
+      value: Knockback Smoke
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 114979979335704276, guid: c1f341430e06e1745844c9664dc09613, type: 3}
+    m_AddedGameObjects: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1f341430e06e1745844c9664dc09613, type: 3}
+--- !u!4 &3974881696480685260 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8656522925563801548, guid: c1f341430e06e1745844c9664dc09613, type: 3}
+  m_PrefabInstance: {fileID: 5695848924627043072}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &3974881696494840204 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 8656522925583198860, guid: c1f341430e06e1745844c9664dc09613, type: 3}
+  m_PrefabInstance: {fileID: 5695848924627043072}
+  m_PrefabAsset: {fileID: 0}

@@ -18,7 +18,7 @@ public class Damage : MonoBehaviour {
       var bounceboxTarget = Bouncebox.ComputeWallbounceTarget(source);
       Status.Add(new HurtStunEffect(hitParams.HitConfig.StunDuration.Ticks));
       Status.Add(new HitStopEffect(knockbackVector, .15f, hitParams.HitConfig.HitStopDuration.Ticks),
-        s => s.Add(new KnockbackEffect((knockbackVector+Vector3.up).normalized*knockbackStrength, bounceboxTarget)));
+        s => s.Add(new KnockbackEffect((knockbackVector+Vector3.up*.5f).normalized*knockbackStrength, bounceboxTarget)));
     }
   }
 

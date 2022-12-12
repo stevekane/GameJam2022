@@ -283,18 +283,6 @@ public class Status : MonoBehaviour {
     IsHurt = false;
     Tags = Upgrades.AbilityTags;
 
-    // Steve - This currently uses localtimescale to slow the AnimationDriver
-    var localSpeed = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
-    if (localSpeed < 1) {
-      if (AnimationDriver) {
-        AnimationDriver.SetSpeed(localSpeed);
-      }
-    } else {
-      if (AnimationDriver) {
-        AnimationDriver.SetSpeed(AnimationDriver.BaseSpeed);
-      }
-    }
-
     // TODO: differentiate between cancelled and completed?
     Removed.ForEach(e => {
       e.OnComplete?.Invoke(this);
