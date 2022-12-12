@@ -1,7 +1,8 @@
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public class SlamAbility : LegacyAbility {
+public class SlamAbility : Ability {
   Animator Animator;
   public AnimationClip Clip;
   public Timeval WindupDuration;
@@ -14,40 +15,40 @@ public class SlamAbility : LegacyAbility {
   public Vector3 FireVFXOffset;
   public float ChargeSpeedFactor = 1f/6f;
 
-  AnimationTask Animation;
+  AnimationJobTask Animation;
 
   void Start() {
     Animator = GetComponentInParent<Animator>();
   }
 
-  public IEnumerator ChargeStart() {
-    Animation = new AnimationTask(Animator, Clip);
-    AddStatusEffect(new SpeedFactorEffect(.5f, .5f));
-    Animation.SetSpeed(ChargeSpeedFactor);
-    yield return Fiber.Any(Charging(), Animation.PlayUntil(WindupDuration.AnimFrames));
-    Animation.SetSpeed(1f);
-    SlamAction.Activate();
-    SFXManager.Instance.TryPlayOneShot(FireSFX);
-    VFXManager.Instance.TrySpawnEffect(FireVFX, SlamAction.Piece.transform.position + FireVFXOffset);
-    SlamAction = null;
-    yield return Animation;
-  }
-
-  public IEnumerator ChargeRelease() {
-    Animation?.SetSpeed(1f);
-    yield return null;
-  }
-
-  public override void OnStop() {
-    Animation?.Stop();
-    Animation = null;
-    if (SlamAction != null) {
-      Destroy(SlamAction.gameObject);
+  public async Task ChargeStart(TaskScope scope) {
+    try {
+      Animation = AnimationDriver.Play(scope, Clip);
+      using var effect = new SpeedFactorEffect(.5f, .5f);
+      Animation.SetSpeed(ChargeSpeedFactor);
+      await scope.Any(Charging, Animation.WaitFrame(WindupDuration.AnimFrames));
+      Animation.SetSpeed(1f);
+      SlamAction.Activate();
+      SFXManager.Instance.TryPlayOneShot(FireSFX);
+      VFXManager.Instance.TrySpawnEffect(FireVFX, SlamAction.Piece.transform.position + FireVFXOffset);
       SlamAction = null;
+      await Animation.WaitDone(scope);
+    } finally {
+      Animation?.Stop();
+      Animation = null;
+      if (SlamAction != null) {
+        Destroy(SlamAction.gameObject);
+        SlamAction = null;
+      }
     }
   }
 
-  IEnumerator Charging() {
+  public async Task ChargeRelease(TaskScope scope) {
+    Animation?.SetSpeed(1f);
+    await scope.Yield();
+  }
+
+  async Task Charging(TaskScope scope) {
     int frames = 0;
     var slam = Instantiate(SlamActionPrefab, transform, false);
     slam.layer = gameObject.layer;
@@ -58,7 +59,7 @@ public class SlamAbility : LegacyAbility {
         SlamAction.AddPiece();
         frames = SlamPiecePeriod.Ticks;
       }
-      yield return null;
+      await scope.Tick();
     }
   }
 

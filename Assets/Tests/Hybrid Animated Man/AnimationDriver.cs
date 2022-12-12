@@ -12,6 +12,14 @@ public class AnimationJobConfig {
   public float Speed = 1;
 }
 
+public static class AnimatorTastExtensions {
+  public static AnimationJobFacade Run(this Animator animator, AnimationClip clip) {
+    var d = animator.GetComponent<AnimationDriver>();
+    var j = d.Play(clip);
+    return j;
+  }
+}
+
 // TODO: rename
 public class AnimationJobTask {
   PlayableGraph Graph;
@@ -136,9 +144,10 @@ public class AnimationJob : IEnumerator, IStoppable {
   public void Start() {
     IsRunning = true;
     Clip.SetSpeed(Animation.Speed);
-    Clip.SetDuration(Animation.Clip.length);
+    Clip.SetDuration(Animation.Clip.isLooping ? double.MaxValue : Animation.Clip.length);
     Mixer.ConnectInput(1, Clip, 0, 1);
-    Mixer.SetLayerMaskFromAvatarMask(1, Animation.Mask);
+    if (Animation.Mask)
+      Mixer.SetLayerMaskFromAvatarMask(1, Animation.Mask);
     Driver.Connect(this);
   }
 
@@ -179,8 +188,13 @@ public class AnimationJob : IEnumerator, IStoppable {
     var time = Clip.GetTime();
     var clip = Clip.GetAnimationClip();
     var frames = (clip.length*clip.frameRate+1)/* / Animator.speed*/;
-    var interpolant = (float)(time/clip.length);
-    var eventHead = (int)Mathf.Lerp(0, frames, interpolant);
+    int eventHead = 0;
+    // TODO: This is a hack for single frame abilities, which AnimationTask could handle but this cannot for some reason.
+    // Need to figure this out at some point. Examples are Vapor's SmashDash anims.
+    if (clip.length > 0) {
+      var interpolant = (float)(time/clip.length);
+      eventHead = (int)Mathf.Lerp(0, frames, interpolant);
+    }
     if (eventHead > EventHead) {
       for (var i = EventHead+1; i <= eventHead; i++) {
         OnFrame.Fire(i);
@@ -268,6 +282,7 @@ public class AnimationDriver : MonoBehaviour {
     Output.SetSourcePlayable(AnimatorController);
   }
 
+  public AnimationJobFacade Play(AnimationClip clip) => Play(new AnimationJobConfig() { Clip = clip });
   public AnimationJobFacade Play(AnimationJobConfig animation) {
     Job?.Stop();
     Job = new AnimationJob(this, Graph, animation);

@@ -103,30 +103,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TriggerConditions: []
   Tags: 0
-  DamageMultiplierFromDuration:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 2
-      outSlope: 2
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
   ArrowPrefab: {fileID: 784070462922033992, guid: 6dea11b6857468a44a87db05b8de29cf, type: 3}
   Animator: {fileID: 2582651164267693602}
   WindupClip: {fileID: 7400000, guid: 8c9354c19de70ae47a15c7f4f4ec971c, type: 2}
@@ -147,6 +123,8 @@ GameObject:
   - component: {fileID: 7271677758858587901}
   - component: {fileID: 374224407259611018}
   - component: {fileID: 2582651163493360474}
+  - component: {fileID: 5837227069530877887}
+  - component: {fileID: 3265260009473907581}
   m_Layer: 10
   m_Name: Wind Ranger Prefab
   m_TagString: Untagged
@@ -198,6 +176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Tags: 0
+  DebugEffects: []
 --- !u!114 &6994602829365010295
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -211,8 +190,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Abilities: []
-  Running: []
-  ToAdd: []
+  Bundle:
+    Fibers: []
+    Added: []
+    Removed: []
 --- !u!114 &2940330219637808556
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -269,6 +250,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Gravity: -10
+  Animator: {fileID: 0}
+  IdleThreshold: 0.1
 --- !u!114 &374224407259611018
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -281,6 +264,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38b5f85dc564c4f4fafa2b5115a61de1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Dead: 0
 --- !u!143 &2582651163493360474
 CharacterController:
   m_ObjectHideFlags: 0
@@ -299,6 +283,33 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &5837227069530877887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2582651163493360454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 004ed0f90de1a634aab5eefd8f1dea0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BaseAttributes: []
+  BaseUpgrades: []
+--- !u!114 &3265260009473907581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2582651163493360454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5858cd79c3bb37845b5d44f08793d81e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 2582651164267693602}
 --- !u!1 &2582651163494764176
 GameObject:
   m_ObjectHideFlags: 0
@@ -478,6 +489,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2582651164267693613}
   - component: {fileID: 2582651164267693602}
+  - component: {fileID: 2927905050732301975}
   m_Layer: 0
   m_Name: Model
   m_TagString: Untagged
@@ -521,6 +533,19 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &2927905050732301975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2582651164267693612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5858cd79c3bb37845b5d44f08793d81e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 2582651164267693602}
 --- !u!1 &2582651164299228344
 GameObject:
   m_ObjectHideFlags: 0
@@ -583,18 +608,6 @@ MonoBehaviour:
     Millis: 100
     FramesPerSecond: 30
   MaxRange: 20
-  HitConfig:
-    DamageModifier:
-      Base: 1
-      Mult: 1
-    HitStopDuration:
-      Millis: 33.333332
-      FramesPerSecond: 30
-    KnockbackStrength: 0
-    KnockbackType: 1
-    SFX: {fileID: 0}
-    VFX: {fileID: 0}
-    VFXOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &6106567879726095616
 GameObject:
   m_ObjectHideFlags: 0
