@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class PelletAbility : Ability {
@@ -12,15 +13,15 @@ public class PelletAbility : Ability {
   public GameObject FireVFX;
   public AudioClip FireSFX;
 
-  public IEnumerator AttackStart() {
-    yield return Windup.Start(Animator, Index);
-    yield return Fiber.All(ShootRoutine(), Active.Start(Animator, Index));
-    yield return Recovery.Start(Animator, Index);
+  public async Task AttackStart(TaskScope scope) {
+    await Windup.Start(scope, Animator, Index);
+    await scope.All(ShootRoutine, s => Active.Start(s, Animator, Index));
+    await Recovery.Start(scope, Animator, Index);
   }
 
-  IEnumerator ShootRoutine() {
+  async Task ShootRoutine(TaskScope scope) {
     for (int i = 0; i < NumBullets; i++) {
-      yield return Fiber.Wait(Active.Duration.Ticks / NumBullets);
+      await scope.Ticks(Active.Duration.Ticks / NumBullets);
       VFXManager.Instance.TrySpawnEffect(FireVFX, transform.position);
       SFXManager.Instance.TryPlayOneShot(FireSFX);
       Bullet.Fire(BulletPrefab, transform.position, transform.forward, gameObject.layer);

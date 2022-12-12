@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [Serializable]
@@ -25,20 +26,19 @@ public class AimAt : AbilityTask {
 }
 
 [Serializable]
-public class InactiveAttackPhase : AbilityTask {
+public class InactiveAttackPhase {
   int Index;
   Animator Animator;
   public Timeval Duration = Timeval.FromMillis(0, 30);
   public Timeval ClipDuration = Timeval.FromMillis(0, 30);
-  public IEnumerator Start(Animator animator, int index) {
-    Reset();
+  public async Task Start(TaskScope scope, Animator animator, int index) {
     Animator = animator;
     Index = index;
-    return this;
+    await TaskRoutine(scope);
   }
-  public override IEnumerator Routine() {
+  public async Task TaskRoutine(TaskScope scope) {
     for (var i = 0; i < Duration.Ticks; i++) {
-      yield return null;
+      await scope.Tick();
       var attackSpeed = ClipDuration.Millis/Duration.Millis;
       Animator.SetFloat("AttackSpeed", attackSpeed);
       Animator.SetBool("Attacking", true);
