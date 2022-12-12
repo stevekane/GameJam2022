@@ -59,7 +59,7 @@ public class SimpleDash : Ability {
 
   async Task MakeCancellable(TaskScope scope) {
     await scope.Millis((int)(DashDuration.Millis / 3));
-    CurrentTags.AddFlags(AbilityTag.Cancellable);
+    Tags.AddFlags(AbilityTag.Cancellable);
     await scope.Forever();
   }
 

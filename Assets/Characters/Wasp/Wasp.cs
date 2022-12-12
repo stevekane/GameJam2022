@@ -9,7 +9,7 @@ public class Wasp : MonoBehaviour {
   Transform Target;
   AbilityManager Abilities;
   int FramesRemaining = 0;
-  IAbility CurrentAbility;
+  Ability CurrentAbility;
   PelletAbility Pellet;
 
   enum StateType { Idle, Chase, Shoot, Kite }

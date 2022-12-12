@@ -45,7 +45,7 @@ public class AttackAbility : Ability {
       vfx.transform.SetParent(AbilityManager.transform, true);
     }
     if (frame >= ActiveEnd.AnimFrames) {
-      CurrentTags.AddFlags(AbilityTag.Cancellable);
+      Tags.AddFlags(AbilityTag.Cancellable);
     }
   }
 

@@ -14,37 +14,21 @@ public class TriggerCondition {
   public HashSet<AttributeTag> RequiredOwnerAttribs = new();
 }
 
-public interface IAbility : IStoppable {
-  public AbilityManager AbilityManager { get; set; }
-  public Attributes Attributes { get; }
-  public Status Status { get; }
-  public Mover Mover { get; }
-  public AbilityTag Tags { get; set; }
-  public void StartRoutine(Fiber routine);
-  public void StopRoutine(Fiber routine);
-  public void MaybeStartTask(AbilityMethodTask func) { }
-  public TriggerCondition GetTriggerCondition(AbilityMethod method);
-  public TriggerCondition GetTriggerCondition(AbilityMethodTask method) => null;
-  public float Score();
-}
-
-interface IScorable {
-  public float Score();
-}
-
 [Serializable]
-public abstract class Ability : MonoBehaviour, IAbility {
+public abstract class Ability : MonoBehaviour {
   protected Bundle Bundle = new();
   protected List<IDisposable> Disposables = new();
   public AbilityManager AbilityManager { get; set; }
-  public Attributes Attributes { get => AbilityManager.GetComponent<Attributes>(); }
-  public Status Status { get => AbilityManager.GetComponent<Status>(); }
-  public Mover Mover { get => AbilityManager.GetComponent<Mover>(); }
+  public AnimationDriver AnimationDriver => AbilityManager.GetComponent<AnimationDriver>();
+  public BlackBoard BlackBoard => AbilityManager.GetComponent<BlackBoard>();
+  public Attributes Attributes => AbilityManager.GetComponent<Attributes>();
+  public Status Status => AbilityManager.GetComponent<Status>();
+  public Mover Mover => AbilityManager.GetComponent<Mover>();
   public List<TriggerCondition> TriggerConditions = new();
   // TODO(Task): object => AbilityMethodTask
   Dictionary<object, TriggerCondition> TriggerConditionsMap = new();
-  [HideInInspector] public AbilityTag Tags { get => CurrentTags; set => CurrentTags = value; } // Inherited from the Trigger when started
-  [HideInInspector] public AbilityTag CurrentTags;
+  [HideInInspector] public AbilityTag Tags;  // Inherited from the Trigger when started
+  public virtual float Score() => 0;
   public bool IsRunning { get => Bundle.IsRunning || ActiveTasks.Count > 0; }
   public IEnumerator Running => Bundle;
   public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
@@ -105,44 +89,4 @@ public abstract class Ability : MonoBehaviour, IAbility {
   }
   public virtual void Awake() => TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.IsTask(this) ? c.Method.GetMethodTask(this) : c.Method.GetMethod(this)] = c);
   public virtual void OnDestroy() => Stop();
-
-  // FiberAbility stuff
-  public AnimationDriver AnimationDriver => AbilityManager.GetComponent<AnimationDriver>();
-  public BlackBoard BlackBoard => AbilityManager.GetComponent<BlackBoard>();
-  public virtual float Score() => 0;
-}
-
-public abstract class FiberAbility : MonoBehaviour, IAbility, IEnumerator, IScorable {
-  public AbilityManager AbilityManager { get; set; }
-  public BlackBoard BlackBoard => AbilityManager.GetComponent<BlackBoard>();
-  public Attributes Attributes => AbilityManager.GetComponent<Attributes>();
-  public Status Status => AbilityManager.GetComponent<Status>();
-  public Mover Mover => AbilityManager.GetComponent<Mover>();
-  public AbilityTag Tags { get; set; }
-  public void StartRoutine(Fiber routine) => Enumerator = routine;
-  public void StopRoutine(Fiber routine) => Enumerator = null;
-  public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerCondition.Empty;
-  public object Current { get => Enumerator.Current; }
-  public void Reset() => throw new NotSupportedException();
-  public bool MoveNext() {
-    if (Enumerator != null) {
-      if (Enumerator.MoveNext()) {
-        return true;
-      } else {
-        Stop();
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-  public void Stop() {
-    Enumerator = null;
-    OnStop();
-  }
-  public bool IsRunning { get; set; }
-  public abstract void OnStop();
-  public IEnumerator Enumerator;
-  public abstract IEnumerator Routine();
-  public abstract float Score();
 }

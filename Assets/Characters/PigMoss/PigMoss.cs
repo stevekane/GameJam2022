@@ -11,7 +11,7 @@ namespace PigMoss {
     [SerializeField] Transform CenterOfArena;
     [SerializeField] Timeval ActionCooldown;
     [SerializeField] BlackBoard BlackBoard;
-    Dictionary<IAbility, AbilityMethodTask> AbilityMethods = new();
+    Dictionary<Ability, AbilityMethodTask> AbilityMethods = new();
 
     Fiber Behavior;
     int AbilityIndex;
@@ -81,7 +81,7 @@ namespace PigMoss {
       }
     }
 
-    IEnumerator TryRun(IAbility ability) {
+    IEnumerator TryRun(Ability ability) {
       if (AbilityMethods.TryGetValue(ability, out var method)) {
         return AbilityManager.TryRun(method);
       } else {
