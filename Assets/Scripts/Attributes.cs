@@ -34,6 +34,9 @@ public enum AttributeTag {
 [Serializable]
 public class AttributeModifier {
   public static AttributeModifier TimesZero = new() { Mult = 0 };
+  public static AttributeModifier TimesOne = new() { Mult = 1 };
+  public static AttributeModifier Plus(float n) => new () { Base = n };
+  public static AttributeModifier Times(float n) => new () { Mult = n };
 
   public float Base = 0;
   public float Mult = 1;

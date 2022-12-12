@@ -102,8 +102,8 @@ public class Mover : MonoBehaviour {
         Animator.SetFloat("RightVelocity", 0);
         Animator.SetFloat("ForwardVelocity", 0);
       }
+      Animator.SetBool("IsGrounded", Status.IsGrounded);
+      Animator.SetBool("IsHurt", Status.IsHurt);
     }
-    Animator.SetBool("IsGrounded", Status.IsGrounded);
-    Animator.SetBool("IsHurt", Status.IsHurt);
   }
 }

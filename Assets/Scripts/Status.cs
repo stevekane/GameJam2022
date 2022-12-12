@@ -114,6 +114,27 @@ public class HitStopEffect : StatusEffect {
   }
 }
 
+public class HurtStunEffect : StatusEffect {
+  int TotalFrames;
+  int Frames;
+  public HurtStunEffect(int totalFrames) {
+    TotalFrames = totalFrames;
+  }
+  public override bool Merge(StatusEffect e) {
+    var existing = (HurtStunEffect)e;
+    TotalFrames = Mathf.Max(TotalFrames-Frames, existing.TotalFrames);
+    return true;
+  }
+  public override void Apply(Status status) {
+    if (Frames <= TotalFrames) {
+      status.IsHurt = true;
+      Frames++;
+    } else {
+      status.Remove(this);
+    }
+  }
+}
+
 public class BurningEffect : StatusEffect {
   float DamagePerFrame = 1f;
   int Frames = Timeval.FromSeconds(3f).Ticks;
@@ -189,16 +210,15 @@ public class Status : MonoBehaviour {
   internal CharacterController Controller;
   internal Optional<Damage> Damage;
   Dictionary<AttributeTag, AttributeModifier> Modifiers = new();
-  static AttributeModifier Zero = new() { Mult = 0 };
 
+  public bool IsGrounded { get => GetBoolean(AttributeTag.IsGrounded); set => SetBoolean(AttributeTag.IsGrounded, value); }
   public bool CanMove { get => GetBoolean(AttributeTag.MoveSpeed); set => SetBoolean(AttributeTag.MoveSpeed, value); }
   public bool CanRotate { get => GetBoolean(AttributeTag.TurnSpeed); set => SetBoolean(AttributeTag.TurnSpeed, value); }
   public bool HasGravity { get => GetBoolean(AttributeTag.HasGravity); set => SetBoolean(AttributeTag.HasGravity, value); }
   public bool CanAttack { get => GetBoolean(AttributeTag.CanAttack); set => SetBoolean(AttributeTag.CanAttack, value); }
   public bool IsHittable { get => GetBoolean(AttributeTag.IsHittable); set => SetBoolean(AttributeTag.IsHittable, value); }
   public bool IsDamageable { get => GetBoolean(AttributeTag.IsDamageable); set => SetBoolean(AttributeTag.IsDamageable, value); }
-  public bool IsGrounded { get => GetBoolean(AttributeTag.IsGrounded); set => SetBoolean(AttributeTag.IsGrounded, value); }
-  public bool IsHurt { get => GetBoolean(AttributeTag.IsHurt); set => SetBoolean(AttributeTag.IsHurt, value); }
+  public bool IsHurt { get => GetBool(AttributeTag.IsHurt); set => SetBool(AttributeTag.IsHurt, value); }
   public AbilityTag Tags = 0;
 
   bool GetBoolean(AttributeTag attrib) => Attributes.GetValue(attrib, 1f) > 0f;
@@ -206,9 +226,11 @@ public class Status : MonoBehaviour {
     if (value) {
       Modifiers.Remove(attrib); // reset it to default
     } else {
-      AttributeModifier.Add(Modifiers, attrib, Zero);
+      AttributeModifier.Add(Modifiers, attrib, AttributeModifier.TimesZero);
     }
   }
+  bool GetBool(AttributeTag attrib) => Attributes.GetValue(attrib) > 0f;
+  void SetBool(AttributeTag attrib, bool b) => AttributeModifier.Add(Modifiers, attrib, AttributeModifier.Plus(b ? 1 : 0));
 
   List<StatusEffect> Added = new();
   public StatusEffect Add(StatusEffect effect, OnEffectComplete onComplete = null) {
@@ -258,6 +280,7 @@ public class Status : MonoBehaviour {
     CanAttack = true;
     IsHittable = true;
     IsDamageable = true;
+    IsHurt = false;
     Tags = Upgrades.AbilityTags;
 
     // Steve - This currently uses localtimescale to slow the AnimationDriver

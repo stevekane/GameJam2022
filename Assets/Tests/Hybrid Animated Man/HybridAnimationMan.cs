@@ -11,7 +11,7 @@ public class HybridAnimationMan : MonoBehaviour {
   IEnumerator StunSelfRoutine() {
     Debug.Log("Stunning self");
     var effect = new InlineEffect(s => {
-      s.IsHurt = false;
+      s.IsHurt = true;
     });
     Status.Add(effect);
     for (var i = 0; i < Duration.Ticks; i++) {
