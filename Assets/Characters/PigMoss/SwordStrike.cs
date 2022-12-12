@@ -27,28 +27,28 @@ namespace PigMoss {
       }
     }
 
-    public override void OnStop() {
-      Collider.enabled = false;
-    }
-
     public async Task Routine(TaskScope scope) {
-      var animation = AnimationDriver.Play(scope, Clip);
-      var windup = animation.WaitFrame(ActiveFrameStart.AnimFrames);
-      var lookAt = Waiter.Repeat(Mover.TryLookAt, BlackBoard.Target);
-      await scope.Any(windup, lookAt);
-      var slashPosition = AbilityManager.transform.position;
-      var slashRotation = AbilityManager.transform.rotation;
-      SFXManager.Instance.TryPlayOneShot(SlashSFX);
-      VFXManager.Instance.TrySpawn2DEffect(SlashVFX, slashPosition, slashRotation);
-      Collider.enabled = true;
-      var contact = Waiter.ListenFor(Contact.OnTriggerStaySource);
-      var endActive = animation.WaitFrame(ActiveFrameEnd.AnimFrames);
-      var activeOutcome = await scope.Any(contact, Waiter.Return<Collider>(endActive, null));
-      if (activeOutcome != null && activeOutcome.TryGetComponent(out Hurtbox hurtbox)) {
-        hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject));
+      try {
+        var animation = AnimationDriver.Play(scope, Clip);
+        var windup = animation.WaitFrame(ActiveFrameStart.AnimFrames);
+        var lookAt = Waiter.Repeat(Mover.TryLookAt, BlackBoard.Target);
+        await scope.Any(windup, lookAt);
+        var slashPosition = AbilityManager.transform.position;
+        var slashRotation = AbilityManager.transform.rotation;
+        SFXManager.Instance.TryPlayOneShot(SlashSFX);
+        VFXManager.Instance.TrySpawn2DEffect(SlashVFX, slashPosition, slashRotation);
+        Collider.enabled = true;
+        var contact = Waiter.ListenFor(Contact.OnTriggerStaySource);
+        var endActive = animation.WaitFrame(ActiveFrameEnd.AnimFrames);
+        var activeOutcome = await scope.Any(contact, Waiter.Return<Collider>(endActive, null));
+        if (activeOutcome != null && activeOutcome.TryGetComponent(out Hurtbox hurtbox)) {
+          hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject));
+        }
+        Collider.enabled = false;
+        await animation.WaitDone(scope);
+      } finally {
+        Collider.enabled = false;
       }
-      Collider.enabled = false;
-      await animation.WaitDone(scope);
     }
   }
 }

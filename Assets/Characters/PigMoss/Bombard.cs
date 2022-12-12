@@ -21,24 +21,24 @@ namespace PigMoss {
       return Mathf.Clamp01(BlackBoard.DistanceScore/25f);
     }
 
-    public override void OnStop() {
-      Animator.SetBool("Extended", false);
-    }
-
     public async Task Routine(TaskScope scope) {
-      SFXManager.Instance.TryPlayOneShot(WindupClip);
-      Animator.SetBool("Extended", true);
-      await scope.Delay(Windup);
-      foreach (var launchSite in LaunchSites) {
-        var missile = GameObject.Instantiate(MissilePrefab, launchSite.position, launchSite.rotation);
-        missile.Target = Radius*UnityEngine.Random.onUnitSphere.XZ();
-        SFXManager.Instance.TryPlayOneShot(ShotClip);
-        VFXManager.Instance.TrySpawnEffect(ShotEffect, launchSite.position);
-        await scope.Delay(ShotPeriod);
+      try {
+        SFXManager.Instance.TryPlayOneShot(WindupClip);
+        Animator.SetBool("Extended", true);
+        await scope.Delay(Windup);
+        foreach (var launchSite in LaunchSites) {
+          var missile = GameObject.Instantiate(MissilePrefab, launchSite.position, launchSite.rotation);
+          missile.Target = Radius*UnityEngine.Random.onUnitSphere.XZ();
+          SFXManager.Instance.TryPlayOneShot(ShotClip);
+          VFXManager.Instance.TrySpawnEffect(ShotEffect, launchSite.position);
+          await scope.Delay(ShotPeriod);
+        }
+        SFXManager.Instance.TryPlayOneShot(RecoveryClip);
+        Animator.SetBool("Extended", false);
+        await scope.Delay(Recovery);
+      } finally {
+        Animator.SetBool("Extended", false);
       }
-      SFXManager.Instance.TryPlayOneShot(RecoveryClip);
-      Animator.SetBool("Extended", false);
-      await scope.Delay(Recovery);
     }
   }
 }

@@ -52,13 +52,13 @@ public abstract class Ability : MonoBehaviour {
   }
   public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
   public TriggerCondition GetTriggerCondition(AbilityMethodTask method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
-  public virtual void Stop() {
-    OnStop();
+  public void Stop() {
+    LegacyStop();
     Tags = 0;
     MainScope.Dispose();
     MainScope = new();
   }
-  public virtual void OnStop() { }
+  protected virtual void LegacyStop() { }
   public virtual void Awake() {
     TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.IsTask(this) ? c.Method.GetMethodTask(this) : c.Method.GetMethod(this)] = c);
     MainScope = new();
@@ -82,8 +82,9 @@ public abstract class LegacyAbility : Ability {
     return d;
   }
   public StatusEffect AddStatusEffect(StatusEffect effect, OnEffectComplete onComplete = null) => Status.Add(Using(effect), onComplete);
-  public override void Stop() {
-    base.Stop();
+  public virtual void OnStop() { }
+  protected override void LegacyStop() {
+    OnStop();
     Bundle.Stop();
     Disposables.ForEach(s => s.Dispose());
     Disposables.Clear();
