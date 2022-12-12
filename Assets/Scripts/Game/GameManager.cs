@@ -33,6 +33,8 @@ public class GameManager : MonoBehaviour {
   public GameObject PlayerPrefab;
   public List<Spawn> PlayerSpawns = new();
 
+  public TaskScope GlobalScope = new();
+
   Bundle Bundle = new Bundle();
   Player Player;
 
@@ -54,6 +56,10 @@ public class GameManager : MonoBehaviour {
 
   void Start() {
     Bundle.StartRoutine(new Fiber(Run()));
+  }
+
+  void OnDestroy() {
+    GlobalScope.Cancel();
   }
 
   void FixedUpdate() {
