@@ -36,7 +36,7 @@ public abstract class Ability : MonoBehaviour {
       try {
         scope.ThrowIfCancelled();
         var result = func(scope);
-        if (result != null)
+        if (result != null)  // Can return null if used only as a key for the event.
           await result;
       } catch (OperationCanceledException) {
       } catch (Exception e) {
