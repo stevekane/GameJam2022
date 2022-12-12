@@ -37,7 +37,7 @@ public class AttackAbilityTask : Ability {
       VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
       await Animation.WaitFrame(ActiveEnd.AnimFrames+1)(scope);
       HitBox.enabled = false;
-      CurrentTags.AddFlags(AbilityTag.Cancellable);
+      Tags.AddFlags(AbilityTag.Cancellable);
       await Animation.WaitDone()(scope);
     } finally {
       HitBox.enabled = false;

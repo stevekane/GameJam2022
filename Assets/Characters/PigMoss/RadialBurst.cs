@@ -22,7 +22,7 @@ namespace PigMoss {
     }
 
     public async Task Routine(TaskScope scope) {
-      using var effect = AddStatusEffect(new InlineEffect(status => {
+      using var effect = Status.Add(new InlineEffect(status => {
         status.CanMove = false;
         status.CanRotate = false;
       }));

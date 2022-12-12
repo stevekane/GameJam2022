@@ -13,7 +13,7 @@ public class ScriptedMovementEffect : StatusEffect {
   }
 }
 
-public class SuplexAbility : Ability {
+public class SuplexAbility : LegacyAbility {
   public float MoveSpeed = 10f;
   public float TargetDistance = 5f;
   public float HitRadius = 10f;

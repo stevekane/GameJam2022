@@ -1,29 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-
-[Serializable]
-public class AimAt : AbilityTask {
-  public Transform Aimer;
-  public Transform Target;
-  public float TurnSpeed;
-  public AimAt(Transform aimer, Transform target, float turnSpeed) {
-    Aimer = aimer;
-    Target = target;
-    TurnSpeed = turnSpeed;
-    Enumerator = Routine();
-  }
-  public override IEnumerator Routine() {
-    while (true) {
-      var current = Aimer.rotation;
-      var desired = Quaternion.LookRotation(Target.position.XZ()-Aimer.position.XZ(), Vector3.up);
-      Aimer.rotation = Quaternion.RotateTowards(current, desired, Time.fixedDeltaTime*TurnSpeed);
-      yield return null;
-    }
-  }
-}
 
 [Serializable]
 public class InactiveAttackPhase {

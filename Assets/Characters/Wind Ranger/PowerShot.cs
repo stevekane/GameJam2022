@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class PowerShot : Ability {
+public class PowerShot : LegacyAbility {
   public PowerShotArrow ArrowPrefab;
   public Animator Animator;
   public AnimationClip WindupClip;

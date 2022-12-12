@@ -107,5 +107,12 @@ public class Attributes : MonoBehaviour {
         Attributes.Add(a, attributes.GetModifier(a));
     }
     public float GetValue(AttributeTag attrib, float baseValue = 0f) => GetModifier(attrib).Apply(baseValue);
+
+    // Don't use this!
+    public static Serialized EmptyDontUse = new();
+    Serialized() {
+      foreach (AttributeTag a in Enum.GetValues(typeof(AttributeTag)))
+        Attributes.Add(a, new());
+    }
   }
 }

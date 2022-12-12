@@ -48,7 +48,7 @@ namespace PigMoss {
 
     public async Task Rush(TaskScope scope) {
       try {
-        using var effect = AddStatusEffect(new ScriptedMovementEffect());
+        using var effect = Status.Add(new ScriptedMovementEffect());
         SFXManager.Instance.TryPlayOneShot(RushSFX);
         Trail.Play();
         var direction = AbilityManager.transform.forward.XZ();

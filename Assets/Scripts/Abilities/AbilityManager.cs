@@ -11,24 +11,24 @@ public enum AxisTag {
 }
 
 public class AbilityManager : MonoBehaviour {
-  [HideInInspector] public IAbility[] Abilities;
+  [HideInInspector] public Ability[] Abilities;
   public Optional<Energy> Energy;
   public Bundle Bundle = new();
 
-  public IEnumerable<IAbility> Running { get => Abilities.Where(a => a.IsRunning); }
+  public IEnumerable<Ability> Running { get => Abilities.Where(a => a.IsRunning); }
 
   Dictionary<AxisTag, AxisState> TagToAxis = new();
   // TODO(Task): object => AbilityMethodTask
   Dictionary<object, EventRouter> MethodToEvent = new();
 
-  public void InitAbilities(IAbility[] abilities) {
+  public void InitAbilities(Ability[] abilities) {
     Abilities = abilities;
     Abilities.ForEach(a => a.AbilityManager = this);
   }
 
   public void InterruptAbilities() => Abilities.Where(a => a.IsRunning && !a.Tags.HasAllFlags(AbilityTag.Uninterruptible)).ForEach(a => a.Stop());
   public void CancelOthers() => Abilities.Where(a => a.IsRunning && a.Tags.HasAllFlags(AbilityTag.Cancellable)).ForEach(a => a.Stop());
-  public void CancelOthers(IAbility except) => Abilities.Where(a => a.IsRunning && a != except && a.Tags.HasAllFlags(AbilityTag.Cancellable)).ForEach(a => a.Stop());
+  public void CancelOthers(Ability except) => Abilities.Where(a => a.IsRunning && a != except && a.Tags.HasAllFlags(AbilityTag.Cancellable)).ForEach(a => a.Stop());
 
   public void RegisterAxis(AxisTag tag, AxisState axis) {
     TagToAxis[tag] = axis;
@@ -59,22 +59,22 @@ public class AbilityManager : MonoBehaviour {
   public void TryInvoke(AbilityMethod method) => GetEvent(method).Fire();
   public void TryInvoke(AbilityMethodTask method) => GetEvent(method).Fire();
   public IEnumerator TryRun(AbilityMethod method) {
-    var ability = (IAbility)method.Target;
+    var ability = (Ability)method.Target;
     GetEvent(method).Fire();
     yield return Fiber.While(() => ability.IsRunning);
   }
   public IEnumerator TryRun(AbilityMethodTask method) {
-    var ability = (IAbility)method.Target;
+    var ability = (Ability)method.Target;
     GetEvent(method).Fire();
     yield return Fiber.While(() => ability.IsRunning);
   }
   public async Task TryRun(TaskScope scope, AbilityMethodTask method) {
-    var ability = (IAbility)method.Target;
+    var ability = (Ability)method.Target;
     GetEvent(method).Fire();
     await scope.While(() => ability.IsRunning);
   }
-  EventRouter CreateRouter(AbilityMethod method) => MethodToEvent[method] = new EventRouter((IAbility)method.Target, method);
-  EventRouter CreateRouter(AbilityMethodTask method) => MethodToEvent[method] = new EventRouter((IAbility)method.Target, method);
+  EventRouter CreateRouter(AbilityMethod method) => MethodToEvent[method] = new EventRouter((Ability)method.Target, method);
+  EventRouter CreateRouter(AbilityMethodTask method) => MethodToEvent[method] = new EventRouter((Ability)method.Target, method);
 
   void Awake() {
     InitAbilities(GetComponentsInChildren<Ability>());
@@ -93,13 +93,13 @@ public class AbilityManager : MonoBehaviour {
   class EventRouter : IEventSource {
     IEventSource EventSource;
     Action Action;
-    IAbility Ability;
+    Ability Ability;
     AbilityMethod Method;
     AbilityMethodTask MethodTask;
     TriggerCondition Trigger;
-    public EventRouter(IAbility ability, AbilityMethod method) =>
+    public EventRouter(Ability ability, AbilityMethod method) =>
       (Ability, Method, Trigger) = (ability, method, ability.GetTriggerCondition(method));
-    public EventRouter(IAbility ability, AbilityMethodTask method) =>
+    public EventRouter(Ability ability, AbilityMethodTask method) =>
       (Ability, MethodTask, Trigger) = (ability, method, ability.GetTriggerCondition(method));
     public void ConnectSource(IEventSource evt) => (EventSource = evt).Listen(Fire);
     public void DisconnectSource() => EventSource?.Unlisten(Fire);
@@ -112,13 +112,12 @@ public class AbilityManager : MonoBehaviour {
 
         Ability.AbilityManager.Energy?.Value.Consume(Trigger.EnergyCost);
 
-        var tags = Ability.Tags;
-        Ability.Tags = tags.AddFlags(Trigger.Tags);
+        Ability.Tags.AddFlags(Trigger.Tags);
         Action?.Invoke();
-        if (Method != null) {
+        if (Method != null && Ability is LegacyAbility lab) {
           var enumerator = Method();
           if (enumerator != null) {  // Can be null if used only for event listeners.
-            Ability.StartRoutine(new Fiber(enumerator));
+            lab.StartRoutine(new Fiber(enumerator));
           }
         } else if (MethodTask != null) {
           Ability.MaybeStartTask(MethodTask);
@@ -139,6 +138,6 @@ public class AbilityManager : MonoBehaviour {
       };
       return canRun;
     }
-    bool CanCancel(IAbility other) => Trigger.Tags.HasAllFlags(AbilityTag.CancelOthers) && other.Tags.HasAllFlags(AbilityTag.Cancellable);
+    bool CanCancel(Ability other) => Trigger.Tags.HasAllFlags(AbilityTag.CancelOthers) && other.Tags.HasAllFlags(AbilityTag.Cancellable);
   }
 }

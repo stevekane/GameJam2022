@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using static Fiber;
 
-public class WindRun : Ability {
+public class WindRun : LegacyAbility {
   public Timeval SlowDuration = Timeval.FromMillis(2000);
   public Timeval Duration = Timeval.FromMillis(3000);
   public LayerMask LayerMask;

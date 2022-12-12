@@ -16,26 +16,26 @@ public class ShieldAbility : Ability {
     }, "ShieldInvulnerable");
 
   public async Task HoldStart(TaskScope scope) {
-    Animator.SetBool("Shielding", true);
-    await Windup.Start(scope, Animator, Index);
-    if (Shield && Shield.Hurtbox)
-      Shield.Hurtbox.gameObject.SetActive(true);
-    using (AddStatusEffect(Invulnerable)) {
-      await scope.ListenFor(AbilityManager.GetEvent(HoldRelease));
+    try {
+      Animator.SetBool("Shielding", true);
+      await Windup.Start(scope, Animator, Index);
+      if (Shield && Shield.Hurtbox)
+        Shield.Hurtbox.gameObject.SetActive(true);
+      using (Status.Add(Invulnerable)) {
+        await scope.ListenFor(AbilityManager.GetEvent(HoldRelease));
+      }
+      if (Shield && Shield.Hurtbox)
+        Shield.Hurtbox.gameObject.SetActive(false);
+      Animator.SetBool("Shielding", false);
+      await Recovery.Start(scope, Animator, Index);
+    } finally {
+      Animator.SetBool("Attacking", false);
+      Animator.SetInteger("AttackIndex", -1);
+      Animator.SetFloat("AttackSpeed", 1);
+      Animator.SetBool("Shielding", false);
+      if (Shield && Shield.Hurtbox)
+        Shield.Hurtbox.gameObject.SetActive(false);
     }
-    if (Shield && Shield.Hurtbox)
-      Shield.Hurtbox.gameObject.SetActive(false);
-    Animator.SetBool("Shielding", false);
-    await Recovery.Start(scope, Animator, Index);
   }
   public Task HoldRelease(TaskScope _) => null;
-
-  public override void OnStop() {
-    Animator.SetBool("Attacking", false);
-    Animator.SetInteger("AttackIndex", -1);
-    Animator.SetFloat("AttackSpeed", 1);
-    Animator.SetBool("Shielding", false);
-    if (Shield && Shield.Hurtbox)
-      Shield.Hurtbox.gameObject.SetActive(false);
-  }
 }

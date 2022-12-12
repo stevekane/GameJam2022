@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SmashDash : Ability {
+public class SmashDash : LegacyAbility {
   public float MaxMoveSpeed = 120f;
   public float MinMoveSpeed = 60f;
   public float TurnSpeed = 60f;

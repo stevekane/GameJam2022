@@ -14,9 +14,15 @@ public class PelletAbility : Ability {
   public AudioClip FireSFX;
 
   public async Task AttackStart(TaskScope scope) {
-    await Windup.Start(scope, Animator, Index);
-    await scope.All(ShootRoutine, s => Active.Start(s, Animator, Index));
-    await Recovery.Start(scope, Animator, Index);
+    try {
+      await Windup.Start(scope, Animator, Index);
+      await scope.All(ShootRoutine, s => Active.Start(s, Animator, Index));
+      await Recovery.Start(scope, Animator, Index);
+    } finally {
+      Animator.SetBool("Attacking", false);
+      Animator.SetInteger("AttackIndex", -1);
+      Animator.SetFloat("AttackSpeed", 1);
+    }
   }
 
   async Task ShootRoutine(TaskScope scope) {
@@ -26,11 +32,5 @@ public class PelletAbility : Ability {
       SFXManager.Instance.TryPlayOneShot(FireSFX);
       Bullet.Fire(BulletPrefab, transform.position, transform.forward, gameObject.layer);
     }
-  }
-
-  public override void OnStop() {
-    Animator.SetBool("Attacking", false);
-    Animator.SetInteger("AttackIndex", -1);
-    Animator.SetFloat("AttackSpeed", 1);
   }
 }
