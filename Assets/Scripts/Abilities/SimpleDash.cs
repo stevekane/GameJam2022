@@ -31,9 +31,9 @@ public class SimpleDash : Ability {
       if (dir == Vector3.zero) {
         dir = AbilityManager.transform.forward;
       }
-      AddStatusEffect(ScriptedMove);
+      using var moveEffect = Status.Add(ScriptedMove);
       await AnimationDriver.Play(scope, DashWindupClip).WaitDone(scope);
-      AddStatusEffect(Invulnerable);
+      using var invulnEffect = Status.Add(Invulnerable);
       AnimationDriver.Play(scope, DashingClip); // don't wait
       await scope.Any(
         s => s.Delay(DashDuration),

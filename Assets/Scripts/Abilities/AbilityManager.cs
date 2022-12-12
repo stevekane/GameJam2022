@@ -114,10 +114,10 @@ public class AbilityManager : MonoBehaviour {
 
         Ability.Tags.AddFlags(Trigger.Tags);
         Action?.Invoke();
-        if (Method != null) {
+        if (Method != null && Ability is LegacyAbility lab) {
           var enumerator = Method();
           if (enumerator != null) {  // Can be null if used only for event listeners.
-            Ability.StartRoutine(new Fiber(enumerator));
+            lab.StartRoutine(new Fiber(enumerator));
           }
         } else if (MethodTask != null) {
           Ability.MaybeStartTask(MethodTask);

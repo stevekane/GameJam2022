@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class LightAttackAbility : Ability {
+public class LightAttackAbility : LegacyAbility {
   public Transform Owner;
   public Animator Animator;
   public AnimationClip Clip;

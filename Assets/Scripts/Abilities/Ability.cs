@@ -16,8 +16,6 @@ public class TriggerCondition {
 
 [Serializable]
 public abstract class Ability : MonoBehaviour {
-  protected Bundle Bundle = new();
-  protected List<IDisposable> Disposables = new();
   public AbilityManager AbilityManager { get; set; }
   public AnimationDriver AnimationDriver => AbilityManager.GetComponent<AnimationDriver>();
   public BlackBoard BlackBoard => AbilityManager.GetComponent<BlackBoard>();
@@ -29,12 +27,7 @@ public abstract class Ability : MonoBehaviour {
   Dictionary<object, TriggerCondition> TriggerConditionsMap = new();
   [HideInInspector] public AbilityTag Tags;  // Inherited from the Trigger when started
   public virtual float Score() => 0;
-  public bool IsRunning { get => Bundle.IsRunning || ActiveTasks.Count > 0; }
-  public IEnumerator Running => Bundle;
-  public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
-  public void StopRoutine(Fiber routine) => Bundle.StopRoutine(routine);
-  // Adapter to run a Task using Fiber tech. Temporary.
-  // TODO: if/when this goes away, we'll need a Task-only notion of IsRunning. Should we keep track of active tasks somehow?
+  public virtual bool IsRunning { get => ActiveTasks.Count > 0; }
   TaskScope MainScope = new();
   List<AbilityMethodTask> ActiveTasks = new();  // TODO(task): could just be a refcount instead?
   public void MaybeStartTask(AbilityMethodTask func) {
@@ -57,28 +50,43 @@ public abstract class Ability : MonoBehaviour {
     ActiveTasks.Add(func);
     TaskScope.Start(task);
   }
+  public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
+  public TriggerCondition GetTriggerCondition(AbilityMethodTask method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
+  public virtual void Stop() {
+    OnStop();
+    Tags = 0;
+    MainScope.Dispose();
+    MainScope = new();
+  }
+  public virtual void OnStop() { }
+  public virtual void Awake() {
+    TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.IsTask(this) ? c.Method.GetMethodTask(this) : c.Method.GetMethod(this)] = c);
+    MainScope = new();
+  }
+  public virtual void OnDestroy() => Stop();
+}
+
+// Legacy support for old Fiber-based Abilities.
+[Serializable]
+public abstract class LegacyAbility : Ability {
+  protected Bundle Bundle = new();
+  public override bool IsRunning { get => Bundle.IsRunning; }
+  public IEnumerator Running => Bundle;
+  public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
+  public Listener FiberListenFor(IEventSource evt) => Fiber.ListenFor(evt);
+  public Listener<T> FiberListenFor<T>(IEventSource<T> evt) => Fiber.ListenFor(evt);
+  public Listener FiberListenFor(AbilityMethod method) => Fiber.ListenFor(AbilityManager.GetEvent(method));
+  protected List<IDisposable> Disposables = new();
   public T Using<T>(T d) where T : IDisposable {
     Disposables.Add(d);
     return d;
   }
   public StatusEffect AddStatusEffect(StatusEffect effect, OnEffectComplete onComplete = null) => Status.Add(Using(effect), onComplete);
-  public Listener FiberListenFor(IEventSource evt) => Fiber.ListenFor(evt);
-  public Listener<T> FiberListenFor<T>(IEventSource<T> evt) => Fiber.ListenFor(evt);
-  public Listener FiberListenFor(AbilityMethod method) => Fiber.ListenFor(AbilityManager.GetEvent(method));
-  public void Stop() {
-    OnStop();
-    Tags = 0;
+  public override void Stop() {
+    base.Stop();
     Bundle.Stop();
     Disposables.ForEach(s => s.Dispose());
     Disposables.Clear();
-    MainScope.Dispose();
-    MainScope = new();
-  }
-  public virtual void OnStop() { }
-  public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
-  public TriggerCondition GetTriggerCondition(AbilityMethodTask method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
-  void Start() {
-    MainScope = new();
   }
   public virtual void FixedUpdate() {
     var isRunning = Bundle.IsRunning;
@@ -87,6 +95,4 @@ public abstract class Ability : MonoBehaviour {
       Stop();
     }
   }
-  public virtual void Awake() => TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.IsTask(this) ? c.Method.GetMethodTask(this) : c.Method.GetMethod(this)] = c);
-  public virtual void OnDestroy() => Stop();
 }

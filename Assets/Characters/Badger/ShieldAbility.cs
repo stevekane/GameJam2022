@@ -20,7 +20,7 @@ public class ShieldAbility : Ability {
     await Windup.Start(scope, Animator, Index);
     if (Shield && Shield.Hurtbox)
       Shield.Hurtbox.gameObject.SetActive(true);
-    using (AddStatusEffect(Invulnerable)) {
+    using (Status.Add(Invulnerable)) {
       await scope.ListenFor(AbilityManager.GetEvent(HoldRelease));
     }
     if (Shield && Shield.Hurtbox)

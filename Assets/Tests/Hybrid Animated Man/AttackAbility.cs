@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackAbility : Ability {
+public class AttackAbility : LegacyAbility {
   [SerializeField] Timeval WindupEnd;
   [SerializeField] Timeval ActiveEnd;
   [SerializeField] Timeval RecoveryEnd;

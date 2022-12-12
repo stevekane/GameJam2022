@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using static Fiber;
 
-public class GrappleAbility : Ability {
+public class GrappleAbility : LegacyAbility {
   enum GrappleState { Holding, Throwing, Pulling }
   enum ThrowResult { Hit, None }
 

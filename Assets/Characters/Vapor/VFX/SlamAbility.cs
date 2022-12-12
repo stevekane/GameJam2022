@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class SlamAbility : Ability {
+public class SlamAbility : LegacyAbility {
   Animator Animator;
   public AnimationClip Clip;
   public Timeval WindupDuration;

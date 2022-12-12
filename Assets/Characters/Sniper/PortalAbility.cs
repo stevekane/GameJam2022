@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class PortalAbility : Ability {
+public class PortalAbility : LegacyAbility {
   public IStoppableValue<Vector3> GetPortalDirection;
   public GameObject PortalPrefab;
   public Timeval FaceDuration = Timeval.FromSeconds(1);

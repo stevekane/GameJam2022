@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class ParryAbility : Ability {
+public class ParryAbility : LegacyAbility {
   [SerializeField] Hurtbox Hurtbox;
   [SerializeField] Timeval BlockDuration = Timeval.FromAnimFrames(15, 30);
   [SerializeField] MeleeAbility RiposteAbility;

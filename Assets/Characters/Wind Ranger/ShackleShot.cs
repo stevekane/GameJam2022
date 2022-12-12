@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class ShackleShot : Ability {
+public class ShackleShot : LegacyAbility {
   public ShackleShotShackle ShacklePrefab;
   public Animator Animator;
   public AnimationClip WindupClip;

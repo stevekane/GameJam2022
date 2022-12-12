@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using static Fiber;
 
-public class FocusFire : Ability {
+public class FocusFire : LegacyAbility {
   public FocusFireArrow ArrowPrefab;
   public AnimationClip FireClip;
   public LayerMask LayerMask;

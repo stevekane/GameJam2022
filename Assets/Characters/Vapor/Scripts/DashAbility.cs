@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class DashAbility : Ability {
+public class DashAbility : LegacyAbility {
   [SerializeField] float MoveSpeedFactor = 3f;
   [SerializeField] ParticleSystem Particles;
   [SerializeField] AudioClip AudioClip;

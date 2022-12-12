@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MetamorphAbility : Ability {
+public class MetamorphAbility : LegacyAbility {
   public Timeval Duration = Timeval.FromSeconds(10f);
   public AttributeModifier DamageModifier = new() { Mult = 2 };
   public AttributeModifier KnockbackModifier = new() { Mult = 1.5f };

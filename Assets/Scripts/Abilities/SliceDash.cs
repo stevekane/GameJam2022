@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SliceDash : Ability {
+public class SliceDash : LegacyAbility {
   public float MoveSpeed = 100f;
   public Timeval WindupDuration = Timeval.FromAnimFrames(2, 30);
   public Timeval Duration = Timeval.FromSeconds(.3f);
