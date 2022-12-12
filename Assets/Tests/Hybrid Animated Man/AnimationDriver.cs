@@ -220,6 +220,11 @@ public class AnimationDriver : MonoBehaviour {
   AnimationJobTask Task = null;
 
   void Awake() {
+    #if UNITY_EDITOR
+    if (!Animator) {
+      Debug.LogError($"AnimationDriver must have Animator reference to initialize", this);
+    }
+    #endif
     Graph = PlayableGraph.Create("Animation Driver");
     Output = AnimationPlayableOutput.Create(Graph, "Animation Driver", Animator);
     AnimatorController = AnimatorControllerPlayable.Create(Graph, Animator.runtimeAnimatorController);

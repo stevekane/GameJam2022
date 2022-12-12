@@ -32,12 +32,16 @@ public class Mover : MonoBehaviour {
     return Quaternion.RotateTowards(currentRotation, desiredRotation, degrees);
   }
 
+  // TODO: These feel like things that maybe should be Attributes?
+  // The weird bit here is that we don't want velocity wiped out every frame
+  // and Gravity is probably a constant value. Today, Gravity could be made "constant"
+  // by defining its base value
   public float Gravity;
+  public Vector3 Velocity { get; private set; }
+  public Vector3 LocalScaledVelocity { get; private set; }
 
   [SerializeField] Animator Animator;
-  [SerializeField] float IdleThreshold = 0.1f;
 
-  Vector3 Velocity;
   CharacterController Controller;
   Attributes Attributes;
   Status Status;
@@ -76,34 +80,21 @@ public class Mover : MonoBehaviour {
     GetAxes(AbilityManager, out var desiredMoveDir, out var desiredFacing);
     var localTimeScale = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
     var velocity = Attributes.GetValue(AttributeTag.MoveSpeed) * desiredMoveDir;
-    var localVelocity = localTimeScale * velocity;
-    Velocity.SetXZ(localVelocity);
     var gravity = Time.fixedDeltaTime * Gravity;
     var localGravity = localTimeScale * gravity;
-    Velocity.y = Controller.isGrounded ? gravity : Velocity.y+gravity;
-    if (!Status.HasGravity)
-      Velocity.y = 0f;
-    Controller.Move(Time.fixedDeltaTime * Velocity);
+    velocity.y = Status.HasGravity switch {
+      true => Controller.isGrounded switch {
+        true => gravity,
+        false => Velocity.y+gravity
+      },
+      false => 0
+    };
+    Velocity = velocity;
+    LocalScaledVelocity = localTimeScale * Velocity;
+    Controller.Move(Time.fixedDeltaTime * LocalScaledVelocity);
     Status.IsGrounded = Controller.isGrounded;
     var turnSpeed = Attributes.GetValue(AttributeTag.TurnSpeed);
     var localTurnSpeed = localTimeScale * turnSpeed;
     transform.rotation = RotationFromDesired(transform.forward, localTurnSpeed, desiredFacing);
-    if (Animator) {
-      var orientedVelocity = Quaternion.Inverse(transform.rotation)*Velocity;
-      var moveSpeed = Attributes.GetValue(AttributeTag.MoveSpeed);
-      // THIS IS NONSCALED VELOCITY!
-      // We want to continue to animate as if we were not slowed
-      if (moveSpeed > 0 && velocity.XZ().magnitude > IdleThreshold) {
-        Animator.SetBool("Moving", true);
-        Animator.SetFloat("RightVelocity", orientedVelocity.x/moveSpeed);
-        Animator.SetFloat("ForwardVelocity", orientedVelocity.z/moveSpeed);
-      } else {
-        Animator.SetBool("Moving", false);
-        Animator.SetFloat("RightVelocity", 0);
-        Animator.SetFloat("ForwardVelocity", 0);
-      }
-      Animator.SetBool("IsGrounded", Status.IsGrounded);
-      Animator.SetBool("IsHurt", Status.IsHurt);
-    }
   }
 }
