@@ -204,6 +204,8 @@ public static class Waiter {
   public static TaskFunc Repeat<T>(Action<T> f, T arg) => s => s.Repeat(() => f(arg));
   public static TaskFunc Repeat(TaskFunc f) => s => s.Repeat(f);
   public static TaskFunc Repeat(int n, TaskFunc f) => s => s.Repeat(n, f);
+  public static TaskFunc Any(params TaskFunc[] fs) => s => s.Any(fs);
+  public static TaskFunc All(params TaskFunc[] fs) => s => s.All(fs);
   public static TaskFunc ListenFor(IEventSource evt) => s => s.ListenFor(evt);
   public static TaskFunc<T> ListenFor<T>(IEventSource<T> evt) => s => s.ListenFor(evt);
   public static TaskFunc<int> ListenForAll<T>(IEventSource<T> evt, T[] results) => s => s.ListenForAll(evt, results);

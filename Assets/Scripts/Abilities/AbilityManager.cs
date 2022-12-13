@@ -14,6 +14,7 @@ public class AbilityManager : MonoBehaviour {
   [HideInInspector] public Ability[] Abilities;
   public Optional<Energy> Energy;
   public Bundle Bundle = new();
+  public TaskScope MainScope = new();
 
   public IEnumerable<Ability> Running { get => Abilities.Where(a => a.IsRunning); }
 
