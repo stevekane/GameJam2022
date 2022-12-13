@@ -25,18 +25,9 @@ public class Character : MonoBehaviour {
   void FixedUpdate() {
     var animator = AnimationDriver.Animator;
     var velocity = Mover.Velocity;
-    var moveSpeed = Attributes.GetValue(AttributeTag.MoveSpeed);
     var orientedVelocity = Quaternion.Inverse(transform.rotation)*Mover.Velocity;
-    // We want to continue to animate as if we were not slowed
-    if (moveSpeed > 0 && Mover.Velocity.XZ().magnitude > IdleThreshold) {
-      animator.SetBool("Moving", true);
-      animator.SetFloat("RightVelocity", orientedVelocity.x/moveSpeed);
-      animator.SetFloat("ForwardVelocity", orientedVelocity.z/moveSpeed);
-    } else {
-      animator.SetBool("Moving", false);
-      animator.SetFloat("RightVelocity", 0);
-      animator.SetFloat("ForwardVelocity", 0);
-    }
+    animator.SetFloat("RightVelocity", orientedVelocity.x);
+    animator.SetFloat("ForwardVelocity", orientedVelocity.z);
     animator.SetBool("IsGrounded", Status.IsGrounded);
     animator.SetBool("IsHurt", Status.IsHurt);
     TorsoRotationConstraint.weight = Mathf.MoveTowards(TorsoRotationConstraint.weight, Status.IsHurt ? 0 : 1, 1/(float)ConstraintBlendFrames);
@@ -44,14 +35,9 @@ public class Character : MonoBehaviour {
     // Use localtimescale to slow the AnimationDriver
     var localSpeed = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
     if (localSpeed < 1) {
-      if (AnimationDriver) {
-        AnimationDriver.SetSpeed(localSpeed);
-      }
+      AnimationDriver.SetSpeed(localSpeed);
     } else {
-      if (AnimationDriver) {
-        AnimationDriver.SetSpeed(AnimationDriver.BaseSpeed);
-      }
+      AnimationDriver.SetSpeed(AnimationDriver.BaseSpeed);
     }
-
   }
 }
