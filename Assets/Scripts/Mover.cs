@@ -62,6 +62,14 @@ public class Mover : MonoBehaviour {
     }
   }
 
+  public Vector3 GetMove() {
+    return AbilityManager.GetAxis(AxisTag.Move).XZ;
+  }
+
+  public Vector3 GetAim() {
+    return AbilityManager.GetAxis(AxisTag.Aim).XZ;
+  }
+
   public void SetMove(Vector3 v) {
     AbilityManager.GetAxis(AxisTag.Move).Update(0, new Vector2(v.x, v.z));
   }
