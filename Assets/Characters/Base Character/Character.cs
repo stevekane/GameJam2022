@@ -26,11 +26,13 @@ public class Character : MonoBehaviour {
     var animator = AnimationDriver.Animator;
     var velocity = Mover.Velocity;
     var orientedVelocity = Quaternion.Inverse(transform.rotation)*Mover.Velocity;
-    animator.SetFloat("RightVelocity", orientedVelocity.x);
-    animator.SetFloat("ForwardVelocity", orientedVelocity.z);
+    var moveSpeed = Attributes.GetValue(AttributeTag.MoveSpeed);
+    animator.SetFloat("RightVelocity", moveSpeed > 0 ? orientedVelocity.x/moveSpeed : 0);
+    animator.SetFloat("ForwardVelocity", moveSpeed > 0 ? orientedVelocity.z/moveSpeed : 0);
     animator.SetBool("IsGrounded", Status.IsGrounded);
     animator.SetBool("IsHurt", Status.IsHurt);
-    TorsoRotationConstraint.weight = Mathf.MoveTowards(TorsoRotationConstraint.weight, Status.IsHurt ? 0 : 1, 1/(float)ConstraintBlendFrames);
+    // TorsoRotationConstraint.weight = Mathf.MoveTowards(TorsoRotationConstraint.weight, Status.IsHurt ? 0 : 1, 1/(float)ConstraintBlendFrames);
+    TorsoRotationConstraint.weight = 0;
     HeadAimConstraint.weight = 0;
     // Use localtimescale to slow the AnimationDriver
     var localSpeed = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
