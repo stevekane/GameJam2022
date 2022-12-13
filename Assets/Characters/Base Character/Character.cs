@@ -19,7 +19,6 @@ public class Character : MonoBehaviour {
   [field:SerializeField] public MultiRotationConstraint TorsoRotationConstraint { get; private set; }
   [field:SerializeField] public MultiAimConstraint HeadAimConstraint { get; private set; }
 
-  [SerializeField] float IdleThreshold = 0.1f;
   [SerializeField] int ConstraintBlendFrames = 4;
 
   void FixedUpdate() {
