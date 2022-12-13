@@ -463,7 +463,7 @@ MonoBehaviour:
     ModeOverride: 1
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7772567, y: 1}
+    m_SensorSize: {x: 1.7777778, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -561,7 +561,7 @@ MonoBehaviour:
     ModeOverride: 2
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7772567, y: 1}
+    m_SensorSize: {x: 1.7777778, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -586,6 +586,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
+--- !u!114 &689612502 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6229237289894470566, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+  m_PrefabInstance: {fileID: 1818372311507013568}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a37b963004c28f4facd7211d042f0ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &744091290
 GameObject:
   m_ObjectHideFlags: 3
@@ -634,7 +645,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_NoiseProfile: {fileID: 11400000, guid: 69ce8388f6785dd4c8c39915efece2f4, type: 2}
   m_PivotOffset: {x: 0, y: 0, z: 0}
-  m_AmplitudeGain: 1.308837e-10
+  m_AmplitudeGain: 0.0001004358
   m_FrequencyGain: 10
   mNoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!114 &744091293
@@ -743,7 +754,7 @@ MonoBehaviour:
     ModeOverride: 2
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7772567, y: 1}
+    m_SensorSize: {x: 1.7777778, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -1662,7 +1673,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh110642
+  m_Name: pb_Mesh110624
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -2242,6 +2253,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1818372311317487525, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+      propertyPath: ButtonMaps.Array.data[2].Entry.Ability
+      value: 
+      objectReference: {fileID: 689612502}
+    - target: {fileID: 1818372311317487525, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+      propertyPath: ButtonMaps.Array.data[3].Entry.Ability
+      value: 
+      objectReference: {fileID: 689612502}
     - target: {fileID: 2433174380011465399, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
       propertyPath: m_Name
       value: Model
@@ -2253,26 +2272,6 @@ PrefabInstance:
     - target: {fileID: 2433787914194279215, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
       propertyPath: m_IsActive
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2994083438686922390, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
-      propertyPath: HitConfig.KnockbackType
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2994083438686922390, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
-      propertyPath: HitConfig.RecoilStrength
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 2994083438686922390, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
-      propertyPath: HitConfig.KnockbackStrength
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 2994083438686922390, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
-      propertyPath: HitConfig.StunDuration.Millis
-      value: 1000
-      objectReference: {fileID: 0}
-    - target: {fileID: 2994083438686922390, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
-      propertyPath: HitConfig.HitStopDuration.Millis
-      value: 500
       objectReference: {fileID: 0}
     - target: {fileID: 3190141033397718553, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
       propertyPath: m_Enabled
