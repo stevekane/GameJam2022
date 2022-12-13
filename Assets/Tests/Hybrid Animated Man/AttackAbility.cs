@@ -1,15 +1,16 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public class AttackAbility : LegacyAbility {
+public class AttackAbility : Ability {
   [SerializeField] Timeval WindupEnd;
+  [SerializeField] Timeval ChargeEnd;
   [SerializeField] Timeval ActiveEnd;
   [SerializeField] Timeval RecoveryEnd;
   [SerializeField] HitConfig HitConfig;
+  [SerializeField] AnimationCurve ChargeScaling = AnimationCurve.Linear(0f, .5f, 1f, 1f);
   [SerializeField] Vibrator Vibrator;
-  [SerializeField] Animator Animator;
   [SerializeField] AnimationJobConfig AttackAnimation;
   [SerializeField] TriggerEvent TriggerEvent;
   [SerializeField] Collider HitBox;
@@ -19,49 +20,58 @@ public class AttackAbility : LegacyAbility {
 
   [NonSerialized] Collider[] Hits = new Collider[16];
   [NonSerialized] HashSet<Collider> PhaseHits = new();
-  [NonSerialized] AnimationJobFacade Animation = null;
+  [NonSerialized] AnimationJobTask Animation = null;
 
-  public override void OnStop() {
-    HitBox.enabled = false;
+  public Task Attack(TaskScope scope) => Main(scope, false);
+  public Task ChargeAttack(TaskScope scope) => Main(scope, true);
+  public Task ChargeRelease(TaskScope scope) => null;
+
+  async Task Main(TaskScope scope, bool chargeable) {
+    Animation = AnimationDriver.Play(scope, AttackAnimation);
+    HitConfig hitConfig = HitConfig;
+    if (chargeable) {
+      var startFrame = Timeval.TickCount;
+      await scope.Any(Charge, ListenFor(ChargeRelease));
+      var numFrames = Timeval.TickCount - startFrame;
+      var chargeScaling = ChargeScaling.Evaluate((float)numFrames / ChargeEnd.Ticks);
+      await Animation.WaitFrame(WindupEnd.AnimFrames)(scope);
+      hitConfig = hitConfig.Scale(chargeScaling);
+    } else {
+      await Animation.WaitFrame(WindupEnd.AnimFrames)(scope);
+    }
     PhaseHits.Clear();
-    Animation?.OnFrame.Unlisten(OnFrame);
+    var rotation = AbilityManager.transform.rotation;
+    var vfxOrigin = AbilityManager.transform.TransformPoint(AttackVFXOffset);
+    SFXManager.Instance.TryPlayOneShot(AttackSFX);
+    VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
+    await scope.Any(Animation.WaitFrame(ActiveEnd.AnimFrames+1), Waiter.Repeat(OnHit(hitConfig)));
+    Tags.AddFlags(AbilityTag.Cancellable);
+    await Animation.WaitDone()(scope);
   }
 
-  public IEnumerator Attack() {
-    var handleHits = Fiber.Repeat(OnHit);
-    Animation = AnimationDriver.Play(AttackAnimation);
-    Animation.OnFrame.Listen(OnFrame);
-    yield return Fiber.Any(Animation, handleHits);
-  }
-
-  void OnFrame(int frame) {
-    HitBox.enabled = frame >= WindupEnd.AnimFrames && frame <= ActiveEnd.AnimFrames;
-    if (frame == WindupEnd.AnimFrames) {
-      var position = AbilityManager.transform.position;
-      var rotation = AbilityManager.transform.rotation;
-      var vfxOrigin = AbilityManager.transform.TransformPoint(AttackVFXOffset);
-      SFXManager.Instance.TryPlayOneShot(AttackSFX);
-      var vfx = VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
-      vfx.transform.SetParent(AbilityManager.transform, true);
-    }
-    if (frame >= ActiveEnd.AnimFrames) {
-      Tags.AddFlags(AbilityTag.Cancellable);
+  async Task Charge(TaskScope scope) {
+    try {
+      await Animation.WaitFrame(1)(scope);
+      Animation.Pause();
+      await scope.Delay(ChargeEnd);
+    } finally {
+      Animation.Resume();
     }
   }
 
-  IEnumerator OnHit() {
-    var hitDetection = Fiber.ListenForAll(TriggerEvent.OnTriggerStaySource, Hits);
-    yield return hitDetection;
-    var hitCount = hitDetection.Value;
-    var attacker = AbilityManager.transform;
-    for (var i = 0; i < hitCount; i++) {
-      var hit = Hits[i];
-      var contact = hit.transform.position;
-      var rotation = AbilityManager.transform.rotation;
-      if (!PhaseHits.Contains(hit) && hit.TryGetComponent(out Hurtbox hurtbox)) {
-        hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject));
-        PhaseHits.Add(hit);
+  TaskFunc OnHit(HitConfig hitConfig) => async (TaskScope scope) => {
+    try {
+      HitBox.enabled = true;
+      var hitCount = await scope.ListenForAll(TriggerEvent.OnTriggerStaySource, Hits);
+      for (var i = 0; i < hitCount; i++) {
+        var hit = Hits[i];
+        if (!PhaseHits.Contains(hit) && hit.TryGetComponent(out Hurtbox hurtbox)) {
+          hurtbox.TryAttack(new HitParams(hitConfig, Attributes));
+          PhaseHits.Add(hit);
+        }
       }
+    } finally {
+      HitBox.enabled = false;
     }
-  }
+  };
 }
