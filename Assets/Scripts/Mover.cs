@@ -78,7 +78,11 @@ public class Mover : MonoBehaviour {
     AbilityManager.GetAxis(AxisTag.Aim).Update(0, new Vector2(v.x, v.z));
   }
 
-  bool WasGrounded = true;
+  Vector3 MoveAccum;
+  public void Move(Vector3 delta) {
+    MoveAccum += delta;
+  }
+
   void FixedUpdate() {
     GetAxes(AbilityManager, out var desiredMoveDir, out var desiredFacing);
     var localTimeScale = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
@@ -86,18 +90,19 @@ public class Mover : MonoBehaviour {
     // Move
     var desiredVelocity = Attributes.GetValue(AttributeTag.MoveSpeed) * desiredMoveDir;
     Velocity.SetXZ(desiredVelocity);
-    desiredVelocity.y = WasGrounded ? -.1f : 0f;  // hack to force the controller to keep us grounded
-    Controller.Move(localTimeScale * Time.fixedDeltaTime * desiredVelocity);
-    if (!Controller.isGrounded) {
-      if (Status.HasGravity) {
-        Velocity.y += (localTimeScale * Time.fixedDeltaTime * Attributes.GetValue(AttributeTag.Gravity));
-      } else {
-        Velocity.y = 0;
-      }
-      Controller.Move(localTimeScale * Time.fixedDeltaTime * Vector3.up*Velocity.y);
+    if (Status.HasGravity) {
+      Velocity.y += (localTimeScale * Time.fixedDeltaTime * Attributes.GetValue(AttributeTag.Gravity));
+    } else {
+      Velocity.y = 0;
     }
-    WasGrounded = Controller.isGrounded;
+    Controller.Move(localTimeScale * Time.fixedDeltaTime * Velocity + MoveAccum);
+    MoveAccum = Vector3.zero;
+
+    var groundedCheck = new Vector3(0, -.1f, 0f);
+    var realPosition = transform.position;
+    Controller.Move(groundedCheck);
     Status.IsGrounded = Controller.isGrounded;
+    transform.position = realPosition;
 
     // Turn
     var turnSpeed = Attributes.GetValue(AttributeTag.TurnSpeed);
