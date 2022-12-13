@@ -109,7 +109,7 @@ MonoBehaviour:
     Tags: 33
     RequiredOwnerTags: 0
     EnergyCost: 0
-  CurrentTags: 0
+  Tags: 0
   WindupEnd:
     Millis: 0
     FramesPerSecond: 24
@@ -235,6 +235,7 @@ MonoBehaviour:
   <TorsoRotationConstraint>k__BackingField: {fileID: 3387614635464300406}
   <HeadAimConstraint>k__BackingField: {fileID: 3344066516362887013}
   IdleThreshold: 0.1
+  ConstraintBlendFrames: 4
 --- !u!114 &5877782677189505306
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -260,7 +261,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Gravity: -24
+  Gravity: -60
   Animator: {fileID: 2347714126523969063}
 --- !u!114 &1818372311317487525
 MonoBehaviour:
@@ -290,6 +291,16 @@ MonoBehaviour:
     Entry:
       Ability: {fileID: 2296086977565652357}
       MethodName: Attack
+  - ButtonCode: 1
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 5212089753699858940}
+      MethodName: Activate
+  - ButtonCode: 1
+    ButtonPressType: 2
+    Entry:
+      Ability: {fileID: 5212089753699858940}
+      MethodName: Release
   AxisMaps:
   - AxisCode: 0
     AxisTag: 0
@@ -320,6 +331,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba179080412a6af41a99d021d690c5fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Abilities: []
   Bundle:
     Fibers: []
     Added: []
@@ -480,6 +492,71 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.75, z: 0}
+--- !u!1 &2851009047071724758
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2954125638789249167}
+  - component: {fileID: 5212089753699858940}
+  m_Layer: 0
+  m_Name: Jump
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2954125638789249167
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2851009047071724758}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3735475313303821151}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5212089753699858940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2851009047071724758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 045e21c2a67f9024cbdfe7a293ed0fa8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TriggerConditions:
+  - Method:
+      MethodName: Activate
+    Tags: 2
+    RequiredOwnerTags: 0
+    EnergyCost: 0
+  - Method:
+      MethodName: Release
+    Tags: 4
+    RequiredOwnerTags: 0
+    EnergyCost: 0
+  Tags: 0
+  Speed: 40
+  Drag: 5
+  MinDuration:
+    Millis: 33.333332
+    FramesPerSecond: 30
+  MaxDuration:
+    Millis: 300
+    FramesPerSecond: 30
+  WindupClip: {fileID: 0}
 --- !u!1 &3029934277970986301
 GameObject:
   m_ObjectHideFlags: 0
@@ -926,7 +1003,7 @@ MonoBehaviour:
     Tags: 33
     RequiredOwnerTags: 0
     EnergyCost: 0
-  CurrentTags: 0
+  Tags: 0
   WindupEnd:
     Millis: 0
     FramesPerSecond: 24
@@ -1010,13 +1087,13 @@ MonoBehaviour:
     Tags: 1
     RequiredOwnerTags: 0
     EnergyCost: 0
-  CurrentTags: 0
-  MaxMoveSpeed: 60
-  MinMoveSpeed: 60
-  TurnSpeed: 60
+  Tags: 0
+  MaxMoveSpeed: 45
+  MinMoveSpeed: 45
+  TurnSpeed: 45
   DashDuration:
-    Millis: 166.66667
-    FramesPerSecond: 30
+    Millis: 83.333336
+    FramesPerSecond: 60
   DashWindupClip: {fileID: 7400000, guid: 2a60e9b2764640043a7ce8027822d075, type: 2}
   DashingClip: {fileID: 7400000, guid: a41ecc2b2a8aa7a4e9a4647f0beb06dd, type: 2}
   DoneClip: {fileID: 7400000, guid: 654d990bb8222c54ea70a2a9aa54ef2e, type: 2}
@@ -1051,6 +1128,7 @@ Transform:
   - {fileID: 6761219406680722472}
   - {fileID: 6953022511117550157}
   - {fileID: 8426644276464679234}
+  - {fileID: 2954125638789249167}
   m_Father: {fileID: 1818372311317487517}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

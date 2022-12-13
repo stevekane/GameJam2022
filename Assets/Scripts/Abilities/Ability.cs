@@ -50,6 +50,7 @@ public abstract class Ability : MonoBehaviour {
     ActiveTasks.Add(func);
     TaskScope.Start(task);
   }
+  public TaskFunc ListenFor(AbilityMethodTask method) => s => s.ListenFor(AbilityManager.GetEvent(method));
   public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
   public TriggerCondition GetTriggerCondition(AbilityMethodTask method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
   public void Stop() {
