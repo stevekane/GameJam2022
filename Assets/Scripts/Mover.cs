@@ -32,12 +32,7 @@ public class Mover : MonoBehaviour {
     return Quaternion.RotateTowards(currentRotation, desiredRotation, degrees);
   }
 
-  // TODO: These feel like things that maybe should be Attributes?
-  // The weird bit here is that we don't want velocity wiped out every frame
-  // and Gravity is probably a constant value. Today, Gravity could be made "constant"
-  // by defining its base value
-  public Vector3 Velocity { get; private set; }
-  public Vector3 LocalScaledVelocity { get; private set; }
+  public Vector3 Velocity;
 
   [SerializeField] Animator Animator;
 
@@ -78,19 +73,20 @@ public class Mover : MonoBehaviour {
   void FixedUpdate() {
     GetAxes(AbilityManager, out var desiredMoveDir, out var desiredFacing);
     var localTimeScale = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
-    var velocity = Attributes.GetValue(AttributeTag.MoveSpeed) * desiredMoveDir;
-    var gravity = Time.fixedDeltaTime * Attributes.GetValue(AttributeTag.Gravity);
-    var localGravity = localTimeScale * gravity;
-    velocity.y = Status.HasGravity switch {
-      true => Controller.isGrounded switch {
-        true => gravity,
-        false => Velocity.y+gravity
-      },
-      false => 0
-    };
-    Velocity = velocity;
-    LocalScaledVelocity = localTimeScale * Velocity;
-    Controller.Move(Time.fixedDeltaTime * LocalScaledVelocity);
+    var desiredVelocity = Attributes.GetValue(AttributeTag.MoveSpeed) * desiredMoveDir;
+    Velocity.x = desiredVelocity.x;
+    Velocity.z = desiredVelocity.z;
+    Controller.Move(localTimeScale * Time.fixedDeltaTime * desiredVelocity.XZ());
+    if (Controller.isGrounded) {
+      Controller.Move(10*Vector3.down);
+    } else {
+      if (Status.HasGravity) {
+        Velocity.y += (localTimeScale * Time.fixedDeltaTime * Attributes.GetValue(AttributeTag.Gravity));
+      } else {
+        Velocity.y = 0;
+      }
+      Controller.Move(localTimeScale * Time.fixedDeltaTime * Vector3.up*Velocity.y);
+    }
     Status.IsGrounded = Controller.isGrounded;
     var turnSpeed = Attributes.GetValue(AttributeTag.TurnSpeed);
     var localTurnSpeed = localTimeScale * turnSpeed;
