@@ -259,12 +259,8 @@ public class Status : MonoBehaviour {
   public void AddAttributeModifier(AttributeTag attrib, AttributeModifier modifier) => AttributeModifier.Add(Modifiers, attrib, modifier);
   public void RemoveAttributeModifier(AttributeTag attrib, AttributeModifier modifier) => AttributeModifier.Remove(Modifiers, attrib, modifier);
 
-  internal void Move(Vector3 delta) {
-    if (Controller) {
-      Controller.Move(delta);
-    } else {
-      transform.position += delta;
-    }
+  public void Move(Vector3 delta) {
+    GetComponent<Mover>().Move(delta);
   }
 
   private void Awake() {
