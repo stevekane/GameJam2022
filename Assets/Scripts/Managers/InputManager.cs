@@ -92,7 +92,7 @@ public class InputManager : MonoBehaviour {
   Vector2 GetAxisFromMouse() {
     if (Player == null)
       return Vector2.zero;
-    var playerPos = MainCamera.Instance.WorldToScreenPoint(Player.transform.position);
+    var playerPos = Camera.main.WorldToScreenPoint(Player.transform.position);
     var playerPos2 = new Vector2(playerPos.x, playerPos.y);
     var mousePos2 = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
     return (mousePos2 - playerPos2).normalized;
