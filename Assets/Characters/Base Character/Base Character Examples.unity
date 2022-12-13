@@ -555,7 +555,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 583777037}
   m_LocalRotation: {x: 0.38268346, y: 0.000000059604645, z: 0.000000014901161, w: 0.9238796}
-  m_LocalPosition: {x: -0.025128482, y: 19.741768, z: -15.691762}
+  m_LocalPosition: {x: -0.025128482, y: 19.741766, z: -15.691761}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -930,11 +930,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5452921525990849646, guid: 01c4af07d3b3baa4f82ff50c90fdafb5, type: 3}
       propertyPath: HitAmplitude
-      value: 0
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 5452921525990849646, guid: 01c4af07d3b3baa4f82ff50c90fdafb5, type: 3}
       propertyPath: HurtAmplitude
-      value: 0
+      value: 0.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -1704,17 +1704,6 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
---- !u!114 &1480998188 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5212089753699858940, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
-  m_PrefabInstance: {fileID: 1818372311507013568}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 045e21c2a67f9024cbdfe7a293ed0fa8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1483633839 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2435917492602536297, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
@@ -1998,11 +1987,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5452921525990849646, guid: 01c4af07d3b3baa4f82ff50c90fdafb5, type: 3}
       propertyPath: HitAmplitude
-      value: 0
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 5452921525990849646, guid: 01c4af07d3b3baa4f82ff50c90fdafb5, type: 3}
       propertyPath: HurtAmplitude
-      value: 0
+      value: 0.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -2074,11 +2063,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5452921525990849646, guid: 01c4af07d3b3baa4f82ff50c90fdafb5, type: 3}
       propertyPath: HitAmplitude
-      value: 0
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 5452921525990849646, guid: 01c4af07d3b3baa4f82ff50c90fdafb5, type: 3}
       propertyPath: HurtAmplitude
-      value: 0
+      value: 0.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -2714,42 +2703,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1818372311317487523, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
-      propertyPath: Gravity
-      value: -60
-      objectReference: {fileID: 0}
-    - target: {fileID: 1818372311317487525, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
-      propertyPath: ButtonMaps.Array.size
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1818372311317487525, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
-      propertyPath: ButtonMaps.Array.data[3].ButtonCode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1818372311317487525, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
-      propertyPath: ButtonMaps.Array.data[4].ButtonCode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1818372311317487525, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
-      propertyPath: ButtonMaps.Array.data[3].Entry.Ability
-      value: 
-      objectReference: {fileID: 1480998188}
-    - target: {fileID: 1818372311317487525, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
-      propertyPath: ButtonMaps.Array.data[4].Entry.Ability
-      value: 
-      objectReference: {fileID: 1480998188}
-    - target: {fileID: 1818372311317487525, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
-      propertyPath: ButtonMaps.Array.data[4].ButtonPressType
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1818372311317487525, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
-      propertyPath: ButtonMaps.Array.data[3].Entry.MethodName
-      value: Activate
-      objectReference: {fileID: 0}
-    - target: {fileID: 1818372311317487525, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
-      propertyPath: ButtonMaps.Array.data[4].Entry.MethodName
-      value: Release
-      objectReference: {fileID: 0}
     - target: {fileID: 2433174380011465399, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
       propertyPath: m_Name
       value: Model
@@ -2789,14 +2742,6 @@ PrefabInstance:
     - target: {fileID: 3870568683664493446, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
       propertyPath: m_Name
       value: Torso Forward
-      objectReference: {fileID: 0}
-    - target: {fileID: 5304582540807413855, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
-      propertyPath: HitAmplitude
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5304582540807413855, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
-      propertyPath: HurtAmplitude
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5505813242816752702, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
       propertyPath: m_Enabled

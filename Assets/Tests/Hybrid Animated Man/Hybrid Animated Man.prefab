@@ -261,7 +261,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Gravity: -24
+  Gravity: -60
   Animator: {fileID: 2347714126523969063}
 --- !u!114 &1818372311317487525
 MonoBehaviour:
@@ -291,6 +291,16 @@ MonoBehaviour:
     Entry:
       Ability: {fileID: 2296086977565652357}
       MethodName: Attack
+  - ButtonCode: 1
+    ButtonPressType: 0
+    Entry:
+      Ability: {fileID: 5212089753699858940}
+      MethodName: Activate
+  - ButtonCode: 1
+    ButtonPressType: 2
+    Entry:
+      Ability: {fileID: 5212089753699858940}
+      MethodName: Release
   AxisMaps:
   - AxisCode: 0
     AxisTag: 0
