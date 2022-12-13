@@ -75,7 +75,7 @@ public class SmashDash : LegacyAbility {
       var targetDir = desiredDir.TryGetDirection() ?? dir;
       dir = Vector3.RotateTowards(dir, targetDir.normalized, TurnSpeed/360f, 0f);
       Status.transform.forward = dir;
-      Status.Move(desiredSpeed * Time.fixedDeltaTime * dir);
+      Mover.Move(desiredSpeed * Time.fixedDeltaTime * dir);
       yield return null;
     }
   }

@@ -27,7 +27,7 @@ public class Jump : Ability {
       using var effect = Status.Add(new InlineEffect(s => {
         s.HasGravity = false;
         velocity = velocity * Mathf.Exp(-Time.fixedDeltaTime * Drag);
-        Status.Move(Time.fixedDeltaTime * velocity);
+        Mover.Move(Time.fixedDeltaTime * velocity);
       }, "Jumping"));
 
       // Double-jump.

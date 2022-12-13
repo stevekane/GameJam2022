@@ -57,7 +57,7 @@ public class KnockbackEffect : StatusEffect {
   }
   public override void Apply(Status status) {
     Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * DRAG);
-    status.Move(Velocity*Time.fixedDeltaTime);
+    status.Mover.Move(Velocity*Time.fixedDeltaTime);
     IsAirborne = IsFirstFrame || Velocity.sqrMagnitude >= AIRBORNE_SPEED*AIRBORNE_SPEED;
     status.CanMove = !IsAirborne;
     status.CanRotate = !IsAirborne;
@@ -182,7 +182,7 @@ public class RecoilEffect : StatusEffect {
   }
   public override void Apply(Status status) {
     Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * DRAG);
-    status.Move(Velocity*Time.fixedDeltaTime);
+    status.Mover.Move(Velocity*Time.fixedDeltaTime);
     status.CanMove = false;
     status.CanRotate = false;
     status.CanAttack = false;
@@ -196,7 +196,7 @@ public class Status : MonoBehaviour {
   internal AnimationDriver AnimationDriver;
   internal Attributes Attributes;
   internal Upgrades Upgrades;
-  internal CharacterController Controller;
+  internal Mover Mover;
   internal Optional<Damage> Damage;
   Dictionary<AttributeTag, AttributeModifier> Modifiers = new();
 
@@ -248,14 +248,10 @@ public class Status : MonoBehaviour {
   public void AddAttributeModifier(AttributeTag attrib, AttributeModifier modifier) => AttributeModifier.Add(Modifiers, attrib, modifier);
   public void RemoveAttributeModifier(AttributeTag attrib, AttributeModifier modifier) => AttributeModifier.Remove(Modifiers, attrib, modifier);
 
-  public void Move(Vector3 delta) {
-    GetComponent<Mover>().Move(delta);
-  }
-
   private void Awake() {
     Attributes = this.GetOrCreateComponent<Attributes>();
     Upgrades = this.GetOrCreateComponent<Upgrades>();
-    Controller = GetComponent<CharacterController>();
+    Mover = GetComponent<Mover>();
     AnimationDriver = GetComponent<AnimationDriver>();
     Damage = GetComponent<Damage>();
   }

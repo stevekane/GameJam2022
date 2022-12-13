@@ -42,12 +42,13 @@ public class SuplexAbility : LegacyAbility {
       var delta = target.transform.position - Status.transform.position;
       if (delta.magnitude < TargetDistance)
         break;
-      Status.Move(MoveSpeed * Time.fixedDeltaTime * delta.normalized);
+      Mover.Move(MoveSpeed * Time.fixedDeltaTime * delta.normalized);
       yield return null;
     }
   }
   public IEnumerator Toss(Transform target) {
     var targetStatus = target.GetComponent<Status>();
+    var targetMover = target.GetComponent<Mover>();
     targetStatus.Add(Using(new ScriptedMovementEffect()));
     var air = transform.position + new Vector3(0f, 25f, 0f) + transform.forward*3f;
     var ground = transform.position + transform.forward*10f;
@@ -58,8 +59,8 @@ public class SuplexAbility : LegacyAbility {
         if (delta.sqrMagnitude < 1f)
           break;
         var move = MoveSpeed * Time.fixedDeltaTime * delta.normalized;
-        Status.Move(move);
-        targetStatus.Move(move);
+        Mover.Move(move);
+        targetMover.Move(move);
         yield return null;
       }
       if (i == 0)
