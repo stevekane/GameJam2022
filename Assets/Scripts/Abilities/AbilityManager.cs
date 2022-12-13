@@ -18,6 +18,8 @@ public class AbilityManager : MonoBehaviour {
 
   public IEnumerable<Ability> Running { get => Abilities.Where(a => a.IsRunning); }
 
+  Status Status;
+
   Dictionary<AxisTag, AxisState> TagToAxis = new();
   // TODO(Task): object => AbilityMethodTask
   Dictionary<object, EventRouter> MethodToEvent = new();
@@ -80,6 +82,7 @@ public class AbilityManager : MonoBehaviour {
   void Awake() {
     InitAbilities(GetComponentsInChildren<Ability>());
     Energy = GetComponent<Energy>();
+    Status = GetComponent<Status>();
   }
   void OnDestroy() {
     Bundle.Stop();
@@ -87,7 +90,12 @@ public class AbilityManager : MonoBehaviour {
     Abilities.ForEach(a => a.AbilityManager = null);
     MethodToEvent.ForEach(kv => kv.Value.DisconnectSource());
   }
-  void FixedUpdate() => Bundle.MoveNext();
+  void FixedUpdate() {
+    if (!Status.CanAttack) {
+      InterruptAbilities();
+    }
+    Bundle.MoveNext();
+  }
 
   // All ability events route through this event source. Input-related event sources that connect to abilities
   // are actually instances of this class via InputManager.RegisterButton(code, type, EventRouterMaker);

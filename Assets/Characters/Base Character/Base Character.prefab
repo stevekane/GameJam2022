@@ -46,8 +46,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Status: {fileID: 8540507123274114192}
-  Controller: {fileID: 8540507123274114196}
   ParticleSystem: {fileID: 3974881696494840204}
+  ParticleSize: 1
 --- !u!1 &8540507123161146150
 GameObject:
   m_ObjectHideFlags: 0
@@ -88,7 +88,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8540507123274114197}
-  - component: {fileID: 8540507123274114222}
   - component: {fileID: 8540507123274114198}
   - component: {fileID: 8540507123274114199}
   - component: {fileID: 8540507123274114192}
@@ -127,29 +126,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8540507123274114222
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8540507123274114195}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3452bb9513db04646a5c8c32a4a674fc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <AbilityManager>k__BackingField: {fileID: 8540507123274114198}
-  <Attributes>k__BackingField: {fileID: 8540507123274114199}
-  <Status>k__BackingField: {fileID: 8540507123274114192}
-  <Upgrades>k__BackingField: {fileID: 8540507123274114193}
-  <Damage>k__BackingField: {fileID: 8540507123274114216}
-  <AnimationDriver>k__BackingField: {fileID: 8540507123274114194}
-  <Mover>k__BackingField: {fileID: 8540507123274114223}
-  <TorsoRotationConstraint>k__BackingField: {fileID: 0}
-  <HeadAimConstraint>k__BackingField: {fileID: 0}
-  IdleThreshold: 0.1
-  ConstraintBlendFrames: 4
 --- !u!114 &8540507123274114198
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -179,7 +155,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 004ed0f90de1a634aab5eefd8f1dea0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BaseAttributes: []
+  BaseAttributes:
+  - Attribute:
+      Value: 6
+      String: Gravity
+    Modifier:
+      Base: -24
+      Mult: 1
   BaseUpgrades: []
 --- !u!114 &8540507123274114192
 MonoBehaviour:
@@ -233,8 +215,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Gravity: -24
-  Animator: {fileID: 8540507124463013524}
+  Velocity: {x: 0, y: 0, z: 0}
 --- !u!114 &8540507123274114216
 MonoBehaviour:
   m_ObjectHideFlags: 0

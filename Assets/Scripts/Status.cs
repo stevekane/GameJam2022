@@ -62,22 +62,12 @@ public class KnockbackEffect : StatusEffect {
     status.CanMove = !IsAirborne;
     status.CanRotate = !IsAirborne;
     status.CanAttack = !IsAirborne;
-    if (status.AnimationDriver && status.AnimationDriver.Animator)
-      status.AnimationDriver.Animator.SetBool("HitFlinch", IsAirborne);
-    if (!status.CanAttack) {
-      status.GetComponent<AbilityManager>()?.InterruptAbilities();
-    }
     if (Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED)
       status.Remove(this);
     IsFirstFrame = false;
   }
-  public override void OnRemoved(Status status) {
-    if (status.AnimationDriver && status.AnimationDriver.Animator)
-      status.AnimationDriver.Animator.SetBool("HitFlinch", false);
-  }
 }
 
-// The hit pause that happens to attacker and defender during melee attack contact.
 public class HitStopEffect : StatusEffect {
   public Vector3 Axis;
   public float Amplitude;
@@ -98,10 +88,6 @@ public class HitStopEffect : StatusEffect {
   }
 
   public override void Apply(Status status) {
-    if (Frames == 0) {
-      if (status.TryGetComponent(out Vibrator v))
-        v.Vibrate(Axis, TotalFrames, Amplitude);
-    }
     if (Frames <= TotalFrames) {
       status.CanAttack = false;
       var localTimeScale = Defaults.Instance.HitStopLocalTime.Evaluate((float)Frames/(float)TotalFrames);
@@ -127,6 +113,9 @@ public class HurtStunEffect : StatusEffect {
   }
   public override void Apply(Status status) {
     if (Frames <= TotalFrames) {
+      status.CanMove = false;
+      status.CanRotate = false;
+      status.CanAttack = false;
       status.IsHurt = true;
       Frames++;
     } else {
@@ -286,8 +275,8 @@ public class Status : MonoBehaviour {
     Added.ForEach(e => Active.Add(e));
     Added.Clear();
     Modifiers.Clear();
-
     Active.ForEach(e => e.Apply(this));
+
 #if UNITY_EDITOR
     DebugEffects.Clear();
     Active.ForEach(e => DebugEffects.Add($"{e}"));

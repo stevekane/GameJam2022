@@ -34,15 +34,15 @@ public class Mover : MonoBehaviour {
 
   public Vector3 Velocity;
 
-  [SerializeField] Animator Animator;
-
   CharacterController Controller;
+  AnimationDriver AnimationDriver;
   Attributes Attributes;
   Status Status;
   AbilityManager AbilityManager;
 
   void Awake() {
     Controller = GetComponent<CharacterController>();
+    AnimationDriver = GetComponent<AnimationDriver>();
     Attributes = GetComponent<Attributes>();
     Status = GetComponent<Status>();
     AbilityManager = GetComponent<AbilityManager>();
@@ -98,6 +98,7 @@ public class Mover : MonoBehaviour {
     Controller.Move(localTimeScale * Time.fixedDeltaTime * Velocity + MoveAccum);
     MoveAccum = Vector3.zero;
 
+    // Grounded Check
     var groundedCheck = new Vector3(0, -.1f, 0f);
     var realPosition = transform.position;
     Controller.Move(groundedCheck);
@@ -108,5 +109,15 @@ public class Mover : MonoBehaviour {
     var turnSpeed = Attributes.GetValue(AttributeTag.TurnSpeed);
     var localTurnSpeed = localTimeScale * turnSpeed;
     transform.rotation = RotationFromDesired(transform.forward, localTurnSpeed, desiredFacing);
+
+    // Animation
+    var animator = AnimationDriver.Animator;
+    var orientedVelocity = Quaternion.Inverse(transform.rotation)*desiredMoveDir;
+    animator.SetFloat("RightVelocity", orientedVelocity.x);
+    animator.SetFloat("ForwardVelocity", orientedVelocity.z);
+    animator.SetBool("IsGrounded", Status.IsGrounded);
+    animator.SetBool("IsHurt", Status.IsHurt);
+    var localSpeed = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
+    AnimationDriver.SetSpeed(localSpeed < 1 ? localSpeed : AnimationDriver.BaseSpeed);
   }
 }

@@ -7,7 +7,7 @@ using Cinemachine;
 public class FocusAllCharacters : MonoBehaviour {
   void Update() {
     var targetGroup = GetComponent<CinemachineTargetGroup>();
-    var targets = FindObjectsOfType<Character>();
+    var targets = FindObjectsOfType<AbilityManager>();
     targetGroup.m_Targets =
       targets.Select(t => new CinemachineTargetGroup.Target() {
         target = t.transform,
