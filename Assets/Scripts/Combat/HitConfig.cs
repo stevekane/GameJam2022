@@ -20,7 +20,8 @@ public class HitConfig {
       KnockbackStrength = KnockbackStrength*scale,
       RecoilStrength = RecoilStrength,
       CameraShakeStrength = CameraShakeStrength,
-      HitStopDuration = HitStopDuration
+      HitStopDuration = HitStopDuration,
+      StunDuration = new Timeval() { Ticks = (int)(StunDuration.Ticks*scale) }
     };
   }
 }
