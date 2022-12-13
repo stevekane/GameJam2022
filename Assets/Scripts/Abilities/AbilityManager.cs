@@ -129,11 +129,15 @@ public class AbilityManager : MonoBehaviour {
     }
     bool ShouldFire() {
       var am = Ability.AbilityManager;
+      var cc = am.GetComponent<CharacterController>();
       var canRun = 0 switch {
         _ when !Ability.Status.Tags.HasAllFlags(Trigger.RequiredOwnerTags) => false,
-        _ when Trigger.Tags.HasAllFlags(AbilityTag.OnlyOne) && am.Running.Any(a => a.Tags.HasAllFlags(AbilityTag.OnlyOne) && !CanCancel(a)) => false,
+        _ when Trigger.Tags.HasAllFlags(AbilityTag.OnlyOne) && am.Running.Any(a => !CanCancel(a)) => false,
+        //_ when Trigger.Tags.HasAllFlags(AbilityTag.OnlyOne) && am.Running.Any(a => a.Tags.HasAllFlags(AbilityTag.OnlyOne) && !CanCancel(a)) => false,
         _ when Trigger.Tags.HasAllFlags(AbilityTag.BlockIfRunning) && Ability.IsRunning => false,
         _ when Trigger.Tags.HasAllFlags(AbilityTag.BlockIfNotRunning) && !Ability.IsRunning => false,
+        _ when Trigger.Tags.HasAllFlags(AbilityTag.Grounded) && !cc.isGrounded => false,
+        _ when Trigger.Tags.HasAllFlags(AbilityTag.Airborne) && cc.isGrounded => false,
         _ when Trigger.EnergyCost > Ability.AbilityManager.Energy?.Value.Points => false,
         _ => true,
       };

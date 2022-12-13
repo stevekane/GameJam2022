@@ -8,6 +8,8 @@ public enum AbilityTag {
   Uninterruptible = 1 << 3,       // This ability keeps running if hit
   Cancellable = 1 << 4,           // This ability can be cancelled if a CancelOthers ability runs
   CancelOthers = 1 << 5,          // This ability will cancel any of the character's abilities with the Cancellable tag
+  Grounded = 1 << 6,              // This ability can only run on the ground
+  Airborne = 1 << 7,              // This ability can only run in the air
 
   AbilityHeavyEnabled = 1 << 28,
   AbilitySlamEnabled = 1 << 29,

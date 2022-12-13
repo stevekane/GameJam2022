@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class AttackAbility : Ability {
-  [SerializeField] Timeval WindupEnd;
-  [SerializeField] Timeval ChargeEnd;
+public class Dive : Ability {
+  [SerializeField] float FallSpeed;
   [SerializeField] Timeval ActiveEnd;
   [SerializeField] Timeval RecoveryEnd;
   [SerializeField] HitConfig HitConfig;
-  [SerializeField] AnimationCurve ChargeScaling = AnimationCurve.Linear(0f, .5f, 1f, 1f);
-  [SerializeField] Vibrator Vibrator;
+  [SerializeField] AnimationJobConfig WindupAnimation;
   [SerializeField] AnimationJobConfig AttackAnimation;
   [SerializeField] TriggerEvent TriggerEvent;
   [SerializeField] Collider HitBox;
@@ -22,40 +20,34 @@ public class AttackAbility : Ability {
   [NonSerialized] HashSet<Collider> PhaseHits = new();
   [NonSerialized] AnimationJobTask Animation = null;
 
-  public Task Attack(TaskScope scope) => Main(scope, false);
-  public Task ChargeAttack(TaskScope scope) => Main(scope, true);
-  public Task ChargeRelease(TaskScope scope) => null;
+  public static InlineEffect ScriptedMove => new(s => {
+    s.HasGravity = false;
+    s.AddAttributeModifier(AttributeTag.MoveSpeed, AttributeModifier.TimesZero);
+    s.AddAttributeModifier(AttributeTag.TurnSpeed, AttributeModifier.TimesZero);
+  }, "DiveMove");
 
-  async Task Main(TaskScope scope, bool chargeable) {
-    Animation = AnimationDriver.Play(scope, AttackAnimation);
+  public async Task Attack(TaskScope scope) {
+    Animation = AnimationDriver.Play(scope, WindupAnimation);
     HitConfig hitConfig = HitConfig;
-    if (chargeable) {
-      var startFrame = Timeval.TickCount;
-      await scope.Any(Charge, ListenFor(ChargeRelease));
-      var numFrames = Timeval.TickCount - startFrame;
-      var chargeScaling = ChargeScaling.Evaluate((float)numFrames / ChargeEnd.Ticks);
-      await Animation.WaitFrame(WindupEnd.AnimFrames)(scope);
-      hitConfig = hitConfig.Scale(chargeScaling);
-    } else {
-      await Animation.WaitFrame(WindupEnd.AnimFrames)(scope);
-    }
+    using var effect = Status.Add(ScriptedMove);
+    await Animation.WaitDone()(scope);
+    await Fall(scope);
     PhaseHits.Clear();
     var rotation = AbilityManager.transform.rotation;
     var vfxOrigin = AbilityManager.transform.TransformPoint(AttackVFXOffset);
     SFXManager.Instance.TryPlayOneShot(AttackSFX);
     VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
+    Animation = AnimationDriver.Play(scope, AttackAnimation);
     await scope.Any(Animation.WaitFrame(ActiveEnd.AnimFrames+1), Waiter.Repeat(OnHit(hitConfig)));
     Tags.AddFlags(AbilityTag.Cancellable);
     await Animation.WaitDone()(scope);
   }
 
-  async Task Charge(TaskScope scope) {
-    try {
-      await Animation.WaitFrame(1)(scope);
-      Animation.Pause();
-      await scope.Delay(ChargeEnd);
-    } finally {
-      Animation.Resume();
+  async Task Fall(TaskScope scope) {
+    var cc = Status.GetComponent<CharacterController>();
+    while (!cc.isGrounded) {
+      await scope.Tick();
+      Status.Move(FallSpeed * Time.fixedDeltaTime * Vector3.down);
     }
   }
 
