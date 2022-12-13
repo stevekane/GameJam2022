@@ -1008,6 +1008,20 @@ MonoBehaviour:
   TriggerConditions: []
   Tags: 0
   Radius: 30
+  HitConfig:
+    DamageModifier:
+      Base: 0
+      Mult: 1
+    KnockbackType: 0
+    KnockbackStrength: 0
+    RecoilStrength: 0
+    CameraShakeStrength: 0
+    HitStopDuration:
+      Millis: 1
+      FramesPerSecond: 30
+    StunDuration:
+      Millis: 500
+      FramesPerSecond: 30
   MissilePrefab: {fileID: 5667205795771851015, guid: 41421b7d6e85e6748afb608a2a977365, type: 3}
   LaunchSites:
   - {fileID: 4591952213016696056}
@@ -1259,7 +1273,7 @@ Transform:
   - {fileID: 433230649554147245}
   - {fileID: 8872822986732128203}
   m_Father: {fileID: 0}
-  m_RootOrder: 31
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8872822988582960445
 MonoBehaviour:
@@ -1344,13 +1358,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BaseAttributes:
-  - Attribute: 3
+  - Attribute:
+      Value: 3
+      String: MoveSpeed
     Modifier:
       Base: 20
       Mult: 1
-  - Attribute: 4
+  - Attribute:
+      Value: 4
+      String: TurnSpeed
     Modifier:
       Base: 360
+      Mult: 1
+  - Attribute:
+      Value: 6
+      String: Gravity
+    Modifier:
+      Base: -40
       Mult: 1
   BaseUpgrades: []
 --- !u!114 &8872822988582960455
@@ -1419,9 +1443,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Gravity: -200
   Animator: {fileID: 0}
-  IdleThreshold: 0.1
 --- !u!114 &8872822988582960448
 MonoBehaviour:
   m_ObjectHideFlags: 0

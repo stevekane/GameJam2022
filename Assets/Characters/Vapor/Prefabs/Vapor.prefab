@@ -78,7 +78,7 @@ MonoBehaviour:
     Tags: 19
     RequiredOwnerTags: 0
     EnergyCost: 0
-  CurrentTags: 0
+  Tags: 0
   Hurtbox: {fileID: 5571416124901615663}
   BlockDuration:
     Millis: 500
@@ -167,7 +167,7 @@ MonoBehaviour:
     Tags: 4
     RequiredOwnerTags: 536870912
     EnergyCost: 0
-  CurrentTags: 0
+  Tags: 0
   Clip: {fileID: 7400000, guid: 1fe47d56f543a9a41a54f10408f923f1, type: 2}
   WindupDuration:
     Millis: 300
@@ -186,6 +186,9 @@ MonoBehaviour:
     CameraShakeStrength: 0
     HitStopDuration:
       Millis: 200
+      FramesPerSecond: 30
+    StunDuration:
+      Millis: 500
       FramesPerSecond: 30
   FireVFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
   FireSFX: {fileID: 8300000, guid: d69edd942348f8b4892dac337d83ac38, type: 3}
@@ -274,8 +277,7 @@ MonoBehaviour:
     Tags: 4
     RequiredOwnerTags: 268435456
     EnergyCost: 0
-  CurrentTags: 0
-  AnimationDriver: {fileID: 3909703178939337023}
+  Tags: 0
   Clip: {fileID: 7400000, guid: b9d79d4ea8efe8d4f959e845de696b68, type: 2}
   WindupDuration:
     Millis: 300
@@ -299,6 +301,9 @@ MonoBehaviour:
     CameraShakeStrength: 0
     HitStopDuration:
       Millis: 200
+      FramesPerSecond: 30
+    StunDuration:
+      Millis: 500
       FramesPerSecond: 30
   ChargeScaling:
     serializedVersion: 2
@@ -411,7 +416,7 @@ MonoBehaviour:
     Tags: 11
     RequiredOwnerTags: -2147483648
     EnergyCost: 0
-  CurrentTags: 0
+  Tags: 0
   MoveSpeed: 40
   TargetDistance: 5
   HitRadius: 10
@@ -425,6 +430,9 @@ MonoBehaviour:
     RecoilStrength: 0
     CameraShakeStrength: 0
     HitStopDuration:
+      Millis: 500
+      FramesPerSecond: 30
+    StunDuration:
       Millis: 500
       FramesPerSecond: 30
 --- !u!1 &3135922338557306933
@@ -505,8 +513,7 @@ MonoBehaviour:
     Tags: 33
     RequiredOwnerTags: 0
     EnergyCost: 0
-  CurrentTags: 0
-  AnimationDriver: {fileID: 3909703178939337023}
+  Tags: 0
   Clip: {fileID: 7400000, guid: 513455d72952b384f8a7a6e6c6cf9b5f, type: 2}
   WindupDuration:
     Millis: 33.333332
@@ -530,6 +537,9 @@ MonoBehaviour:
     CameraShakeStrength: 0
     HitStopDuration:
       Millis: 100
+      FramesPerSecond: 30
+    StunDuration:
+      Millis: 500
       FramesPerSecond: 30
   ChargeScaling:
     serializedVersion: 2
@@ -642,7 +652,7 @@ MonoBehaviour:
     Tags: 9
     RequiredOwnerTags: 0
     EnergyCost: 0
-  CurrentTags: 0
+  Tags: 0
   MoveSpeed: 120
   WindupDuration:
     Millis: 66.666664
@@ -664,6 +674,9 @@ MonoBehaviour:
     CameraShakeStrength: 0
     HitStopDuration:
       Millis: 133.33333
+      FramesPerSecond: 30
+    StunDuration:
+      Millis: 500
       FramesPerSecond: 30
 --- !u!1 &5529297459764154501
 GameObject:
@@ -720,7 +733,7 @@ MonoBehaviour:
     Tags: 4
     RequiredOwnerTags: 0
     EnergyCost: 0
-  CurrentTags: 0
+  Tags: 0
   MoveSpeedFactor: 2.5
   Particles: {fileID: 4585268613483689328}
   AudioClip: {fileID: 8300000, guid: 0eda13886c86ca145936c7017a0dafa5, type: 3}
@@ -905,6 +918,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba179080412a6af41a99d021d690c5fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Abilities: []
   Bundle:
     Fibers: []
     Added: []
@@ -1009,9 +1023,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Gravity: -200
   Animator: {fileID: 0}
-  IdleThreshold: 0.1
 --- !u!114 &4289594239830466653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1037,7 +1049,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 004ed0f90de1a634aab5eefd8f1dea0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BaseAttributes: []
+  BaseAttributes:
+  - Attribute:
+      Value: 6
+      String: Gravity
+    Modifier:
+      Base: -40
+      Mult: 1
   BaseUpgrades:
   - {fileID: 11400000, guid: eeb227d5a03ae7c469f518f08fe5d373, type: 2}
   - {fileID: 11400000, guid: dc80687754ecb424f854f46614676ec5, type: 2}
@@ -1389,7 +1407,7 @@ MonoBehaviour:
     Tags: 2
     RequiredOwnerTags: 1073741824
     EnergyCost: 10
-  CurrentTags: 0
+  Tags: 0
   Duration:
     Millis: 10000
     FramesPerSecond: 30
@@ -1477,7 +1495,7 @@ MonoBehaviour:
     Tags: 2
     RequiredOwnerTags: 0
     EnergyCost: 0
-  CurrentTags: 0
+  Tags: 0
   MaxMoveSpeed: 120
   MinMoveSpeed: 60
   TurnSpeed: 60
@@ -1565,8 +1583,7 @@ MonoBehaviour:
     Tags: 3
     RequiredOwnerTags: 0
     EnergyCost: 0
-  CurrentTags: 0
-  AnimationDriver: {fileID: 0}
+  Tags: 0
   Clip: {fileID: 7400000, guid: 1b025aa438c5e1741a2dd59ec5848134, type: 2}
   WindupDuration:
     Millis: 33.333332
@@ -1590,6 +1607,9 @@ MonoBehaviour:
     CameraShakeStrength: 0
     HitStopDuration:
       Millis: 200
+      FramesPerSecond: 30
+    StunDuration:
+      Millis: 500
       FramesPerSecond: 30
   ChargeScaling:
     serializedVersion: 2
@@ -1702,8 +1722,7 @@ MonoBehaviour:
     Tags: 33
     RequiredOwnerTags: 0
     EnergyCost: 0
-  CurrentTags: 0
-  AnimationDriver: {fileID: 3909703178939337023}
+  Tags: 0
   Clip: {fileID: 7400000, guid: 976e876ec99a2d34584d30aa83e78b19, type: 2}
   WindupDuration:
     Millis: 33.333332
@@ -1727,6 +1746,9 @@ MonoBehaviour:
     CameraShakeStrength: 0
     HitStopDuration:
       Millis: 100
+      FramesPerSecond: 30
+    StunDuration:
+      Millis: 500
       FramesPerSecond: 30
   ChargeScaling:
     serializedVersion: 2
@@ -1811,7 +1833,7 @@ MonoBehaviour:
     Tags: 2
     RequiredOwnerTags: 0
     EnergyCost: 0
-  CurrentTags: 0
+  Tags: 0
   Abilities:
   - Ability: {fileID: 5074622147386750202}
     MethodName: AttackStart

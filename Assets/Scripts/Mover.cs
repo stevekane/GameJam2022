@@ -36,7 +36,6 @@ public class Mover : MonoBehaviour {
   // The weird bit here is that we don't want velocity wiped out every frame
   // and Gravity is probably a constant value. Today, Gravity could be made "constant"
   // by defining its base value
-  public float Gravity;
   public Vector3 Velocity { get; private set; }
   public Vector3 LocalScaledVelocity { get; private set; }
 
@@ -80,7 +79,7 @@ public class Mover : MonoBehaviour {
     GetAxes(AbilityManager, out var desiredMoveDir, out var desiredFacing);
     var localTimeScale = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
     var velocity = Attributes.GetValue(AttributeTag.MoveSpeed) * desiredMoveDir;
-    var gravity = Time.fixedDeltaTime * Gravity;
+    var gravity = Time.fixedDeltaTime * Attributes.GetValue(AttributeTag.Gravity);
     var localGravity = localTimeScale * gravity;
     velocity.y = Status.HasGravity switch {
       true => Controller.isGrounded switch {

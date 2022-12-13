@@ -117,7 +117,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Gravity: -60
   Animator: {fileID: 2347714126523969063}
 --- !u!114 &1818372311317487525
 MonoBehaviour:
@@ -210,17 +209,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BaseAttributes:
-  - Attribute: 3
+  - Attribute:
+      Value: 3
+      String: MoveSpeed
     Modifier:
       Base: 10
       Mult: 1
-  - Attribute: 4
+  - Attribute:
+      Value: 4
+      String: TurnSpeed
     Modifier:
       Base: 720
       Mult: 1
-  - Attribute: 0
+  - Attribute:
+      Value: 0
+      String: Damage
     Modifier:
       Base: 10
+      Mult: 1
+  - Attribute:
+      Value: 6
+      String: Gravity
+    Modifier:
+      Base: -40
       Mult: 1
   BaseUpgrades: []
 --- !u!114 &1818372311317487522

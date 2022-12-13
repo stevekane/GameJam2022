@@ -10,6 +10,7 @@ public enum AttributeTag {
   MoveSpeed,
   TurnSpeed,
   AttackSpeed,
+  Gravity,
   HasGravity,
   CanAttack,
   IsHittable,
@@ -65,7 +66,7 @@ public class AttributeModifier {
 // Fuck you, Unity
 [Serializable]
 public class AttributeTagModifierPair {
-  public AttributeTag Attribute;
+  public SerializableEnum<AttributeTag> Attribute;
   public AttributeModifier Modifier;
 }
 

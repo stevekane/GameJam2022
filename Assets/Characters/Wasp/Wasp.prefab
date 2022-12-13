@@ -421,7 +421,7 @@ MonoBehaviour:
     Tags: 1
     RequiredOwnerTags: 0
     EnergyCost: 0
-  CurrentTags: 0
+  Tags: 0
   Index: 0
   Animator: {fileID: 7727835182619467870}
   Windup:
@@ -878,21 +878,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BaseAttributes:
-  - Attribute: 0
+  - Attribute:
+      Value: 0
+      String: Damage
     Modifier:
       Base: 5
       Mult: 1
-  - Attribute: 3
+  - Attribute:
+      Value: 3
+      String: MoveSpeed
     Modifier:
       Base: 10
       Mult: 1
-  - Attribute: 4
+  - Attribute:
+      Value: 4
+      String: TurnSpeed
     Modifier:
       Base: 1080
       Mult: 1
-  - Attribute: 1
+  - Attribute:
+      Value: 1
+      String: Health
     Modifier:
       Base: 20
+      Mult: 1
+  - Attribute:
+      Value: 6
+      String: Gravity
+    Modifier:
+      Base: -40
       Mult: 1
   BaseUpgrades: []
 --- !u!114 &1657031132205634076
@@ -921,6 +935,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba179080412a6af41a99d021d690c5fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Abilities: []
   Bundle:
     Fibers: []
     Added: []
@@ -937,9 +952,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Gravity: -200
   Animator: {fileID: 0}
-  IdleThreshold: 0.1
 --- !u!114 &5571416124093621161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -953,10 +966,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Target: {fileID: 5571416123647958240}
-  DamageDuration:
+  HitDuration:
     Millis: 200
     FramesPerSecond: 30
-  DamageAmplitude: 0.2
+  HurtDuration:
+    Millis: 300
+    FramesPerSecond: 30
+  HitAmplitude: 0.1
+  HurtAmplitude: 0.2
 --- !u!114 &922338563387012078
 MonoBehaviour:
   m_ObjectHideFlags: 0
