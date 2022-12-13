@@ -78,16 +78,17 @@ public class Mover : MonoBehaviour {
     AbilityManager.GetAxis(AxisTag.Aim).Update(0, new Vector2(v.x, v.z));
   }
 
+  bool WasGrounded = true;
   void FixedUpdate() {
     GetAxes(AbilityManager, out var desiredMoveDir, out var desiredFacing);
     var localTimeScale = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
+
+    // Move
     var desiredVelocity = Attributes.GetValue(AttributeTag.MoveSpeed) * desiredMoveDir;
-    Velocity.x = desiredVelocity.x;
-    Velocity.z = desiredVelocity.z;
-    Controller.Move(localTimeScale * Time.fixedDeltaTime * desiredVelocity.XZ());
-    if (Controller.isGrounded) {
-      Controller.Move(10*Vector3.down);
-    } else {
+    Velocity.SetXZ(desiredVelocity);
+    desiredVelocity.y = WasGrounded ? -.1f : 0f;  // hack to force the controller to keep us grounded
+    Controller.Move(localTimeScale * Time.fixedDeltaTime * desiredVelocity);
+    if (!Controller.isGrounded) {
       if (Status.HasGravity) {
         Velocity.y += (localTimeScale * Time.fixedDeltaTime * Attributes.GetValue(AttributeTag.Gravity));
       } else {
@@ -95,7 +96,10 @@ public class Mover : MonoBehaviour {
       }
       Controller.Move(localTimeScale * Time.fixedDeltaTime * Vector3.up*Velocity.y);
     }
+    WasGrounded = Controller.isGrounded;
     Status.IsGrounded = Controller.isGrounded;
+
+    // Turn
     var turnSpeed = Attributes.GetValue(AttributeTag.TurnSpeed);
     var localTurnSpeed = localTimeScale * turnSpeed;
     transform.rotation = RotationFromDesired(transform.forward, localTurnSpeed, desiredFacing);
