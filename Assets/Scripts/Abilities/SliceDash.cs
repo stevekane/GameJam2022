@@ -46,9 +46,9 @@ public class SliceDash : LegacyAbility {
       var front = Status.transform.position + Status.transform.forward.XZ()*5f;
       foreach (var h in Hits) {
         var delta = (front - h.transform.position).XZ();
-        h.GetComponent<Status>().Move(move + (1f / timer.Value.Ticks) * delta);
+        h.GetComponent<Mover>().Move(move + (1f / timer.Value.Ticks) * delta);
       }
-      Status.Move(move);
+      Mover.Move(move);
       yield return null;
     }
   }

@@ -47,7 +47,7 @@ public class Dive : Ability {
     var cc = Status.GetComponent<CharacterController>();
     while (!cc.isGrounded) {
       await scope.Tick();
-      Status.Move(FallSpeed * Time.fixedDeltaTime * Vector3.down);
+      Mover.Move(FallSpeed * Time.fixedDeltaTime * Vector3.down);
     }
   }
 

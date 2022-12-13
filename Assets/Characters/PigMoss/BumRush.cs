@@ -53,7 +53,7 @@ namespace PigMoss {
         Trail.Play();
         var direction = AbilityManager.transform.forward.XZ();
         var wait = Waiter.Delay(RushDuration);
-        var move = Waiter.Repeat(Status.Move, direction*RushSpeed*Time.fixedDeltaTime);
+        var move = Waiter.Repeat(Mover.Move, direction*RushSpeed*Time.fixedDeltaTime);
         await scope.Any(wait, move);
       } finally {
         Trail.Stop();
