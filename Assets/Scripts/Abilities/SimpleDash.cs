@@ -12,17 +12,15 @@ public class SimpleDash : Ability {
   public AnimationClip DashingClip;
   public AnimationClip DoneClip;
 
-  public static InlineEffect ScriptedMove { get => new(s => {
-      s.HasGravity = false;
-      s.AddAttributeModifier(AttributeTag.MoveSpeed, AttributeModifier.TimesZero);
-      s.AddAttributeModifier(AttributeTag.TurnSpeed, AttributeModifier.TimesZero);
-    }, "DashMove");
-  }
-  public static InlineEffect Invulnerable { get => new(s => {
-      s.IsDamageable = false;
-      s.IsHittable = false;
-    }, "DashInvulnerable");
-  }
+  public static InlineEffect ScriptedMove => new(s => {
+    s.HasGravity = false;
+    s.AddAttributeModifier(AttributeTag.MoveSpeed, AttributeModifier.TimesZero);
+    s.AddAttributeModifier(AttributeTag.TurnSpeed, AttributeModifier.TimesZero);
+  }, "DashMove");
+  public static InlineEffect Invulnerable => new(s => {
+    s.IsDamageable = false;
+    s.IsHittable = false;
+  }, "DashInvulnerable");
 
   // Button press/release.
   public async Task Activate(TaskScope scope) {
