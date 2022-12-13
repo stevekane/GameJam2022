@@ -180,7 +180,7 @@ public class TaskScope : IDisposable {
     ThrowIfCancelled();
     var done = NewChildToken();
     int resultCount = 0;
-    async void callback(T value) { results[resultCount++] = value; await Tick(); done.Cancel(); }
+    async void callback(T value) { try { results[resultCount++] = value; await Tick(); } catch { } done.Cancel(); }
     try {
       evt.Listen(callback);
       await Task.Delay(-1, done.Token);
