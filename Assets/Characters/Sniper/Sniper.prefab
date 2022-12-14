@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ce0c9e24a5611d40b8628b31748e2d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Owner: {fileID: 0}
 --- !u!65 &7926842371776325126
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -121,46 +122,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TriggerConditions: []
   Tags: 0
-  DamageMultiplierFromDuration:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
   ArrowPrefab: {fileID: 784070462922033992, guid: c1ff05184d4e2f845ab45eacc4823912, type: 3}
   Animator: {fileID: 1479183465072908194}
   WindupClip: {fileID: 7400000, guid: 8c9354c19de70ae47a15c7f4f4ec971c, type: 2}
   ReleaseClip: {fileID: 7400000, guid: bfdc02c2d8ebc254a95fa10a13a43297, type: 2}
-  HitConfig:
-    DamageModifier:
-      Base: 25
-      Mult: 1
-    HitStopDuration:
-      Millis: 200
-      FramesPerSecond: 30
-    KnockbackStrength: 10
-    KnockbackType: 1
-    SFX: {fileID: 8300000, guid: e80d7d2490cf6ac45bffd0ae0656c910, type: 3}
-    VFX: {fileID: 159918, guid: f3d60ef1464f95348a9ffe17f312927e, type: 3}
-    VFXOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &2582190511109450765
 GameObject:
   m_ObjectHideFlags: 0
@@ -414,6 +379,7 @@ GameObject:
   - component: {fileID: 6716735781350007446}
   - component: {fileID: 7679737047819394672}
   - component: {fileID: 7326708138265937753}
+  - component: {fileID: 7622619342564340445}
   m_Layer: 10
   m_Name: Sniper
   m_TagString: Untagged
@@ -471,6 +437,10 @@ MonoBehaviour:
   MaxDistance: 20
   EyeHeight: 0.5
   FieldOfView: 45
+  Bundle:
+    Fibers: []
+    Added: []
+    Removed: []
 --- !u!114 &6716735781350007437
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -484,8 +454,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Abilities: []
-  Running: []
-  ToAdd: []
+  Bundle:
+    Fibers: []
+    Added: []
+    Removed: []
 --- !u!114 &6716735781350007434
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -511,7 +483,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Gravity: -200
 --- !u!114 &6716735781350007435
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -525,7 +496,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BaseAttributes:
-  - Attribute: 4
+  - Attribute:
+      Value: 4
+      String: TurnSpeed
     Modifier:
       Base: 360
       Mult: 1
@@ -543,6 +516,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Tags: 0
+  DebugEffects: []
 --- !u!114 &6716735781350007433
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -586,9 +560,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c806621753f76840a91b87e3c0d2fc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Hurtboxes: []
   FallSFX: {fileID: 0}
-  IsParrying: 0
-  IsBlocking: 0
 --- !u!114 &7326708138265937753
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -601,7 +574,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 589031cb649129f4595d6562a2fa54c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _Points: 0
+  <Points>k__BackingField: 0
+--- !u!114 &7622619342564340445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6716735781350007444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5858cd79c3bb37845b5d44f08793d81e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 0}
 --- !u!1 &6716735782081316428
 GameObject:
   m_ObjectHideFlags: 0
