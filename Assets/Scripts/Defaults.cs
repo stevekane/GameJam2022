@@ -5,4 +5,7 @@ public class Defaults : MonoBehaviour {
 
   [Header("Combat")]
   public AnimationCurve HitStopLocalTime;
+
+  [Header("Physics")]
+  public LayerMask EnvironmentLayerMask;
 }
