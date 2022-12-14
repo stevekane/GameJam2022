@@ -1,7 +1,11 @@
 using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(CharacterController), typeof(Status), typeof(AbilityManager))]
+[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(AbilityManager))]
+[RequireComponent(typeof(AnimationDriver))]
+[RequireComponent(typeof(Attributes))]
+[RequireComponent(typeof(Status))]
 public class Mover : MonoBehaviour {
   public static void UpdateAxes(AbilityManager manager, Vector3 desiredMoveDir, Vector3 desiredFacing) {
     SetMove(manager, desiredMoveDir);
@@ -32,20 +36,20 @@ public class Mover : MonoBehaviour {
     return Quaternion.RotateTowards(currentRotation, desiredRotation, degrees);
   }
 
-  public Vector3 Velocity;
-
   CharacterController Controller;
+  AbilityManager AbilityManager;
   AnimationDriver AnimationDriver;
   Attributes Attributes;
   Status Status;
-  AbilityManager AbilityManager;
+  Vector3 Velocity;
+  Vector3 MoveAccum;
 
   void Awake() {
     Controller = GetComponent<CharacterController>();
+    AbilityManager = GetComponent<AbilityManager>();
     AnimationDriver = GetComponent<AnimationDriver>();
     Attributes = GetComponent<Attributes>();
     Status = GetComponent<Status>();
-    AbilityManager = GetComponent<AbilityManager>();
   }
 
   public IEnumerator TryAimAt(Vector3 desired, Timeval MaxDuration, float tolerance = .95f) {
@@ -67,7 +71,7 @@ public class Mover : MonoBehaviour {
   }
 
   public Vector3 GetAim() {
-    return AbilityManager.GetAxis(AxisTag.Aim).XZ;
+    return AbilityManager.GetAxis(AxisTag.Aim).XZ.TryGetDirection() ?? transform.forward;
   }
 
   public void SetMove(Vector3 v) {
@@ -78,32 +82,30 @@ public class Mover : MonoBehaviour {
     AbilityManager.GetAxis(AxisTag.Aim).Update(0, new Vector2(v.x, v.z));
   }
 
-  Vector3 MoveAccum;
   public void Move(Vector3 delta) {
     MoveAccum += delta;
   }
 
   void FixedUpdate() {
-    GetAxes(AbilityManager, out var desiredMoveDir, out var desiredFacing);
+    const float GROUND_DISTANCE = .2f;
+    var desiredMoveDir = GetMove();
+    var desiredFacing = GetAim();
     var localTimeScale = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
+    var groundRay = new Ray(transform.position, Vector3.down);
+    Status.IsGrounded = Physics.Raycast(groundRay, GROUND_DISTANCE, Defaults.Instance.EnvironmentLayerMask);
 
     // Move
-    var desiredVelocity = Attributes.GetValue(AttributeTag.MoveSpeed) * desiredMoveDir;
-    Velocity.SetXZ(desiredVelocity);
-    if (Status.HasGravity) {
-      Velocity.y += (localTimeScale * Time.fixedDeltaTime * Attributes.GetValue(AttributeTag.Gravity));
-    } else {
-      Velocity.y = 0;
-    }
+    var moveSpeed = Attributes.GetValue(AttributeTag.MoveSpeed);
+    var gravity = localTimeScale * Time.fixedDeltaTime * Attributes.GetValue(AttributeTag.Gravity);
+    Velocity.x = localTimeScale * moveSpeed * desiredMoveDir.x;
+    Velocity.z = localTimeScale * moveSpeed * desiredMoveDir.z;
+    Velocity.y = Status switch {
+      Status { HasGravity: true, IsGrounded: true } => gravity,
+      Status { HasGravity: true, IsGrounded: false } => Velocity.y + gravity,
+      _ => 0
+    };
     Controller.Move(localTimeScale * Time.fixedDeltaTime * Velocity + MoveAccum);
     MoveAccum = Vector3.zero;
-
-    // Grounded Check
-    var groundedCheck = new Vector3(0, -.1f, 0f);
-    var realPosition = transform.position;
-    Controller.Move(groundedCheck);
-    Status.IsGrounded = Controller.isGrounded;
-    transform.position = realPosition;
 
     // Turn
     var turnSpeed = Attributes.GetValue(AttributeTag.TurnSpeed);
@@ -117,7 +119,6 @@ public class Mover : MonoBehaviour {
     animator.SetFloat("ForwardVelocity", orientedVelocity.z);
     animator.SetBool("IsGrounded", Status.IsGrounded);
     animator.SetBool("IsHurt", Status.IsHurt);
-    var localSpeed = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
-    AnimationDriver.SetSpeed(localSpeed < 1 ? localSpeed : AnimationDriver.BaseSpeed);
+    AnimationDriver.SetSpeed(localTimeScale < 1 ? localTimeScale : AnimationDriver.BaseSpeed);
   }
 }

@@ -91,7 +91,7 @@ public class AbilityManager : MonoBehaviour {
     MethodToEvent.ForEach(kv => kv.Value.DisconnectSource());
   }
   void FixedUpdate() {
-    if (!Status.CanAttack) {
+    if (Status.IsHurt) {
       InterruptAbilities();
     }
     Bundle.MoveNext();
