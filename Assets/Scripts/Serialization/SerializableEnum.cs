@@ -19,7 +19,7 @@ public class SerializableEnum<T> : SerializableEnumBase, ISerializationCallbackR
 
   public void OnAfterDeserialize() {
     if (!Enum.TryParse(String, out T value)) {
-      Debug.LogError($"Unknown enum value for {typeof(T).GetType().Name}: {String}");
+      Debug.LogError($"Unknown enum value for {typeof(T).GetType()}: '{String}'={Value}");
       Value = (T)(object)(-1);  // this cast is lame
     } else {
       Value = value;

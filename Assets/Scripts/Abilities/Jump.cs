@@ -32,12 +32,11 @@ public class Jump : Ability {
 
       // Double-jump.
       JumpsRemaining--;
-      var c = Status.GetComponent<CharacterController>();
-      if (c.isGrounded) {
+      if (Status.IsGrounded) {
         // Reset jumps when grounded.
         AbilityManager.MainScope.Start(async s => {
-          await s.Until(() => !c.isGrounded);
-          await s.Until(() => c.isGrounded);
+          await s.Until(() => !Status.IsGrounded);
+          await s.Until(() => Status.IsGrounded);
           JumpsRemaining = 2;
         });
       }

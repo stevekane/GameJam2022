@@ -87,12 +87,9 @@ public class Mover : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    const float GROUND_DISTANCE = .2f;
     var desiredMoveDir = GetMove();
     var desiredFacing = GetAim();
     var localTimeScale = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
-    var groundRay = new Ray(transform.position, Vector3.down);
-    Status.IsGrounded = Physics.Raycast(groundRay, GROUND_DISTANCE, Defaults.Instance.EnvironmentLayerMask);
 
     // Move
     var moveSpeed = Attributes.GetValue(AttributeTag.MoveSpeed);

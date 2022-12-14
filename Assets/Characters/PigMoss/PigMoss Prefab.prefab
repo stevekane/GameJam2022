@@ -1010,14 +1010,14 @@ MonoBehaviour:
   Radius: 30
   HitConfig:
     DamageModifier:
-      Base: 0
+      Base: 10
       Mult: 1
     KnockbackType: 0
-    KnockbackStrength: 0
+    KnockbackStrength: 10
     RecoilStrength: 0
-    CameraShakeStrength: 0
+    CameraShakeStrength: 1
     HitStopDuration:
-      Millis: 1
+      Millis: 300
       FramesPerSecond: 30
     StunDuration:
       Millis: 500
@@ -1443,6 +1443,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 253e1bc8f121a6544912b55a7ab8f545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Velocity: {x: 0, y: 0, z: 0}
   Animator: {fileID: 0}
 --- !u!114 &8872822988582960448
 MonoBehaviour:

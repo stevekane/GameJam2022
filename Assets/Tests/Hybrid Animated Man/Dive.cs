@@ -44,10 +44,9 @@ public class Dive : Ability {
   }
 
   async Task Fall(TaskScope scope) {
-    var cc = Status.GetComponent<CharacterController>();
-    while (!cc.isGrounded) {
-      await scope.Tick();
+    while (!Status.IsGrounded) {
       Mover.Move(FallSpeed * Time.fixedDeltaTime * Vector3.down);
+      await scope.Tick();
     }
   }
 
