@@ -41,8 +41,9 @@ public class Wallbounce : MonoBehaviour {
   }
 
   // Find a point near the attacker to bounce his victim towards (pre-computed and referenced when wallbounce occurs).
+  // Uses the current tick as a random seed for the main angle so that multi-hits bounce to the same destination.
   public static Vector3 ComputeWallbounceTarget(Transform attacker) {
-    var randAngle = UnityEngine.Random.Range(0, 360f);
+    var randAngle = (float)new System.Random(Timeval.TickCount).NextDouble() * 360f + UnityEngine.Random.Range(-15f, 15f);
     var dir = Quaternion.AngleAxis(randAngle, Vector3.up) * attacker.forward;
     var distance = 6f;
     var targetPos = attacker.position + distance*dir;
