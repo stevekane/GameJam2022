@@ -95,7 +95,6 @@ public class AbilityManager : MonoBehaviour {
       InterruptAbilities();
     }
     Bundle.MoveNext();
-    Timeval.TickEvent.Fire();
   }
 
   // All ability events route through this event source. Input-related event sources that connect to abilities

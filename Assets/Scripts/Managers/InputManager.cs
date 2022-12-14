@@ -146,6 +146,7 @@ public class InputManager : MonoBehaviour {
   void FixedUpdate() {
     Player = Player ?? FindObjectOfType<Player>();
     Timeval.TickCount++;
+    Timeval.TickEvent.Fire();
   }
 
   // TODO: Remove this testing junk.
