@@ -15,10 +15,10 @@ public class Damage : MonoBehaviour {
       var knockbackVector = hitParams.KnockbackVector;
       var knockbackStrength = 5f * hitParams.KnockbackStrength * Mathf.Pow((Points+100f) / 100f, 2f);
       var rotation = Quaternion.LookRotation(knockbackVector);
-      var bounceboxTarget = Bouncebox.ComputeWallbounceTarget(source);
+      var wallbounceTarget = Wallbounce.ComputeWallbounceTarget(source);
       Status.Add(new HurtStunEffect(hitParams.HitConfig.StunDuration.Ticks));
       Status.Add(new HitStopEffect(knockbackVector, .15f, hitParams.HitConfig.HitStopDuration.Ticks),
-        s => s.Add(new KnockbackEffect((knockbackVector+Vector3.up*.5f).normalized*knockbackStrength, bounceboxTarget)));
+        s => s.Add(new KnockbackEffect((knockbackVector+Vector3.up*.5f).normalized*knockbackStrength, wallbounceTarget)));
     }
   }
 
