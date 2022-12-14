@@ -22,24 +22,17 @@ public class HitParams {
   };
 
   HitParams() { }
-  public HitParams(HitConfig hitConfig, Attributes.Serialized attackerAttributes, GameObject attacker, GameObject source) {
+  public HitParams(HitConfig hitConfig, Attributes.Serialized attackerAttributes, GameObject attacker, GameObject source)
+    => Init(hitConfig, attackerAttributes, attacker, source);
+  public HitParams(HitConfig hitConfig, Attributes.Serialized attackerAttributes, GameObject source)
+     => Init(hitConfig, attackerAttributes, source, source);
+  public HitParams(HitConfig hitConfig, Attributes attributes)
+     => Init(hitConfig, attributes.serialized, attributes.gameObject, attributes.gameObject);
+
+  void Init(HitConfig hitConfig, Attributes.Serialized attackerAttributes, GameObject attacker, GameObject source) {
     HitConfig = hitConfig;
     AttackerAttributes = attackerAttributes;
     Attacker = attacker;
     Source = source;
-  }
-
-  public HitParams(HitConfig hitConfig, Attributes.Serialized attackerAttributes, GameObject source) {
-    HitConfig = hitConfig;
-    AttackerAttributes = attackerAttributes;
-    Attacker = source;
-    Source = source;
-  }
-
-  public HitParams(HitConfig hitConfig, Attributes attributes) {
-    HitConfig = hitConfig;
-    AttackerAttributes = attributes.serialized;
-    Attacker = attributes.gameObject;
-    Source = attributes.gameObject;
   }
 }
