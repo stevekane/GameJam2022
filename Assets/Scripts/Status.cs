@@ -258,10 +258,10 @@ public class Status : MonoBehaviour {
   private void FixedUpdate() {
     Modifiers.Clear();
 
-    IsHurt = false;
     const float GROUND_DISTANCE = .2f;
     var groundRay = new Ray(transform.position, Vector3.down);
     IsGrounded = Physics.Raycast(groundRay, GROUND_DISTANCE, Defaults.Instance.EnvironmentLayerMask);
+    IsHurt = false;
 
     Tags = Upgrades.AbilityTags;
 
