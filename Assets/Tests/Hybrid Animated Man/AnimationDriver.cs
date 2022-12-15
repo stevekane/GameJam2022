@@ -171,6 +171,7 @@ public class AnimationJob : IEnumerator, IStoppable {
   public bool IsRunning { get; private set; }
   public bool MoveNext() {
     if (IsRunning) {
+      // Set the mixer blend level based on fade in fade out
       Clip.SetSpeed(BaseSpeed*Animation.Speed*Driver.speed);
       if (Clip.IsNull() || !Clip.IsValid()) {
         Stop();
