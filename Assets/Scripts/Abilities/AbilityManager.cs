@@ -49,11 +49,6 @@ public class AbilityManager : MonoBehaviour {
     return evt;
   }
   public void TryInvoke(AbilityMethod method) => GetEvent(method).Fire();
-  public IEnumerator TryRun(AbilityMethod method) {
-    var ability = (Ability)method.Target;
-    GetEvent(method).Fire();
-    yield return Fiber.While(() => ability.IsRunning);
-  }
   public async Task TryRun(TaskScope scope, AbilityMethod method) {
     var ability = (Ability)method.Target;
     GetEvent(method).Fire();
@@ -70,6 +65,7 @@ public class AbilityManager : MonoBehaviour {
     Abilities.ForEach(a => a.Stop());
     Abilities.ForEach(a => a.AbilityManager = null);
     MethodToEvent.ForEach(kv => kv.Value.DisconnectSource());
+    MainScope.Dispose();
   }
   void FixedUpdate() {
     if (Status.IsHurt)
