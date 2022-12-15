@@ -5,27 +5,32 @@ using UnityEngine;
 public enum KnockBackType {
   Delta,
   Forward,
-  Back,
-  Right,
-  Left,
-  Up,
-  Down
 }
 
 public static class KnockBackTypeExtensions {
-  public static Vector3 KnockbackVector(this KnockBackType type, Transform attacker, Transform target) {
-    var p0 = attacker.position.XZ();
-    var p1 = target.position.XZ();
-    return type switch {
-      KnockBackType.Delta => p0.TryGetDirection(p1) ?? attacker.forward,
+  /*
+  KnockbackVector determined from choosing an attack axis and then a vector relative
+  to that attack axis.
+
+  For example, if you declare Attacker then <0,1,0> the resulting vector will be straight up
+  along the attacker's forward direction.
+
+  If you want to encode an AOE knock-away attack, you might chooise Delta then <0,0,1>
+  which will knock all targets away from the attacker along the floor (z is forward)
+  */
+  public static Vector3 KnockbackVector(
+  this KnockBackType type,
+  Vector3 RelativeVector,
+  Transform attacker,
+  Transform target) {
+    var direction = type switch {
+      KnockBackType.Delta => attacker.position.XZ().TryGetDirection(target.position.XZ()) ?? attacker.forward,
       KnockBackType.Forward => attacker.forward,
-      KnockBackType.Back => -attacker.forward,
-      KnockBackType.Right => attacker.right,
-      KnockBackType.Left => -attacker.right,
-      KnockBackType.Up => attacker.up,
-      KnockBackType.Down => -attacker.up,
       _ => attacker.forward,
     };
+    var rotation = Quaternion.LookRotation(direction);
+    var knockbackVector = rotation * RelativeVector.normalized;
+    return knockbackVector;
   }
 }
 

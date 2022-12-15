@@ -222,7 +222,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Tags: 32
+  - Tags: 0
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
@@ -244,6 +244,7 @@ MonoBehaviour:
       Base: 0
       Mult: 1
     KnockbackType: 1
+    RelativeKnockbackVector: {x: 0, y: 0, z: 1}
     KnockbackStrength: 3
     RecoilStrength: 9
     CameraShakeStrength: 1
@@ -343,6 +344,7 @@ MonoBehaviour:
       Base: 20
       Mult: 1
     KnockbackType: 0
+    RelativeKnockbackVector: {x: 0, y: 0, z: 1}
     KnockbackStrength: 20
     RecoilStrength: 0
     CameraShakeStrength: 1
@@ -539,7 +541,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Tags: 32
+  - Tags: 0
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
@@ -561,6 +563,7 @@ MonoBehaviour:
       Base: 0
       Mult: 1
     KnockbackType: 1
+    RelativeKnockbackVector: {x: 0, y: 0, z: 1}
     KnockbackStrength: 3
     RecoilStrength: 9
     CameraShakeStrength: 1
@@ -657,21 +660,22 @@ MonoBehaviour:
   Chargeable: 1
   WindupEnd:
     Millis: 0
-    FramesPerSecond: 24
+    FramesPerSecond: 60
   ChargeEnd:
-    Millis: 833.3333
+    Millis: 625
     FramesPerSecond: 24
   ActiveEnd:
-    Millis: 208.33333
-    FramesPerSecond: 24
+    Millis: 83.333336
+    FramesPerSecond: 60
   RecoveryEnd:
-    Millis: 416.66666
-    FramesPerSecond: 24
+    Millis: 333.33334
+    FramesPerSecond: 60
   HitConfig:
     DamageModifier:
       Base: 0
       Mult: 1
     KnockbackType: 1
+    RelativeKnockbackVector: {x: 0, y: 1, z: 1}
     KnockbackStrength: 50
     RecoilStrength: 30
     CameraShakeStrength: 1
@@ -821,7 +825,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Tags: 0
+  - Tags: 2
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0

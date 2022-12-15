@@ -1,9 +1,12 @@
 using System;
+using UnityEngine;
 
 [Serializable]
 public class HitConfig {
   public AttributeModifier DamageModifier;
   public KnockBackType KnockbackType;
+  [Tooltip("Vector in the reference frame defined by knockbacktype, an attacker and defender")]
+  public Vector3 RelativeKnockbackVector = Vector3.forward;
   public float KnockbackStrength;
   public float RecoilStrength;
   public float CameraShakeStrength;
@@ -18,6 +21,7 @@ public class HitConfig {
       },
       KnockbackType = KnockbackType,
       KnockbackStrength = KnockbackStrength*scale,
+      RelativeKnockbackVector = RelativeKnockbackVector,
       RecoilStrength = RecoilStrength,
       CameraShakeStrength = CameraShakeStrength,
       HitStopDuration = HitStopDuration,

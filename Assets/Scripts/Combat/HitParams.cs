@@ -7,7 +7,7 @@ public class HitParams {
   public GameObject Source;
   public GameObject Defender;
   public Attributes.Serialized DefenderAttributes;
-  public Vector3 KnockbackVector => HitConfig.KnockbackType.KnockbackVector(Source.transform, Defender.transform);
+  public Vector3 KnockbackVector => HitConfig.KnockbackType.KnockbackVector(HitConfig.RelativeKnockbackVector, Source.transform, Defender.transform);
   public float KnockbackStrength => AttackerAttributes.GetValue(AttributeTag.Knockback, HitConfig.KnockbackStrength);
   public float Damage => HitConfig.DamageModifier.Apply(AttackerAttributes.GetValue(AttributeTag.Damage, 0));
 
