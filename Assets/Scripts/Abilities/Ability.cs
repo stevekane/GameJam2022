@@ -40,8 +40,6 @@ public abstract class Ability : MonoBehaviour {
         if (result != null)  // Can return null if used only as a key for the event.
           await result;
       } catch (OperationCanceledException) {
-      } catch (Exception e) {
-        Debug.LogError($"Exception during Ability {this}: {e}");
       } finally {
         ActiveTasks.Remove(func);
         if (ActiveTasks.Count == 0)
