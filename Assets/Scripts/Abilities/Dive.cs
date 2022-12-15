@@ -44,7 +44,7 @@ public class Dive : Ability {
     // Attack
     PhaseHits.Clear();
     SFXManager.Instance.TryPlayOneShot(LandSFX);
-    VFXManager.Instance.TrySpawnEffect(LandVFX, LandVFXTransform.position, LandVFXTransform.rotation);
+    VFXManager.Instance.TrySpawnEffect(LandVFX, AbilityManager.transform.position, Quaternion.LookRotation(Vector3.down));
     await scope.Any(Waiter.Delay(LandDuration), Waiter.Repeat(OnHit(hitConfig)));
     // Recovery
     Tags.AddFlags(AbilityTag.Cancellable);
