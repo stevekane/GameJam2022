@@ -412,11 +412,36 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5452921525990849618, guid: 01c4af07d3b3baa4f82ff50c90fdafb5, type: 3}
   m_PrefabInstance: {fileID: 6643722}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &308646892 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1818372311317487516, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+  m_PrefabInstance: {fileID: 1818372311507013568}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &364122205 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1818372311317487517, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
   m_PrefabInstance: {fileID: 1818372311507013568}
   m_PrefabAsset: {fileID: 0}
+--- !u!95 &364122222
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 308646892}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: fbfbd4d6c313a334988ab900ec011bd2, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1001 &447536725
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -548,7 +573,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 583777037}
   m_LocalRotation: {x: 0.38268346, y: 0.000000059604645, z: 0.000000014901161, w: 0.9238796}
-  m_LocalPosition: {x: -0.025128482, y: 19.741764, z: -15.691761}
+  m_LocalPosition: {x: -0.025128482, y: 19.741766, z: -15.691762}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -702,7 +727,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_NoiseProfile: {fileID: 11400000, guid: 69ce8388f6785dd4c8c39915efece2f4, type: 2}
   m_PivotOffset: {x: 0, y: 0, z: 0}
-  m_AmplitudeGain: 0.000000003716129
+  m_AmplitudeGain: 1.8e-44
   m_FrequencyGain: 10
   mNoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!114 &744091293
@@ -2227,6 +2252,18 @@ PrefabInstance:
     - target: {fileID: 2347714126523969063, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
       propertyPath: m_WarningMessage
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3306629136697047538, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+      propertyPath: LandDuration.Millis
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 3306629136697047538, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+      propertyPath: WindupDuration.Millis
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 3306629136697047538, guid: fc9325b0e9965134597c6a28e546a9c2, type: 3}
+      propertyPath: RecoveryDuration.Millis
+      value: 333.33334
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []

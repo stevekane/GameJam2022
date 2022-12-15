@@ -30,6 +30,7 @@ public class AnimationJobTask {
   double DesiredSpeed = 1;
   public bool IsRunning { get; private set; } = false;
   public int CurrentFrame { get; private set; } = -1;
+  public int NumFrames => (int)(Clip.GetAnimationClip() is var clip ? clip.length*clip.frameRate+1 : 0);
 
   public AnimationJobTask(AnimationDriver driver, PlayableGraph graph, AnimationJobConfig animation) {
     Graph = graph;
@@ -54,6 +55,12 @@ public class AnimationJobTask {
   public async Task WaitFrame(TaskScope scope, int frame) {
     while (CurrentFrame < frame && IsRunning)
       await scope.Yield();  // tick or yield?
+  }
+  public TaskFunc PauseAtFrame(int frame) => s => PauseAtFrame(s, frame);
+  public async Task PauseAtFrame(TaskScope scope, int frame) {
+    while (CurrentFrame < frame && IsRunning)
+      await scope.Yield();  // tick or yield?
+    Pause();
   }
   public TaskFunc WaitDone() => s => WaitDone(s);
   public async Task WaitDone(TaskScope scope) {
@@ -284,7 +291,8 @@ public class AnimationDriver : MonoBehaviour {
   }
 
   public void Disconnect(AnimationJobTask animationJob) {
-    Output.SetSourcePlayable(AnimatorController);
+    if (animationJob == Task)  // Ignore Disconnect from inactive jobs.
+      Output.SetSourcePlayable(AnimatorController);
   }
 
   public AnimationJobFacade Play(AnimationClip clip) => Play(new AnimationJobConfig() { Clip = clip });
