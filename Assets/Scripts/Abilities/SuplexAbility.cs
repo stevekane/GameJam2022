@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class ScriptedMovementEffect : StatusEffect {
@@ -13,14 +14,14 @@ public class ScriptedMovementEffect : StatusEffect {
   }
 }
 
-public class SuplexAbility : LegacyAbility {
+public class SuplexAbility : Ability {
   public float MoveSpeed = 10f;
   public float TargetDistance = 5f;
   public float HitRadius = 10f;
   public float HitCameraShakeIntensity;
   public HitConfig HitConfig;
 
-  public IEnumerator AttackStart() {
+  public override async Task MainAction(TaskScope scope) {
     var targets = FindObjectsOfType<Hurtbox>();
     var best = targets.Aggregate(((Hurtbox)null, 0f), (best, next) => {
       // TODO: check IsVisibleFrom - but the mask system is garbage?
@@ -30,26 +31,26 @@ public class SuplexAbility : LegacyAbility {
     });
     if (best.Item2 < .9) {
       Debug.Log($"No Targets found: {best.Item1} {best.Item2}");
-      yield break;
+      return;
     }
     var target = best.Item1.Owner.transform;
-    yield return MoveTo(target);
-    yield return Toss(target);
+    await MoveTo(scope, target);
+    await Toss(scope, target);
   }
-  public IEnumerator MoveTo(Transform target) {
-    Status.Add(Using(new ScriptedMovementEffect()));
+  async Task MoveTo(TaskScope scope, Transform target) {
+    using var e = Status.Add(new ScriptedMovementEffect());
     while (true) {
       var delta = target.transform.position - Status.transform.position;
       if (delta.magnitude < TargetDistance)
         break;
       Mover.Move(MoveSpeed * Time.fixedDeltaTime * delta.normalized);
-      yield return null;
+      await scope.Tick();
     }
   }
-  public IEnumerator Toss(Transform target) {
+  async Task Toss(TaskScope scope, Transform target) {
     var targetStatus = target.GetComponent<Status>();
     var targetMover = target.GetComponent<Mover>();
-    targetStatus.Add(Using(new ScriptedMovementEffect()));
+    using var e = Status.Add(new ScriptedMovementEffect());
     var air = transform.position + new Vector3(0f, 25f, 0f) + transform.forward*3f;
     var ground = transform.position + transform.forward*10f;
     var positions = new[] { air, ground };
@@ -61,7 +62,7 @@ public class SuplexAbility : LegacyAbility {
         var move = MoveSpeed * Time.fixedDeltaTime * delta.normalized;
         Mover.Move(move);
         targetMover.Move(move);
-        yield return null;
+        await scope.Tick();
       }
       if (i == 0)
         targetStatus.transform.up = -targetStatus.transform.up;
@@ -73,7 +74,7 @@ public class SuplexAbility : LegacyAbility {
       if (c.TryGetComponent(out Hurtbox hurtbox))
         hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject));
     });
-    yield return Fiber.Wait(HitConfig.HitStopDuration.Ticks);
+    await scope.Delay(HitConfig.HitStopDuration);
     targetStatus.transform.up = -targetStatus.transform.up;
   }
 }

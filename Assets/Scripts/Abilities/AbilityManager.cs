@@ -21,8 +21,7 @@ public class AbilityManager : MonoBehaviour {
   Status Status;
 
   Dictionary<AxisTag, AxisState> TagToAxis = new();
-  // TODO(Task): object => AbilityMethodTask
-  Dictionary<object, EventRouter> MethodToEvent = new();
+  Dictionary<AbilityMethod, EventRouter> MethodToEvent = new();
 
   public void InitAbilities(Ability[] abilities) {
     Abilities = abilities;
@@ -45,11 +44,6 @@ public class AbilityManager : MonoBehaviour {
       TagToAxis[tag] = axis = new();
     return axis;
   }
-  public IEventSource GetEvent(LegacyAbilityMethod method) {
-    if (!MethodToEvent.TryGetValue(method, out EventRouter evt))
-      evt = CreateRouter(method);
-    return evt;
-  }
   public IEventSource GetEvent(AbilityMethod method) {
     if (!MethodToEvent.TryGetValue(method, out EventRouter evt))
       evt = CreateRouter(method);
@@ -66,7 +60,6 @@ public class AbilityManager : MonoBehaviour {
     GetEvent(method).Fire();
     await scope.While(() => ability.IsRunning);
   }
-  EventRouter CreateRouter(LegacyAbilityMethod method) => MethodToEvent[method] = new EventRouter((Ability)method.Target, method);
   EventRouter CreateRouter(AbilityMethod method) => MethodToEvent[method] = new EventRouter((Ability)method.Target, method);
 
   void Awake() {
@@ -93,13 +86,10 @@ public class AbilityManager : MonoBehaviour {
     IEventSource EventSource;
     Action Action;
     Ability Ability;
-    LegacyAbilityMethod Method;
-    AbilityMethod MethodTask;
+    AbilityMethod Method;
     TriggerCondition Trigger;
-    public EventRouter(Ability ability, LegacyAbilityMethod method) =>
-      (Ability, Method, Trigger) = (ability, method, ability.GetTriggerCondition(method));
     public EventRouter(Ability ability, AbilityMethod method) =>
-      (Ability, MethodTask, Trigger) = (ability, method, ability.GetTriggerCondition(method));
+      (Ability, Method, Trigger) = (ability, method, ability.GetTriggerCondition(method));
     public void ConnectSource(IEventSource evt) => (EventSource = evt).Listen(Fire);
     public void DisconnectSource() => EventSource?.Unlisten(Fire);
     public void Listen(Action handler) => Action += handler;
@@ -115,16 +105,7 @@ public class AbilityManager : MonoBehaviour {
         Ability.AbilityManager.Energy?.Value.Consume(Trigger.EnergyCost);
 
         Ability.Tags.AddFlags(Trigger.Tags);
-        if (Method != null && Ability is LegacyAbility lab) {
-          var enumerator = Method();
-          if (enumerator != null) {  // Can be null if used only for event listeners.
-            lab.StartRoutine(new Fiber(enumerator));
-          }
-        } else if (MethodTask != null) {
-          Ability.MaybeStartTask(MethodTask);
-        } else {
-          Debug.LogError($"{Ability} has no Method!");
-        }
+        Ability.MaybeStartTask(Method);
       }
     }
     bool ShouldFire() {
