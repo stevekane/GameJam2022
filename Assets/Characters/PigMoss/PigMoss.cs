@@ -12,9 +12,13 @@ namespace PigMoss {
     [SerializeField] Timeval ActionCooldown;
     [SerializeField] BlackBoard BlackBoard;
 
+    Mover Mover;
     Fiber Behavior;
     int AbilityIndex;
 
+    private void Awake() {
+      Mover = GetComponent<Mover>();
+    }
     void Start() => Behavior = new Fiber(Fiber.Repeat(MakeBehavior));
     void OnDestroy() => Behavior.Stop();
     void FixedUpdate() => Behavior.MoveNext();
@@ -61,7 +65,7 @@ namespace PigMoss {
       yield return Fiber.Any(cooldown, pursue);
       // TODO: This seems hacky? must be a nicer way to stop trying to move...
       // I kinda feel like it should be set every frame or something
-      Mover.UpdateAxes(AbilityManager, Vector3.zero, transform.forward.XZ());
+      Mover.SetMoveAim(Vector3.zero, transform.forward.XZ());
     }
 
     void PursueTarget() {
@@ -69,9 +73,9 @@ namespace PigMoss {
         var delta = BlackBoard.Target.transform.position - transform.position;
         var toTarget = delta.XZ().normalized;
         if (delta.magnitude > 10) {
-          Mover.UpdateAxes(AbilityManager, toTarget, toTarget);
+          Mover.SetMoveAim(toTarget, toTarget);
         } else {
-          Mover.UpdateAxes(AbilityManager, Vector3.zero, transform.forward.XZ());
+          Mover.SetMoveAim(Vector3.zero, transform.forward.XZ());
         }
       }
     }

@@ -37,7 +37,7 @@ public class Wasp : MonoBehaviour {
     async Task Chase(TaskScope scope) {
       while (true) {
         if (TargetInRange(ShootRadius, out var targetDelta) && Status.CanAttack) {
-          Mover.UpdateAxes(Abilities, Vector3.zero, transform.forward.XZ());
+          Mover.SetMoveAim(Vector3.zero, transform.forward.XZ());
           await scope.Any(
             s => Abilities.TryRun(s, Pellet.MainAction),
             Waiter.Repeat(() => Mover.TryLookAt(Target)));
@@ -45,7 +45,7 @@ public class Wasp : MonoBehaviour {
           return;
         }
         var dir = targetDelta.normalized;
-        Mover.UpdateAxes(Abilities, dir, dir);
+        Mover.SetMoveAim(dir, dir);
         await scope.Tick();
       }
     }
@@ -53,9 +53,9 @@ public class Wasp : MonoBehaviour {
       while (true) {
         if (TargetInRange(KiteRadius, out var targetDelta)) {
           var dir = -targetDelta.normalized;
-          Mover.UpdateAxes(Abilities, dir, dir);
+          Mover.SetMoveAim(dir, dir);
         } else {
-          Mover.UpdateAxes(Abilities, Vector3.zero, transform.forward.XZ());
+          Mover.SetMoveAim(Vector3.zero, transform.forward.XZ());
           return;
         }
         await scope.Tick();

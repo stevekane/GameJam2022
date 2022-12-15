@@ -10,6 +10,7 @@ public class Badger : MonoBehaviour {
   Status Status;
   Hurtbox Hurtbox;
   Transform Target;
+  Mover Mover;
   AbilityManager Abilities;
   AbilityManager TargetAbilities;
   Shield Shield;
@@ -22,6 +23,7 @@ public class Badger : MonoBehaviour {
     Target = GameObject.FindObjectOfType<Player>().transform;
     TargetAbilities = Target.GetComponent<AbilityManager>();
     Status = GetComponent<Status>();
+    Mover = GetComponent<Mover>();
     Hurtbox = GetComponentInChildren<Hurtbox>();
     Shield = GetComponentInChildren<Shield>();
     Abilities = GetComponent<AbilityManager>();
@@ -82,11 +84,11 @@ public class Badger : MonoBehaviour {
       var desiredMoveDir = Vector3.zero;
       if (!inRange)
         desiredMoveDir = (desiredPos - transform.position).XZ().normalized;
-      Mover.UpdateAxes(Abilities, desiredMoveDir, desiredFacing);
+      Mover.SetMoveAim(desiredMoveDir, desiredFacing);
       await scope.Tick();
     }
 
-    Mover.UpdateAxes(Abilities, Vector3.zero, transform.forward.XZ());
+    Mover.SetMoveAim(Vector3.zero, transform.forward.XZ());
 
     if (WasHit) {
       WasHit = false;
