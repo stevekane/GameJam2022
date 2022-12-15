@@ -24,6 +24,17 @@ public class VFXManager : MonoBehaviour {
     }
   }
 
+  public GameObject TrySpawnWithParent(GameObject prefab, Transform parent, float lifetime = 3f) {
+    if (prefab) {
+      var effect = Instantiate(prefab, parent);
+      if (lifetime >= 0f)
+        Destroy(effect, lifetime);
+        return effect;
+    } else {
+      return null;
+    }
+  }
+
   public GameObject TrySpawn2DEffect(GameObject prefab, Vector3 position, Quaternion rotation, float lifetime = 3f) {
     // This rotation trickery is an attempt to align a camera-facing spritesheet animation with the world-space orientation.
     // I don't know if this is correct. World-space y rotation correspends to a negative z rotation, I guess, but the x rotation

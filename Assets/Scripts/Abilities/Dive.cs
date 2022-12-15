@@ -34,7 +34,7 @@ public class Dive : Ability {
     HitConfig hitConfig = HitConfig;
     using var effect = Status.Add(ScriptedMove);
     SFXManager.Instance.TryPlayOneShot(WindupSFX);
-    VFXManager.Instance.TrySpawnEffect(WindupVFX, WindupVFXTransform.position, WindupVFXTransform.rotation, WindupDuration.Seconds);
+    VFXManager.Instance.TrySpawnWithParent(WindupVFX, WindupVFXTransform, 1);
     Animation = AnimationDriver.Play(scope, WindupAnimation);
     await scope.All(Animation.PauseAtFrame(Animation.NumFrames-1), Waiter.Delay(WindupDuration));
     Animation.Stop();
@@ -44,7 +44,7 @@ public class Dive : Ability {
     // Attack
     PhaseHits.Clear();
     SFXManager.Instance.TryPlayOneShot(LandSFX);
-    VFXManager.Instance.TrySpawnEffect(LandVFX, LandVFXTransform.position, LandVFXTransform.rotation);
+    VFXManager.Instance.TrySpawnEffect(LandVFX, AbilityManager.transform.position, Quaternion.LookRotation(Vector3.down));
     await scope.Any(Waiter.Delay(LandDuration), Waiter.Repeat(OnHit(hitConfig)));
     // Recovery
     Tags.AddFlags(AbilityTag.Cancellable);
