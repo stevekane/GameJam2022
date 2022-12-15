@@ -11,8 +11,8 @@ public class RepeatDive : MonoBehaviour {
   async void Start() {
     try {
       while (true) {
-        await Scope.Run(Jump.Activate);
-        await Scope.Run(Dive.Attack);
+        await Scope.Run(Jump.MainAction);
+        await Scope.Run(Dive.MainAction);
         await Scope.Delay(Wait);
       }
     } catch (Exception e) {
