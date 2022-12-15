@@ -4,6 +4,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public abstract class AbilityTask : IEnumerator {
+  public IEnumerator Enumerator;
+  public object Current { get => Enumerator.Current; }
+  public bool MoveNext() => Enumerator.MoveNext();
+  public void Dispose() => Enumerator = null;
+  public void Reset() => Enumerator = Routine();
+  public abstract IEnumerator Routine();
+}
+
 public interface IValue<T> {
   public T Value { get; }
 }
