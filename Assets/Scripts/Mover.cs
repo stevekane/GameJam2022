@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
@@ -18,8 +17,12 @@ public class Mover : MonoBehaviour {
   AnimationDriver AnimationDriver;
   Attributes Attributes;
   Status Status;
-  Vector3 Velocity;
-  Vector3 MoveAccum;
+  Vector3 MoveDelta;
+
+  public Vector3 InputVelocity { get; private set; }
+  public Vector3 GravitationalVelocity { get; private set; }
+  public Vector3 MoveVelocity { get; private set; }
+  public Vector3 Velocity { get; private set; }
 
   void Awake() {
     Controller = GetComponent<CharacterController>();
@@ -44,28 +47,29 @@ public class Mover : MonoBehaviour {
   public void SetAim(Vector3 v) => AbilityManager.GetAxis(AxisTag.Aim).Update(0, new Vector2(v.x, v.z));
   public Vector3 GetMove() => AbilityManager.GetAxis(AxisTag.Move).XZ;
   public Vector3 GetAim() => AbilityManager.GetAxis(AxisTag.Aim).XZ.TryGetDirection() ?? transform.forward;
-
-  public void Move(Vector3 delta) {
-    MoveAccum += delta;
-  }
+  public void Move(Vector3 delta) => MoveDelta += delta;
 
   void FixedUpdate() {
     var desiredMoveDir = GetMove();
     var desiredFacing = GetAim();
     var localTimeScale = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
+    var dt = localTimeScale * Time.fixedDeltaTime;
 
     // Move
     var moveSpeed = Attributes.GetValue(AttributeTag.MoveSpeed);
-    var gravity = localTimeScale * Time.fixedDeltaTime * Attributes.GetValue(AttributeTag.Gravity);
-    Velocity.x = localTimeScale * moveSpeed * desiredMoveDir.x;
-    Velocity.z = localTimeScale * moveSpeed * desiredMoveDir.z;
-    Velocity.y = Status switch {
+    var gravity = Vector3.up * dt * Attributes.GetValue(AttributeTag.Gravity);
+    InputVelocity = localTimeScale * moveSpeed * desiredMoveDir;
+    GravitationalVelocity = Status switch {
       Status { HasGravity: true, IsGrounded: true } => gravity,
-      Status { HasGravity: true, IsGrounded: false } => Velocity.y + gravity,
-      _ => 0
+      Status { HasGravity: true, IsGrounded: false } => GravitationalVelocity + gravity,
+      _ => Vector3.zero
     };
-    Controller.Move(localTimeScale * Time.fixedDeltaTime * Velocity + MoveAccum);
-    MoveAccum = Vector3.zero;
+    MoveVelocity = MoveDelta / Time.fixedDeltaTime;
+    Velocity = InputVelocity + GravitationalVelocity + MoveVelocity;
+    var inputDelta = dt * InputVelocity;
+    var gravitationalDelta = dt * GravitationalVelocity;
+    Controller.Move(inputDelta + gravitationalDelta + MoveDelta);
+    MoveDelta = Vector3.zero;
 
     // Turn
     var turnSpeed = Attributes.GetValue(AttributeTag.TurnSpeed);

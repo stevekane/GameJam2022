@@ -42,7 +42,7 @@ public class AttackAbility : Ability {
     SFXManager.Instance.TryPlayOneShot(AttackSFX);
     VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
     await scope.Any(Animation.WaitFrame(ActiveEnd.AnimFrames+1), Waiter.Repeat(OnHit(hitConfig)));
-    Tags.AddFlags(AbilityTag.Cancellable);
+    // Tags.AddFlags(AbilityTag.Cancellable);
     await Animation.WaitDone()(scope);
   }
 

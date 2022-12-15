@@ -46,7 +46,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Status: {fileID: 8540507123274114192}
+  Mover: {fileID: 8540507123274114223}
   ParticleSystem: {fileID: 3974881696494840204}
+  MinimumSpeed: 20
 --- !u!1 &8540507123161146150
 GameObject:
   m_ObjectHideFlags: 0
@@ -515,6 +517,10 @@ PrefabInstance:
     - target: {fileID: 8656522925564163052, guid: c1f341430e06e1745844c9664dc09613, type: 3}
       propertyPath: m_Name
       value: Knockback Smoke
+      objectReference: {fileID: 0}
+    - target: {fileID: 8656522925583198860, guid: c1f341430e06e1745844c9664dc09613, type: 3}
+      propertyPath: playOnAwake
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 114979979335704276, guid: c1f341430e06e1745844c9664dc09613, type: 3}
