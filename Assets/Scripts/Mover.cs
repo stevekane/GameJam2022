@@ -7,33 +7,10 @@ using UnityEngine;
 [RequireComponent(typeof(Attributes))]
 [RequireComponent(typeof(Status))]
 public class Mover : MonoBehaviour {
-  public static void UpdateAxes(AbilityManager manager, Vector3 desiredMoveDir, Vector3 desiredFacing) {
-    SetMove(manager, desiredMoveDir);
-    SetAim(manager, desiredFacing);
-  }
-  public static void SetMove(AbilityManager manager, Vector3 desiredMoveDir) {
-    manager.GetAxis(AxisTag.Move).Update(0f, new Vector2(desiredMoveDir.x, desiredMoveDir.z));
-  }
-  public static void SetAim(AbilityManager manager, Vector3 desiredFacing) {
-    manager.GetAxis(AxisTag.Aim).Update(0f, new Vector2(desiredFacing.x, desiredFacing.z));
-  }
-  public static void GetAxes(AbilityManager manager, out Vector3 desiredMoveDir, out Vector3 desiredFacing) {
-    desiredMoveDir = manager.GetAxis(AxisTag.Move).XZ;
-    desiredFacing = manager.GetAxis(AxisTag.Aim).XZ.TryGetDirection() ?? manager.transform.forward;
-  }
-
-  public static Quaternion RotationFromDesired(Vector3 forward, float speed, Vector3 desiredForward) =>
-    RotationFromDesired(Quaternion.LookRotation(forward), speed, desiredForward);
   public static Quaternion RotationFromDesired(Quaternion rotation, float speed, Vector3 desiredForward) {
     var desiredRotation = Quaternion.LookRotation(desiredForward);
     var degrees = speed * Time.fixedDeltaTime;
     return Quaternion.RotateTowards(rotation, desiredRotation, degrees);
-  }
-  static Quaternion RotationFromDesired(Transform t, float speed, Vector3 desiredForward) {
-    var currentRotation = t.rotation;
-    var desiredRotation = Quaternion.LookRotation(desiredForward);
-    var degrees = speed * Time.fixedDeltaTime;
-    return Quaternion.RotateTowards(currentRotation, desiredRotation, degrees);
   }
 
   CharacterController Controller;
@@ -52,35 +29,21 @@ public class Mover : MonoBehaviour {
     Status = GetComponent<Status>();
   }
 
-  public IEnumerator TryAimAt(Vector3 desired, Timeval MaxDuration, float tolerance = .95f) {
-    Mover.GetAxes(AbilityManager, out var desiredMove, out var desiredFacing);
-    Mover.UpdateAxes(AbilityManager, desiredMove, desired);
-    var aimingTimeout = Fiber.Wait(MaxDuration.Ticks);
-    var aimed = Fiber.Until(() => Vector3.Dot(transform.forward, desired) >= tolerance);
-    yield return Fiber.Any(aimingTimeout, aimed);
-  }
-
   public void TryLookAt(Transform target) {
     if (target) {
       SetAim((target.position-transform.position).normalized);
     }
   }
 
-  public Vector3 GetMove() {
-    return AbilityManager.GetAxis(AxisTag.Move).XZ;
+  public void SetMoveAim(Vector3 move, Vector3 aim) {
+    SetMove(move);
+    SetAim(aim);
   }
 
-  public Vector3 GetAim() {
-    return AbilityManager.GetAxis(AxisTag.Aim).XZ.TryGetDirection() ?? transform.forward;
-  }
-
-  public void SetMove(Vector3 v) {
-    AbilityManager.GetAxis(AxisTag.Move).Update(0, new Vector2(v.x, v.z));
-  }
-
-  public void SetAim(Vector3 v) {
-    AbilityManager.GetAxis(AxisTag.Aim).Update(0, new Vector2(v.x, v.z));
-  }
+  public void SetMove(Vector3 v) => AbilityManager.GetAxis(AxisTag.Move).Update(0, new Vector2(v.x, v.z));
+  public void SetAim(Vector3 v) => AbilityManager.GetAxis(AxisTag.Aim).Update(0, new Vector2(v.x, v.z));
+  public Vector3 GetMove() => AbilityManager.GetAxis(AxisTag.Move).XZ;
+  public Vector3 GetAim() => AbilityManager.GetAxis(AxisTag.Aim).XZ.TryGetDirection() ?? transform.forward;
 
   public void Move(Vector3 delta) {
     MoveAccum += delta;
@@ -107,7 +70,7 @@ public class Mover : MonoBehaviour {
     // Turn
     var turnSpeed = Attributes.GetValue(AttributeTag.TurnSpeed);
     var localTurnSpeed = localTimeScale * turnSpeed;
-    transform.rotation = RotationFromDesired(transform.forward, localTurnSpeed, desiredFacing);
+    transform.rotation = RotationFromDesired(transform.rotation, localTurnSpeed, desiredFacing);
 
     // Animation
     var animator = AnimationDriver.Animator;

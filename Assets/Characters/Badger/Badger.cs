@@ -1,28 +1,29 @@
 using System;
 using System.Collections;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class Badger : MonoBehaviour {
   public float AttackRange = 2f;
   public Timeval AttackDelay = Timeval.FromMillis(1000);
   Status Status;
-  Defender Defender;
   Hurtbox Hurtbox;
   Transform Target;
+  Mover Mover;
   AbilityManager Abilities;
   AbilityManager TargetAbilities;
   Shield Shield;
   MeleeAbility PunchAbility;
   ShieldAbility ShieldAbility;
-  Bundle Bundle = new();
+  TaskScope MainScope = new();
   bool WasHit = false;
 
   public void Awake() {
     Target = GameObject.FindObjectOfType<Player>().transform;
     TargetAbilities = Target.GetComponent<AbilityManager>();
     Status = GetComponent<Status>();
-    Defender = GetComponent<Defender>();
+    Mover = GetComponent<Mover>();
     Hurtbox = GetComponentInChildren<Hurtbox>();
     Shield = GetComponentInChildren<Shield>();
     Abilities = GetComponent<AbilityManager>();
@@ -50,62 +51,62 @@ public class Badger : MonoBehaviour {
     return delta.sqrMagnitude < .1f;
   }
 
-  void Start() => Bundle.StartRoutine(Fiber.Repeat(Behavior));
-  void FixedUpdate() => Bundle.MoveNext();
+  void Start() => MainScope.Start(Waiter.Repeat(Behavior));
+  void OnDestroy() => MainScope.Dispose();
 
-  IEnumerator Behavior() {
+  async Task Behavior(TaskScope scope) {
     if (Target == null) {
-      Bundle.Stop();
-      yield break;
+      MainScope.Cancel();
+      return;
     }
 
     var desiredPos = ChoosePosition();
     var desiredFacing = (Target.position - transform.position).XZ().normalized;
     var inRange = IsInRange(desiredPos);
 
-    IEnumerator MaybeAttack() {
+    async Task MaybeAttack(TaskScope scope) {
       if (Status.CanAttack) {
         if (TargetIsAttacking && Shield) {
           Abilities.TryInvoke(ShieldAbility.MainAction);
           // Hold shield until .5s after target stops attacking, or it dies.
-          yield return Fiber.Any(
+          await scope.Any(
             TrueForDuration(Timeval.FromSeconds(.5f), () => !TargetIsAttacking),
-            Fiber.While(() => Shield != null));
-          yield return Abilities.TryRun(ShieldAbility.MainRelease);
+            Waiter.While(() => Shield != null));
+          await Abilities.TryRun(scope, ShieldAbility.MainRelease);
         } else if (inRange) {
-          yield return Abilities.TryRun(PunchAbility.MainAction);
-          yield return Fiber.Wait(AttackDelay.Ticks);
+          await Abilities.TryRun(scope, PunchAbility.MainAction);
+          await scope.Delay(AttackDelay);
         }
       }
     }
 
-    IEnumerator Move() {
+    async Task Move(TaskScope scope) {
       var desiredMoveDir = Vector3.zero;
       if (!inRange)
         desiredMoveDir = (desiredPos - transform.position).XZ().normalized;
-      Mover.UpdateAxes(Abilities, desiredMoveDir, desiredFacing);
-      yield return null;
+      Mover.SetMoveAim(desiredMoveDir, desiredFacing);
+      await scope.Tick();
     }
 
-    Mover.UpdateAxes(Abilities, Vector3.zero, transform.forward.XZ());
+    Mover.SetMoveAim(Vector3.zero, transform.forward.XZ());
 
     if (WasHit) {
       WasHit = false;
       ShieldAbility.Stop();
-      yield return Fiber.Wait(Timeval.FromSeconds(.5f));
-      yield break;
+      await scope.Millis(500);
+      return;
     }
 
-    yield return MaybeAttack();
-    yield return Move();
+    await MaybeAttack(scope);
+    await Move(scope);
   }
 
-  IEnumerator TrueForDuration(Timeval waitTime, Func<bool> pred) {
+  TaskFunc TrueForDuration(Timeval waitTime, Func<bool> pred) => async (TaskScope scope) => {
     var ticks = waitTime.Ticks;
     while (ticks-- > 0) {
       if (!pred())
         ticks = waitTime.Ticks;
-      yield return null;
+      await scope.Tick();
     }
-  }
+  };
 }

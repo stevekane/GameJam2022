@@ -31,10 +31,12 @@ public abstract class Ability : MonoBehaviour {
   public virtual bool IsRunning { get => ActiveTasks.Count > 0; }
   TaskScope MainScope = new();
   List<AbilityMethod> ActiveTasks = new();  // TODO(Task): could just be a refcount instead?
-  public void MaybeStartTask(AbilityMethod func) => MainScope.Start(s => TaskRunner(s, func));
+  public void MaybeStartTask(AbilityMethod func) {
+    MainScope.Start(s => TaskRunner(s, func));
+    ActiveTasks.Add(func);
+  }
   public async Task TaskRunner(TaskScope scope, AbilityMethod func) {
     try {
-      ActiveTasks.Add(func);
       scope.ThrowIfCancelled();
       if (func(scope) is var task && task != null)  // Can return null if used only as a key for the event.
         await task;
