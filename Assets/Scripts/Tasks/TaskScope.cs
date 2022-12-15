@@ -50,12 +50,12 @@ public class TaskScope : IDisposable {
   // Fiber adapter.
   public async Task RunFiber(IEnumerator routine) {
     ThrowIfCancelled();
-    Fiber f = routine as Fiber ?? new Fiber(routine);
     try {
-      while (f.MoveNext())
+      while (routine.MoveNext())
         await Tick();
     } catch {
-      f.Stop();
+      if (routine is IStoppable s)
+        s.Stop();
     }
   }
 

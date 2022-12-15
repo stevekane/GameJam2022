@@ -271,6 +271,7 @@ public class Status : MonoBehaviour {
       e.OnRemoved(this);
       e.Status = null;
       Active.Remove(e);
+      Added.Remove(e);
     });
     Removed.Clear();
     Added.ForEach(e => Active.Add(e));

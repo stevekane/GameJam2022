@@ -2,6 +2,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Threading.Tasks;
 
 namespace PigMoss {
   public class PigMoss : MonoBehaviour {
@@ -13,20 +14,20 @@ namespace PigMoss {
     [SerializeField] BlackBoard BlackBoard;
 
     Mover Mover;
-    Fiber Behavior;
     int AbilityIndex;
+    TaskScope MainScope = new();
 
     private void Awake() {
       Mover = GetComponent<Mover>();
     }
-    void Start() => Behavior = new Fiber(Fiber.Repeat(MakeBehavior));
-    void OnDestroy() => Behavior.Stop();
-    void FixedUpdate() => Behavior.MoveNext();
 
-    IEnumerator MakeBehavior() {
+    void Start() => MainScope.Start(Waiter.Repeat(Behavior));
+    void OnDestroy() => MainScope.Dispose();
+
+    async Task Behavior(TaskScope scope) {
       // Targeting
       var acquireTargets = new AcquireTargets(transform, TargetingConfig, PhysicsQuery.Colliders);
-      yield return acquireTargets;
+      await scope.RunFiber(acquireTargets);
 
       // Scoring
       AbilityManager.InitAbilities(Abilities);
@@ -57,12 +58,10 @@ namespace PigMoss {
         }
       }
       AbilityIndex = indices[UnityEngine.Random.Range(0, indices.Count)];
-      yield return AbilityManager.TryRun(Abilities[AbilityIndex].MainAction);
+      await AbilityManager.TryRun(scope, Abilities[AbilityIndex].MainAction);
 
       // Cooldown
-      var cooldown = Fiber.Wait(ActionCooldown);
-      var pursue = Fiber.Repeat(PursueTarget);
-      yield return Fiber.Any(cooldown, pursue);
+      await scope.Any(Waiter.Delay(ActionCooldown), Waiter.Repeat(PursueTarget));
       // TODO: This seems hacky? must be a nicer way to stop trying to move...
       // I kinda feel like it should be set every frame or something
       Mover.SetMoveAim(Vector3.zero, transform.forward.XZ());

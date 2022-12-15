@@ -28,12 +28,11 @@ public class Jump : Ability {
         Mover.Move(Time.fixedDeltaTime * velocity);
       }, "Jumping"));
 
-      // Double-jump.
-      JumpsRemaining--;
       // Reset jumps when grounded.
       AbilityManager.MainScope.Start(async s => {
         if (Status.IsGrounded)  // May not have started jumping before this runs.
           await s.Until(() => !Status.IsGrounded);
+        JumpsRemaining--;
         await s.Until(() => Status.IsGrounded);
         JumpsRemaining = 2;
       });
