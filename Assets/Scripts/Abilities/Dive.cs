@@ -34,7 +34,7 @@ public class Dive : Ability {
     HitConfig hitConfig = HitConfig;
     using var effect = Status.Add(ScriptedMove);
     SFXManager.Instance.TryPlayOneShot(WindupSFX);
-    Destroy(Instantiate(WindupVFX, WindupVFXTransform), 1);
+    VFXManager.Instance.TrySpawnWithParent(WindupVFX, WindupVFXTransform, 1);
     Animation = AnimationDriver.Play(scope, WindupAnimation);
     await scope.All(Animation.PauseAtFrame(Animation.NumFrames-1), Waiter.Delay(WindupDuration));
     Animation.Stop();
