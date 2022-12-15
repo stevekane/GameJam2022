@@ -34,15 +34,18 @@ public class TaskScope : IDisposable {
     ThrowIfCancelled();
     return task;
   }
-  public static void Start(Task task) => task.Start(TaskScheduler.FromCurrentSynchronizationContext());
   public void Start(TaskFunc f) {
+    ThrowIfCancelled();
+    TaskScope scope = new(this);
     var task = new Task(async () => {
       try {
-        await f(this);
+        await f(scope);
       } catch (OperationCanceledException) {
+      } finally {
+        scope.Dispose();
       }
     });
-    Start(task);
+    task.Start(TaskScheduler.FromCurrentSynchronizationContext());
   }
   // Fiber adapter.
   public async Task RunFiber(IEnumerator routine) {

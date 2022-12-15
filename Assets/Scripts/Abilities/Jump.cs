@@ -30,14 +30,13 @@ public class Jump : Ability {
 
       // Double-jump.
       JumpsRemaining--;
-      if (Status.IsGrounded) {
-        // Reset jumps when grounded.
-        AbilityManager.MainScope.Start(async s => {
+      // Reset jumps when grounded.
+      AbilityManager.MainScope.Start(async s => {
+        if (Status.IsGrounded)  // May not have started jumping before this runs.
           await s.Until(() => !Status.IsGrounded);
-          await s.Until(() => Status.IsGrounded);
-          JumpsRemaining = 2;
-        });
-      }
+        await s.Until(() => Status.IsGrounded);
+        JumpsRemaining = 2;
+      });
 
       await scope.Any(Waiter.All(Waiter.While(() => Holding), Waiter.Delay(MinDuration)), Waiter.Delay(MaxDuration));
     } finally {

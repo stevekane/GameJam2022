@@ -31,23 +31,19 @@ public abstract class Ability : MonoBehaviour {
   public virtual bool IsRunning { get => ActiveTasks.Count > 0; }
   TaskScope MainScope = new();
   List<AbilityMethod> ActiveTasks = new();  // TODO(Task): could just be a refcount instead?
-  public void MaybeStartTask(AbilityMethod func) {
-    var task = new Task(async () => {
-      using TaskScope scope = new(MainScope);
-      try {
-        scope.ThrowIfCancelled();
-        var result = func(scope);
-        if (result != null)  // Can return null if used only as a key for the event.
-          await result;
-      } catch (OperationCanceledException) {
-      } finally {
-        ActiveTasks.Remove(func);
-        if (ActiveTasks.Count == 0)
-          Stop(); // TODO: Don't think this is right.. in the cancellation case, this will be called twice.
-      }
-    });
-    ActiveTasks.Add(func);
-    TaskScope.Start(task);
+  public void MaybeStartTask(AbilityMethod func) => MainScope.Start(s => TaskRunner(s, func));
+  public async Task TaskRunner(TaskScope scope, AbilityMethod func) {
+    try {
+      ActiveTasks.Add(func);
+      scope.ThrowIfCancelled();
+      if (func(scope) is var task && task != null)  // Can return null if used only as a key for the event.
+        await task;
+    } catch (OperationCanceledException) {
+    } finally {
+      ActiveTasks.Remove(func);
+      if (ActiveTasks.Count == 0)
+        Stop(); // TODO: Don't think this is right.. in the cancellation case, this will be called twice.
+    }
   }
   public TaskFunc ListenFor(AbilityMethod method) => s => s.ListenFor(AbilityManager.GetEvent(method));
   // Main entry points, bound to JustDown/JustUp for player.
