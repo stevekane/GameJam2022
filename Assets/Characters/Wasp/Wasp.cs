@@ -10,13 +10,8 @@ public class Wasp : MonoBehaviour {
   Transform Target;
   AbilityManager Abilities;
   Mover Mover;
-  int FramesRemaining = 0;
-  Ability CurrentAbility;
   PelletAbility Pellet;
   TaskScope MainScope = new();
-
-  enum StateType { Idle, Chase, Shoot, Kite }
-  StateType State = StateType.Idle;
 
   public void Awake() {
     Target = GameObject.FindObjectOfType<Player>().transform;

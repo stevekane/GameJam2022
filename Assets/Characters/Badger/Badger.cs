@@ -8,7 +8,6 @@ public class Badger : MonoBehaviour {
   public float AttackRange = 2f;
   public Timeval AttackDelay = Timeval.FromMillis(1000);
   Status Status;
-  Defender Defender;
   Hurtbox Hurtbox;
   Transform Target;
   AbilityManager Abilities;
@@ -23,7 +22,6 @@ public class Badger : MonoBehaviour {
     Target = GameObject.FindObjectOfType<Player>().transform;
     TargetAbilities = Target.GetComponent<AbilityManager>();
     Status = GetComponent<Status>();
-    Defender = GetComponent<Defender>();
     Hurtbox = GetComponentInChildren<Hurtbox>();
     Shield = GetComponentInChildren<Shield>();
     Abilities = GetComponent<AbilityManager>();
