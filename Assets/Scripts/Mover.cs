@@ -52,14 +52,6 @@ public class Mover : MonoBehaviour {
     Status = GetComponent<Status>();
   }
 
-  public IEnumerator TryAimAt(Vector3 desired, Timeval MaxDuration, float tolerance = .95f) {
-    Mover.GetAxes(AbilityManager, out var desiredMove, out var desiredFacing);
-    Mover.UpdateAxes(AbilityManager, desiredMove, desired);
-    var aimingTimeout = Fiber.Wait(MaxDuration.Ticks);
-    var aimed = Fiber.Until(() => Vector3.Dot(transform.forward, desired) >= tolerance);
-    yield return Fiber.Any(aimingTimeout, aimed);
-  }
-
   public void TryLookAt(Transform target) {
     if (target) {
       SetAim((target.position-transform.position).normalized);

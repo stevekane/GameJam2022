@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class Wasp : MonoBehaviour {
@@ -8,9 +9,11 @@ public class Wasp : MonoBehaviour {
   Status Status;
   Transform Target;
   AbilityManager Abilities;
+  Mover Mover;
   int FramesRemaining = 0;
   Ability CurrentAbility;
   PelletAbility Pellet;
+  TaskScope MainScope = new();
 
   enum StateType { Idle, Chase, Shoot, Kite }
   StateType State = StateType.Idle;
@@ -18,64 +21,55 @@ public class Wasp : MonoBehaviour {
   public void Awake() {
     Target = GameObject.FindObjectOfType<Player>().transform;
     Status = GetComponent<Status>();
+    Mover = GetComponent<Mover>();
     Abilities = GetComponent<AbilityManager>();
     Pellet = GetComponentInChildren<PelletAbility>();
   }
+  void Start() => MainScope.Start(Waiter.Repeat(Behavior));
+  void OnDestroy() => MainScope.Dispose();
 
-  void FixedUpdate() {
-    if (Target == null)
+  async Task Behavior(TaskScope scope) {
+    if (Target == null) {
+      MainScope.Cancel();
       return;
+    }
 
-    if (!CurrentAbility?.IsRunning ?? false)
-      CurrentAbility = null;
-    var desiredMoveDir = Vector3.zero;
-    var desiredFacing = transform.forward;
-
-    switch (State) {
-    case StateType.Idle:
-      if (--FramesRemaining <= 0) {
-        State = StateType.Chase;
-        break;
-      }
-      break;
-    case StateType.Chase: {
-        var targetDelta = (Target.transform.position - transform.position);
-        var targetInRange = targetDelta.sqrMagnitude < ShootRadius*ShootRadius;
-        var dir = targetDelta.normalized;
-        desiredFacing = dir;
-        if (targetInRange && Status.CanAttack && CurrentAbility == null) {
-          State = StateType.Shoot;
-          Abilities.TryInvoke(Pellet.MainAction);
-          CurrentAbility = Abilities.Abilities.FirstOrDefault((a) => a.IsRunning);
-        } else {
-          desiredMoveDir = dir;
+    var KiteRadius = ShootRadius - 5f;
+    bool TargetInRange(float dist, out Vector3 delta) {
+      delta = (Target.transform.position - transform.position);
+      return delta.sqrMagnitude < dist*dist;
+    }
+    async Task Chase(TaskScope scope) {
+      while (true) {
+        if (TargetInRange(ShootRadius, out var targetDelta) && Status.CanAttack) {
+          Mover.UpdateAxes(Abilities, Vector3.zero, transform.forward.XZ());
+          await scope.Any(
+            s => Abilities.TryRun(s, Pellet.MainAction),
+            Waiter.Repeat(() => Mover.TryLookAt(Target)));
+          await scope.Delay(ShootDelay);
+          return;
         }
-        break;
-      }
-    case StateType.Shoot: {
-        var targetDelta = (Target.transform.position - transform.position);
         var dir = targetDelta.normalized;
-        desiredFacing = dir;
-        if (CurrentAbility == null) {
-          State = StateType.Kite;
-        }
-        break;
+        Mover.UpdateAxes(Abilities, dir, dir);
+        await scope.Tick();
       }
-    case StateType.Kite: {
-        var targetDelta = (Target.transform.position - transform.position);
-        var desiredDist = ShootRadius - 5f;
-        if (targetDelta.sqrMagnitude < desiredDist*desiredDist && Status.CanMove) {
+    }
+    async Task Kite(TaskScope scope) {
+      while (true) {
+        if (TargetInRange(KiteRadius, out var targetDelta)) {
           var dir = -targetDelta.normalized;
-          desiredMoveDir = dir;
-          desiredFacing = dir;
+          Mover.UpdateAxes(Abilities, dir, dir);
         } else {
-          State = StateType.Idle;
-          FramesRemaining = ShootDelay.Ticks;
+          Mover.UpdateAxes(Abilities, Vector3.zero, transform.forward.XZ());
+          return;
         }
-        break;
+        await scope.Tick();
       }
     }
 
-    Mover.UpdateAxes(Abilities, desiredMoveDir, desiredFacing);
+    if (TargetInRange(KiteRadius, out var delta))
+      await Kite(scope);
+    else
+      await Chase(scope);
   }
 }
