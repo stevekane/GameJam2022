@@ -5,16 +5,19 @@ using UnityEngine;
 
 public class Dive : Ability {
   [SerializeField] float FallSpeed;
-  [SerializeField] Timeval ActiveEnd;
-  [SerializeField] Timeval RecoveryEnd;
   [SerializeField] HitConfig HitConfig;
+  [SerializeField] Timeval WindupDuration;
+  [SerializeField] Timeval LandDuration;
+  [SerializeField] Timeval RecoveryDuration;
   [SerializeField] AnimationJobConfig WindupAnimation;
-  [SerializeField] AnimationJobConfig AttackAnimation;
-  [SerializeField] TriggerEvent TriggerEvent;
-  [SerializeField] Collider HitBox;
-  [SerializeField] Vector3 AttackVFXOffset;
-  [SerializeField] GameObject AttackVFX;
-  [SerializeField] AudioClip AttackSFX;
+  [SerializeField] AnimationJobConfig FallAnimation;
+  [SerializeField] Transform WindupVFXTransform;
+  [SerializeField] GameObject WindupVFX;
+  [SerializeField] AudioClip WindupSFX;
+  [SerializeField] Transform LandVFXTransform;
+  [SerializeField] GameObject LandVFX;
+  [SerializeField] AudioClip LandSFX;
+  [SerializeField] TriggerEvent Hitbox;
 
   [NonSerialized] Collider[] Hits = new Collider[16];
   [NonSerialized] HashSet<Collider> PhaseHits = new();
@@ -27,20 +30,26 @@ public class Dive : Ability {
   }, "DiveMove");
 
   public async Task Attack(TaskScope scope) {
-    Animation = AnimationDriver.Play(scope, WindupAnimation);
+    // Windup
     HitConfig hitConfig = HitConfig;
     using var effect = Status.Add(ScriptedMove);
-    await Animation.WaitDone()(scope);
-    await Fall(scope);
+    SFXManager.Instance.TryPlayOneShot(WindupSFX);
+    VFXManager.Instance.TrySpawnEffect(WindupVFX, WindupVFXTransform.position, WindupVFXTransform.rotation, WindupDuration.Seconds);
+    Animation = AnimationDriver.Play(scope, WindupAnimation);
+    await scope.All(Animation.PauseAtFrame(Animation.NumFrames-1), Waiter.Delay(WindupDuration));
+    Animation.Stop();
+    // Fall
+    Animation = AnimationDriver.Play(scope, FallAnimation);
+    await scope.All(Animation.PauseAtFrame(Animation.NumFrames-1), Fall);
+    // Attack
     PhaseHits.Clear();
-    var rotation = AbilityManager.transform.rotation;
-    var vfxOrigin = AbilityManager.transform.TransformPoint(AttackVFXOffset);
-    SFXManager.Instance.TryPlayOneShot(AttackSFX);
-    VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
-    Animation = AnimationDriver.Play(scope, AttackAnimation);
-    await scope.Any(Animation.WaitFrame(ActiveEnd.AnimFrames+1), Waiter.Repeat(OnHit(hitConfig)));
+    SFXManager.Instance.TryPlayOneShot(LandSFX);
+    VFXManager.Instance.TrySpawnEffect(LandVFX, LandVFXTransform.position, LandVFXTransform.rotation);
+    await scope.Any(Waiter.Delay(LandDuration), Waiter.Repeat(OnHit(hitConfig)));
+    // Recovery
     Tags.AddFlags(AbilityTag.Cancellable);
-    await Animation.WaitDone()(scope);
+    await scope.Delay(RecoveryDuration);
+    Animation.Stop();
   }
 
   async Task Fall(TaskScope scope) {
@@ -52,8 +61,8 @@ public class Dive : Ability {
 
   TaskFunc OnHit(HitConfig hitConfig) => async (TaskScope scope) => {
     try {
-      HitBox.enabled = true;
-      var hitCount = await scope.ListenForAll(TriggerEvent.OnTriggerStaySource, Hits);
+      Hitbox.enableCollision = true;
+      var hitCount = await scope.ListenForAll(Hitbox.OnTriggerStaySource, Hits);
       for (var i = 0; i < hitCount; i++) {
         var hit = Hits[i];
         if (!PhaseHits.Contains(hit) && hit.TryGetComponent(out Hurtbox hurtbox)) {
@@ -62,7 +71,7 @@ public class Dive : Ability {
         }
       }
     } finally {
-      HitBox.enabled = false;
+      Hitbox.enableCollision = false;
     }
   };
 }
