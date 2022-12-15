@@ -13,7 +13,6 @@ public enum AxisTag {
 public class AbilityManager : MonoBehaviour {
   [HideInInspector] public Ability[] Abilities;
   public Optional<Energy> Energy;
-  public Bundle Bundle = new();
   public TaskScope MainScope = new();
 
   public IEnumerable<Ability> Running { get => Abilities.Where(a => a.IsRunning); }
@@ -68,16 +67,13 @@ public class AbilityManager : MonoBehaviour {
     Status = GetComponent<Status>();
   }
   void OnDestroy() {
-    Bundle.Stop();
     Abilities.ForEach(a => a.Stop());
     Abilities.ForEach(a => a.AbilityManager = null);
     MethodToEvent.ForEach(kv => kv.Value.DisconnectSource());
   }
   void FixedUpdate() {
-    if (Status.IsHurt) {
+    if (Status.IsHurt)
       InterruptAbilities();
-    }
-    Bundle.MoveNext();
   }
 
   // All ability events route through this event source. Input-related event sources that connect to abilities

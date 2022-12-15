@@ -21,7 +21,7 @@ public class Dive : Ability {
 
   [NonSerialized] Collider[] Hits = new Collider[16];
   [NonSerialized] HashSet<Collider> PhaseHits = new();
-  [NonSerialized] AnimationJobTask Animation = null;
+  [NonSerialized] AnimationJob Animation = null;
 
   public static InlineEffect ScriptedMove => new(s => {
     s.HasGravity = false;

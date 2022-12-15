@@ -15,7 +15,7 @@ public class SlamAbility : Ability {
   public Vector3 FireVFXOffset;
   public float ChargeSpeedFactor = 1f/6f;
 
-  AnimationJobTask Animation;
+  AnimationJob Animation;
 
   void Start() {
     Animator = GetComponentInParent<Animator>();

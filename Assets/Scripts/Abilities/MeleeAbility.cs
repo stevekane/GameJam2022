@@ -25,7 +25,7 @@ public class MeleeAbility : Ability {
   public bool Chargeable = false;
 
   GameObject AttackVFXInstance;
-  AnimationJobTask Animation;
+  AnimationJob Animation;
   List<Hurtbox> Hits = new(capacity: 16);
   HashSet<Hurtbox> PhaseHits = new(capacity: 16);
 

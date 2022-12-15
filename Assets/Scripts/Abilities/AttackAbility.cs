@@ -21,7 +21,7 @@ public class AttackAbility : Ability {
 
   [NonSerialized] Collider[] Hits = new Collider[16];
   [NonSerialized] HashSet<Collider> PhaseHits = new();
-  [NonSerialized] AnimationJobTask Animation = null;
+  [NonSerialized] AnimationJob Animation = null;
 
   public override async Task MainAction(TaskScope scope) {
     Animation = AnimationDriver.Play(scope, AttackAnimation);
