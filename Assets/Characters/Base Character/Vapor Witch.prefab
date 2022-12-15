@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8087321096434592370}
   - component: {fileID: 6146343011195675188}
   m_Layer: 0
-  m_Name: SimpleDash
+  m_Name: Dash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -128,7 +128,7 @@ GameObject:
   - component: {fileID: 6111221259034757630}
   - component: {fileID: 7660922521612850758}
   m_Layer: 0
-  m_Name: AttackTask
+  m_Name: Primary Attack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -169,7 +169,7 @@ MonoBehaviour:
   Tags: 0
   Chargeable: 0
   WindupEnd:
-    Millis: 0
+    Millis: 125
     FramesPerSecond: 24
   ChargeEnd:
     Millis: 1
@@ -178,7 +178,7 @@ MonoBehaviour:
     Millis: 208.33333
     FramesPerSecond: 24
   RecoveryEnd:
-    Millis: 416.66666
+    Millis: 833.3333
     FramesPerSecond: 24
   HitConfig:
     DamageModifier:
@@ -189,7 +189,7 @@ MonoBehaviour:
     RecoilStrength: 9
     CameraShakeStrength: 1
     HitStopDuration:
-      Millis: 200
+      Millis: 100
       FramesPerSecond: 30
     StunDuration:
       Millis: 500
@@ -222,7 +222,7 @@ MonoBehaviour:
   AttackAnimation:
     Clip: {fileID: 7400000, guid: 62766a0642318924eaec6b6094e7cf70, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
-    Speed: 3
+    Speed: 1
   TriggerEvent: {fileID: 7781392534903117839}
   HitBox: {fileID: 796463285021203977}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
@@ -445,7 +445,7 @@ GameObject:
   - component: {fileID: 8232410521789651352}
   - component: {fileID: 6310204078310613430}
   m_Layer: 0
-  m_Name: ChargeAttack
+  m_Name: Heavy Charge Attack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -954,6 +954,19 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8540507123274114195, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
   m_PrefabInstance: {fileID: 6353001707408592015}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2171272179652211397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3364079649355753500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38b5f85dc564c4f4fafa2b5115a61de1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Dead: 0
 --- !u!114 &7001852881807073526
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -982,19 +995,6 @@ MonoBehaviour:
     AxisTag: 0
   - AxisCode: 0
     AxisTag: 1
---- !u!114 &2171272179652211397
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3364079649355753500}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38b5f85dc564c4f4fafa2b5115a61de1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Dead: 0
 --- !u!114 &3364079649355753510 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8540507123274114217, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
