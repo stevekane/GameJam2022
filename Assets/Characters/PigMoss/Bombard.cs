@@ -22,7 +22,7 @@ namespace PigMoss {
       return Mathf.Clamp01(BlackBoard.DistanceScore/25f);
     }
 
-    public async Task Routine(TaskScope scope) {
+    public override async Task MainAction(TaskScope scope) {
       try {
         SFXManager.Instance.TryPlayOneShot(WindupClip);
         Animator.SetBool("Extended", true);

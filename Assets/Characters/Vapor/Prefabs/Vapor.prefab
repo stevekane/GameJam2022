@@ -73,9 +73,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Method:
-      MethodName: Execute
-    Tags: 19
+  - Tags: 19
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
@@ -157,14 +155,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Method:
-      MethodName: ChargeStart
-    Tags: 19
+  - Tags: 19
     RequiredOwnerTags: 536870912
     EnergyCost: 0
-  - Method:
-      MethodName: ChargeRelease
-    Tags: 4
+  - Tags: 4
     RequiredOwnerTags: 536870912
     EnergyCost: 0
   Tags: 0
@@ -267,14 +261,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Method:
-      MethodName: ChargeStart
-    Tags: 35
+  - Tags: 35
     RequiredOwnerTags: 268435456
     EnergyCost: 0
-  - Method:
-      MethodName: ChargeRelease
-    Tags: 4
+  - Tags: 4
     RequiredOwnerTags: 268435456
     EnergyCost: 0
   Tags: 0
@@ -338,6 +328,7 @@ MonoBehaviour:
   AttackVFX: {fileID: 0}
   VFXOffset: {x: 0, y: 1, z: 0}
   Hitbox: {fileID: 614107697933067398}
+  Chargeable: 0
 --- !u!1 &2784476827323047724
 GameObject:
   m_ObjectHideFlags: 0
@@ -411,9 +402,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Method:
-      MethodName: AttackStart
-    Tags: 11
+  - Tags: 11
     RequiredOwnerTags: -2147483648
     EnergyCost: 0
   Tags: 0
@@ -508,9 +497,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Method:
-      MethodName: AttackStart
-    Tags: 33
+  - Tags: 33
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
@@ -574,6 +561,7 @@ MonoBehaviour:
   AttackVFX: {fileID: 7226583673155636401, guid: 21c6b51d75be0554b9d09aca74522e2e, type: 3}
   VFXOffset: {x: 0, y: 1, z: 0}
   Hitbox: {fileID: 4191209124205267904}
+  Chargeable: 0
 --- !u!1 &4804604425537202661
 GameObject:
   m_ObjectHideFlags: 0
@@ -647,9 +635,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Method:
-      MethodName: Execute
-    Tags: 9
+  - Tags: 9
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
@@ -723,14 +709,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Method:
-      MethodName: Begin
-    Tags: 8
+  - Tags: 8
     RequiredOwnerTags: 0
     EnergyCost: 5
-  - Method:
-      MethodName: Release
-    Tags: 4
+  - Tags: 4
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
@@ -937,75 +919,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ButtonMaps:
   - ButtonCode: 2
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 626726736180106372}
-      MethodName: Attack
-  - ButtonCode: 8
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 696150299245317217}
-      MethodName: Begin
-  - ButtonCode: 8
-    ButtonPressType: 2
-    Entry:
-      Ability: {fileID: 696150299245317217}
-      MethodName: Release
+    Ability: {fileID: 626726736180106372}
   - ButtonCode: 1
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 8522030806182356177}
-      MethodName: Begin
-  - ButtonCode: 1
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 3002947848983109568}
-      MethodName: AttackStart
+    Ability: {fileID: 5938650978471480679}
   - ButtonCode: 3
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 5938650978471480679}
-      MethodName: ChargeStart
-  - ButtonCode: 3
-    ButtonPressType: 2
-    Entry:
-      Ability: {fileID: 5938650978471480679}
-      MethodName: ChargeRelease
-  - ButtonCode: 8
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 4440389021436948925}
-      MethodName: Execute
-  - ButtonCode: 3
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 7621250335256250255}
-      MethodName: ChargeStart
-  - ButtonCode: 3
-    ButtonPressType: 2
-    Entry:
-      Ability: {fileID: 7621250335256250255}
-      MethodName: ChargeRelease
+    Ability: {fileID: 7621250335256250255}
   - ButtonCode: 0
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 3701212827919873877}
-      MethodName: Execute
+    Ability: {fileID: 2864923836562023574}
   - ButtonCode: 0
-    ButtonPressType: 2
-    Entry:
-      Ability: {fileID: 3701212827919873877}
-      MethodName: Release
-  - ButtonCode: 0
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 2864923836562023574}
-      MethodName: Pressed
-  - ButtonCode: 0
-    ButtonPressType: 2
-    Entry:
-      Ability: {fileID: 2864923836562023574}
-      MethodName: Release
+    Ability: {fileID: 3701212827919873877}
   AxisMaps:
   - AxisCode: 0
     AxisTag: 0
@@ -1419,9 +1341,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Method:
-      MethodName: Begin
-    Tags: 2
+  - Tags: 2
     RequiredOwnerTags: 1073741824
     EnergyCost: 10
   Tags: 0
@@ -1507,9 +1427,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Method:
-      MethodName: Pressed
-    Tags: 2
+  - Tags: 2
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
@@ -1595,9 +1513,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Method:
-      MethodName: AttackStart
-    Tags: 3
+  - Tags: 3
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
@@ -1661,6 +1577,7 @@ MonoBehaviour:
   AttackVFX: {fileID: 7226583673155636401, guid: 67c8e7d5d38369645a9629e0bc4ea132, type: 3}
   VFXOffset: {x: 0, y: 1, z: 0}
   Hitbox: {fileID: 2235355344487846090}
+  Chargeable: 0
 --- !u!1 &7848055432845249743
 GameObject:
   m_ObjectHideFlags: 0
@@ -1734,9 +1651,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Method:
-      MethodName: AttackStart
-    Tags: 33
+  - Tags: 33
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
@@ -1800,6 +1715,7 @@ MonoBehaviour:
   AttackVFX: {fileID: 7226583673155636401, guid: 21c6b51d75be0554b9d09aca74522e2e, type: 3}
   VFXOffset: {x: 0, y: 1, z: 0}
   Hitbox: {fileID: 5980368241445658472}
+  Chargeable: 0
 --- !u!1 &9127015034591396752
 GameObject:
   m_ObjectHideFlags: 0
@@ -1845,17 +1761,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Method:
-      MethodName: Attack
-    Tags: 2
+  - Tags: 2
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
   Abilities:
-  - Ability: {fileID: 5074622147386750202}
-    MethodName: AttackStart
-  - Ability: {fileID: 4591415989985486789}
-    MethodName: AttackStart
+  - {fileID: 5074622147386750202}
+  - {fileID: 4591415989985486789}
 --- !u!1001 &1011520355114941726
 PrefabInstance:
   m_ObjectHideFlags: 0

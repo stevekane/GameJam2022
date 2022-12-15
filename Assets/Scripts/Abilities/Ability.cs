@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
+public delegate IEnumerator LegacyAbilityMethod();
+public delegate Task AbilityMethod(TaskScope scope);
+
 [Serializable]
 public class TriggerCondition {
   internal static TriggerCondition Empty = new();
-  public AbilityMethodReferenceSelf Method;
+  internal static TriggerCondition BlockIfNotRunning = new() { Tags = AbilityTag.BlockIfNotRunning };
   public AbilityTag Tags = 0;
   public AbilityTag RequiredOwnerTags = 0;
   public float EnergyCost = 0f;
@@ -29,8 +32,8 @@ public abstract class Ability : MonoBehaviour {
   public virtual float Score() => 0;
   public virtual bool IsRunning { get => ActiveTasks.Count > 0; }
   TaskScope MainScope = new();
-  List<AbilityMethodTask> ActiveTasks = new();  // TODO(task): could just be a refcount instead?
-  public void MaybeStartTask(AbilityMethodTask func) {
+  List<AbilityMethod> ActiveTasks = new();  // TODO(task): could just be a refcount instead?
+  public void MaybeStartTask(AbilityMethod func) {
     var task = new Task(async () => {
       using TaskScope scope = new(MainScope);
       try {
@@ -50,9 +53,12 @@ public abstract class Ability : MonoBehaviour {
     ActiveTasks.Add(func);
     TaskScope.Start(task);
   }
-  public TaskFunc ListenFor(AbilityMethodTask method) => s => s.ListenFor(AbilityManager.GetEvent(method));
+  public TaskFunc ListenFor(AbilityMethod method) => s => s.ListenFor(AbilityManager.GetEvent(method));
+  // Main entry points, bound to JustDown/JustUp for player.
+  public virtual Task MainAction(TaskScope scope) => null;
+  public virtual Task MainRelease(TaskScope scope) => null;
+  public TriggerCondition GetTriggerCondition(LegacyAbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
   public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
-  public TriggerCondition GetTriggerCondition(AbilityMethodTask method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
   public void Stop() {
     LegacyStop();
     Tags = 0;
@@ -61,7 +67,8 @@ public abstract class Ability : MonoBehaviour {
   }
   protected virtual void LegacyStop() { }
   public virtual void Awake() {
-    TriggerConditions.ForEach(c => TriggerConditionsMap[c.Method.IsTask(this) ? c.Method.GetMethodTask(this) : c.Method.GetMethod(this)] = c);
+    TriggerConditionsMap[(AbilityMethod)MainAction] = TriggerConditions.Count > 0 ? TriggerConditions[0] : new();
+    TriggerConditionsMap[(AbilityMethod)MainRelease] = TriggerCondition.BlockIfNotRunning;
     MainScope = new();
   }
   public virtual void OnDestroy() => Stop();
@@ -76,7 +83,7 @@ public abstract class LegacyAbility : Ability {
   public void StartRoutine(Fiber routine) => Bundle.StartRoutine(routine);
   public Listener FiberListenFor(IEventSource evt) => Fiber.ListenFor(evt);
   public Listener<T> FiberListenFor<T>(IEventSource<T> evt) => Fiber.ListenFor(evt);
-  public Listener FiberListenFor(AbilityMethod method) => Fiber.ListenFor(AbilityManager.GetEvent(method));
+  public Listener FiberListenFor(LegacyAbilityMethod method) => Fiber.ListenFor(AbilityManager.GetEvent(method));
   protected List<IDisposable> Disposables = new();
   public T Using<T>(T d) where T : IDisposable {
     Disposables.Add(d);

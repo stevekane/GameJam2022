@@ -50,7 +50,7 @@ Transform:
   - {fileID: 3735475313303821151}
   - {fileID: 6421325524824663125}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1818372311317487519
 MonoBehaviour:
@@ -107,40 +107,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ButtonMaps:
   - ButtonCode: 0
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 6705401411987309461}
-      MethodName: Activate
+    Ability: {fileID: 6705401411987309461}
   - ButtonCode: 2
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 2994083438686922390}
-      MethodName: Attack
+    Ability: {fileID: 2994083438686922390}
   - ButtonCode: 3
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 6229237289894470566}
-      MethodName: ChargeAttack
-  - ButtonCode: 3
-    ButtonPressType: 2
-    Entry:
-      Ability: {fileID: 6229237289894470566}
-      MethodName: ChargeRelease
+    Ability: {fileID: 6229237289894470566}
   - ButtonCode: 1
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 5212089753699858940}
-      MethodName: Activate
-  - ButtonCode: 1
-    ButtonPressType: 2
-    Entry:
-      Ability: {fileID: 5212089753699858940}
-      MethodName: Release
+    Ability: {fileID: 5212089753699858940}
   - ButtonCode: 3
-    ButtonPressType: 0
-    Entry:
-      Ability: {fileID: 3306629136697047538}
-      MethodName: Attack
+    Ability: {fileID: 3306629136697047538}
   AxisMaps:
   - AxisCode: 0
     AxisTag: 0
@@ -408,9 +383,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Method:
-      MethodName: Attack
-    Tags: 161
+  - Tags: 161
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
@@ -430,13 +403,13 @@ MonoBehaviour:
       Millis: 500
       FramesPerSecond: 30
   WindupDuration:
-    Millis: 300
-    FramesPerSecond: 30
-  LandDuration:
     Millis: 500
     FramesPerSecond: 30
+  LandDuration:
+    Millis: 100
+    FramesPerSecond: 30
   RecoveryDuration:
-    Millis: 300
+    Millis: 333.33334
     FramesPerSecond: 30
   WindupAnimation:
     Clip: {fileID: 7400000, guid: d95a9fc399dec29429aba42a08e54091, type: 2}
@@ -447,7 +420,7 @@ MonoBehaviour:
     Mask: {fileID: 0}
     Speed: 1
   WindupVFXTransform: {fileID: 1815533418011165114}
-  WindupVFX: {fileID: 0}
+  WindupVFX: {fileID: 100000, guid: 77ec3c4e07a36814fb3169ecef41b50a, type: 3}
   WindupSFX: {fileID: 0}
   LandVFXTransform: {fileID: 2436655940960377493}
   LandVFX: {fileID: 159918, guid: f3d60ef1464f95348a9ffe17f312927e, type: 3}
@@ -498,14 +471,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Method:
-      MethodName: Activate
-    Tags: 17
-    RequiredOwnerTags: 0
-    EnergyCost: 0
-  - Method:
-      MethodName: Release
-    Tags: 4
+  - Tags: 17
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
@@ -960,12 +926,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Method:
-      MethodName: Attack
-    Tags: 33
+  - Tags: 33
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
+  Chargeable: 0
   WindupEnd:
     Millis: 0
     FramesPerSecond: 24
@@ -1071,9 +1036,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Method:
-      MethodName: Activate
-    Tags: 33
+  - Tags: 33
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
@@ -1168,17 +1131,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Method:
-      MethodName: ChargeAttack
-    Tags: 97
-    RequiredOwnerTags: 0
-    EnergyCost: 0
-  - Method:
-      MethodName: ChargeRelease
-    Tags: 4
+  - Tags: 97
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
+  Chargeable: 1
   WindupEnd:
     Millis: 0
     FramesPerSecond: 24

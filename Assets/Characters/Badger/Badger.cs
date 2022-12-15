@@ -66,14 +66,14 @@ public class Badger : MonoBehaviour {
     IEnumerator MaybeAttack() {
       if (Status.CanAttack) {
         if (TargetIsAttacking && Shield) {
-          Abilities.TryInvoke(ShieldAbility.HoldStart);
+          Abilities.TryInvoke(ShieldAbility.MainAction);
           // Hold shield until .5s after target stops attacking, or it dies.
           yield return Fiber.Any(
             TrueForDuration(Timeval.FromSeconds(.5f), () => !TargetIsAttacking),
             Fiber.While(() => Shield != null));
-          yield return Abilities.TryRun(ShieldAbility.HoldRelease);
+          yield return Abilities.TryRun(ShieldAbility.MainRelease);
         } else if (inRange) {
-          yield return Abilities.TryRun(PunchAbility.AttackStart);
+          yield return Abilities.TryRun(PunchAbility.MainAction);
           yield return Fiber.Wait(AttackDelay.Ticks);
         }
       }

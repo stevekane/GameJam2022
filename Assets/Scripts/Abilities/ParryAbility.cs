@@ -34,7 +34,7 @@ public class ParryAbility : LegacyAbility {
 
   public IEnumerator Riposte() {
     using (Status.Add(Invulnerable)) {
-      AbilityManager.TryInvoke(RiposteAbility.AttackStart);
+      AbilityManager.TryInvoke(RiposteAbility.MainAction);
       yield return Fiber.While(() => RiposteAbility.IsRunning);
     }
   }

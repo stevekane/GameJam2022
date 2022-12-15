@@ -21,7 +21,7 @@ namespace PigMoss {
       }
     }
 
-    public async Task Routine(TaskScope scope) {
+    public override async Task MainAction(TaskScope scope) {
       using var effect = Status.Add(new InlineEffect(status => {
         status.CanMove = false;
         status.CanRotate = false;

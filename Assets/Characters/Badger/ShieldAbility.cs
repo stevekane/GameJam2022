@@ -15,14 +15,14 @@ public class ShieldAbility : Ability {
       s.IsHittable = false;
     }, "ShieldInvulnerable");
 
-  public async Task HoldStart(TaskScope scope) {
+  public override async Task MainAction(TaskScope scope) {
     try {
       Animator.SetBool("Shielding", true);
       await Windup.Start(scope, Animator, Index);
       if (Shield && Shield.Hurtbox)
         Shield.Hurtbox.gameObject.SetActive(true);
       using (Status.Add(Invulnerable)) {
-        await scope.ListenFor(AbilityManager.GetEvent(HoldRelease));
+        await scope.ListenFor(AbilityManager.GetEvent(MainRelease));
       }
       if (Shield && Shield.Hurtbox)
         Shield.Hurtbox.gameObject.SetActive(false);
@@ -37,5 +37,4 @@ public class ShieldAbility : Ability {
         Shield.Hurtbox.gameObject.SetActive(false);
     }
   }
-  public Task HoldRelease(TaskScope _) => null;
 }

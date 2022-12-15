@@ -1,14 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEngine;
 
 [Serializable]
 public class ButtonTriggerMap {
   public ButtonCode ButtonCode;
-  public ButtonPressType ButtonPressType;
-  public AbilityMethodReference Entry;
+  public Ability Ability;
 }
 
 [Serializable]
@@ -25,14 +22,8 @@ public class InputToTriggerMap : MonoBehaviour {
   void Start() {
     var AbilityManager = GetComponent<AbilityManager>();
     ButtonMaps.ForEach(b => {
-      var methodInfo = b.Entry.Ability.GetType().GetMethod(b.Entry.MethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-      if (methodInfo.ReturnType == typeof(IEnumerator)) {
-        var method = (AbilityMethod)Delegate.CreateDelegate(typeof(AbilityMethod), b.Entry.Ability, methodInfo);
-        AbilityManager.RegisterEvent(method, InputManager.Instance.ButtonEvent(b.ButtonCode, b.ButtonPressType));
-      } else {
-        var method = (AbilityMethodTask)Delegate.CreateDelegate(typeof(AbilityMethodTask), b.Entry.Ability, methodInfo);
-        AbilityManager.RegisterEvent(method, InputManager.Instance.ButtonEvent(b.ButtonCode, b.ButtonPressType));
-      }
+      AbilityManager.RegisterEvent(b.Ability.MainAction, InputManager.Instance.ButtonEvent(b.ButtonCode, ButtonPressType.JustDown));
+      AbilityManager.RegisterEvent(b.Ability.MainRelease, InputManager.Instance.ButtonEvent(b.ButtonCode, ButtonPressType.JustUp));
     });
     AxisMaps.ForEach(a => {
       AbilityManager.RegisterAxis(a.AxisTag, InputManager.Instance.Axis(a.AxisCode));

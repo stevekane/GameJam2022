@@ -40,44 +40,34 @@ public class AbilityManager : MonoBehaviour {
     var router = CreateRouter(method);
     router.ConnectSource(evt);
   }
-  public void RegisterEvent(AbilityMethodTask method, IEventSource evt) {
-    var router = CreateRouter(method);
-    router.ConnectSource(evt);
-  }
   public AxisState GetAxis(AxisTag tag) {
     if (!TagToAxis.TryGetValue(tag, out AxisState axis))
       TagToAxis[tag] = axis = new();
     return axis;
+  }
+  public IEventSource GetEvent(LegacyAbilityMethod method) {
+    if (!MethodToEvent.TryGetValue(method, out EventRouter evt))
+      evt = CreateRouter(method);
+    return evt;
   }
   public IEventSource GetEvent(AbilityMethod method) {
     if (!MethodToEvent.TryGetValue(method, out EventRouter evt))
       evt = CreateRouter(method);
     return evt;
   }
-  public IEventSource GetEvent(AbilityMethodTask method) {
-    if (!MethodToEvent.TryGetValue(method, out EventRouter evt))
-      evt = CreateRouter(method);
-    return evt;
-  }
   public void TryInvoke(AbilityMethod method) => GetEvent(method).Fire();
-  public void TryInvoke(AbilityMethodTask method) => GetEvent(method).Fire();
   public IEnumerator TryRun(AbilityMethod method) {
     var ability = (Ability)method.Target;
     GetEvent(method).Fire();
     yield return Fiber.While(() => ability.IsRunning);
   }
-  public IEnumerator TryRun(AbilityMethodTask method) {
-    var ability = (Ability)method.Target;
-    GetEvent(method).Fire();
-    yield return Fiber.While(() => ability.IsRunning);
-  }
-  public async Task TryRun(TaskScope scope, AbilityMethodTask method) {
+  public async Task TryRun(TaskScope scope, AbilityMethod method) {
     var ability = (Ability)method.Target;
     GetEvent(method).Fire();
     await scope.While(() => ability.IsRunning);
   }
+  EventRouter CreateRouter(LegacyAbilityMethod method) => MethodToEvent[method] = new EventRouter((Ability)method.Target, method);
   EventRouter CreateRouter(AbilityMethod method) => MethodToEvent[method] = new EventRouter((Ability)method.Target, method);
-  EventRouter CreateRouter(AbilityMethodTask method) => MethodToEvent[method] = new EventRouter((Ability)method.Target, method);
 
   void Awake() {
     InitAbilities(GetComponentsInChildren<Ability>());
@@ -103,18 +93,21 @@ public class AbilityManager : MonoBehaviour {
     IEventSource EventSource;
     Action Action;
     Ability Ability;
-    AbilityMethod Method;
-    AbilityMethodTask MethodTask;
+    LegacyAbilityMethod Method;
+    AbilityMethod MethodTask;
     TriggerCondition Trigger;
-    public EventRouter(Ability ability, AbilityMethod method) =>
+    public EventRouter(Ability ability, LegacyAbilityMethod method) =>
       (Ability, Method, Trigger) = (ability, method, ability.GetTriggerCondition(method));
-    public EventRouter(Ability ability, AbilityMethodTask method) =>
+    public EventRouter(Ability ability, AbilityMethod method) =>
       (Ability, MethodTask, Trigger) = (ability, method, ability.GetTriggerCondition(method));
     public void ConnectSource(IEventSource evt) => (EventSource = evt).Listen(Fire);
     public void DisconnectSource() => EventSource?.Unlisten(Fire);
     public void Listen(Action handler) => Action += handler;
     public void Unlisten(Action handler) => Action -= handler;
     public void Fire() {
+      // Always invoke the event - if no one is listening this will noop.
+      Action?.Invoke();
+
       if (ShouldFire()) {
         if (Trigger.Tags.HasAllFlags(AbilityTag.CancelOthers))
           Ability.AbilityManager.CancelOthers();
@@ -122,7 +115,6 @@ public class AbilityManager : MonoBehaviour {
         Ability.AbilityManager.Energy?.Value.Consume(Trigger.EnergyCost);
 
         Ability.Tags.AddFlags(Trigger.Tags);
-        Action?.Invoke();
         if (Method != null && Ability is LegacyAbility lab) {
           var enumerator = Method();
           if (enumerator != null) {  // Can be null if used only for event listeners.

@@ -21,7 +21,7 @@ public class SlamAbility : Ability {
     Animator = GetComponentInParent<Animator>();
   }
 
-  public async Task ChargeStart(TaskScope scope) {
+  public override async Task MainAction(TaskScope scope) {
     try {
       Animation = AnimationDriver.Play(scope, Clip);
       using var effect = new SpeedFactorEffect(.5f, .5f);
@@ -43,7 +43,7 @@ public class SlamAbility : Ability {
     }
   }
 
-  public async Task ChargeRelease(TaskScope scope) {
+  public override async Task MainRelease(TaskScope scope) {
     Animation?.SetSpeed(1f);
     await scope.Yield();
   }

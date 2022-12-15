@@ -29,7 +29,7 @@ namespace PigMoss {
       }
     }
 
-    public async Task Routine(TaskScope scope) {
+    public override async Task MainAction(TaskScope scope) {
       try {
         Animator.SetInteger("State", (int)BladeState.Revealed);
         SFXManager.Instance.TryPlayOneShot(RevealedSFX);

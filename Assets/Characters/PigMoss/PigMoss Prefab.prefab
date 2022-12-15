@@ -119,6 +119,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collider: {fileID: 0}
 --- !u!1 &1675909835453448955
 GameObject:
   m_ObjectHideFlags: 0
@@ -494,6 +495,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collider: {fileID: 0}
 --- !u!1 &4069261157340341339
 GameObject:
   m_ObjectHideFlags: 0
@@ -1059,6 +1061,7 @@ GameObject:
   - component: {fileID: 8872822986732128196}
   - component: {fileID: 8872822986732128197}
   - component: {fileID: 8872822986732128202}
+  - component: {fileID: 1846207649}
   m_Layer: 0
   m_Name: PigMoss Model
   m_TagString: Untagged
@@ -1149,6 +1152,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Damage: {fileID: 8872822988582960455}
+--- !u!95 &1846207649
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8872822986732128199}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &8872822986952010240
 GameObject:
   m_ObjectHideFlags: 0
@@ -1274,7 +1297,7 @@ Transform:
   - {fileID: 433230649554147245}
   - {fileID: 8872822986732128203}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 31
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8872822988582960445
 MonoBehaviour:
@@ -1531,7 +1554,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5858cd79c3bb37845b5d44f08793d81e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Animator: {fileID: 0}
+  Animator: {fileID: 1846207649}
 --- !u!114 &22511065851894553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1599,6 +1622,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Collider: {fileID: 0}
 --- !u!65 &3432616973734515041
 BoxCollider:
   m_ObjectHideFlags: 0

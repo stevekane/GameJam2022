@@ -29,7 +29,7 @@ public class Dive : Ability {
     s.AddAttributeModifier(AttributeTag.TurnSpeed, AttributeModifier.TimesZero);
   }, "DiveMove");
 
-  public async Task Attack(TaskScope scope) {
+  public override async Task MainAction(TaskScope scope) {
     // Windup
     HitConfig hitConfig = HitConfig;
     using var effect = Status.Add(ScriptedMove);

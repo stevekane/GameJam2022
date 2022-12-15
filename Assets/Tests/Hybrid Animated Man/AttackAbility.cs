@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public class AttackAbility : Ability {
+  [SerializeField] bool Chargeable;
   [SerializeField] Timeval WindupEnd;
   [SerializeField] Timeval ChargeEnd;
   [SerializeField] Timeval ActiveEnd;
@@ -22,16 +23,12 @@ public class AttackAbility : Ability {
   [NonSerialized] HashSet<Collider> PhaseHits = new();
   [NonSerialized] AnimationJobTask Animation = null;
 
-  public Task Attack(TaskScope scope) => Main(scope, false);
-  public Task ChargeAttack(TaskScope scope) => Main(scope, true);
-  public Task ChargeRelease(TaskScope scope) => null;
-
-  async Task Main(TaskScope scope, bool chargeable) {
+  public override async Task MainAction(TaskScope scope) {
     Animation = AnimationDriver.Play(scope, AttackAnimation);
     HitConfig hitConfig = HitConfig;
-    if (chargeable) {
+    if (Chargeable) {
       var startFrame = Timeval.TickCount;
-      await scope.Any(Charge, ListenFor(ChargeRelease));
+      await scope.Any(Charge, ListenFor(MainRelease));
       var numFrames = Timeval.TickCount - startFrame;
       var chargeScaling = ChargeScaling.Evaluate((float)numFrames / ChargeEnd.Ticks);
       await Animation.WaitFrame(WindupEnd.AnimFrames)(scope);

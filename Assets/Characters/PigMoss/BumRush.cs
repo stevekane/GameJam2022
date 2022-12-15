@@ -27,7 +27,7 @@ namespace PigMoss {
       }
     }
 
-    public async Task Routine(TaskScope scope) {
+    public override async Task MainAction(TaskScope scope) {
       try {
         Animator.SetBool("Extended", true);
         var windup = Waiter.Delay(WindupDuration);
@@ -46,7 +46,7 @@ namespace PigMoss {
       }
     }
 
-    public async Task Rush(TaskScope scope) {
+    async Task Rush(TaskScope scope) {
       try {
         using var effect = Status.Add(new ScriptedMovementEffect());
         SFXManager.Instance.TryPlayOneShot(RushSFX);

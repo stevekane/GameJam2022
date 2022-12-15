@@ -27,7 +27,7 @@ namespace PigMoss {
       }
     }
 
-    public async Task Routine(TaskScope scope) {
+    public override async Task MainAction(TaskScope scope) {
       try {
         var animation = AnimationDriver.Play(scope, Clip);
         var windup = animation.WaitFrame(ActiveFrameStart.AnimFrames);

@@ -23,7 +23,7 @@ public class SimpleDash : Ability {
   }, "DashInvulnerable");
 
   // Button press/release.
-  public async Task Activate(TaskScope scope) {
+  public override async Task MainAction(TaskScope scope) {
     try {
       var dir = AbilityManager.GetAxis(AxisTag.Move).XZ;
       if (dir == Vector3.zero) {

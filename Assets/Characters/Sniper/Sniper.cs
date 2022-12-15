@@ -112,11 +112,11 @@ public class Sniper : MonoBehaviour {
     var toTarget = Target.position-transform.position;
     if (toTarget.magnitude < MinDistance) {
       PortalAbility.GetPortalDirection = new ChooseRandomDirection();
-      AbilityManager.TryInvoke(PortalAbility.PortalStart);
+      //AbilityManager.TryInvoke(PortalAbility.PortalStart);  // Convert to new Ability
       yield return PortalAbility.Running;
     } else {
       yield return Mover.TryAimAt(toTarget.normalized, Timeval.FromSeconds(1));
-      AbilityManager.TryInvoke(PowerShotAbility.MakeRoutine);
+      //AbilityManager.TryInvoke(PowerShotAbility.MakeRoutine);
       yield return PowerShotAbility.Running;
     }
   }

@@ -11,7 +11,7 @@ public class Jump : Ability {
   // Button press/release.
   bool Holding = true;
   int JumpsRemaining = 2;
-  public async Task Activate(TaskScope scope) {
+  public override async Task MainAction(TaskScope scope) {
     try {
       Holding = true;
 
@@ -44,7 +44,7 @@ public class Jump : Ability {
     }
   }
 
-  public Task Release(TaskScope scope) {
+  public override Task MainRelease(TaskScope scope) {
     Holding = false;
     return null;
   }

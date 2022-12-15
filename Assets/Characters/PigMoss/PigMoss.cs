@@ -11,15 +11,10 @@ namespace PigMoss {
     [SerializeField] Transform CenterOfArena;
     [SerializeField] Timeval ActionCooldown;
     [SerializeField] BlackBoard BlackBoard;
-    Dictionary<Ability, AbilityMethodTask> AbilityMethods = new();
 
     Fiber Behavior;
     int AbilityIndex;
 
-    void Awake() {
-      foreach (var a in Abilities)
-        AbilityMethods[a] = new AbilityMethodReference() { Ability = a, MethodName = "Routine" }.GetMethodTask();
-    }
     void Start() => Behavior = new Fiber(Fiber.Repeat(MakeBehavior));
     void OnDestroy() => Behavior.Stop();
     void FixedUpdate() => Behavior.MoveNext();
@@ -58,7 +53,7 @@ namespace PigMoss {
         }
       }
       AbilityIndex = indices[UnityEngine.Random.Range(0, indices.Count)];
-      yield return TryRun(Abilities[AbilityIndex]);
+      yield return AbilityManager.TryRun(Abilities[AbilityIndex].MainAction);
 
       // Cooldown
       var cooldown = Fiber.Wait(ActionCooldown);
@@ -79,15 +74,6 @@ namespace PigMoss {
           Mover.UpdateAxes(AbilityManager, Vector3.zero, transform.forward.XZ());
         }
       }
-    }
-
-    IEnumerator TryRun(Ability ability) {
-      if (AbilityMethods.TryGetValue(ability, out var method)) {
-        return AbilityManager.TryRun(method);
-      } else {
-        Debug.LogError($"{ability} is missing its Routine");
-      }
-      return null;
     }
   }
 }

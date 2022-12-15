@@ -13,7 +13,7 @@ public class PelletAbility : Ability {
   public GameObject FireVFX;
   public AudioClip FireSFX;
 
-  public async Task AttackStart(TaskScope scope) {
+  public override async Task MainAction(TaskScope scope) {
     try {
       await Windup.Start(scope, Animator, Index);
       await scope.All(ShootRoutine, s => Active.Start(s, Animator, Index));

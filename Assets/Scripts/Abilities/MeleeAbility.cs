@@ -22,6 +22,7 @@ public class MeleeAbility : Ability {
   public GameObject AttackVFX;
   public Vector3 VFXOffset = Vector3.up;
   public AttackHitbox Hitbox;
+  public bool Chargeable = false;
 
   GameObject AttackVFXInstance;
   AnimationJobTask Animation;
@@ -33,19 +34,17 @@ public class MeleeAbility : Ability {
     Hitbox.TriggerStay = OnContact;
   }
 
-  public Task AttackStart(TaskScope scope) => Routine(scope, false);
-  public Task ChargeStart(TaskScope scope) => Routine(scope, true);
-  public async Task ChargeRelease(TaskScope scope) {
+  public override Task MainRelease(TaskScope scope) {
     Animation?.SetSpeed(1);
-    await scope.Yield();
+    return null;
   }
 
-  async Task Routine(TaskScope scope, bool chargeable) {
+  public override async Task MainAction(TaskScope scope) {
     Animation = AnimationDriver.Play(scope, Clip);
 
     // Windup
     HitConfig hitConfig = HitConfig;
-    if (chargeable) {
+    if (Chargeable) {
       Animation.SetSpeed(ChargeSpeedFactor);
       var startFrame = Timeval.TickCount;
       await Animation.WaitFrame(WindupDuration.AnimFrames)(scope);
