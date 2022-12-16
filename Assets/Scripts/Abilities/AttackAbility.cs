@@ -22,9 +22,18 @@ public class AttackAbility : Ability {
   [NonSerialized] HashSet<Collider> PhaseHits = new();
   [NonSerialized] AnimationJob Animation = null;
 
+  public static InlineEffect InPlace = new(s => {
+    s.HasGravity = false;
+    s.CanMove = false;
+    s.CanRotate = false;
+  }, "HangTime");
+
+  public static InlineEffect NoEffect = new(s => {}, "NoEffect");
+
   public override async Task MainAction(TaskScope scope) {
     Animation = AnimationDriver.Play(scope, AttackAnimation);
     HitConfig hitConfig = HitConfig;
+    using var effect = Status.Add(hitConfig.InPlace ? InPlace : NoEffect);
     if (Chargeable) {
       var startFrame = Timeval.TickCount;
       await scope.Any(Charge, ListenFor(MainRelease));
