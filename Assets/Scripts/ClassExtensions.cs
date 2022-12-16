@@ -71,6 +71,21 @@ public static class MonoExtensions {
     }
   }
 
+  public static Transform FindDescendant(this Transform t, string name) {
+    for (var i = 0; i < t.childCount; i++) {
+      var child = t.GetChild(i);
+      if (child.name == name) {
+        return child;
+      } else {
+        var fromSubtree = child.FindDescendant(name);
+        if (fromSubtree) {
+          return fromSubtree;
+        }
+      }
+    }
+    return null;
+  }
+
   public static bool IsInFrontOf(this Vector3 p, Transform t) {
     var delta = p-t.position;
     var dot = Vector3.Dot(delta.normalized, t.forward);
