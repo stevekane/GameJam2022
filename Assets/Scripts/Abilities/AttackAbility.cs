@@ -13,8 +13,7 @@ public class AttackAbility : Ability {
   [SerializeField] AnimationCurve ChargeScaling = AnimationCurve.Linear(0f, .5f, 1f, 1f);
   [SerializeField] Vibrator Vibrator;
   [SerializeField] AnimationJobConfig AttackAnimation;
-  [SerializeField] TriggerEvent TriggerEvent;
-  [SerializeField] Collider HitBox;
+  [SerializeField] TriggerEvent Hitbox;
   [SerializeField] Vector3 AttackVFXOffset;
   [SerializeField] GameObject AttackVFX;
   [SerializeField] AudioClip AttackSFX;
@@ -42,8 +41,7 @@ public class AttackAbility : Ability {
     SFXManager.Instance.TryPlayOneShot(AttackSFX);
     VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
     await scope.Any(Animation.WaitFrame(ActiveEnd.AnimFrames+1), Waiter.Repeat(OnHit(hitConfig)));
-    // Tags.AddFlags(AbilityTag.Cancellable);
-    await Animation.WaitDone()(scope);
+    await scope.Any(MakeCancellable, Animation.WaitDone());
   }
 
   async Task Charge(TaskScope scope) {
@@ -56,10 +54,16 @@ public class AttackAbility : Ability {
     }
   }
 
+  async Task MakeCancellable(TaskScope scope) {
+    await scope.Delay(RecoveryEnd);
+    Tags.AddFlags(AbilityTag.Cancellable);
+    await scope.Forever();
+  }
+
   TaskFunc OnHit(HitConfig hitConfig) => async (TaskScope scope) => {
     try {
-      HitBox.enabled = true;
-      var hitCount = await scope.ListenForAll(TriggerEvent.OnTriggerStaySource, Hits);
+      Hitbox.enableCollision = true;
+      var hitCount = await scope.ListenForAll(Hitbox.OnTriggerStaySource, Hits);
       for (var i = 0; i < hitCount; i++) {
         var hit = Hits[i];
         if (!PhaseHits.Contains(hit) && hit.TryGetComponent(out Hurtbox hurtbox)) {
@@ -68,7 +72,7 @@ public class AttackAbility : Ability {
         }
       }
     } finally {
-      HitBox.enabled = false;
+      Hitbox.enableCollision = false;
     }
   };
 }
