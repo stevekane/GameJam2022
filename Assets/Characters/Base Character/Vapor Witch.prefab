@@ -231,8 +231,8 @@ MonoBehaviour:
     Millis: 125
     FramesPerSecond: 24
   ChargeEnd:
-    Millis: 1
-    FramesPerSecond: 30
+    Millis: 0
+    FramesPerSecond: 24
   ActiveEnd:
     Millis: 208.33333
     FramesPerSecond: 24
@@ -278,13 +278,12 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  Vibrator: {fileID: 0}
+  Vibrator: {fileID: 3364079649355753510}
   AttackAnimation:
     Clip: {fileID: 7400000, guid: 62766a0642318924eaec6b6094e7cf70, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
     Speed: 1
-  TriggerEvent: {fileID: 7781392534903117839}
-  HitBox: {fileID: 796463285021203977}
+  Hitbox: {fileID: 7781392534903117839}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
@@ -374,7 +373,7 @@ MonoBehaviour:
   WindupVFXTransform: {fileID: 2298568700673657943}
   WindupVFX: {fileID: 100000, guid: 77ec3c4e07a36814fb3169ecef41b50a, type: 3}
   WindupSFX: {fileID: 0}
-  LandVFXTransform: {fileID: 0}
+  LandVFXTransform: {fileID: 2298727057689762155}
   LandVFX: {fileID: 3432958286849152088, guid: 87ee7299dd44ed747af24dbb91bcd33b, type: 3}
   LandSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
   Hitbox: {fileID: 2309940460413394567}
@@ -597,13 +596,12 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  Vibrator: {fileID: 0}
+  Vibrator: {fileID: 3364079649355753510}
   AttackAnimation:
     Clip: {fileID: 7400000, guid: 8ba2a5b0d9933fe4c813b4808937910a, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
     Speed: 1
-  TriggerEvent: {fileID: 8479126164374817058}
-  HitBox: {fileID: 1800344975577912335}
+  Hitbox: {fileID: 8479126164374817058}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
@@ -659,17 +657,17 @@ MonoBehaviour:
   Tags: 0
   Chargeable: 1
   WindupEnd:
-    Millis: 0
-    FramesPerSecond: 60
+    Millis: 125
+    FramesPerSecond: 24
   ChargeEnd:
     Millis: 625
     FramesPerSecond: 24
   ActiveEnd:
-    Millis: 83.333336
-    FramesPerSecond: 60
+    Millis: 208.33333
+    FramesPerSecond: 24
   RecoveryEnd:
-    Millis: 333.33334
-    FramesPerSecond: 60
+    Millis: 833.3333
+    FramesPerSecond: 24
   HitConfig:
     DamageModifier:
       Base: 0
@@ -713,9 +711,8 @@ MonoBehaviour:
   AttackAnimation:
     Clip: {fileID: 7400000, guid: 62766a0642318924eaec6b6094e7cf70, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
-    Speed: 3
-  TriggerEvent: {fileID: 1672519219772526389}
-  HitBox: {fileID: 2402037130279295334}
+    Speed: 1
+  Hitbox: {fileID: 1672519219772526389}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
@@ -918,6 +915,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4202873523494526, guid: 9984be23625843a48a44d88aae5669f2, type: 3}
   m_PrefabInstance: {fileID: 2299305809950757417}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &2298727057689762155 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4079634231987010, guid: 9984be23625843a48a44d88aae5669f2, type: 3}
+  m_PrefabInstance: {fileID: 2299305809950757417}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2303771352680290845 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4615360315754548, guid: 9984be23625843a48a44d88aae5669f2, type: 3}
@@ -1022,7 +1024,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114197, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114197, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1090,7 +1092,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[3].Modifier.Base
-      value: 10
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[3].Modifier.Mult
