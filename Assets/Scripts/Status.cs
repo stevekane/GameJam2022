@@ -95,14 +95,12 @@ public class SlowFallDuration : StatusEffect {
 
 public class HitStopEffect : StatusEffect {
   public Vector3 Axis;
-  public float Amplitude;
   public int TotalFrames;
   public int Frames;
 
-  public HitStopEffect(Vector3 axis, float amplitude, int totalFrames) {
+  public HitStopEffect(Vector3 axis, int totalFrames) {
     Frames = 0;
     Axis = axis;
-    Amplitude = amplitude;
     TotalFrames = totalFrames;
   }
   public override bool Merge(StatusEffect e) {

@@ -48,6 +48,12 @@ public class Mover : MonoBehaviour {
   public Vector3 GetMove() => AbilityManager.GetAxis(AxisTag.Move).XZ;
   public Vector3 GetAim() => AbilityManager.GetAxis(AxisTag.Aim).XZ.TryGetDirection() ?? transform.forward;
   public void Move(Vector3 delta) => MoveDelta += delta;
+  public void ResetVelocity() {
+    InputVelocity = Vector3.zero;
+    GravitationalVelocity = Vector3.zero;
+    MoveVelocity = Vector3.zero;
+    Velocity = Vector3.zero;
+  }
 
   void FixedUpdate() {
     var desiredMoveDir = GetMove();

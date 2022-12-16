@@ -35,7 +35,7 @@ public class Wallbounce : MonoBehaviour {
         }
         Status.Remove(k);
         // Note we drop WallbounceTarget for the new knockback. If it bounces again, we use normal reflection to avoid getting stuck.
-        Status.Add(new HitStopEffect(transform.right, .15f, Duration.Ticks), s => s.Add(new KnockbackEffect(bounceVel, null)));
+        Status.Add(new HitStopEffect(transform.right, Duration.Ticks), s => s.Add(new KnockbackEffect(bounceVel, null)));
       }
     }
   }
