@@ -10,6 +10,10 @@ public class AnimationJobConfig {
   public AnimationClip Clip;
   public AvatarMask Mask = null;
   public float Speed = 1;
+  [Range(0,1)]
+  public float BlendInFraction;
+  [Range(0,1)]
+  public float BlendOutFraction;
 }
 
 public class AnimationJob {
@@ -79,9 +83,28 @@ public class AnimationJob {
     Driver.Disconnect(this);
   }
 
+  float BlendWeight() {
+    var time = Clip.GetTime();
+    var duration = Clip.GetDuration();
+    var fraction = time/duration;
+    // blending out
+    if (Animation.BlendOutFraction > 0 && fraction >= (1-Animation.BlendOutFraction)) {
+      var f = 1-(float)(fraction-(1-Animation.BlendOutFraction))/Animation.BlendOutFraction;
+      return f;
+    // blending in
+    } else if (Animation.BlendInFraction > 0 && fraction <= Animation.BlendInFraction) {
+      var f = (float)fraction/Animation.BlendInFraction;
+      return f;
+    // full blending
+    } else {
+      return 1;
+    }
+  }
+
   public async Task Run(TaskScope scope) {
     try {
       while (IsRunning && Clip.IsValid()) {
+        Mixer.SetInputWeight(1, BlendWeight());
         Clip.SetSpeed(DesiredSpeed * Animation.Speed * Driver.speed);
         UpdateCurrentFrame();
         if (Clip.IsDone())

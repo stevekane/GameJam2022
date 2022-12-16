@@ -1,9 +1,8 @@
 using System;
 using UnityEngine;
 
-public class RepeatDive : MonoBehaviour {
-  public Jump Jump;
-  public Dive Dive;
+public class RepeatAttack : MonoBehaviour {
+  public Ability Attack;
   public Timeval Wait = Timeval.FromSeconds(1);
 
   TaskScope Scope = new();
@@ -12,8 +11,7 @@ public class RepeatDive : MonoBehaviour {
     try {
       while (true) {
         await Scope.Delay(Wait);
-        await Scope.Run(Jump.MainAction);
-        await Scope.Run(Dive.MainAction);
+        await Scope.Run(Attack.MainAction);
       }
     } catch (Exception e) {
     }
