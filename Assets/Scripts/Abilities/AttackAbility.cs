@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class AttackAbility : Ability {
   [SerializeField] bool Chargeable;
-  [SerializeField] Timeval WindupEnd;
   [SerializeField] Timeval ChargeEnd;
+  [SerializeField] Timeval WindupEnd;
   [SerializeField] Timeval ActiveEnd;
   [SerializeField] Timeval RecoveryEnd;
   [SerializeField] HitConfig HitConfig;

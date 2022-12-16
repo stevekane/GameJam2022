@@ -17,6 +17,7 @@ public class Damage : MonoBehaviour {
       var rotation = Quaternion.LookRotation(knockbackVector);
       var wallbounceTarget = Wallbounce.ComputeWallbounceTarget(source);
       Status.Add(new HurtStunEffect(hitParams.HitConfig.StunDuration.Ticks));
+      Status.Add(new SlowFallDuration(hitParams.HitConfig.SlowFallDuration.Ticks));
       Status.Add(new HitStopEffect(knockbackVector, .15f, hitParams.HitConfig.HitStopDuration.Ticks),
         s => s.Add(new KnockbackEffect(knockbackVector * knockbackStrength, wallbounceTarget)));
     }

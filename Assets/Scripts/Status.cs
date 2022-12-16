@@ -68,6 +68,31 @@ public class KnockbackEffect : StatusEffect {
   }
 }
 
+public class SlowFallDuration : StatusEffect {
+  public AttributeModifier Modifier;
+  public int TotalFrames;
+  public int Frames;
+  public SlowFallDuration(int totalFrames) {
+    Modifier = new AttributeModifier { Mult = .5f };
+    TotalFrames = totalFrames;
+    Frames = 0;
+  }
+  public override bool Merge(StatusEffect e) {
+    var sf = (SlowFallDuration)e;
+    TotalFrames = Mathf.Max(TotalFrames - Frames, sf.TotalFrames);
+    Frames = 0;
+    return true;
+  }
+  public override void Apply(Status status) {
+    if (Frames < TotalFrames) {
+      Frames++;
+      status.AddAttributeModifier(AttributeTag.Gravity, Modifier);
+    } else {
+      status.Remove(this);
+    }
+  }
+}
+
 public class HitStopEffect : StatusEffect {
   public Vector3 Axis;
   public float Amplitude;
@@ -88,7 +113,7 @@ public class HitStopEffect : StatusEffect {
   }
 
   public override void Apply(Status status) {
-    if (Frames <= TotalFrames) {
+    if (Frames < TotalFrames) {
       status.CanAttack = false;
       var localTimeScale = Defaults.Instance.HitStopLocalTime.Evaluate((float)Frames/(float)TotalFrames);
       var localTimeScaleMod = new AttributeModifier { Mult = localTimeScale };
@@ -112,7 +137,7 @@ public class HurtStunEffect : StatusEffect {
     return true;
   }
   public override void Apply(Status status) {
-    if (Frames <= TotalFrames) {
+    if (Frames < TotalFrames) {
       status.CanMove = false;
       status.CanRotate = false;
       status.CanAttack = false;

@@ -12,6 +12,7 @@ public class HitConfig {
   public float CameraShakeStrength;
   public Timeval HitStopDuration;
   public Timeval StunDuration = Timeval.FromMillis(500);
+  public Timeval SlowFallDuration = Timeval.FromSeconds(0);
 
   public HitConfig Scale(float scale) {
     return new() {
@@ -25,7 +26,8 @@ public class HitConfig {
       RecoilStrength = RecoilStrength,
       CameraShakeStrength = CameraShakeStrength,
       HitStopDuration = HitStopDuration,
-      StunDuration = new Timeval() { Ticks = (int)(StunDuration.Ticks*scale) }
+      StunDuration = new Timeval() { Ticks = (int)(StunDuration.Ticks*scale) },
+      SlowFallDuration = SlowFallDuration
     };
   }
 }
