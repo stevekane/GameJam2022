@@ -5,9 +5,9 @@ using UnityEngine;
 public class ShieldAbility : Ability {
   public int Index;
   public Animator Animator;
-  public InactiveAttackPhase Windup;
-  public InactiveAttackPhase Active;
-  public InactiveAttackPhase Recovery;
+  public AnimationJobConfig BlockAnimation;
+  public Timeval WindupDuration;
+  public Timeval RecoveryDuration;
   public Shield Shield;
 
   public static InlineEffect Invulnerable => new(s => {
@@ -16,25 +16,23 @@ public class ShieldAbility : Ability {
     }, "ShieldInvulnerable");
 
   public override async Task MainAction(TaskScope scope) {
+    AnimationJob animation = null;
     try {
-      Animator.SetBool("Shielding", true);
-      await Windup.Start(scope, Animator, Index);
-      if (Shield && Shield.Hurtbox)
-        Shield.Hurtbox.gameObject.SetActive(true);
+      animation = AnimationDriver.Play(scope, BlockAnimation);
+      await animation.PauseAtFrame(scope, animation.NumFrames-1);
+      await scope.Delay(WindupDuration);
+      if (Shield)
+        Shield.HurtboxEnabled = true;
       using (Status.Add(Invulnerable)) {
         await scope.ListenFor(AbilityManager.GetEvent(MainRelease));
       }
-      if (Shield && Shield.Hurtbox)
-        Shield.Hurtbox.gameObject.SetActive(false);
-      Animator.SetBool("Shielding", false);
-      await Recovery.Start(scope, Animator, Index);
+      if (Shield)
+        Shield.HurtboxEnabled = false;
+      animation.Stop();
+      await scope.Delay(RecoveryDuration);
     } finally {
-      Animator.SetBool("Attacking", false);
-      Animator.SetInteger("AttackIndex", -1);
-      Animator.SetFloat("AttackSpeed", 1);
-      Animator.SetBool("Shielding", false);
-      if (Shield && Shield.Hurtbox)
-        Shield.Hurtbox.gameObject.SetActive(false);
+      if (Shield)
+        Shield.HurtboxEnabled = false;
     }
   }
 }

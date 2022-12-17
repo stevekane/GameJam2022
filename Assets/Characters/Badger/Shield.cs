@@ -9,6 +9,11 @@ public class Shield : MonoBehaviour {
   Damage Damage;
   TaskScope Scope = new();
 
+  public bool HurtboxEnabled {
+    get => Hurtbox && Hurtbox.enabled;
+    set { if (Hurtbox) Hurtbox.gameObject.SetActive(value); }
+  }
+
   async Task WatchDamage(TaskScope scope) {
     await scope.While(() => Damage.Points < MaxDamage);
     Destroy(Hurtbox.gameObject);

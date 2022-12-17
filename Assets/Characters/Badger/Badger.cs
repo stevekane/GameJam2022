@@ -14,7 +14,7 @@ public class Badger : MonoBehaviour {
   AbilityManager Abilities;
   AbilityManager TargetAbilities;
   Shield Shield;
-  MeleeAbility PunchAbility;
+  AttackAbility PunchAbility;
   ShieldAbility ShieldAbility;
   TaskScope MainScope = new();
   bool WasHit = false;
@@ -27,7 +27,7 @@ public class Badger : MonoBehaviour {
     Hurtbox = GetComponentInChildren<Hurtbox>();
     Shield = GetComponentInChildren<Shield>();
     Abilities = GetComponent<AbilityManager>();
-    PunchAbility = GetComponentInChildren<MeleeAbility>();
+    PunchAbility = GetComponentInChildren<AttackAbility>();
     ShieldAbility = GetComponentInChildren<ShieldAbility>();
     Hurtbox.OnHurt.Listen((_) => WasHit = true);
   }
