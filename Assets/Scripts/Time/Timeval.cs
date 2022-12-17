@@ -8,12 +8,12 @@ public class Timeval {
   public static EventSource TickEvent = new();
 
   [SerializeField] public float Millis = 1;
-  [SerializeField] public int FramesPerSecond = 30;
+  [SerializeField] public int FramesPerSecond = 60;
 
-  public static Timeval FromSeconds(float seconds, int fps = 30) {
+  public static Timeval FromSeconds(float seconds, int fps = 60) {
     return new Timeval { Millis = seconds*1000f, FramesPerSecond = fps };
   }
-  public static Timeval FromMillis(float millis, int fps = 30) {
+  public static Timeval FromMillis(float millis, int fps = 60) {
     return new Timeval { Millis = millis, FramesPerSecond = fps };
   }
   public static Timeval FromAnimFrames(int frames, int fps) {
