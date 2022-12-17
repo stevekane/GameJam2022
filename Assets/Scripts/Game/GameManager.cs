@@ -76,6 +76,13 @@ public class GameManager : MonoBehaviour {
   }
 
   IEnumerator Run() {
+    while (!ManageGameLoop) {
+      if (!ManageGameLoop && Input.GetKeyDown(KeyCode.Space)) {
+        yield return Await(SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name));
+      } else {
+        yield return null;
+      }
+    }
     while (ManageGameLoop) {
       // Spawn and configure the player
       var playerSpawn = PlayerSpawns[0];

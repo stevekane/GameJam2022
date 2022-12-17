@@ -89,12 +89,10 @@ public class AnimationJob {
     var fraction = time/duration;
     // blending out
     if (Animation.BlendOutFraction > 0 && fraction >= (1-Animation.BlendOutFraction)) {
-      var f = 1-(float)(fraction-(1-Animation.BlendOutFraction))/Animation.BlendOutFraction;
-      return f;
+      return 1-(float)(fraction-(1-Animation.BlendOutFraction))/Animation.BlendOutFraction;
     // blending in
     } else if (Animation.BlendInFraction > 0 && fraction <= Animation.BlendInFraction) {
-      var f = (float)fraction/Animation.BlendInFraction;
-      return f;
+      return (float)fraction/Animation.BlendInFraction;
     // full blending
     } else {
       return 1;

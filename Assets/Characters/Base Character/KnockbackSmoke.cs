@@ -7,7 +7,7 @@ public class KnockbackSmoke : MonoBehaviour {
   [SerializeField] float MinimumSpeed = 10;
 
   void FixedUpdate() {
-    if (Status.IsHurt && Mover.Velocity.XZ().sqrMagnitude >= MinimumSpeed*MinimumSpeed) {
+    if (Status.IsHurt && !Status.IsGrounded && Mover.Velocity.sqrMagnitude >= MinimumSpeed*MinimumSpeed) {
       ParticleSystem.Emit(1);
     }
   }
