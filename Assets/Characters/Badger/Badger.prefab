@@ -52,6 +52,8 @@ MonoBehaviour:
     Clip: {fileID: 7400000, guid: bb232cefdc4a76c4cb516b8ef26d5c05, type: 2}
     Mask: {fileID: 0}
     Speed: 1
+    BlendInFraction: 0
+    BlendOutFraction: 0
   WindupDuration:
     Millis: 66.666664
     FramesPerSecond: 60
@@ -281,9 +283,9 @@ MonoBehaviour:
   ColorName: _EmissionColor
   FlashColor: {r: 1, g: 1, b: 1, a: 1}
   Renderers:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 3913512119582707597}
+  - {fileID: 23000012591374700}
+  - {fileID: 23543508095172022}
 --- !u!143 &2555919906692459508
 CharacterController:
   m_ObjectHideFlags: 0
@@ -713,6 +715,8 @@ MonoBehaviour:
     Clip: {fileID: 7400000, guid: 62766a0642318924eaec6b6094e7cf70, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
     Speed: 1
+    BlendInFraction: 0
+    BlendOutFraction: 0
   Hitbox: {fileID: 1937133181429255386}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
@@ -822,12 +826,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 90
       objectReference: {fileID: 0}
+    - target: {fileID: 23543507840377854, guid: 39e0fb4b243ffb645a622d1945004ee5, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 39e0fb4b243ffb645a622d1945004ee5, type: 3}
 --- !u!4 &4582691279172030 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4582690453958646, guid: 39e0fb4b243ffb645a622d1945004ee5, type: 3}
+  m_PrefabInstance: {fileID: 827383368}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &23543508095172022 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 23543507840377854, guid: 39e0fb4b243ffb645a622d1945004ee5, type: 3}
   m_PrefabInstance: {fileID: 827383368}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1942795320171498592
@@ -959,6 +972,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Warrok W Kurniawan
       objectReference: {fileID: 0}
+    - target: {fileID: 3103283877742750325, guid: 8ca9d28cb7ead5f428ca3e9e0cd4a4c9, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5866666021909216657, guid: 8ca9d28cb7ead5f428ca3e9e0cd4a4c9, type: 3}
     m_AddedGameObjects:
@@ -977,6 +994,11 @@ Transform:
 --- !u!4 &1933235880753431059 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8ca9d28cb7ead5f428ca3e9e0cd4a4c9, type: 3}
+  m_PrefabInstance: {fileID: 2116272597634409976}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &3913512119582707597 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3103283877742750325, guid: 8ca9d28cb7ead5f428ca3e9e0cd4a4c9, type: 3}
   m_PrefabInstance: {fileID: 2116272597634409976}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &5143927027518599227 stripped
@@ -1043,6 +1065,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: bae48a370600d8a4e998c51287d52193, type: 3}
+--- !u!23 &23000012591374700 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 4393536787344323802, guid: bae48a370600d8a4e998c51287d52193, type: 3}
+  m_PrefabInstance: {fileID: 4371108534760396214}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &4545087445822192106 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 268572202797100124, guid: bae48a370600d8a4e998c51287d52193, type: 3}
