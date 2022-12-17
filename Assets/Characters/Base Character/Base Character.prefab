@@ -276,7 +276,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Duration:
-    Millis: 500
+    Millis: 166.66667
     FramesPerSecond: 30
   ColorName: _EmissionColor
   FlashColor: {r: 1, g: 1, b: 1, a: 1}
@@ -404,6 +404,7 @@ GameObject:
   - component: {fileID: 8540507124463013526}
   - component: {fileID: 8540507124463013524}
   - component: {fileID: 8540507124463013547}
+  - component: {fileID: 9141335893900312875}
   m_Layer: 0
   m_Name: Animator
   m_TagString: Untagged
@@ -462,6 +463,19 @@ MonoBehaviour:
   - m_Rig: {fileID: 0}
     m_Active: 1
   m_Effectors: []
+--- !u!114 &9141335893900312875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8540507124463013527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fa1d2c24f52cf348b30f69503c55ca2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 8540507124463013524}
 --- !u!1001 &5695848924627043072
 PrefabInstance:
   m_ObjectHideFlags: 0

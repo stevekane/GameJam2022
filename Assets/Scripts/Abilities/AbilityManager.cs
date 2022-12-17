@@ -89,18 +89,15 @@ public class AbilityManager : MonoBehaviour {
     public void Fire() {
       // Always invoke the event - if no one is listening this will noop.
       Action?.Invoke();
-
       if (ShouldFire()) {
         if (Trigger.Tags.HasAllFlags(AbilityTag.CancelOthers))
           Ability.AbilityManager.CancelOthers();
-
         Ability.AbilityManager.Energy?.Value.Consume(Trigger.EnergyCost);
-
         Ability.Tags.AddFlags(Trigger.Tags);
         Ability.MaybeStartTask(Method);
       }
     }
-    bool ShouldFire() {
+    public bool ShouldFire() {
       var am = Ability.AbilityManager;
       var Status = am.GetComponent<Status>();
       var canRun = 0 switch {

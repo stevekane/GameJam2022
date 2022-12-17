@@ -23,16 +23,24 @@ public class Dive : Ability {
   [NonSerialized] HashSet<Collider> PhaseHits = new();
   [NonSerialized] AnimationJob Animation = null;
 
-  public static InlineEffect ScriptedMove => new(s => {
+  public static InlineEffect DiveEffect => new(s => {
+    s.IsHittable = false;
     s.HasGravity = false;
-    s.AddAttributeModifier(AttributeTag.MoveSpeed, AttributeModifier.TimesZero);
-    s.AddAttributeModifier(AttributeTag.TurnSpeed, AttributeModifier.TimesZero);
+    s.CanMove = false;
+    s.CanRotate = false;
+    s.CanAttack = false;
+  }, "DiveMove");
+
+  public static InlineEffect RecoveryEffect => new(s => {
+    s.CanMove = false;
+    s.CanRotate = false;
+    s.CanAttack = false;
   }, "DiveMove");
 
   public override async Task MainAction(TaskScope scope) {
     // Windup
     HitConfig hitConfig = HitConfig;
-    using var effect = Status.Add(ScriptedMove);
+    using var diveEffect = Status.Add(DiveEffect);
     SFXManager.Instance.TryPlayOneShot(WindupSFX);
     VFXManager.Instance.TrySpawnWithParent(WindupVFX, WindupVFXTransform, 1);
     Animation = AnimationDriver.Play(scope, WindupAnimation);
@@ -47,6 +55,8 @@ public class Dive : Ability {
     VFXManager.Instance.TrySpawnEffect(LandVFX, AbilityManager.transform.position, Quaternion.LookRotation(Vector3.down));
     await scope.Any(Waiter.Delay(LandDuration), Waiter.Repeat(OnHit(hitConfig)));
     // Recovery
+    diveEffect.Dispose();
+    using var recoveryEffect = Status.Add(RecoveryEffect);
     Tags.AddFlags(AbilityTag.Cancellable);
     await scope.Delay(RecoveryDuration);
     Animation.Stop();

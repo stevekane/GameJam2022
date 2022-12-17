@@ -82,7 +82,7 @@ public class Badger : MonoBehaviour {
 
     async Task Move(TaskScope scope) {
       var desiredMoveDir = Vector3.zero;
-      if (!inRange)
+      if (!inRange && Status.IsGrounded)
         desiredMoveDir = (desiredPos - transform.position).XZ().normalized;
       Mover.SetMoveAim(desiredMoveDir, desiredFacing);
       await scope.Tick();
