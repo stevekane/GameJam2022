@@ -54,6 +54,11 @@ public class AbilityManager : MonoBehaviour {
     GetEvent(method).Fire();
     await scope.While(() => ability.IsRunning);
   }
+  public TaskFunc TryRun(AbilityMethod method) => async (TaskScope scope) => {
+    var ability = (Ability)method.Target;
+    GetEvent(method).Fire();
+    await scope.While(() => ability.IsRunning);
+  };
   EventRouter CreateRouter(AbilityMethod method) => MethodToEvent[method] = new EventRouter((Ability)method.Target, method);
 
   void Awake() {

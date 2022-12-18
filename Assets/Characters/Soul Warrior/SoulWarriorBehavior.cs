@@ -9,9 +9,9 @@ public class SoulWarriorBehavior : MonoBehaviour {
   [SerializeField] BackDash BackDash;
   [SerializeField] Dive Dive;
   [SerializeField] float DesiredDistance = 1f;
-  [SerializeField] float DangerDistance = 3f;
   [SerializeField] float OutOfRangeDistance = 6f;
   [SerializeField] float DiveHeight = 15f;
+  [SerializeField] float MaxDiveHeight = 100f;
 
   Mover Mover;
   Status Status;
@@ -41,6 +41,14 @@ public class SoulWarriorBehavior : MonoBehaviour {
     }
   }
 
+  void TrySetTeleportBehindTarget() {
+    if (Target) {
+      var delta = (Target.position-transform.position).XZ();
+      var toTarget = delta.normalized;
+      Teleport.Destination = Target.position + DiveHeight * toTarget;
+    }
+  }
+
   void TryLookAtTarget() {
     if (Target) {
       var delta = (Target.position-transform.position).XZ();
@@ -55,8 +63,6 @@ public class SoulWarriorBehavior : MonoBehaviour {
     var delta = (Target.position-transform.position).XZ();
     var toTarget = delta.normalized;
     var distanceToTarget = delta.magnitude;
-    // TODO: Smooth this out starting 1 unit away from desired
-    // slow down to zero as we get to desired distance
     if (distanceToTarget < DesiredDistance) {
       Mover.SetMove(Vector3.zero);
     } else {
@@ -72,35 +78,38 @@ public class SoulWarriorBehavior : MonoBehaviour {
       var toPlayer = delta.normalized;
       var distanceToPlayer = delta.magnitude;
       if (Status.IsGrounded) {
-        if (distanceToPlayer < DangerDistance) {
-          await AbilityManager.TryRun(scope, BackDash.MainAction);
-        } else if (distanceToPlayer < OutOfRangeDistance) {
-          await scope.Any(
-            Waiter.Repeat(TryLookAtTarget),
-            Waiter.Repeat(TryMoveTowardsTarget),
-            s => AbilityManager.TryRun(s, HardAttack.MainAction));
+        if (distanceToPlayer < OutOfRangeDistance) {
+          var diceRoll = Random.Range(0f, 1f);
+          if (diceRoll < .5f) {
+            await AbilityManager.TryRun(scope, BackDash.MainAction);
+          } else {
+            await scope.Any(
+              Waiter.Repeat(TryLookAtTarget),
+              Waiter.Repeat(TryMoveTowardsTarget),
+              AbilityManager.TryRun(HardAttack.MainAction));
+          }
         } else {
           var diceRoll = Random.Range(0f, 1f);
           if (diceRoll < .01f) {
             await scope.Any(
-              s => s.Repeat(TrySetTeleportOverTarget),
-              s => AbilityManager.TryRun(s, Teleport.MainAction)
-            );
+              Waiter.Repeat(TrySetTeleportOverTarget),
+              AbilityManager.TryRun(Teleport.MainAction));
           } else if (diceRoll < .02f) {
+            await scope.Any(
+              Waiter.Repeat(TrySetTeleportBehindTarget),
+              AbilityManager.TryRun(Teleport.MainAction));
+          } else if (diceRoll < .03f) {
             Throw.OnThrow = SetHomingSphereHitParams;
             await scope.Any(
-              s => s.Repeat(TryLookAtTarget),
-              s => AbilityManager.TryRun(s, Throw.MainAction)
-            );
+              Waiter.Repeat(TryLookAtTarget),
+              AbilityManager.TryRun(Throw.MainAction));
           } else {
             TryLookAtTarget();
             TryMoveTowardsTarget();
           }
         }
       } else {
-        var groundRay = new Ray(transform.position, Vector3.down);
-        var overGround = Physics.Raycast(groundRay.origin, groundRay.direction, 1000, Defaults.Instance.EnvironmentLayerMask);
-        if (overGround) {
+        if (PhysicsQuery.GroundCheck(transform.position, MaxDiveHeight)) {
           await AbilityManager.TryRun(scope, Dive.MainAction);
         } else {
           Teleport.Destination = DiveHeight * Vector3.up;

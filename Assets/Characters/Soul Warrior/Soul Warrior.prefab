@@ -148,7 +148,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Tags: 73
+  - Tags: 65
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
@@ -334,7 +334,7 @@ MonoBehaviour:
     BlendInFraction: 0
     BlendOutFraction: 0.2
   WindupVFXTransform: {fileID: 5343061925828056540}
-  WindupVFX: {fileID: 100000, guid: 77ec3c4e07a36814fb3169ecef41b50a, type: 3}
+  WindupVFX: {fileID: 5004110830200433158, guid: e8cd8df4f7ff541489a01ae1439a2204, type: 3}
   WindupSFX: {fileID: 0}
   LandVFXTransform: {fileID: 0}
   LandVFX: {fileID: 8194992990867289339, guid: 99bc28c0d45f51c4fbac01080b73edc7, type: 3}
@@ -946,9 +946,10 @@ MonoBehaviour:
   Teleport: {fileID: 7053381319833114771}
   BackDash: {fileID: 6422472136148966431}
   Dive: {fileID: 4584590916625472510}
-  DangerDistance: 5
-  OutOfRangeDistance: 6
+  DesiredDistance: 1
+  OutOfRangeDistance: 10
   DiveHeight: 10
+  MaxDiveHeight: 100
 --- !u!114 &4220133813938994158 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8540507123274114219, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}

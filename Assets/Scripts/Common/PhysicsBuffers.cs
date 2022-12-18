@@ -51,6 +51,12 @@ public static class PhysicsQuery {
   public static Collider[] Colliders = new Collider[MAX_COLLIDERS];
   public static RaycastHit[] RaycastHits = new RaycastHit[MAX_RAYCAST_HITS];
 
+  public static bool GroundCheck(
+  Vector3 origin,
+  float maxDistance = .2f) {
+    return Physics.Raycast(origin, Vector3.down, maxDistance, Defaults.Instance.EnvironmentLayerMask);
+  }
+
   public static bool InFieldOfView(
   Vector3 position,
   Vector3 forward,
