@@ -1,28 +1,6 @@
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
-/*
-Soul Warrior always wants to close distance on the player
-but also does not want to be too close. It understands the danger
-of being in the player's primary attack range (5 units) and will
-prefer to hop backwards or teleport if it finds itself there.
-
-It looks for openings in the player's attack pattern while moving
-around to try to stay in its preferred striking range.
-
-Soul Warrior Attacks:
-
-- Teleport above player into dive (strong knockback)
-- Charging slash (medium lateral knockback)
-- Parry will listen for an attack, block the damage from that attack, and fire a very large very fast counter attack
-- Homing fireball. Spawns a fireball that homes on the player until it hits them or the environment
-- Spawn Minion. Spawns a weak minion that just tries to move at the player for now.
-
-Soul Warrior Mobility
-
-- Hop backwards used when too close to the player
-*/
 public class SoulWarriorBehavior : MonoBehaviour {
   [SerializeField] AttackAbility HardAttack;
   [SerializeField] Throw Throw;
@@ -30,6 +8,7 @@ public class SoulWarriorBehavior : MonoBehaviour {
   [SerializeField] Teleport Teleport;
   [SerializeField] BackDash BackDash;
   [SerializeField] Dive Dive;
+  [SerializeField] float DesiredDistance = 1f;
   [SerializeField] float DangerDistance = 3f;
   [SerializeField] float OutOfRangeDistance = 6f;
   [SerializeField] float DiveHeight = 15f;
@@ -65,10 +44,23 @@ public class SoulWarriorBehavior : MonoBehaviour {
   void TryLookAtTarget() {
     if (Target) {
       var delta = (Target.position-transform.position).XZ();
-      var toPlayer = delta.normalized;
-      var distanceToPlayer = delta.magnitude;
-      Mover.SetAim(toPlayer);
-      Mover.SetMove(toPlayer);
+      var toTarget = delta.normalized;
+      var distanceToTarget = delta.magnitude;
+      Mover.SetAim(toTarget);
+      Mover.SetMove(toTarget);
+    }
+  }
+
+  void TryMoveTowardsTarget() {
+    var delta = (Target.position-transform.position).XZ();
+    var toTarget = delta.normalized;
+    var distanceToTarget = delta.magnitude;
+    // TODO: Smooth this out starting 1 unit away from desired
+    // slow down to zero as we get to desired distance
+    if (distanceToTarget < DesiredDistance) {
+      Mover.SetMove(Vector3.zero);
+    } else {
+      Mover.SetMove(toTarget);
     }
   }
 
@@ -79,39 +71,39 @@ public class SoulWarriorBehavior : MonoBehaviour {
       var delta = (Target.position-transform.position).XZ();
       var toPlayer = delta.normalized;
       var distanceToPlayer = delta.magnitude;
-      Mover.SetAim(toPlayer);
-      Mover.SetMove(toPlayer);
       if (Status.IsGrounded) {
         if (distanceToPlayer < DangerDistance) {
-          Mover.SetMove(Vector3.zero);
           await AbilityManager.TryRun(scope, BackDash.MainAction);
         } else if (distanceToPlayer < OutOfRangeDistance) {
-          Mover.SetMove(Vector3.zero);
-          await AbilityManager.TryRun(scope, HardAttack.MainAction);
+          await scope.Any(
+            Waiter.Repeat(TryLookAtTarget),
+            Waiter.Repeat(TryMoveTowardsTarget),
+            s => AbilityManager.TryRun(s, HardAttack.MainAction));
         } else {
           var diceRoll = Random.Range(0f, 1f);
           if (diceRoll < .01f) {
-            Mover.SetMove(Vector3.zero);
             await scope.Any(
               s => s.Repeat(TrySetTeleportOverTarget),
               s => AbilityManager.TryRun(s, Teleport.MainAction)
             );
-            await scope.Tick();
           } else if (diceRoll < .02f) {
             Throw.OnThrow = SetHomingSphereHitParams;
             await scope.Any(
               s => s.Repeat(TryLookAtTarget),
               s => AbilityManager.TryRun(s, Throw.MainAction)
             );
+          } else {
+            TryLookAtTarget();
+            TryMoveTowardsTarget();
           }
         }
       } else {
-        if (Physics.Raycast(transform.position, Vector3.down, 1000, Defaults.Instance.EnvironmentLayerMask)) {
-          Mover.SetMove(Vector3.zero);
+        var groundRay = new Ray(transform.position, Vector3.down);
+        var overGround = Physics.Raycast(groundRay.origin, groundRay.direction, 1000, Defaults.Instance.EnvironmentLayerMask);
+        if (overGround) {
           await AbilityManager.TryRun(scope, Dive.MainAction);
         } else {
-          Mover.SetMove(Vector3.zero);
-          Teleport.Destination = DiveHeight * Vector3.up; // TODO: cheap way to get back to the arena
+          Teleport.Destination = DiveHeight * Vector3.up;
           await AbilityManager.TryRun(scope, Teleport.MainAction);
         }
       }

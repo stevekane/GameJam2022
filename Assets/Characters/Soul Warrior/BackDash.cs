@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class BackDash : Ability {
   [SerializeField] float Distance = 5f;
-  [SerializeField] Timeval Duration = Timeval.FromSeconds(.5f);
   [SerializeField] AnimationJobConfig Animation;
 
   public static InlineEffect ScriptedMove => new(s => {
@@ -14,19 +13,13 @@ public class BackDash : Ability {
   }, "DashMove");
 
   public override async Task MainAction(TaskScope scope) {
-    try {
-      using var scriptedMove = Status.Add(ScriptedMove);
-      AnimationDriver.Play(scope, Animation);
-      await scope.Any(
-        s => s.Delay(Duration),
-        s => s.Repeat(Move)
-      );
-    } finally {
-    }
+    using var scriptedMove = Status.Add(ScriptedMove);
+    var animation = AnimationDriver.Play(scope, Animation);
+    await scope.Any(animation.WaitDone, Waiter.Repeat(Move));
   }
 
   async Task Move(TaskScope scope) {
-    var speed = Distance / (float)Duration.Ticks;
+    var speed = Distance / Timeval.FromSeconds(Animation.Clip.length).Ticks;
     var inPlane = speed * -transform.forward.XZ();
     Mover.Move(inPlane);
     await scope.Tick();
