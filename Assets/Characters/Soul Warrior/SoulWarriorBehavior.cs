@@ -75,7 +75,6 @@ public class SoulWarriorBehavior : MonoBehaviour {
   async Task Behavior(TaskScope scope) {
     if (!Target) {
       Target = FindObjectOfType<Player>().transform;
-      await scope.Tick();
     } else {
       var delta = (Target.position-transform.position).XZ();
       var toPlayer = delta.normalized;
@@ -86,11 +85,9 @@ public class SoulWarriorBehavior : MonoBehaviour {
         if (distanceToPlayer < DangerDistance) {
           Mover.SetMove(Vector3.zero);
           await AbilityManager.TryRun(scope, BackDash.MainAction);
-          await scope.Tick();
         } else if (distanceToPlayer < OutOfRangeDistance) {
           Mover.SetMove(Vector3.zero);
           await AbilityManager.TryRun(scope, HardAttack.MainAction);
-          await scope.Tick();
         } else {
           var diceRoll = Random.Range(0f, 1f);
           if (diceRoll < .01f) {
@@ -106,24 +103,19 @@ public class SoulWarriorBehavior : MonoBehaviour {
               s => s.Repeat(TryLookAtTarget),
               s => AbilityManager.TryRun(s, Throw.MainAction)
             );
-            await scope.Tick();
-          } else {
-            await scope.Tick();
           }
         }
       } else {
         if (Physics.Raycast(transform.position, Vector3.down, 1000, Defaults.Instance.EnvironmentLayerMask)) {
           Mover.SetMove(Vector3.zero);
           await AbilityManager.TryRun(scope, Dive.MainAction);
-          await scope.Tick();
         } else {
           Mover.SetMove(Vector3.zero);
           Teleport.Destination = DiveHeight * Vector3.up; // TODO: cheap way to get back to the arena
           await AbilityManager.TryRun(scope, Teleport.MainAction);
-          await scope.Tick();
         }
-        await scope.Tick();
       }
     }
+    await scope.Tick();
   }
 }
