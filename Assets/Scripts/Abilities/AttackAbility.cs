@@ -11,7 +11,6 @@ public class AttackAbility : Ability {
   [SerializeField] Timeval RecoveryEnd;
   [SerializeField] HitConfig HitConfig;
   [SerializeField] AnimationCurve ChargeScaling = AnimationCurve.Linear(0f, .5f, 1f, 1f);
-  [SerializeField] Vibrator Vibrator;
   [SerializeField] AnimationJobConfig AttackAnimation;
   [SerializeField] TriggerEvent Hitbox;
   [SerializeField] Vector3 AttackVFXOffset;
