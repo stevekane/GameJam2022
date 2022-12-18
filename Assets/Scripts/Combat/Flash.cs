@@ -22,6 +22,12 @@ public class Flash : MonoBehaviour {
   }
   #endif
 
+  public void Run() {
+    EndFlash();
+    StopAllCoroutines();
+    StartCoroutine(FlashRoutine(Duration));
+  }
+
   void OnHurt(HitParams hitParams) {
     EndFlash();
     StopAllCoroutines();

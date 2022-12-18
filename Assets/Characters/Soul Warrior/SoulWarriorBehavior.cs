@@ -24,26 +24,51 @@ Soul Warrior Mobility
 - Hop backwards used when too close to the player
 */
 public class SoulWarriorBehavior : MonoBehaviour {
+  [SerializeField] Throw Throw;
+  [SerializeField] HitConfig ThrowHitConfig;
   [SerializeField] Teleport Teleport;
   [SerializeField] BackDash BackDash;
   [SerializeField] Dive Dive;
   [SerializeField] float DangerDistance = 5f;
   [SerializeField] float DiveHeight = 15f;
-  [SerializeField] TargetingConfig TargetingConfig;
 
   Mover Mover;
   Status Status;
+  Attributes Attributes;
   AbilityManager AbilityManager;
   Transform Target;
   TaskScope MainScope = new();
 
+  public void SetHomingSphereHitParams(GameObject go) {
+    if (go.TryGetComponent(out HomingMissile homingMissile)) {
+      homingMissile.HitParams = new HitParams(ThrowHitConfig, Attributes.serialized, gameObject);
+    }
+  }
+
   void Awake() {
     Mover = GetComponent<Mover>();
     Status = GetComponent<Status>();
+    Attributes = GetComponent<Attributes>();
     AbilityManager = GetComponent<AbilityManager>();
   }
   void Start() => MainScope.Start(Waiter.Repeat(Behavior));
   void OnDestroy() => MainScope.Dispose();
+
+  void TrySetTeleportOverTarget() {
+    if (Target) {
+      Teleport.Destination = Target.position + DiveHeight * Vector3.up;
+    }
+  }
+
+  void TryLookAtTarget() {
+    if (Target) {
+      var delta = (Target.position-transform.position).XZ();
+      var toPlayer = delta.normalized;
+      var distanceToPlayer = delta.magnitude;
+      Mover.SetAim(toPlayer);
+      Mover.SetMove(toPlayer);
+    }
+  }
 
   async Task Behavior(TaskScope scope) {
     if (!Target) {
@@ -64,8 +89,17 @@ public class SoulWarriorBehavior : MonoBehaviour {
           var diceRoll = Random.Range(0f, 1f);
           if (diceRoll < .01f) {
             Mover.SetMove(Vector3.zero);
-            Teleport.Destination = transform.position + delta + DiveHeight * Vector3.up;
-            await AbilityManager.TryRun(scope, Teleport.MainAction);
+            await scope.Any(
+              s => s.Repeat(TrySetTeleportOverTarget),
+              s => AbilityManager.TryRun(s, Teleport.MainAction)
+            );
+            await scope.Tick();
+          } else if (diceRoll < .02f) {
+            Throw.OnThrow = SetHomingSphereHitParams;
+            await scope.Any(
+              s => s.Repeat(TryLookAtTarget),
+              s => AbilityManager.TryRun(s, Throw.MainAction)
+            );
             await scope.Tick();
           } else {
             await scope.Tick();
