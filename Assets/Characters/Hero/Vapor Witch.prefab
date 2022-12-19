@@ -49,14 +49,18 @@ MonoBehaviour:
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
-  MaxMoveSpeed: 45
-  MinMoveSpeed: 45
-  TurnSpeed: 45
+  MaxMoveSpeed: 30
+  MinMoveSpeed: 30
+  TurnSpeed: 30
   DashDuration:
-    Millis: 133.33333
+    Millis: 250
     FramesPerSecond: 60
-  LaunchChip: {fileID: 0}
-  DashingClip: {fileID: 7400000, guid: a41ecc2b2a8aa7a4e9a4647f0beb06dd, type: 2}
+  Animation:
+    Clip: {fileID: 7400000, guid: 41ce4530a91acd54da3005021ef5f865, type: 2}
+    Mask: {fileID: 0}
+    Speed: 1
+    BlendInFraction: 0.2
+    BlendOutFraction: 0.2
   LaunchSFX: {fileID: 8300000, guid: 10c28a03acd49694e8db907df2dd45f9, type: 3}
   LaunchVFX: {fileID: 100000, guid: e53da0fb627b93d419d10d2f7be0ee52, type: 3}
   VFXOffset: {x: 0, y: 1, z: 0}

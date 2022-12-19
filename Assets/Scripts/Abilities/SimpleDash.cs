@@ -6,8 +6,7 @@ public class SimpleDash : Ability {
   public float MinMoveSpeed = 60f;
   public float TurnSpeed = 60f;
   public Timeval DashDuration = Timeval.FromSeconds(.3f);
-  public AnimationClip LaunchChip;
-  public AnimationClip DashingClip;
+  public AnimationJobConfig Animation;
   public AudioClip LaunchSFX;
   public GameObject LaunchVFX;
   public Vector3 VFXOffset;
@@ -27,11 +26,10 @@ public class SimpleDash : Ability {
     try {
       var dir = AbilityManager.GetAxis(AxisTag.Move).XZ.TryGetDirection() ?? AbilityManager.transform.forward;
       using var moveEffect = Status.Add(ScriptedMove);
-      await AnimationDriver.Play(scope, LaunchChip).WaitDone(scope);
+      using var invulnEffect = Status.Add(Invulnerable);
       SFXManager.Instance.TryPlayOneShot(LaunchSFX);
       VFXManager.Instance.TrySpawnEffect(LaunchVFX, transform.position + VFXOffset, transform.rotation);
-      using var invulnEffect = Status.Add(Invulnerable);
-      AnimationDriver.Play(scope, DashingClip); // don't wait
+      AnimationDriver.Play(scope, Animation);
       await scope.Any(
         Waiter.Delay(DashDuration),
         Waiter.Repeat(Move(dir.normalized)),
