@@ -4,6 +4,10 @@ using UnityEngine;
 public class BackDash : Ability {
   [SerializeField] float Distance = 5f;
   [SerializeField] AnimationJobConfig Animation;
+  [SerializeField] GameObject LaunchVFX;
+  [SerializeField] AudioClip LaunchSFX;
+  [SerializeField] GameObject LandVFX;
+  [SerializeField] AudioClip LandSFX;
 
   public static InlineEffect ScriptedMove => new(s => {
     s.CanMove = false;
@@ -15,7 +19,11 @@ public class BackDash : Ability {
   public override async Task MainAction(TaskScope scope) {
     using var scriptedMove = Status.Add(ScriptedMove);
     var animation = AnimationDriver.Play(scope, Animation);
+    SFXManager.Instance.TryPlayOneShot(LaunchSFX);
+    VFXManager.Instance.TrySpawnEffect(LaunchVFX, transform.position);
     await scope.Any(animation.WaitDone, Waiter.Repeat(Move));
+    SFXManager.Instance.TryPlayOneShot(LandSFX);
+    VFXManager.Instance.TrySpawnEffect(LandVFX, transform.position);
   }
 
   async Task Move(TaskScope scope) {

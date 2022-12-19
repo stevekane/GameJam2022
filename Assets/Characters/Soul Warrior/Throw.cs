@@ -9,6 +9,8 @@ public class Throw : Ability {
   [SerializeField] AvatarTransform Spawn;
   [SerializeField] GameObject ChannelVFX;
   [SerializeField] AudioSource ChannelAudioSource;
+  [SerializeField] GameObject SpawnVFX;
+  [SerializeField] AudioClip SpawnSFX;
   [SerializeField] GameObject ProjectilePrefab;
 
   public Action<GameObject> OnThrow;
@@ -28,6 +30,8 @@ public class Throw : Ability {
       var position = Spawn.Transform.position;
       var rotation = AbilityManager.transform.rotation;
       var projectile = Instantiate(ProjectilePrefab, position, rotation);
+      SFXManager.Instance.TryPlayOneShot(SpawnSFX);
+      VFXManager.Instance.TrySpawnEffect(SpawnVFX, Spawn.Transform.position, rotation);
       OnThrow?.Invoke(projectile);
       await animation.WaitDone(scope);
     } finally {

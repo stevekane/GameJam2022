@@ -51,7 +51,7 @@ public class Dive : Ability {
     // Attack
     PhaseHits.Clear();
     SFXManager.Instance.TryPlayOneShot(LandSFX);
-    VFXManager.Instance.TrySpawnEffect(LandVFX, AbilityManager.transform.position, Quaternion.LookRotation(Vector3.down));
+    VFXManager.Instance.TrySpawnEffect(LandVFX, AbilityManager.transform.position);
     await scope.Any(Waiter.Delay(LandDuration), Waiter.Repeat(OnHit(HitConfig)));
     // Recovery
     diveEffect.Dispose();

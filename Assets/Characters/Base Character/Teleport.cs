@@ -9,6 +9,7 @@ public class Teleport : Ability {
   [SerializeField] GameObject ChannelVFX;
   [SerializeField] AudioClip OutSFX;
   [SerializeField] GameObject OutVFX;
+  [SerializeField] AudioClip InSFX;
   [SerializeField] GameObject InVFX;
   [SerializeField] Vector3 VFXOffset;
 
@@ -29,6 +30,7 @@ public class Teleport : Ability {
       await animationJob.WaitDone(scope);
       SFXManager.Instance.TryPlayOneShot(OutSFX);
       VFXManager.Instance.TrySpawnEffect(OutVFX, AbilityManager.transform.position+VFXOffset);
+      SFXManager.Instance.TryPlayOneShot(InSFX);
       VFXManager.Instance.TrySpawnEffect(InVFX, Destination+VFXOffset);
       Flash.Run();
       Mover.Move(Destination-AbilityManager.transform.position);

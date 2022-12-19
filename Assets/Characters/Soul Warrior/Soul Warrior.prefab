@@ -101,6 +101,10 @@ MonoBehaviour:
     Speed: 1
     BlendInFraction: 0.15
     BlendOutFraction: 0.15
+  LaunchVFX: {fileID: 100000, guid: 77191daeade45f54bb8cc2c23bc31d17, type: 3}
+  LaunchSFX: {fileID: 8300000, guid: 64742627e1785be4594cf6c6834978a0, type: 3}
+  LandVFX: {fileID: 100000, guid: 77191daeade45f54bb8cc2c23bc31d17, type: 3}
+  LandSFX: {fileID: 8300000, guid: 3e23f735a49b7b3409b80f77674edf2e, type: 3}
 --- !u!1 &3185692927365275638
 GameObject:
   m_ObjectHideFlags: 0
@@ -217,7 +221,7 @@ MonoBehaviour:
   Hitbox: {fileID: 7192207245549015361}
   AttackVFXOffset: {x: 0, y: 1, z: 0}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
-  AttackSFX: {fileID: 8300000, guid: 28406bf68add30e4e89d6cd063fb84e6, type: 3}
+  AttackSFX: {fileID: 8300000, guid: 13a4de47aac3fa74abfddf49a13f92c3, type: 3}
 --- !u!65 &3853045096224174420
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -335,9 +339,9 @@ MonoBehaviour:
     BlendOutFraction: 0.2
   WindupVFXTransform: {fileID: 5343061925828056540}
   WindupVFX: {fileID: 5004110830200433158, guid: e8cd8df4f7ff541489a01ae1439a2204, type: 3}
-  WindupSFX: {fileID: 0}
+  WindupSFX: {fileID: 8300000, guid: bc7ce4173f77cb14584df01058caea92, type: 3}
   LandVFXTransform: {fileID: 0}
-  LandVFX: {fileID: 8194992990867289339, guid: 99bc28c0d45f51c4fbac01080b73edc7, type: 3}
+  LandVFX: {fileID: 1418612635309521422, guid: 0de62770a20c55c44905cf3984977a64, type: 3}
   LandSFX: {fileID: 8300000, guid: 78850fd5336d0a54a9f85f580d94877d, type: 3}
   Hitbox: {fileID: 8208371365778823801}
 --- !u!65 &3802458583439753259
@@ -378,7 +382,7 @@ GameObject:
   - component: {fileID: 5880383986943101862}
   - component: {fileID: 7857056079350604122}
   m_Layer: 0
-  m_Name: Throw Homing Sphere
+  m_Name: Fireball
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -431,6 +435,8 @@ MonoBehaviour:
   Spawn: {fileID: 3268788069094683409}
   ChannelVFX: {fileID: 5004110830200433158, guid: e8cd8df4f7ff541489a01ae1439a2204, type: 3}
   ChannelAudioSource: {fileID: 7857056079350604122}
+  SpawnVFX: {fileID: 0}
+  SpawnSFX: {fileID: 8300000, guid: f52b70f9938ea084ea30fcec727bbae4, type: 3}
   ProjectilePrefab: {fileID: 3805252507082426493, guid: d20c6a996c593444e8d034a782224fd2, type: 3}
 --- !u!82 &7857056079350604122
 AudioSource:
@@ -442,8 +448,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_audioClip: {fileID: 8300000, guid: bc7ce4173f77cb14584df01058caea92, type: 3}
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 1
@@ -631,8 +637,9 @@ MonoBehaviour:
   Flash: {fileID: 4220133813938994158}
   FXTransform: {fileID: 5427623611988391633}
   ChannelVFX: {fileID: 5004110830200433158, guid: e8cd8df4f7ff541489a01ae1439a2204, type: 3}
-  OutSFX: {fileID: 8300000, guid: 28406bf68add30e4e89d6cd063fb84e6, type: 3}
+  OutSFX: {fileID: 8300000, guid: b368e7961aae83d4789c8088895456b4, type: 3}
   OutVFX: {fileID: 141433446842962269, guid: 6457400d0686182489366666d94a73c9, type: 3}
+  InSFX: {fileID: 8300000, guid: 2d0413f78c43feb42853953e49f66ede, type: 3}
   InVFX: {fileID: 141433446842962269, guid: 6457400d0686182489366666d94a73c9, type: 3}
   VFXOffset: {x: 0, y: 1, z: 0}
 --- !u!1001 &5347694608513358492

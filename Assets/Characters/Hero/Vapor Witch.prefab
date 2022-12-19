@@ -55,9 +55,11 @@ MonoBehaviour:
   DashDuration:
     Millis: 133.33333
     FramesPerSecond: 60
-  DashWindupClip: {fileID: 7400000, guid: 2a60e9b2764640043a7ce8027822d075, type: 2}
+  LaunchChip: {fileID: 0}
   DashingClip: {fileID: 7400000, guid: a41ecc2b2a8aa7a4e9a4647f0beb06dd, type: 2}
-  DoneClip: {fileID: 7400000, guid: 654d990bb8222c54ea70a2a9aa54ef2e, type: 2}
+  LaunchSFX: {fileID: 8300000, guid: 10c28a03acd49694e8db907df2dd45f9, type: 3}
+  LaunchVFX: {fileID: 100000, guid: e53da0fb627b93d419d10d2f7be0ee52, type: 3}
+  VFXOffset: {x: 0, y: 1, z: 0}
 --- !u!1 &1628730702909225045
 GameObject:
   m_ObjectHideFlags: 0
@@ -279,7 +281,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  Vibrator: {fileID: 3364079649355753510}
   AttackAnimation:
     Clip: {fileID: 7400000, guid: 62766a0642318924eaec6b6094e7cf70, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
@@ -622,7 +623,9 @@ MonoBehaviour:
   MaxDuration:
     Millis: 200
     FramesPerSecond: 30
-  WindupClip: {fileID: 0}
+  WindupClip: {fileID: 7400000, guid: 2a6b2e49b8c217e4c8ccc212650f9ac5, type: 2}
+  LaunchSFX: {fileID: 8300000, guid: 006a7e9d1c0e1234f89c4f6957918bf5, type: 3}
+  LaunchVFX: {fileID: 100000, guid: e53da0fb627b93d419d10d2f7be0ee52, type: 3}
 --- !u!1 &5557811211696183068
 GameObject:
   m_ObjectHideFlags: 0
@@ -726,7 +729,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  Vibrator: {fileID: 3364079649355753510}
   AttackAnimation:
     Clip: {fileID: 7400000, guid: 8ba2a5b0d9933fe4c813b4808937910a, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
@@ -843,7 +845,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  Vibrator: {fileID: 3364079649355753510}
   AttackAnimation:
     Clip: {fileID: 7400000, guid: 62766a0642318924eaec6b6094e7cf70, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
@@ -960,7 +961,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  Vibrator: {fileID: 3364079649355753510}
   AttackAnimation:
     Clip: {fileID: 7400000, guid: cacbd4a8ef54cb84db3723764b9b47a4, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
@@ -1190,7 +1190,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  Vibrator: {fileID: 3364079649355753510}
   AttackAnimation:
     Clip: {fileID: 7400000, guid: f190d813cf4ee50499abc916c88f5fd9, type: 2}
     Mask: {fileID: 0}
@@ -1626,17 +1625,6 @@ MonoBehaviour:
     AxisTag: 0
   - AxisCode: 0
     AxisTag: 1
---- !u!114 &3364079649355753510 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8540507123274114217, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
-  m_PrefabInstance: {fileID: 6353001707408592015}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3364079649355753500}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d0cba5e795e3e24f94847040ed69f07, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &3364079649997762474 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8540507123161146149, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}

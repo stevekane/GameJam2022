@@ -7,6 +7,8 @@ public class Jump : Ability {
   public Timeval MinDuration = Timeval.FromSeconds(.1f);
   public Timeval MaxDuration = Timeval.FromSeconds(.5f);
   public AnimationClip WindupClip;
+  public AudioClip LaunchSFX;
+  public GameObject LaunchVFX;
 
   // Button press/release.
   bool Holding = true;
@@ -18,9 +20,13 @@ public class Jump : Ability {
       if (JumpsRemaining <= 0)
         return;
 
-      //await AnimationDriver.Play(scope, WindupClip).WaitDone(scope);
-      await scope.Ticks(3); // anim placeholder
-
+      if (Status.IsGrounded) {
+        await AnimationDriver.Play(scope, WindupClip).WaitDone(scope);
+      } else {
+        // TOOD: play an aerial variant of the windup animation here
+      }
+      SFXManager.Instance.TryPlayOneShot(LaunchSFX);
+      VFXManager.Instance.TrySpawnEffect(LaunchVFX, transform.position, transform.rotation);
       var velocity = Speed * Vector3.up;
       using var effect = Status.Add(new InlineEffect(s => {
         s.HasGravity = false;
@@ -37,7 +43,11 @@ public class Jump : Ability {
         JumpsRemaining = 2;
       });
 
-      await scope.Any(Waiter.All(Waiter.While(() => Holding), Waiter.Delay(MinDuration)), Waiter.Delay(MaxDuration));
+      await scope.Any(
+        Waiter.All(
+          Waiter.While(() => Holding),
+          Waiter.Delay(MinDuration)),
+        Waiter.Delay(MaxDuration));
     } finally {
     }
   }
