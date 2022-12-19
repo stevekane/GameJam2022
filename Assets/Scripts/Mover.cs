@@ -84,7 +84,7 @@ public class Mover : MonoBehaviour {
 
     // Animation
     var animator = AnimationDriver.Animator;
-    var orientedVelocity = Quaternion.Inverse(transform.rotation)*desiredMoveDir;
+    var orientedVelocity = Quaternion.Inverse(transform.rotation)*InputVelocity;
     animator.SetFloat("RightVelocity", orientedVelocity.x);
     animator.SetFloat("ForwardVelocity", orientedVelocity.z);
     animator.SetBool("IsGrounded", Status.IsGrounded);

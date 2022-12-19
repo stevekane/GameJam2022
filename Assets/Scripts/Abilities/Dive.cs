@@ -35,11 +35,10 @@ public class Dive : Ability {
     s.CanMove = false;
     s.CanRotate = false;
     s.CanAttack = false;
-  }, "DiveMove");
+  }, "DiveRecovery");
 
   public override async Task MainAction(TaskScope scope) {
     // Windup
-    HitConfig hitConfig = HitConfig;
     using var diveEffect = Status.Add(DiveEffect);
     SFXManager.Instance.TryPlayOneShot(WindupSFX);
     VFXManager.Instance.TrySpawnWithParent(WindupVFX, WindupVFXTransform, 1);
@@ -53,7 +52,7 @@ public class Dive : Ability {
     PhaseHits.Clear();
     SFXManager.Instance.TryPlayOneShot(LandSFX);
     VFXManager.Instance.TrySpawnEffect(LandVFX, AbilityManager.transform.position, Quaternion.LookRotation(Vector3.down));
-    await scope.Any(Waiter.Delay(LandDuration), Waiter.Repeat(OnHit(hitConfig)));
+    await scope.Any(Waiter.Delay(LandDuration), Waiter.Repeat(OnHit(HitConfig)));
     // Recovery
     diveEffect.Dispose();
     using var recoveryEffect = Status.Add(RecoveryEffect);
