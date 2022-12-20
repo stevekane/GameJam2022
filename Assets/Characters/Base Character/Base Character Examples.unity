@@ -2196,7 +2196,7 @@ MonoBehaviour:
     ModeOverride: 2
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.777101, y: 1}
+    m_SensorSize: {x: 1.7777778, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -2213,7 +2213,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 609569421}
   m_LocalRotation: {x: 0.38268346, y: 0.000000059604645, z: 0.000000014901161, w: 0.9238796}
-  m_LocalPosition: {x: 0.445202, y: 26.763832, z: -24.147854}
+  m_LocalPosition: {x: 0.44520175, y: 26.763832, z: -24.147854}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2232,6 +2232,10 @@ PrefabInstance:
     - target: {fileID: 2555919906692459507, guid: e5e0701d4fe371c43bd0d095a3bc1fc2, type: 3}
       propertyPath: m_Name
       value: Badger_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2555919906692459507, guid: e5e0701d4fe371c43bd0d095a3bc1fc2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2555919906692459509, guid: e5e0701d4fe371c43bd0d095a3bc1fc2, type: 3}
       propertyPath: m_RootOrder
@@ -2328,7 +2332,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_NoiseProfile: {fileID: 11400000, guid: 69ce8388f6785dd4c8c39915efece2f4, type: 2}
   m_PivotOffset: {x: 0, y: 0, z: 0}
-  m_AmplitudeGain: 2.751166e-32
+  m_AmplitudeGain: 7.316989e-15
   m_FrequencyGain: 10
   mNoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!114 &744091293
@@ -2442,7 +2446,7 @@ MonoBehaviour:
     ModeOverride: 2
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.777101, y: 1}
+    m_SensorSize: {x: 1.7777778, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -2657,6 +2661,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Badger
       objectReference: {fileID: 0}
+    - target: {fileID: 2555919906692459507, guid: e5e0701d4fe371c43bd0d095a3bc1fc2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2555919906692459509, guid: e5e0701d4fe371c43bd0d095a3bc1fc2, type: 3}
       propertyPath: m_RootOrder
       value: 20
@@ -2841,22 +2849,22 @@ MonoBehaviour:
   m_RotationMode: 0
   m_UpdateMethod: 2
   m_Targets:
-  - target: {fileID: 1226312285}
-    weight: 1
-    radius: 0
-  - target: {fileID: 2043224646}
+  - target: {fileID: 1240974521}
     weight: 1
     radius: 0
   - target: {fileID: 509390322}
     weight: 1
     radius: 0
-  - target: {fileID: 1240974521}
+  - target: {fileID: 1226312285}
+    weight: 1
+    radius: 0
+  - target: {fileID: 1037724490}
     weight: 1
     radius: 0
   - target: {fileID: 152857004}
     weight: 1
     radius: 0
-  - target: {fileID: 1037724490}
+  - target: {fileID: 2043224646}
     weight: 1
     radius: 0
 --- !u!4 &1122899131
@@ -2867,7 +2875,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1122899129}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.04188679, y: 0, z: 2.2047532}
+  m_LocalPosition: {x: 0.38657516, y: 0, z: 1.9577771}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3206,7 +3214,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1325853189}
   m_LocalRotation: {x: 0.38268346, y: 0.000000059604645, z: 0.000000014901161, w: 0.9238796}
-  m_LocalPosition: {x: 0.445202, y: 26.763832, z: -24.147854}
+  m_LocalPosition: {x: 0.44520175, y: 26.763832, z: -24.147854}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3397,6 +3405,10 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1970454300393332327, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
+      propertyPath: UseMouseAndKeyboard
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2320604253984722449, guid: 122edd45c8ec8b74b99a86e1acb4e5ee, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -3525,7 +3537,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh29142
+  m_Name: pb_Mesh34222
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
