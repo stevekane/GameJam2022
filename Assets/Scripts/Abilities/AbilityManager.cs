@@ -107,6 +107,7 @@ public class AbilityManager : MonoBehaviour {
       var Status = am.GetComponent<Status>();
       var canRun = 0 switch {
         _ when !Ability.Status.Tags.HasAllFlags(Trigger.RequiredOwnerTags) => false,
+        _ when !Status.CanAttack => false, // TODO: Is this needed? It sure feels necessary
         _ when Trigger.Tags.HasAllFlags(AbilityTag.OnlyOne) && am.Running.Any(a => !CanCancel(a)) => false,
         //_ when Trigger.Tags.HasAllFlags(AbilityTag.OnlyOne) && am.Running.Any(a => a.Tags.HasAllFlags(AbilityTag.OnlyOne) && !CanCancel(a)) => false,
         _ when Trigger.Tags.HasAllFlags(AbilityTag.BlockIfRunning) && Ability.IsRunning => false,
