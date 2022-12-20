@@ -17,6 +17,9 @@ public class BackDash : Ability {
   }, "DashMove");
 
   public override async Task MainAction(TaskScope scope) {
+    if (!Status.CanAttack) {
+      Debug.Log("Dash fired while unable to attack");
+    }
     using var scriptedMove = Status.Add(ScriptedMove);
     var animation = AnimationDriver.Play(scope, Animation);
     SFXManager.Instance.TryPlayOneShot(LaunchSFX);
