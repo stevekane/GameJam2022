@@ -22,12 +22,12 @@ public class HeightIndicator : MonoBehaviour {
 
   void FixedUpdate() {
     var color = CurrentColor;
-    if (!Status.IsGrounded && transform.position.y >= 0) {
+    if (Defaults.Instance.ShowAltimeter && !Status.IsGrounded && transform.position.y >= 0) {
       Altimeter.gameObject.SetActive(true);
       Altimeter.SetPosition(0, transform.position);
       Altimeter.SetPosition(1, transform.position - Vector3.up * (transform.position.y + GroundOffsetEpsilon));
       Altimeter.material.color = color;
-    } else if (!Status.IsGrounded && transform.position.y < -HeadHeight) {
+    } else if (Defaults.Instance.ShowAltimeter && !Status.IsGrounded && transform.position.y < -HeadHeight) {
       Altimeter.gameObject.SetActive(true);
       Altimeter.SetPosition(0, transform.position + Vector3.up * HeadHeight);
       Altimeter.SetPosition(1, transform.position - Vector3.up * (transform.position.y + GroundOffsetEpsilon));
