@@ -219,6 +219,7 @@ public class Status : MonoBehaviour {
   internal AnimationDriver AnimationDriver;
   internal Attributes Attributes;
   internal Upgrades Upgrades;
+  internal CharacterController CharacterController;
   internal Mover Mover;
   internal Optional<Damage> Damage;
   Dictionary<AttributeTag, AttributeModifier> Modifiers = new();
@@ -273,6 +274,7 @@ public class Status : MonoBehaviour {
   private void Awake() {
     Attributes = this.GetOrCreateComponent<Attributes>();
     Upgrades = this.GetOrCreateComponent<Upgrades>();
+    CharacterController = GetComponent<CharacterController>();
     Mover = GetComponent<Mover>();
     AnimationDriver = GetComponent<AnimationDriver>();
     Damage = GetComponent<Damage>();
@@ -282,9 +284,15 @@ public class Status : MonoBehaviour {
     Modifiers.Clear();
 
     const float GROUND_DISTANCE = .2f;
-    const float GROUND_SKIN_THICKNESS = .1f;
-    var groundRay = new Ray(transform.position+Vector3.up*GROUND_SKIN_THICKNESS, Vector3.down);
-    IsGrounded = Physics.Raycast(groundRay, GROUND_DISTANCE, Defaults.Instance.EnvironmentLayerMask);
+    {
+      var cylinderHeight = Mathf.Max(0, CharacterController.height - 2*CharacterController.radius);
+      var offsetDistance = cylinderHeight / 2;
+      var offset = offsetDistance*Vector3.up;
+      var skinOffset = CharacterController.skinWidth*Vector3.up;
+      var position = transform.TransformPoint(CharacterController.center + skinOffset - offset);
+      var ray = new Ray(position, Vector3.down);
+      IsGrounded = Physics.SphereCast(ray, CharacterController.radius, GROUND_DISTANCE, Defaults.Instance.EnvironmentLayerMask);
+    }
     IsHurt = false;
 
     Tags = Upgrades.AbilityTags;
@@ -310,5 +318,13 @@ public class Status : MonoBehaviour {
 
 #if UNITY_EDITOR
   public List<string> DebugEffects = new();
+  void OnDrawGizmos() {
+    var controller = CharacterController != null ? CharacterController : GetComponent<CharacterController>();
+    var cylinderHeight = Mathf.Max(0, controller.height - 2*controller.radius);
+    var offsetDistance = cylinderHeight / 2;
+    var offset = offsetDistance*Vector3.up;
+    var position = transform.TransformPoint(controller.center-offset);
+    Gizmos.DrawWireSphere(position, controller.radius);
+  }
 #endif
 }
