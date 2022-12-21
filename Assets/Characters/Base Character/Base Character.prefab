@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: 8540507123274114194}
   - component: {fileID: 8540507123274114223}
   - component: {fileID: 8540507123274114216}
+  - component: {fileID: 6765661457513728133}
   - component: {fileID: 8540507123274114217}
   - component: {fileID: 8540507123274114218}
   - component: {fileID: 8540507123274114219}
@@ -157,7 +158,7 @@ MonoBehaviour:
       Value: 6
       String: Gravity
     Modifier:
-      Base: -24
+      Base: -10
       Mult: 1
   BaseUpgrades: []
 --- !u!114 &8540507123274114192
@@ -225,6 +226,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Points>k__BackingField: 0
+--- !u!114 &6765661457513728133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8540507123274114195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c806621753f76840a91b87e3c0d2fc3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Hurtboxes:
+  - {fileID: 8540507124290307027}
+  FallSFX: {fileID: 8300000, guid: fe6b13c084178f441942a9885f9857db, type: 3}
 --- !u!114 &8540507123274114217
 MonoBehaviour:
   m_ObjectHideFlags: 0
