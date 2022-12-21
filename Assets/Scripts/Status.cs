@@ -282,7 +282,8 @@ public class Status : MonoBehaviour {
     Modifiers.Clear();
 
     const float GROUND_DISTANCE = .2f;
-    var groundRay = new Ray(transform.position, Vector3.down);
+    const float GROUND_SKIN_THICKNESS = .1f;
+    var groundRay = new Ray(transform.position+Vector3.up*GROUND_SKIN_THICKNESS, Vector3.down);
     IsGrounded = Physics.Raycast(groundRay, GROUND_DISTANCE, Defaults.Instance.EnvironmentLayerMask);
     IsHurt = false;
 
