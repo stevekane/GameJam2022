@@ -8,4 +8,6 @@ public class Defaults : MonoBehaviour {
 
   [Header("Physics")]
   public LayerMask EnvironmentLayerMask;
+
+  public bool ShowAltimeter = false;
 }

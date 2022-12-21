@@ -63,6 +63,7 @@ public class TaskScope : IDisposable {
   public async Task Yield() {
     ThrowIfCancelled();
     await Task.Yield();
+    ThrowIfCancelled();
   }
   public Task Tick() => ListenFor(Timeval.TickEvent);
   public async Task Ticks(int ticks) {
