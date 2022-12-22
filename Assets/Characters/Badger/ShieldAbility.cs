@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class ShieldAbility : Ability {
   public int Index;
-  public Animator Animator;
   public AnimationJobConfig BlockAnimation;
   public Timeval WindupDuration;
   public Timeval RecoveryDuration;
