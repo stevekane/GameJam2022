@@ -1,4 +1,38 @@
+using System;
 using UnityEngine;
+
+[Serializable]
+public enum KnockbackType {
+  Delta,
+  Forward,
+}
+
+public static class KnockbackTypeExtensions {
+  /*
+  KnockbackVector determined from choosing an attack axis and then a vector relative
+  to that attack axis.
+
+  For example, if you declare Attacker then <0,1,0> the resulting vector will be straight up
+  along the attacker's forward direction.
+
+  If you want to encode an AOE knock-away attack, you might chooise Delta then <0,0,1>
+  which will knock all targets away from the attacker along the floor (z is forward)
+  */
+  public static Vector3 KnockbackVector(
+  this KnockbackType type,
+  Vector3 RelativeVector,
+  Transform attacker,
+  Transform target) {
+    var direction = type switch {
+      KnockbackType.Delta => attacker.position.XZ().TryGetDirection(target.position.XZ()) ?? attacker.forward,
+      KnockbackType.Forward => attacker.forward,
+      _ => attacker.forward,
+    };
+    var rotation = Quaternion.LookRotation(direction);
+    var knockbackVector = rotation * RelativeVector.normalized;
+    return knockbackVector;
+  }
+}
 
 public class Damage : MonoBehaviour {
   [field:SerializeField] public float Points { get; private set; }

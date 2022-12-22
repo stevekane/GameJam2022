@@ -5,7 +5,7 @@ using UnityEngine;
 public class HitConfig {
   public AttributeModifier Damage;
   public AttributeModifier Knockback;
-  public KnockBackType KnockbackType;
+  public KnockbackType KnockbackType;
   [Tooltip("Vector in the reference frame defined by knockbacktype, an attacker and defender")]
   public Vector3 RelativeKnockbackVector = Vector3.forward;
   public float RecoilStrength;
