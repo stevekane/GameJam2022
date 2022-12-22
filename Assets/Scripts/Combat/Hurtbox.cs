@@ -12,14 +12,7 @@ public class Hurtbox : MonoBehaviour {
     hitParams.Defender = Owner;
     if (Owner.TryGetComponent(out Attributes defenderAttributes))
       hitParams.DefenderAttributes = defenderAttributes;
-    if (Owner.TryGetComponent(out Status status)) {
-      if (status.IsHittable) {
-        hitParams.Defender.SendMessage("OnHurt", hitParams, SendMessageOptions.DontRequireReceiver);
-        hitParams.Source.SendMessage("OnHit", hitParams, SendMessageOptions.DontRequireReceiver);
-        OnHurt.Fire(hitParams);
-        CameraShaker.Instance.Shake(hitParams.HitConfig.CameraShakeStrength);
-      }
-    } else {
+    if (!Owner.TryGetComponent(out Status status) || status.IsHittable) {
       hitParams.Defender.SendMessage("OnHurt", hitParams, SendMessageOptions.DontRequireReceiver);
       hitParams.Source.SendMessage("OnHit", hitParams, SendMessageOptions.DontRequireReceiver);
       OnHurt.Fire(hitParams);
