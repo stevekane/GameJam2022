@@ -20,17 +20,15 @@ public static class KnockbackTypeExtensions {
   */
   public static Vector3 KnockbackVector(
   this KnockbackType type,
-  Vector3 RelativeVector,
+  float pitchAngle,
   Transform attacker,
   Transform target) {
     var direction = type switch {
-      KnockbackType.Delta => attacker.position.XZ().TryGetDirection(target.position.XZ()) ?? attacker.forward,
-      KnockbackType.Forward => attacker.forward,
-      _ => attacker.forward,
+      KnockbackType.Delta => attacker.position.TryGetDirection(target.position) ?? attacker.forward.XZ(),
+      KnockbackType.Forward => attacker.forward.XZ(),
+      _ => attacker.forward.XZ(),
     };
-    var rotation = Quaternion.LookRotation(direction);
-    var knockbackVector = rotation * RelativeVector.normalized;
-    return knockbackVector;
+    return Vector3.RotateTowards(direction, Vector3.up, pitchAngle * Mathf.Deg2Rad, 0f);
   }
 }
 

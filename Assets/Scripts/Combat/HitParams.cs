@@ -7,7 +7,8 @@ public class HitParams {
   public GameObject Source;
   public GameObject Defender;
   public Attributes.Serialized DefenderAttributes;
-  public Vector3 KnockbackVector => HitConfig.KnockbackType.KnockbackVector(HitConfig.RelativeKnockbackVector, Source.transform, Defender.transform);
+  // TODO: cache this value? It gets called at least 4x per hit.
+  public Vector3 KnockbackVector => HitConfig.KnockbackType.KnockbackVector(HitConfig.KnockbackAngle, Source.transform, Defender.transform);
   public float KnockbackStrength => HitConfig.Knockback.Apply(AttackerAttributes.GetValue(AttributeTag.Knockback, 0));
   public float Damage => HitConfig.Damage.Apply(AttackerAttributes.GetValue(AttributeTag.Damage, 0));
 

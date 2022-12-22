@@ -157,6 +157,7 @@ MonoBehaviour:
     EnergyCost: 0
   Tags: 0
   Chargeable: 0
+  InPlace: 0
   ChargeEnd:
     Millis: 0
     FramesPerSecond: 60
@@ -173,11 +174,12 @@ MonoBehaviour:
     Damage:
       Base: 0
       Mult: 1
-    KnockbackType: 0
-    RelativeKnockbackVector: {x: 0, y: 0, z: 1}
     Knockback:
       Base: 20
       Mult: 1
+    KnockbackType: 0
+    KnockbackAngle: 10
+    RelativeKnockbackVector: {x: 0, y: 0, z: 1}
     RecoilStrength: 5
     CameraShakeStrength: 5
     HitStopDuration:
@@ -189,7 +191,6 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 0
       FramesPerSecond: 60
-    InPlace: 0
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -303,11 +304,12 @@ MonoBehaviour:
     Damage:
       Base: 0
       Mult: 1
-    KnockbackType: 0
-    RelativeKnockbackVector: {x: 0, y: 0, z: 1}
     Knockback:
       Base: 25
       Mult: 1
+    KnockbackType: 0
+    KnockbackAngle: 0
+    RelativeKnockbackVector: {x: 0, y: 0, z: 1}
     RecoilStrength: 0
     CameraShakeStrength: 5
     HitStopDuration:
@@ -319,7 +321,6 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 0
       FramesPerSecond: 60
-    InPlace: 0
   WindupDuration:
     Millis: 500
     FramesPerSecond: 60
@@ -735,7 +736,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114197, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: m_RootOrder
-      value: 10
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114197, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -778,52 +779,24 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
-      propertyPath: BaseAttributes.Array.data[1].Modifier.Base
+      propertyPath: BaseAttributes.Array.size
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
-      propertyPath: BaseAttributes.Array.data[1].Modifier.Mult
+      propertyPath: BaseAttributes.Array.data[4].Modifier.Base
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
+      propertyPath: BaseAttributes.Array.data[4].Modifier.Mult
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
-      propertyPath: BaseAttributes.Array.data[2].Modifier.Base
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
-      propertyPath: BaseAttributes.Array.data[2].Modifier.Mult
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
-      propertyPath: BaseAttributes.Array.data[3].Modifier.Base
-      value: 720
-      objectReference: {fileID: 0}
-    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
-      propertyPath: BaseAttributes.Array.data[3].Modifier.Mult
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
-      propertyPath: BaseAttributes.Array.data[1].Attribute.Value
+      propertyPath: BaseAttributes.Array.data[4].Attribute.Value
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
-      propertyPath: BaseAttributes.Array.data[2].Attribute.Value
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
-      propertyPath: BaseAttributes.Array.data[3].Attribute.Value
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
-      propertyPath: BaseAttributes.Array.data[1].Attribute.String
+      propertyPath: BaseAttributes.Array.data[4].Attribute.String
       value: Damage
-      objectReference: {fileID: 0}
-    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
-      propertyPath: BaseAttributes.Array.data[2].Attribute.String
-      value: MoveSpeed
-      objectReference: {fileID: 0}
-    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
-      propertyPath: BaseAttributes.Array.data[3].Attribute.String
-      value: TurnSpeed
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114219, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: Renderers.Array.size
@@ -919,11 +892,12 @@ MonoBehaviour:
     Damage:
       Base: 0
       Mult: 1
-    KnockbackType: 0
-    RelativeKnockbackVector: {x: 0, y: 0, z: 1}
     Knockback:
       Base: 12
       Mult: 1
+    KnockbackType: 0
+    KnockbackAngle: 0
+    RelativeKnockbackVector: {x: 0, y: 0, z: 1}
     RecoilStrength: 0
     CameraShakeStrength: 5
     HitStopDuration:
@@ -935,7 +909,6 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 0
       FramesPerSecond: 60
-    InPlace: 0
   Teleport: {fileID: 7053381319833114771}
   BackDash: {fileID: 6422472136148966431}
   Dive: {fileID: 4584590916625472510}

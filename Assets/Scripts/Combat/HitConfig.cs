@@ -3,11 +3,13 @@ using UnityEngine;
 
 [Serializable]
 public class HitConfig {
+  [Tooltip("Final damage = Base + Mult*CharacterDamageAttrib")]
   public AttributeModifier Damage;
+  [Tooltip("Final knockback = Base + Mult*CharacterKnockbackAttrib")]
   public AttributeModifier Knockback;
   public KnockbackType KnockbackType;
-  [Tooltip("Vector in the reference frame defined by knockbacktype, an attacker and defender")]
-  public Vector3 RelativeKnockbackVector = Vector3.forward;
+  [Tooltip("Angle (degrees) above the horizontal plane along the direction defined by knockbacktype, an attacker and defender")]
+  public float KnockbackAngle = 0;
   public float RecoilStrength;
   public float CameraShakeStrength;
   public Timeval HitStopDuration;
@@ -25,7 +27,7 @@ public class HitConfig {
         Mult = Knockback.Mult
       },
       KnockbackType = KnockbackType,
-      RelativeKnockbackVector = RelativeKnockbackVector,
+      KnockbackAngle = KnockbackAngle,
       RecoilStrength = RecoilStrength,
       CameraShakeStrength = CameraShakeStrength,
       HitStopDuration = HitStopDuration,

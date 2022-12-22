@@ -289,6 +289,7 @@ MonoBehaviour:
   TriggerConditions: []
   Tags: 0
   Chargeable: 0
+  InPlace: 0
   ChargeEnd:
     Millis: 0
     FramesPerSecond: 24
@@ -309,6 +310,7 @@ MonoBehaviour:
       Base: 3
       Mult: 1
     KnockbackType: 1
+    KnockbackAngle: 0
     RelativeKnockbackVector: {x: 0, y: 0, z: 1}
     RecoilStrength: 10
     CameraShakeStrength: 2
@@ -321,7 +323,6 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 0
       FramesPerSecond: 60
-    InPlace: 0
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -356,7 +357,6 @@ MonoBehaviour:
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
-  InPlace: 0
 --- !u!1 &2868650853462325931
 GameObject:
   m_ObjectHideFlags: 0
@@ -416,6 +416,7 @@ MonoBehaviour:
       Base: 20
       Mult: 1
     KnockbackType: 0
+    KnockbackAngle: 30
     RelativeKnockbackVector: {x: 0, y: 0.7, z: 1}
     RecoilStrength: 0
     CameraShakeStrength: 1
@@ -428,7 +429,6 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 0
       FramesPerSecond: 30
-    InPlace: 0
   WindupDuration:
     Millis: 500
     FramesPerSecond: 30
@@ -683,6 +683,7 @@ MonoBehaviour:
   TriggerConditions: []
   Tags: 0
   Chargeable: 0
+  InPlace: 0
   ChargeEnd:
     Millis: 1
     FramesPerSecond: 30
@@ -703,6 +704,7 @@ MonoBehaviour:
       Base: 3
       Mult: 1
     KnockbackType: 1
+    KnockbackAngle: 0
     RelativeKnockbackVector: {x: 0, y: 0, z: 1}
     RecoilStrength: 10
     CameraShakeStrength: 2
@@ -715,7 +717,6 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 0
       FramesPerSecond: 60
-    InPlace: 0
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -750,7 +751,6 @@ MonoBehaviour:
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
-  InPlace: 0
 --- !u!1 &5751272113798131921
 GameObject:
   m_ObjectHideFlags: 0
@@ -802,6 +802,7 @@ MonoBehaviour:
     EnergyCost: 0
   Tags: 0
   Chargeable: 1
+  InPlace: 0
   ChargeEnd:
     Millis: 1000
     FramesPerSecond: 60
@@ -822,6 +823,7 @@ MonoBehaviour:
       Base: 50
       Mult: 1
     KnockbackType: 1
+    KnockbackAngle: 45
     RelativeKnockbackVector: {x: 0, y: 1, z: 1}
     RecoilStrength: 30
     CameraShakeStrength: 1
@@ -834,7 +836,6 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 0
       FramesPerSecond: 30
-    InPlace: 0
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -869,7 +870,6 @@ MonoBehaviour:
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
-  InPlace: 0
 --- !u!1 &6068021541246575134
 GameObject:
   m_ObjectHideFlags: 0
@@ -921,6 +921,7 @@ MonoBehaviour:
     EnergyCost: 0
   Tags: 0
   Chargeable: 0
+  InPlace: 0
   ChargeEnd:
     Millis: 1
     FramesPerSecond: 30
@@ -941,6 +942,7 @@ MonoBehaviour:
       Base: 6
       Mult: 1
     KnockbackType: 1
+    KnockbackAngle: 90
     RelativeKnockbackVector: {x: 0, y: 1, z: 0}
     RecoilStrength: 12
     CameraShakeStrength: 4
@@ -953,7 +955,6 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 1000
       FramesPerSecond: 30
-    InPlace: 0
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -988,7 +989,6 @@ MonoBehaviour:
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: da396a16a7f24f64cbb0054f5a56b46a, type: 3}
-  InPlace: 0
 --- !u!1 &8126501186462212013
 GameObject:
   m_ObjectHideFlags: 0
@@ -1153,6 +1153,7 @@ MonoBehaviour:
     EnergyCost: 0
   Tags: 0
   Chargeable: 0
+  InPlace: 1
   ChargeEnd:
     Millis: 1
     FramesPerSecond: 30
@@ -1173,6 +1174,7 @@ MonoBehaviour:
       Base: 30
       Mult: 1
     KnockbackType: 1
+    KnockbackAngle: -45
     RelativeKnockbackVector: {x: 0, y: -1, z: 1}
     RecoilStrength: 25
     CameraShakeStrength: 8
@@ -1185,7 +1187,6 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 0
       FramesPerSecond: 30
-    InPlace: 1
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -1220,7 +1221,6 @@ MonoBehaviour:
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 2708598583397607911, guid: 6398d43fe79ea0140913dc5530c646af, type: 3}
   AttackSFX: {fileID: 8300000, guid: 0e5edb6bccf05984dad128fb1a9fc914, type: 3}
-  InPlace: 1
 --- !u!1001 &2299305809950757417
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1498,7 +1498,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114197, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114197, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: m_LocalPosition.x
