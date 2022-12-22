@@ -138,10 +138,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BaseAttributes:
   - Attribute:
-      Value: 6
+      Value: 7
       String: Gravity
     Modifier:
-      Base: -64
+      Base: 40
       Mult: 1
   - Attribute:
       Value: 3
@@ -160,6 +160,12 @@ MonoBehaviour:
       String: Damage
     Modifier:
       Base: 8
+      Mult: 1
+  - Attribute:
+      Value: 6
+      String: MaxFallSpeed
+    Modifier:
+      Base: 15
       Mult: 1
   BaseUpgrades: []
 --- !u!114 &2555919906692459504
@@ -710,7 +716,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  Vibrator: {fileID: 2555919906692459465}
   AttackAnimation:
     Clip: {fileID: 7400000, guid: 62766a0642318924eaec6b6094e7cf70, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}

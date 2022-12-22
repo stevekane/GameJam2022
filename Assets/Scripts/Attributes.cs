@@ -10,6 +10,7 @@ public enum AttributeTag {
   MoveSpeed,
   TurnSpeed,
   AttackSpeed,
+  MaxFallSpeed,
   Gravity,
   HasGravity,
   CanAttack,
