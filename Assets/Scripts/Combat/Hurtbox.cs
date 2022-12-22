@@ -11,7 +11,7 @@ public class Hurtbox : MonoBehaviour {
   public void TryAttack(HitParams hitParams) {
     hitParams.Defender = Owner;
     if (Owner.TryGetComponent(out Attributes defenderAttributes))
-      hitParams.DefenderAttributes = defenderAttributes.serialized;
+      hitParams.DefenderAttributes = defenderAttributes;
     if (Owner.TryGetComponent(out Status status)) {
       if (status.IsHittable) {
         hitParams.Defender.SendMessage("OnHurt", hitParams, SendMessageOptions.DontRequireReceiver);

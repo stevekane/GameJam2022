@@ -48,7 +48,8 @@ public class Damage : MonoBehaviour {
     if (Status != null) {
       var source = hitParams.Source.transform;
       var knockbackVector = hitParams.KnockbackVector;
-      var knockbackStrength = 5f * hitParams.KnockbackStrength * Mathf.Pow((Points+100f) / 100f, 2f);
+      var defenderWeightFactor = 2f / (1f + hitParams.DefenderAttributes.GetValue(AttributeTag.Weight));
+      var knockbackStrength = hitParams.GetKnockbackStrength(Points);
       var rotation = Quaternion.LookRotation(knockbackVector);
       var wallbounceTarget = Wallbounce.ComputeWallbounceTarget(source);
       Mover.ResetVelocity();
@@ -68,12 +69,7 @@ public class Damage : MonoBehaviour {
   }
 
   public void AddPoints(float dp) {
-    if (Status) {
-      if (Status.IsDamageable) {
-        Points += dp;
-      }
-    } else {
+    if (Status == null || Status.IsDamageable)
       Points += dp;
-    }
   }
 }

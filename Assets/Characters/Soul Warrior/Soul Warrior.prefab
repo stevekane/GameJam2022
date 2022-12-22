@@ -179,7 +179,6 @@ MonoBehaviour:
       Mult: 1
     KnockbackType: 0
     KnockbackAngle: 10
-    RelativeKnockbackVector: {x: 0, y: 0, z: 1}
     RecoilStrength: 5
     CameraShakeStrength: 5
     HitStopDuration:
@@ -309,7 +308,6 @@ MonoBehaviour:
       Mult: 1
     KnockbackType: 0
     KnockbackAngle: 0
-    RelativeKnockbackVector: {x: 0, y: 0, z: 1}
     RecoilStrength: 0
     CameraShakeStrength: 5
     HitStopDuration:
@@ -780,7 +778,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.size
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[4].Modifier.Base
@@ -791,12 +789,28 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
+      propertyPath: BaseAttributes.Array.data[5].Modifier.Base
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
+      propertyPath: BaseAttributes.Array.data[5].Modifier.Mult
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[4].Attribute.Value
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
+      propertyPath: BaseAttributes.Array.data[5].Attribute.Value
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[4].Attribute.String
       value: Damage
+      objectReference: {fileID: 0}
+    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
+      propertyPath: BaseAttributes.Array.data[5].Attribute.String
+      value: Weight
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114219, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: Renderers.Array.size
@@ -897,7 +911,6 @@ MonoBehaviour:
       Mult: 1
     KnockbackType: 0
     KnockbackAngle: 0
-    RelativeKnockbackVector: {x: 0, y: 0, z: 1}
     RecoilStrength: 0
     CameraShakeStrength: 5
     HitStopDuration:

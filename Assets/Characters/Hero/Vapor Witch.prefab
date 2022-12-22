@@ -307,11 +307,10 @@ MonoBehaviour:
       Base: 0
       Mult: 1
     Knockback:
-      Base: 3
-      Mult: 1
+      Base: 5
+      Mult: 0.1
     KnockbackType: 1
     KnockbackAngle: 0
-    RelativeKnockbackVector: {x: 0, y: 0, z: 1}
     RecoilStrength: 10
     CameraShakeStrength: 2
     HitStopDuration:
@@ -417,7 +416,6 @@ MonoBehaviour:
       Mult: 1
     KnockbackType: 0
     KnockbackAngle: 30
-    RelativeKnockbackVector: {x: 0, y: 0.7, z: 1}
     RecoilStrength: 0
     CameraShakeStrength: 1
     HitStopDuration:
@@ -701,11 +699,10 @@ MonoBehaviour:
       Base: 0
       Mult: 1
     Knockback:
-      Base: 3
-      Mult: 1
+      Base: 5
+      Mult: 0.1
     KnockbackType: 1
     KnockbackAngle: 0
-    RelativeKnockbackVector: {x: 0, y: 0, z: 1}
     RecoilStrength: 10
     CameraShakeStrength: 2
     HitStopDuration:
@@ -824,7 +821,6 @@ MonoBehaviour:
       Mult: 1
     KnockbackType: 1
     KnockbackAngle: 45
-    RelativeKnockbackVector: {x: 0, y: 1, z: 1}
     RecoilStrength: 30
     CameraShakeStrength: 1
     HitStopDuration:
@@ -943,7 +939,6 @@ MonoBehaviour:
       Mult: 1
     KnockbackType: 1
     KnockbackAngle: 90
-    RelativeKnockbackVector: {x: 0, y: 1, z: 0}
     RecoilStrength: 12
     CameraShakeStrength: 4
     HitStopDuration:
@@ -1175,7 +1170,6 @@ MonoBehaviour:
       Mult: 1
     KnockbackType: 1
     KnockbackAngle: -45
-    RelativeKnockbackVector: {x: 0, y: -1, z: 1}
     RecoilStrength: 25
     CameraShakeStrength: 8
     HitStopDuration:
@@ -1542,7 +1536,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.size
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[0].Modifier.Base
@@ -1581,6 +1575,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
+      propertyPath: BaseAttributes.Array.data[5].Modifier.Base
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
+      propertyPath: BaseAttributes.Array.data[5].Modifier.Mult
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[1].Attribute.Value
       value: 4
       objectReference: {fileID: 0}
@@ -1597,6 +1599,10 @@ PrefabInstance:
       value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
+      propertyPath: BaseAttributes.Array.data[5].Attribute.Value
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[1].Attribute.String
       value: MoveSpeed
       objectReference: {fileID: 0}
@@ -1611,6 +1617,10 @@ PrefabInstance:
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[4].Attribute.String
       value: MaxFallSpeed
+      objectReference: {fileID: 0}
+    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
+      propertyPath: BaseAttributes.Array.data[5].Attribute.String
+      value: Weight
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114219, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: Renderers.Array.size
