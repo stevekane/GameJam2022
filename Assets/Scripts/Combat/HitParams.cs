@@ -8,8 +8,8 @@ public class HitParams {
   public GameObject Defender;
   public Attributes.Serialized DefenderAttributes;
   public Vector3 KnockbackVector => HitConfig.KnockbackType.KnockbackVector(HitConfig.RelativeKnockbackVector, Source.transform, Defender.transform);
-  public float KnockbackStrength => AttackerAttributes.GetValue(AttributeTag.Knockback, HitConfig.KnockbackStrength);
-  public float Damage => HitConfig.DamageModifier.Apply(AttackerAttributes.GetValue(AttributeTag.Damage, 0));
+  public float KnockbackStrength => HitConfig.Knockback.Apply(AttackerAttributes.GetValue(AttributeTag.Knockback, 0));
+  public float Damage => HitConfig.Damage.Apply(AttackerAttributes.GetValue(AttributeTag.Damage, 0));
 
   // Useful if HitParams are reused for multiple calls to Hurtbox.TryAttack(), which will reset the Defender.
   public HitParams Clone() => new() {

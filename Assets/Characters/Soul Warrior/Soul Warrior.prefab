@@ -170,12 +170,14 @@ MonoBehaviour:
     Millis: 1666.6666
     FramesPerSecond: 60
   HitConfig:
-    DamageModifier:
+    Damage:
       Base: 0
       Mult: 1
     KnockbackType: 0
     RelativeKnockbackVector: {x: 0, y: 0, z: 1}
-    KnockbackStrength: 20
+    Knockback:
+      Base: 20
+      Mult: 1
     RecoilStrength: 5
     CameraShakeStrength: 5
     HitStopDuration:
@@ -298,12 +300,14 @@ MonoBehaviour:
   Tags: 0
   FallSpeed: 150
   HitConfig:
-    DamageModifier:
+    Damage:
       Base: 0
       Mult: 1
     KnockbackType: 0
     RelativeKnockbackVector: {x: 0, y: 0, z: 1}
-    KnockbackStrength: 25
+    Knockback:
+      Base: 25
+      Mult: 1
     RecoilStrength: 0
     CameraShakeStrength: 5
     HitStopDuration:
@@ -912,12 +916,14 @@ MonoBehaviour:
   HardAttack: {fileID: 6721464206334880950}
   Throw: {fileID: 5880383986943101862}
   ThrowHitConfig:
-    DamageModifier:
+    Damage:
       Base: 0
       Mult: 1
     KnockbackType: 0
     RelativeKnockbackVector: {x: 0, y: 0, z: 1}
-    KnockbackStrength: 12
+    Knockback:
+      Base: 12
+      Mult: 1
     RecoilStrength: 0
     CameraShakeStrength: 5
     HitStopDuration:

@@ -3,11 +3,11 @@ using UnityEngine;
 
 [Serializable]
 public class HitConfig {
-  public AttributeModifier DamageModifier;
+  public AttributeModifier Damage;
+  public AttributeModifier Knockback;
   public KnockBackType KnockbackType;
   [Tooltip("Vector in the reference frame defined by knockbacktype, an attacker and defender")]
   public Vector3 RelativeKnockbackVector = Vector3.forward;
-  public float KnockbackStrength;
   public float RecoilStrength;
   public float CameraShakeStrength;
   public Timeval HitStopDuration;
@@ -17,12 +17,15 @@ public class HitConfig {
 
   public HitConfig Scale(float scale) {
     return new() {
-      DamageModifier = new AttributeModifier() {
-        Base = DamageModifier.Base,
-        Mult = DamageModifier.Mult*scale
+      Damage = new() {
+        Base = Damage.Base*scale,
+        Mult = Damage.Mult
+      },
+      Knockback = new() {
+        Base = Knockback.Base*scale,
+        Mult = Knockback.Mult
       },
       KnockbackType = KnockbackType,
-      KnockbackStrength = KnockbackStrength*scale,
       RelativeKnockbackVector = RelativeKnockbackVector,
       RecoilStrength = RecoilStrength,
       CameraShakeStrength = CameraShakeStrength,

@@ -7,6 +7,7 @@ public enum AttributeTag {
   Damage,
   Health,
   Knockback,
+  Weight,
   MoveSpeed,
   TurnSpeed,
   AttackSpeed,

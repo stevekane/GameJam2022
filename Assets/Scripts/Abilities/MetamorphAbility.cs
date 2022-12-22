@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class MetamorphAbility : Ability {
   public Timeval Duration = Timeval.FromSeconds(10f);
-  public AttributeModifier DamageModifier = new() { Mult = 2 };
-  public AttributeModifier KnockbackModifier = new() { Mult = 1.5f };
+  public AttributeModifier Damage = new() { Mult = 2 };
+  public AttributeModifier Knockback = new() { Mult = 1.5f };
   Animator Animator;
 
   public override async Task MainAction(TaskScope scope) {
@@ -15,8 +15,8 @@ public class MetamorphAbility : Ability {
         status.Tags.ClearFlags(AbilityTag.AbilityMorphEnabled);
         status.Tags.AddFlags(AbilityTag.AbilitySlamEnabled);
         status.Tags.AddFlags(AbilityTag.AbilitySuplexEnabled);
-        status.AddAttributeModifier(AttributeTag.Damage, DamageModifier);
-        status.AddAttributeModifier(AttributeTag.Knockback, KnockbackModifier);
+        status.AddAttributeModifier(AttributeTag.Damage, Damage);
+        status.AddAttributeModifier(AttributeTag.Knockback, Knockback);
       }));
       await scope.Any(Waiter.Delay(Duration), ListenFor(MainRelease));
     } finally {
