@@ -22,14 +22,19 @@ public class SimpleDash : Ability {
   }, "DashInvulnerable");
 
   // Button press/release.
+  int AirDashRemaining = 1;
   public override async Task MainAction(TaskScope scope) {
     try {
+      if (AirDashRemaining <= 0 && !Status.IsGrounded)
+        return;
+
       var dir = AbilityManager.GetAxis(AxisTag.Move).XZ.TryGetDirection() ?? AbilityManager.transform.forward;
       using var moveEffect = Status.Add(ScriptedMove);
       using var invulnEffect = Status.Add(Invulnerable);
       SFXManager.Instance.TryPlayOneShot(LaunchSFX);
       VFXManager.Instance.TrySpawnEffect(LaunchVFX, transform.position + VFXOffset, transform.rotation);
       AnimationDriver.Play(scope, Animation);
+      AirDashRemaining--;
       await scope.Any(
         Waiter.Delay(DashDuration),
         Waiter.Repeat(Move(dir.normalized)),
@@ -54,7 +59,8 @@ public class SimpleDash : Ability {
     await scope.Forever();
   }
 
-  public override void Awake() {
-    base.Awake();
+  void FixedUpdate() {
+    if (Status.IsGrounded)
+      AirDashRemaining = 1;
   }
 }

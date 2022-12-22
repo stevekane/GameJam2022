@@ -53,12 +53,10 @@ public abstract class Ability : MonoBehaviour {
   public virtual Task MainRelease(TaskScope scope) => null;
   public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
   public void Stop() {
-    LegacyStop();
     Tags = 0;
     MainScope.Dispose();
     MainScope = new();
   }
-  protected virtual void LegacyStop() { }
   public virtual void Awake() {
     TriggerConditionsMap[MainAction] = TriggerConditions.Count > 0 ? TriggerConditions[0] : new();
     TriggerConditionsMap[MainRelease] = TriggerCondition.BlockIfNotRunning;

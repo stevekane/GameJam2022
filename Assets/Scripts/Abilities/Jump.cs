@@ -12,12 +12,12 @@ public class Jump : Ability {
 
   // Button press/release.
   bool Holding = true;
-  int JumpsRemaining = 2;
+  int AirJumpsRemaining = 1;
   public override async Task MainAction(TaskScope scope) {
     try {
       Holding = true;
 
-      if (JumpsRemaining <= 0)
+      if (AirJumpsRemaining <= 0 && !Status.IsGrounded)
         return;
 
       if (Status.IsGrounded) {
@@ -34,15 +34,7 @@ public class Jump : Ability {
         Mover.Move(Time.fixedDeltaTime * velocity);
       }, "Jumping"));
 
-      // Reset jumps when grounded.
-      AbilityManager.MainScope.Start(async s => {
-        if (Status.IsGrounded)  // May not have started jumping before this runs.
-          await s.Until(() => !Status.IsGrounded);
-        JumpsRemaining--;
-        await s.Until(() => Status.IsGrounded);
-        JumpsRemaining = 2;
-      });
-
+      AirJumpsRemaining--;
       await scope.Any(
         Waiter.All(
           Waiter.While(() => Holding),
@@ -55,5 +47,10 @@ public class Jump : Ability {
   public override Task MainRelease(TaskScope scope) {
     Holding = false;
     return null;
+  }
+
+  void FixedUpdate() {
+    if (Status.IsGrounded)
+      AirJumpsRemaining = 1;
   }
 }
