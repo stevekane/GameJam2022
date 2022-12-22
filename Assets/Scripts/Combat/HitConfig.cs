@@ -13,7 +13,6 @@ public class HitConfig {
   public Timeval HitStopDuration;
   public Timeval StunDuration = Timeval.FromMillis(500);
   public Timeval SlowFallDuration = Timeval.FromSeconds(0);
-  public bool InPlace;
 
   public HitConfig Scale(float scale) {
     return new() {
@@ -32,7 +31,6 @@ public class HitConfig {
       HitStopDuration = HitStopDuration,
       StunDuration = new Timeval() { Ticks = (int)(StunDuration.Ticks*scale) },
       SlowFallDuration = SlowFallDuration,
-      InPlace = InPlace
     };
   }
 }
