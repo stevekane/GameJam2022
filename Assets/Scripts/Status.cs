@@ -14,6 +14,26 @@ public abstract class StatusEffect : IDisposable {
   public void Dispose() => Status?.Remove(this);
 }
 
+public class TimedEffect : StatusEffect {
+  protected int Ticks = 0;
+  protected int TotalTicks;
+  public TimedEffect(int ticks) => TotalTicks = ticks;
+  public override sealed void Apply(Status status) {
+    if (Ticks++ < TotalTicks) {
+      ApplyTimed(status);
+    } else {
+      status.Remove(this);
+    }
+  }
+  public virtual void ApplyTimed(Status status) { }
+  public override bool Merge(StatusEffect e) {
+    var other = (TimedEffect)e;
+    TotalTicks = Mathf.Max(TotalTicks - Ticks, other.TotalTicks);
+    Ticks = 0;
+    return true;
+  }
+}
+
 public class InlineEffect : StatusEffect {
   Action<Status> ApplyFunc;
   string Name;
@@ -30,6 +50,53 @@ public class SpeedFactorEffect : StatusEffect {
   public override void Apply(Status status) {
     status.AddAttributeModifier(AttributeTag.MoveSpeed, MoveSpeedModifier);
     status.AddAttributeModifier(AttributeTag.TurnSpeed, TurnSpeedModifier);
+  }
+}
+
+public class SlowFallDuration : TimedEffect {
+  public AttributeModifier Modifier;
+  public SlowFallDuration(int ticks) : base(ticks) => Modifier = new AttributeModifier { Mult = .5f };
+  public override void ApplyTimed(Status status) => status.AddAttributeModifier(AttributeTag.Gravity, Modifier);
+}
+
+public class HitStopEffect : TimedEffect {
+  public Vector3 Axis;
+  public HitStopEffect(Vector3 axis, int ticks) : base(ticks) => Axis = axis;
+  public override void ApplyTimed(Status status) {
+    status.CanAttack = false;
+    var localTimeScale = Defaults.Instance.HitStopLocalTime.Evaluate((float)Ticks/TotalTicks);
+    var localTimeScaleMod = new AttributeModifier { Mult = localTimeScale };
+    status.AddAttributeModifier(AttributeTag.LocalTimeScale, localTimeScaleMod);
+  }
+}
+
+public class HurtStunEffect : TimedEffect {
+  public HurtStunEffect(int ticks) : base(ticks) { }
+  public override void ApplyTimed(Status status) {
+    status.CanMove = false;
+    status.CanRotate = false;
+    status.CanAttack = false;
+    status.IsHurt = true;
+  }
+}
+
+public class BurningEffect : TimedEffect {
+  float DamagePerFrame = 1f;
+  public BurningEffect(float dps) : base(Timeval.FromSeconds(3f).Ticks) {
+    DamagePerFrame = dps / Timeval.FixedUpdatePerSecond;
+  }
+  public override void ApplyTimed(Status status) {
+    status.Damage?.Value.AddPoints(DamagePerFrame);
+  }
+}
+
+public class FreezingEffect : TimedEffect {
+  public FreezingEffect(int ticks) : base(ticks) { }
+  public override void ApplyTimed(Status status) {
+    status.CanMove = false;
+    status.CanRotate = false;
+    status.CanAttack = false;
+    status.AddAttributeModifier(AttributeTag.LocalTimeScale, AttributeModifier.TimesZero);
   }
 }
 
@@ -65,128 +132,6 @@ public class KnockbackEffect : StatusEffect {
     if (Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED)
       status.Remove(this);
     IsFirstFrame = false;
-  }
-}
-
-public class SlowFallDuration : StatusEffect {
-  public AttributeModifier Modifier;
-  public int TotalFrames;
-  public int Frames;
-  public SlowFallDuration(int totalFrames) {
-    Modifier = new AttributeModifier { Mult = .5f };
-    TotalFrames = totalFrames;
-    Frames = 0;
-  }
-  public override bool Merge(StatusEffect e) {
-    var sf = (SlowFallDuration)e;
-    TotalFrames = Mathf.Max(TotalFrames - Frames, sf.TotalFrames);
-    Frames = 0;
-    return true;
-  }
-  public override void Apply(Status status) {
-    if (Frames < TotalFrames) {
-      Frames++;
-      status.AddAttributeModifier(AttributeTag.Gravity, Modifier);
-    } else {
-      status.Remove(this);
-    }
-  }
-}
-
-public class HitStopEffect : StatusEffect {
-  public Vector3 Axis;
-  public int TotalFrames;
-  public int Frames;
-
-  public HitStopEffect(Vector3 axis, int totalFrames) {
-    Frames = 0;
-    Axis = axis;
-    TotalFrames = totalFrames;
-  }
-  public override bool Merge(StatusEffect e) {
-    var h = (HitStopEffect)e;
-    TotalFrames = Mathf.Max(TotalFrames - Frames, h.TotalFrames);
-    Frames = 0;
-    return true;
-  }
-
-  public override void Apply(Status status) {
-    if (Frames < TotalFrames) {
-      status.CanAttack = false;
-      var localTimeScale = Defaults.Instance.HitStopLocalTime.Evaluate((float)Frames/(float)TotalFrames);
-      var localTimeScaleMod = new AttributeModifier { Mult = localTimeScale };
-      status.AddAttributeModifier(AttributeTag.LocalTimeScale, localTimeScaleMod);
-      Frames++;
-    } else {
-      status.Remove(this);
-    }
-  }
-}
-
-public class HurtStunEffect : StatusEffect {
-  int TotalFrames;
-  int Frames;
-  public HurtStunEffect(int totalFrames) {
-    TotalFrames = totalFrames;
-  }
-  public override bool Merge(StatusEffect e) {
-    var existing = (HurtStunEffect)e;
-    TotalFrames = Mathf.Max(TotalFrames-Frames, existing.TotalFrames);
-    return true;
-  }
-  public override void Apply(Status status) {
-    if (Frames < TotalFrames) {
-      status.CanMove = false;
-      status.CanRotate = false;
-      status.CanAttack = false;
-      status.IsHurt = true;
-      Frames++;
-    } else {
-      status.Remove(this);
-    }
-  }
-}
-
-public class BurningEffect : StatusEffect {
-  float DamagePerFrame = 1f;
-  int Frames = Timeval.FromSeconds(3f).Ticks;
-  public BurningEffect(float dps) {
-    DamagePerFrame = dps / Timeval.FixedUpdatePerSecond;
-  }
-  public override void Apply(Status status) {
-    if (--Frames <= 0) {
-      status.Remove(this);
-    } else {
-      status.Damage?.Value.AddPoints(DamagePerFrame);
-    }
-  }
-  public override bool Merge(StatusEffect e) {
-    var other = (BurningEffect)e;
-    DamagePerFrame = Mathf.Max(DamagePerFrame, other.DamagePerFrame);
-    Frames = Math.Max(Frames, other.Frames);
-    return true;
-  }
-}
-
-public class FreezingEffect : StatusEffect {
-  int Frames;
-  public FreezingEffect(int frames) {
-    Frames = frames;
-  }
-  public override void Apply(Status status) {
-    if (--Frames <= 0) {
-      status.Remove(this);
-    } else {
-      status.CanMove = false;
-      status.CanRotate = false;
-      status.CanAttack = false;
-      status.AddAttributeModifier(AttributeTag.LocalTimeScale, AttributeModifier.TimesZero);
-    }
-  }
-  public override bool Merge(StatusEffect e) {
-    var other = (FreezingEffect)e;
-    Frames = Math.Max(Frames, other.Frames);
-    return true;
   }
 }
 
