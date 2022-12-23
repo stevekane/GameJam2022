@@ -48,7 +48,6 @@ public class Damage : MonoBehaviour {
     if (Status != null) {
       var source = hitParams.Source.transform;
       var knockbackVector = hitParams.KnockbackVector;
-      var defenderWeightFactor = 2f / (1f + hitParams.DefenderAttributes.GetValue(AttributeTag.Weight));
       var knockbackStrength = hitParams.GetKnockbackStrength(Points);
       var rotation = Quaternion.LookRotation(knockbackVector);
       var wallbounceTarget = Wallbounce.ComputeWallbounceTarget(source);

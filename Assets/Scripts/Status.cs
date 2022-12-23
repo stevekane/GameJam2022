@@ -35,9 +35,9 @@ public class SpeedFactorEffect : StatusEffect {
 
 // The flying state that happens to a defender when they get hit by a strong attack.
 public class KnockbackEffect : StatusEffect {
-  static readonly float DRAG = 5f;
-  static readonly float AIRBORNE_SPEED = 100f;
-  static readonly float DONE_SPEED = 5f;
+  const float DRAG = 5f;
+  const float AIRBORNE_SPEED = 100f;
+  const float DONE_SPEED = 5f;
 
   // Returns the speed needed to cover the given distance with exponential decay due to drag.
   public static float GetSpeedToTravelDistance(float distance) => DRAG*distance;
