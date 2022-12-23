@@ -440,7 +440,27 @@ MonoBehaviour:
   ChannelAudioSource: {fileID: 7857056079350604122}
   SpawnVFX: {fileID: 0}
   SpawnSFX: {fileID: 8300000, guid: f52b70f9938ea084ea30fcec727bbae4, type: 3}
-  ProjectilePrefab: {fileID: 3805252507082426493, guid: d20c6a996c593444e8d034a782224fd2, type: 3}
+  ProjectilePrefab: {fileID: 4208020136327101218, guid: d20c6a996c593444e8d034a782224fd2, type: 3}
+  HitConfig:
+    Damage:
+      Base: 0
+      Mult: 1
+    Knockback:
+      Base: 12
+      Mult: 1
+    KnockbackType: 0
+    KnockbackAngle: 0
+    RecoilStrength: 0
+    CameraShakeStrength: 5
+    HitStopDuration:
+      Millis: 100
+      FramesPerSecond: 60
+    StunDuration:
+      Millis: 500
+      FramesPerSecond: 60
+    SlowFallDuration:
+      Millis: 0
+      FramesPerSecond: 60
 --- !u!82 &7857056079350604122
 AudioSource:
   m_ObjectHideFlags: 0
@@ -888,6 +908,19 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8540507123274114195, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
   m_PrefabInstance: {fileID: 5482310809826680645}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1169844905359849451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4220133813938994134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65cced279f9613b45973ba06b4520d5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Wave: 0
 --- !u!114 &4616713024154015929
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -929,19 +962,6 @@ MonoBehaviour:
   OutOfRangeDistance: 10
   DiveHeight: 10
   MaxDiveHeight: 100
---- !u!114 &1169844905359849451
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4220133813938994134}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65cced279f9613b45973ba06b4520d5f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Wave: 0
 --- !u!114 &4220133813938994158 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8540507123274114219, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}

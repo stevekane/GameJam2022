@@ -4,7 +4,6 @@ using UnityEngine;
 public class SoulWarriorBehavior : MonoBehaviour {
   [SerializeField] AttackAbility HardAttack;
   [SerializeField] Throw Throw;
-  [SerializeField] HitConfig ThrowHitConfig;
   [SerializeField] Teleport Teleport;
   [SerializeField] BackDash BackDash;
   [SerializeField] Dive Dive;
@@ -15,21 +14,13 @@ public class SoulWarriorBehavior : MonoBehaviour {
 
   Mover Mover;
   Status Status;
-  Attributes Attributes;
   AbilityManager AbilityManager;
   Transform Target;
   TaskScope MainScope = new();
 
-  public void SetHomingSphereHitParams(GameObject go) {
-    if (go.TryGetComponent(out HomingMissile homingMissile)) {
-      homingMissile.HitParams = new HitParams(ThrowHitConfig, Attributes.serialized, gameObject);
-    }
-  }
-
   void Awake() {
     Mover = GetComponent<Mover>();
     Status = GetComponent<Status>();
-    Attributes = GetComponent<Attributes>();
     AbilityManager = GetComponent<AbilityManager>();
   }
   void Start() => MainScope.Start(Waiter.Repeat(Behavior));
@@ -99,7 +90,6 @@ public class SoulWarriorBehavior : MonoBehaviour {
               Waiter.Repeat(TrySetTeleportBehindTarget),
               AbilityManager.TryRun(Teleport.MainAction));
           } else if (diceRoll < .03f) {
-            Throw.OnThrow = SetHomingSphereHitParams;
             await scope.Any(
               Waiter.Repeat(TryLookAtTarget),
               AbilityManager.TryRun(Throw.MainAction));

@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -11,9 +10,8 @@ public class Throw : Ability {
   [SerializeField] AudioSource ChannelAudioSource;
   [SerializeField] GameObject SpawnVFX;
   [SerializeField] AudioClip SpawnSFX;
-  [SerializeField] GameObject ProjectilePrefab;
-
-  public Action<GameObject> OnThrow;
+  [SerializeField] Hitter ProjectilePrefab;
+  [SerializeField] HitConfig HitConfig;
 
   InlineEffect ThrowEffect => new(s => {
     s.AddAttributeModifier(AttributeTag.MoveSpeed, MoveSpeedModifier);
@@ -30,9 +28,9 @@ public class Throw : Ability {
       var position = Spawn.Transform.position;
       var rotation = AbilityManager.transform.rotation;
       var projectile = Instantiate(ProjectilePrefab, position, rotation);
+      projectile.HitParams = new(HitConfig, Attributes.serialized, gameObject);
       SFXManager.Instance.TryPlayOneShot(SpawnSFX);
       VFXManager.Instance.TrySpawnEffect(SpawnVFX, Spawn.Transform.position, rotation);
-      OnThrow?.Invoke(projectile);
       await animation.WaitDone(scope);
     } finally {
       ChannelAudioSource.Stop();

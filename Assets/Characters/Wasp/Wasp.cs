@@ -10,7 +10,7 @@ public class Wasp : MonoBehaviour {
   Transform Target;
   AbilityManager Abilities;
   Mover Mover;
-  PelletAbility Pellet;
+  Throw Throw;
   TaskScope MainScope = new();
 
   public void Awake() {
@@ -18,7 +18,7 @@ public class Wasp : MonoBehaviour {
     Status = GetComponent<Status>();
     Mover = GetComponent<Mover>();
     Abilities = GetComponent<AbilityManager>();
-    Pellet = GetComponentInChildren<PelletAbility>();
+    Throw = GetComponentInChildren<Throw>();
   }
   void Start() => MainScope.Start(Waiter.Repeat(Behavior));
   void OnDestroy() => MainScope.Dispose();
@@ -39,7 +39,7 @@ public class Wasp : MonoBehaviour {
         if (TargetInRange(ShootRadius, out var targetDelta) && Status.CanAttack) {
           Mover.SetMoveAim(Vector3.zero, transform.forward.XZ());
           await scope.Any(
-            s => Abilities.TryRun(s, Pellet.MainAction),
+            s => Abilities.TryRun(s, Throw.MainAction),
             Waiter.Repeat(() => Mover.TryLookAt(Target)));
           await scope.Delay(ShootDelay);
           return;
