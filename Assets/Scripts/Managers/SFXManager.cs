@@ -4,6 +4,8 @@ using UnityEngine;
 public class SFXManager : MonoBehaviour {
   public static SFXManager Instance;
 
+  public AudioClip FallSFX;
+
   [SerializeField] AudioSource AudioSource;
   List<AudioClip> ClipsPlayedThisFrame = new();  // TODO: is this a good idea?
 

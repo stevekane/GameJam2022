@@ -7,7 +7,6 @@ public class Defender : MonoBehaviour {
   bool Died = false;
   public Vector3? LastGroundedPosition { get; private set; }
   public Hurtbox[] Hurtboxes;
-  public AudioClip FallSFX;
 
   void Awake() {
     Status = GetComponent<Status>();
@@ -19,7 +18,7 @@ public class Defender : MonoBehaviour {
     if (transform.position.y < -1f && !PlayingFallSound) {
       LastGroundedPosition = transform.position;
       PlayingFallSound = true;
-      SFXManager.Instance.TryPlayOneShot(FallSFX);
+      SFXManager.Instance.TryPlayOneShot(SFXManager.Instance.FallSFX);
     }
     if (transform.position.y < -100f) {
       Die();
