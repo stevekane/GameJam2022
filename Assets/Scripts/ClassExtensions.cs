@@ -107,12 +107,6 @@ public static class MonoExtensions {
   }
 }
 
-public static class PlayableExtensions {
-  public static IEnumerator UntilDone(this AnimationClipPlayable playable) {
-    return Fiber.Until(() => !playable.IsValid() || playable.IsDone());
-  }
-}
-
 public static class AudioSourceExtensions {
   public static bool PlayOptionalOneShot(this AudioSource source, AudioClip clip) {
     if (clip && source) {

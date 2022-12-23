@@ -7,9 +7,6 @@ using TMPro;
 using System.Threading.Tasks;
 
 public class GameManager : MonoBehaviour {
-  public static IEnumerator Await(AsyncOperation op) {
-    yield return Fiber.ListenFor(new AsyncOperationEventSource(op));
-  }
   public static async Task Await(TaskScope scope, AsyncOperation op) {
     await scope.ListenFor(new AsyncOperationEventSource(op));
   }

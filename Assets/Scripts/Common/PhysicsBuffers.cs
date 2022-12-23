@@ -18,7 +18,7 @@ public class TargetingConfig {
 }
 
 [Serializable]
-public class AcquireTargets : IEnumerator, IValue<int> {
+public class AcquireTargets : IEnumerator {
   public int Value { get; private set; }
   public object Current => Value;
   public TargetingConfig Config;
