@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public class SlamAbility : Ability {
-  Animator Animator;
   public AnimationClip Clip;
   public Timeval WindupDuration;
   public Timeval SlamPiecePeriod;
@@ -17,14 +16,16 @@ public class SlamAbility : Ability {
 
   AnimationJob Animation;
 
-  void Start() {
-    Animator = GetComponentInParent<Animator>();
-  }
+  static readonly AttributeModifier Half = new() { Mult = .5f };
+  public static InlineEffect SlowedMove => new(s => {
+    s.AddAttributeModifier(AttributeTag.MoveSpeed, Half);
+    s.AddAttributeModifier(AttributeTag.TurnSpeed, Half);
+  }, "SlamMove");
 
   public override async Task MainAction(TaskScope scope) {
     try {
       Animation = AnimationDriver.Play(scope, Clip);
-      using var effect = new SpeedFactorEffect(.5f, .5f);
+      using var effect = Status.Add(SlowedMove);
       Animation.SetSpeed(ChargeSpeedFactor);
       await scope.Any(Charging, Animation.WaitFrame(WindupDuration.AnimFrames));
       Animation.SetSpeed(1f);

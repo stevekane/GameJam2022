@@ -43,16 +43,6 @@ public class InlineEffect : StatusEffect {
   public override string ToString() => Name;
 }
 
-public class SpeedFactorEffect : StatusEffect {
-  AttributeModifier MoveSpeedModifier, TurnSpeedModifier;
-  public SpeedFactorEffect(float move, float rotate) => (MoveSpeedModifier, TurnSpeedModifier) = (new() { Mult = move }, new() { Mult = rotate });
-  public override bool Merge(StatusEffect e) => false;
-  public override void Apply(Status status) {
-    status.AddAttributeModifier(AttributeTag.MoveSpeed, MoveSpeedModifier);
-    status.AddAttributeModifier(AttributeTag.TurnSpeed, TurnSpeedModifier);
-  }
-}
-
 public class SlowFallDuration : TimedEffect {
   public AttributeModifier Modifier;
   public SlowFallDuration(int ticks) : base(ticks) => Modifier = new AttributeModifier { Mult = .5f };
