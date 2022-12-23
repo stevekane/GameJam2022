@@ -20,7 +20,7 @@ public class Defender : MonoBehaviour {
       PlayingFallSound = true;
       SFXManager.Instance.TryPlayOneShot(SFXManager.Instance.FallSFX);
     }
-    if (transform.position.y < -100f) {
+    if (transform.position.y < -30f) {
       Die();
     }
   }
