@@ -85,7 +85,7 @@ public class MeleeAbility : Ability {
   TaskFunc HandleHits(HitConfig config) => async (TaskScope scope) => {
     if (Hits.Count != 0) {
       Hits.ForEach(target => {
-        target.TryAttack(new HitParams(config, Attributes.serialized, Attributes.gameObject));
+        target.TryAttack(new HitParams(config, Attributes));
         Owner.transform.forward = (target.transform.position - Owner.transform.position).XZ().normalized;
       });
       AbilityManager.Energy?.Value.Add(HitEnergyGain * Hits.Count);

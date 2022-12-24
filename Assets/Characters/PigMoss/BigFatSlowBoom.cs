@@ -6,7 +6,7 @@ public class BigFatSlowBoom : MonoBehaviour {
   HitParams HitParams;
 
   public void InitHitParams(HitConfig hitConfig, Attributes attacker) {
-    HitParams = new HitParams(hitConfig, attacker.serialized, attacker.gameObject, gameObject);
+    HitParams = new HitParams(hitConfig, attacker.SerializedCopy, attacker.gameObject, gameObject);
   }
 
   void Detonate(GameObject target) {

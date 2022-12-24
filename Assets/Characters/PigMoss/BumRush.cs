@@ -37,7 +37,7 @@ namespace PigMoss {
           var contact = Waiter.ListenFor(SpikeTriggerEvent.OnTriggerEnterSource);
           var outcome = await scope.Any(contact, Waiter.Return<Collider>(Rush));
           if (outcome != null && outcome.TryGetComponent(out Hurtbox hurtbox)) {
-            hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject));
+            hurtbox.TryAttack(new HitParams(HitConfig, Attributes));
           }
           await scope.Delay(RecoveryDuration);
         }

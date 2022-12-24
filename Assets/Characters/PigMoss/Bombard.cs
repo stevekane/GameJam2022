@@ -28,7 +28,7 @@ namespace PigMoss {
         Animator.SetBool("Extended", true);
         await scope.Delay(Windup);
         foreach (var launchSite in LaunchSites) {
-          GameManager.Instance.GlobalScope.Start(s => LaunchMissle(s, HitConfig, Attributes.serialized, Attributes.gameObject, MissilePrefab, launchSite, Radius, ShotClip, ShotEffect));
+          GameManager.Instance.GlobalScope.Start(s => LaunchMissle(s, HitConfig, Attributes.SerializedCopy, Attributes.gameObject, MissilePrefab, launchSite, Radius, ShotClip, ShotEffect));
           await scope.Delay(ShotPeriod);
         }
         SFXManager.Instance.TryPlayOneShot(RecoveryClip);
@@ -39,7 +39,7 @@ namespace PigMoss {
       }
     }
 
-    static async Task LaunchMissle(TaskScope scope, HitConfig hitConfig, Attributes.Serialized attributes, GameObject attacker, Missile misslePrefab, Transform launchSite, float radius, AudioClip sfx, GameObject vfx) {
+    static async Task LaunchMissle(TaskScope scope, HitConfig hitConfig, IAttributes attributes, GameObject attacker, Missile misslePrefab, Transform launchSite, float radius, AudioClip sfx, GameObject vfx) {
       // Launch missile.
       var missile = Instantiate(misslePrefab, launchSite.position, launchSite.rotation);
       SFXManager.Instance.TryPlayOneShot(sfx);

@@ -61,7 +61,7 @@ namespace PigMoss {
 
     void ProcessHit(Collider c) {
       if (c.TryGetComponent(out Hurtbox hurtbox)) {
-        hurtbox.TryAttack(new HitParams(BladeHitParams, Attributes.serialized, Attributes.gameObject));
+        hurtbox.TryAttack(new HitParams(BladeHitParams, Attributes));
       }
     }
   }

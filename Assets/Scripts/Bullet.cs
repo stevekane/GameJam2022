@@ -19,7 +19,7 @@ public class Bullet : MonoBehaviour {
   public static Bullet Fire(Bullet prefab, Vector3 position, Vector3 direction, int layer) {
     var bullet = Instantiate(prefab, position, Quaternion.FromToRotation(Vector3.forward, direction));
     bullet.gameObject.SetActive(true);
-    bullet.HitParams = new HitParams(bullet.HitConfig, bullet.Attributes.serialized, bullet.Attributes.gameObject, bullet.gameObject);
+    bullet.HitParams = new HitParams(bullet.HitConfig, bullet.Attributes.SerializedCopy, bullet.Attributes.gameObject, bullet.gameObject);
     bullet.Direction = direction;
     bullet.CollisionLayer = layer;
     return bullet;

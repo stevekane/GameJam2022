@@ -42,7 +42,7 @@ namespace PigMoss {
         var endActive = animation.WaitFrame(ActiveFrameEnd.AnimFrames);
         var activeOutcome = await scope.Any(contact, Waiter.Return<Collider>(endActive, null));
         if (activeOutcome != null && activeOutcome.TryGetComponent(out Hurtbox hurtbox)) {
-          hurtbox.TryAttack(new HitParams(HitConfig, Attributes.serialized, Attributes.gameObject));
+          hurtbox.TryAttack(new HitParams(HitConfig, Attributes));
         }
         Collider.enabled = false;
         await animation.WaitDone(scope);

@@ -30,7 +30,7 @@ public class Throw : Ability {
       var position = Spawn.Transform.position;
       var rotation = AbilityManager.transform.rotation;
       var projectile = Instantiate(ProjectilePrefab, position, rotation);
-      projectile.HitParams = new(HitConfig, Attributes.serialized, gameObject);
+      projectile.HitParams = new(HitConfig, Attributes.SerializedCopy, Attributes.gameObject, projectile.gameObject);
       SFXManager.Instance.TryPlayOneShot(SpawnSFX);
       VFXManager.Instance.TrySpawnEffect(SpawnVFX, Spawn.Transform.position, rotation);
       await animation.WaitDone(scope);
