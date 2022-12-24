@@ -77,7 +77,7 @@ public class GameManager : MonoBehaviour {
 
   IEnumerator Run() {
     while (!ManageGameLoop) {
-      if (!ManageGameLoop && Input.GetKeyDown(KeyCode.Backspace)) {
+      if (!ManageGameLoop && Input.GetKeyDown(KeyCode.R)) {
         yield return Await(SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name));
       } else {
         yield return null;
