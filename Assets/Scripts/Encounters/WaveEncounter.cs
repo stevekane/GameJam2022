@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public interface ISpawnAction<T> {
@@ -59,23 +60,22 @@ public class WaveEncounter : Encounter {
     }
   }
 
-  IEnumerator Spawn(SpawnRequest sr, ISpawnAction<GameObject> spawnAction = null) {
+  TaskFunc Spawn(SpawnRequest sr, ISpawnAction<GameObject> spawnAction = null) => async (TaskScope scope) => {
     var p = sr.transform.position;
     var r = sr.transform.rotation;
     VFXManager.Instance.SpawnEffect(sr.config.PreviewEffect, p, r);
-    yield return Fiber.Wait(sr.config.PreviewEffect.Duration.Ticks);
+    await scope.Delay(sr.config.PreviewEffect.Duration);
     VFXManager.Instance.SpawnEffect(sr.config.SpawnEffect, p, r);
     spawnAction?.OnSpawn(Instantiate(sr.config.Mob, p, r));
-  }
+  };
 
-  public override IEnumerator Run() {
+  public override async Task Run(TaskScope scope) {
     for (var waveNumber = 0; waveNumber < TotalWaveCount; waveNumber++) {
       var spawnAction = new MobSpawnAction { WaveNumber = waveNumber };
       foreach (var wave in Wave(InitialBudget+BudgetPerWave*waveNumber, Config)) {
-        var spawn = new Fiber(Spawn(wave, spawnAction));
-        Bundle.StartRoutine(spawn);
+        scope.Start(Spawn(wave, spawnAction));
       }
-      yield return Fiber.Wait(WavePeriod.Ticks);
+      await scope.Delay(WavePeriod);
     }
   }
 }

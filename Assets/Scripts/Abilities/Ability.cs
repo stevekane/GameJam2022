@@ -28,7 +28,8 @@ public abstract class Ability : MonoBehaviour {
   Dictionary<AbilityMethod, TriggerCondition> TriggerConditionsMap = new();
   [HideInInspector] public AbilityTag Tags;  // Inherited from the Trigger when started
   public virtual float Score() => 0;
-  public virtual bool IsRunning { get => ActiveTasks.Count > 0; }
+  public virtual bool IsRunning => ActiveTasks.Count > 0;
+  public virtual HitConfig HitConfigData => null;
   TaskScope MainScope = new();
   List<AbilityMethod> ActiveTasks = new();  // TODO(Task): could just be a refcount instead?
   public void MaybeStartTask(AbilityMethod func) {

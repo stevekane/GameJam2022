@@ -53,9 +53,7 @@ public class TaskScope : IDisposable {
     try {
       while (routine.MoveNext())
         await Tick();
-    } catch {
-      if (routine is IStoppable s)
-        s.Stop();
+    } finally {
     }
   }
 

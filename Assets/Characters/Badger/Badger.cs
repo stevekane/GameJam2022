@@ -32,8 +32,8 @@ public class Badger : MonoBehaviour {
     Hurtbox.OnHurt.Listen((_) => WasHit = true);
   }
 
-  // TODO: What about dash?
-  bool TargetIsAttacking { get => TargetAbilities.Abilities.Any((a) => a.IsRunning); }
+  bool TargetIsAttacking => TargetAbilities.Abilities.Any(a => a.IsRunning && a.HitConfigData != null);
+  bool TargetIsNear => (Target.position - transform.position).sqrMagnitude < 7f*7f;
 
   Vector3 ChoosePosition() {
     var t = Target.transform;
@@ -66,7 +66,7 @@ public class Badger : MonoBehaviour {
 
     async Task MaybeAttack(TaskScope scope) {
       if (Status.CanAttack) {
-        if (TargetIsAttacking && Shield) {
+        if (Shield && TargetIsAttacking && TargetIsNear) {
           Abilities.TryInvoke(ShieldAbility.MainAction);
           // Hold shield until .5s after target stops attacking, or it dies.
           await scope.Any(

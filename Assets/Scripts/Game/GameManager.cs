@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System.Threading.Tasks;
 
 public class GameManager : MonoBehaviour {
-  public static IEnumerator Await(AsyncOperation op) {
-    yield return Fiber.ListenFor(new AsyncOperationEventSource(op));
+  public static async Task Await(TaskScope scope, AsyncOperation op) {
+    await scope.ListenFor(new AsyncOperationEventSource(op));
   }
 
   public static GameManager Instance;
@@ -35,7 +36,6 @@ public class GameManager : MonoBehaviour {
 
   public TaskScope GlobalScope = new();
 
-  Bundle Bundle = new Bundle();
   Player Player;
 
   void Awake() {
@@ -55,32 +55,28 @@ public class GameManager : MonoBehaviour {
   }
 
   void Start() {
-    Bundle.StartRoutine(new Fiber(Run()));
+    GlobalScope.Start(Run);
   }
 
   void OnDestroy() {
     GlobalScope.Cancel();
   }
 
-  void FixedUpdate() {
-    Bundle.MoveNext();
-  }
+  TaskFunc EncounterDefeated(Encounter encounter) => async (TaskScope scope) => {
+    await encounter.Run(scope);
+    await scope.Until(() => MobManager.Instance.Mobs.Count <= 0);
+  };
 
-  IEnumerator EncounterDefeated(Encounter encounter) {
-    yield return new Fiber(encounter.Run());
-    yield return Fiber.Until(() => MobManager.Instance.Mobs.Count <= 0);
-  }
+  TaskFunc PlayerDeath(Player player) => async (TaskScope scope) => {
+    await scope.Until(() => player.Dead);
+  };
 
-  IEnumerator PlayerDeath(Player player) {
-    yield return Fiber.Until(() => player.Dead);
-  }
-
-  IEnumerator Run() {
+  async Task Run(TaskScope scope) {
     while (!ManageGameLoop) {
-      if (!ManageGameLoop && Input.GetKeyDown(KeyCode.R)) {
-        yield return Await(SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name));
+      if (!ManageGameLoop && Input.GetKeyDown(KeyCode.Backspace)) {
+        await Await(scope, SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name));
       } else {
-        yield return null;
+        await scope.Tick();
       }
     }
     while (ManageGameLoop) {
@@ -95,41 +91,37 @@ public class GameManager : MonoBehaviour {
       PlayerVirtualCamera.Instance.Follow = Player.transform;
 
       // TODO: Eliminate this hack to allow loaded upgrades to apply before opening the shop
-      yield return Fiber.Wait(2);
+      await scope.Ticks(2);
       // Wait for the player to purchase upgrades
       var shop = FindObjectOfType<Shop>();
       shop.Open();
-      yield return Fiber.Until(() => !shop.IsOpen);
+      await scope.Until(() => !shop.IsOpen);
 
       // Enter pre-game countdown
       InputManager.Instance.SetInputEnabled(false);
       SetCountdownTextEnabled(CountdownText, isEnabled: true);
-      yield return Countdown(PingCountdown, CountdownDuration);
+      await Countdown(scope, PingCountdown, CountdownDuration);
       SetCountdownTextEnabled(CountdownText, isEnabled: false);
       InputManager.Instance.SetInputEnabled(true);
       // Exit pre-game countdown
 
       // Begin GameLoop
       var encounter = FindObjectOfType<Encounter>();
-      encounter.Bundle = Bundle;
       var encounterDefeated = EncounterDefeated(encounter);
       var playerDeath = PlayerDeath(Player);
-      var outcome = Fiber.Select(encounterDefeated, playerDeath);
-      // TODO: What if both happen at the same time? stupid concurrency
-      yield return outcome;
-      // TODO: Returning an int is pretty horrible... maybe just return the completed Fiber
-      Debug.Log(outcome.Value switch {
+      var outcome = await scope.Any(encounterDefeated, playerDeath);
+      Debug.Log(outcome switch {
         0 => "You win",
         _ => "You lose"
       });
       SaveData.SaveToFile();
       Destroy(Player.gameObject);
       InputManager.Instance.SetInputEnabled(false);
-      yield return Fiber.Wait(Timeval.FixedUpdatePerSecond * 3);
+      await scope.Millis(3000);
       // End GameLoop
 
       // Cleanup references and reload the scene
-      yield return Await(SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name));
+      await Await(scope, SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name));
     }
   }
 
@@ -151,12 +143,10 @@ public class GameManager : MonoBehaviour {
     return !Player || Player.GetComponent<Attributes>().GetValue(AttributeTag.Health, 0f) <= 0;
   }
 
-  IEnumerator Countdown(
-  Action<int> f,
-  int seconds) {
+  async Task Countdown(TaskScope scope, Action<int> f, int seconds) {
     for (var i = seconds; i >= 0; i--) {
       f(i);
-      yield return Fiber.Wait(Timeval.FixedUpdatePerSecond);
+      await scope.Millis(1000);
     }
   }
 

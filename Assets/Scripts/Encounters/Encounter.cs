@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [Serializable]
@@ -9,6 +10,5 @@ public struct SpawnRequest {
 }
 
 public abstract class Encounter : MonoBehaviour {
-  public Bundle Bundle;
-  public abstract IEnumerator Run();
+  public abstract Task Run(TaskScope scope);
 }

@@ -6,18 +6,17 @@ public class HomingMissile : MonoBehaviour {
   [SerializeField] GameObject ContactVFX;
   [SerializeField] AudioClip ContactSFX;
 
-  [NonSerialized] public HitParams HitParams;
-
+  Hitter Hitter;
   Rigidbody Rigidbody;
   Transform Target;
 
-  void Awake() => Rigidbody = GetComponent<Rigidbody>();
+  void Awake() {
+    Rigidbody = GetComponent<Rigidbody>();
+    Hitter = GetComponent<Hitter>();
+  }
   void Start() => Target = FindObjectOfType<Player>().transform;
   void FixedUpdate() {
     if (Target) {
-      var delta = Target.position-transform.position;
-      var toTarget = delta.normalized;
-      var rotation = Quaternion.LookRotation(toTarget);
       Rigidbody.velocity = transform.forward * Speed;
     }
   }
@@ -27,7 +26,7 @@ public class HomingMissile : MonoBehaviour {
     SFXManager.Instance.TryPlayOneShot(ContactSFX);
     Destroy(gameObject);
     if (target.TryGetComponent(out Hurtbox hurtbox)) {
-      hurtbox.TryAttack(HitParams);
+      hurtbox.TryAttack(Hitter.HitParams);
     }
   }
 }

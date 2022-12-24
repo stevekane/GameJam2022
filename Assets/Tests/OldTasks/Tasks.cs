@@ -112,7 +112,7 @@ namespace Test {
     otherwise 0
   */
 
-  public class Listen<T> : ITask, IValue<T> {
+  public class Listen<T> : ITask {
     bool IsRunning = true;
     EventSource<T> Source;
     Action Action;

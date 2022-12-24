@@ -1,5 +1,64 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1210567075985150702
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2979888837283388818}
+  - component: {fileID: 8553821940252974118}
+  - component: {fileID: 8076677049902406753}
+  m_Layer: 13
+  m_Name: Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2979888837283388818
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210567075985150702}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 2.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9163235369884920280}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8553821940252974118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210567075985150702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Collider: {fileID: 0}
+--- !u!65 &8076677049902406753
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210567075985150702}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Size: {x: 5, y: 4, z: 6}
+  m_Center: {x: 0, y: 0.5, z: -1}
 --- !u!1 &1266263005576043606
 GameObject:
   m_ObjectHideFlags: 0
@@ -230,6 +289,7 @@ MonoBehaviour:
   TriggerConditions: []
   Tags: 0
   Chargeable: 0
+  InPlace: 0
   ChargeEnd:
     Millis: 0
     FramesPerSecond: 24
@@ -243,12 +303,14 @@ MonoBehaviour:
     Millis: 100
     FramesPerSecond: 60
   HitConfig:
-    DamageModifier:
+    Damage:
       Base: 0
       Mult: 1
+    Knockback:
+      Base: 5
+      Mult: 0.1
     KnockbackType: 1
-    RelativeKnockbackVector: {x: 0, y: 0, z: 1}
-    KnockbackStrength: 3
+    KnockbackAngle: 0
     RecoilStrength: 10
     CameraShakeStrength: 2
     HitStopDuration:
@@ -260,7 +322,6 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 0
       FramesPerSecond: 60
-    InPlace: 0
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -294,7 +355,7 @@ MonoBehaviour:
   Hitbox: {fileID: 7781392534903117839}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
-  AttackSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
+  AttackSFX: {fileID: 8300000, guid: c266e86e5ec11e344bf66dede26cbc46, type: 3}
 --- !u!1 &2868650853462325931
 GameObject:
   m_ObjectHideFlags: 0
@@ -347,12 +408,14 @@ MonoBehaviour:
   Tags: 0
   FallSpeed: 90
   HitConfig:
-    DamageModifier:
+    Damage:
+      Base: 20
+      Mult: 1
+    Knockback:
       Base: 20
       Mult: 1
     KnockbackType: 0
-    RelativeKnockbackVector: {x: 0, y: 0.7, z: 1}
-    KnockbackStrength: 20
+    KnockbackAngle: 30
     RecoilStrength: 0
     CameraShakeStrength: 1
     HitStopDuration:
@@ -364,7 +427,6 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 0
       FramesPerSecond: 30
-    InPlace: 0
   WindupDuration:
     Millis: 500
     FramesPerSecond: 30
@@ -389,7 +451,7 @@ MonoBehaviour:
   WindupVFXTransform: {fileID: 2298568700673657943}
   WindupVFX: {fileID: 100000, guid: 77ec3c4e07a36814fb3169ecef41b50a, type: 3}
   WindupSFX: {fileID: 0}
-  LandVFXTransform: {fileID: 2298727057689762155}
+  LandVFXTransform: {fileID: 0}
   LandVFX: {fileID: 3432958286849152088, guid: 87ee7299dd44ed747af24dbb91bcd33b, type: 3}
   LandSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
   Hitbox: {fileID: 2309940460413394567}
@@ -423,7 +485,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 9163235369884920280}
+  m_Father: {fileID: 5391186949400025363}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &168426987354171595
@@ -450,8 +512,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 0
   serializedVersion: 2
-  m_Size: {x: 5, y: 4, z: 6}
-  m_Center: {x: 0, y: 0.5, z: -1}
+  m_Size: {x: 5, y: 3, z: 6}
+  m_Center: {x: 0, y: 1, z: -1}
 --- !u!1 &3059229951090697377
 GameObject:
   m_ObjectHideFlags: 0
@@ -511,65 +573,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 5, y: 1, z: 5}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &4458482926235983216
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7497109550174042116}
-  - component: {fileID: 6657708291265946507}
-  - component: {fileID: 505687690187425658}
-  m_Layer: 13
-  m_Name: Hitbox
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &7497109550174042116
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4458482926235983216}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 2.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5391186949400025363}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6657708291265946507
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4458482926235983216}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Collider: {fileID: 0}
---- !u!65 &505687690187425658
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4458482926235983216}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Size: {x: 5, y: 3, z: 6}
-  m_Center: {x: 0, y: 1, z: -1}
 --- !u!1 &5002591724277737038
 GameObject:
   m_ObjectHideFlags: 0
@@ -678,6 +681,7 @@ MonoBehaviour:
   TriggerConditions: []
   Tags: 0
   Chargeable: 0
+  InPlace: 0
   ChargeEnd:
     Millis: 1
     FramesPerSecond: 30
@@ -691,12 +695,14 @@ MonoBehaviour:
     Millis: 100
     FramesPerSecond: 60
   HitConfig:
-    DamageModifier:
+    Damage:
       Base: 0
       Mult: 1
+    Knockback:
+      Base: 5
+      Mult: 0.1
     KnockbackType: 1
-    RelativeKnockbackVector: {x: 0, y: 0, z: 1}
-    KnockbackStrength: 3
+    KnockbackAngle: 0
     RecoilStrength: 10
     CameraShakeStrength: 2
     HitStopDuration:
@@ -708,7 +714,6 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 0
       FramesPerSecond: 60
-    InPlace: 0
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -742,7 +747,7 @@ MonoBehaviour:
   Hitbox: {fileID: 8479126164374817058}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
-  AttackSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
+  AttackSFX: {fileID: 8300000, guid: 90fb91c5d9f18df4183363d36d921429, type: 3}
 --- !u!1 &5751272113798131921
 GameObject:
   m_ObjectHideFlags: 0
@@ -794,6 +799,7 @@ MonoBehaviour:
     EnergyCost: 0
   Tags: 0
   Chargeable: 1
+  InPlace: 0
   ChargeEnd:
     Millis: 1000
     FramesPerSecond: 60
@@ -807,12 +813,14 @@ MonoBehaviour:
     Millis: 208.33333
     FramesPerSecond: 24
   HitConfig:
-    DamageModifier:
+    Damage:
       Base: 0
       Mult: 1
+    Knockback:
+      Base: 50
+      Mult: 1
     KnockbackType: 1
-    RelativeKnockbackVector: {x: 0, y: 1, z: 1}
-    KnockbackStrength: 50
+    KnockbackAngle: 45
     RecoilStrength: 30
     CameraShakeStrength: 1
     HitStopDuration:
@@ -824,7 +832,6 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 0
       FramesPerSecond: 30
-    InPlace: 0
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -858,7 +865,7 @@ MonoBehaviour:
   Hitbox: {fileID: 1672519219772526389}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
-  AttackSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
+  AttackSFX: {fileID: 8300000, guid: 28406bf68add30e4e89d6cd063fb84e6, type: 3}
 --- !u!1 &6068021541246575134
 GameObject:
   m_ObjectHideFlags: 0
@@ -888,7 +895,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7497109550174042116}
+  - {fileID: 1429396950507340675}
   m_Father: {fileID: 3364079649997762474}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -910,6 +917,7 @@ MonoBehaviour:
     EnergyCost: 0
   Tags: 0
   Chargeable: 0
+  InPlace: 0
   ChargeEnd:
     Millis: 1
     FramesPerSecond: 30
@@ -923,12 +931,14 @@ MonoBehaviour:
     Millis: 266.66666
     FramesPerSecond: 60
   HitConfig:
-    DamageModifier:
+    Damage:
       Base: 0
       Mult: 1
+    Knockback:
+      Base: 6
+      Mult: 1
     KnockbackType: 1
-    RelativeKnockbackVector: {x: 0, y: 1, z: 0}
-    KnockbackStrength: 6
+    KnockbackAngle: 90
     RecoilStrength: 12
     CameraShakeStrength: 4
     HitStopDuration:
@@ -940,7 +950,6 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 1000
       FramesPerSecond: 30
-    InPlace: 0
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -971,7 +980,7 @@ MonoBehaviour:
     Speed: 1
     BlendInFraction: 0
     BlendOutFraction: 0
-  Hitbox: {fileID: 6657708291265946507}
+  Hitbox: {fileID: 168426987354171595}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: da396a16a7f24f64cbb0054f5a56b46a, type: 3}
@@ -1117,7 +1126,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1429396950507340675}
+  - {fileID: 2979888837283388818}
   m_Father: {fileID: 3364079649997762474}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1139,6 +1148,7 @@ MonoBehaviour:
     EnergyCost: 0
   Tags: 0
   Chargeable: 0
+  InPlace: 1
   ChargeEnd:
     Millis: 1
     FramesPerSecond: 30
@@ -1152,12 +1162,14 @@ MonoBehaviour:
     Millis: 250
     FramesPerSecond: 60
   HitConfig:
-    DamageModifier:
+    Damage:
       Base: 0
       Mult: 1
+    Knockback:
+      Base: 30
+      Mult: 1
     KnockbackType: 1
-    RelativeKnockbackVector: {x: 0, y: -1, z: 1}
-    KnockbackStrength: 30
+    KnockbackAngle: -45
     RecoilStrength: 25
     CameraShakeStrength: 8
     HitStopDuration:
@@ -1169,7 +1181,6 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 0
       FramesPerSecond: 30
-    InPlace: 1
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -1200,7 +1211,7 @@ MonoBehaviour:
     Speed: 1
     BlendInFraction: 0
     BlendOutFraction: 0
-  Hitbox: {fileID: 168426987354171595}
+  Hitbox: {fileID: 8553821940252974118}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 2708598583397607911, guid: 6398d43fe79ea0140913dc5530c646af, type: 3}
   AttackSFX: {fileID: 8300000, guid: 0e5edb6bccf05984dad128fb1a9fc914, type: 3}
@@ -1291,11 +1302,6 @@ SkinnedMeshRenderer:
 --- !u!4 &2298568700673657943 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4202873523494526, guid: 9984be23625843a48a44d88aae5669f2, type: 3}
-  m_PrefabInstance: {fileID: 2299305809950757417}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &2298727057689762155 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4079634231987010, guid: 9984be23625843a48a44d88aae5669f2, type: 3}
   m_PrefabInstance: {fileID: 2299305809950757417}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &2303771352680290845 stripped
@@ -1486,7 +1492,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114197, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114197, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1530,11 +1536,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.size
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[0].Modifier.Base
-      value: -24
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[1].Modifier.Base
@@ -1562,23 +1568,39 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[4].Modifier.Base
-      value: 10
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[4].Modifier.Mult
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
+      propertyPath: BaseAttributes.Array.data[5].Modifier.Base
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
+      propertyPath: BaseAttributes.Array.data[5].Modifier.Mult
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[1].Attribute.Value
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[2].Attribute.Value
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[3].Attribute.Value
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
+      propertyPath: BaseAttributes.Array.data[4].Attribute.Value
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
+      propertyPath: BaseAttributes.Array.data[5].Attribute.Value
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[1].Attribute.String
@@ -1594,7 +1616,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[4].Attribute.String
-      value: Damage
+      value: MaxFallSpeed
+      objectReference: {fileID: 0}
+    - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
+      propertyPath: BaseAttributes.Array.data[5].Attribute.String
+      value: Weight
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114219, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: Renderers.Array.size
@@ -1652,21 +1678,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8540507123274114195, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
   m_PrefabInstance: {fileID: 6353001707408592015}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &703169241837475340
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3364079649355753500}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c806621753f76840a91b87e3c0d2fc3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Hurtboxes:
-  - {fileID: 3364079650338656092}
-  FallSFX: {fileID: 8300000, guid: fe6b13c084178f441942a9885f9857db, type: 3}
 --- !u!114 &2171272179652211397
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1722,14 +1733,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8540507124463013526, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
   m_PrefabInstance: {fileID: 6353001707408592015}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &3364079650338656092 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8540507124290307027, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
-  m_PrefabInstance: {fileID: 6353001707408592015}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ce0c9e24a5611d40b8628b31748e2d6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

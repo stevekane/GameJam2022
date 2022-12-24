@@ -23,6 +23,8 @@ public class Dive : Ability {
   [NonSerialized] HashSet<Collider> PhaseHits = new();
   [NonSerialized] AnimationJob Animation = null;
 
+  public override HitConfig HitConfigData => HitConfig;
+
   public static InlineEffect DiveEffect => new(s => {
     s.IsHittable = false;
     s.HasGravity = false;

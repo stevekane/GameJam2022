@@ -20,9 +20,10 @@ public class Mover : MonoBehaviour {
   Vector3 MoveDelta;
 
   public Vector3 InputVelocity { get; private set; }
-  public Vector3 GravitationalVelocity { get; private set; }
+  public Vector3 FallVelocity => new(0, -FallSpeed, 0);
   public Vector3 MoveVelocity { get; private set; }
   public Vector3 Velocity { get; private set; }
+  public float FallSpeed { get; private set; }
 
   void Awake() {
     Controller = GetComponent<CharacterController>();
@@ -50,7 +51,7 @@ public class Mover : MonoBehaviour {
   public void Move(Vector3 delta) => MoveDelta += delta;
   public void ResetVelocity() {
     InputVelocity = Vector3.zero;
-    GravitationalVelocity = Vector3.zero;
+    FallSpeed = 0;
     MoveVelocity = Vector3.zero;
     Velocity = Vector3.zero;
   }
@@ -63,18 +64,19 @@ public class Mover : MonoBehaviour {
 
     // Move
     var moveSpeed = Attributes.GetValue(AttributeTag.MoveSpeed);
-    var gravity = Vector3.up * dt * Attributes.GetValue(AttributeTag.Gravity);
+    var gravity = dt * Attributes.GetValue(AttributeTag.Gravity);
     InputVelocity = localTimeScale * moveSpeed * desiredMoveDir;
-    GravitationalVelocity = Status switch {
+    FallSpeed = Status switch {
       Status { HasGravity: true, IsGrounded: true } => gravity,
-      Status { HasGravity: true, IsGrounded: false } => GravitationalVelocity + gravity,
-      _ => Vector3.zero
+      Status { HasGravity: true, IsGrounded: false } => FallSpeed + gravity,
+      _ => 0
     };
+    FallSpeed = Mathf.Min(FallSpeed, Attributes.GetValue(AttributeTag.MaxFallSpeed));
     MoveVelocity = MoveDelta / Time.fixedDeltaTime;
-    Velocity = InputVelocity + GravitationalVelocity + MoveVelocity;
+    Velocity = InputVelocity + FallVelocity + MoveVelocity;
     var inputDelta = dt * InputVelocity;
-    var gravitationalDelta = dt * GravitationalVelocity;
-    Controller.Move(inputDelta + gravitationalDelta + MoveDelta);
+    var fallDelta = dt * FallVelocity;
+    Controller.Move(inputDelta + fallDelta + MoveDelta);
     MoveDelta = Vector3.zero;
 
     // Turn

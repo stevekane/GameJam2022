@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class AttackAbility : Ability {
   [SerializeField] bool Chargeable;
+  [SerializeField] bool InPlace = false;
   [SerializeField] Timeval ChargeEnd;
   [SerializeField] Timeval WindupEnd;
   [SerializeField] Timeval ActiveEnd;
@@ -21,18 +22,18 @@ public class AttackAbility : Ability {
   [NonSerialized] HashSet<Collider> PhaseHits = new();
   [NonSerialized] AnimationJob Animation = null;
 
-  public static InlineEffect InPlace = new(s => {
+  public override HitConfig HitConfigData => HitConfig;
+
+  public static InlineEffect InPlaceEffect = new(s => {
     s.HasGravity = false;
     s.CanMove = false;
     s.CanRotate = false;
-  }, "HangTime");
-
-  public static InlineEffect NoEffect = new(s => {}, "NoEffect");
+  }, "InPlace");
 
   public override async Task MainAction(TaskScope scope) {
     Animation = AnimationDriver.Play(scope, AttackAnimation);
     HitConfig hitConfig = HitConfig;
-    using var effect = Status.Add(hitConfig.InPlace ? InPlace : NoEffect);
+    using var effect = InPlace ? Status.Add(InPlaceEffect) : null;
     if (Chargeable) {
       var startFrame = Timeval.TickCount;
       await scope.Any(Charge, ListenFor(MainRelease));
