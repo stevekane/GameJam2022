@@ -5,7 +5,7 @@ public class HitParams {
   public GameObject Attacker;
   public GameObject Source;
   public GameObject Defender;
-  public IAttributes AttackerAttributes;
+  public Attributes.Serialized AttackerAttributes;
   public IAttributes DefenderAttributes;
   // TODO: cache this value? It gets called at least 4x per hit.
   public Vector3 KnockbackVector => HitConfig.KnockbackType.KnockbackVector(HitConfig.KnockbackAngle, Source.transform, Defender.transform);
@@ -27,12 +27,12 @@ public class HitParams {
   };
 
   HitParams() { }
-  public HitParams(HitConfig hitConfig, IAttributes attackerAttributes, GameObject attacker, GameObject source)
+  public HitParams(HitConfig hitConfig, Attributes.Serialized attackerAttributes, GameObject attacker, GameObject source)
     => Init(hitConfig, attackerAttributes, attacker, source);
   public HitParams(HitConfig hitConfig, Attributes attributes)
      => Init(hitConfig, attributes.SerializedCopy, attributes.gameObject, attributes.gameObject);
 
-  void Init(HitConfig hitConfig, IAttributes attackerAttributes, GameObject attacker, GameObject source) {
+  void Init(HitConfig hitConfig, Attributes.Serialized attackerAttributes, GameObject attacker, GameObject source) {
     HitConfig = hitConfig;
     AttackerAttributes = attackerAttributes;
     Attacker = attacker;
