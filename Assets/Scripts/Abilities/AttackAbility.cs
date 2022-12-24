@@ -22,7 +22,7 @@ public class AttackAbility : Ability {
   [NonSerialized] HashSet<Collider> PhaseHits = new();
   [NonSerialized] AnimationJob Animation = null;
 
-  public HitConfig HitConfigData => HitConfig;
+  public override HitConfig HitConfigData => HitConfig;
 
   public static InlineEffect InPlaceEffect = new(s => {
     s.HasGravity = false;

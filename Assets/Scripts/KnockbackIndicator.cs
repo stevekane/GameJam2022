@@ -8,7 +8,7 @@ public class KnockbackIndicator : MonoBehaviour {
 
   AbilityManager AbilityManager;
   Attributes Attributes;
-  AttackAbility LastAttack;
+  Ability LastAttack;
   HitParams LastHitParams;
   Dictionary<Defender, LineRenderer[]> Indicators = new();
 
@@ -73,7 +73,7 @@ public class KnockbackIndicator : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    var a = AbilityManager.Running.FirstOrDefault(a => a is AttackAbility) as AttackAbility;
+    var a = AbilityManager.Running.FirstOrDefault(a => a.HitConfigData != null);
     if (a != null && a != LastAttack) {
       LastHitParams = new(a.HitConfigData, Attributes);
       UpdateIndicators(LastHitParams);

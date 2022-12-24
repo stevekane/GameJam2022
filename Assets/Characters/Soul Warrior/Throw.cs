@@ -13,6 +13,8 @@ public class Throw : Ability {
   [SerializeField] Hitter ProjectilePrefab;
   [SerializeField] HitConfig HitConfig;
 
+  public override HitConfig HitConfigData => HitConfig;
+
   InlineEffect ThrowEffect => new(s => {
     s.AddAttributeModifier(AttributeTag.MoveSpeed, MoveSpeedModifier);
     s.CanAttack = false;
