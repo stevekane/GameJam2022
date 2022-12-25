@@ -63,7 +63,7 @@ namespace PigMoss {
       }
 
       // Explode.
-      var explosion = Instantiate(payload.SpawnPrefab, payload.transform.position, payload.transform.rotation).GetComponent<Explosion>();
+      var explosion = Instantiate(payload.SpawnPrefab, payload.transform.position, payload.transform.rotation).GetComponent<Hitter>();
       explosion.HitParams = new HitParams(hitConfig, attributes, attacker, explosion.gameObject);
       Destroy(explosion.gameObject, 5);
       Destroy(payload.gameObject);

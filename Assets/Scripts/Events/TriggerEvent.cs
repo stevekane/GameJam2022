@@ -1,10 +1,10 @@
 using UnityEngine;
 
 public class TriggerEvent : MonoBehaviour {
-  public Collider Collider;
   public EventSource<Collider> OnTriggerEnterSource = new();
   public EventSource<Collider> OnTriggerExitSource = new();
   public EventSource<Collider> OnTriggerStaySource = new();
+  Collider Collider;
 
   public bool enableCollision {
     get => Collider.enabled;

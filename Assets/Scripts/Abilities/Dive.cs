@@ -54,7 +54,7 @@ public class Dive : Ability {
     PhaseHits.Clear();
     SFXManager.Instance.TryPlayOneShot(LandSFX);
     VFXManager.Instance.TrySpawnEffect(LandVFX, AbilityManager.transform.position);
-    await scope.Any(Waiter.Delay(LandDuration), Waiter.Repeat(OnHit(HitConfig)));
+    await scope.Any(Waiter.Delay(LandDuration), HitHandler.Loop(Hitbox, new HitParams(HitConfig, Attributes)));
     // Recovery
     diveEffect.Dispose();
     using var recoveryEffect = Status.Add(RecoveryEffect);
@@ -69,20 +69,4 @@ public class Dive : Ability {
       await scope.Tick();
     }
   }
-
-  TaskFunc OnHit(HitConfig hitConfig) => async (TaskScope scope) => {
-    try {
-      Hitbox.enableCollision = true;
-      var hitCount = await scope.ListenForAll(Hitbox.OnTriggerStaySource, Hits);
-      for (var i = 0; i < hitCount; i++) {
-        var hit = Hits[i];
-        if (!PhaseHits.Contains(hit) && hit.TryGetComponent(out Hurtbox hurtbox)) {
-          hurtbox.TryAttack(new HitParams(hitConfig, Attributes));
-          PhaseHits.Add(hit);
-        }
-      }
-    } finally {
-      Hitbox.enableCollision = false;
-    }
-  };
 }

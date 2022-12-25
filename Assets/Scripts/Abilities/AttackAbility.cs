@@ -18,8 +18,6 @@ public class AttackAbility : Ability {
   [SerializeField] GameObject AttackVFX;
   [SerializeField] AudioClip AttackSFX;
 
-  [NonSerialized] Collider[] Hits = new Collider[16];
-  [NonSerialized] HashSet<Collider> PhaseHits = new();
   [NonSerialized] AnimationJob Animation = null;
 
   public override HitConfig HitConfigData => HitConfig;
@@ -44,12 +42,11 @@ public class AttackAbility : Ability {
     } else {
       await Animation.WaitFrame(WindupEnd.AnimFrames)(scope);
     }
-    PhaseHits.Clear();
     var rotation = AbilityManager.transform.rotation;
     var vfxOrigin = AbilityManager.transform.TransformPoint(AttackVFXOffset);
     SFXManager.Instance.TryPlayOneShot(AttackSFX);
     VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
-    await scope.Any(Animation.WaitFrame(ActiveEnd.AnimFrames+1), Waiter.Repeat(OnHit(hitConfig)));
+    await scope.Any(Animation.WaitFrame(ActiveEnd.AnimFrames+1), HitHandler.Loop(Hitbox, new HitParams(HitConfig, Attributes)));
     await scope.Any(MakeCancellable, Animation.WaitDone());
   }
 
@@ -68,20 +65,4 @@ public class AttackAbility : Ability {
     Tags.AddFlags(AbilityTag.Cancellable);
     await scope.Forever();
   }
-
-  TaskFunc OnHit(HitConfig hitConfig) => async (TaskScope scope) => {
-    try {
-      Hitbox.enableCollision = true;
-      var hitCount = await scope.ListenForAll(Hitbox.OnTriggerStaySource, Hits);
-      for (var i = 0; i < hitCount; i++) {
-        var hit = Hits[i];
-        if (!PhaseHits.Contains(hit) && hit.TryGetComponent(out Hurtbox hurtbox)) {
-          hurtbox.TryAttack(new HitParams(hitConfig, Attributes));
-          PhaseHits.Add(hit);
-        }
-      }
-    } finally {
-      Hitbox.enableCollision = false;
-    }
-  };
 }

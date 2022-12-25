@@ -25,3 +25,22 @@ public class EventSource<T> : IEventSource<T> {
   public void Unlisten(Action<T> handler) => Action -= handler;
   public void Fire(T t) => Action?.Invoke(t);
 }
+
+class ScopedListener : IDisposable {
+  IEventSource Event;
+  Action Action;
+  public ScopedListener(IEventSource evt, Action action) {
+    (Event, Action) = (evt, action);
+    Event.Listen(Action);
+  }
+  public void Dispose() => Event.Unlisten(Action);
+}
+class ScopedListener<T> : IDisposable {
+  IEventSource<T> Event;
+  Action<T> Action;
+  public ScopedListener(IEventSource<T> evt, Action<T> action) {
+    (Event, Action) = (evt, action);
+    Event.Listen(Action);
+  }
+  public void Dispose() => Event.Unlisten(Action);
+}

@@ -24622,6 +24622,7 @@ GameObject:
   - component: {fileID: 1418612635309521423}
   - component: {fileID: 1418612635309521410}
   - component: {fileID: 3245988718801214114}
+  - component: {fileID: 2365884925299757859}
   m_Layer: 0
   m_Name: Bombard Missile Explosion Prefab
   m_TagString: Untagged
@@ -24649,6 +24650,7 @@ Transform:
   - {fileID: 4951517407457740318}
   - {fileID: 1666996874451618279}
   - {fileID: 1418612634491952956}
+  - {fileID: 156982219051522069}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -24664,22 +24666,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22fc14b70b7ac334881fa90784a2fe40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LayerMask:
-    serializedVersion: 2
-    m_Bits: 16384
-  Radius: 5
-  HitParams:
-    Damage: 15
-    Knockback:
-      Base: 25
-      Mult: 1
-    KnockbackType: 0
-    HitStopDuration:
-      Millis: 100
-      FramesPerSecond: 30
-    SFX: {fileID: 8300000, guid: 8ba1ce15e8593064aa781b941381f053, type: 3}
-    VFX: {fileID: 100000, guid: bc98890f6028f444eaa7789bde5e2eeb, type: 3}
-    VFXOffset: {x: 0, y: 1, z: 0}
+  Hitbox: {fileID: 1699387733208715225}
+  Duration:
+    Millis: 500
+    FramesPerSecond: 60
 --- !u!114 &2711200519072151688
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29838,6 +29828,76 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &2365884925299757859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1418612635309521422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78b08aeb66c3476429e3cc52a3e466e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &1639983937930313930
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 156982219051522069}
+  - component: {fileID: 5385595353568402944}
+  - component: {fileID: 1699387733208715225}
+  m_Layer: 15
+  m_Name: Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &156982219051522069
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1639983937930313930}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1418612635309521409}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &5385595353568402944
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1639983937930313930}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 2
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1699387733208715225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1639983937930313930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1666996874451618272
 GameObject:
   m_ObjectHideFlags: 0

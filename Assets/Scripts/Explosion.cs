@@ -1,21 +1,16 @@
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class Explosion : MonoBehaviour {
-  public HitParams HitParams;
-  [SerializeField] LayerMask LayerMask;
-  [SerializeField] float Radius = 1;
+  public TriggerEvent Hitbox;
+  public Timeval Duration = Timeval.FromMillis(500);
+  TaskScope MainScope = new();
 
-  void Start() {
-    var numHits = Physics.OverlapSphereNonAlloc(transform.position, Radius, PhysicsQuery.Colliders, LayerMask);
-    for (int i = 0; i < numHits; i++) {
-      if (PhysicsQuery.Colliders[i].TryGetComponent(out Hurtbox hurtbox)) {
-        hurtbox.TryAttack(HitParams);
-      }
-    }
-  }
+  void Start() => MainScope.Start(MainAction);
+  void OnDestroy() => MainScope.Dispose();
 
-  public void OnDrawGizmos() {
-    Gizmos.color = UnityEngine.Color.red;
-    Gizmos.DrawWireSphere(transform.position, Radius);
+  async Task MainAction(TaskScope scope) {
+    if (TryGetComponent(out Hitter hitter))
+      await scope.Any(Waiter.Delay(Duration), HitHandler.Loop(Hitbox, hitter.HitParams));
   }
 }
