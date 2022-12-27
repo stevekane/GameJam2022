@@ -7,9 +7,6 @@ public class AttackAbility : Ability {
   [SerializeField] bool Chargeable;
   [SerializeField] bool InPlace = false;
   [SerializeField] Timeval ChargeEnd;
-  [SerializeField] Timeval WindupEnd;
-  [SerializeField] Timeval ActiveEnd;
-  [SerializeField] Timeval RecoveryEnd;
   [SerializeField] HitConfig HitConfig;
   [SerializeField] AnimationCurve ChargeScaling = AnimationCurve.Linear(0f, .5f, 1f, 1f);
   [SerializeField] AnimationJobConfig AttackAnimation;
