@@ -59,20 +59,16 @@ public class AnimationJob {
       Clip.Play();
   }
 
-  public float GetPhaseStartTime(int phase) => phase-1 < 0 ? 0 : Phases[phase-1].time;
-  public float GetPhaseEndTime(int phase) => phase < Phases.Length ? Phases[phase].time : Animation.Clip.length;
-  public void SetPhaseDuration() {
-    var duration = Animation.PhaseDurations[CurrentPhase];
-    var startTime = GetPhaseStartTime(CurrentPhase);
-    var endTime = GetPhaseEndTime(CurrentPhase);
-    DesiredSpeed = (endTime-startTime)/duration.Seconds;
-  }
-
   public TaskFunc WaitPhase(int phase) => s => WaitPhase(s, phase);
   public async Task WaitPhase(TaskScope scope, int phase) {
     var time = GetPhaseEndTime(phase);
     while (Clip.GetTime() < time && IsRunning)
       await scope.Yield();
+  }
+  public TaskFunc PauseAfterPhase(int phase) => s => PauseAfterPhase(s, phase);
+  public async Task PauseAfterPhase(TaskScope scope, int phase) {
+    await WaitPhase(scope, phase);
+    Pause();
   }
 
   public TaskFunc WaitFrame(int frame) => s => WaitFrame(s, frame);
@@ -159,6 +155,14 @@ public class AnimationJob {
       CurrentPhase++;
     if (oldPhase != CurrentPhase)
       SetPhaseDuration();
+  }
+
+  float GetPhaseStartTime(int phase) => phase-1 < 0 ? 0 : Phases[phase-1].time;
+  float GetPhaseEndTime(int phase) => phase < Phases.Length ? Phases[phase].time : Animation.Clip.length;
+  void SetPhaseDuration() {
+    var duration = Animation.PhaseDurations[CurrentPhase];
+    var clipDuration = GetPhaseEndTime(CurrentPhase) - GetPhaseStartTime(CurrentPhase);
+    DesiredSpeed = duration.Seconds == 0f ? float.MaxValue : clipDuration/duration.Seconds;
   }
 }
 

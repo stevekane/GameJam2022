@@ -2,15 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Dive : Ability {
   [SerializeField] float FallSpeed;
   [SerializeField] HitConfig HitConfig;
-  [SerializeField] Timeval WindupDuration;
-  [SerializeField] Timeval LandDuration;
-  [SerializeField] Timeval RecoveryDuration;
-  [SerializeField] AnimationJobConfig WindupAnimation;
-  [SerializeField] AnimationJobConfig FallAnimation;
+  [FormerlySerializedAs("FallAnimation")]
+  [SerializeField] AnimationJobConfig AnimationConfig;
   [SerializeField] Transform WindupVFXTransform;
   [SerializeField] GameObject WindupVFX;
   [SerializeField] AudioClip WindupSFX;
@@ -19,8 +17,6 @@ public class Dive : Ability {
   [SerializeField] AudioClip LandSFX;
   [SerializeField] TriggerEvent Hitbox;
 
-  [NonSerialized] Collider[] Hits = new Collider[16];
-  [NonSerialized] HashSet<Collider> PhaseHits = new();
   [NonSerialized] AnimationJob Animation = null;
 
   public override HitConfig HitConfigData => HitConfig;
@@ -36,7 +32,6 @@ public class Dive : Ability {
   public static InlineEffect RecoveryEffect => new(s => {
     s.CanMove = false;
     s.CanRotate = false;
-    s.CanAttack = false;
   }, "DiveRecovery");
 
   public override async Task MainAction(TaskScope scope) {
@@ -44,23 +39,20 @@ public class Dive : Ability {
     using var diveEffect = Status.Add(DiveEffect);
     SFXManager.Instance.TryPlayOneShot(WindupSFX);
     VFXManager.Instance.TrySpawnWithParent(WindupVFX, WindupVFXTransform, 1);
-    Animation = AnimationDriver.Play(scope, WindupAnimation);
-    await scope.All(Animation.PauseAtFrame(Animation.NumFrames-1), Waiter.Delay(WindupDuration));
-    Animation.Stop();
+    Animation = AnimationDriver.Play(scope, AnimationConfig);
+    await Animation.WaitPhase(scope, 0);
     // Fall
-    Animation = AnimationDriver.Play(scope, FallAnimation);
-    await scope.All(Animation.PauseAtFrame(Animation.NumFrames-1), Fall);
+    await scope.All(Animation.PauseAfterPhase(1), Fall);
     // Attack
-    PhaseHits.Clear();
     SFXManager.Instance.TryPlayOneShot(LandSFX);
     VFXManager.Instance.TrySpawnEffect(LandVFX, AbilityManager.transform.position);
-    await scope.Any(Waiter.Delay(LandDuration), HitHandler.Loop(Hitbox, new HitParams(HitConfig, Attributes)));
+    Animation.Resume();
+    await scope.Any(Animation.WaitPhase(2), HitHandler.Loop(Hitbox, new HitParams(HitConfig, Attributes)));
     // Recovery
     diveEffect.Dispose();
     using var recoveryEffect = Status.Add(RecoveryEffect);
     Tags.AddFlags(AbilityTag.Cancellable);
-    await scope.Delay(RecoveryDuration);
-    Animation.Stop();
+    await Animation.WaitDone(scope);
   }
 
   async Task Fall(TaskScope scope) {

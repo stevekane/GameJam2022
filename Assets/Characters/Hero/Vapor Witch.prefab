@@ -427,29 +427,20 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 0
       FramesPerSecond: 30
-  WindupDuration:
-    Millis: 500
-    FramesPerSecond: 30
   LandDuration:
     Millis: 100
     FramesPerSecond: 30
-  RecoveryDuration:
-    Millis: 333.33334
-    FramesPerSecond: 30
-  WindupAnimation:
-    Clip: {fileID: 7400000, guid: d95a9fc399dec29429aba42a08e54091, type: 2}
-    Mask: {fileID: 0}
-    Speed: 1
-    PhaseDurations:
-    - Millis: 16.666668
-      FramesPerSecond: 60
-    BlendInFraction: 0
-    BlendOutFraction: 0
-  FallAnimation:
+  AnimationConfig:
     Clip: {fileID: 7400000, guid: b0637973c7ede3f41bbd02cca7c60b5d, type: 2}
     Mask: {fileID: 0}
     Speed: 1
     PhaseDurations:
+    - Millis: 500
+      FramesPerSecond: 60
+    - Millis: 183.33336
+      FramesPerSecond: 60
+    - Millis: 50
+      FramesPerSecond: 60
     - Millis: 166.66667
       FramesPerSecond: 60
     BlendInFraction: 0
