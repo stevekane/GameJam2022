@@ -10,6 +10,7 @@ public class AnimationJobConfig {
   public AnimationClip Clip;
   public AvatarMask Mask = null;
   public float Speed = 1;
+  public Timeval[] PhaseDurations;
   [Range(0,1)]
   public float BlendInFraction;
   [Range(0,1)]
@@ -25,7 +26,10 @@ public class AnimationJob {
   double DesiredSpeed = 1;
   public bool IsRunning { get; private set; } = false;
   public int CurrentFrame { get; private set; } = -1;
-  public int NumFrames => (int)(Clip.GetAnimationClip() is var clip ? clip.length*clip.frameRate+1 : 0);
+  public int CurrentPhase { get; private set; } = 0;
+  public int NumFrames => (int)(Animation.Clip.length*Animation.Clip.frameRate+1);
+  public AnimationEvent[] Phases => Animation.Clip.events;
+  public int NumPhases => Phases.Length+1;
 
   public AnimationJob(AnimationDriver driver, PlayableGraph graph, AnimationJobConfig animation) {
     Graph = graph;
@@ -33,6 +37,15 @@ public class AnimationJob {
     Animation = animation;
     Clip = AnimationClipPlayable.Create(Graph, Animation.Clip);
     Mixer = AnimationLayerMixerPlayable.Create(Graph, 2);
+
+    // TODO: Legacy. Update all old anims and remove this.
+    if (Animation.PhaseDurations.Length == 0 && NumPhases == 1) {
+      Animation.PhaseDurations = new[] { Timeval.FromSeconds(Animation.Clip.length) };
+    }
+
+    Debug.Assert(Animation.PhaseDurations.Length == NumPhases,
+      "Number of phase durations should match the number of phases (animation events + 1)");
+    SetPhaseDuration();
   }
 
   public void SetSpeed(double speed) => DesiredSpeed = speed;
@@ -46,15 +59,32 @@ public class AnimationJob {
       Clip.Play();
   }
 
+  public float GetPhaseStartTime(int phase) => phase-1 < 0 ? 0 : Phases[phase-1].time;
+  public float GetPhaseEndTime(int phase) => phase < Phases.Length ? Phases[phase].time : Animation.Clip.length;
+  public void SetPhaseDuration() {
+    var duration = Animation.PhaseDurations[CurrentPhase];
+    var startTime = GetPhaseStartTime(CurrentPhase);
+    var endTime = GetPhaseEndTime(CurrentPhase);
+    DesiredSpeed = (endTime-startTime)/duration.Seconds;
+    Debug.Log($"Phase {CurrentPhase} duration = {duration.Seconds}/{endTime - startTime} = {DesiredSpeed}");
+  }
+
+  public TaskFunc WaitPhase(int phase) => s => WaitPhase(s, phase);
+  public async Task WaitPhase(TaskScope scope, int phase) {
+    var time = GetPhaseEndTime(phase);
+    while (Clip.GetTime() < time && IsRunning)
+      await scope.Yield();
+  }
+
   public TaskFunc WaitFrame(int frame) => s => WaitFrame(s, frame);
   public async Task WaitFrame(TaskScope scope, int frame) {
     while (CurrentFrame < frame && IsRunning)
-      await scope.Yield();  // tick or yield?
+      await scope.Yield();
   }
   public TaskFunc PauseAtFrame(int frame) => s => PauseAtFrame(s, frame);
   public async Task PauseAtFrame(TaskScope scope, int frame) {
     while (CurrentFrame < frame && IsRunning)
-      await scope.Yield();  // tick or yield?
+      await scope.Yield();
     Pause();
   }
   public TaskFunc WaitDone() => s => WaitDone(s);
@@ -102,15 +132,16 @@ public class AnimationJob {
   public async Task Run(TaskScope scope) {
     try {
       while (IsRunning && Clip.IsValid()) {
+        UpdateCurrentFrame();
+        UpdateCurrentPhase();
         Mixer.SetInputWeight(1, BlendWeight());
         Clip.SetSpeed(DesiredSpeed * Animation.Speed * Driver.speed);
-        UpdateCurrentFrame();
         if (Clip.IsDone())
           break;
-        // await scope.Tick();
-        await scope.Yield(); // tick or yield?
+        await scope.Yield();
       }
     } finally {
+      // TODO: how to pause at end?
       Stop();
     }
   }
@@ -120,6 +151,15 @@ public class AnimationJob {
     var frames = (clip.length*clip.frameRate+1)/* / Animator.speed*/;
     var interpolant = (float)(Clip.GetTime()/clip.length);
     CurrentFrame = (int)Mathf.Lerp(0, frames, interpolant);
+  }
+  // TODO: This doesn't support looping.
+  void UpdateCurrentPhase() {
+    var time = Clip.GetTime();
+    var oldPhase = CurrentPhase;
+    while (CurrentPhase < Phases.Length && time >= Phases[CurrentPhase].time)
+      CurrentPhase++;
+    if (oldPhase != CurrentPhase)
+      SetPhaseDuration();
   }
 }
 
