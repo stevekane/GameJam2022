@@ -66,7 +66,6 @@ public class AnimationJob {
     var startTime = GetPhaseStartTime(CurrentPhase);
     var endTime = GetPhaseEndTime(CurrentPhase);
     DesiredSpeed = (endTime-startTime)/duration.Seconds;
-    Debug.Log($"Phase {CurrentPhase} duration = {duration.Seconds}/{endTime - startTime} = {DesiredSpeed}");
   }
 
   public TaskFunc WaitPhase(int phase) => s => WaitPhase(s, phase);
