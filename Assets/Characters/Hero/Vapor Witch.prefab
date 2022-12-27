@@ -45,7 +45,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Collider: {fileID: 0}
 --- !u!65 &8076677049902406753
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -118,6 +117,7 @@ MonoBehaviour:
     Clip: {fileID: 7400000, guid: 10c638eb3be7fba4ca0ac3ca09c7ba41, type: 2}
     Mask: {fileID: 0}
     Speed: 1
+    PhaseDurations: []
     BlendInFraction: 0.05
     BlendOutFraction: 0.15
   LaunchSFX: {fileID: 8300000, guid: 10c28a03acd49694e8db907df2dd45f9, type: 3}
@@ -168,7 +168,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Collider: {fileID: 0}
 --- !u!65 &1800344975577912335
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -227,7 +226,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Collider: {fileID: 0}
 --- !u!65 &796463285021203977
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -350,6 +348,15 @@ MonoBehaviour:
     Clip: {fileID: 7400000, guid: 62766a0642318924eaec6b6094e7cf70, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
     Speed: 1
+    PhaseDurations:
+    - Millis: 33.333332
+      FramesPerSecond: 60
+    - Millis: 50
+      FramesPerSecond: 60
+    - Millis: 83.333336
+      FramesPerSecond: 60
+    - Millis: 166.66667
+      FramesPerSecond: 60
     BlendInFraction: 0.15
     BlendOutFraction: 0.15
   Hitbox: {fileID: 7781392534903117839}
@@ -440,12 +447,14 @@ MonoBehaviour:
     Clip: {fileID: 7400000, guid: d95a9fc399dec29429aba42a08e54091, type: 2}
     Mask: {fileID: 0}
     Speed: 1
+    PhaseDurations: []
     BlendInFraction: 0
     BlendOutFraction: 0
   FallAnimation:
     Clip: {fileID: 7400000, guid: b0637973c7ede3f41bbd02cca7c60b5d, type: 2}
     Mask: {fileID: 0}
     Speed: 1
+    PhaseDurations: []
     BlendInFraction: 0
     BlendOutFraction: 0
   WindupVFXTransform: {fileID: 2298568700673657943}
@@ -500,7 +509,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Collider: {fileID: 0}
 --- !u!65 &9026935872212849193
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -559,7 +567,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Collider: {fileID: 0}
 --- !u!65 &2402037130279295334
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -630,7 +637,15 @@ MonoBehaviour:
   MaxDuration:
     Millis: 200
     FramesPerSecond: 30
-  WindupClip: {fileID: 7400000, guid: 2a6b2e49b8c217e4c8ccc212650f9ac5, type: 2}
+  Animation:
+    Clip: {fileID: 7400000, guid: 2a6b2e49b8c217e4c8ccc212650f9ac5, type: 2}
+    Mask: {fileID: 0}
+    Speed: 1
+    PhaseDurations:
+    - Millis: 33.333332
+      FramesPerSecond: 60
+    BlendInFraction: 0
+    BlendOutFraction: 0
   LaunchSFX: {fileID: 8300000, guid: 006a7e9d1c0e1234f89c4f6957918bf5, type: 3}
   LaunchVFX: {fileID: 100000, guid: e53da0fb627b93d419d10d2f7be0ee52, type: 3}
 --- !u!1 &5557811211696183068
@@ -742,6 +757,15 @@ MonoBehaviour:
     Clip: {fileID: 7400000, guid: 8ba2a5b0d9933fe4c813b4808937910a, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
     Speed: 1
+    PhaseDurations:
+    - Millis: 33.333332
+      FramesPerSecond: 60
+    - Millis: 50
+      FramesPerSecond: 60
+    - Millis: 83.333336
+      FramesPerSecond: 60
+    - Millis: 166.66667
+      FramesPerSecond: 60
     BlendInFraction: 0.15
     BlendOutFraction: 0.15
   Hitbox: {fileID: 8479126164374817058}
@@ -860,6 +884,15 @@ MonoBehaviour:
     Clip: {fileID: 7400000, guid: 62766a0642318924eaec6b6094e7cf70, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
     Speed: 1
+    PhaseDurations:
+    - Millis: 33.333332
+      FramesPerSecond: 60
+    - Millis: 50
+      FramesPerSecond: 60
+    - Millis: 83.333336
+      FramesPerSecond: 60
+    - Millis: 166.66667
+      FramesPerSecond: 60
     BlendInFraction: 0
     BlendOutFraction: 0
   Hitbox: {fileID: 1672519219772526389}
@@ -978,6 +1011,15 @@ MonoBehaviour:
     Clip: {fileID: 7400000, guid: cacbd4a8ef54cb84db3723764b9b47a4, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
     Speed: 1
+    PhaseDurations:
+    - Millis: 166.66667
+      FramesPerSecond: 60
+    - Millis: 83.333336
+      FramesPerSecond: 60
+    - Millis: 16.666666
+      FramesPerSecond: 60
+    - Millis: 133.33333
+      FramesPerSecond: 60
     BlendInFraction: 0
     BlendOutFraction: 0
   Hitbox: {fileID: 168426987354171595}
@@ -1029,7 +1071,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Collider: {fileID: 0}
 --- !u!135 &6034689546152661622
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1209,6 +1250,15 @@ MonoBehaviour:
     Clip: {fileID: 7400000, guid: f190d813cf4ee50499abc916c88f5fd9, type: 2}
     Mask: {fileID: 0}
     Speed: 1
+    PhaseDurations:
+    - Millis: 133.33333
+      FramesPerSecond: 60
+    - Millis: 33.333332
+      FramesPerSecond: 60
+    - Millis: 83.333336
+      FramesPerSecond: 60
+    - Millis: 0
+      FramesPerSecond: 60
     BlendInFraction: 0
     BlendOutFraction: 0
   Hitbox: {fileID: 8553821940252974118}

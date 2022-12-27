@@ -6,7 +6,7 @@ public class Jump : Ability {
   public float Drag = 5f;
   public Timeval MinDuration = Timeval.FromSeconds(.1f);
   public Timeval MaxDuration = Timeval.FromSeconds(.5f);
-  public AnimationClip WindupClip;
+  public AnimationJobConfig Animation;
   public AudioClip LaunchSFX;
   public GameObject LaunchVFX;
 
@@ -21,7 +21,7 @@ public class Jump : Ability {
         return;
 
       if (Status.IsGrounded) {
-        await AnimationDriver.Play(scope, WindupClip).WaitDone(scope);
+        await AnimationDriver.Play(scope, Animation).WaitDone(scope);
       } else {
         // TOOD: play an aerial variant of the windup animation here
       }
