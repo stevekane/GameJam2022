@@ -99,6 +99,7 @@ MonoBehaviour:
     Clip: {fileID: 7400000, guid: 489eec6c8aab448448bb1bac2ca02b2f, type: 2}
     Mask: {fileID: 0}
     Speed: 1
+    PhaseDurations: []
     BlendInFraction: 0.15
     BlendOutFraction: 0.15
   LaunchVFX: {fileID: 100000, guid: 77191daeade45f54bb8cc2c23bc31d17, type: 3}
@@ -161,15 +162,6 @@ MonoBehaviour:
   ChargeEnd:
     Millis: 0
     FramesPerSecond: 60
-  WindupEnd:
-    Millis: 1166.6666
-    FramesPerSecond: 60
-  ActiveEnd:
-    Millis: 1266.6666
-    FramesPerSecond: 60
-  RecoveryEnd:
-    Millis: 1666.6666
-    FramesPerSecond: 60
   HitConfig:
     Damage:
       Base: 0
@@ -218,6 +210,15 @@ MonoBehaviour:
     Clip: {fileID: 7400000, guid: acc917c930058fd47b5e60312335f4b9, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
     Speed: 1
+    PhaseDurations:
+    - Millis: 0
+      FramesPerSecond: 60
+    - Millis: 1216.6666
+      FramesPerSecond: 60
+    - Millis: 1250
+      FramesPerSecond: 60
+    - Millis: 1666.6666
+      FramesPerSecond: 60
     BlendInFraction: 0.15
     BlendOutFraction: 0.15
   Hitbox: {fileID: 7192207245549015361}
@@ -249,7 +250,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Collider: {fileID: 3853045096224174420}
 --- !u!1 &3375571370796655110
 GameObject:
   m_ObjectHideFlags: 0
@@ -296,7 +296,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a458cba5f3451b41a506fa855a0903b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TriggerConditions: []
+  TriggerConditions:
+  - Tags: 128
+    RequiredOwnerTags: 0
+    EnergyCost: 0
   Tags: 0
   FallSpeed: 150
   HitConfig:
@@ -319,25 +322,17 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 0
       FramesPerSecond: 60
-  WindupDuration:
-    Millis: 500
-    FramesPerSecond: 60
-  LandDuration:
-    Millis: 33.333332
-    FramesPerSecond: 60
-  RecoveryDuration:
-    Millis: 500
-    FramesPerSecond: 60
-  WindupAnimation:
-    Clip: {fileID: 7400000, guid: d95a9fc399dec29429aba42a08e54091, type: 2}
-    Mask: {fileID: 0}
-    Speed: 1
-    BlendInFraction: 1
-    BlendOutFraction: 0
-  FallAnimation:
+  AnimationConfig:
     Clip: {fileID: 7400000, guid: b0637973c7ede3f41bbd02cca7c60b5d, type: 2}
     Mask: {fileID: 0}
     Speed: 1
+    PhaseDurations:
+    - Millis: 166.66667
+      FramesPerSecond: 60
+    - Millis: 200
+      FramesPerSecond: 60
+    - Millis: 216.66667
+      FramesPerSecond: 60
     BlendInFraction: 0
     BlendOutFraction: 0.2
   WindupVFXTransform: {fileID: 5343061925828056540}
@@ -372,7 +367,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Collider: {fileID: 3802458583439753259}
 --- !u!1 &3693029004425411739
 GameObject:
   m_ObjectHideFlags: 0
@@ -430,6 +424,7 @@ MonoBehaviour:
     Clip: {fileID: 7400000, guid: c9bed7027c51f8b409f355f5b329401f, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
     Speed: 1
+    PhaseDurations: []
     BlendInFraction: 0.25
     BlendOutFraction: 0.1
   Windup:
@@ -655,6 +650,7 @@ MonoBehaviour:
     Clip: {fileID: 7400000, guid: 7d38354039671664b9039d2fccc8d484, type: 2}
     Mask: {fileID: 0}
     Speed: 1
+    PhaseDurations: []
     BlendInFraction: 0.25
     BlendOutFraction: 0
   Flash: {fileID: 4220133813938994158}
@@ -935,26 +931,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HardAttack: {fileID: 6721464206334880950}
   Throw: {fileID: 5880383986943101862}
-  ThrowHitConfig:
-    Damage:
-      Base: 0
-      Mult: 1
-    Knockback:
-      Base: 12
-      Mult: 1
-    KnockbackType: 0
-    KnockbackAngle: 0
-    RecoilStrength: 0
-    CameraShakeStrength: 5
-    HitStopDuration:
-      Millis: 100
-      FramesPerSecond: 60
-    StunDuration:
-      Millis: 500
-      FramesPerSecond: 60
-    SlowFallDuration:
-      Millis: 0
-      FramesPerSecond: 60
   Teleport: {fileID: 7053381319833114771}
   BackDash: {fileID: 6422472136148966431}
   Dive: {fileID: 4584590916625472510}

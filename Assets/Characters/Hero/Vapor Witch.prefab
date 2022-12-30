@@ -427,9 +427,6 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 0
       FramesPerSecond: 30
-  LandDuration:
-    Millis: 100
-    FramesPerSecond: 30
   AnimationConfig:
     Clip: {fileID: 7400000, guid: b0637973c7ede3f41bbd02cca7c60b5d, type: 2}
     Mask: {fileID: 0}
@@ -1281,6 +1278,10 @@ PrefabInstance:
       propertyPath: m_ApplyRootMotion
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 137020602886767594, guid: 9984be23625843a48a44d88aae5669f2, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: a3b87fc7558468a4abe1ea067ccad831, type: 2}
     m_RemovedComponents:
     - {fileID: 95226846252001880, guid: 9984be23625843a48a44d88aae5669f2, type: 3}
     m_AddedGameObjects:
@@ -1390,7 +1391,7 @@ PrefabInstance:
     - target: {fileID: 23164307116791904, guid: 431dbce9d7d62814ba63a540408200f7, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: c6b388159611c424f83b4e2ff0dc7e89, type: 2}
+      objectReference: {fileID: 2100000, guid: c5908e9f171917f4eab88a5e4c96a696, type: 2}
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 431dbce9d7d62814ba63a540408200f7, type: 3}
@@ -1494,7 +1495,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114197, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: m_RootOrder
-      value: 18
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114197, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: m_LocalPosition.x

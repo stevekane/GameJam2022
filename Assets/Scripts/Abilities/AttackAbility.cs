@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -34,17 +33,19 @@ public class AttackAbility : Ability {
       await scope.Any(Charge, ListenFor(MainRelease));
       var numFrames = Timeval.TickCount - startFrame;
       var chargeScaling = ChargeScaling.Evaluate((float)numFrames / ChargeEnd.Ticks);
-      await Animation.WaitPhase(scope, 0);
+      await scope.Run(Animation.WaitPhase(0));
       hitConfig = hitConfig.Scale(chargeScaling);
     } else {
-      await Animation.WaitPhase(scope, 0);
+      await scope.Run(Animation.WaitPhase(0));
     }
     var rotation = AbilityManager.transform.rotation;
     var vfxOrigin = AbilityManager.transform.TransformPoint(AttackVFXOffset);
     SFXManager.Instance.TryPlayOneShot(AttackSFX);
     VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
     await scope.Any(Animation.WaitPhase(1), HitHandler.Loop(Hitbox, new HitParams(HitConfig, Attributes)));
-    await scope.Any(MakeCancellable, Animation.WaitDone());
+    Tags.AddFlags(AbilityTag.Cancellable);
+    await scope.Run(Animation.WaitPhase(2));
+    await scope.Run(Animation.WaitDone);
   }
 
   async Task Charge(TaskScope scope) {
@@ -55,11 +56,5 @@ public class AttackAbility : Ability {
     } finally {
       Animation.Resume();
     }
-  }
-
-  async Task MakeCancellable(TaskScope scope) {
-    await Animation.WaitPhase(scope, 2);
-    Tags.AddFlags(AbilityTag.Cancellable);
-    await scope.Forever();
   }
 }
