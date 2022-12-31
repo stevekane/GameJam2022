@@ -37,30 +37,16 @@ public class Sniper : MonoBehaviour {
   }
 
   void TryAim() {
-    if (Target) {
-      var toTarget = transform.position.TryGetDirection(Target.transform.position) ?? transform.forward;
-      Mover.SetAim(toTarget);
-    }
+    var aim = Target ? (Target.position-transform.position).normalized : transform.forward;
+    Mover.SetAim(aim);
   }
 
   async Task TryReposition(TaskScope scope) {
-    var destination = Target.position+DesiredDistance*UnityEngine.Random.Range(0, 4) switch {
-      0 => Target.forward,
-      1 => -Target.forward,
-      2 => Target.right,
-      _ => -Target.right
-    };
-    var navMeshAreaIndex = NavMesh.GetAreaFromName(NavMeshAreaName);
-    var navMeshMask = 1 << navMeshAreaIndex; // For real? wtf unity
-    var validPosition = NavMesh.SamplePosition(destination, out var hit, NavMeshSearchRadius, navMeshMask);
-    if (validPosition) {
+    var destination = Target.position+Random.onUnitSphere.XZ()*DesiredDistance;
+    if (ValidNavMeshPosition(destination, NavMeshAreaName)) {
       await scope.Repeat(RepositionDelay.Ticks, async s => {
         var toDestination = destination-transform.position;
-        if (toDestination.magnitude > MinDistanceToDestination) {
-          Mover.SetMove(toDestination.XZ().normalized);
-        } else {
-          Mover.SetMove(Vector3.zero);
-        }
+        Mover.SetMove(toDestination.magnitude > MinDistanceToDestination ? toDestination.normalized : Vector3.zero);
         await s.Tick();
       });
     } else {
@@ -71,10 +57,20 @@ public class Sniper : MonoBehaviour {
 
   async Task TryStartAbility(TaskScope scope) {
     var index = UnityEngine.Random.Range(0, Abilities.Length);
-    var runningAbility = AbilityManager.TryRun(Abilities[index].MainAction);
+    await scope.Run(RunAbility(Abilities[index]));
+    await scope.Delay(AbilityDelay);
+  }
+
+  TaskFunc RunAbility(Ability ability) => async scope => {
+    var runningAbility = AbilityManager.TryRun(ability.MainAction);
     await scope.Tick();
     await scope.Tick();
     await scope.Run(runningAbility);
-    await scope.Delay(AbilityDelay);
+  };
+
+  bool ValidNavMeshPosition(Vector3 position, string areaName = "Walkable") {
+    var navMeshAreaIndex = NavMesh.GetAreaFromName(NavMeshAreaName);
+    var navMeshMask = 1 << navMeshAreaIndex; // For real? wtf unity
+    return NavMesh.SamplePosition(position, out var hit, NavMeshSearchRadius, navMeshMask);
   }
 }
