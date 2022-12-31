@@ -52,7 +52,7 @@ MonoBehaviour:
   Tags: 0
   MoveSpeedModifier:
     Base: 0
-    Mult: 0
+    Mult: 1
   Animation:
     Clip: {fileID: 7400000, guid: c9bed7027c51f8b409f355f5b329401f, type: 2}
     Mask: {fileID: 0}
@@ -71,10 +71,10 @@ MonoBehaviour:
   ProjectilePrefab: {fileID: 4208020136327101218, guid: d20c6a996c593444e8d034a782224fd2, type: 3}
   HitConfig:
     Damage:
-      Base: 0
+      Base: 10
       Mult: 1
     Knockback:
-      Base: 0
+      Base: 10
       Mult: 1
     KnockbackType: 1
     KnockbackAngle: 0
@@ -287,6 +287,10 @@ PrefabInstance:
     - target: {fileID: 1289511351522972, guid: 2d18226cba948bf43a34a7f91fe5f43d, type: 3}
       propertyPath: m_Name
       value: SM_Wep_ForestWitch_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 1289511351522972, guid: 2d18226cba948bf43a34a7f91fe5f43d, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4732990423796136, guid: 2d18226cba948bf43a34a7f91fe5f43d, type: 3}
       propertyPath: m_RootOrder
@@ -540,6 +544,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 613256d8bcb31874ba527fb660efb9cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  NavMeshAreaName: Walkable
+  NavMeshSearchRadius: 1
+  DesiredDistance: 10
+  MinDistanceToDestination: 1
+  RepositionDelay:
+    Millis: 1000
+    FramesPerSecond: 60
+  AbilityDelay:
+    Millis: 2000
+    FramesPerSecond: 60
 --- !u!4 &2130385387032696454 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8540507124463013526, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
