@@ -2,23 +2,29 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
 
+[RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(AbilityManager))]
+[RequireComponent(typeof(Mover))]
 public class Sniper : MonoBehaviour {
   [SerializeField] string NavMeshAreaName = "Walkable";
   [SerializeField] float NavMeshSearchRadius = 1f;
   [SerializeField] float DesiredDistance = 10f;
-  [SerializeField] float MinDistanceToDestination = 1f;
   [SerializeField] Timeval RepositionDelay = Timeval.FromSeconds(1);
   [SerializeField] Timeval AbilityDelay = Timeval.FromSeconds(2);
 
   Transform Target;
-  Mover Mover;
+  NavMeshAgent NavMeshAgent;
   AbilityManager AbilityManager;
+  Mover Mover;
   Ability[] Abilities;
   TaskScope Scope = new();
 
   void Awake() {
-    Mover = GetComponent<Mover>();
+    NavMeshAgent = GetComponent<NavMeshAgent>();
+    NavMeshAgent.updatePosition = false;
+    NavMeshAgent.updateRotation = false;
     AbilityManager = GetComponent<AbilityManager>();
+    Mover = GetComponent<Mover>();
     Abilities = GetComponentsInChildren<Ability>();
   }
   void Start() => Scope.Start(Behavior);
@@ -28,6 +34,7 @@ public class Sniper : MonoBehaviour {
     await scope.All(
       Waiter.Repeat(TryFindTarget),
       Waiter.Repeat(TryAim),
+      Waiter.Repeat(TryMove),
       Waiter.Repeat(TryReposition),
       Waiter.Repeat(TryStartAbility));
   }
@@ -37,40 +44,31 @@ public class Sniper : MonoBehaviour {
   }
 
   void TryAim() {
-    var aim = Target ? (Target.position-transform.position).normalized : transform.forward;
-    Mover.SetAim(aim);
+    Mover.SetAim(Target ? (Target.position-transform.position).normalized : transform.forward);
+  }
+
+  void TryMove() {
+    NavMeshAgent.nextPosition = transform.position;
+    Mover.SetMove(NavMeshAgent.desiredVelocity.normalized);
   }
 
   async Task TryReposition(TaskScope scope) {
-    var destination = Target.position+Random.onUnitSphere.XZ()*DesiredDistance;
-    if (ValidNavMeshPosition(destination, NavMeshAreaName)) {
-      await scope.Repeat(RepositionDelay.Ticks, async s => {
-        var toDestination = destination-transform.position;
-        Mover.SetMove(toDestination.magnitude > MinDistanceToDestination ? toDestination.normalized : Vector3.zero);
-        await s.Tick();
-      });
-    } else {
-      Mover.SetMove(Vector3.zero);
-      await scope.Delay(RepositionDelay);
-    }
+    NavMeshAgent.SetDestination(Target.position+Random.onUnitSphere.XZ()*DesiredDistance);
+    await scope.Delay(RepositionDelay);
   }
 
   async Task TryStartAbility(TaskScope scope) {
     var index = UnityEngine.Random.Range(0, Abilities.Length);
-    await scope.Run(RunAbility(Abilities[index]));
+    await scope.Run(Abilities[index].MainAction);
     await scope.Delay(AbilityDelay);
   }
 
-  TaskFunc RunAbility(Ability ability) => async scope => {
-    var runningAbility = AbilityManager.TryRun(ability.MainAction);
-    await scope.Tick();
-    await scope.Tick();
-    await scope.Run(runningAbility);
-  };
-
-  bool ValidNavMeshPosition(Vector3 position, string areaName = "Walkable") {
-    var navMeshAreaIndex = NavMesh.GetAreaFromName(NavMeshAreaName);
-    var navMeshMask = 1 << navMeshAreaIndex; // For real? wtf unity
-    return NavMesh.SamplePosition(position, out var hit, NavMeshSearchRadius, navMeshMask);
+  void OnDrawGizmos() {
+    if (NavMeshAgent) {
+      var corners = NavMeshAgent.path.corners;
+      for (var i = 0; i < corners.Length-1; i++) {
+        Gizmos.DrawLine(Vector3.up+corners[i], Vector3.up+corners[i+1]);
+      }
+    }
   }
 }

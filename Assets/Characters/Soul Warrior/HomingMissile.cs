@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class HomingMissile : MonoBehaviour {
@@ -28,5 +27,11 @@ public class HomingMissile : MonoBehaviour {
     if (target.TryGetComponent(out Hurtbox hurtbox)) {
       hurtbox.TryAttack(Hitter.HitParams);
     }
+  }
+
+  void OnCollisionEnter(Collision c) {
+    VFXManager.Instance.TrySpawnEffect(ContactVFX, transform.position);
+    SFXManager.Instance.TryPlayOneShot(ContactSFX);
+    Destroy(gameObject);
   }
 }

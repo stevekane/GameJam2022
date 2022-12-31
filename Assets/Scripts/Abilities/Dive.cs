@@ -1,13 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class Dive : Ability {
   [SerializeField] float FallSpeed;
   [SerializeField] HitConfig HitConfig;
-  [FormerlySerializedAs("FallAnimation")]
   [SerializeField] AnimationJobConfig AnimationConfig;
   [SerializeField] Transform WindupVFXTransform;
   [SerializeField] GameObject WindupVFX;
