@@ -1,11 +1,8 @@
 using UnityEngine;
 
 namespace Traditional {
-  public class Gravity : Attribute<float> {
+  public class Gravity : AttributeFloat {
     [field:SerializeField]
     public override float Base { get; set; } = -10;
-    public override float Evaluate(float t) {
-      return t;
-    }
   }
 }

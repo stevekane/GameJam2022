@@ -13,16 +13,14 @@ namespace Traditional {
   }
 
   public class Foot : MonoBehaviour {
-    [SerializeField] string GroundTagName = "Ground";
     [SerializeField] Collider Collider;
     [SerializeField] GameObject Owner;
 
     void OnTriggerEnter(Collider collider) {
-      if (collider.CompareTag(GroundTagName)) {
-        const string FOOTSTEP_EVENT_NAME = "OnFootStep";
+      if (collider.CompareTag(Globals.GROUND_TAG_NAME)) {
         var footHit = new FootHit(foot: Collider, ground: collider);
         var messageOptions = SendMessageOptions.DontRequireReceiver;
-        Owner.SendMessage(FOOTSTEP_EVENT_NAME, footHit, messageOptions);
+        Owner.SendMessage(Globals.FOOTSTEP_EVENT_NAME, footHit, messageOptions);
       }
     }
   }

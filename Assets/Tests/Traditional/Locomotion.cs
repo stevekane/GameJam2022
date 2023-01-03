@@ -16,16 +16,16 @@ namespace Traditional {
     [SerializeField] AnimationTimeScale AnimationTimeScale;
 
     void FixedUpdate() {
-      var moveDelta = MoveDelta.Evaluate(MoveDelta.Base);
-      var moveDirection = MoveDirection.Evaluate(MoveDirection.Base);
-      var aimDirection = AimDirection.Evaluate(AimDirection.Base);
-      var moveSpeed = MoveSpeed.Evaluate(MoveSpeed.Base);
-      var turnSpeed = TurnSpeed.Evaluate(TurnSpeed.Base);
-      var gravity = Gravity.Evaluate(Gravity.Base);
-      var localTimeScale = LocalTimeScale.Evaluate(LocalTimeScale.Base);
-      var fallSpeed = FallSpeed.Evaluate(FallSpeed.Base);
-      var maxFallSpeed = MaxFallSpeed.Evaluate(MaxFallSpeed.Base);
-      var animationTimeScale = AnimationTimeScale.Evaluate(AnimationTimeScale.Base);
+      var moveDelta = MoveDelta.Value;
+      var moveDirection = MoveDirection.Value;
+      var aimDirection = AimDirection.Value;
+      var moveSpeed = MoveSpeed.Value;
+      var turnSpeed = TurnSpeed.Value;
+      var gravity = Gravity.Value;
+      var localTimeScale = LocalTimeScale.Value;
+      var fallSpeed = FallSpeed.Value;
+      var maxFallSpeed = MaxFallSpeed.Value;
+      var animationTimeScale = AnimationTimeScale.Value;
       var dt = localTimeScale*Time.fixedDeltaTime;
 
       // movement
@@ -47,8 +47,13 @@ namespace Traditional {
       Animator.SetSpeed(localTimeScale < 1 ? localTimeScale : 1);
 
       // Write next frames state here... ponder this...
-      FallSpeed.Base = Mathf.Min(maxFallSpeed, dt*gravity + (CharacterController.isGrounded ? 0 : FallSpeed.Base));
-      MoveDelta.Base = Vector3.zero;
+      if (!CharacterController.isGrounded) {
+        var unboundedFallSpeed = dt * gravity + fallSpeed;
+        var boundedFallSpeed = Mathf.Max(maxFallSpeed, unboundedFallSpeed);
+        FallSpeed.Add(boundedFallSpeed);
+      } else {
+        FallSpeed.Add(dt * gravity);
+      }
     }
   }
 }
