@@ -31,13 +31,13 @@ namespace Traditional {
     }
 
     void OnLand() {
-      Debug.Log("OnLand");
       if (enabled) {
         enabled = false;
         Remaining = 0;
         AudioSource.PlayOptionalOneShot(LandingSFX);
         var rotation = Quaternion.LookRotation(transform.forward.XZ(), Vector3.up);
         Destroy(Instantiate(LandingVFX, transform.position, rotation), 2);
+        Debug.Log("Landed during tumble");
       }
     }
 

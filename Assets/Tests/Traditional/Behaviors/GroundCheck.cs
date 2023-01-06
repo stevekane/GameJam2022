@@ -20,6 +20,12 @@ namespace Traditional {
       var position = transform.TransformPoint(CharacterController.center + skinOffset - offset);
       var ray = new Ray(position, Vector3.down);
       var didHit = Physics.SphereCast(ray, CharacterController.radius, out Hit, GROUND_DISTANCE, LayerMask);
+      if (Grounded.Value && !didHit) {
+        SendMessage(Globals.TAKEOFF_EVENT_NAME, SendMessageOptions.DontRequireReceiver);
+      }
+      if (!Grounded.Value && didHit) {
+        SendMessage(Globals.LAND_EVENT_NAME, SendMessageOptions.DontRequireReceiver);
+      }
       Grounded.Value = didHit;
     }
 

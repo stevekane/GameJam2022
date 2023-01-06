@@ -533,18 +533,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0dd39e761ad46944aaacc5bcf04f754, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CharacterController: {fileID: 360860652}
   Animator: {fileID: 360860669}
-  MoveDelta: {fileID: 360860663}
   MoveDirection: {fileID: 360860654}
-  AimDirection: {fileID: 360860653}
   MoveSpeed: {fileID: 360860656}
-  TurnSpeed: {fileID: 360860657}
   LocalTimeScale: {fileID: 360860655}
-  Gravity: {fileID: 360860660}
-  FallSpeed: {fileID: 360860662}
-  MaxFallSpeed: {fileID: 360860659}
   AnimationTimeScale: {fileID: 360860667}
+  Grounded: {fileID: 360860675}
 --- !u!114 &360860662
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -782,11 +776,11 @@ MonoBehaviour:
   TurnSpeed: {fileID: 360860657}
   TakeoffSFX: {fileID: 8300000, guid: df7b0527bedef454c888055c076048ed, type: 3}
   TakeoffVFX: {fileID: 1965343156803978, guid: f7f7edf3ec6776a458b1c3bf19c1a2ea, type: 3}
-  LandingSFX: {fileID: 8300000, guid: 02f7d8d552d38114ba04d3572d857279, type: 3}
+  LandingSFX: {fileID: 8300000, guid: 0e5edb6bccf05984dad128fb1a9fc914, type: 3}
   LandingVFX: {fileID: 1040608886635896, guid: 6a86ed17143a4b748843dbe0253be098, type: 3}
   LaunchHeight: 10
   TumbleDuration:
-    Millis: 2000
+    Millis: 3000
     FramesPerSecond: 60
 --- !u!114 &360860674
 MonoBehaviour:
