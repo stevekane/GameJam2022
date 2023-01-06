@@ -725,7 +725,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_NoiseProfile: {fileID: 11400000, guid: 69ce8388f6785dd4c8c39915efece2f4, type: 2}
   m_PivotOffset: {x: 0, y: 0, z: 0}
-  m_AmplitudeGain: 0.00000100938
+  m_AmplitudeGain: 0.1945885
   m_FrequencyGain: 10
   mNoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!114 &744091293
@@ -981,10 +981,10 @@ MonoBehaviour:
   m_RotationMode: 0
   m_UpdateMethod: 2
   m_Targets:
-  - target: {fileID: 509390322}
+  - target: {fileID: 1249928421}
     weight: 1
     radius: 0
-  - target: {fileID: 1249928421}
+  - target: {fileID: 509390322}
     weight: 1
     radius: 0
 --- !u!4 &1122899131
@@ -1132,6 +1132,26 @@ PrefabInstance:
     - target: {fileID: 4220133813938994134, guid: 793f5a03a68163244841bd511b3990d8, type: 3}
       propertyPath: m_Name
       value: Soul Warrior
+      objectReference: {fileID: 0}
+    - target: {fileID: 4616713024154015929, guid: 793f5a03a68163244841bd511b3990d8, type: 3}
+      propertyPath: OutOfRangeDistance
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 6721464206334880950, guid: 793f5a03a68163244841bd511b3990d8, type: 3}
+      propertyPath: AttackAnimation.PhaseDurations.Array.data[0].Millis
+      value: 1200
+      objectReference: {fileID: 0}
+    - target: {fileID: 6721464206334880950, guid: 793f5a03a68163244841bd511b3990d8, type: 3}
+      propertyPath: AttackAnimation.PhaseDurations.Array.data[1].Millis
+      value: 49.999954
+      objectReference: {fileID: 0}
+    - target: {fileID: 6721464206334880950, guid: 793f5a03a68163244841bd511b3990d8, type: 3}
+      propertyPath: AttackAnimation.PhaseDurations.Array.data[2].Millis
+      value: 250.00012
+      objectReference: {fileID: 0}
+    - target: {fileID: 6721464206334880950, guid: 793f5a03a68163244841bd511b3990d8, type: 3}
+      propertyPath: AttackAnimation.PhaseDurations.Array.data[3].Millis
+      value: 166.66663
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
