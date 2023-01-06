@@ -62,6 +62,18 @@ namespace Traditional {
       } else {
         FallSpeed.Add(dt * gravity);
       }
+
+      // grounded check
+      {
+        const float GROUND_DISTANCE = .2f;
+        var cylinderHeight = Mathf.Max(0, CharacterController.height - 2*CharacterController.radius);
+        var offsetDistance = cylinderHeight / 2;
+        var offset = offsetDistance*Vector3.up;
+        var skinOffset = CharacterController.skinWidth*Vector3.up;
+        var position = transform.TransformPoint(CharacterController.center + skinOffset - offset);
+        var ray = new Ray(position, Vector3.down);
+        var grounded = Physics.SphereCast(ray, CharacterController.radius, GROUND_DISTANCE, Defaults.Instance.EnvironmentLayerMask);
+      }
     }
   }
 }
