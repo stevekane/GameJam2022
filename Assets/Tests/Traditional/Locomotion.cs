@@ -39,6 +39,14 @@ namespace Traditional {
       var desiredRotation = Quaternion.LookRotation(aimDirection.sqrMagnitude > 0 ? aimDirection : transform.forward);
       transform.rotation = Quaternion.RotateTowards(transform.rotation, desiredRotation, maxDegrees);
 
+      // broadcast events for physics.... probably should not live here?
+      if (Animator.GetBool("IsGrounded") && !CharacterController.isGrounded) {
+        SendMessage(Globals.TAKEOFF_EVENT_NAME, SendMessageOptions.DontRequireReceiver);
+      }
+      if (!Animator.GetBool("IsGrounded") && CharacterController.isGrounded) {
+        SendMessage(Globals.LAND_EVENT_NAME, SendMessageOptions.DontRequireReceiver);
+      }
+
       // animation
       var orientedVelocity = Quaternion.Inverse(transform.rotation)*inputVelocity;
       Animator.SetFloat("RightVelocity", orientedVelocity.x * animationTimeScale);

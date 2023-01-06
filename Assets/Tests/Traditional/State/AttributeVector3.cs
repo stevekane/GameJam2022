@@ -6,6 +6,7 @@ namespace Traditional {
     public float Mul = 1;
   }
 
+  [DefaultExecutionOrder(-100)]
   public abstract class AttributeVector3 : MonoBehaviour {
     ModifierVector3 Accumulator = new();
     ModifierVector3 Current = new();
