@@ -443,7 +443,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3853268898807207900, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
       propertyPath: m_Enabled
@@ -524,7 +524,7 @@ MonoBehaviour:
     ModeOverride: 2
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7784753, y: 1}
+    m_SensorSize: {x: 1.7777778, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -541,7 +541,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 609569421}
   m_LocalRotation: {x: 0.38268346, y: 0.000000059604645, z: 0.000000014901161, w: 0.9238796}
-  m_LocalPosition: {x: -0.0000043754358, y: 25.455847, z: -25.455843}
+  m_LocalPosition: {x: -1.3762249, y: 27.750643, z: -23.161047}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -725,7 +725,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_NoiseProfile: {fileID: 11400000, guid: 69ce8388f6785dd4c8c39915efece2f4, type: 2}
   m_PivotOffset: {x: 0, y: 0, z: 0}
-  m_AmplitudeGain: 0.00000001711907
+  m_AmplitudeGain: 0.00000100938
   m_FrequencyGain: 10
   mNoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!114 &744091293
@@ -984,6 +984,9 @@ MonoBehaviour:
   - target: {fileID: 509390322}
     weight: 1
     radius: 0
+  - target: {fileID: 1249928421}
+    weight: 1
+    radius: 0
 --- !u!4 &1122899131
 Transform:
   m_ObjectHideFlags: 0
@@ -992,7 +995,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1122899129}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -1.5000026, y: 0, z: 5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1130,14 +1133,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Soul Warrior
       objectReference: {fileID: 0}
-    - target: {fileID: 4220133813938994134, guid: 793f5a03a68163244841bd511b3990d8, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6726703971455639177, guid: 793f5a03a68163244841bd511b3990d8, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 793f5a03a68163244841bd511b3990d8, type: 3}
@@ -1203,6 +1198,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1647527232}
   m_SourcePrefab: {fileID: 100100000, guid: 8a98e2e95cc7b6a498d66d4ca2806a07, type: 3}
+--- !u!4 &1249928421 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4220133813938994128, guid: 793f5a03a68163244841bd511b3990d8, type: 3}
+  m_PrefabInstance: {fileID: 1183205555}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1325853189
 GameObject:
   m_ObjectHideFlags: 0
@@ -1282,7 +1282,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1325853189}
   m_LocalRotation: {x: 0.38268346, y: 0.000000059604645, z: 0.000000014901161, w: 0.9238796}
-  m_LocalPosition: {x: -0.0000043754358, y: 25.455847, z: -25.455843}
+  m_LocalPosition: {x: -1.3762249, y: 27.750643, z: -23.161047}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1544,7 +1544,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh240018
+  m_Name: pb_Mesh43688
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2

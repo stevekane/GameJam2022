@@ -44,7 +44,7 @@ public class AnimationJob {
     }
 
     Debug.Assert(Animation.PhaseDurations.Length == NumPhases,
-      "Number of phase durations should match the number of phases (animation events + 1)");
+      $"Number of phase durations should match the number of phases (animation events + 1) for clip {animation.Clip}");
     SetPhaseDuration();
   }
 
