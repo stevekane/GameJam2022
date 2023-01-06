@@ -19,7 +19,7 @@ namespace Traditional {
 
     void OnEnable() {
       // mvv/2 = mgh from conservation of energy. solve for v: v = (2gh)^(1/2)
-      FallSpeed.Add(Mathf.Sqrt(2 * -Gravity.Value * LaunchHeight));
+      FallSpeed.Base = Mathf.Sqrt(2 * -Gravity.Value * LaunchHeight);
       Remaining = TumbleDuration.Ticks;
       AudioSource.PlayOptionalOneShot(TakeoffSFX);
       var rotation = Quaternion.LookRotation(Vector3.up, transform.forward.XZ());
@@ -31,6 +31,7 @@ namespace Traditional {
     }
 
     void OnLand() {
+      Debug.Log("OnLand");
       if (enabled) {
         enabled = false;
         Remaining = 0;

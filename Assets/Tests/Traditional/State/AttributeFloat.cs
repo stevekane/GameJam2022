@@ -1,12 +1,10 @@
-using UnityEngine;
-
 namespace Traditional {
   public class ModifierFloat {
     public float Add = 0;
     public float Mul = 1;
   }
 
-  public abstract class AttributeFloat : MonoBehaviour {
+  public abstract class AttributeFloat : AbstractState {
     ModifierFloat Accumulator = new();
     ModifierFloat Current = new();
     public abstract float Base { get; set; }
@@ -14,7 +12,7 @@ namespace Traditional {
     public float Evaluate(float f) => (Base + f + Current.Add) * Current.Mul;
     public void Add(float v) => Accumulator.Add += v;
     public void Mul(float v) => Accumulator.Mul *= v;
-    void FixedUpdate() {
+    public void FixedUpdate() {
       Current = Accumulator;
       Accumulator = new();
     }
