@@ -11,7 +11,7 @@ public class Spawner : MonoBehaviour {
     spawn.gameObject.SetActive(false);
     spawn.transform.SetParent(transform, false);
     spawn.transform.SetPositionAndRotation(transform.position, transform.rotation);
-    VFXManager.Instance.TrySpawnEffect(VFX, transform.position, transform.rotation, Delay.Seconds);
+    VFXManager.Instance.TrySpawnEffect(VFX, transform.position, VFX.transform.rotation, Delay.Seconds);
     await scope.Delay(Delay);
     spawn.gameObject.SetActive(true);
   }
