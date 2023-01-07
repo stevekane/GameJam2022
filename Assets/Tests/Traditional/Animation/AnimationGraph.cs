@@ -129,7 +129,6 @@ namespace Traditional {
     }
 
     void TryFireFrameEvent(List<AnimationFrameEvent> events, int frame, AnimationClipPlayable playable) {
-      Debug.Log($"TryFire for frame {frame}");
       foreach (var frameEvent in events) {
         if (frameEvent.Frame == frame) {
           frameEvent.Event?.Invoke(playable);
