@@ -55,15 +55,6 @@ MonoBehaviour:
   ChargeEnd:
     Millis: 1000
     FramesPerSecond: 60
-  WindupEnd:
-    Millis: 125
-    FramesPerSecond: 24
-  ActiveEnd:
-    Millis: 208.33333
-    FramesPerSecond: 24
-  RecoveryEnd:
-    Millis: 208.33333
-    FramesPerSecond: 24
   HitConfig:
     Damage:
       Base: 0
@@ -112,6 +103,15 @@ MonoBehaviour:
     Clip: {fileID: 7400000, guid: 62766a0642318924eaec6b6094e7cf70, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
     Speed: 1
+    PhaseDurations:
+    - Millis: 33.333336
+      FramesPerSecond: 60
+    - Millis: 50.000004
+      FramesPerSecond: 60
+    - Millis: 83.33334
+      FramesPerSecond: 60
+    - Millis: 166.66669
+      FramesPerSecond: 60
     BlendInFraction: 0
     BlendOutFraction: 0
   Hitbox: {fileID: 570507791598587095}
@@ -169,6 +169,9 @@ MonoBehaviour:
     Clip: {fileID: 7400000, guid: bb232cefdc4a76c4cb516b8ef26d5c05, type: 2}
     Mask: {fileID: 0}
     Speed: 1
+    PhaseDurations:
+    - Millis: 16.666668
+      FramesPerSecond: 60
     BlendInFraction: 0
     BlendOutFraction: 0
   WindupDuration:
@@ -223,7 +226,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ad0abbc840f586439b88a3e3888f837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Collider: {fileID: 0}
 --- !u!65 &4405226312582970017
 BoxCollider:
   m_ObjectHideFlags: 0
