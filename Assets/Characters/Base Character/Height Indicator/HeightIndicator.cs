@@ -10,6 +10,7 @@ public class HeightIndicator : MonoBehaviour {
   [SerializeField] LineRenderer Altimeter;
   [SerializeField] MeshRenderer Surface;
   [SerializeField] AnimationCurve Opacity;
+  float LastKnownAltitude;
 
   Color CurrentColor {
     get {
@@ -35,8 +36,12 @@ public class HeightIndicator : MonoBehaviour {
     } else {
       Altimeter.gameObject.SetActive(false);
     }
+    const float MAX_RAYCAST_DISTANCE = 1000;
+    var didHit = Physics.Raycast(transform.position, Vector3.down, out var hit, MAX_RAYCAST_DISTANCE, Defaults.Instance.EnvironmentLayerMask);
+    var position = (didHit ? hit.point : (transform.position.XZ() + LastKnownAltitude * Vector3.up)) + GroundOffsetEpsilon * Vector3.up;
+    LastKnownAltitude = position.y;
     Surface.gameObject.SetActive(!Status.IsGrounded);
-    Surface.transform.position = new Vector3(transform.position.x, GroundOffsetEpsilon, transform.position.z);
+    Surface.transform.position = position;
     Surface.material.color = color;
   }
 }
