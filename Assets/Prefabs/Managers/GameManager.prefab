@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &644938811
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 644938812}
+  m_Layer: 0
+  m_Name: PlayerSpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &644938812
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 644938811}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2320604253984722449}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2438599627160442252
 GameObject:
   m_ObjectHideFlags: 0
@@ -36,6 +67,7 @@ Transform:
   - {fileID: 5830417630241389433}
   - {fileID: 5030305013953000145}
   - {fileID: 8943343125011706077}
+  - {fileID: 644938812}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -51,22 +83,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 155763a58652c754c882cd5270011336, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ManageGameLoop: 1
+  ManageGameLoop: 0
   Defaults: {fileID: 2108860027064489209}
   InputManager: {fileID: 1970454300393332327}
   SFXManager: {fileID: 890327845329776198}
   VFXManager: {fileID: 8970819236641759571}
   ProjectileManager: {fileID: 6118021831669865595}
   MobManager: {fileID: 6622965607796276172}
-  CountdownClips:
-  - {fileID: 8300000, guid: ef7a0b83852d6464e9ea1a2a219c7fb6, type: 3}
-  - {fileID: 8300000, guid: c122fc2666275ba4d9a01b68864b0748, type: 3}
-  - {fileID: 8300000, guid: 6cf327dc633c522479b20c942f83d741, type: 3}
-  - {fileID: 8300000, guid: 664ffb0e85b7c874f90344b4d50b4625, type: 3}
-  CountdownText: {fileID: 3174319645272023504}
-  CountdownDuration: 3
-  PlayerPrefab: {fileID: 5571416124093621165, guid: 632959dd8c1b9fb4d840eb1b4e6388e6, type: 3}
-  PlayerSpawns: []
+  PlayerPrefab: {fileID: 3364079649355753500, guid: 8a98e2e95cc7b6a498d66d4ca2806a07, type: 3}
+  PlayerSpawn: {fileID: 644938812}
 --- !u!1 &4239017431238182045
 GameObject:
   m_ObjectHideFlags: 0
@@ -147,6 +172,7 @@ MonoBehaviour:
   EnvironmentLayerMask:
     serializedVersion: 2
     m_Bits: 1
+  ShowAltimeter: 0
 --- !u!1001 &280374231821887748
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -578,20 +604,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: UI
       objectReference: {fileID: 0}
+    - target: {fileID: 6551784529045743179, guid: ef1a07e60f5d26f4f82ab06ecec0dee3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: ef1a07e60f5d26f4f82ab06ecec0dee3, type: 3}
---- !u!114 &3174319645272023504 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4888762482108515662, guid: ef1a07e60f5d26f4f82ab06ecec0dee3, type: 3}
-  m_PrefabInstance: {fileID: 8058397090036737182}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &8943343125011706077 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1425404973665965123, guid: ef1a07e60f5d26f4f82ab06ecec0dee3, type: 3}

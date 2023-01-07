@@ -25,14 +25,9 @@ public class GameManager : MonoBehaviour {
   public ProjectileManager ProjectileManager;
   public MobManager MobManager;
 
-  [Header("Countdown")]
-  public AudioClip[] CountdownClips;
-  public TextMeshProUGUI CountdownText;
-  public int CountdownDuration = 3;
-
   [Header("Player")]
   public GameObject PlayerPrefab;
-  public List<Spawn> PlayerSpawns = new();
+  public Transform PlayerSpawn;
 
   public TaskScope GlobalScope = new();
 
@@ -50,7 +45,6 @@ public class GameManager : MonoBehaviour {
       ProjectileManager.Instance = ProjectileManager;
       MobManager.Instance = MobManager;
       DontDestroyOnLoad(Instance.gameObject);
-      SetCountdownTextEnabled(CountdownText, isEnabled: false);
     }
   }
 
@@ -64,7 +58,6 @@ public class GameManager : MonoBehaviour {
 
   TaskFunc EncounterDefeated(Encounter encounter) => async (TaskScope scope) => {
     await encounter.Run(scope);
-    await scope.Until(() => MobManager.Instance.Mobs.Count <= 0);
   };
 
   TaskFunc PlayerDeath(Player player) => async (TaskScope scope) => {
@@ -81,29 +74,20 @@ public class GameManager : MonoBehaviour {
     }
     while (ManageGameLoop) {
       // Spawn and configure the player
-      var playerSpawn = PlayerSpawns[0];
-      var p = playerSpawn.transform.position;
-      var r = playerSpawn.transform.rotation;
-      Player = Instantiate(PlayerPrefab, p, r).GetComponent<Player>();
+      Player = Instantiate(PlayerPrefab, PlayerSpawn.position, PlayerSpawn.rotation).GetComponent<Player>();
       SaveData.LoadFromFile();
 
       // Setup camera to target the player
-      PlayerVirtualCamera.Instance.Follow = Player.transform;
+      //PlayerVirtualCamera.Instance.Follow = Player.transform;
 
       // TODO: Eliminate this hack to allow loaded upgrades to apply before opening the shop
       await scope.Ticks(2);
       // Wait for the player to purchase upgrades
       var shop = FindObjectOfType<Shop>();
-      shop.Open();
-      await scope.Until(() => !shop.IsOpen);
-
-      // Enter pre-game countdown
-      InputManager.Instance.SetInputEnabled(false);
-      SetCountdownTextEnabled(CountdownText, isEnabled: true);
-      await Countdown(scope, PingCountdown, CountdownDuration);
-      SetCountdownTextEnabled(CountdownText, isEnabled: false);
-      InputManager.Instance.SetInputEnabled(true);
-      // Exit pre-game countdown
+      if (shop != null) {
+        shop.Open();
+        await scope.Until(() => !shop.IsOpen);
+      }
 
       // Begin GameLoop
       var encounter = FindObjectOfType<Encounter>();
@@ -125,16 +109,6 @@ public class GameManager : MonoBehaviour {
     }
   }
 
-  void PingCountdown(int n) {
-    var clip = CountdownClips[n%CountdownClips.Length];
-    SFXManager.Instance.TryPlayOneShot(clip);
-    CountdownText.text = n.ToString();
-  }
-
-  void SetCountdownTextEnabled(TextMeshProUGUI text, bool isEnabled) {
-    text.enabled = isEnabled;
-  }
-
   void SetPlayerInputsEnabled(GameObject player, bool isEnabled) {
     player.GetComponent<InputToTriggerMap>().enabled = isEnabled;
   }
@@ -142,12 +116,4 @@ public class GameManager : MonoBehaviour {
   bool GameOver() {
     return !Player || Player.GetComponent<Attributes>().GetValue(AttributeTag.Health, 0f) <= 0;
   }
-
-  async Task Countdown(TaskScope scope, Action<int> f, int seconds) {
-    for (var i = seconds; i >= 0; i--) {
-      f(i);
-      await scope.Millis(1000);
-    }
-  }
-
 }
