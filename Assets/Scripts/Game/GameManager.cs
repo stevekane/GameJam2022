@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour {
   public VFXManager VFXManager;
   public ProjectileManager ProjectileManager;
   public MobManager MobManager;
+  public GrapplePointManager GrapplePointManager;
 
   [Header("Player")]
   public GameObject PlayerPrefab;
@@ -44,6 +45,7 @@ public class GameManager : MonoBehaviour {
       VFXManager.Instance = VFXManager;
       ProjectileManager.Instance = ProjectileManager;
       MobManager.Instance = MobManager;
+      GrapplePointManager.Instance = GrapplePointManager;
       DontDestroyOnLoad(Instance.gameObject);
     }
   }

@@ -8,6 +8,7 @@ public class Defaults : MonoBehaviour {
 
   [Header("Physics")]
   public LayerMask EnvironmentLayerMask;
+  public LayerMask GrapplePointLayerMask;
 
   public bool ShowAltimeter = false;
 }
