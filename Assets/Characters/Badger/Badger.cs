@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Badger : MonoBehaviour {
   public float AttackRange = 2f;
@@ -10,6 +11,7 @@ public class Badger : MonoBehaviour {
   Status Status;
   Hurtbox Hurtbox;
   Transform Target;
+  NavMeshAgent NavMeshAgent;
   Mover Mover;
   AbilityManager Abilities;
   AbilityManager TargetAbilities;
@@ -17,19 +19,29 @@ public class Badger : MonoBehaviour {
   AttackAbility PunchAbility;
   ShieldAbility ShieldAbility;
   TaskScope MainScope = new();
-  bool WasHit = false;
+
+  public static InlineEffect HurtStunEffect => new(s => {
+    s.CanMove = false;
+    s.CanRotate = false;
+    s.CanAttack = false;
+  }, "BadgerHurt");
 
   public void Awake() {
-    Target = GameObject.FindObjectOfType<Player>().transform;
+    Target = Player.Get().transform;
     TargetAbilities = Target.GetComponent<AbilityManager>();
     Status = GetComponent<Status>();
     Mover = GetComponent<Mover>();
+    NavMeshAgent = GetComponent<NavMeshAgent>();
     Hurtbox = GetComponentInChildren<Hurtbox>();
     Shield = GetComponentInChildren<Shield>();
     Abilities = GetComponent<AbilityManager>();
     PunchAbility = GetComponentInChildren<AttackAbility>();
     ShieldAbility = GetComponentInChildren<ShieldAbility>();
-    Hurtbox.OnHurt.Listen((_) => WasHit = true);
+    Hurtbox.OnHurt.Listen(async _ => {
+      using var effect = Status.Add(HurtStunEffect);
+      ShieldAbility.Stop();
+      await MainScope.Millis(500);
+    });
   }
 
   bool TargetIsAttacking => TargetAbilities.Abilities.Any(a => a.IsRunning && a.HitConfigData != null);
@@ -81,22 +93,12 @@ public class Badger : MonoBehaviour {
     }
 
     async Task Move(TaskScope scope) {
-      var desiredMoveDir = Vector3.zero;
-      if (!inRange && Status.IsGrounded)
-        desiredMoveDir = (desiredPos - transform.position).XZ().normalized;
-      Mover.SetMoveAim(desiredMoveDir, desiredFacing);
+      NavMeshAgent.SetDestination(desiredPos);
+      Mover.SetMoveFromNavMeshAgent();
       await scope.Tick();
     }
 
-    Mover.SetMoveAim(Vector3.zero, transform.forward.XZ());
-
-    if (WasHit) {
-      WasHit = false;
-      ShieldAbility.Stop();
-      await scope.Millis(500);
-      return;
-    }
-
+    Mover.SetMoveAim(Vector3.zero, desiredFacing);
     await MaybeAttack(scope);
     await Move(scope);
   }
