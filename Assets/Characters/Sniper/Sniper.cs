@@ -34,7 +34,6 @@ public class Sniper : MonoBehaviour {
     await scope.All(
       Waiter.Repeat(TryFindTarget),
       Waiter.Repeat(TryAim),
-      Waiter.Repeat(TryMove),
       Waiter.Repeat(TryReposition),
       Waiter.Repeat(TryStartAbility));
   }
@@ -47,11 +46,6 @@ public class Sniper : MonoBehaviour {
     Mover.SetAim(Target ? (Target.position-transform.position).normalized : transform.forward);
   }
 
-  void TryMove() {
-    NavMeshAgent.nextPosition = transform.position;
-    Mover.SetMove(NavMeshAgent.desiredVelocity.normalized);
-  }
-
   async Task TryReposition(TaskScope scope) {
     NavMeshAgent.SetDestination(Target.position+Random.onUnitSphere.XZ()*DesiredDistance);
     await scope.Delay(RepositionDelay);
@@ -59,7 +53,7 @@ public class Sniper : MonoBehaviour {
 
   async Task TryStartAbility(TaskScope scope) {
     var index = UnityEngine.Random.Range(0, Abilities.Length);
-    await scope.Run(Abilities[index].MainAction);
+    await AbilityManager.TryRun(scope, Abilities[index].MainAction);
     await scope.Delay(AbilityDelay);
   }
 

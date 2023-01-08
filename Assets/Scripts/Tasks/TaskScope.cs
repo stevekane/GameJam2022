@@ -102,12 +102,14 @@ public class TaskScope : IDisposable {
     while (true) {
       ThrowIfCancelled();
       await f(this);
+      await Yield();
     }
   }
   public async Task Repeat(int n, TaskFunc f) {
     for (int i = 0; i < n; i++) {
       ThrowIfCancelled();
       await f(this);
+      await Yield();
     }
   }
 
