@@ -2,16 +2,17 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public class Spawner : MonoBehaviour {
+  public Mob Mob;
   public GameObject VFX;
   public Timeval Delay;
 
-  public async Task Spawn(TaskScope scope, Mob mob, int wave) {
-    var spawn = Instantiate(mob);
+  public async Task Spawn(TaskScope scope, int wave) {
+    var spawn = Instantiate(Mob);
     spawn.Wave = wave;
     spawn.gameObject.SetActive(false);
     spawn.transform.SetParent(transform, false);
     spawn.transform.SetPositionAndRotation(transform.position, transform.rotation);
-    VFXManager.Instance.TrySpawnEffect(VFX, transform.position, transform.rotation, Delay.Seconds);
+    VFXManager.Instance.TrySpawnEffect(VFX, transform.position, VFX.transform.rotation, Delay.Seconds);
     await scope.Delay(Delay);
     spawn.gameObject.SetActive(true);
   }
