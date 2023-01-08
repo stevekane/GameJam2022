@@ -86,7 +86,10 @@ public class Badger : MonoBehaviour {
             Waiter.While(() => Shield != null));
           await Abilities.TryRun(scope, ShieldAbility.MainRelease);
         } else if (inRange) {
-          await Abilities.TryRun(scope, PunchAbility.MainAction);
+          Abilities.TryInvoke(PunchAbility.MainAction);
+          await scope.Millis(250);
+          Abilities.TryInvoke(PunchAbility.MainRelease);
+          await scope.While(() => PunchAbility.IsRunning);
           await scope.Delay(AttackDelay);
         }
       }
