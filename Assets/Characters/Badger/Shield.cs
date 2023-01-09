@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Shield : MonoBehaviour {
   public float MaxDamage = 50f;
-  public AnimationClip DeathClip;
+  public AnimationJobConfig DeathAnimation;
   public Hurtbox Hurtbox;
   AnimationDriver AnimationDriver;
   Damage Damage;
@@ -17,14 +17,14 @@ public class Shield : MonoBehaviour {
   async Task WatchDamage(TaskScope scope) {
     await scope.While(() => Damage.Points < MaxDamage);
     Destroy(Hurtbox.gameObject);
-    var job = AnimationDriver.Play(scope, DeathClip);
+    var job = AnimationDriver.Play(scope, DeathAnimation);
     await job.WaitDone(scope);
     Destroy(gameObject, .01f);
   }
 
   void Awake() {
-    Damage = GetComponent<Damage>();
-    AnimationDriver = GetComponentInParent<AnimationDriver>();
+    this.InitComponent(out Damage);
+    this.InitComponent(out AnimationDriver);
     Scope.Start(WatchDamage);
   }
   void OnDestroy() => Scope.Cancel();

@@ -15,6 +15,8 @@ GameObject:
   - component: {fileID: 3641015012057092173}
   - component: {fileID: 268572202797100124}
   - component: {fileID: 4186049276395318185}
+  - component: {fileID: 2828648347040857723}
+  - component: {fileID: 9181324558145025681}
   m_Layer: 0
   m_Name: Badger Shield
   m_TagString: Untagged
@@ -37,7 +39,7 @@ Transform:
   - {fileID: 6634595600402657913}
   - {fileID: 4370596035667142084}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1795976427893006414
 MonoBehaviour:
@@ -118,7 +120,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxDamage: 50
-  DeathClip: {fileID: 7400000, guid: b7ae6f0bce86d7040beedea994af7458, type: 2}
+  DeathAnimation:
+    Clip: {fileID: 7400000, guid: 8cb575086177dec47bb6eb10bb22109a, type: 2}
+    Mask: {fileID: 0}
+    Speed: 1
+    PhaseDurations:
+    - Millis: 266.6667
+      FramesPerSecond: 60
+    BlendInFraction: 0
+    BlendOutFraction: 0
   Hurtbox: {fileID: 9089024143987124539}
 --- !u!114 &4186049276395318185
 MonoBehaviour:
@@ -137,6 +147,39 @@ MonoBehaviour:
   OnHurtSFX: {fileID: 8300000, guid: cd13436b01a4b5b4082c89e180d10dc3, type: 3}
   OnHitVFX: {fileID: 0}
   OnHitSFX: {fileID: 0}
+--- !u!95 &2828648347040857723
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6274870303657193773}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &9181324558145025681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6274870303657193773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5858cd79c3bb37845b5d44f08793d81e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 2828648347040857723}
 --- !u!1 &6555308413220831287
 GameObject:
   m_ObjectHideFlags: 0

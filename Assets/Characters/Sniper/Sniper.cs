@@ -6,8 +6,6 @@ using UnityEngine.AI;
 [RequireComponent(typeof(AbilityManager))]
 [RequireComponent(typeof(Mover))]
 public class Sniper : MonoBehaviour {
-  [SerializeField] string NavMeshAreaName = "Walkable";
-  [SerializeField] float NavMeshSearchRadius = 1f;
   [SerializeField] float DesiredDistance = 10f;
   [SerializeField] Timeval RepositionDelay = Timeval.FromSeconds(1);
   [SerializeField] Timeval AbilityDelay = Timeval.FromSeconds(2);
@@ -21,8 +19,6 @@ public class Sniper : MonoBehaviour {
 
   void Awake() {
     NavMeshAgent = GetComponent<NavMeshAgent>();
-    NavMeshAgent.updatePosition = false;
-    NavMeshAgent.updateRotation = false;
     AbilityManager = GetComponent<AbilityManager>();
     Mover = GetComponent<Mover>();
     Abilities = GetComponentsInChildren<Ability>();
@@ -40,7 +36,7 @@ public class Sniper : MonoBehaviour {
   }
 
   void TryFindTarget() {
-    Target = Target ? Target : FindObjectOfType<Player>()?.transform;
+    Target = Target ? Target : Player.Get()?.transform;
   }
 
   void TryAim() {
@@ -48,8 +44,7 @@ public class Sniper : MonoBehaviour {
   }
 
   void TryMove() {
-    NavMeshAgent.nextPosition = transform.position;
-    Mover.SetMove(NavMeshAgent.desiredVelocity.normalized);
+    Mover.SetMoveFromNavMeshAgent();
   }
 
   async Task TryReposition(TaskScope scope) {
@@ -59,7 +54,7 @@ public class Sniper : MonoBehaviour {
 
   async Task TryStartAbility(TaskScope scope) {
     var index = UnityEngine.Random.Range(0, Abilities.Length);
-    await scope.Run(Abilities[index].MainAction);
+    await AbilityManager.TryRun(scope, Abilities[index].MainAction);
     await scope.Delay(AbilityDelay);
   }
 

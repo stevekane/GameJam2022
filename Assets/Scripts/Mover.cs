@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(AbilityManager))]
@@ -12,6 +13,7 @@ public class Mover : MonoBehaviour {
     return Quaternion.RotateTowards(rotation, desiredRotation, degrees);
   }
 
+  NavMeshAgent NavMeshAgent;
   CharacterController Controller;
   AbilityManager AbilityManager;
   AnimationDriver AnimationDriver;
@@ -26,11 +28,16 @@ public class Mover : MonoBehaviour {
   public float FallSpeed { get; private set; }
 
   void Awake() {
-    Controller = GetComponent<CharacterController>();
-    AbilityManager = GetComponent<AbilityManager>();
-    AnimationDriver = GetComponent<AnimationDriver>();
-    Attributes = GetComponent<Attributes>();
-    Status = GetComponent<Status>();
+    this.InitComponent(out Controller);
+    this.InitComponent(out AbilityManager);
+    this.InitComponent(out AnimationDriver);
+    this.InitComponent(out Attributes);
+    this.InitComponent(out Status);
+    this.InitComponent(out NavMeshAgent, true);
+    if (NavMeshAgent) {
+      NavMeshAgent.updatePosition = false;
+      NavMeshAgent.updateRotation = false;
+    }
   }
 
   public void TryLookAt(Transform target) {
@@ -44,6 +51,10 @@ public class Mover : MonoBehaviour {
     SetAim(aim);
   }
 
+  public void SetMoveFromNavMeshAgent() {
+    NavMeshAgent.nextPosition = transform.position;
+    SetMove(NavMeshAgent.desiredVelocity.normalized);
+  }
   public void SetMove(Vector3 v) => AbilityManager.GetAxis(AxisTag.Move).Update(0, new Vector2(v.x, v.z));
   public void SetAim(Vector3 v) => AbilityManager.GetAxis(AxisTag.Aim).Update(0, new Vector2(v.x, v.z));
   public Vector3 GetMove() => AbilityManager.GetAxis(AxisTag.Move).XZ;

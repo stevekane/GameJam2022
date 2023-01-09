@@ -63,12 +63,27 @@ public static class GameObjectExtensions {
 
 public static class MonoExtensions {
   // Returns the (first matching) requested component on this object, creating it first if necessary.
-  public static T GetOrCreateComponent<T>(this MonoBehaviour self) where T : MonoBehaviour {
+  public static T GetOrCreateComponent<T>(this MonoBehaviour self) where T : Component {
     if (self.TryGetComponent(out T t)) {
       return t;
     } else {
       return self.gameObject.AddComponent<T>();
     }
+  }
+  public static void InitComponent<T>(this MonoBehaviour self, out T component, bool optional = false) where T : Component {
+    component = self.GetComponent<T>();
+    if (!optional)
+      Debug.Assert(component, $"{self} is missing required component {typeof(T).Name}");
+  }
+  public static void InitComponentFromParent<T>(this MonoBehaviour self, out T component, bool optional = false) where T : Component {
+    component = self.GetComponentInParent<T>();
+    if (!optional)
+      Debug.Assert(component, $"{self} is missing required component {typeof(T).Name}");
+  }
+  public static void InitComponentFromChildren<T>(this MonoBehaviour self, out T component, bool optional = false) where T : Component {
+    component = self.GetComponentInChildren<T>();
+    if (!optional)
+      Debug.Assert(component, $"{self} is missing required component {typeof(T).Name}");
   }
 
   public static Transform FindDescendant(this Transform t, string name) {
