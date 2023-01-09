@@ -11,6 +11,7 @@ public class Badger : MonoBehaviour {
   Status Status;
   Hurtbox Hurtbox;
   Transform Target;
+  Transform Protectee;
   NavMeshAgent NavMeshAgent;
   Mover Mover;
   AbilityManager Abilities;
@@ -47,16 +48,23 @@ public class Badger : MonoBehaviour {
   bool TargetIsAttacking => TargetAbilities.Abilities.Any(a => a.IsRunning && a.HitConfigData != null);
   bool TargetIsNear => (Target.position - transform.position).sqrMagnitude < 7f*7f;
 
+  void ChooseProtectee() {
+    if (Protectee)
+      return;
+    var protectees = FindObjectsOfType<Sniper>();
+    if (protectees.Length == 0)
+      return;
+    Protectee = protectees[UnityEngine.Random.Range(0, protectees.Length-1)].transform;
+  }
+  // Try to get between target and protectee (or self, if no protectee).
   Vector3 ChoosePosition() {
+    ChooseProtectee();
     var t = Target.transform;
+    var other = Protectee ? Protectee.transform : transform;
+    var dir = other.position - t.position;
     var d = AttackRange*.9f;
-    var choices = new[] { t.position + t.right*d, t.position - t.right*d, t.position - t.forward*d };
-    var closest = choices[0];
-    foreach (var p in choices) {
-      if ((p - transform.position).XZ().sqrMagnitude < (p - closest).XZ().sqrMagnitude)
-        closest = p;
-    }
-    return closest;
+    var pos = t.position + d*dir.normalized;
+    return pos;
   }
   bool IsInRange(Vector3 pos) {
     var delta = (pos - transform.position).XZ();
