@@ -1,9 +1,5 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro;
 using System.Threading.Tasks;
 
 public class GameManager : MonoBehaviour {
@@ -25,6 +21,7 @@ public class GameManager : MonoBehaviour {
   public ProjectileManager ProjectileManager;
   public MobManager MobManager;
   public GrapplePointManager GrapplePointManager;
+  public CameraManager CameraManager;
 
   [Header("Player")]
   public GameObject PlayerPrefab;
@@ -46,6 +43,7 @@ public class GameManager : MonoBehaviour {
       ProjectileManager.Instance = ProjectileManager;
       MobManager.Instance = MobManager;
       GrapplePointManager.Instance = GrapplePointManager;
+      CameraManager.Instance = CameraManager;
       DontDestroyOnLoad(Instance.gameObject);
     }
   }
