@@ -36,7 +36,7 @@ public class UpgradeUI : MonoBehaviour {
       }
     });
     Canvas.SetActive(true);
-    InputManager.Instance.SetInputEnabled(false);
+    Player.Get().GetComponent<InputManager>().SetInputEnabled(false);
     Time.timeScale = 0f;
     if (selected != null)
       EventSystem.current.SetSelectedGameObject(selected.Value.gameObject);
@@ -53,7 +53,7 @@ public class UpgradeUI : MonoBehaviour {
   }
 
   void EnableInput() {
-    InputManager.Instance.SetInputEnabled(true);
+    Player.Get().GetComponent<InputManager>().SetInputEnabled(true);
     IsShowing = false;
   }
 
