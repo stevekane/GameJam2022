@@ -706,61 +706,8 @@ MonoBehaviour:
   m_DecalLayerMask: 1
   m_ScaleMode: 0
   m_Offset: {x: 0, y: 0, z: 50}
-  m_Size: {x: 100, y: 0.1, z: 100}
+  m_Size: {x: 100, y: 0.05, z: 100}
   m_FadeFactor: 1
---- !u!1 &4667551691631117443
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8189583050396416308}
-  - component: {fileID: 1299594893960351285}
-  m_Layer: 10
-  m_Name: Grapple Interest Sphere
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &8189583050396416308
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4667551691631117443}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1423379513644721348}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!135 &1299594893960351285
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4667551691631117443}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 20
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5002591724277737038
 GameObject:
   m_ObjectHideFlags: 0
@@ -883,7 +830,7 @@ MonoBehaviour:
   m_DecalLayerMask: 1
   m_ScaleMode: 0
   m_Offset: {x: 0, y: 0, z: 50}
-  m_Size: {x: 0.1, y: 100, z: 100}
+  m_Size: {x: 0.05, y: 100, z: 100}
   m_FadeFactor: 1
 --- !u!1 &5557811211696183068
 GameObject:
@@ -2178,11 +2125,11 @@ PrefabInstance:
     - target: {fileID: 950711741214612097, guid: 6e735d981ec46f64695cd7ea0c61bb4d, type: 3}
       propertyPath: Colliders.Array.data[0]
       value: 
-      objectReference: {fileID: 1299594893960351285}
+      objectReference: {fileID: 8473742237787949857}
     - target: {fileID: 950711741214612097, guid: 6e735d981ec46f64695cd7ea0c61bb4d, type: 3}
       propertyPath: Colliders.Array.data[1]
       value: 
-      objectReference: {fileID: 1299594893960351285}
+      objectReference: {fileID: 8473742237787949857}
     - target: {fileID: 5653738520704633857, guid: 6e735d981ec46f64695cd7ea0c61bb4d, type: 3}
       propertyPath: m_Name
       value: Camera Subject
@@ -2233,15 +2180,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 6319565379575719321, guid: 6e735d981ec46f64695cd7ea0c61bb4d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8189583050396416308}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6e735d981ec46f64695cd7ea0c61bb4d, type: 3}
 --- !u!4 &1423379513644721348 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6319565379575719321, guid: 6e735d981ec46f64695cd7ea0c61bb4d, type: 3}
+  m_PrefabInstance: {fileID: 4932364196633051485}
+  m_PrefabAsset: {fileID: 0}
+--- !u!135 &8473742237787949857 stripped
+SphereCollider:
+  m_CorrespondingSourceObject: {fileID: 3597110228349880956, guid: 6e735d981ec46f64695cd7ea0c61bb4d, type: 3}
   m_PrefabInstance: {fileID: 4932364196633051485}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6353001707408592015

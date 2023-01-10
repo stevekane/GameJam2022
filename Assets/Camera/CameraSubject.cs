@@ -1,13 +1,14 @@
 using UnityEngine;
 
 /*
-Add to GameObjects you wish to be kept in-view by the camera
-When this subject is added, it should turn on its own collider
-This collider checks for overlaps that contain CameraSubjectInterest
-and adds them to the CameraManager's TargetGroup
+Add to GameObjects you wish to be kept in-view by the camera.
+
+When targeted, this turns on CameraSubjectInterestBounds objects
+which in turn may detect CameraSubjectInterests and target them
+with the CameraManager.
 */
 public class CameraSubject : MonoBehaviour {
-  public Collider[] Colliders;
+  public Collider InterestBoundsCollider;
 
   void OnTriggerEnter(Collider c) {
     if (c.TryGetComponent(out CameraSubjectInterest interest)) {
