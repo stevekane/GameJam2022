@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public enum ButtonPressType {
   JustDown,
@@ -50,12 +51,11 @@ public class InputManager : MonoBehaviour {
   public static InputManager Instance;
 
   bool InputEnabled = true;
-  public bool UseMouseAndKeyboard = false;
-  Player Player;
   Dictionary<(ButtonCode, ButtonPressType), EventSource> Buttons = new();
   public AxisState AxisLeft = new();
   public AxisState AxisRight = new();
   public float StickDeadZone;
+  PlayerInputActions Controls;
 
   public IEventSource ButtonEvent(ButtonCode code, ButtonPressType type) {
     if (!Buttons.TryGetValue((code, type), out EventSource evt))
@@ -80,48 +80,39 @@ public class InputManager : MonoBehaviour {
   }
 
   void Awake() {
+    Controls = new();
+    //Controls.devices = new[] { Gamepad.all[1] };
+
+    // TODO: move
     Time.fixedDeltaTime = 1f / Timeval.FixedUpdatePerSecond;
   }
-
-  Vector2 GetAxisFromKeyboard() {
-    float right = (Input.GetKey(KeyCode.D) ? 1 : 0) - (Input.GetKey(KeyCode.A) ? 1 : 0);
-    float up = (Input.GetKey(KeyCode.W) ? 1 : 0) - (Input.GetKey(KeyCode.S) ? 1 : 0);
-    return new Vector2(right, up);
-  }
-
-  Vector2 GetAxisFromMouse() {
-    if (Player == null)
-      return Vector2.zero;
-    var playerPos = Camera.main.WorldToScreenPoint(Player.transform.position);
-    var playerPos2 = new Vector2(playerPos.x, playerPos.y);
-    var mousePos2 = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-    return (mousePos2 - playerPos2).normalized;
-  }
-  Vector2 GetAxisFromInput(string xname, string yname) {
-    return new Vector2(Input.GetAxisRaw(xname), Input.GetAxisRaw(yname));
-  }
+  void OnEnable() => Controls.Enable();
+  void OnDisable() => Controls.Disable();
 
   void BroadcastEvent(ButtonCode code, ButtonPressType type, IEventSource evt) {
     if (code == ButtonCode.Unbound) return;
-    Predicate<string> func = type switch {
-      ButtonPressType.JustDown => Input.GetButtonDown,
-      ButtonPressType.Down => Input.GetButton,
-      ButtonPressType.JustUp => Input.GetButtonUp,
-      _ => Input.GetButtonDown
+    var action = code switch {
+      ButtonCode.L1 => Controls.Player.L1,
+      ButtonCode.L2 => Controls.Player.L2,
+      ButtonCode.R1 => Controls.Player.R1,
+      ButtonCode.R2 => Controls.Player.R2,
+      ButtonCode.North => Controls.Player.North,
+      ButtonCode.East => Controls.Player.East,
+      ButtonCode.South => Controls.Player.South,
+      ButtonCode.West => Controls.Player.West,
+      _ => null,
     };
-    var name = code switch {
-      ButtonCode.L1 => "L1",
-      ButtonCode.L2 => "L2",
-      ButtonCode.R1 => "R1",
-      ButtonCode.R2 => "R2",
-      ButtonCode.North => "North",
-      ButtonCode.East => "East",
-      ButtonCode.South => "South",
-      ButtonCode.West => "West",
-      _ => "",
+    Func<bool> func = type switch {
+      ButtonPressType.JustDown => action.WasPressedThisFrame,
+      ButtonPressType.Down => action.IsPressed,
+      ButtonPressType.JustUp => action.WasReleasedThisFrame,
+      _ => null
     };
-    if (func(name))
+    if (func())
       evt.Fire();
+  }
+  Vector2 GetAxisFromInput(InputAction action) {
+    return action.ReadValue<Vector2>();
   }
 
   void Update() {
@@ -130,21 +121,13 @@ public class InputManager : MonoBehaviour {
     foreach (var it in Buttons) {
       BroadcastEvent(it.Key.Item1, it.Key.Item2, it.Value);
     }
-    if (UseMouseAndKeyboard) {
-      AxisLeft.Update(StickDeadZone, GetAxisFromKeyboard());
-      AxisRight.Update(StickDeadZone, GetAxisFromMouse());
-    } else {
-      AxisLeft.Update(StickDeadZone, GetAxisFromInput("LeftX", "LeftY"));
-      AxisRight.Update(StickDeadZone, GetAxisFromInput("RightX", "RightY"));
-    }
+    AxisLeft.Update(StickDeadZone, GetAxisFromInput(Controls.Player.Move));
+    AxisRight.Update(StickDeadZone, GetAxisFromInput(Controls.Player.Look));
 
-    if (Input.GetKeyDown(KeyCode.W))
-      UseMouseAndKeyboard = true;
     CheckSaveLoad();
   }
 
   void FixedUpdate() {
-    Player = Player ?? FindObjectOfType<Player>();
     Timeval.TickCount++;
     Timeval.TickEvent.Fire();
   }

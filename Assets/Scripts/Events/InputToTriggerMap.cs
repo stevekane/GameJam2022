@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor.ShaderGraph;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Composites;
 
 [Serializable]
 public class ButtonTriggerMap {
@@ -18,7 +21,6 @@ public class AxisTriggerMap {
 public class InputToTriggerMap : MonoBehaviour {
   [SerializeField] List<ButtonTriggerMap> ButtonMaps;
   [SerializeField] List<AxisTriggerMap> AxisMaps;
-
   void Start() {
     var AbilityManager = GetComponent<AbilityManager>();
     ButtonMaps.ForEach(b => {
