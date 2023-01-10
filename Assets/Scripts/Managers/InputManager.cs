@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -48,11 +49,12 @@ public class AxisState {
 }
 
 public class InputManager : MonoBehaviour {
+  public int PlayerIndex = 0;
+  public float StickDeadZone;
   bool InputEnabled = true;
   Dictionary<(ButtonCode, ButtonPressType), EventSource> Buttons = new();
-  public AxisState AxisLeft = new();
-  public AxisState AxisRight = new();
-  public float StickDeadZone;
+  AxisState AxisLeft = new();
+  AxisState AxisRight = new();
   PlayerInputActions Controls;
 
   public IEventSource ButtonEvent(ButtonCode code, ButtonPressType type) {
@@ -79,7 +81,18 @@ public class InputManager : MonoBehaviour {
 
   void Awake() {
     Controls = new();
-    //Controls.devices = new[] { Gamepad.all[1] };
+    // Restrict devices so different controllers are owned by different players.
+    if (PlayerIndex == 0) {
+      Controls.devices = new InputDevice[] {
+        Keyboard.current,
+        Mouse.current,
+        Gamepad.all.First(g => g.name.Contains("DualShock"))
+      };
+    } else if (PlayerIndex == 1) {
+      Controls.devices = new InputDevice[] {
+        Gamepad.all.Last(g => g.name.Contains("DualShock"))
+      };
+    }
   }
   void OnEnable() => Controls.Enable();
   void OnDisable() => Controls.Disable();
