@@ -19,6 +19,7 @@ public class Wolf : MonoBehaviour {
   CycleAbility LightAbility;
   AttackAbility HeavyAbility;
   SwipeDash DashAbility;
+  Jump JumpAbility;
   TaskScope MainScope = new();
   float DesiredDistance;
 
@@ -38,11 +39,15 @@ public class Wolf : MonoBehaviour {
     this.InitComponentFromChildren(out LightAbility);
     this.InitComponentFromChildren(out HeavyAbility);
     this.InitComponentFromChildren(out DashAbility);
+    this.InitComponentFromChildren(out JumpAbility);
     Hurtbox.OnHurt.Listen(async _ => {
       using var effect = Status.Add(HurtStunEffect);
       await MainScope.Millis(500);
     });
   }
+
+  void Start() => MainScope.Start(Behavior);
+  void OnDestroy() => MainScope.Dispose();
 
   Vector3 ChoosePosition(float desiredDist) {
     var t = Target.transform;
@@ -59,15 +64,13 @@ public class Wolf : MonoBehaviour {
     return delta.y < dist && delta.XZ().sqrMagnitude < dist*dist;
   }
 
-  void Start() => MainScope.Start(Behavior);
-  void OnDestroy() => MainScope.Dispose();
-
   async Task Behavior(TaskScope scope) {
     DesiredDistance = DashRange;
     await scope.All(
       Waiter.Repeat(TryFindTarget),
       Waiter.Repeat(TryAim),
       Waiter.Repeat(TryMove),
+      Waiter.Repeat(TryJump),
       Waiter.Repeat(TryReposition),
       Waiter.Repeat(TryAttackSequence));
   }
@@ -84,6 +87,17 @@ public class Wolf : MonoBehaviour {
   void TryMove() {
     if (ShouldMove)
       Mover.SetMoveFromNavMeshAgent();
+  }
+
+  async Task TryJump(TaskScope scope) {
+    bool OverVoid() {
+      const float MAX_RAYCAST_DISTANCE = 1000;
+      return !Physics.Raycast(transform.position, Vector3.down, MAX_RAYCAST_DISTANCE, Defaults.Instance.EnvironmentLayerMask);
+    }
+    if (ShouldMove && Status.CanAttack && !Status.IsGrounded && OverVoid()) {
+      DesiredDistance = 0f;
+      await Abilities.TryRun(scope, JumpAbility.MainAction);
+    }
   }
 
   async Task TryReposition(TaskScope scope) {

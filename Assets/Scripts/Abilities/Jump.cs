@@ -15,6 +15,7 @@ public class Jump : Ability {
   int AirJumpsRemaining = 1;
   public override async Task MainAction(TaskScope scope) {
     try {
+      Debug.Log($"Jumping...");
       Holding = true;
 
       if (AirJumpsRemaining <= 0 && !Status.IsGrounded)
@@ -41,6 +42,7 @@ public class Jump : Ability {
           Waiter.Delay(MinDuration)),
         Waiter.Delay(MaxDuration));
     } finally {
+      Debug.Log($"Jump done");
     }
   }
 
