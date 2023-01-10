@@ -48,8 +48,6 @@ public class AxisState {
 }
 
 public class InputManager : MonoBehaviour {
-  public static InputManager Instance;
-
   bool InputEnabled = true;
   Dictionary<(ButtonCode, ButtonPressType), EventSource> Buttons = new();
   public AxisState AxisLeft = new();
@@ -82,9 +80,6 @@ public class InputManager : MonoBehaviour {
   void Awake() {
     Controls = new();
     //Controls.devices = new[] { Gamepad.all[1] };
-
-    // TODO: move
-    Time.fixedDeltaTime = 1f / Timeval.FixedUpdatePerSecond;
   }
   void OnEnable() => Controls.Enable();
   void OnDisable() => Controls.Disable();
@@ -125,11 +120,6 @@ public class InputManager : MonoBehaviour {
     AxisRight.Update(StickDeadZone, GetAxisFromInput(Controls.Player.Look));
 
     CheckSaveLoad();
-  }
-
-  void FixedUpdate() {
-    Timeval.TickCount++;
-    Timeval.TickEvent.Fire();
   }
 
   // TODO: Remove this testing junk.

@@ -15,7 +15,6 @@ public class GameManager : MonoBehaviour {
 
   [Header("Subsystems")]
   public Defaults Defaults;
-  public InputManager InputManager;
   public SFXManager SFXManager;
   public VFXManager VFXManager;
   public ProjectileManager ProjectileManager;
@@ -32,12 +31,12 @@ public class GameManager : MonoBehaviour {
   Player Player;
 
   void Awake() {
+    Time.fixedDeltaTime = 1f / Timeval.FixedUpdatePerSecond;
     if (Instance) {
       Destroy(gameObject);
     } else {
       Instance = this;
       Defaults.Instance = Defaults;
-      InputManager.Instance = InputManager;
       SFXManager.Instance = SFXManager;
       VFXManager.Instance = VFXManager;
       ProjectileManager.Instance = ProjectileManager;
@@ -54,6 +53,11 @@ public class GameManager : MonoBehaviour {
 
   void OnDestroy() {
     GlobalScope.Cancel();
+  }
+
+  void FixedUpdate() {
+    Timeval.TickCount++;
+    Timeval.TickEvent.Fire();
   }
 
   TaskFunc EncounterDefeated(Encounter encounter) => async (TaskScope scope) => {
@@ -100,7 +104,6 @@ public class GameManager : MonoBehaviour {
       });
       SaveData.SaveToFile();
       Destroy(Player.gameObject);
-      InputManager.Instance.SetInputEnabled(false);
       await scope.Millis(3000);
       // End GameLoop
 

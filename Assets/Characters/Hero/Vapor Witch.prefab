@@ -2211,7 +2211,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114197, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114197, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2408,6 +2408,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8540507123274114195, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7001852881807073526}
+    - targetCorrespondingSourceObject: {fileID: 8540507123274114195, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1190803532}
   m_SourcePrefab: {fileID: 100100000, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
 --- !u!4 &3364079649355753498 stripped
 Transform:
@@ -2466,6 +2469,29 @@ MonoBehaviour:
     AxisTag: 0
   - AxisCode: 0
     AxisTag: 1
+--- !u!114 &1190803532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3364079649355753500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa12d5ee94bcfd44dbe7e8a8507d46c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AxisLeft:
+    RawXY: {x: 0, y: 0}
+    XY: {x: 0, y: 0}
+    RawXZ: {x: 0, y: 0, z: 0}
+    XZ: {x: 0, y: 0, z: 0}
+  AxisRight:
+    RawXY: {x: 0, y: 0}
+    XY: {x: 0, y: 0}
+    RawXZ: {x: 0, y: 0, z: 0}
+    XZ: {x: 0, y: 0, z: 0}
+  StickDeadZone: 0.18
 --- !u!4 &3364079649997762474 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8540507123161146149, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
