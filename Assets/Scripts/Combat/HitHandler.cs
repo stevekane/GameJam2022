@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 // Common routine for handling hitbox collision + processing the hit.
 public static class HitHandler {
-  public static TaskFunc Loop(TriggerEvent hitbox, HitParams hitParams) => async (TaskScope scope) => {
+  public static TaskFunc Loop(TriggerEvent hitbox, HitParams hitParams, Action<Hurtbox> onHit = null) => async (TaskScope scope) => {
     try {
       List<Hurtbox> hits = new();
       int lastHit = 0;
@@ -13,8 +14,10 @@ public static class HitHandler {
       });
       hitbox.enableCollision = true;
       while (true) {
-        while (lastHit < hits.Count)
+        while (lastHit < hits.Count) {
+          onHit?.Invoke(hits[lastHit]);
           hits[lastHit++].TryAttack(hitParams.Clone());
+        }
         await scope.Tick();
       }
     } finally {

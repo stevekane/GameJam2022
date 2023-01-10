@@ -143,7 +143,6 @@ public class RecoilEffect : StatusEffect {
     status.Mover.Move(Velocity*Time.fixedDeltaTime);
     status.CanMove = false;
     status.CanRotate = false;
-    status.CanAttack = false;
     if (Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED)
       status.Remove(this);
   }
