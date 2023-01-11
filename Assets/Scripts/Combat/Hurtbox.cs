@@ -11,10 +11,8 @@ public class Hurtbox : MonoBehaviour {
   }
 
   public bool CanBeHurtBy(HitParams hitParams) {
-    if (!Team.CanBeHurtBy(hitParams.AttackerTeamID)) {
-      Debug.Log($"{Owner}:{Team.ID} can't be hurt by {hitParams.Attacker}:{hitParams.AttackerTeamID}");
+    if (!Team.CanBeHurtBy(hitParams.AttackerTeamID))
       return false;
-    }
     if (Owner.TryGetComponent(out Status status) && !status.IsHittable)
       return false;
     return true;
