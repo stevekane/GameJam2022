@@ -57,11 +57,12 @@ public class CharacterRotationTester : MonoBehaviour {
     LineRenderer.enabled = false;
     Animator.SetInteger("GrappleState", 1);
     RightArmRig.weight = 0;
-    var speed = CharacterController.velocity;
+    var velocity  = CharacterController.velocity;
     for (var i = 0; i < TurnAndThrowDuration.Ticks; i++) {
       var degrees = TurnSpeed * Time.fixedDeltaTime;
       var stretchInterpolant = Mathf.InverseLerp(PullStretchDuration.Ticks, 0, i);
-      CharacterController.Move(Time.fixedDeltaTime*speed);
+      velocity += Time.fixedDeltaTime * Gravity * Vector3.up;
+      CharacterController.Move(Time.fixedDeltaTime * velocity);
       Animator.SetFloat("Rotation", 90 * stretchInterpolant);
       transform.rotation = Quaternion.RotateTowards(transform.rotation, AtTarget, degrees);
       yield return new WaitForFixedUpdate();
@@ -73,11 +74,14 @@ public class CharacterRotationTester : MonoBehaviour {
     Animator.SetInteger("GrappleState", 1);
     ClipSource.PlayOneShot(ThrowClip);
     Destroy(Instantiate(ThrowVFX, RightHandAvatarTransform.Transform.position, transform.rotation), 3);
+    var velocity  = CharacterController.velocity;
     for (var i = 0; i <= ThrowDuration.Ticks; i++) {
       var interpolant = (float)i/(float)ThrowDuration.Ticks;
       var origin = RightHandAvatarTransform.Transform.position;
       var destination = Target.position;
       var armInterpolant = (float)i/(float)ThrowDuration.Ticks;
+      velocity += Time.fixedDeltaTime * Gravity * Vector3.up;
+      CharacterController.Move(Time.fixedDeltaTime * velocity);
       RightArmRig.weight = interpolant;
       LineRenderer.SetPosition(1, Vector3.Lerp(origin, destination, interpolant));
       yield return new WaitForFixedUpdate();
