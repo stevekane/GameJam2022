@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.Serialization;
 
 public class CharacterRotationTester : MonoBehaviour {
   [SerializeField] Transform Target;
@@ -15,9 +16,9 @@ public class CharacterRotationTester : MonoBehaviour {
   [SerializeField] float Distance = 5;
   [SerializeField] float VaultSpeedMultiplier = 1.25f;
   [SerializeField] float Gravity = -20f;
-  [SerializeField] Timeval TurnAndThrowDuration = Timeval.FromMillis(250);
+  [FormerlySerializedAs("TurnAndThrowDuration")]
+  [SerializeField] Timeval WindupDuration = Timeval.FromMillis(250);
   [SerializeField] Timeval ThrowDuration = Timeval.FromMillis(100);
-  [SerializeField] Timeval PullStretchDuration = Timeval.FromMillis(250);
   [SerializeField] Timeval VaultDuration = Timeval.FromSeconds(1);
   [Tooltip("Strength of the arm constraint over the duration of pulling")]
   [SerializeField] AnimationCurve ArmPullConstraintStrength;
@@ -30,9 +31,6 @@ public class CharacterRotationTester : MonoBehaviour {
   [SerializeField] GameObject HitVFX;
   [SerializeField] GameObject VaultVFX;
 
-  Vector3 ToTarget => Target.position-transform.position;
-  Quaternion AtTarget => Quaternion.LookRotation(ToTarget, Vector3.up);
-
   IEnumerator Start() {
     var origin = transform.position;
     while (true) {
@@ -44,23 +42,25 @@ public class CharacterRotationTester : MonoBehaviour {
 
   IEnumerator GrappleTo(Vector3 position) {
     Target.position = position;
-    yield return StartCoroutine(TurnAndThrow());
+    yield return StartCoroutine(Windup());
     yield return StartCoroutine(Throw());
     yield return StartCoroutine(Pull());
     yield return StartCoroutine(Vault());
   }
 
-  IEnumerator TurnAndThrow() {
+  IEnumerator Windup() {
     LineRenderer.enabled = false;
     Animator.SetInteger("GrappleState", 1);
     RightArmRig.weight = 0;
     var velocity  = CharacterController.velocity;
-    for (var i = 0; i < TurnAndThrowDuration.Ticks; i++) {
+    for (var i = 0; i < WindupDuration.Ticks; i++) {
       var degrees = TurnSpeed * Time.fixedDeltaTime;
-      var stretchInterpolant = Mathf.InverseLerp(PullStretchDuration.Ticks, 0, i);
+      var delta = Target.position-transform.position;
+      var toTargetXZ = delta.XZ().normalized;
+      var atTargetXZ = Quaternion.LookRotation(toTargetXZ, Vector3.up);
       velocity += Time.fixedDeltaTime * Gravity * Vector3.up;
       CharacterController.Move(Time.fixedDeltaTime * velocity);
-      transform.rotation = Quaternion.RotateTowards(transform.rotation, AtTarget, degrees);
+      transform.rotation = Quaternion.RotateTowards(transform.rotation, atTargetXZ, degrees);
       yield return new WaitForFixedUpdate();
     }
   }
@@ -87,18 +87,24 @@ public class CharacterRotationTester : MonoBehaviour {
   }
 
   IEnumerator Pull() {
+    var origin = transform.position;
+    var delta = Target.position-transform.position;
+    var distanceToTarget = delta.magnitude;
+    var toTarget = delta.normalized;
+    var toTargetXZ = delta.XZ().normalized;
     LineRenderer.enabled = true;
     Animator.SetInteger("GrappleState", 2);
+    Debug.DrawRay(transform.position, toTarget, Color.blue, 3f);
+    Debug.DrawRay(transform.position, transform.up, Color.green, 3f);
+    Animator.SetFloat("Rotation", Vector3.Dot(toTarget, transform.up));
     PullLoop.Play();
-    var origin = transform.position;
-    var distanceToTarget = Vector3.Distance(transform.position, Target.position);
     var duration = distanceToTarget / PullSpeed;
     for (var i = 0; i <= duration; i++) {
       var degrees = TurnSpeed * Time.fixedDeltaTime;
-      var stretchInterpolant = Mathf.InverseLerp(0, PullStretchDuration.Ticks, i);
       var positionInterpolant = (float)i/(float)duration;
       var nextPosition = Vector3.Lerp(origin, Target.position, positionInterpolant);
-      transform.rotation = Quaternion.RotateTowards(transform.rotation, AtTarget, degrees);
+      var atTargetXZ = Quaternion.LookRotation(toTargetXZ, Vector3.up);
+      transform.rotation = Quaternion.RotateTowards(transform.rotation, atTargetXZ, degrees);
       CharacterController.Move(nextPosition-transform.position);
       RightArmRig.weight = ArmPullConstraintStrength.Evaluate(positionInterpolant);
       yield return new WaitForFixedUpdate();
