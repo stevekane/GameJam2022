@@ -1,27 +1,24 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Animations.Rigging;
 
 public class CharacterRotationTester : MonoBehaviour {
   [SerializeField] Transform Target;
   [SerializeField] CharacterController CharacterController;
   [SerializeField] AvatarTransform HandAvatarTransform;
-  [SerializeField] Rig ArmRig;
   [SerializeField] LineRenderer LineRenderer;
   [SerializeField] Animator Animator;
+  [Tooltip("Speed of pulling in units per second")]
   [SerializeField] float PullSpeed = 15;
-  [SerializeField] float TimeScale = 1;
+  [Tooltip("Rate of rotation in degrees per second")]
   [SerializeField] float TurnSpeed = 360;
+  [Tooltip("This is in normalized units that span a range -1 to 1. Thus, a value of 2 would cover the whole range in 1 second")]
+  [SerializeField] float RotationSpeed = 2;
   [SerializeField] float Distance = 5;
   [SerializeField] float VaultSpeedMultiplier = 1.25f;
   [SerializeField] float Gravity = -20f;
   [SerializeField] Timeval WindupDuration = Timeval.FromMillis(250);
   [SerializeField] Timeval ThrowDuration = Timeval.FromMillis(100);
   [SerializeField] Timeval VaultDuration = Timeval.FromSeconds(1);
-  [Tooltip("Strength of the arm constraint over the duration of throwing")]
-  [SerializeField] AnimationCurve ArmThrowConstraintStrength;
-  [Tooltip("Strength of the arm constraint over the duration of pulling")]
-  [SerializeField] AnimationCurve ArmPullConstraintStrength;
   [SerializeField] AudioSource PullLoop;
   [SerializeField] AudioSource ClipSource;
   [SerializeField] AudioClip ThrowClip;
@@ -30,6 +27,8 @@ public class CharacterRotationTester : MonoBehaviour {
   [SerializeField] GameObject ThrowVFX;
   [SerializeField] GameObject HitVFX;
   [SerializeField] GameObject VaultVFX;
+
+  float CurrentRotation = 0;
 
   IEnumerator Start() {
     var origin = transform.position;
@@ -51,7 +50,6 @@ public class CharacterRotationTester : MonoBehaviour {
   IEnumerator Windup() {
     LineRenderer.enabled = false;
     Animator.SetInteger("GrappleState", 1);
-    ArmRig.weight = 0;
     var velocity  = CharacterController.velocity;
     for (var i = 0; i < WindupDuration.Ticks; i++) {
       var degrees = TurnSpeed * Time.fixedDeltaTime;
@@ -62,7 +60,8 @@ public class CharacterRotationTester : MonoBehaviour {
       transform.rotation = Quaternion.RotateTowards(transform.rotation, atTargetXZ, degrees);
       velocity += Time.fixedDeltaTime * Gravity * Vector3.up;
       CharacterController.Move(Time.fixedDeltaTime * velocity);
-      Animator.SetFloat("Rotation", Vector3.Dot(toTarget, Vector3.up));
+      CurrentRotation = Mathf.MoveTowards(CurrentRotation, Vector3.Dot(toTarget, Vector3.up), Time.fixedDeltaTime * RotationSpeed);
+      Animator.SetFloat("Rotation", CurrentRotation);
       yield return new WaitForFixedUpdate();
     }
   }
@@ -82,8 +81,8 @@ public class CharacterRotationTester : MonoBehaviour {
       velocity += Time.fixedDeltaTime * Gravity * Vector3.up;
       CharacterController.Move(Time.fixedDeltaTime * velocity);
       LineRenderer.SetPosition(1, Vector3.Lerp(origin, destination, interpolant));
-      Animator.SetFloat("Rotation", Vector3.Dot(toTarget, Vector3.up));
-      ArmRig.weight = ArmThrowConstraintStrength.Evaluate(interpolant);
+      CurrentRotation = Mathf.MoveTowards(CurrentRotation, Vector3.Dot(toTarget, Vector3.up), Time.fixedDeltaTime * RotationSpeed);
+      Animator.SetFloat("Rotation", CurrentRotation);
       yield return new WaitForFixedUpdate();
     }
     ClipSource.PlayOneShot(HitClip);
@@ -107,11 +106,10 @@ public class CharacterRotationTester : MonoBehaviour {
       var atTargetXZ = Quaternion.LookRotation(toTargetXZ, Vector3.up);
       transform.rotation = Quaternion.RotateTowards(transform.rotation, atTargetXZ, degrees);
       CharacterController.Move(nextPosition-transform.position);
-      Animator.SetFloat("Rotation", Vector3.Dot(toTarget, Vector3.up));
-      ArmRig.weight = ArmPullConstraintStrength.Evaluate(interpolant);
+      CurrentRotation = Mathf.MoveTowards(CurrentRotation, Vector3.Dot(toTarget, Vector3.up), Time.fixedDeltaTime * RotationSpeed);
+      Animator.SetFloat("Rotation", CurrentRotation);
       yield return new WaitForFixedUpdate();
     }
-    ArmRig.weight = 0;
     PullLoop.Stop();
   }
 
@@ -119,19 +117,18 @@ public class CharacterRotationTester : MonoBehaviour {
     LineRenderer.enabled = false;
     Animator.SetInteger("GrappleState", 3);
     ClipSource.PlayOneShot(VaultClip);
-    ArmRig.weight = 0;
     Destroy(Instantiate(VaultVFX, transform.position, transform.rotation), 3);
     var velocity = CharacterController.velocity * VaultSpeedMultiplier;
     for (var i = 0; i < VaultDuration.Ticks; i++) {
       velocity += Time.fixedDeltaTime * Gravity * Vector3.up;
       CharacterController.Move(Time.fixedDeltaTime * velocity);
-      Animator.SetFloat("Rotation", Vector3.Dot(velocity.normalized, Vector3.up));
+      CurrentRotation = Mathf.MoveTowards(CurrentRotation, Vector3.Dot(velocity.normalized, Vector3.up), Time.fixedDeltaTime * RotationSpeed);
+      Animator.SetFloat("Rotation", CurrentRotation);
       yield return new WaitForFixedUpdate();
     }
   }
 
   void LateUpdate() {
     LineRenderer.SetPosition(0, HandAvatarTransform.Transform.position);
-    Time.timeScale = TimeScale;
   }
 }
