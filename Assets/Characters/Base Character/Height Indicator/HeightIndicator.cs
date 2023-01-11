@@ -39,7 +39,8 @@ public class HeightIndicator : MonoBehaviour {
     const float MAX_RAYCAST_DISTANCE = 1000;
     var didHit = Physics.Raycast(transform.position, Vector3.down, out var hit, MAX_RAYCAST_DISTANCE, Defaults.Instance.EnvironmentLayerMask);
     var position = (didHit ? hit.point : (transform.position.XZ() + LastKnownAltitude * Vector3.up)) + GroundOffsetEpsilon * Vector3.up;
-    LastKnownAltitude = position.y;
+    if (didHit)
+      LastKnownAltitude = hit.point.y;
     Surface.gameObject.SetActive(!Status.IsGrounded);
     Surface.transform.position = position;
     Surface.material.color = color;
