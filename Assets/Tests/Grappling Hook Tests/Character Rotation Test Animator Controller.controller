@@ -179,13 +179,13 @@ AnimatorController:
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: GrappleState
     m_Type: 3
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
@@ -203,10 +203,22 @@ AnimatorController:
     m_Name: Rotation
     m_StateMachine: {fileID: 6442930658317068173}
     m_Mask: {fileID: 0}
-    m_Motions: []
+    m_Motions:
+    - serializedVersion: 2
+      m_State: {fileID: 984297036543409417}
+      m_Motion: {fileID: 7400000, guid: 15d118174c9a19547a46841930f2f2fe, type: 2}
+    - serializedVersion: 2
+      m_State: {fileID: 8667880398761286475}
+      m_Motion: {fileID: 7400000, guid: 15d118174c9a19547a46841930f2f2fe, type: 2}
+    - serializedVersion: 2
+      m_State: {fileID: 604960537400396060}
+      m_Motion: {fileID: 7400000, guid: 256112aa42ad2cb49a6ba343dbee8c9a, type: 2}
+    - serializedVersion: 2
+      m_State: {fileID: 4957567914771207721}
+      m_Motion: {fileID: 7400000, guid: 256112aa42ad2cb49a6ba343dbee8c9a, type: 2}
     m_Behaviours: []
     m_BlendingMode: 1
-    m_SyncedLayerIndex: -1
+    m_SyncedLayerIndex: 0
     m_DefaultWeight: 1
     m_IKPass: 0
     m_SyncedLayerAffectsTiming: 0

@@ -19,9 +19,6 @@ public class CharacterRotationTester : MonoBehaviour {
   [SerializeField] Timeval ThrowDuration = Timeval.FromMillis(100);
   [SerializeField] Timeval PullStretchDuration = Timeval.FromMillis(250);
   [SerializeField] Timeval VaultDuration = Timeval.FromSeconds(1);
-  [Tooltip("Strength of stretching over the duration of pulling")]
-  //  TODO: ATM THIS IS NOT USED. Use in the code or move all this logic to Animator StateMachine
-  [SerializeField] AnimationCurve BodyStretchStrength;
   [Tooltip("Strength of the arm constraint over the duration of pulling")]
   [SerializeField] AnimationCurve ArmPullConstraintStrength;
   [SerializeField] AudioSource PullLoop;
@@ -63,7 +60,6 @@ public class CharacterRotationTester : MonoBehaviour {
       var stretchInterpolant = Mathf.InverseLerp(PullStretchDuration.Ticks, 0, i);
       velocity += Time.fixedDeltaTime * Gravity * Vector3.up;
       CharacterController.Move(Time.fixedDeltaTime * velocity);
-      Animator.SetFloat("Rotation", 90 * stretchInterpolant);
       transform.rotation = Quaternion.RotateTowards(transform.rotation, AtTarget, degrees);
       yield return new WaitForFixedUpdate();
     }
@@ -102,10 +98,8 @@ public class CharacterRotationTester : MonoBehaviour {
       var stretchInterpolant = Mathf.InverseLerp(0, PullStretchDuration.Ticks, i);
       var positionInterpolant = (float)i/(float)duration;
       var nextPosition = Vector3.Lerp(origin, Target.position, positionInterpolant);
-      CharacterController.Move(nextPosition-transform.position);
       transform.rotation = Quaternion.RotateTowards(transform.rotation, AtTarget, degrees);
-      Animator.SetFloat("Rotation", 90 * stretchInterpolant);
-      // TODO: Drive animator with other AnimationCurve instead of this thing...
+      CharacterController.Move(nextPosition-transform.position);
       RightArmRig.weight = ArmPullConstraintStrength.Evaluate(positionInterpolant);
       yield return new WaitForFixedUpdate();
     }
