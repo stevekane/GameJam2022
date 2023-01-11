@@ -2,24 +2,35 @@ using UnityEngine;
 
 public class Hurtbox : MonoBehaviour {
   public GameObject Owner;
+  public Team Team;
   public EventSource<HitParams> OnHurt = new();
 
   void Awake() {
     Owner = Owner ?? transform.parent.gameObject;
+    Team = Team ?? Owner.GetComponent<Team>();
   }
 
-  public void TryAttack(HitParams hitParams) {
+  public bool CanBeHurtBy(HitParams hitParams) {
+    if (!Team.CanBeHurtBy(hitParams.AttackerTeamID)) {
+      Debug.Log($"{Owner}:{Team.ID} can't be hurt by {hitParams.Attacker}:{hitParams.AttackerTeamID}");
+      return false;
+    }
+    if (Owner.TryGetComponent(out Status status) && !status.IsHittable)
+      return false;
+    return true;
+  }
+  public bool TryAttack(HitParams hitParams) {
+    if (!CanBeHurtBy(hitParams)) return false;
+
     hitParams.Defender = Owner;
-    if (Owner.TryGetComponent(out Attributes defenderAttributes)) {
+    if (Owner.TryGetComponent(out Attributes defenderAttributes))
       hitParams.DefenderAttributes = defenderAttributes;
-      if (hitParams.Attacker == defenderAttributes.gameObject)
-        return;  // TODO: Hacky way to avoid self collision. Won't work for projectiles.
-    }
-    if (!Owner.TryGetComponent(out Status status) || status.IsHittable) {
-      hitParams.Defender.SendMessage("OnHurt", hitParams, SendMessageOptions.DontRequireReceiver);
-      hitParams.Source.SendMessage("OnHit", hitParams, SendMessageOptions.DontRequireReceiver);
-      OnHurt.Fire(hitParams);
-      CameraShaker.Instance.Shake(hitParams.HitConfig.CameraShakeStrength);
-    }
+
+    hitParams.Defender.SendMessage("OnHurt", hitParams, SendMessageOptions.DontRequireReceiver);
+    hitParams.Source.SendMessage("OnHit", hitParams, SendMessageOptions.DontRequireReceiver);
+    OnHurt.Fire(hitParams);
+    CameraShaker.Instance.Shake(hitParams.HitConfig.CameraShakeStrength);
+
+    return true;
   }
 }

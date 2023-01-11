@@ -15,8 +15,11 @@ public static class HitHandler {
       hitbox.enableCollision = true;
       while (true) {
         while (lastHit < hits.Count) {
-          onHit?.Invoke(hits[lastHit]);
-          hits[lastHit++].TryAttack(hitParams.Clone());
+          var hb = hits[lastHit++];
+          if (hb.CanBeHurtBy(hitParams)) {
+            onHit?.Invoke(hb);
+            hb.TryAttack(hitParams.Clone());
+          }
         }
         await scope.Tick();
       }

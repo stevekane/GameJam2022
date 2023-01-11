@@ -2,9 +2,10 @@ using UnityEngine;
 
 public class HitParams {
   public HitConfig HitConfig;
-  public GameObject Attacker;
-  public GameObject Source;
-  public GameObject Defender;
+  public GameObject Attacker;  // Might be dead by the time hit is processed.
+  public GameObject Source;    // Source of damage (e.g. the attacker for melee, fireball for projectile, etc)
+  public GameObject Defender;  // Initialized by Hurtbox when processing a hit.
+  public int AttackerTeamID;
   public Attributes.Serialized AttackerAttributes;
   public IAttributes DefenderAttributes;
   // TODO: cache this value? It gets called at least 4x per hit.
@@ -22,6 +23,7 @@ public class HitParams {
     Attacker = Attacker,
     Source = Source,
     Defender = Defender,
+    AttackerTeamID = AttackerTeamID,
     AttackerAttributes = AttackerAttributes,
     DefenderAttributes = DefenderAttributes,
   };
@@ -37,5 +39,6 @@ public class HitParams {
     AttackerAttributes = attackerAttributes;
     Attacker = attacker;
     Source = source;
+    AttackerTeamID = attacker.GetComponent<Team>().ID;
   }
 }
