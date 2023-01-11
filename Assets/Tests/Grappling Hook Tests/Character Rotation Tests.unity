@@ -1460,8 +1460,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Target: {fileID: 1716846061}
   CharacterController: {fileID: 2013164726}
-  RightHandAvatarTransform: {fileID: 772965697}
-  RightArmRig: {fileID: 1559346884}
+  HandAvatarTransform: {fileID: 772965697}
+  ArmRig: {fileID: 1559346884}
   LineRenderer: {fileID: 2013164727}
   Animator: {fileID: 2013164723}
   PullSpeed: 1
@@ -1470,18 +1470,39 @@ MonoBehaviour:
   Distance: 0
   VaultSpeedMultiplier: 1.2
   Gravity: -40
-  TurnAndThrowDuration:
+  WindupDuration:
     Millis: 416.66666
     FramesPerSecond: 60
   ThrowDuration:
     Millis: 100
     FramesPerSecond: 60
-  PullStretchDuration:
-    Millis: 166.66667
-    FramesPerSecond: 60
   VaultDuration:
     Millis: 500
     FramesPerSecond: 60
+  ArmThrowConstraintStrength:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   ArmPullConstraintStrength:
     serializedVersion: 2
     m_Curve:
