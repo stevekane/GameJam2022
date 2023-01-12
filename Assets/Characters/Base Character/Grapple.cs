@@ -2,6 +2,11 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public class Grapple : Ability {
+  const int NotGrappling = 0;
+  const int Throwing = 1;
+  const int Pulling = 2;
+  const int Vaulting = 3;
+
   [SerializeField] AvatarTransform HookOrigin;
   [SerializeField] LineRenderer GrappleLine;
   [SerializeField] Animator Animator;
@@ -9,6 +14,7 @@ public class Grapple : Ability {
   [SerializeField] float TurnSpeed = 360;
   [SerializeField] float RotationSpeed = 2; // TODO: This probably should be degrees/second
   [SerializeField] float VaultSpeedMultiplier = 1.25f;
+  [SerializeField] float VaultDrag = 2;
   [SerializeField] Timeval WindupDuration = Timeval.FromMillis(250);
   [SerializeField] Timeval ThrowDuration = Timeval.FromMillis(100);
   [SerializeField] Timeval HangDuration = Timeval.FromMillis(300);
@@ -82,7 +88,7 @@ public class Grapple : Ability {
       Target = null;
       CurrentRotation = 0;
       GrappleLine.enabled = false;
-      Animator.SetInteger("GrappleState", 0);
+      Animator.SetInteger("GrappleState", NotGrappling);
       Animator.SetFloat("GrappleRotation", CurrentRotation);
     }
   }
@@ -104,7 +110,7 @@ public class Grapple : Ability {
   }
 
   async Task Windup(TaskScope scope) {
-    Animator.SetInteger("GrappleState", 1);
+    Animator.SetInteger("GrappleState", Throwing);
     GrappleLine.enabled = false;
     for (var i = 0; i < WindupDuration.Ticks; i++) {
       var delta = Target.transform.position-transform.position;
@@ -115,7 +121,7 @@ public class Grapple : Ability {
   }
 
   async Task Throw(TaskScope scope) {
-    Animator.SetInteger("GrappleState", 1);
+    Animator.SetInteger("GrappleState", Throwing);
     ClipSource.PlayOneShot(ThrowClip);
     GrappleLine.enabled = true;
     Destroy(Instantiate(ThrowVFX, HookOrigin.Transform.position, transform.rotation), 3);
@@ -137,7 +143,7 @@ public class Grapple : Ability {
     var toTarget = delta.normalized;
     var toTargetXZ = delta.XZ().normalized;
     GrappleLine.enabled = true;
-    Animator.SetInteger("GrappleState", 2);
+    Animator.SetInteger("GrappleState", Pulling);
     PullLoop.Play();
     var duration = Timeval.FromSeconds(distanceToTarget / PullSpeed);
     Velocity = delta / duration.Seconds;
@@ -151,11 +157,10 @@ public class Grapple : Ability {
 
   async Task Vault(TaskScope scope) {
     GrappleLine.enabled = false;
-    Animator.SetInteger("GrappleState", 3);
     ClipSource.PlayOneShot(VaultClip);
     Velocity *= VaultSpeedMultiplier;
     Destroy(Instantiate(VaultVFX, transform.position, transform.rotation), 3);
-    Status.Add(new KnockbackEffect(Velocity, null, drag: 1f));
+    Status.Add(new VaultEffect(Velocity, VaultDrag));
     await scope.Tick();
   }
 }

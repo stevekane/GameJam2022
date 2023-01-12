@@ -127,6 +127,30 @@ public class KnockbackEffect : StatusEffect {
   }
 }
 
+// Vault effect from grappling
+public class VaultEffect : StatusEffect {
+  public float Drag;
+  public Vector3 Velocity;
+  public VaultEffect(Vector3 velocity, float drag = 5f) {
+    Velocity = velocity;
+    Drag = drag;
+  }
+  public override bool Merge(StatusEffect e) {
+    var vaultEffect = (VaultEffect)e;
+    Velocity = vaultEffect.Velocity;
+    Drag = vaultEffect.Drag;
+    return true;
+  }
+  public override void Apply(Status status) {
+    if (status.IsGrounded) {
+      status.Remove(this);
+    } else {
+      Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * Drag);
+      status.Mover.Move(Velocity*Time.fixedDeltaTime);
+    }
+  }
+}
+
 // The recoil effect that pushes you back when you hit something.
 public class RecoilEffect : StatusEffect {
   static readonly float DRAG = 5f;
