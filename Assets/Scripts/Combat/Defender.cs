@@ -33,6 +33,6 @@ public class Defender : MonoBehaviour {
     Died = true;
     // TODO: keep track of last attacker
     LastGroundedPosition = LastGroundedPosition ?? transform.position;
-    SendMessage("OnDeath", SendMessageOptions.RequireReceiver);
+    SendMessage("OnDeath", LevelBounds.GetIntersectionNormal(transform.position), SendMessageOptions.RequireReceiver);
   }
 }

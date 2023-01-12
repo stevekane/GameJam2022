@@ -9,7 +9,7 @@ public class Mob : MonoBehaviour {
     Coin.SpawnCoins(GetComponent<Defender>().LastGroundedPosition.Value.XZ() + new Vector3(0, 1f, 0), gold);
   }
 
-  void OnDeath() {
+  void OnDeath(Vector3 normal) {
     DropGold();
     Destroy(gameObject, .01f);
   }
