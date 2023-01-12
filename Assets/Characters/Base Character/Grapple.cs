@@ -11,6 +11,7 @@ public class Grapple : Ability {
   [SerializeField] float VaultSpeedMultiplier = 1.25f;
   [SerializeField] Timeval WindupDuration = Timeval.FromMillis(250);
   [SerializeField] Timeval ThrowDuration = Timeval.FromMillis(100);
+  [SerializeField] Timeval HangDuration = Timeval.FromMillis(300);
   [SerializeField] Timeval VaultDuration = Timeval.FromSeconds(1);
   [SerializeField] AudioSource PullLoop;
   [SerializeField] AudioSource ClipSource;
@@ -39,7 +40,7 @@ public class Grapple : Ability {
 
   InlineEffect VaultEffect => new(s => {
     s.AddAttributeModifier(AttributeTag.TurnSpeed, AttributeModifier.Times(.25f));
-    s.AddAttributeModifier(AttributeTag.MoveSpeed, AttributeModifier.TimesZero);
+    s.AddAttributeModifier(AttributeTag.MoveSpeed, AttributeModifier.Times(1f));
   }, "Vault effect");
 
   void FixedUpdate() {
@@ -70,7 +71,7 @@ public class Grapple : Ability {
         using (var activeEffect = Status.Add(ActiveEffect)) {
           await scope.Any(
             Waiter.Repeat(UpdateCurrentRotationFromTarget),
-            Waiter.Sequence(Windup, Throw));
+            Waiter.Sequence(Windup, Throw, Waiter.Delay(HangDuration)));
         }
         using (var pullEffect = Status.Add(PullEffect)) {
           await scope.Any(
