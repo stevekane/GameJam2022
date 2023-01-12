@@ -92,20 +92,22 @@ public class FreezingEffect : TimedEffect {
 
 // The flying state that happens to a defender when they get hit by a strong attack.
 public class KnockbackEffect : StatusEffect {
-  const float DRAG = 5f;
+  const float DRAG = 5;
   const float AIRBORNE_SPEED = 100f;
   const float DONE_SPEED = 5f;
 
   // Returns the speed needed to cover the given distance with exponential decay due to drag.
   public static float GetSpeedToTravelDistance(float distance) => DRAG*distance;
 
+  public float Drag;
   public Vector3 Velocity;
   public Vector3? WallbounceTarget;
   public bool IsAirborne = false;
   bool IsFirstFrame = true; // Hacky way to ensure we have a hitflinch+cancel effect when a defender is first hit
-  public KnockbackEffect(Vector3 velocity, Vector3? wallbounceTarget) {
+  public KnockbackEffect(Vector3 velocity, Vector3? wallbounceTarget = null, float drag = 5f) {
     Velocity = velocity;
     WallbounceTarget = wallbounceTarget;
+    Drag = drag;
   }
   public override bool Merge(StatusEffect e) {
     Velocity = ((KnockbackEffect)e).Velocity;
@@ -113,7 +115,7 @@ public class KnockbackEffect : StatusEffect {
     return true;
   }
   public override void Apply(Status status) {
-    Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * DRAG);
+    Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * Drag);
     status.Mover.Move(Velocity*Time.fixedDeltaTime);
     IsAirborne = IsFirstFrame || Velocity.sqrMagnitude >= AIRBORNE_SPEED*AIRBORNE_SPEED;
     status.CanMove = !IsAirborne;

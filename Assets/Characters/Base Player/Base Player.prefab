@@ -1606,7 +1606,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TriggerConditions:
-  - Tags: 8
+  - Tags: 0
     RequiredOwnerTags: 0
     EnergyCost: 0
   Tags: 0
@@ -1616,12 +1616,18 @@ MonoBehaviour:
   PullSpeed: 80
   TurnSpeed: 360
   RotationSpeed: 2
-  VaultSpeedMultiplier: 0.5
+  VaultSpeedMultiplier: 1
   WindupDuration:
     Millis: 416.66666
     FramesPerSecond: 60
   ThrowDuration:
     Millis: 200
+    FramesPerSecond: 60
+  HangDuration:
+    Millis: 300
+    FramesPerSecond: 60
+  HoldDuration:
+    Millis: 0
     FramesPerSecond: 60
   VaultDuration:
     Millis: 250
@@ -2088,7 +2094,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[4].Modifier.Base
-      value: 15
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 8540507123274114199, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       propertyPath: BaseAttributes.Array.data[4].Modifier.Mult
