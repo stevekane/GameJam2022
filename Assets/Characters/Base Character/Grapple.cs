@@ -12,6 +12,7 @@ public class Grapple : Ability {
   [SerializeField] Timeval WindupDuration = Timeval.FromMillis(250);
   [SerializeField] Timeval ThrowDuration = Timeval.FromMillis(100);
   [SerializeField] Timeval HangDuration = Timeval.FromMillis(300);
+  [SerializeField] Timeval HoldDuration = Timeval.FromMillis(100);
   [SerializeField] Timeval VaultDuration = Timeval.FromSeconds(1);
   [SerializeField] AudioSource PullLoop;
   [SerializeField] AudioSource ClipSource;
@@ -37,11 +38,6 @@ public class Grapple : Ability {
     s.CanRotate = false;
     s.CanMove = false;
   }, "Throw and pull");
-
-  InlineEffect VaultEffect => new(s => {
-    s.AddAttributeModifier(AttributeTag.TurnSpeed, AttributeModifier.Times(.25f));
-    s.AddAttributeModifier(AttributeTag.MoveSpeed, AttributeModifier.Times(1f));
-  }, "Vault effect");
 
   void FixedUpdate() {
     var layerMask = Defaults.Instance.GrapplePointLayerMask;
@@ -76,19 +72,14 @@ public class Grapple : Ability {
         using (var pullEffect = Status.Add(PullEffect)) {
           await scope.Any(
             Waiter.Repeat(UpdateCurrentRotationFromVelocity),
-            Pull);
+            Waiter.Sequence(Pull, Waiter.Delay(HoldDuration)));
         }
-        using (var vaultEffect = Status.Add(VaultEffect)) {
-          await scope.Any(
-            Waiter.Repeat(UpdateCurrentRotationFromVelocity),
-            Vault);
-        }
+        await scope.Run(Vault);
       } else {
         await scope.Tick();
       }
     } finally {
       Target = null;
-      Velocity = Vector3.zero;
       CurrentRotation = 0;
       GrappleLine.enabled = false;
       Animator.SetInteger("GrappleState", 0);
@@ -164,10 +155,7 @@ public class Grapple : Ability {
     ClipSource.PlayOneShot(VaultClip);
     Velocity *= VaultSpeedMultiplier;
     Destroy(Instantiate(VaultVFX, transform.position, transform.rotation), 3);
-    while (!Status.IsGrounded) {
-      Velocity -= Time.fixedDeltaTime * Attributes.GetValue(AttributeTag.Gravity, 0) * Vector3.up;
-      Mover.Move(Time.fixedDeltaTime * Velocity);
-      await scope.Tick();
-    }
+    Status.Add(new KnockbackEffect(Velocity, null, drag: 1f));
+    await scope.Tick();
   }
 }
