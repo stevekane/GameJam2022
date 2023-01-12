@@ -63,7 +63,7 @@ public class AbilityManager : MonoBehaviour {
 
   void Awake() {
     InitAbilities(GetComponentsInChildren<Ability>());
-    Energy = GetComponent<Energy>();
+    Energy = GetComponentInChildren<Energy>();
     Status = GetComponent<Status>();
   }
   void OnDestroy() {

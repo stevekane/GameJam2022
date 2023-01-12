@@ -43,10 +43,14 @@ public class AttackAbility : Ability {
     var vfxOrigin = AbilityManager.transform.TransformPoint(AttackVFXOffset);
     SFXManager.Instance.TryPlayOneShot(AttackSFX);
     VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
-    await scope.Any(Animation.WaitPhase(1), HitHandler.Loop(Hitbox, Parrybox, new HitParams(HitConfig, Attributes)));
+    await scope.Any(Animation.WaitPhase(1), HitHandler.Loop(Hitbox, Parrybox, new HitParams(HitConfig, Attributes), OnHit));
     Tags.AddFlags(AbilityTag.Cancellable);
     await scope.Run(Animation.WaitPhase(2));
     await scope.Run(Animation.WaitDone);
+  }
+
+  void OnHit(Hurtbox target) {
+    AbilityManager.Energy?.Value.Add(1);
   }
 
   async Task Charge(TaskScope scope) {
