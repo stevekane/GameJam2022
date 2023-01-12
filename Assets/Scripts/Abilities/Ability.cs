@@ -19,6 +19,7 @@ public class TriggerCondition {
 [Serializable]
 public abstract class Ability : MonoBehaviour {
   public AbilityManager AbilityManager { get; set; }
+  public AvatarAttacher AvatarAttacher => AbilityManager.GetComponent<AvatarAttacher>();
   public AnimationDriver AnimationDriver => AbilityManager.GetComponent<AnimationDriver>();
   public BlackBoard BlackBoard => AbilityManager.GetComponent<BlackBoard>();
   public Attributes Attributes => AbilityManager.GetComponent<Attributes>();
