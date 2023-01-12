@@ -1,10 +1,6 @@
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
-using static UnityEditor.PlayerSettings;
 
 public class Wolf : MonoBehaviour {
   public float DashRange = 8f;

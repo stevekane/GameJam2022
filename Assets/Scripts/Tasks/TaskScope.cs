@@ -222,4 +222,9 @@ public static class Waiter {
   public static TaskFunc<T> ListenFor<T>(IEventSource<T> evt) => s => s.ListenFor(evt);
   public static TaskFunc<int> ListenForAll<T>(IEventSource<T> evt, T[] results) => s => s.ListenForAll(evt, results);
   public static TaskFunc<T> Return<T>(TaskFunc f, T t = default) => s => s.Return<T>(f(s), t);
+  public static TaskFunc Sequence(params TaskFunc[] fs) => async (TaskScope s) => {
+    foreach (var f in fs) {
+      await s.Run(f);
+    }
+  };
 }

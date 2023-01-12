@@ -71,7 +71,7 @@ public class CharacterRotationTester : MonoBehaviour {
     Animator.SetInteger("GrappleState", 1);
     ClipSource.PlayOneShot(ThrowClip);
     Destroy(Instantiate(ThrowVFX, HandAvatarTransform.Transform.position, transform.rotation), 3);
-    var velocity  = CharacterController.velocity;
+    var velocity = CharacterController.velocity;
     for (var i = 0; i <= ThrowDuration.Ticks; i++) {
       var interpolant = (float)i/(float)ThrowDuration.Ticks;
       var origin = HandAvatarTransform.Transform.position;
