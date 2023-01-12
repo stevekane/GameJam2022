@@ -6,7 +6,7 @@ public class TriggerEvent : MonoBehaviour {
   public EventSource<Collider> OnTriggerStaySource = new();
   Collider Collider;
 
-  public bool enableCollision {
+  public bool EnableCollision {
     get => Collider.enabled;
     set => Collider.enabled = value;
   }

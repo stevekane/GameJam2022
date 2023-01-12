@@ -1,9 +1,12 @@
+using System;
 using UnityEngine;
+using static UnityEngine.ParticleSystem;
 
 public class HomingMissile : MonoBehaviour {
   [SerializeField] float Speed = 15;
   [SerializeField] GameObject ContactVFX;
   [SerializeField] AudioClip ContactSFX;
+  [SerializeField] TriggerEvent Hitbox;
 
   Hitter Hitter;
   Rigidbody Rigidbody;
@@ -12,7 +15,9 @@ public class HomingMissile : MonoBehaviour {
   void Awake() {
     Rigidbody = GetComponent<Rigidbody>();
     Hitter = GetComponent<Hitter>();
+    Hitbox.OnTriggerEnterSource.Listen(OnHitboxEnter);
   }
+
   void Start() => Target = FindObjectOfType<Player>().transform;
   void FixedUpdate() {
     if (Target) {
@@ -20,18 +25,27 @@ public class HomingMissile : MonoBehaviour {
     }
   }
 
-  void OnTriggerEnter(Collider target) {
+  void Explode() {
     VFXManager.Instance.TrySpawnEffect(ContactVFX, transform.position);
     SFXManager.Instance.TryPlayOneShot(ContactSFX);
-    Destroy(gameObject);
+    Destroy(gameObject, .01f);
+  }
+
+  void OnHitboxEnter(Collider target) {
     if (target.TryGetComponent(out Hurtbox hurtbox)) {
-      hurtbox.TryAttack(Hitter.HitParams);
+      if (hurtbox.TryAttack(Hitter.HitParams))
+        Explode();
+    } else if (target.TryGetComponent(out Parrybox parrybox)) {
+      parrybox.TryParry(Hitter.HitParams);
     }
   }
 
   void OnCollisionEnter(Collision c) {
-    VFXManager.Instance.TrySpawnEffect(ContactVFX, transform.position);
-    SFXManager.Instance.TryPlayOneShot(ContactSFX);
-    Destroy(gameObject);
+    Explode();
+  }
+
+  void OnWasParried(HitParams hitParams) {
+    transform.forward = hitParams.Defender.transform.forward;
+    Hitter.HitParams.AttackerTeamID = hitParams.DefenderTeamID;
   }
 }

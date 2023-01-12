@@ -67,6 +67,17 @@ public class Damage : MonoBehaviour {
     });
   }
 
+  void OnWasParried(HitParams hitParams) {
+    if (Status != null) {
+      Status.Add(new RecoilEffect(hitParams.HitConfig.RecoilStrength * -hitParams.Source.transform.forward));
+    }
+  }
+
+  void OnDidParry(HitParams hitParams) {
+    // Hmm.. this is probably wrong. `hitParams` is the reflected attack. We probably want the parry attack's recoil here.
+    Status.Add(new RecoilEffect(hitParams.HitConfig.RecoilStrength * -hitParams.Defender.transform.forward));
+  }
+
   public void AddPoints(float dp) {
     if (Status == null || Status.IsDamageable)
       Points += dp;

@@ -5,7 +5,7 @@ using UnityEngine;
 public class ParryAbility : Ability {
   [SerializeField] Hurtbox Hurtbox;
   [SerializeField] Timeval BlockDuration = Timeval.FromAnimFrames(15, 30);
-  [SerializeField] MeleeAbility RiposteAbility;
+  [SerializeField] AttackAbility RiposteAbility;
   Animator Animator;
 
   public static InlineEffect Invulnerable { get => new(s => {
@@ -33,8 +33,7 @@ public class ParryAbility : Ability {
 
   public async Task Riposte(TaskScope scope) {
     using (Status.Add(Invulnerable)) {
-      AbilityManager.TryInvoke(RiposteAbility.MainAction);
-      await scope.While(() => RiposteAbility.IsRunning);
+      await AbilityManager.TryRun(scope, RiposteAbility.MainAction);
     }
   }
 

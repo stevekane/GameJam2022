@@ -680,6 +680,7 @@ MonoBehaviour:
     BlendInFraction: 0.15
     BlendOutFraction: 0.15
   Hitbox: {fileID: 7781392534903117839}
+  Parrybox: {fileID: 0}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: c266e86e5ec11e344bf66dede26cbc46, type: 3}
@@ -769,10 +770,14 @@ MonoBehaviour:
       FramesPerSecond: 60
     BlendInFraction: 0
     BlendOutFraction: 0
-  WindupVFXTransform: {fileID: 0}
+  WindupVFXAttachment:
+    Value: 13
+    String: LeftHand
   WindupVFX: {fileID: 100000, guid: 77ec3c4e07a36814fb3169ecef41b50a, type: 3}
   WindupSFX: {fileID: 0}
-  LandVFXTransform: {fileID: 0}
+  LandVFXAttachment:
+    Value: 5
+    String: LeftFoot
   LandVFX: {fileID: 3432958286849152088, guid: 87ee7299dd44ed747af24dbb91bcd33b, type: 3}
   LandSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
   Hitbox: {fileID: 2309940460413394567}
@@ -1245,6 +1250,7 @@ MonoBehaviour:
     BlendInFraction: 0.15
     BlendOutFraction: 0.15
   Hitbox: {fileID: 8479126164374817058}
+  Parrybox: {fileID: 0}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: 90fb91c5d9f18df4183363d36d921429, type: 3}
@@ -1363,6 +1369,7 @@ MonoBehaviour:
     BlendInFraction: 0
     BlendOutFraction: 0
   Hitbox: {fileID: 1672519219772526389}
+  Parrybox: {fileID: 0}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: 28406bf68add30e4e89d6cd063fb84e6, type: 3}
@@ -1481,6 +1488,7 @@ MonoBehaviour:
     BlendInFraction: 0
     BlendOutFraction: 0
   Hitbox: {fileID: 168426987354171595}
+  Parrybox: {fileID: 0}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: da396a16a7f24f64cbb0054f5a56b46a, type: 3}
@@ -1899,6 +1907,7 @@ MonoBehaviour:
     BlendInFraction: 0
     BlendOutFraction: 0
   Hitbox: {fileID: 8553821940252974118}
+  Parrybox: {fileID: 0}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 2708598583397607911, guid: 6398d43fe79ea0140913dc5530c646af, type: 3}
   AttackSFX: {fileID: 8300000, guid: 0e5edb6bccf05984dad128fb1a9fc914, type: 3}
@@ -2191,6 +2200,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8540507123274114195, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1190803532}
+    - targetCorrespondingSourceObject: {fileID: 8540507123274114195, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1110940083044590820}
   m_SourcePrefab: {fileID: 100100000, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
 --- !u!4 &3364079649355753498 stripped
 Transform:
@@ -2263,6 +2275,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerIndex: 0
   StickDeadZone: 0.18
+--- !u!114 &1110940083044590820
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3364079649355753500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53951e61643bf5e4c9f9eb7648c523e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ID: 0
 --- !u!4 &3364079649997762474 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8540507123161146149, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}

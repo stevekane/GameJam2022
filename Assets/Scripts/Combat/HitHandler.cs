@@ -4,24 +4,36 @@ using UnityEngine;
 
 // Common routine for handling hitbox collision + processing the hit.
 public static class HitHandler {
-  public static TaskFunc Loop(TriggerEvent hitbox, HitParams hitParams, Action<Hurtbox> onHit = null) => async (TaskScope scope) => {
+  public static TaskFunc Loop(TriggerEvent hitbox, HitParams hitParams, Action<Hurtbox> onHit = null) => Loop(hitbox, null, hitParams, onHit);
+  public static TaskFunc Loop(TriggerEvent hitbox, Parrybox parrybox, HitParams hitParams, Action<Hurtbox> onHit = null) => async (TaskScope scope) => {
+    //GameObject dbg = null;
     try {
+      Parrybox parried = null;
       List<Hurtbox> hits = new();
       int lastHit = 0;
       using var listener = new ScopedListener<Collider>(hitbox.OnTriggerStaySource, hit => {
-        if (hit.TryGetComponent(out Hurtbox hurtbox) && !hits.Contains(hurtbox))
+        if (hit.TryGetComponent(out Parrybox pb) && pb.TryParry(hitParams))
+          parried = pb;
+        if (hit.TryGetComponent(out Hurtbox hurtbox) && !hits.Contains(hurtbox) && hurtbox.CanBeHurtBy(hitParams))
           hits.Add(hurtbox);
       });
-      hitbox.enableCollision = true;
-      while (true) {
+      hitbox.EnableCollision = true;
+      if (parrybox) parrybox.EnableCollision = true;
+      //if (parrybox) dbg = VFXManager.Instance.TrySpawnEffect(VFXManager.Instance.DebugIndicatorPrefab, parrybox.transform.position, parrybox.transform.rotation);
+      while (!parried) {
         while (lastHit < hits.Count) {
-          onHit?.Invoke(hits[lastHit]);
-          hits[lastHit++].TryAttack(hitParams.Clone());
+          var hb = hits[lastHit++];
+          if (hb.CanBeHurtBy(hitParams)) {
+            onHit?.Invoke(hb);
+            hb.TryAttack(hitParams.Clone());
+          }
         }
         await scope.Tick();
       }
     } finally {
-      hitbox.enableCollision = false;
+      //GameObject.Destroy(dbg);
+      hitbox.EnableCollision = false;
+      if (parrybox) parrybox.EnableCollision = false;
     }
   };
 }

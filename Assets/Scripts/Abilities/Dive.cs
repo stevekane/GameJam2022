@@ -6,10 +6,10 @@ public class Dive : Ability {
   [SerializeField] float FallSpeed;
   [SerializeField] HitConfig HitConfig;
   [SerializeField] AnimationJobConfig AnimationConfig;
-  [SerializeField] Transform WindupVFXTransform;
+  [SerializeField] SerializableEnum<AvatarBone> WindupVFXAttachment;
   [SerializeField] GameObject WindupVFX;
   [SerializeField] AudioClip WindupSFX;
-  [SerializeField] Transform LandVFXTransform;
+  [SerializeField] SerializableEnum<AvatarBone> LandVFXAttachment;
   [SerializeField] GameObject LandVFX;
   [SerializeField] AudioClip LandSFX;
   [SerializeField] TriggerEvent Hitbox;
@@ -35,14 +35,14 @@ public class Dive : Ability {
     // Windup
     using var diveEffect = Status.Add(DiveEffect);
     SFXManager.Instance.TryPlayOneShot(WindupSFX);
-    VFXManager.Instance.TrySpawnWithParent(WindupVFX, WindupVFXTransform, 1);
+    VFXManager.Instance.TrySpawnWithParent(WindupVFX, AvatarAttacher.GetBoneTransform(WindupVFXAttachment), 1);
     Animation = AnimationDriver.Play(scope, AnimationConfig);
     await Animation.WaitPhase(scope, 0);
     // Fall
     await scope.All(Animation.PauseAfterPhase(1), Fall);
     // Attack
     SFXManager.Instance.TryPlayOneShot(LandSFX);
-    VFXManager.Instance.TrySpawnEffect(LandVFX, AbilityManager.transform.position);
+    VFXManager.Instance.TrySpawnWithParent(LandVFX, AvatarAttacher.GetBoneTransform(LandVFXAttachment));
     Animation.Resume();
     await scope.Any(Animation.WaitPhase(2), HitHandler.Loop(Hitbox, new HitParams(HitConfig, Attributes)));
     // Recovery

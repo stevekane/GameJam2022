@@ -102,6 +102,7 @@ GameObject:
   - component: {fileID: 8540507123274114219}
   - component: {fileID: 8540507123274114196}
   - component: {fileID: 8437850777724818617}
+  - component: {fileID: 3790946257131143859}
   m_Layer: 10
   m_Name: Base Character
   m_TagString: Untagged
@@ -303,6 +304,8 @@ MonoBehaviour:
   OnHurtSFX: {fileID: 8300000, guid: 3df9bbbc130ccb344af5f3fc793a630f, type: 3}
   OnHitVFX: {fileID: 1995403933065894, guid: bf3228cec72bf65469800c0e55477fbd, type: 3}
   OnHitSFX: {fileID: 0}
+  OnParryVFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
+  OnParrySFX: {fileID: 8300000, guid: 0e270ecb84908054a9d6f727dbea974e, type: 3}
 --- !u!114 &8540507123274114219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -365,6 +368,19 @@ MonoBehaviour:
   AudioClip: {fileID: 8300000, guid: 4218f46b43e534f4dbdd7c725af99e62, type: 3}
   Effect: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
   Explosion: {fileID: 159918, guid: dd127aeec3eb80342924ba6a37f77936, type: 3}
+--- !u!114 &3790946257131143859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8540507123274114195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fa1d2c24f52cf348b30f69503c55ca2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 8540507124463013524}
 --- !u!1 &8540507124290307039
 GameObject:
   m_ObjectHideFlags: 0
@@ -412,6 +428,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Owner: {fileID: 8540507123274114195}
+  Team: {fileID: 0}
 --- !u!65 &8540507124290307036
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -471,7 +488,6 @@ GameObject:
   - component: {fileID: 8540507124463013526}
   - component: {fileID: 8540507124463013524}
   - component: {fileID: 8540507124463013547}
-  - component: {fileID: 9141335893900312875}
   - component: {fileID: 6517935512785470978}
   m_Layer: 0
   m_Name: Animator
@@ -529,19 +545,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_RigLayers: []
   m_Effectors: []
---- !u!114 &9141335893900312875
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8540507124463013527}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4fa1d2c24f52cf348b30f69503c55ca2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Animator: {fileID: 8540507124463013524}
 --- !u!114 &6517935512785470978
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 335112221}
   - component: {fileID: 335112223}
   - component: {fileID: 335112222}
-  m_Layer: 15
+  m_Layer: 13
   m_Name: Hitbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -181,6 +181,7 @@ MonoBehaviour:
     BlendInFraction: 0
     BlendOutFraction: 0
   Hitbox: {fileID: 335112223}
+  Parrybox: {fileID: 0}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
@@ -194,7 +195,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1974679390}
   - component: {fileID: 1974679391}
-  m_Layer: 15
+  m_Layer: 0
   m_Name: Shield
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -246,7 +247,7 @@ MonoBehaviour:
   RecoveryDuration:
     Millis: 66.666664
     FramesPerSecond: 60
-  Shield: {fileID: 0}
+  Shield: {fileID: 268572201568636213}
 --- !u!1001 &1293401618
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -330,6 +331,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 960416854098356451}
     m_Modifications:
+    - target: {fileID: 8429542747410914, guid: bae48a370600d8a4e998c51287d52193, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6274870303657193773, guid: bae48a370600d8a4e998c51287d52193, type: 3}
       propertyPath: m_Name
       value: Badger Shield
@@ -337,6 +342,14 @@ PrefabInstance:
     - target: {fileID: 6274870303657193773, guid: bae48a370600d8a4e998c51287d52193, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6555308413220831287, guid: bae48a370600d8a4e998c51287d52193, type: 3}
+      propertyPath: m_Layer
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 6555308413220831287, guid: bae48a370600d8a4e998c51287d52193, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8236355918522095634, guid: bae48a370600d8a4e998c51287d52193, type: 3}
       propertyPath: m_RootOrder
@@ -382,6 +395,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -180
       objectReference: {fileID: 0}
+    - target: {fileID: 9089024143987124539, guid: bae48a370600d8a4e998c51287d52193, type: 3}
+      propertyPath: Team
+      value: 
+      objectReference: {fileID: 769591196909034451}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -390,6 +407,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1673575837}
   m_SourcePrefab: {fileID: 100100000, guid: bae48a370600d8a4e998c51287d52193, type: 3}
+--- !u!114 &268572201568636213 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 268572202797100124, guid: bae48a370600d8a4e998c51287d52193, type: 3}
+  m_PrefabInstance: {fileID: 1464394089}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6274870304953765956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee6ea34be97c11945ba705739140dd5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6274870304953765956 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6274870303657193773, guid: bae48a370600d8a4e998c51287d52193, type: 3}
@@ -522,15 +550,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994128, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 6
+      value: -1.0775671
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994128, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 0.000002861023
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994128, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3
+      value: 4.87059
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994128, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_LocalRotation.w
@@ -570,7 +598,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994134, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_Name
-      value: Badger_1
+      value: Badger
+      objectReference: {fileID: 0}
+    - target: {fileID: 4220133813938994134, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4220133815127855569, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_Avatar
@@ -599,6 +631,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1205254327}
   m_SourcePrefab: {fileID: 100100000, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
+--- !u!114 &769591196909034451 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4425587420101878499, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
+  m_PrefabInstance: {fileID: 4018613097858857264}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 960416853277623014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53951e61643bf5e4c9f9eb7648c523e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &960416853277623014 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4220133813938994134, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
