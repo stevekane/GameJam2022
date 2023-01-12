@@ -10,6 +10,7 @@ public class AttackAbility : Ability {
   [SerializeField] AnimationCurve ChargeScaling = AnimationCurve.Linear(0f, .5f, 1f, 1f);
   [SerializeField] AnimationJobConfig AttackAnimation;
   [SerializeField] TriggerEvent Hitbox;
+  [SerializeField] Parrybox Parrybox;
   [SerializeField] Vector3 AttackVFXOffset;
   [SerializeField] GameObject AttackVFX;
   [SerializeField] AudioClip AttackSFX;
@@ -42,7 +43,7 @@ public class AttackAbility : Ability {
     var vfxOrigin = AbilityManager.transform.TransformPoint(AttackVFXOffset);
     SFXManager.Instance.TryPlayOneShot(AttackSFX);
     VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
-    await scope.Any(Animation.WaitPhase(1), HitHandler.Loop(Hitbox, new HitParams(HitConfig, Attributes)));
+    await scope.Any(Animation.WaitPhase(1), HitHandler.Loop(Hitbox, Parrybox, new HitParams(HitConfig, Attributes)));
     Tags.AddFlags(AbilityTag.Cancellable);
     await scope.Run(Animation.WaitPhase(2));
     await scope.Run(Animation.WaitDone);

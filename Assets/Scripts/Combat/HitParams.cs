@@ -11,6 +11,7 @@ public class HitParams {
   // TODO: cache this value? It gets called at least 4x per hit.
   public Vector3 KnockbackVector => HitConfig.KnockbackType.KnockbackVector(HitConfig.KnockbackAngle, Source.transform, Defender.transform);
   public float Damage => HitConfig.Damage.Apply(AttackerAttributes.GetValue(AttributeTag.Damage, 0));
+  public int DefenderTeamID => Defender.GetComponent<Team>().ID;
 
   public float GetKnockbackStrength(float defenderDamage) {
     var defenderWeightFactor = 2f / (1f + DefenderAttributes.GetValue(AttributeTag.Weight));

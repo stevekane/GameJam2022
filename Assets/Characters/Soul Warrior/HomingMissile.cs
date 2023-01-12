@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using static UnityEngine.ParticleSystem;
 
 public class HomingMissile : MonoBehaviour {
   [SerializeField] float Speed = 15;
@@ -34,10 +35,17 @@ public class HomingMissile : MonoBehaviour {
     if (target.TryGetComponent(out Hurtbox hurtbox)) {
       if (hurtbox.TryAttack(Hitter.HitParams))
         Explode();
+    } else if (target.TryGetComponent(out Parrybox parrybox)) {
+      parrybox.TryParry(Hitter.HitParams);
     }
   }
 
   void OnCollisionEnter(Collision c) {
     Explode();
+  }
+
+  void OnWasParried(HitParams hitParams) {
+    transform.forward = hitParams.Defender.transform.forward;
+    Hitter.HitParams.AttackerTeamID = hitParams.DefenderTeamID;
   }
 }

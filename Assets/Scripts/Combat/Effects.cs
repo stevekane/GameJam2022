@@ -12,6 +12,8 @@ public class Effects : MonoBehaviour {
   [Header("OnHit")]
   [SerializeField] GameObject OnHitVFX;
   [SerializeField] AudioClip OnHitSFX;
+  [SerializeField] GameObject OnParryVFX;
+  [SerializeField] AudioClip OnParrySFX;
 
   void OnHurt(HitParams hitParams) {
     var position = transform.position+transform.TransformVector(VFXOffset);
@@ -27,5 +29,13 @@ public class Effects : MonoBehaviour {
     var rotation = Quaternion.LookRotation(direction.normalized);
     VFXManager.Instance.TrySpawnEffect(OnHitVFX, position, rotation);
     SFXManager.Instance.TryPlayOneShot(OnHitSFX);
+  }
+
+  void OnWasParried(HitParams hitParams) {
+    var position = transform.position+transform.TransformVector(VFXOffset);
+    var direction = -hitParams.KnockbackVector;
+    var rotation = Quaternion.LookRotation(direction.normalized);
+    VFXManager.Instance.TrySpawnEffect(OnParryVFX, position, rotation);
+    SFXManager.Instance.TryPlayOneShot(OnParrySFX);
   }
 }
