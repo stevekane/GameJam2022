@@ -7,9 +7,11 @@ public class Defender : MonoBehaviour {
   bool Died = false;
   public Vector3? LastGroundedPosition { get; private set; }
   public Hurtbox[] Hurtboxes;
+  LevelBounds LevelBounds;
 
   void Awake() {
-    Status = GetComponent<Status>();
+    this.InitComponent(out Status);
+    LevelBounds = FindObjectOfType<LevelBounds>();
   }
 
   void FixedUpdate() {
@@ -20,7 +22,7 @@ public class Defender : MonoBehaviour {
       PlayingFallSound = true;
       SFXManager.Instance.TryPlayOneShot(SFXManager.Instance.FallSFX);
     }
-    if (transform.position.y < -30f) {
+    if (LevelBounds && !LevelBounds.IsInBounds(transform.position)) {
       Die();
     }
   }
