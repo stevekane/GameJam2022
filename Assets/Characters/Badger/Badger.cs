@@ -66,52 +66,63 @@ public class Badger : MonoBehaviour {
     var pos = t.position + d*dir.normalized;
     return pos;
   }
-  bool IsInRange(Vector3 pos) {
-    var delta = (pos - transform.position).XZ();
-    return delta.sqrMagnitude < .1f;
-  }
+  bool IsAtDestination() => NavMeshAgent.remainingDistance < NavMeshAgent.stoppingDistance;
 
-  void Start() => MainScope.Start(Waiter.Repeat(Behavior));
+  void Start() => MainScope.Start(Behavior);
   void OnDestroy() => MainScope.Dispose();
 
   async Task Behavior(TaskScope scope) {
-    if (Target == null) {
-      MainScope.Cancel();
-      return;
+    await scope.All(
+      Waiter.Repeat(TryFindTarget),
+      Waiter.Repeat(TryAim),
+      Waiter.Repeat(TryMove),
+      Waiter.Repeat(TryReposition),
+      Waiter.Repeat(TryAttack));
+  }
+
+  void TryFindTarget() {
+    Target = Target ? Target : Player.Get()?.transform;
+  }
+
+  void TryAim() {
+    Mover.SetAim(Target ? (Target.position-transform.position).XZ().normalized : transform.forward);
+  }
+
+  bool ShouldMove = true;
+  void TryMove() {
+    if (ShouldMove) {
+      Mover.SetMoveFromNavMeshAgent();
+    } else {
+      Mover.SetMove(Vector3.zero);
     }
+  }
 
-    var desiredPos = ChoosePosition();
-    var desiredFacing = (Target.position - transform.position).XZ().normalized;
-    var inRange = IsInRange(desiredPos);
+  async Task TryReposition(TaskScope scope) {
+    NavMeshAgent.SetDestination(ChoosePosition());
+    await scope.Tick();
+  }
 
-    async Task MaybeAttack(TaskScope scope) {
-      if (Status.CanAttack) {
-        if (Shield && TargetIsAttacking && TargetIsNear) {
-          Abilities.TryInvoke(ShieldAbility.MainAction);
-          // Hold shield until .5s after target stops attacking, or it dies.
-          await scope.Any(
-            TrueForDuration(Timeval.FromSeconds(.5f), () => !TargetIsAttacking),
-            Waiter.While(() => Shield != null));
-          await Abilities.TryRun(scope, ShieldAbility.MainRelease);
-        } else if (inRange) {
-          Abilities.TryInvoke(PunchAbility.MainAction);
-          await scope.Millis(250);
-          Abilities.TryInvoke(PunchAbility.MainRelease);
-          await scope.While(() => PunchAbility.IsRunning);
-          await scope.Delay(AttackDelay);
-        }
+  async Task TryAttack(TaskScope scope) {
+    if (Target && Status.CanAttack) {
+      if (Shield && TargetIsAttacking && TargetIsNear) {
+        ShouldMove = false;
+        Abilities.TryInvoke(ShieldAbility.MainAction);
+        // Hold shield until .5s after target stops attacking, or it dies.
+        await scope.Any(
+          TrueForDuration(Timeval.FromSeconds(.5f), () => !TargetIsAttacking),
+          Waiter.While(() => Shield != null));
+        await Abilities.TryRun(scope, ShieldAbility.MainRelease);
+        ShouldMove = true;
+      } else if (IsAtDestination()) {
+        ShouldMove = false;
+        Abilities.TryInvoke(PunchAbility.MainAction);
+        await scope.Millis(250);
+        Abilities.TryInvoke(PunchAbility.MainRelease);
+        await scope.While(() => PunchAbility.IsRunning);
+        await scope.Delay(AttackDelay);
+        ShouldMove = true;
       }
     }
-
-    async Task Move(TaskScope scope) {
-      NavMeshAgent.SetDestination(desiredPos);
-      Mover.SetMoveFromNavMeshAgent();
-      await scope.Tick();
-    }
-
-    Mover.SetMoveAim(Vector3.zero, desiredFacing);
-    await MaybeAttack(scope);
-    await Move(scope);
   }
 
   TaskFunc TrueForDuration(Timeval waitTime, Func<bool> pred) => async (TaskScope scope) => {

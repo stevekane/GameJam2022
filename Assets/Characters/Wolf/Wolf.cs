@@ -50,10 +50,7 @@ public class Wolf : MonoBehaviour {
     var delta = t.position.XZ() - transform.position.XZ();
     return transform.position + delta - desiredDist * delta.normalized;
   }
-  bool IsInRange(Vector3 pos) {
-    var delta = (pos - transform.position).XZ();
-    return delta.sqrMagnitude < .1f;
-  }
+  bool IsAtDestination() => NavMeshAgent.remainingDistance < NavMeshAgent.stoppingDistance;
   bool TargetInRange() {
     var delta = (Target.position - transform.position);
     var dist = AttackRange;
@@ -102,7 +99,7 @@ public class Wolf : MonoBehaviour {
   }
 
   async Task TryAttackSequence(TaskScope scope) {
-    if (Target && Status.CanAttack && IsInRange(NavMeshAgent.destination)) {
+    if (Target && Status.CanAttack && IsAtDestination()) {
       var didHit = false;
       DashAbility.Target = Target;
       DashAbility.OnHit = _ => didHit = true;  // TODO: check if the player was the collider?
