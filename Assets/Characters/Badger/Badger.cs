@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public class Badger : MonoBehaviour {
-  public float AttackRange = 2f;
+  public float AttackRange = 4f;
   public Timeval AttackDelay = Timeval.FromMillis(1000);
   Status Status;
   Hurtbox Hurtbox;
@@ -47,6 +47,7 @@ public class Badger : MonoBehaviour {
 
   bool TargetIsAttacking => TargetAbilities.Abilities.Any(a => a.IsRunning && a.HitConfigData != null);
   bool TargetIsNear => (Target.position - transform.position).sqrMagnitude < 7f*7f;
+  bool TargetInAttackRange => (Target.position - transform.position).sqrMagnitude < AttackRange*AttackRange;
 
   void ChooseProtectee() {
     if (Protectee)
@@ -62,11 +63,10 @@ public class Badger : MonoBehaviour {
     var t = Target.transform;
     var other = Protectee ? Protectee.transform : transform;
     var dir = other.position - t.position;
-    var d = AttackRange*.9f;
+    var d = AttackRange - NavMeshAgent.stoppingDistance;
     var pos = t.position + d*dir.normalized;
     return pos;
   }
-  bool IsAtDestination() => NavMeshAgent.remainingDistance < NavMeshAgent.stoppingDistance;
 
   void Start() => MainScope.Start(Behavior);
   void OnDestroy() => MainScope.Dispose();
@@ -113,7 +113,7 @@ public class Badger : MonoBehaviour {
           Waiter.While(() => Shield != null));
         await Abilities.TryRun(scope, ShieldAbility.MainRelease);
         ShouldMove = true;
-      } else if (IsAtDestination()) {
+      } else if (TargetInAttackRange) {
         ShouldMove = false;
         Abilities.TryInvoke(PunchAbility.MainAction);
         await scope.Millis(250);
