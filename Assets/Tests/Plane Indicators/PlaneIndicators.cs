@@ -6,7 +6,6 @@ public class PlaneIndicators : MonoBehaviour {
     transform.parent = null;
   }
   void LateUpdate() {
-    if (Target)
-      transform.position = Target.position;
+    transform.position = Target.position;
   }
 }

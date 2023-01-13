@@ -3,13 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Flash : MonoBehaviour {
-  public Timeval Duration = Timeval.FromMillis(500);
-  public string ColorName = "_EmissionColor";
+  [SerializeField] GameObject RendererRoot;
+  [SerializeField] string ColorName = "_EmissionColor";
+  [SerializeField] Timeval Duration = Timeval.FromMillis(500);
   [ColorUsage(showAlpha: true, hdr: true)]
-  public Color FlashColor = Color.white;
-  public List<Renderer> Renderers;
+  [SerializeField] Color FlashColor = Color.white;
+
+  Renderer[] Renderers;
   List<Material> Materials = new();
   Dictionary<Material, Color> PreviousColors = new();
+
+  void Awake() {
+    Renderers = RendererRoot.GetComponentsInChildren<Renderer>();
+  }
 
   #if UNITY_EDITOR
   [ContextMenu("Test Flash")]
