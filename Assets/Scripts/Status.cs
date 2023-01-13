@@ -217,6 +217,10 @@ public class Status : MonoBehaviour {
     // TODO: merge onComplete with existing.OnComplete?
   }
 
+  // TODO HACK: Use double-buffering instead.
+  List<Action<Status>> NextTick = new();
+  public void AddNextTick(Action<Status> func) => NextTick.Add(func);
+
   List<StatusEffect> Removed = new();
   public void Remove(StatusEffect effect) {
     if (effect != null)
@@ -269,6 +273,8 @@ public class Status : MonoBehaviour {
     Added.ForEach(e => Active.Add(e));
     Added.Clear();
     Active.ForEach(e => e.Apply(this));
+    NextTick.ForEach(f => f(this));
+    NextTick.Clear();
 
 #if UNITY_EDITOR
     DebugEffects.Clear();

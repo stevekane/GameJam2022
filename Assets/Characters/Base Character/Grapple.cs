@@ -66,7 +66,7 @@ public class Grapple : Ability {
     }
     if (Candidate != null) {
       Candidate.Sources.Add(transform.position);
-      Status.AddAttributeModifier(AttributeTag.LocalTimeScale, AttributeModifier.Times(aiming ? AimLocalTimeDilation : 1));
+      Status.AddNextTick(s => s.AddAttributeModifier(AttributeTag.LocalTimeScale, AttributeModifier.Times(aiming ? AimLocalTimeDilation : 1)));
       GrappleAimLine.enabled = aiming;
       GrappleAimLine.SetPosition(1, Candidate.transform.position);
     }
