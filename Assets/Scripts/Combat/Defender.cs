@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Status))]
 public class Defender : MonoBehaviour {
   Status Status;
-  bool PlayingFallSound;
+  bool PlayedFallSound = false;
   bool Died = false;
   public Vector3? LastGroundedPosition { get; private set; }
   public Hurtbox[] Hurtboxes;
@@ -17,11 +17,13 @@ public class Defender : MonoBehaviour {
   void FixedUpdate() {
     var dt = Time.fixedDeltaTime;
     Hurtboxes.ForEach(hb => hb.gameObject.SetActive(Status.IsHittable));
-    if (transform.position.y < -1f && !PlayingFallSound) {
+    if (transform.position.y < LevelBounds.Bottom+10f && !PlayedFallSound) {
       LastGroundedPosition = transform.position;
-      PlayingFallSound = true;
+      PlayedFallSound = true;
       SFXManager.Instance.TryPlayOneShot(SFXManager.Instance.FallSFX);
     }
+    if (Status.IsGrounded)
+      PlayedFallSound = false;
     if (LevelBounds && !LevelBounds.IsInBounds(transform.position)) {
       Die();
     }
