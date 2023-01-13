@@ -14,7 +14,7 @@ public class Grapple : Ability {
   [SerializeField] float AimLocalTimeDilation = 1;
   [SerializeField] float PullSpeed = 15;
   [SerializeField] float TurnSpeed = 360;
-  [SerializeField] float RotationSpeed = 2; // TODO: This probably should be degrees/second
+  [SerializeField] float RotationSpeed = 180;
   [SerializeField] float VaultSpeedMultiplier = 1.25f;
   [SerializeField] float VaultDrag = 2;
   [SerializeField] Timeval WindupDuration = Timeval.FromMillis(250);
@@ -114,7 +114,7 @@ public class Grapple : Ability {
   }
 
   void UpdateCurrentRotationFromVelocity() {
-    var rotationDelta = Time.fixedDeltaTime * RotationSpeed;
+    var rotationDelta = Time.fixedDeltaTime * RotationSpeed / 90; // degrees/s to (-1)-1 unts/s
     var desiredRotation = Vector3.Dot(Velocity.normalized, Vector3.up);
     CurrentRotation = Mathf.MoveTowards(CurrentRotation, desiredRotation, rotationDelta);
     Animator.SetFloat("GrappleRotation", CurrentRotation);

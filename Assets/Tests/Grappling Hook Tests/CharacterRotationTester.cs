@@ -7,12 +7,12 @@ public class CharacterRotationTester : MonoBehaviour {
   [SerializeField] AvatarTransform HandAvatarTransform;
   [SerializeField] LineRenderer LineRenderer;
   [SerializeField] Animator Animator;
-  [Tooltip("Speed of pulling in units per second")]
+  [Tooltip("Rate of pulling in units per second")]
   [SerializeField] float PullSpeed = 15;
-  [Tooltip("Rate of rotation in degrees per second")]
+  [Tooltip("Rate of yaw change in degrees per second")]
   [SerializeField] float TurnSpeed = 360;
-  [Tooltip("This is in normalized units that span a range -1 to 1. Thus, a value of 2 would cover the whole range in 1 second")]
-  [SerializeField] float RotationSpeed = 2;
+  [Tooltip("Rate of pitch change in degrees/second")]
+  [SerializeField] float RotationSpeed = 180;
   [SerializeField] float Distance = 5;
   [SerializeField] float VaultSpeedMultiplier = 1.25f;
   [SerializeField] float Gravity = -20f;
@@ -30,6 +30,29 @@ public class CharacterRotationTester : MonoBehaviour {
   [SerializeField] GameObject VaultVFX;
 
   float CurrentRotation = 0;
+  float NormalizedRotationSpeed => RotationSpeed / 90;
+
+  /*
+  TODO: Express rotation in degrees/second.
+
+  Currently, rotation is expressed in something like... normalized units (except the range is -1 to 1)
+
+  Dot(Vnorm,Up) is a value between -1 and 1.
+
+  This means that the range is 180 degrees.
+
+  Thus, if we express rotationspeed in degrees/second then we must map that into our normalized range.
+
+  For example, if the value is 180 then we expect to rotate 2 units/second which could for example
+  carry you from -1 to 1.
+
+  If the value is 360 then we expect to rotate 4 units/second meaning we could get from -1 to 1 in half a second.
+
+  Therefore, to convert from Degrees/second to dotvalue/second we must divide the value by 90.
+
+  180 / 90 = 2 u/s
+  360 / 90 = 4 u/s etc
+  */
 
   IEnumerator Start() {
     var origin = transform.position;
@@ -61,7 +84,7 @@ public class CharacterRotationTester : MonoBehaviour {
       transform.rotation = Quaternion.RotateTowards(transform.rotation, atTargetXZ, degrees);
       velocity += Time.fixedDeltaTime * Gravity * Vector3.up;
       CharacterController.Move(Time.fixedDeltaTime * velocity);
-      CurrentRotation = Mathf.MoveTowards(CurrentRotation, Vector3.Dot(toTarget, Vector3.up), Time.fixedDeltaTime * RotationSpeed);
+      CurrentRotation = Mathf.MoveTowards(CurrentRotation, Vector3.Dot(toTarget, Vector3.up), Time.fixedDeltaTime * NormalizedRotationSpeed);
       Animator.SetFloat("Rotation", CurrentRotation);
       yield return new WaitForFixedUpdate();
     }
@@ -82,7 +105,7 @@ public class CharacterRotationTester : MonoBehaviour {
       velocity += Time.fixedDeltaTime * Gravity * Vector3.up;
       CharacterController.Move(Time.fixedDeltaTime * velocity);
       LineRenderer.SetPosition(1, Vector3.Lerp(origin, destination, interpolant));
-      CurrentRotation = Mathf.MoveTowards(CurrentRotation, Vector3.Dot(toTarget, Vector3.up), Time.fixedDeltaTime * RotationSpeed);
+      CurrentRotation = Mathf.MoveTowards(CurrentRotation, Vector3.Dot(toTarget, Vector3.up), Time.fixedDeltaTime * NormalizedRotationSpeed);
       Animator.SetFloat("Rotation", CurrentRotation);
       yield return new WaitForFixedUpdate();
     }
@@ -107,7 +130,7 @@ public class CharacterRotationTester : MonoBehaviour {
       var atTargetXZ = Quaternion.LookRotation(toTargetXZ, Vector3.up);
       transform.rotation = Quaternion.RotateTowards(transform.rotation, atTargetXZ, degrees);
       CharacterController.Move(nextPosition-transform.position);
-      CurrentRotation = Mathf.MoveTowards(CurrentRotation, Vector3.Dot(toTarget, Vector3.up), Time.fixedDeltaTime * RotationSpeed);
+      CurrentRotation = Mathf.MoveTowards(CurrentRotation, Vector3.Dot(toTarget, Vector3.up), Time.fixedDeltaTime * NormalizedRotationSpeed);
       Animator.SetFloat("Rotation", CurrentRotation);
       yield return new WaitForFixedUpdate();
     }
@@ -123,7 +146,7 @@ public class CharacterRotationTester : MonoBehaviour {
     for (var i = 0; i < VaultDuration.Ticks; i++) {
       velocity += Time.fixedDeltaTime * Gravity * Vector3.up;
       CharacterController.Move(Time.fixedDeltaTime * velocity);
-      CurrentRotation = Mathf.MoveTowards(CurrentRotation, Vector3.Dot(velocity.normalized, Vector3.up), Time.fixedDeltaTime * RotationSpeed);
+      CurrentRotation = Mathf.MoveTowards(CurrentRotation, Vector3.Dot(velocity.normalized, Vector3.up), Time.fixedDeltaTime * NormalizedRotationSpeed);
       Animator.SetFloat("Rotation", CurrentRotation);
       yield return new WaitForFixedUpdate();
     }
