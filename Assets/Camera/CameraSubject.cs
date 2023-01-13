@@ -1,24 +1,25 @@
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
-/*
-Add to GameObjects you wish to be kept in-view by the camera.
-
-When targeted, this turns on CameraSubjectInterestBounds objects
-which in turn may detect CameraSubjectInterests and target them
-with the CameraManager.
-*/
 public class CameraSubject : MonoBehaviour {
-  public Collider InterestBoundsCollider;
   public float Radius = 3;
 
-  void OnTriggerEnter(Collider c) {
-    if (c.TryGetComponent(out CameraSubjectInterest interest)) {
-      CameraManager.Instance.TargetGroup.AddMember(interest.transform, 1, 1);
-    }
+  bool SpawnGhost = false;
+
+  void Awake() {
+    SpawnGhost = true;
+    CameraManager.Instance.AddTarget(this);
   }
-  void OnTriggerExit(Collider c) {
-    if (c.TryGetComponent(out CameraSubjectInterest interest)) {
-      CameraManager.Instance.TargetGroup.RemoveMember(interest.transform);
-    }
+
+  #if UNITY_EDITOR
+  void OnApplicationQuit() {
+    SpawnGhost = false;
+  }
+  #endif
+
+  void OnDestroy() {
+    CameraManager.Instance.RemoveTarget(this, SpawnGhost);
   }
 }
