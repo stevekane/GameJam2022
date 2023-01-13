@@ -1,9 +1,8 @@
-using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 
 namespace PigMoss {
-  class RadialBurst : Ability {
+    class RadialBurst : Ability {
     public HitConfig HitConfig;
     public Vibrator Vibrator;
     public BigFatSlowBoom ProjectilePrefab;

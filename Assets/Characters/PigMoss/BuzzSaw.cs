@@ -1,10 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
 namespace PigMoss {
-  class BuzzSaw : Ability {
+    class BuzzSaw : Ability {
     enum BladeState { Hidden = 0, Revealed = 1, Extended = 2 }
 
     public AudioClip RevealedSFX;

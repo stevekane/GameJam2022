@@ -1,11 +1,11 @@
 using System;
+using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections;
 using UnityEngine;
 
 namespace Test {
-  public interface ITask : IEnumerator { }
+    public interface ITask : IEnumerator { }
 
   public readonly struct FrameInfo {
     public readonly int Frame;

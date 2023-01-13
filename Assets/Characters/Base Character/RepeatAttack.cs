@@ -13,7 +13,7 @@ public class RepeatAttack : MonoBehaviour {
         await Scope.Delay(Wait);
         await Scope.Run(Attack.MainAction);
       }
-    } catch (Exception e) {
+    } catch (Exception) {
     }
   }
 

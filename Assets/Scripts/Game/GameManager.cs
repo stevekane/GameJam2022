@@ -1,6 +1,6 @@
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Threading.Tasks;
 
 public class GameManager : MonoBehaviour {
   public static async Task Await(TaskScope scope, AsyncOperation op) {

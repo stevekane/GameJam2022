@@ -1,7 +1,7 @@
-using System.Linq;
-using UnityEngine;
-using UnityEditor;
 using Cinemachine;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
 [ExecuteInEditMode]
 public class FocusAllCharacters : MonoBehaviour {

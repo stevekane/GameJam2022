@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
-using UnityEngine.Playables;
 using UnityEngine.Events;
+using UnityEngine.Playables;
 
 namespace Traditional {
-  [Serializable]
+    [Serializable]
   public struct AnimationFrameEvent {
     public int Frame;
     public UnityEvent<AnimationClipPlayable> Event;
