@@ -113,9 +113,9 @@ public class Badger : MonoBehaviour {
         await Abilities.TryRun(scope, ShieldAbility.MainRelease);
         ShouldMove = true;
       } else if (TargetInAttackRange) {
-        ShouldMove = false;
+        //ShouldMove = false;
         Abilities.TryInvoke(PunchAbility.MainAction);
-        await scope.Millis(250);
+        await scope.Millis(750);
         Abilities.TryInvoke(PunchAbility.MainRelease);
         await scope.While(() => PunchAbility.IsRunning);
         await scope.Delay(AttackDelay);
