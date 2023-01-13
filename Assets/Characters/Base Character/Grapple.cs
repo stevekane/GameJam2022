@@ -1,5 +1,7 @@
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UIElements;
+using static UnityEngine.UI.Image;
 
 public class Grapple : Ability {
   const int NotGrappling = 0;
@@ -8,6 +10,7 @@ public class Grapple : Ability {
   const int Vaulting = 3;
 
   [SerializeField] AvatarTransform HookOrigin;
+  [SerializeField] LineRenderer GrappleAimLine;
   [SerializeField] LineRenderer GrappleLine;
   [SerializeField] Animator Animator;
   [SerializeField] float PullSpeed = 15;
@@ -46,23 +49,33 @@ public class Grapple : Ability {
   }, "Throw and pull");
 
   void FixedUpdate() {
-    var layerMask = Defaults.Instance.GrapplePointLayerMask;
-    var queryTriggerInteraction = QueryTriggerInteraction.Collide;
-    var toTarget = float.MaxValue;
+    var aim = AbilityManager.GetAxis(AxisTag.ReallyAim);
+    if (aim.XZ == Vector3.zero) {
+      GrappleAimLine.enabled = false;
+      return;
+    }
+
+    float bestScore = float.MaxValue;
     var eye = transform.position;
     Candidate = null;
     foreach (var grapplePoint in GrapplePointManager.Instance.Points) {
-      var isVisible = grapplePoint.transform.IsVisibleFrom(eye, layerMask, queryTriggerInteraction);
-      var toGrapplePoint = Vector3.Distance(transform.position, grapplePoint.transform.position);
-      if (isVisible && toGrapplePoint < toTarget) {
+      var isVisible = grapplePoint.transform.IsVisibleFrom(eye, Defaults.Instance.GrapplePointLayerMask, QueryTriggerInteraction.Collide);
+      var dist = Vector3.Distance(transform.position, grapplePoint.transform.position);
+      var angle = Mathf.Abs(Vector3.Angle(aim.XZ, (grapplePoint.transform.position - eye).XZ()));
+      var score = angle > 180f ? float.MaxValue : 100f*(angle/180f) + dist;
+      if (isVisible && score < bestScore) {
         Candidate = grapplePoint;
-        toTarget = toGrapplePoint;
+        bestScore = score;
       }
     }
     Candidate?.Sources.Add(transform.position);
+    GrappleAimLine.enabled = Candidate;
+    if (Candidate)
+      GrappleAimLine.SetPosition(1, Candidate.transform.position);
   }
 
   void LateUpdate() {
+    GrappleAimLine.SetPosition(0, HookOrigin.Transform.position);
     GrappleLine.SetPosition(0, HookOrigin.Transform.position);
   }
 

@@ -8,6 +8,7 @@ using UnityEngine;
 public enum AxisTag {
   Move,
   Aim,
+  ReallyAim,
 }
 
 public class AbilityManager : MonoBehaviour {
