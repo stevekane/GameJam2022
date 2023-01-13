@@ -38,9 +38,9 @@ public class Coin : MonoBehaviour {
   }
 
   IEnumerator Collect() {
-    var player = FindObjectOfType<Player>();
+    var player = Player.Get();
     var accel = 60f;
-    while (true) {
+    while (player) {
       var dir = (player.transform.position - transform.position).normalized;
       CollectSpeed += Time.fixedDeltaTime * accel;
       transform.position += Time.fixedDeltaTime * CollectSpeed * dir;

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6823200998282874673}
   - component: {fileID: 114169630031731988}
   m_Layer: 0
-  m_Name: Spike Blood Spray
+  m_Name: Death Blood Spray
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 6823200998282874702}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_LocalScale: {x: 5, y: 5, z: 15}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6823200998337669390}
@@ -118,7 +118,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.3
+      scalar: 2
       minScalar: 0.5
       maxCurve:
         serializedVersion: 2
@@ -1032,8 +1032,8 @@ ParticleSystem:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-      cycleCount: 1
-      repeatInterval: 0.01
+      cycleCount: 15
+      repeatInterval: 0.1
       probability: 1
   SizeModule:
     enabled: 1
