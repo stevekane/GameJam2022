@@ -9,6 +9,7 @@ with the CameraManager.
 */
 public class CameraSubject : MonoBehaviour {
   public Collider InterestBoundsCollider;
+  public float Radius = 3;
 
   void OnTriggerEnter(Collider c) {
     if (c.TryGetComponent(out CameraSubjectInterest interest)) {

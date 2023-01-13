@@ -6,7 +6,7 @@ public class CameraBounds: MonoBehaviour {
     if (c.TryGetComponent(out CameraSubject subject)) {
       if (CameraManager.Instance.TargetGroup.FindMember(subject.transform) < 0) {
         subject.InterestBoundsCollider.enabled = true;
-        CameraManager.Instance.TargetGroup.AddMember(subject.transform, 1, 1);
+        CameraManager.Instance.TargetGroup.AddMember(subject.transform, 1, subject.Radius);
       }
     }
   }
