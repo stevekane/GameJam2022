@@ -1,7 +1,5 @@
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEngine.UI.Image;
 
 public class Grapple : Ability {
   const int NotGrappling = 0;
@@ -13,6 +11,7 @@ public class Grapple : Ability {
   [SerializeField] LineRenderer GrappleAimLine;
   [SerializeField] LineRenderer GrappleLine;
   [SerializeField] Animator Animator;
+  [SerializeField] float AimLocalTimeDilation = 1;
   [SerializeField] float PullSpeed = 15;
   [SerializeField] float TurnSpeed = 360;
   [SerializeField] float RotationSpeed = 2; // TODO: This probably should be degrees/second
@@ -50,28 +49,27 @@ public class Grapple : Ability {
 
   void FixedUpdate() {
     var aim = AbilityManager.GetAxis(AxisTag.ReallyAim);
-    if (aim.XZ == Vector3.zero) {
-      GrappleAimLine.enabled = false;
-      return;
-    }
-
-    float bestScore = float.MaxValue;
+    var aiming = aim.XZ.sqrMagnitude > 0;
+    var direction = aiming ? aim.XZ : transform.forward.XZ();
+    var bestScore = float.MaxValue;
     var eye = transform.position;
     Candidate = null;
     foreach (var grapplePoint in GrapplePointManager.Instance.Points) {
       var isVisible = grapplePoint.transform.IsVisibleFrom(eye, Defaults.Instance.GrapplePointLayerMask, QueryTriggerInteraction.Collide);
       var dist = Vector3.Distance(transform.position, grapplePoint.transform.position);
-      var angle = Mathf.Abs(Vector3.Angle(aim.XZ, (grapplePoint.transform.position - eye).XZ()));
+      var angle = Mathf.Abs(Vector3.Angle(direction, (grapplePoint.transform.position - eye).XZ()));
       var score = angle > 180f ? float.MaxValue : 100f*(angle/180f) + dist;
       if (isVisible && score < bestScore) {
         Candidate = grapplePoint;
         bestScore = score;
       }
     }
-    Candidate?.Sources.Add(transform.position);
-    GrappleAimLine.enabled = Candidate;
-    if (Candidate)
+    if (Candidate != null) {
+      Candidate.Sources.Add(transform.position);
+      Status.AddAttributeModifier(AttributeTag.LocalTimeScale, AttributeModifier.Times(aiming ? AimLocalTimeDilation : 1));
+      GrappleAimLine.enabled = aiming;
       GrappleAimLine.SetPosition(1, Candidate.transform.position);
+    }
   }
 
   void LateUpdate() {
