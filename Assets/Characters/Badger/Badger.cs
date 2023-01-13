@@ -46,7 +46,11 @@ public class Badger : MonoBehaviour {
 
   bool TargetIsAttacking => TargetAbilities.Abilities.Any(a => a.IsRunning && a.HitConfigData != null);
   bool TargetIsNear => (Target.position - transform.position).sqrMagnitude < 7f*7f;
-  bool TargetInAttackRange => (Target.position - transform.position).sqrMagnitude < AttackRange*AttackRange;
+  bool TargetInRange(float range) {
+    var delta = (Target.position - transform.position);
+    var dist = range;
+    return delta.y < dist && delta.XZ().sqrMagnitude < dist*dist;
+  }
 
   void ChooseProtectee() {
     if (Protectee)
@@ -112,10 +116,10 @@ public class Badger : MonoBehaviour {
           Waiter.While(() => Shield != null));
         await Abilities.TryRun(scope, ShieldAbility.MainRelease);
         ShouldMove = true;
-      } else if (TargetInAttackRange) {
-        ShouldMove = false;
+      } else if (TargetInRange(AttackRange)) {
+        //ShouldMove = false;
         Abilities.TryInvoke(PunchAbility.MainAction);
-        await scope.Millis(250);
+        await scope.Millis(750);
         Abilities.TryInvoke(PunchAbility.MainRelease);
         await scope.While(() => PunchAbility.IsRunning);
         await scope.Delay(AttackDelay);
