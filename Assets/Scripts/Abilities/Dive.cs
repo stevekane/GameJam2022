@@ -33,6 +33,7 @@ public class Dive : Ability {
 
   public override async Task MainAction(TaskScope scope) {
     // Windup
+    Mover.ResetVelocityAndMovementEffects();
     using var diveEffect = Status.Add(DiveEffect);
     SFXManager.Instance.TryPlayOneShot(WindupSFX);
     VFXManager.Instance.TrySpawnWithParent(WindupVFX, AvatarAttacher.GetBoneTransform(WindupVFXAttachment), 1);

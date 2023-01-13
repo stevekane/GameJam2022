@@ -50,7 +50,7 @@ public class Damage : MonoBehaviour {
       var knockbackVector = hitParams.KnockbackVector;
       var knockbackStrength = hitParams.GetKnockbackStrength(Points);
       var rotation = Quaternion.LookRotation(knockbackVector);
-      Mover.ResetVelocity();
+      Mover.ResetVelocityAndMovementEffects();
       Status.Add(new HitStopEffect(knockbackVector, hitParams.HitConfig.HitStopDuration.Ticks),
         s => {
           s.Add(new HurtStunEffect(hitParams.HitConfig.StunDuration.Ticks));
