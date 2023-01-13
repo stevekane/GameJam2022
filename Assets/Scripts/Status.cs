@@ -101,7 +101,7 @@ public class KnockbackEffect : StatusEffect {
 
   public float Drag;
   public Vector3 Velocity;
-  public Vector3? WallbounceTarget;
+  public Vector3? WallbounceTarget;  // TODO: Obsolete for now. Remove at some point.
   public bool IsAirborne = false;
   bool IsFirstFrame = true; // Hacky way to ensure we have a hitflinch+cancel effect when a defender is first hit
   public KnockbackEffect(Vector3 velocity, Vector3? wallbounceTarget = null, float drag = 5f) {
