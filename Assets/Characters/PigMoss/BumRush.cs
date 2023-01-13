@@ -1,11 +1,9 @@
-using System;
-using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace PigMoss {
-  class BumRush : Ability {
+    class BumRush : Ability {
     public Animator Animator;
     public Timeval WindupDuration = Timeval.FromSeconds(1);
     public Timeval RushDuration = Timeval.FromSeconds(.5f);

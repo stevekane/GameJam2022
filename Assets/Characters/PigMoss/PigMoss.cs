@@ -1,11 +1,10 @@
-using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Linq;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace PigMoss {
-  public class PigMoss : MonoBehaviour {
+    public class PigMoss : MonoBehaviour {
     [SerializeField] AbilityManager AbilityManager;
     [SerializeField] Ability[] Abilities;
     [SerializeField] TargetingConfig TargetingConfig;

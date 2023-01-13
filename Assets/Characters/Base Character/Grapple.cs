@@ -1,7 +1,5 @@
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEngine.UI.Image;
 
 public class Grapple : Ability {
   const int NotGrappling = 0;

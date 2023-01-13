@@ -1,5 +1,5 @@
-using UnityEngine;
 using Cinemachine;
+using UnityEngine;
 
 public class PlayerVirtualCamera : MonoBehaviour {
   public static CinemachineVirtualCamera Instance;

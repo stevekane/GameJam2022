@@ -1,8 +1,8 @@
-using UnityEngine;
 using Cinemachine;
+using UnityEngine;
 
 namespace Traditional {
-  public class CameraFramer : MonoBehaviour {
+    public class CameraFramer : MonoBehaviour {
     [SerializeField] CinemachineTargetGroup Group;
     [SerializeField] string Tag;
 

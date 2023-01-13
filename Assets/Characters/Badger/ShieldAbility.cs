@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Threading.Tasks;
-using UnityEngine;
 
 public class ShieldAbility : Ability {
   public int Index;

@@ -15,7 +15,7 @@ public class RepeatDive : MonoBehaviour {
         await Scope.Run(Jump.MainAction);
         await Scope.Run(Dive.MainAction);
       }
-    } catch (Exception e) {
+    } catch (Exception) {
     }
   }
 

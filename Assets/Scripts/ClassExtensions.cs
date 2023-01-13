@@ -1,9 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Animations;
-using UnityEngine.Playables;
 
 public static class VectorExtensions {
   // Projects a Vector3 to the XZ plane. Used when we only care about horizontal movement.

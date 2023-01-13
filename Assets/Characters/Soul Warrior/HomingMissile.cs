@@ -1,6 +1,4 @@
-using System;
 using UnityEngine;
-using static UnityEngine.ParticleSystem;
 
 public class HomingMissile : MonoBehaviour {
   [SerializeField] float Speed = 15;

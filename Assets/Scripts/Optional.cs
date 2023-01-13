@@ -1,4 +1,3 @@
-using System;
 // Simple utility class to allow null chaining for unity game objects.
 // Example usage:
 //   Optional<Animator> animator = GetComponent<Animator>();
