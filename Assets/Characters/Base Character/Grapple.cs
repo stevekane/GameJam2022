@@ -66,6 +66,7 @@ public class Grapple : Ability {
     }
     if (Candidate != null) {
       Candidate.Sources.Add(transform.position);
+      // HACK: This won't work in general but happens to work currently. Should be done through Status
       Status.AddAttributeModifier(AttributeTag.LocalTimeScale, AttributeModifier.Times(aiming ? AimLocalTimeDilation : 1));
       GrappleAimLine.enabled = aiming;
       GrappleAimLine.SetPosition(1, Candidate.transform.position);
