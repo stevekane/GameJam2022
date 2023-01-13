@@ -68,6 +68,12 @@ public class Mover : MonoBehaviour {
     MoveVelocity = Vector3.zero;
     Velocity = Vector3.zero;
   }
+  // TODO HACK: better way to cancel movement effects
+  public void ResetVelocityAndMovementEffects() {
+    ResetVelocity();
+    Status.Remove(Status.Get<KnockbackEffect>());
+    Status.Remove(Status.Get<VaultEffect>());
+  }
 
   void FixedUpdate() {
     var desiredMoveDir = GetMove();
