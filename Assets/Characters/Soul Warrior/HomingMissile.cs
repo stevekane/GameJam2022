@@ -10,7 +10,6 @@ public class HomingMissile : MonoBehaviour {
 
   Hitter Hitter;
   Rigidbody Rigidbody;
-  Transform Target;
 
   void Awake() {
     Rigidbody = GetComponent<Rigidbody>();
@@ -18,11 +17,8 @@ public class HomingMissile : MonoBehaviour {
     Hitbox.OnTriggerEnterSource.Listen(OnHitboxEnter);
   }
 
-  void Start() => Target = FindObjectOfType<Player>().transform;
   void FixedUpdate() {
-    if (Target) {
-      Rigidbody.velocity = transform.forward * Speed;
-    }
+    Rigidbody.velocity = transform.forward * Speed;
   }
 
   void Explode() {
