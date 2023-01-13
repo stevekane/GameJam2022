@@ -13,6 +13,8 @@ public class Throw : Ability {
   [SerializeField] Hitter ProjectilePrefab;
   [SerializeField] HitConfig HitConfig;
 
+  public Transform Target { get; set; }
+
   public override HitConfig HitConfigData => HitConfig;
 
   InlineEffect ThrowEffect => new(s => {
@@ -28,7 +30,8 @@ public class Throw : Ability {
       var animation = AnimationDriver.Play(scope, Animation);
       await animation.WaitFrame(Windup.AnimFrames)(scope);
       var position = Spawn.Transform.position;
-      var rotation = AbilityManager.transform.rotation;
+      var dir = (Target ? AbilityManager.transform.position.TryGetDirection(Target.position) : null) ?? AbilityManager.transform.forward;
+      var rotation = Quaternion.LookRotation(dir);
       var projectile = Instantiate(ProjectilePrefab, position, rotation);
       projectile.HitParams = new(HitConfig, Attributes.SerializedCopy, Attributes.gameObject, projectile.gameObject);
       SFXManager.Instance.TryPlayOneShot(SpawnSFX);

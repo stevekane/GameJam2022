@@ -18,9 +18,9 @@ public class Sniper : MonoBehaviour {
   TaskScope Scope = new();
 
   void Awake() {
-    NavMeshAgent = GetComponent<NavMeshAgent>();
-    AbilityManager = GetComponent<AbilityManager>();
-    Mover = GetComponent<Mover>();
+    this.InitComponent(out NavMeshAgent);
+    this.InitComponent(out AbilityManager);
+    this.InitComponent(out Mover);
     Abilities = GetComponentsInChildren<Ability>();
   }
   void Start() => Scope.Start(Behavior);
@@ -53,8 +53,10 @@ public class Sniper : MonoBehaviour {
   }
 
   async Task TryStartAbility(TaskScope scope) {
-    var index = UnityEngine.Random.Range(0, Abilities.Length);
-    await AbilityManager.TryRun(scope, Abilities[index].MainAction);
+    var ability = Abilities[UnityEngine.Random.Range(0, Abilities.Length)];
+    if (ability is Throw t)
+      t.Target = Target;
+    await AbilityManager.TryRun(scope, ability.MainAction);
     await scope.Delay(AbilityDelay);
   }
 
