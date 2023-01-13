@@ -19,4 +19,13 @@ public class Spawner : MonoBehaviour {
     VFXManager.Instance.TrySpawnEffect(DoneVFX, transform.position + VFXOffset, DoneVFX.transform.rotation);
     spawn.gameObject.SetActive(true);
   }
+
+#if UNITY_EDITOR
+  [ContextMenu("Snap to Ground")]
+  public void TestFlash() {
+    if (Physics.Raycast(new Ray(transform.position, Vector3.down), out var hit, float.MaxValue, Layers.EnvironmentMask))
+      transform.position = hit.point;
+  }
+#endif
+
 }
