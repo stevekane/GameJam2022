@@ -193,10 +193,14 @@ MonoBehaviour:
       FramesPerSecond: 60
     BlendInFraction: 0
     BlendOutFraction: 0.2
-  WindupVFXTransform: {fileID: 66616898}
+  WindupVFXAttachment:
+    Value: 0
+    String: Hips
   WindupVFX: {fileID: 5004110830200433158, guid: e8cd8df4f7ff541489a01ae1439a2204, type: 3}
   WindupSFX: {fileID: 8300000, guid: bc7ce4173f77cb14584df01058caea92, type: 3}
-  LandVFXTransform: {fileID: 0}
+  LandVFXAttachment:
+    Value: 0
+    String: Hips
   LandVFX: {fileID: 1418612635309521422, guid: 0de62770a20c55c44905cf3984977a64, type: 3}
   LandSFX: {fileID: 8300000, guid: 78850fd5336d0a54a9f85f580d94877d, type: 3}
   Hitbox: {fileID: 881263286}
@@ -349,6 +353,7 @@ MonoBehaviour:
     BlendInFraction: 0.15
     BlendOutFraction: 0.15
   Hitbox: {fileID: 1425603668}
+  Parrybox: {fileID: 0}
   AttackVFXOffset: {x: 0, y: 1, z: 0}
   AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
   AttackSFX: {fileID: 8300000, guid: 13a4de47aac3fa74abfddf49a13f92c3, type: 3}
@@ -982,7 +987,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994134, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994158, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: Renderers.Array.data[0]
@@ -996,6 +1001,10 @@ PrefabInstance:
       propertyPath: m_Avatar
       value: 
       objectReference: {fileID: 9000000, guid: a50cd06a0668d1a418d586a2944e3ed5, type: 3}
+    - target: {fileID: 8224746052066751759, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
+      propertyPath: Radius
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
