@@ -48,12 +48,17 @@ public class Wolf : MonoBehaviour {
   Vector3 ChoosePosition(float desiredDist) {
     var t = Target.transform;
     var delta = t.position.XZ() - transform.position.XZ();
-    return transform.position + delta - desiredDist * delta.normalized;
+    return transform.position + delta - (desiredDist - NavMeshAgent.stoppingDistance) * delta.normalized;
   }
-  bool IsAtDestination() => NavMeshAgent.remainingDistance < NavMeshAgent.stoppingDistance;
-  bool TargetInRange() {
+  bool TargetInXZRange(float range) {
     var delta = (Target.position - transform.position);
-    var dist = AttackRange;
+    var dist = range;
+    return delta.XZ().sqrMagnitude < dist*dist;
+  }
+
+  bool TargetInRange(float range) {
+    var delta = (Target.position - transform.position);
+    var dist = range;
     return delta.y < dist && delta.XZ().sqrMagnitude < dist*dist;
   }
 
@@ -99,7 +104,7 @@ public class Wolf : MonoBehaviour {
   }
 
   async Task TryAttackSequence(TaskScope scope) {
-    if (Target && Status.CanAttack && IsAtDestination()) {
+    if (Target && Status.CanAttack && TargetInRange(DashRange)) {
       var didHit = false;
       DashAbility.Target = Target;
       DashAbility.OnHit = _ => didHit = true;  // TODO: check if the player was the collider?
@@ -111,6 +116,7 @@ public class Wolf : MonoBehaviour {
         DesiredDistance = AttackRange*.7f;
         await scope.Any(
           TryFinisherSequence,
+          Waiter.Until(() => !TargetInXZRange(DashRange)),
           Waiter.Until(() => Status.IsHurt));
       }
       ShouldMove = false;
@@ -121,11 +127,11 @@ public class Wolf : MonoBehaviour {
   }
 
   async Task TryFinisherSequence(TaskScope scope) {
-    await scope.Until(() => TargetInRange() && Status.CanAttack);
+    await scope.Until(() => TargetInRange(AttackRange) && Status.CanAttack);
     await Abilities.TryRun(scope, LightAbility.MainAction);
-    await scope.Until(() => TargetInRange() && Status.CanAttack);
+    await scope.Until(() => TargetInRange(AttackRange) && Status.CanAttack);
     await Abilities.TryRun(scope, LightAbility.MainAction);
-    await scope.Until(() => TargetInRange() && Status.CanAttack);
+    await scope.Until(() => TargetInRange(AttackRange) && Status.CanAttack);
     await Abilities.TryRun(scope, HeavyAbility.MainAction);
   }
 }
