@@ -29,6 +29,7 @@ public class AnimationDriverTester : MonoBehaviour {
   #if UNITY_EDITOR
   void OnDrawGizmos() {
     Handles.Label(Animator.transform.position + 2 * Vector3.up, "Animator");
+    Handles.Label(AnimationDriver.transform.position + 2 * Vector3.up, "Animation Driver");
   }
   #endif
 }
