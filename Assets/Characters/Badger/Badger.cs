@@ -101,6 +101,9 @@ public class Badger : MonoBehaviour {
   }
 
   async Task TryReposition(TaskScope scope) {
+    if (Status.IsGrounded) {
+      NavMeshAgent.Warp(transform.position);
+    }
     NavMeshAgent.SetDestination(ChoosePosition());
     await scope.Tick();
   }

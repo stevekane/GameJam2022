@@ -16,7 +16,7 @@ public class AnimationDriverTester : MonoBehaviour {
         try {
           Animator.SetTrigger("Attack");
           AnimationDriver.Play(s, AnimationConfig);
-          await s.Delay(Timeval.FromSeconds(1));
+          await s.Delay(Timeval.FromSeconds(3));
         } catch (Exception e) {
           Debug.LogWarning(e.Message);
         }
