@@ -28,7 +28,7 @@ public class Mover : MonoBehaviour {
   public Vector3 Velocity { get; private set; }
   public float FallSpeed { get; private set; }
 
-  void Awake() {
+  public void Awake() {
     this.InitComponent(out Controller);
     this.InitComponent(out AbilityManager);
     this.InitComponent(out AnimationDriver);
@@ -53,7 +53,9 @@ public class Mover : MonoBehaviour {
   }
 
   public void SetMoveFromNavMeshAgent() {
-    SetMove(NavMeshAgent.desiredVelocity.normalized);
+    // TODO: Probably move this out of here altogether
+    // Mover likely does not need to know if it is being driven via NavMesh
+    Move(Time.fixedDeltaTime * NavMeshAgent.desiredVelocity);
   }
   public void SetMove(Vector3 v) => AbilityManager.GetAxis(AxisTag.Move).Update(0, new Vector2(v.x, v.z));
   public void SetAim(Vector3 v) => AbilityManager.GetAxis(AxisTag.Aim).Update(0, new Vector2(v.x, v.z));
@@ -74,7 +76,7 @@ public class Mover : MonoBehaviour {
     Status.Remove(Status.Get<VaultEffect>());
   }
 
-  void FixedUpdate() {
+  public void FixedUpdate() {
     var desiredMoveDir = GetMove();
     var desiredFacing = GetAim();
     var localTimeScale = Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
@@ -112,9 +114,14 @@ public class Mover : MonoBehaviour {
     animator.SetBool("IsGrounded", Status.IsGrounded);
     animator.SetBool("IsHurt", Status.IsHurt);
     AnimationDriver.SetSpeed(localTimeScale < 1 ? localTimeScale : AnimationDriver.BaseSpeed);
+
+    if (NavMeshAgent) {
+      NavMeshAgent.nextPosition = transform.position;
+      Debug.DrawRay(NavMeshAgent.destination + 4* Vector3.up, 4*Vector3.down, Color.blue);
+    }
   }
 
-  void OnDrawGizmos() {
+  public void OnDrawGizmos() {
     if (NavMeshAgent != null) {
       Gizmos.color = NavMeshAgent.isOnOffMeshLink ? Color.green : Color.red;
       Gizmos.DrawRay(transform.position + 4 * Vector3.up, 4 * Vector3.down);

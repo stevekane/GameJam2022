@@ -94,7 +94,7 @@ public class Badger : MonoBehaviour {
   bool ShouldMove = true;
   void TryMove() {
     if (ShouldMove) {
-      Mover.SetMoveFromNavMeshAgent();
+      // Mover.SetMoveFromNavMeshAgent();
     } else {
       Mover.SetMove(Vector3.zero);
     }
@@ -102,10 +102,11 @@ public class Badger : MonoBehaviour {
 
   async Task TryReposition(TaskScope scope) {
     if (Status.IsGrounded) {
-      NavMeshAgent.Warp(transform.position);
+      // NavMeshAgent.Warp(transform.position);
     }
+    // NavMeshAgent.SetDestination(ChoosePosition());
     NavMeshAgent.SetDestination(ChoosePosition());
-    await scope.Tick();
+    await scope.Delay(Timeval.FromSeconds(3));
   }
 
   async Task TryAttack(TaskScope scope) {
