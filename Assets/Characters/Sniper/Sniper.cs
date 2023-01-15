@@ -14,14 +14,16 @@ public class Sniper : MonoBehaviour {
   NavMeshAgent NavMeshAgent;
   AbilityManager AbilityManager;
   Mover Mover;
-  Ability[] Abilities;
+  AIMover AIMover;
+  Throw Throw;
   TaskScope Scope = new();
 
   void Awake() {
     this.InitComponent(out NavMeshAgent);
     this.InitComponent(out AbilityManager);
     this.InitComponent(out Mover);
-    Abilities = GetComponentsInChildren<Ability>();
+    this.InitComponent(out AIMover);
+    this.InitComponentFromChildren(out Throw);
   }
   void Start() => Scope.Start(Behavior);
   void OnDestroy() => Scope.Dispose();
@@ -44,7 +46,7 @@ public class Sniper : MonoBehaviour {
   }
 
   void TryMove() {
-    Mover.SetMoveFromNavMeshAgent();
+    AIMover.SetMoveFromNavMeshAgent();
   }
 
   async Task TryReposition(TaskScope scope) {
@@ -53,10 +55,8 @@ public class Sniper : MonoBehaviour {
   }
 
   async Task TryStartAbility(TaskScope scope) {
-    var ability = Abilities[UnityEngine.Random.Range(0, Abilities.Length)];
-    if (ability is Throw t)
-      t.Target = Target;
-    await AbilityManager.TryRun(scope, ability.MainAction);
+    Throw.Target = Target;
+    await AbilityManager.TryRun(scope, Throw.MainAction);
     await scope.Delay(AbilityDelay);
   }
 

@@ -26,8 +26,8 @@ public static class VectorExtensions {
     return vector.sqrMagnitude > 0 ? vector.normalized : null;
   }
 
-  public static Vector3 MidPoint(this Vector3 first, Vector3 second) {
-    return first+(second-first)/2;
+  public static float SqrDistance(this Vector3 a, Vector3 b) {
+    return (a-b).sqrMagnitude;
   }
 }
 

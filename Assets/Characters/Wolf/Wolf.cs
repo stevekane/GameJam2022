@@ -11,6 +11,7 @@ public class Wolf : MonoBehaviour {
   Transform Target;
   NavMeshAgent NavMeshAgent;
   Mover Mover;
+  AIMover AIMover;
   AbilityManager Abilities;
   CycleAbility LightAbility;
   AttackAbility HeavyAbility;
@@ -29,6 +30,7 @@ public class Wolf : MonoBehaviour {
     Target = Player.Get().transform;
     this.InitComponent(out Status);
     this.InitComponent(out Mover);
+    this.InitComponent(out AIMover);
     this.InitComponent(out NavMeshAgent);
     this.InitComponentFromChildren(out Hurtbox);
     this.InitComponent(out Abilities);
@@ -84,7 +86,7 @@ public class Wolf : MonoBehaviour {
   bool ShouldMove = true;
   void TryMove() {
     if (ShouldMove)
-      Mover.SetMoveFromNavMeshAgent();
+      AIMover.SetMoveFromNavMeshAgent();
   }
 
   async Task TryJump(TaskScope scope) {
