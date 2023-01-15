@@ -14,6 +14,7 @@ public class AttackAbility : Ability {
   [SerializeField] Vector3 AttackVFXOffset;
   [SerializeField] GameObject AttackVFX;
   [SerializeField] AudioClip AttackSFX;
+  [SerializeField] bool RecoveryCancelable = true;
 
   [NonSerialized] AnimationJob Animation = null;
 
@@ -44,8 +45,9 @@ public class AttackAbility : Ability {
     SFXManager.Instance.TryPlayOneShot(AttackSFX);
     VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
     await scope.Any(Animation.WaitPhase(1), HitHandler.Loop(Hitbox, Parrybox, new HitParams(HitConfig, Attributes), OnHit));
-    Tags.AddFlags(AbilityTag.Cancellable);
     await scope.Run(Animation.WaitPhase(2));
+    if (RecoveryCancelable)
+      Tags.AddFlags(AbilityTag.Cancellable);
     await scope.Run(Animation.WaitDone);
   }
 

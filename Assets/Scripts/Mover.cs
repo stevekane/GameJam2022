@@ -127,6 +127,7 @@ public class Mover : MonoBehaviour {
         Debug.Log($"Teleported to {destination}");
         Debug.DrawLine(linkData.startPos, linkData.endPos, Color.green, 10);
         NavMeshAgent.Warp(destination);
+        NavMeshAgent.CompleteOffMeshLink();
       } else {
         NavMeshAgent.nextPosition = transform.position;
       }

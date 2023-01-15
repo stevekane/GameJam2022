@@ -1,9 +1,8 @@
 using System;
 using UnityEngine;
 
-public class AnimationDriverTester : MonoBehaviour {
-  [SerializeField] AnimationDriver AnimationDriver;
-  [SerializeField] AnimationJobConfig AnimationConfig;
+public class AnimatorTester : MonoBehaviour {
+  [SerializeField] Animator Animator;
   [SerializeField] Timeval Period = Timeval.FromSeconds(1);
 
   TaskScope scope = new();
@@ -11,7 +10,7 @@ public class AnimationDriverTester : MonoBehaviour {
     try {
       await scope.Repeat(async s => {
         try {
-          AnimationDriver.Play(s, AnimationConfig);
+          Animator.Play("Attack");
           await s.Delay(Period);
         } catch (Exception e) {
           Debug.LogWarning(e.Message);
