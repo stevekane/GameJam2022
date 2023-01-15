@@ -56,7 +56,7 @@ public class Mover : MonoBehaviour {
   public void SetMoveFromNavMeshAgent() {
     // TODO: Probably move this out of here altogether
     // Mover likely does not need to know if it is being driven via NavMesh
-    Move(Time.fixedDeltaTime * NavMeshAgent.desiredVelocity);
+    SetMove(NavMeshAgent.desiredVelocity.normalized);
   }
   public void SetMove(Vector3 v) => AbilityManager.GetAxis(AxisTag.Move).Update(0, new Vector2(v.x, v.z));
   public void SetAim(Vector3 v) => AbilityManager.GetAxis(AxisTag.Aim).Update(0, new Vector2(v.x, v.z));

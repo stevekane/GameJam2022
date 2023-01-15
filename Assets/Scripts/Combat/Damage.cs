@@ -45,17 +45,19 @@ public class Damage : MonoBehaviour {
 
   void OnHurt(HitParams hitParams) {
     AddPoints(hitParams.Damage);
-    var knockbackVector = hitParams.KnockbackVector;
-    if (Status && Status.IsKnockable) {
-      Mover.ResetVelocityAndMovementEffects();
-      Status.Add(new HitStopEffect(knockbackVector, hitParams.HitConfig.HitStopDuration.Ticks),
-        s => {
-          s.Add(new HurtStunEffect(hitParams.HitConfig.StunDuration.Ticks));
-          s.Add(new SlowFallDuration(hitParams.HitConfig.SlowFallDuration.Ticks));
-          s.Add(new KnockbackEffect(knockbackVector * hitParams.GetKnockbackStrength(Points)));
-        });
-    } else {
-      Status.Add(new HitStopEffect(knockbackVector, hitParams.HitConfig.HitStopDuration.Ticks));
+    if (Status) {
+      var knockbackVector = hitParams.KnockbackVector;
+      if (Status.IsKnockable) {
+        Mover.ResetVelocityAndMovementEffects();
+        Status.Add(new HitStopEffect(knockbackVector, hitParams.HitConfig.HitStopDuration.Ticks),
+          s => {
+            s.Add(new HurtStunEffect(hitParams.HitConfig.StunDuration.Ticks));
+            s.Add(new SlowFallDuration(hitParams.HitConfig.SlowFallDuration.Ticks));
+            s.Add(new KnockbackEffect(knockbackVector * hitParams.GetKnockbackStrength(Points)));
+          });
+      } else {
+        Status.Add(new HitStopEffect(knockbackVector, hitParams.HitConfig.HitStopDuration.Ticks));
+      }
     }
   }
 
