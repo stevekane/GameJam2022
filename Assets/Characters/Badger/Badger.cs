@@ -12,6 +12,7 @@ public class Badger : MonoBehaviour {
   Transform Target;
   Transform Protectee;
   NavMeshAgent NavMeshAgent;
+  AIMover AIMover;
   Mover Mover;
   AbilityManager Abilities;
   AbilityManager TargetAbilities;
@@ -30,6 +31,7 @@ public class Badger : MonoBehaviour {
     Target = Player.Get().transform;
     TargetAbilities = Target.GetComponent<AbilityManager>();
     Status = GetComponent<Status>();
+    AIMover = GetComponent<AIMover>();
     Mover = GetComponent<Mover>();
     NavMeshAgent = GetComponent<NavMeshAgent>();
     Hurtbox = GetComponentInChildren<Hurtbox>();
@@ -79,8 +81,8 @@ public class Badger : MonoBehaviour {
       Waiter.Repeat(TryFindTarget),
       Waiter.Repeat(TryAim),
       Waiter.Repeat(TryMove),
-      Waiter.Repeat(TryReposition),
-      Waiter.Repeat(TryAttack));
+      Waiter.Repeat(TryReposition));
+      //Waiter.Repeat(TryAttack));
   }
 
   void TryFindTarget() {
@@ -94,7 +96,7 @@ public class Badger : MonoBehaviour {
   bool ShouldMove = true;
   async Task TryMove(TaskScope scope) {
     if (ShouldMove) {
-      Mover.SetMoveFromNavMeshAgent();
+      AIMover.SetMoveFromNavMeshAgent();
     } else {
       Mover.SetMove(Vector3.zero);
     }
