@@ -101,12 +101,7 @@ public class Badger : MonoBehaviour {
     await scope.Tick();
   }
 
-  bool WasGrounded = false;
   async Task TryReposition(TaskScope scope) {
-    if (!WasGrounded && Status.IsGrounded) {
-      NavMeshAgent.Warp(transform.position);
-    }
-    WasGrounded = Status.IsGrounded;
     NavMeshAgent.SetDestination(ChoosePosition());
     await scope.Tick();
   }
@@ -142,4 +137,14 @@ public class Badger : MonoBehaviour {
       await scope.Tick();
     }
   };
+
+  void OnDrawGizmos() {
+    if (NavMeshAgent) {
+      Gizmos.DrawSphere(Vector3.up+NavMeshAgent.nextPosition, 1f);
+      var corners = NavMeshAgent.path.corners;
+      for (var i = 0; i < corners.Length-1; i++) {
+        Gizmos.DrawLine(Vector3.up+corners[i], Vector3.up+corners[i+1]);
+      }
+    }
+  }
 }
