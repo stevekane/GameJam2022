@@ -53,10 +53,11 @@ public class Mover : MonoBehaviour {
     SetAim(aim);
   }
 
+  // TODO: Probably move this out of here altogether
+  // Mover likely does not need to know if it is being driven via NavMesh
+  bool WasGrounded = true, WasOnLink = false;
   public void SetMoveFromNavMeshAgent() {
-    // TODO: Probably move this out of here altogether
-    // Mover likely does not need to know if it is being driven via NavMesh
-    SetMove(NavMeshAgent.desiredVelocity.normalized);
+    SetMove(NavMeshAgent.velocity.normalized);
   }
   public void SetMove(Vector3 v) => AbilityManager.GetAxis(AxisTag.Move).Update(0, new Vector2(v.x, v.z));
   public void SetAim(Vector3 v) => AbilityManager.GetAxis(AxisTag.Aim).Update(0, new Vector2(v.x, v.z));
@@ -109,9 +110,7 @@ public class Mover : MonoBehaviour {
 
     // Animation
     var animator = AnimationDriver.Animator;
-    var orientedVelocity = NavMeshAgent
-      ? NavMeshAgent.velocity.normalized
-      : Quaternion.Inverse(transform.rotation)*InputVelocity;
+    var orientedVelocity = Quaternion.Inverse(transform.rotation)*InputVelocity;
     animator.SetFloat("RightVelocity", orientedVelocity.x);
     animator.SetFloat("ForwardVelocity", orientedVelocity.z);
     animator.SetBool("IsGrounded", Status.IsGrounded);
@@ -119,14 +118,22 @@ public class Mover : MonoBehaviour {
     AnimationDriver.SetSpeed(localTimeScale < 1 ? localTimeScale : AnimationDriver.BaseSpeed);
 
     if (NavMeshAgent) {
+      // Hacks to update navmesh agent state to behave correctly.
+      if (!WasGrounded && Status.IsGrounded)
+        NavMeshAgent.Warp(transform.position);
+      if (WasOnLink != NavMeshAgent.isOnOffMeshLink && Status.IsGrounded)
+        NavMeshAgent.Warp(transform.position);
+      WasGrounded = Status.IsGrounded;
+      WasOnLink = NavMeshAgent.isOnOffMeshLink;
+
       if (NavMeshAgent.isOnOffMeshLink) {
-        var linkData = NavMeshAgent.currentOffMeshLinkData;
-        var toStart = Vector3.Distance(transform.position, linkData.startPos);
-        var toEnd = Vector3.Distance(transform.position, linkData.endPos);
-        var destination = toStart < toEnd ? linkData.endPos : linkData.startPos;
-        Debug.Log($"Teleported to {destination}");
-        Debug.DrawLine(linkData.startPos, linkData.endPos, Color.green, 10);
-        NavMeshAgent.Warp(destination);
+        //var linkData = NavMeshAgent.currentOffMeshLinkData;
+        //var toStart = Vector3.Distance(transform.position, linkData.startPos);
+        //var toEnd = Vector3.Distance(transform.position, linkData.endPos);
+        //var destination = toStart < toEnd ? linkData.endPos : linkData.startPos;
+        //Debug.Log($"Teleported to {destination}");
+        //Debug.DrawLine(linkData.startPos, linkData.endPos, Color.green, 10);
+        NavMeshAgent.nextPosition = transform.position;
       } else {
         NavMeshAgent.nextPosition = transform.position;
       }
@@ -137,6 +144,10 @@ public class Mover : MonoBehaviour {
     if (NavMeshAgent != null) {
       Gizmos.color = NavMeshAgent.isOnOffMeshLink ? Color.green : Color.red;
       Gizmos.DrawRay(transform.position + 4 * Vector3.up, 4 * Vector3.down);
+      Gizmos.DrawRay(transform.position + 3 * Vector3.up, NavMeshAgent.desiredVelocity);
+      Gizmos.color = Color.blue;
+      Gizmos.DrawRay(transform.position + 4 * Vector3.up, NavMeshAgent.velocity);
+
     }
   }
 }
