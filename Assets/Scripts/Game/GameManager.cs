@@ -78,7 +78,8 @@ public class GameManager : MonoBehaviour {
     }
     while (ManageGameLoop) {
       // Spawn and configure the player
-      Player = Instantiate(PlayerPrefab, PlayerSpawn.position, PlayerSpawn.rotation).GetComponent<Player>();
+      Player = FindObjectOfType<Player>();
+      Player = Player ?? Instantiate(PlayerPrefab, PlayerSpawn.position, PlayerSpawn.rotation).GetComponent<Player>();
       SaveData.LoadFromFile();
 
       // Setup camera to target the player

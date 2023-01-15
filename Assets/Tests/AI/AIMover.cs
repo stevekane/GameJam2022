@@ -60,10 +60,8 @@ public class AIMover : MonoBehaviour {
     const float MaxHorizontalFall = 5f;
 
     if (dest.y < transform.position.y && transform.position.XZ().SqrDistance(dest.XZ()) < MaxHorizontalFall*MaxHorizontalFall) {
-      Debug.Log($"offlink falling: {dest} - {transform.position}");
       await FallOffLink(scope, dest);
     } else if (Jump) {
-      Debug.Log($"offlink jump: {dest} - {transform.position}");
       await JumpOffLink(scope, dest);
     } else {
       // Stand here and be sad.
