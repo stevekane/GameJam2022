@@ -39,8 +39,12 @@ public abstract class Ability : MonoBehaviour {
   public async Task TaskRunner(TaskScope scope, AbilityMethod func) {
     try {
       scope.ThrowIfCancelled();
-      if (func(scope) is var task && task != null)  // Can return null if used only as a key for the event.
+      if (func(scope) is var task && task != null) { // Can return null if used only as a key for the event.
+        // Well this is hella specific. Is there a more general way to handle this?
+        var uninterruptible = TriggerConditionsMap[func].Tags.HasFlag(AbilityTag.Uninterruptible);
+        using var uninterruptibleEffect = uninterruptible ? Status.Add(new UninterruptibleEffect()) : null;
         await task;
+      }
     } catch (OperationCanceledException) {
     } finally {
       ActiveTasks.Remove(func);

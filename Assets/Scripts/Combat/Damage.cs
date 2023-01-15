@@ -45,18 +45,17 @@ public class Damage : MonoBehaviour {
 
   void OnHurt(HitParams hitParams) {
     AddPoints(hitParams.Damage);
-    if (Status != null) {
-      var source = hitParams.Source.transform;
-      var knockbackVector = hitParams.KnockbackVector;
-      var knockbackStrength = hitParams.GetKnockbackStrength(Points);
-      var rotation = Quaternion.LookRotation(knockbackVector);
+    var knockbackVector = hitParams.KnockbackVector;
+    if (Status && Status.IsKnockable) {
       Mover.ResetVelocityAndMovementEffects();
       Status.Add(new HitStopEffect(knockbackVector, hitParams.HitConfig.HitStopDuration.Ticks),
         s => {
           s.Add(new HurtStunEffect(hitParams.HitConfig.StunDuration.Ticks));
           s.Add(new SlowFallDuration(hitParams.HitConfig.SlowFallDuration.Ticks));
-          s.Add(new KnockbackEffect(knockbackVector * knockbackStrength));
+          s.Add(new KnockbackEffect(knockbackVector * hitParams.GetKnockbackStrength(Points)));
         });
+    } else {
+      Status.Add(new HitStopEffect(knockbackVector, hitParams.HitConfig.HitStopDuration.Ticks));
     }
   }
 

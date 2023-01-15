@@ -43,6 +43,12 @@ public class InlineEffect : StatusEffect {
   public override string ToString() => Name;
 }
 
+public class UninterruptibleEffect : StatusEffect {
+  //public UninterruptibleEffect(int ticks) : base(ticks) => Modifier = new AttributeModifier { Mult = .5f };
+  public override bool Merge(StatusEffect e) => false;
+  public override void Apply(Status status) => status.IsKnockable = false;
+}
+
 public class SlowFallDuration : TimedEffect {
   public AttributeModifier Modifier;
   public SlowFallDuration(int ticks) : base(ticks) => Modifier = new AttributeModifier { Mult = .5f };
@@ -189,6 +195,7 @@ public class Status : MonoBehaviour {
   public bool CanRotate { get => GetBoolean(AttributeTag.TurnSpeed); set => SetBoolean(AttributeTag.TurnSpeed, value); }
   public bool HasGravity { get => GetBoolean(AttributeTag.HasGravity); set => SetBoolean(AttributeTag.HasGravity, value); }
   public bool CanAttack { get => GetBoolean(AttributeTag.CanAttack); set => SetBoolean(AttributeTag.CanAttack, value); }
+  public bool IsKnockable { get => GetBoolean(AttributeTag.IsKnockable); set => SetBoolean(AttributeTag.IsKnockable, value); }
   public bool IsHittable { get => GetBoolean(AttributeTag.IsHittable); set => SetBoolean(AttributeTag.IsHittable, value); }
   public bool IsDamageable { get => GetBoolean(AttributeTag.IsDamageable); set => SetBoolean(AttributeTag.IsDamageable, value); }
   public bool IsHurt { get => GetBoolean(AttributeTag.IsHurt); set => SetBoolean(AttributeTag.IsHurt, value); }
