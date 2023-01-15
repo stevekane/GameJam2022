@@ -81,8 +81,8 @@ public class Badger : MonoBehaviour {
       Waiter.Repeat(TryFindTarget),
       Waiter.Repeat(TryAim),
       Waiter.Repeat(TryMove),
-      Waiter.Repeat(TryReposition));
-      //Waiter.Repeat(TryAttack));
+      Waiter.Repeat(TryReposition),
+      Waiter.Repeat(TryAttack));
   }
 
   void TryFindTarget() {
