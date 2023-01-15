@@ -27,9 +27,8 @@ public class AbilityManager : MonoBehaviour {
     Abilities.ForEach(a => a.AbilityManager = this);
   }
 
-  public void InterruptAbilities() => Abilities.Where(a => a.IsRunning && !a.Tags.HasAllFlags(AbilityTag.Uninterruptible)).ForEach(a => a.Stop());
-  public void CancelOthers() => Abilities.Where(a => a.IsRunning && a.Tags.HasAllFlags(AbilityTag.Cancellable)).ForEach(a => a.Stop());
-  public void CancelOthers(Ability except) => Abilities.Where(a => a.IsRunning && a != except && a.Tags.HasAllFlags(AbilityTag.Cancellable)).ForEach(a => a.Stop());
+  public void InterruptAbilities() => Abilities.Where(a => a.IsRunning && !a.ActiveTags.HasAllFlags(AbilityTag.Uninterruptible)).ForEach(a => a.Stop());
+  public void CancelAbilities() => Abilities.Where(a => a.IsRunning && a.ActiveTags.HasAllFlags(AbilityTag.Cancellable)).ForEach(a => a.Stop());
 
   public void RegisterAxis(AxisTag tag, AxisState axis) {
     TagToAxis[tag] = axis;
@@ -96,9 +95,8 @@ public class AbilityManager : MonoBehaviour {
       Action?.Invoke();
       if (ShouldFire()) {
         if (Trigger.Tags.HasAllFlags(AbilityTag.CancelOthers))
-          Ability.AbilityManager.CancelOthers();
+          Ability.AbilityManager.CancelAbilities();
         Ability.AbilityManager.Energy?.Value.Consume(Trigger.EnergyCost);
-        Ability.Tags.AddFlags(Trigger.Tags);
         Ability.MaybeStartTask(Method);
       }
     }
@@ -119,6 +117,6 @@ public class AbilityManager : MonoBehaviour {
       };
       return canRun;
     }
-    bool CanCancel(Ability other) => Trigger.Tags.HasAllFlags(AbilityTag.CancelOthers) && other.Tags.HasAllFlags(AbilityTag.Cancellable);
+    bool CanCancel(Ability other) => Trigger.Tags.HasAllFlags(AbilityTag.CancelOthers) && other.ActiveTags.HasAllFlags(AbilityTag.Cancellable);
   }
 }

@@ -10,7 +10,7 @@ public class AnimationPhaseTest : Ability {
   int Phase = 0;
   AnimationEventListener Events;
 
-  public override void Awake() {
+  public void Start() {
     Events = AbilityManager.GetComponentInChildren<AnimationEventListener>();
   }
 
