@@ -3,7 +3,9 @@ using UnityEngine.AI;
 
 public class AIMover : Mover {
   public new void Awake() {
-
+    var NavMeshAgent = GetComponent<NavMeshAgent>();
+    NavMeshAgent.updatePosition = true;
+    NavMeshAgent.updateRotation = true;
   }
   public new void FixedUpdate() {
     var NavMeshAgent = GetComponent<NavMeshAgent>();

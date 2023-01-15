@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-[RequireComponent(typeof(CharacterController))]
-[RequireComponent(typeof(AbilityManager))]
-[RequireComponent(typeof(AnimationDriver))]
-[RequireComponent(typeof(Attributes))]
-[RequireComponent(typeof(Status))]
+// TODO: REMOVED FOR AI TESTING
+// [RequireComponent(typeof(CharacterController))]
+// [RequireComponent(typeof(AbilityManager))]
+// [RequireComponent(typeof(AnimationDriver))]
+// [RequireComponent(typeof(Attributes))]
+// [RequireComponent(typeof(Status))]
 public class Mover : MonoBehaviour {
   public static Quaternion RotationFromDesired(Quaternion rotation, float speed, Vector3 desiredForward) {
     var desiredRotation = Quaternion.LookRotation(desiredForward);
@@ -108,7 +109,9 @@ public class Mover : MonoBehaviour {
 
     // Animation
     var animator = AnimationDriver.Animator;
-    var orientedVelocity = Quaternion.Inverse(transform.rotation)*InputVelocity;
+    var orientedVelocity = NavMeshAgent
+      ? NavMeshAgent.velocity.normalized
+      : Quaternion.Inverse(transform.rotation)*InputVelocity;
     animator.SetFloat("RightVelocity", orientedVelocity.x);
     animator.SetFloat("ForwardVelocity", orientedVelocity.z);
     animator.SetBool("IsGrounded", Status.IsGrounded);
@@ -116,8 +119,17 @@ public class Mover : MonoBehaviour {
     AnimationDriver.SetSpeed(localTimeScale < 1 ? localTimeScale : AnimationDriver.BaseSpeed);
 
     if (NavMeshAgent) {
-      NavMeshAgent.nextPosition = transform.position;
-      Debug.DrawRay(NavMeshAgent.destination + 4* Vector3.up, 4*Vector3.down, Color.blue);
+      if (NavMeshAgent.isOnOffMeshLink) {
+        var linkData = NavMeshAgent.currentOffMeshLinkData;
+        var toStart = Vector3.Distance(transform.position, linkData.startPos);
+        var toEnd = Vector3.Distance(transform.position, linkData.endPos);
+        var destination = toStart < toEnd ? linkData.endPos : linkData.startPos;
+        Debug.Log($"Teleported to {destination}");
+        Debug.DrawLine(linkData.startPos, linkData.endPos, Color.green, 10);
+        NavMeshAgent.Warp(destination);
+      } else {
+        NavMeshAgent.nextPosition = transform.position;
+      }
     }
   }
 
