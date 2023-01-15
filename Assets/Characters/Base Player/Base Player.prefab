@@ -668,25 +668,26 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   AttackAnimation:
-    Clip: {fileID: 7400000, guid: 62766a0642318924eaec6b6094e7cf70, type: 2}
-    Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
+    Clip: {fileID: 7400000, guid: 3766ebf57fae5ea49859605838dce4d3, type: 2}
+    Mask: {fileID: 0}
     Speed: 1
     PhaseDurations:
-    - Millis: 33.333336
+    - Millis: 83.333336
       FramesPerSecond: 60
-    - Millis: 50.000004
+    - Millis: 66.666664
       FramesPerSecond: 60
-    - Millis: 83.33334
+    - Millis: 100
       FramesPerSecond: 60
-    - Millis: 166.66669
+    - Millis: 366.66666
       FramesPerSecond: 60
-    BlendInFraction: 0.15
-    BlendOutFraction: 0.15
+    BlendInFraction: 0.1
+    BlendOutFraction: 0.1
   Hitbox: {fileID: 7781392534903117839}
   Parrybox: {fileID: 0}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
-  AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
+  AttackVFX: {fileID: 0}
   AttackSFX: {fileID: 8300000, guid: c266e86e5ec11e344bf66dede26cbc46, type: 3}
+  RecoveryCancelable: 1
 --- !u!1 &2868650853462325931
 GameObject:
   m_ObjectHideFlags: 0
@@ -735,7 +736,7 @@ MonoBehaviour:
   TriggerConditions:
   - Tags: 161
     RequiredOwnerTags: 0
-    EnergyCost: 0
+    EnergyCost: 3
   Tags: 0
   FallSpeed: 90
   HitConfig:
@@ -1486,25 +1487,26 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   AttackAnimation:
-    Clip: {fileID: 7400000, guid: 8ba2a5b0d9933fe4c813b4808937910a, type: 2}
-    Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
+    Clip: {fileID: 7400000, guid: f57b3d85cf5b26f4f8132ba301a25dcc, type: 2}
+    Mask: {fileID: 0}
     Speed: 1
     PhaseDurations:
-    - Millis: 33.333336
+    - Millis: 150
       FramesPerSecond: 60
-    - Millis: 50.000004
+    - Millis: 33.333332
       FramesPerSecond: 60
-    - Millis: 83.33334
+    - Millis: 66.666664
       FramesPerSecond: 60
-    - Millis: 166.66669
+    - Millis: 383.33334
       FramesPerSecond: 60
-    BlendInFraction: 0.15
-    BlendOutFraction: 0.15
+    BlendInFraction: 0.1
+    BlendOutFraction: 0.1
   Hitbox: {fileID: 8479126164374817058}
   Parrybox: {fileID: 0}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
-  AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
+  AttackVFX: {fileID: 0}
   AttackSFX: {fileID: 8300000, guid: 90fb91c5d9f18df4183363d36d921429, type: 3}
+  RecoveryCancelable: 1
 --- !u!1 &5751272113798131921
 GameObject:
   m_ObjectHideFlags: 0
@@ -1609,21 +1611,22 @@ MonoBehaviour:
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
     Speed: 1
     PhaseDurations:
-    - Millis: 133.33333
+    - Millis: 66.666664
+      FramesPerSecond: 60
+    - Millis: 50
       FramesPerSecond: 60
     - Millis: 83.333336
       FramesPerSecond: 60
-    - Millis: 166.66667
+    - Millis: 83.333336
       FramesPerSecond: 60
-    - Millis: 166.66669
-      FramesPerSecond: 60
-    BlendInFraction: 0
-    BlendOutFraction: 0
+    BlendInFraction: 0.1
+    BlendOutFraction: 0.1
   Hitbox: {fileID: 1672519219772526389}
   Parrybox: {fileID: 0}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
-  AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
+  AttackVFX: {fileID: 0}
   AttackSFX: {fileID: 8300000, guid: 28406bf68add30e4e89d6cd063fb84e6, type: 3}
+  RecoveryCancelable: 1
 --- !u!1 &6068021541246575134
 GameObject:
   m_ObjectHideFlags: 0
@@ -1697,7 +1700,7 @@ MonoBehaviour:
       Millis: 1000
       FramesPerSecond: 30
     SlowFallDuration:
-      Millis: 1000
+      Millis: 0
       FramesPerSecond: 30
   ChargeScaling:
     serializedVersion: 2
@@ -1728,21 +1731,22 @@ MonoBehaviour:
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
     Speed: 1
     PhaseDurations:
-    - Millis: 166.66667
+    - Millis: 83.333336
       FramesPerSecond: 60
-    - Millis: 83.33331
+    - Millis: 50
       FramesPerSecond: 60
     - Millis: 16.66671
       FramesPerSecond: 60
     - Millis: 133.3333
       FramesPerSecond: 60
-    BlendInFraction: 0
-    BlendOutFraction: 0
+    BlendInFraction: 0.1
+    BlendOutFraction: 0.1
   Hitbox: {fileID: 168426987354171595}
   Parrybox: {fileID: 0}
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
-  AttackVFX: {fileID: 7226583673155636401, guid: f71b110b68842ee4a8870b768db72a08, type: 3}
+  AttackVFX: {fileID: 0}
   AttackSFX: {fileID: 8300000, guid: da396a16a7f24f64cbb0054f5a56b46a, type: 3}
+  RecoveryCancelable: 1
 --- !u!1 &6611056153277067358
 GameObject:
   m_ObjectHideFlags: 0
@@ -2228,6 +2232,7 @@ MonoBehaviour:
   AttackVFXOffset: {x: 0, y: 1, z: 2.5}
   AttackVFX: {fileID: 2708598583397607911, guid: 6398d43fe79ea0140913dc5530c646af, type: 3}
   AttackSFX: {fileID: 8300000, guid: 0e5edb6bccf05984dad128fb1a9fc914, type: 3}
+  RecoveryCancelable: 1
 --- !u!1001 &6353001707408592015
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2496,6 +2501,8 @@ MonoBehaviour:
     AxisTag: 0
   - AxisCode: 0
     AxisTag: 1
+  - AxisCode: 1
+    AxisTag: 2
 --- !u!114 &1190803532
 MonoBehaviour:
   m_ObjectHideFlags: 0
