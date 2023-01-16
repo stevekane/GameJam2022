@@ -56,6 +56,27 @@ General questions about integration:
     w
 
   This ordering is arbitrary and comes from our InputManager code.
+
+
+Comments on best practices:
+
+  Normally, you should analyze your inputs and decide which you will consume on a given frame
+  in some kind of input-processing script. For example, if a character is in the previous
+  scenario where they pushed jump within a buffer (unconsumed) and they push attack on a frame
+  it would look something like this:
+
+  var jumpFrame = Buffer.Jump.Pressed
+  var attackFrame = Buffer.Attack.Pressed
+
+  if (attackFrame.HasValue && jumpFrame.HasValue) {
+    if (attackFrame.Value <= jumpFrame.Value) {
+      Consume(Buffer.Attack.Pressed)
+      Attack()
+    } else if (CanJump) {
+      Consume(Buffer.Jump.Pressed)
+      Jump()
+    }
+  }
 */
 public class InputBuffer : MonoBehaviour {
   [SerializeField] PlayerInputActions Controls;
