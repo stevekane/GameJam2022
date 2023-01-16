@@ -6,6 +6,11 @@ This example system listens for concurrent inputs and discriminates among them.
 The simple thing it does it always chooses to attack if an attempt to attack
 and an attempt to jump have happened recently but the attack is permitted
 and the jump is permitted.
+
+Let's review actions.
+
+Actions are things a thing can do.
+Actions can change what happens during
 */
 public class TestInputManager : MonoBehaviour {
   enum PlayerState { Idle, Jumping, Attacking }

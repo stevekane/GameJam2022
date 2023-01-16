@@ -50,12 +50,16 @@ public class AxisState {
 
 public class InputManager : MonoBehaviour {
   public int PlayerIndex = 0;
+  public int InputBufferTickLength = 10;
   public float StickDeadZone;
   bool InputEnabled = true;
+  Dictionary<(ButtonCode, ButtonPressType), int> Buffer = new();
   Dictionary<(ButtonCode, ButtonPressType), EventSource> Buttons = new();
   AxisState AxisLeft = new();
   AxisState AxisRight = new();
   PlayerInputActions Controls;
+  Dictionary<ButtonCode, int> Releases = new();
+  Dictionary<ButtonCode, int> Holds = new();
 
   public IEventSource ButtonEvent(ButtonCode code, ButtonPressType type) {
     if (!Buttons.TryGetValue((code, type), out EventSource evt))
@@ -77,6 +81,10 @@ public class InputManager : MonoBehaviour {
       AxisLeft.Update(0, new());
       AxisRight.Update(0, new());
     }
+  }
+
+  public void Consume(ButtonCode code, ButtonPressType type) {
+    Buffer.UpdateOrAdd((code, type), 0);
   }
 
   void Awake() {
@@ -116,7 +124,11 @@ public class InputManager : MonoBehaviour {
       ButtonPressType.JustUp => action.WasReleasedThisFrame,
       _ => null
     };
-    if (func())
+    if (func()) {
+      Buffer.UpdateOrAdd((code, type), Timeval.TickCount);
+    }
+
+    if (Buffer.TryGetValue((code, type), out int tickCount) && Timeval.TickCount - tickCount <= InputBufferTickLength)
       evt.Fire();
   }
   Vector2 GetAxisFromInput(InputAction action) {

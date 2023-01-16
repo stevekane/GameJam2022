@@ -46,6 +46,7 @@ General questions about integration:
 
   I believe if you press two buttons simultaneously today, they will happen to be processed in
   the following order:
+
     l1
     l2
     r1
@@ -56,7 +57,6 @@ General questions about integration:
     w
 
   This ordering is arbitrary and comes from our InputManager code.
-
 
 Comments on best practices:
 
@@ -109,11 +109,12 @@ public class InputBuffer : MonoBehaviour {
   }
 
   void UpdateOrAdd<K,V>(Dictionary<K,V> d, K k, V v) {
-    if (d.ContainsKey(k)) {
-      d[k] = v;
-    } else {
-      d.Add(k, v);
-    }
+    d[k] = v;
+    // if (d.ContainsKey(k)) {
+    //   d[k] = v;
+    // } else {
+    //   d.Add(k, v);
+    // }
   }
 
   void Record(ButtonCode code, InputAction action) {
