@@ -19,7 +19,7 @@ public enum AttributeTag {
   IsDamageable,
   IsGrounded,
   IsHurt,
-  IsKnockable,
+  IsInterruptible,
 
   GoldGain,
 
