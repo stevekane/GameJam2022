@@ -5,7 +5,6 @@ public class ParryAbility : Ability {
   [SerializeField] Hurtbox Hurtbox;
   [SerializeField] Timeval BlockDuration = Timeval.FromAnimFrames(15, 30);
   [SerializeField] AttackAbility RiposteAbility;
-  Animator Animator;
 
   public static InlineEffect Invulnerable { get => new(s => {
       s.IsDamageable = false;
@@ -18,7 +17,7 @@ public class ParryAbility : Ability {
       return;
     try {
       using (Status.Add(Invulnerable)) {
-        Animator.SetBool("Blocking", true);
+        AnimationDriver.Animator.SetBool("Blocking", true);
         Debug.LogWarning("Fix up Parry Ability to listen for hurtbox event");
         var onHurt = Waiter.ListenFor(Hurtbox.OnHurt);
         var hurt = await scope.Any(onHurt, Waiter.Return<HitParams>(Waiter.Delay(BlockDuration)), Waiter.Return<HitParams>(ListenFor(MainRelease)));
@@ -26,7 +25,7 @@ public class ParryAbility : Ability {
           AbilityManager.MainScope.Start(Riposte);
       }
     } finally {
-      Animator.SetBool("Blocking", false);
+      AnimationDriver.Animator.SetBool("Blocking", false);
     }
   }
 
@@ -34,10 +33,5 @@ public class ParryAbility : Ability {
     using (Status.Add(Invulnerable)) {
       await AbilityManager.TryRun(scope, RiposteAbility.MainAction);
     }
-  }
-
-  public override void Awake() {
-    base.Awake();
-    Animator = GetComponentInParent<Animator>();
   }
 }

@@ -26,22 +26,27 @@ public abstract class Ability : MonoBehaviour {
   public Mover Mover => AbilityManager.GetComponent<Mover>();
   public List<TriggerCondition> TriggerConditions = new();
   Dictionary<AbilityMethod, TriggerCondition> TriggerConditionsMap = new();
-  [HideInInspector] public AbilityTag Tags;  // Inherited from the Trigger when started
+  [HideInInspector] protected AbilityTag Tags;  // Inherited from the Trigger when started
+  TaskScope MainScope = new();
+  List<AbilityMethod> ActiveTasks = new();  // TODO(Task): could just be a refcount instead?
+
+  public virtual AbilityTag ActiveTags => Tags;
   public virtual float Score() => 0;
   public virtual bool IsRunning => ActiveTasks.Count > 0;
   public virtual HitConfig HitConfigData => null;
-  TaskScope MainScope = new();
-  List<AbilityMethod> ActiveTasks = new();  // TODO(Task): could just be a refcount instead?
+
   public void MaybeStartTask(AbilityMethod func) {
     MainScope.Start(s => TaskRunner(s, func));
     ActiveTasks.Add(func);
   }
   public async Task TaskRunner(TaskScope scope, AbilityMethod func) {
     try {
+      var trigger = TriggerConditionsMap[func];
+      Tags.AddFlags(trigger.Tags);
       scope.ThrowIfCancelled();
       if (func(scope) is var task && task != null) { // Can return null if used only as a key for the event.
         // Well this is hella specific. Is there a more general way to handle this?
-        var uninterruptible = TriggerConditionsMap[func].Tags.HasFlag(AbilityTag.Uninterruptible);
+        var uninterruptible = trigger.Tags.HasFlag(AbilityTag.Uninterruptible);
         using var uninterruptibleEffect = uninterruptible ? Status.Add(new UninterruptibleEffect()) : null;
         await task;
       }
@@ -62,10 +67,10 @@ public abstract class Ability : MonoBehaviour {
     MainScope.Dispose();
     MainScope = new();
   }
-  public virtual void Awake() {
+  public void Awake() {
     TriggerConditionsMap[MainAction] = TriggerConditions.Count > 0 ? TriggerConditions[0] : new();
     TriggerConditionsMap[MainRelease] = TriggerCondition.BlockIfNotRunning;
     MainScope = new();
   }
-  public virtual void OnDestroy() => Stop();
+  public void OnDestroy() => Stop();
 }
