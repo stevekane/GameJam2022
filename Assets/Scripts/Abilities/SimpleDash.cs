@@ -25,6 +25,8 @@ public class SimpleDash : Ability {
   int AirDashRemaining = 1;
   public override async Task MainAction(TaskScope scope) {
     try {
+      if (AbilityManager.GetAxis(AxisTag.ReallyAim).XZ != Vector3.zero)
+        return;  // TODO HACK: Allows this to share a button with Grapply. Should support gestures instead.
       if (AirDashRemaining <= 0 && !Status.IsGrounded)
         return;
 

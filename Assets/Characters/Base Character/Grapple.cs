@@ -65,7 +65,8 @@ public class Grapple : Ability {
       }
     }
     if (Candidate != null) {
-      Status.AddNextTick(s => s.AddAttributeModifier(AttributeTag.LocalTimeScale, AttributeModifier.Times(aiming ? AimLocalTimeDilation : 1)));
+      if (aiming)
+        Status.AddNextTick(s => s.AddAttributeModifier(AttributeTag.LocalTimeScale, AttributeModifier.Times(AimLocalTimeDilation)));
       GrappleAimLine.enabled = aiming;
       GrappleAimLine.SetPosition(1, Candidate.transform.position);
     }
@@ -77,6 +78,8 @@ public class Grapple : Ability {
   }
 
   public override async Task MainAction(TaskScope scope) {
+    if (AbilityManager.GetAxis(AxisTag.ReallyAim).XZ == Vector3.zero)
+      return;  // TODO HACK: Allows this to share a button with SimpleDash. Should support gestures instead.
     try {
       if (Candidate != null) {
         Target = Candidate;
