@@ -123,7 +123,7 @@ public class InputManager : MonoBehaviour {
     return action.ReadValue<Vector2>();
   }
 
-  void Update() {
+  void FixedUpdate() {
     if (!InputEnabled)
       return;
     foreach (var it in Buttons) {
