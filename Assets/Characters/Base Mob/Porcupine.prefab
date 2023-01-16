@@ -117,6 +117,7 @@ MonoBehaviour:
     EnergyCost: 0
   Chargeable: 0
   InPlace: 0
+  RecoveryCancelable: 1
   ChargeEnd:
     Millis: 1000
     FramesPerSecond: 60
@@ -132,10 +133,10 @@ MonoBehaviour:
     RecoilStrength: 0
     CameraShakeStrength: 1
     HitStopDuration:
-      Millis: 500
+      Millis: 200
       FramesPerSecond: 30
     StunDuration:
-      Millis: 500
+      Millis: 400
       FramesPerSecond: 30
     SlowFallDuration:
       Millis: 0
@@ -184,7 +185,6 @@ MonoBehaviour:
   AttackVFXOffset: {x: 0, y: 0, z: 0}
   AttackVFX: {fileID: 7226583673155636401, guid: 4a41155be7b478d488c122e78a719148, type: 3}
   AttackSFX: {fileID: 8300000, guid: f1e550cbab16a22428ec9f3166a3faa5, type: 3}
-  RecoveryCancelable: 1
 --- !u!1 &478649686
 GameObject:
   m_ObjectHideFlags: 0
