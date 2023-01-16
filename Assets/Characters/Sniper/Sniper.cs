@@ -15,6 +15,7 @@ public class Sniper : MonoBehaviour {
   AbilityManager AbilityManager;
   Mover Mover;
   AIMover AIMover;
+  Flash Flash;
   Throw Throw;
   TaskScope Scope = new();
 
@@ -23,6 +24,7 @@ public class Sniper : MonoBehaviour {
     this.InitComponent(out AbilityManager);
     this.InitComponent(out Mover);
     this.InitComponent(out AIMover);
+    this.InitComponent(out Flash);
     this.InitComponentFromChildren(out Throw);
   }
   void Start() => Scope.Start(Behavior);
@@ -55,6 +57,7 @@ public class Sniper : MonoBehaviour {
   }
 
   async Task TryStartAbility(TaskScope scope) {
+    await Flash.RunStrobe(scope, Color.red, Timeval.FromMillis(150), 3);
     Throw.Target = Target;
     await AbilityManager.TryRun(scope, Throw.MainAction);
     await scope.Delay(AbilityDelay);

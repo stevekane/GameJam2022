@@ -12,12 +12,13 @@ public class Badger : MonoBehaviour {
   Transform Target;
   Transform Protectee;
   NavMeshAgent NavMeshAgent;
+  Flash Flash;
   AIMover AIMover;
   Mover Mover;
   AbilityManager Abilities;
   AbilityManager TargetAbilities;
   Shield Shield;
-  AttackAbility PunchAbility;
+  AttackAbility AttackAbility;
   ShieldAbility ShieldAbility;
   TaskScope MainScope = new();
 
@@ -30,15 +31,17 @@ public class Badger : MonoBehaviour {
   public void Awake() {
     Target = Player.Get().transform;
     TargetAbilities = Target.GetComponent<AbilityManager>();
-    Status = GetComponent<Status>();
-    AIMover = GetComponent<AIMover>();
-    Mover = GetComponent<Mover>();
-    NavMeshAgent = GetComponent<NavMeshAgent>();
-    Hurtbox = GetComponentInChildren<Hurtbox>();
-    Shield = GetComponentInChildren<Shield>();
-    Abilities = GetComponent<AbilityManager>();
-    PunchAbility = GetComponentInChildren<AttackAbility>();
-    ShieldAbility = GetComponentInChildren<ShieldAbility>();
+
+    this.InitComponent(out Status);
+    this.InitComponent(out Mover);
+    this.InitComponent(out AIMover);
+    this.InitComponent(out NavMeshAgent);
+    this.InitComponent(out Flash);
+    this.InitComponentFromChildren(out Hurtbox);
+    this.InitComponent(out Abilities);
+    this.InitComponentFromChildren(out Shield);
+    this.InitComponentFromChildren(out AttackAbility);
+    this.InitComponentFromChildren(out ShieldAbility);
     Hurtbox.OnHurt.Listen(async _ => {
       using var effect = Status.Add(HurtStunEffect);
       ShieldAbility.Stop();
@@ -121,10 +124,11 @@ public class Badger : MonoBehaviour {
         ShouldMove = true;
       } else if (TargetInRange(AttackRange)) {
         //ShouldMove = false;
-        Abilities.TryInvoke(PunchAbility.MainAction);
+        await Flash.RunStrobe(scope, Color.red, Timeval.FromMillis(150), 3);
+        Abilities.TryInvoke(AttackAbility.MainAction);
         await scope.Millis(750);
-        Abilities.TryInvoke(PunchAbility.MainRelease);
-        await scope.While(() => PunchAbility.IsRunning);
+        Abilities.TryInvoke(AttackAbility.MainRelease);
+        await scope.While(() => AttackAbility.IsRunning);
         await scope.Delay(AttackDelay);
         ShouldMove = true;
       }

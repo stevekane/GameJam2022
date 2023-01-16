@@ -14,7 +14,8 @@ public class HitParams {
   public int DefenderTeamID => Defender.GetComponent<Team>().ID;
 
   public float GetKnockbackStrength(float defenderDamage) {
-    var defenderWeightFactor = 2f / (1f + DefenderAttributes.GetValue(AttributeTag.Weight));
+    //var defenderWeightFactor = 2f / (1f + DefenderAttributes.GetValue(AttributeTag.Weight));
+    var defenderWeightFactor = 1f / DefenderAttributes.GetValue(AttributeTag.Weight);
     return HitConfig.Knockback.Apply((defenderDamage/10f + (defenderDamage * Damage)/20f) * defenderWeightFactor * 1.4f + 18f);
   }
 

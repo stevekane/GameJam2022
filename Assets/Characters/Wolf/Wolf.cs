@@ -10,6 +10,7 @@ public class Wolf : MonoBehaviour {
   Hurtbox Hurtbox;
   Transform Target;
   NavMeshAgent NavMeshAgent;
+  Flash Flash;
   Mover Mover;
   AIMover AIMover;
   AbilityManager Abilities;
@@ -32,6 +33,7 @@ public class Wolf : MonoBehaviour {
     this.InitComponent(out Mover);
     this.InitComponent(out AIMover);
     this.InitComponent(out NavMeshAgent);
+    this.InitComponent(out Flash);
     this.InitComponentFromChildren(out Hurtbox);
     this.InitComponent(out Abilities);
     this.InitComponentFromChildren(out LightAbility);
@@ -107,6 +109,7 @@ public class Wolf : MonoBehaviour {
 
   async Task TryAttackSequence(TaskScope scope) {
     if (Target && Status.CanAttack && TargetInRange(DashRange)) {
+      await Flash.RunStrobe(scope, Color.red, Timeval.FromMillis(150), 3);
       var didHit = false;
       DashAbility.Target = Target;
       DashAbility.OnHit = _ => didHit = true;  // TODO: check if the player was the collider?
