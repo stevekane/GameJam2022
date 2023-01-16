@@ -5,6 +5,7 @@ using UnityEngine;
 public class AttackAbility : Ability {
   [SerializeField] bool Chargeable;
   [SerializeField] bool InPlace = false;
+  [SerializeField] bool RecoveryCancelable = true;
   [SerializeField] Timeval ChargeEnd;
   [SerializeField] HitConfig HitConfig;
   [SerializeField] AnimationCurve ChargeScaling = AnimationCurve.Linear(0f, .5f, 1f, 1f);
@@ -14,7 +15,6 @@ public class AttackAbility : Ability {
   [SerializeField] Vector3 AttackVFXOffset;
   [SerializeField] GameObject AttackVFX;
   [SerializeField] AudioClip AttackSFX;
-  [SerializeField] bool RecoveryCancelable = true;
 
   [NonSerialized] AnimationJob Animation = null;
 
