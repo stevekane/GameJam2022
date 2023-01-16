@@ -29,6 +29,33 @@ Design choices:
   Buffer can cause multiple, unwanted inputs to be executed. Example is two jumps in the buffer
   could lead to immediate double-jumping. Possible solution is clearing the buffer once an
   input has been processed.
+
+General questions about integration:
+
+  How do we handle choosing which input to respect when multiple inputs have happened within
+  some threshold?
+
+  For example, if jump was pushed on frame 2 and attack was pushed on frame 3 do we prioritize
+  attack over jump?
+
+  Let's say we attempt to process jump on frame 2, and on frame 3. It is pushed on frame 2 but
+  you were still in the air. On frame 3, we are on the ground and attack and jump are both
+  considered to have been pushed and thus both fire. What happens?
+
+  How are we handling concurrent input currently in general?
+
+  I believe if you press two buttons simultaneously today, they will happen to be processed in
+  the following order:
+    l1
+    l2
+    r1
+    r2
+    n
+    e
+    s
+    w
+
+  This ordering is arbitrary and comes from our InputManager code.
 */
 public class InputBuffer : MonoBehaviour {
   [SerializeField] PlayerInputActions Controls;
@@ -46,6 +73,18 @@ public class InputBuffer : MonoBehaviour {
     } else {
       return null;
     }
+  }
+
+  public void ConsumePress(ButtonCode code) {
+    UpdateOrAdd(Presses, code, 0);
+  }
+
+  public void ConsumeHold(ButtonCode code) {
+    UpdateOrAdd(Holds, code, 0);
+  }
+
+  public void ConsumeRelease(ButtonCode code) {
+    UpdateOrAdd(Releases, code, 0);
   }
 
   void UpdateOrAdd<K,V>(Dictionary<K,V> d, K k, V v) {
@@ -94,6 +133,7 @@ public class InputBuffer : MonoBehaviour {
     Record(ButtonCode.South, Controls.Player.South);
     Record(ButtonCode.West, Controls.Player.West);
     if (Pressed(ButtonCode.L1, TickBufferLength).HasValue) {
+      ConsumePress(ButtonCode.L1);
       Debug.Log("Recent l1 push");
     }
   }
