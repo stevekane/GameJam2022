@@ -33,42 +33,41 @@ public class AbilityManager : MonoBehaviour {
   public void RegisterAxis(AxisTag tag, AxisState axis) {
     TagToAxis[tag] = axis;
   }
-  public void RegisterEvent(AbilityMethod method, IEventSource evt) {
-    var router = CreateRouter(method);
-    router.ConnectSource(evt);
-  }
   public AxisState GetAxis(AxisTag tag) {
     if (!TagToAxis.TryGetValue(tag, out AxisState axis))
       TagToAxis[tag] = axis = new();
     return axis;
   }
-  public IEventSource GetEvent(AbilityMethod method) {
+  public IEventSource GetEvent(AbilityMethod method) => GetRouter(method);
+  public bool CanInvoke(AbilityMethod method) => GetRouter(method).ShouldFire();
+  public bool TryInvoke(AbilityMethod method) {
+    if (GetRouter(method) is var r && r.ShouldFire() is var shouldFire && shouldFire)
+      r.Fire();
+    return shouldFire;
+  }
+  public TaskFunc TryRun(AbilityMethod method) => s => TryRun(s, method);
+  public async Task TryRun(TaskScope scope, AbilityMethod method) {
+    if (!TryInvoke(method))
+      return;
+    var ability = (Ability)method.Target;
+    await scope.While(() => ability.IsRunning);
+  }
+
+  EventRouter CreateRouter(AbilityMethod method) => MethodToEvent[method] = new EventRouter((Ability)method.Target, method);
+  EventRouter GetRouter(AbilityMethod method) {
     if (!MethodToEvent.TryGetValue(method, out EventRouter evt))
       evt = CreateRouter(method);
     return evt;
   }
-  public void TryInvoke(AbilityMethod method) => GetEvent(method).Fire();
-  public async Task TryRun(TaskScope scope, AbilityMethod method) {
-    var ability = (Ability)method.Target;
-    GetEvent(method).Fire();
-    await scope.While(() => ability.IsRunning);
-  }
-  public TaskFunc TryRun(AbilityMethod method) => async (TaskScope scope) => {
-    var ability = (Ability)method.Target;
-    GetEvent(method).Fire();
-    await scope.While(() => ability.IsRunning);
-  };
-  EventRouter CreateRouter(AbilityMethod method) => MethodToEvent[method] = new EventRouter((Ability)method.Target, method);
 
   void Awake() {
     InitAbilities(GetComponentsInChildren<Ability>());
+    this.InitComponent(out Status);
     Energy = GetComponentInChildren<Energy>();
-    Status = GetComponent<Status>();
   }
   void OnDestroy() {
     Abilities.ForEach(a => a.Stop());
     Abilities.ForEach(a => a.AbilityManager = null);
-    MethodToEvent.ForEach(kv => kv.Value.DisconnectSource());
     MainScope.Dispose();
   }
   void FixedUpdate() {
@@ -79,39 +78,36 @@ public class AbilityManager : MonoBehaviour {
   // All ability events route through this event source. Input-related event sources that connect to abilities
   // are actually instances of this class via InputManager.RegisterButton(code, type, EventRouterMaker);
   class EventRouter : IEventSource {
-    IEventSource EventSource;
+    //IEventSource EventSource;
     Action Action;
     Ability Ability;
     AbilityMethod Method;
     TriggerCondition Trigger;
     public EventRouter(Ability ability, AbilityMethod method) =>
       (Ability, Method, Trigger) = (ability, method, ability.GetTriggerCondition(method));
-    public void ConnectSource(IEventSource evt) => (EventSource = evt).Listen(Fire);
-    public void DisconnectSource() => EventSource?.Unlisten(Fire);
     public void Listen(Action handler) => Action += handler;
     public void Unlisten(Action handler) => Action -= handler;
     public void Fire() {
-      // Always invoke the event - if no one is listening this will noop.
+      Debug.Assert(ShouldFire(), $"{Ability} event fired when it shouldn't - all code paths should have checked ShouldFire");
       Action?.Invoke();
-      if (ShouldFire()) {
-        if (Trigger.Tags.HasAllFlags(AbilityTag.CancelOthers))
-          Ability.AbilityManager.CancelAbilities();
-        Ability.AbilityManager.Energy?.Value.Consume(Trigger.EnergyCost);
-        Ability.MaybeStartTask(Method);
-      }
+      if (Trigger.Tags.HasAllFlags(AbilityTag.CancelOthers))
+        Ability.AbilityManager.CancelAbilities();
+      Ability.AbilityManager.Energy?.Value.Consume(Trigger.EnergyCost);
+      Ability.MaybeStartTask(Method);
     }
     public bool ShouldFire() {
       var am = Ability.AbilityManager;
-      var Status = am.GetComponent<Status>();
+      var status = am.Status;
       var canRun = 0 switch {
+        //_ when !Ability.CanStart(Method) => false,
+        _ when !status.CanAttack => false,
         _ when !Ability.Status.Tags.HasAllFlags(Trigger.RequiredOwnerTags) => false,
-        _ when !Status.CanAttack => false, // TODO: Is this needed? It sure feels necessary
         _ when Trigger.Tags.HasAllFlags(AbilityTag.OnlyOne) && am.Running.Any(a => !CanCancel(a)) => false,
         //_ when Trigger.Tags.HasAllFlags(AbilityTag.OnlyOne) && am.Running.Any(a => a.Tags.HasAllFlags(AbilityTag.OnlyOne) && !CanCancel(a)) => false,
         _ when Trigger.Tags.HasAllFlags(AbilityTag.BlockIfRunning) && Ability.IsRunning => false,
         _ when Trigger.Tags.HasAllFlags(AbilityTag.BlockIfNotRunning) && !Ability.IsRunning => false,
-        _ when Trigger.Tags.HasAllFlags(AbilityTag.Grounded) && !Status.IsGrounded => false,
-        _ when Trigger.Tags.HasAllFlags(AbilityTag.Airborne) && Status.IsGrounded => false,
+        _ when Trigger.Tags.HasAllFlags(AbilityTag.Grounded) && !status.IsGrounded => false,
+        _ when Trigger.Tags.HasAllFlags(AbilityTag.Airborne) && status.IsGrounded => false,
         _ when Trigger.EnergyCost > Ability.AbilityManager.Energy?.Value.Points => false,
         _ => true,
       };

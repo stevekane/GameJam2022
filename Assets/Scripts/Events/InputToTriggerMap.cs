@@ -21,9 +21,15 @@ public class InputToTriggerMap : MonoBehaviour {
   void Start() {
     var AbilityManager = GetComponent<AbilityManager>();
     var InputManager = GetComponent<InputManager>();
+    void ConnectButtonToAction(AbilityMethod method, ButtonCode buttonCode, ButtonPressType pressType) {
+      InputManager.ButtonEvent(buttonCode, pressType).Listen(() => {
+        if (AbilityManager.TryInvoke(method))
+          InputManager.Consume(buttonCode, pressType);
+      });
+    }
     ButtonMaps.ForEach(b => {
-      AbilityManager.RegisterEvent(b.Ability.MainAction, InputManager.ButtonEvent(b.ButtonCode, ButtonPressType.JustDown));
-      AbilityManager.RegisterEvent(b.Ability.MainRelease, InputManager.ButtonEvent(b.ButtonCode, ButtonPressType.JustUp));
+      ConnectButtonToAction(b.Ability.MainAction, b.ButtonCode, ButtonPressType.JustDown);
+      ConnectButtonToAction(b.Ability.MainRelease, b.ButtonCode, ButtonPressType.JustUp);
     });
     AxisMaps.ForEach(a => {
       AbilityManager.RegisterAxis(a.AxisTag, InputManager.Axis(a.AxisCode));
