@@ -21,15 +21,14 @@ public class SimpleDash : Ability {
     s.IsHittable = false;
   }, "DashInvulnerable");
 
+  public override bool CanStart(AbilityMethod func) =>
+    AbilityManager.GetAxis(AxisTag.ReallyAim).XZ == Vector3.zero &&
+    (Status.IsGrounded || AirDashRemaining > 0);
+
   // Button press/release.
   int AirDashRemaining = 1;
   public override async Task MainAction(TaskScope scope) {
     try {
-      if (AbilityManager.GetAxis(AxisTag.ReallyAim).XZ != Vector3.zero)
-        return;  // TODO HACK: Allows this to share a button with Grapply. Should support gestures instead.
-      if (AirDashRemaining <= 0 && !Status.IsGrounded)
-        return;
-
       var dir = AbilityManager.GetAxis(AxisTag.Move).XZ.TryGetDirection() ?? AbilityManager.transform.forward;
       using var moveEffect = Status.Add(ScriptedMove);
       using var invulnEffect = Status.Add(Invulnerable);

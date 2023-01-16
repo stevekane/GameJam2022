@@ -99,7 +99,7 @@ public class AbilityManager : MonoBehaviour {
       var am = Ability.AbilityManager;
       var status = am.Status;
       var canRun = 0 switch {
-        //_ when !Ability.CanStart(Method) => false,
+        _ when !Ability.CanStart(Method) => false,
         _ when !status.CanAttack => false,
         _ when !Ability.Status.Tags.HasAllFlags(Trigger.RequiredOwnerTags) => false,
         _ when Trigger.Tags.HasAllFlags(AbilityTag.OnlyOne) && am.Running.Any(a => !CanCancel(a)) => false,

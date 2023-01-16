@@ -35,6 +35,7 @@ public abstract class Ability : MonoBehaviour {
   public virtual bool IsRunning => ActiveTasks.Count > 0;
   public virtual HitConfig HitConfigData => null;
 
+  public virtual bool CanStart(AbilityMethod func) => true;
   public void MaybeStartTask(AbilityMethod func) {
     MainScope.Start(s => TaskRunner(s, func));
     ActiveTasks.Add(func);
@@ -69,7 +70,8 @@ public abstract class Ability : MonoBehaviour {
   }
   public void Awake() {
     TriggerConditionsMap[MainAction] = TriggerConditions.Count > 0 ? TriggerConditions[0] : new();
-    TriggerConditionsMap[MainRelease] = TriggerCondition.BlockIfNotRunning;
+    TriggerConditionsMap[MainRelease] = new();  // TODO: input buffering breaks unless we always consume release events
+    //TriggerConditionsMap[MainRelease] = TriggerCondition.BlockIfNotRunning;
     MainScope = new();
   }
   public void OnDestroy() => Stop();
