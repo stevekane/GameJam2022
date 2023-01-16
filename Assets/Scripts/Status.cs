@@ -44,9 +44,8 @@ public class InlineEffect : StatusEffect {
 }
 
 public class UninterruptibleEffect : StatusEffect {
-  //public UninterruptibleEffect(int ticks) : base(ticks) => Modifier = new AttributeModifier { Mult = .5f };
   public override bool Merge(StatusEffect e) => false;
-  public override void Apply(Status status) => status.IsKnockable = false;
+  public override void Apply(Status status) => status.IsInterruptible = false;
 }
 
 public class SlowFallDuration : TimedEffect {
@@ -109,7 +108,6 @@ public class KnockbackEffect : StatusEffect {
   public Vector3 Velocity;
   public Vector3? WallbounceTarget;  // TODO: Obsolete for now. Remove at some point.
   public bool IsAirborne = false;
-  bool IsFirstFrame = true; // Hacky way to ensure we have a hitflinch+cancel effect when a defender is first hit
   public KnockbackEffect(Vector3 velocity, Vector3? wallbounceTarget = null, float drag = 5f) {
     Velocity = velocity;
     WallbounceTarget = wallbounceTarget;
@@ -117,19 +115,19 @@ public class KnockbackEffect : StatusEffect {
   }
   public override bool Merge(StatusEffect e) {
     Velocity = ((KnockbackEffect)e).Velocity;
-    IsFirstFrame = true;
     return true;
   }
   public override void Apply(Status status) {
     Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * Drag);
     status.Mover.Move(Velocity*Time.fixedDeltaTime);
-    IsAirborne = IsFirstFrame || Velocity.sqrMagnitude >= AIRBORNE_SPEED*AIRBORNE_SPEED;
-    status.CanMove = !IsAirborne;
-    status.CanRotate = !IsAirborne;
-    status.CanAttack = !IsAirborne;
+    IsAirborne = Velocity.sqrMagnitude >= AIRBORNE_SPEED*AIRBORNE_SPEED;
+    if (status.IsInterruptible) {
+      status.CanMove = !IsAirborne;
+      status.CanRotate = !IsAirborne;
+      status.CanAttack = !IsAirborne;
+    }
     if (Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED)
       status.Remove(this);
-    IsFirstFrame = false;
   }
 }
 
@@ -195,7 +193,7 @@ public class Status : MonoBehaviour {
   public bool CanRotate { get => GetBoolean(AttributeTag.TurnSpeed); set => SetBoolean(AttributeTag.TurnSpeed, value); }
   public bool HasGravity { get => GetBoolean(AttributeTag.HasGravity); set => SetBoolean(AttributeTag.HasGravity, value); }
   public bool CanAttack { get => GetBoolean(AttributeTag.CanAttack); set => SetBoolean(AttributeTag.CanAttack, value); }
-  public bool IsKnockable { get => GetBoolean(AttributeTag.IsKnockable); set => SetBoolean(AttributeTag.IsKnockable, value); }
+  public bool IsInterruptible { get => GetBoolean(AttributeTag.IsInterruptible); set => SetBoolean(AttributeTag.IsInterruptible, value); }
   public bool IsHittable { get => GetBoolean(AttributeTag.IsHittable); set => SetBoolean(AttributeTag.IsHittable, value); }
   public bool IsDamageable { get => GetBoolean(AttributeTag.IsDamageable); set => SetBoolean(AttributeTag.IsDamageable, value); }
   public bool IsHurt { get => GetBoolean(AttributeTag.IsHurt); set => SetBoolean(AttributeTag.IsHurt, value); }

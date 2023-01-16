@@ -47,17 +47,15 @@ public class Damage : MonoBehaviour {
     AddPoints(hitParams.Damage);
     if (Status) {
       var knockbackVector = hitParams.KnockbackVector;
-      if (Status.IsKnockable) {
+      if (Status.IsInterruptible)
         Mover.ResetVelocityAndMovementEffects();
-        Status.Add(new HitStopEffect(knockbackVector, hitParams.HitConfig.HitStopDuration.Ticks),
-          s => {
+      Status.Add(new HitStopEffect(knockbackVector, hitParams.HitConfig.HitStopDuration.Ticks),
+        s => {
+          if (s.IsInterruptible)
             s.Add(new HurtStunEffect(hitParams.HitConfig.StunDuration.Ticks));
-            s.Add(new SlowFallDuration(hitParams.HitConfig.SlowFallDuration.Ticks));
-            s.Add(new KnockbackEffect(knockbackVector * hitParams.GetKnockbackStrength(Points)));
-          });
-      } else {
-        Status.Add(new HitStopEffect(knockbackVector, hitParams.HitConfig.HitStopDuration.Ticks));
-      }
+          s.Add(new SlowFallDuration(hitParams.HitConfig.SlowFallDuration.Ticks));
+          s.Add(new KnockbackEffect(knockbackVector * hitParams.GetKnockbackStrength(Points)));
+        });
     }
   }
 
