@@ -12,7 +12,6 @@ public class CameraSubject : MonoBehaviour {
   }
 
   void OnDeath() {
-    Debug.Log("I died, shoot");
     CameraManager.Instance.RemoveTarget(this, true);
   }
 }
