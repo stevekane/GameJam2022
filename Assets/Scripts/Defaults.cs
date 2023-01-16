@@ -9,6 +9,7 @@ public class Defaults : MonoBehaviour {
   [Header("Physics")]
   public LayerMask EnvironmentLayerMask;
   public LayerMask GrapplePointLayerMask;
+  public string GroundTag = "Ground";
 
   public bool ShowAltimeter = false;
 }

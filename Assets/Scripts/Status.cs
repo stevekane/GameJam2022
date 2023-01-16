@@ -260,7 +260,9 @@ public class Status : MonoBehaviour {
       var skinOffset = CharacterController.skinWidth*Vector3.up;
       var position = transform.TransformPoint(CharacterController.center + skinOffset - offset);
       var ray = new Ray(position, Vector3.down);
-      IsGrounded = Physics.SphereCast(ray, CharacterController.radius, GROUND_DISTANCE, Defaults.Instance.EnvironmentLayerMask, QueryTriggerInteraction.Ignore);
+      var hit = new RaycastHit();
+      var didHit = Physics.SphereCast(ray, CharacterController.radius, out hit, GROUND_DISTANCE, Defaults.Instance.EnvironmentLayerMask, QueryTriggerInteraction.Ignore);
+      IsGrounded = didHit && hit.collider.CompareTag(Defaults.Instance.GroundTag);
     }
     IsHurt = false;
 

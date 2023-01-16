@@ -10,6 +10,7 @@ public class HeightIndicator : MonoBehaviour {
   [SerializeField] LineRenderer Altimeter;
   [SerializeField] MeshRenderer Surface;
   [SerializeField] AnimationCurve Opacity;
+  [SerializeField] bool AlwaysVisible;
   float LastKnownAltitude;
 
   Color CurrentColor {
@@ -41,7 +42,7 @@ public class HeightIndicator : MonoBehaviour {
     var position = (didHit ? hit.point : (transform.position.XZ() + LastKnownAltitude * Vector3.up)) + GroundOffsetEpsilon * Vector3.up;
     if (didHit)
       LastKnownAltitude = hit.point.y;
-    Surface.gameObject.SetActive(!Status.IsGrounded);
+    Surface.gameObject.SetActive(AlwaysVisible || !Status.IsGrounded);
     Surface.transform.position = position;
     Surface.material.color = color;
   }
