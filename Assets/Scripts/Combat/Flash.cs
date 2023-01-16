@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class Flash : MonoBehaviour {
@@ -23,26 +24,40 @@ public class Flash : MonoBehaviour {
     if (Application.IsPlaying(this)) {
       EndFlash();
       StopAllCoroutines();
-      StartCoroutine(FlashRoutine(Timeval.FromMillis(1000)));
+      StartCoroutine(FlashRoutine(FlashColor, Timeval.FromMillis(1000)));
     }
   }
-  #endif
+#endif
+
+  public async Task RunStrobe(TaskScope scope, Color color, Timeval eachDuration, int repeat) {
+    EndFlash();
+    StopAllCoroutines();
+    SighUsingTwoDifferentMechanismsForAsyncIsFun = true;
+    StartCoroutine(StrobeRoutine(color, eachDuration, repeat));
+    await scope.Until(() => !SighUsingTwoDifferentMechanismsForAsyncIsFun);
+  }
+
+  public void RunFlash(Color color, Timeval duration) {
+    EndFlash();
+    StopAllCoroutines();
+    StartCoroutine(FlashRoutine(color, duration));
+  }
 
   public void Run() {
     EndFlash();
     StopAllCoroutines();
-    StartCoroutine(FlashRoutine(Duration));
+    StartCoroutine(FlashRoutine(FlashColor, Duration));
   }
 
   void OnHurt(HitParams hitParams) {
     EndFlash();
     StopAllCoroutines();
-    StartCoroutine(FlashRoutine(Duration));
+    StartCoroutine(FlashRoutine(FlashColor, Duration));
   }
 
-  void StartFlash(Timeval duration) {
+  void StartFlash(Color color) {
     foreach (var material in PreviousColors.Keys) {
-      material.SetVector(ColorName, FlashColor);
+      material.SetVector(ColorName, color);
     }
   }
 
@@ -73,10 +88,24 @@ public class Flash : MonoBehaviour {
     }
   }
 
-  IEnumerator FlashRoutine(Timeval duration) {
+  IEnumerator FlashRoutine(Color color, Timeval duration) {
     StorePreviousColors();
-    StartFlash(duration);
+    StartFlash(color);
     yield return StartCoroutine(WaitNTicks(duration.Ticks));
     EndFlash();
+    SighUsingTwoDifferentMechanismsForAsyncIsFun = false;
+  }
+
+  bool SighUsingTwoDifferentMechanismsForAsyncIsFun = false;
+  IEnumerator StrobeRoutine(Color color, Timeval eachDuration, int repeat) {
+    StorePreviousColors();
+
+    for (int i = 0; i < repeat; i++) {
+      StartFlash(color);
+      yield return StartCoroutine(WaitNTicks(eachDuration.Ticks));
+      EndFlash();
+      yield return StartCoroutine(WaitNTicks(eachDuration.Ticks));
+    }
+    SighUsingTwoDifferentMechanismsForAsyncIsFun = false;
   }
 }
