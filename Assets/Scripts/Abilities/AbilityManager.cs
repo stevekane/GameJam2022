@@ -1,3 +1,4 @@
+using OpenCover.Framework.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ public class AbilityManager : MonoBehaviour {
   Status Status;
 
   Dictionary<AxisTag, AxisState> TagToAxis = new();
-  Dictionary<AbilityMethod, EventRouter> MethodToEvent = new();
+  Dictionary<AbilityMethod, EventSource> MethodToEvent = new();
 
   public void InitAbilities(Ability[] abilities) {
     Abilities = abilities;
@@ -38,12 +39,15 @@ public class AbilityManager : MonoBehaviour {
       TagToAxis[tag] = axis = new();
     return axis;
   }
-  public IEventSource GetEvent(AbilityMethod method) => GetRouter(method);
-  public bool CanInvoke(AbilityMethod method) => GetRouter(method).ShouldFire();
+  public IEventSource GetEvent(AbilityMethod method) {
+    if (!MethodToEvent.TryGetValue(method, out EventSource evt))
+      MethodToEvent[method] = evt = new();
+    return evt;
+  }
   public bool TryInvoke(AbilityMethod method) {
-    if (GetRouter(method) is var r && r.ShouldFire() is var shouldFire && shouldFire)
-      r.Fire();
-    return shouldFire;
+    if (CanInvoke(method) is var can && can)
+      Invoke(method);
+    return can;
   }
   public TaskFunc TryRun(AbilityMethod method) => s => TryRun(s, method);
   public async Task TryRun(TaskScope scope, AbilityMethod method) {
@@ -53,11 +57,36 @@ public class AbilityManager : MonoBehaviour {
     await scope.While(() => ability.IsRunning);
   }
 
-  EventRouter CreateRouter(AbilityMethod method) => MethodToEvent[method] = new EventRouter((Ability)method.Target, method);
-  EventRouter GetRouter(AbilityMethod method) {
-    if (!MethodToEvent.TryGetValue(method, out EventRouter evt))
-      evt = CreateRouter(method);
-    return evt;
+  public bool CanInvoke(AbilityMethod method) {
+    var ability = (Ability)method.Target;
+    var trigger = ability.GetTriggerCondition(method);
+    bool CanCancel(Ability other) => trigger.Tags.HasAllFlags(AbilityTag.CancelOthers) && other.ActiveTags.HasAllFlags(AbilityTag.Cancellable);
+
+    var canRun = 0 switch {
+      _ when !ability.CanStart(method) => false,
+      _ when !Status.CanAttack => false,
+      _ when !ability.Status.Tags.HasAllFlags(trigger.RequiredOwnerTags) => false,
+      _ when trigger.Tags.HasAllFlags(AbilityTag.OnlyOne) && Running.Any(a => !CanCancel(a)) => false,
+      //_ when Trigger.Tags.HasAllFlags(AbilityTag.OnlyOne) && am.Running.Any(a => a.Tags.HasAllFlags(AbilityTag.OnlyOne) && !CanCancel(a)) => false,
+      _ when trigger.Tags.HasAllFlags(AbilityTag.BlockIfRunning) && ability.IsRunning => false,
+      _ when trigger.Tags.HasAllFlags(AbilityTag.BlockIfNotRunning) && !ability.IsRunning => false,
+      _ when trigger.Tags.HasAllFlags(AbilityTag.Grounded) && !Status.IsGrounded => false,
+      _ when trigger.Tags.HasAllFlags(AbilityTag.Airborne) && Status.IsGrounded => false,
+      _ when trigger.EnergyCost > Energy?.Value.Points => false,
+      _ => true,
+    };
+    return canRun;
+  }
+
+  void Invoke(AbilityMethod method) {
+    var ability = (Ability)method.Target;
+    var trigger = ability.GetTriggerCondition(method);
+    Debug.Assert(CanInvoke(method), $"{ability} event fired when it shouldn't - all code paths should have checked ShouldFire");
+    GetEvent(method).Fire();
+    if (trigger.Tags.HasAllFlags(AbilityTag.CancelOthers))
+      CancelAbilities();
+    Energy?.Value.Consume(trigger.EnergyCost);
+    ability.MaybeStartTask(method);
   }
 
   void Awake() {
@@ -73,46 +102,5 @@ public class AbilityManager : MonoBehaviour {
   void FixedUpdate() {
     if (Status.IsHurt)
       InterruptAbilities();
-  }
-
-  // All ability events route through this event source. Input-related event sources that connect to abilities
-  // are actually instances of this class via InputManager.RegisterButton(code, type, EventRouterMaker);
-  class EventRouter : IEventSource {
-    //IEventSource EventSource;
-    Action Action;
-    Ability Ability;
-    AbilityMethod Method;
-    TriggerCondition Trigger;
-    public EventRouter(Ability ability, AbilityMethod method) =>
-      (Ability, Method, Trigger) = (ability, method, ability.GetTriggerCondition(method));
-    public void Listen(Action handler) => Action += handler;
-    public void Unlisten(Action handler) => Action -= handler;
-    public void Fire() {
-      Debug.Assert(ShouldFire(), $"{Ability} event fired when it shouldn't - all code paths should have checked ShouldFire");
-      Action?.Invoke();
-      if (Trigger.Tags.HasAllFlags(AbilityTag.CancelOthers))
-        Ability.AbilityManager.CancelAbilities();
-      Ability.AbilityManager.Energy?.Value.Consume(Trigger.EnergyCost);
-      Ability.MaybeStartTask(Method);
-    }
-    public bool ShouldFire() {
-      var am = Ability.AbilityManager;
-      var status = am.Status;
-      var canRun = 0 switch {
-        _ when !Ability.CanStart(Method) => false,
-        _ when !status.CanAttack => false,
-        _ when !Ability.Status.Tags.HasAllFlags(Trigger.RequiredOwnerTags) => false,
-        _ when Trigger.Tags.HasAllFlags(AbilityTag.OnlyOne) && am.Running.Any(a => !CanCancel(a)) => false,
-        //_ when Trigger.Tags.HasAllFlags(AbilityTag.OnlyOne) && am.Running.Any(a => a.Tags.HasAllFlags(AbilityTag.OnlyOne) && !CanCancel(a)) => false,
-        _ when Trigger.Tags.HasAllFlags(AbilityTag.BlockIfRunning) && Ability.IsRunning => false,
-        _ when Trigger.Tags.HasAllFlags(AbilityTag.BlockIfNotRunning) && !Ability.IsRunning => false,
-        _ when Trigger.Tags.HasAllFlags(AbilityTag.Grounded) && !status.IsGrounded => false,
-        _ when Trigger.Tags.HasAllFlags(AbilityTag.Airborne) && status.IsGrounded => false,
-        _ when Trigger.EnergyCost > Ability.AbilityManager.Energy?.Value.Points => false,
-        _ => true,
-      };
-      return canRun;
-    }
-    bool CanCancel(Ability other) => Trigger.Tags.HasAllFlags(AbilityTag.CancelOthers) && other.ActiveTags.HasAllFlags(AbilityTag.Cancellable);
   }
 }
