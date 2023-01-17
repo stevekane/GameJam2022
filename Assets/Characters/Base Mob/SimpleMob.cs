@@ -38,8 +38,8 @@ public class SimpleMob : MonoBehaviour {
     this.InitComponent(out Mover);
     this.InitComponent(out AIMover);
     this.InitComponent(out Flash);
-    this.InitComponentFromChildren(out Shield);
-    this.InitComponentFromChildren(out ShieldAbility);
+    this.InitComponentFromChildren(out Shield, optional: true);
+    this.InitComponentFromChildren(out ShieldAbility, optional: true);
   }
   void Start() => MainScope.Start(Behavior);
   void OnDestroy() => MainScope.Dispose();
@@ -143,9 +143,9 @@ public class SimpleMob : MonoBehaviour {
     return transform.position + delta - (desiredDist - NavMeshAgent.stoppingDistance) * delta.normalized;
   }
   Vector3 RandomAroundTarget(float desiredDist) {
-    return Target.position + desiredDist * UnityEngine.Random.onUnitSphere.XZ();
+    return Target.position + desiredDist * UnityEngine.Random.insideUnitCircle.normalized.XZ();
   }
   Vector3 RandomAroundMe(float desiredDist) {
-    return transform.position + desiredDist * UnityEngine.Random.onUnitSphere.XZ();
+    return transform.position + desiredDist * UnityEngine.Random.insideUnitCircle.normalized.XZ();
   }
 }

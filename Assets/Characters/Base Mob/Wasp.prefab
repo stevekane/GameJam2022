@@ -342,6 +342,9 @@ MonoBehaviour:
     BlendOutFraction: 0
   LaunchSFX: {fileID: 8300000, guid: 006a7e9d1c0e1234f89c4f6957918bf5, type: 3}
   LaunchVFX: {fileID: 100000, guid: e53da0fb627b93d419d10d2f7be0ee52, type: 3}
+  CoyoteTime:
+    Millis: 100
+    FramesPerSecond: 60
 --- !u!1001 &318737534
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -503,6 +506,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3639504942597343017, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
+      propertyPath: m_VersionIndex
+      value: 272
+      objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994128, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -584,10 +591,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4220133813938994134, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1514170453}
+      addedObject: {fileID: 7760687618719448864}
     - targetCorrespondingSourceObject: {fileID: 4220133813938994134, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7760687618719448864}
+      addedObject: {fileID: 137244083}
   m_SourcePrefab: {fileID: 100100000, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
 --- !u!4 &422875574219556800 stripped
 Transform:
@@ -604,25 +611,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4220133813938994134, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
   m_PrefabInstance: {fileID: 4561783860089886227}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1514170453
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 422875575514181061}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 613256d8bcb31874ba527fb660efb9cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DesiredDistance: 10
-  RepositionDelay:
-    Millis: 1000
-    FramesPerSecond: 60
-  AbilityDelay:
-    Millis: 2000
-    FramesPerSecond: 60
 --- !u!114 &7760687618719448864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -636,3 +624,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UseDesiredVelocity: 0
+--- !u!114 &137244083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 422875575514181061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8bf1b714c4aa05499422fed822da3aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RepositionDistance: 20
+  RepositionDelay:
+    Millis: 3000
+    FramesPerSecond: 60
+  RepositionBehavior: 1
+  TelegraphBehavior: 0
+  BlockRange: 10
+  AttackRange: 100
+  MainAttack: {fileID: 1504200987}
+  AttackDelay:
+    Millis: 2000
+    FramesPerSecond: 60
