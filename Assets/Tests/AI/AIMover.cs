@@ -98,6 +98,7 @@ public class AIMover : MonoBehaviour {
   async Task TeleportOffLink(TaskScope scope, Vector3 dest) {
     OffMeshVelocity = Vector3.zero;
     Teleport.Destination = dest;
+    await scope.Until(() => AbilityManager.CanInvoke(Teleport.MainAction));
     await AbilityManager.TryRun(scope, Teleport.MainAction);
   }
 
