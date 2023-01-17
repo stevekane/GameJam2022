@@ -13,12 +13,12 @@ public class Jump : Ability {
   // Button press/release.
   bool Holding = true;
   int AirJumpsRemaining = 1;
+
+  public override bool CanStart(AbilityMethod func) => Status.IsGrounded ? true : AirJumpsRemaining > 0;
+
   public override async Task MainAction(TaskScope scope) {
     try {
       Holding = true;
-
-      if (AirJumpsRemaining <= 0 && !Status.IsGrounded)
-        return;
 
       if (Status.IsGrounded) {
         await AnimationDriver.Play(scope, Animation).WaitDone(scope);
