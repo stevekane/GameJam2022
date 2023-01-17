@@ -164,10 +164,8 @@ public class RecoilEffect : StatusEffect {
   public RecoilEffect(Vector3 velocity) {
     Velocity = velocity;
   }
-  public override bool Merge(StatusEffect e) {
-    Velocity += ((RecoilEffect)e).Velocity;
-    return true;
-  }
+  // Ignore subsequent recoils.
+  public override bool Merge(StatusEffect e) => true;
   public override void Apply(Status status) {
     Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * DRAG);
     status.Mover.Move(Velocity*Time.fixedDeltaTime);
@@ -175,6 +173,21 @@ public class RecoilEffect : StatusEffect {
     status.CanRotate = false;
     if (Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED)
       status.Remove(this);
+  }
+}
+
+// Some forward-translation juice for melee hits to convey momentum.
+public class HitFollowthroughEffect : TimedEffect {
+  public Vector3 Velocity;
+  public HitFollowthroughEffect(Vector3 velocity, Timeval duration) : base(duration.Ticks) {
+    Velocity = velocity;
+  }
+  // Ignore subsequent hits.
+  public override bool Merge(StatusEffect e) => true;
+  public override void ApplyTimed(Status status) {
+    status.Mover.Move(Velocity*Time.fixedDeltaTime);
+    status.CanMove = false;
+    status.CanRotate = false;
   }
 }
 
@@ -213,7 +226,7 @@ public class Status : MonoBehaviour {
   public StatusEffect Add(StatusEffect effect, OnEffectComplete onComplete = null) {
     effect.Status = this;
     var count = Active.Count;
-    var existing = Active.FirstOrDefault((e) => e.GetType() == effect.GetType());
+    var existing = Active.FirstOrDefault((e) => e.GetType() == effect.GetType()) ?? Added.FirstOrDefault((e) => e.GetType() == effect.GetType());
     if (existing != null && existing.Merge(effect))
       return existing;
     effect.OnComplete = onComplete;

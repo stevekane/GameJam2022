@@ -43,25 +43,32 @@ public class Damage : MonoBehaviour {
     Status = GetComponent<Status>();
   }
 
+  static readonly Timeval RecoilDuration = Timeval.FromAnimFrames(12, 60);
   void OnHurt(HitParams hitParams) {
     AddPoints(hitParams.Damage);
     if (Status) {
       var knockbackVector = hitParams.KnockbackVector;
+      var forward = hitParams.Source.transform.forward;
       if (Status.IsInterruptible)
         Mover.ResetVelocityAndMovementEffects();
-      Status.Add(new HitStopEffect(knockbackVector, hitParams.HitConfig.HitStopDuration.Ticks),
+      Status.Add(new HitFollowthroughEffect(hitParams.HitConfig.RecoilStrength * forward, RecoilDuration));
+      Status.Add(new HitStopEffect(forward, hitParams.HitConfig.HitStopDuration.Ticks),
         s => {
-          if (s.IsInterruptible)
+          //s.Add(new RecoilEffect(hitParams.HitConfig.RecoilStrength * recoilDir));
+          if (s.IsInterruptible) {
             s.Add(new HurtStunEffect(hitParams.HitConfig.StunDuration.Ticks));
-          s.Add(new SlowFallDuration(hitParams.HitConfig.SlowFallDuration.Ticks));
-          s.Add(new KnockbackEffect(knockbackVector * hitParams.GetKnockbackStrength(Points)));
+            s.Add(new SlowFallDuration(hitParams.HitConfig.SlowFallDuration.Ticks));
+            s.Add(new KnockbackEffect(knockbackVector * hitParams.GetKnockbackStrength(Points)));
+          }
         });
     }
   }
 
   void OnHit(HitParams hitParams) {
-    Status.Add(new HitStopEffect(hitParams.Source.transform.forward, hitParams.HitConfig.HitStopDuration.Ticks), s => {
-      s.Add(new RecoilEffect(hitParams.HitConfig.RecoilStrength * -hitParams.Source.transform.forward));
+    var forward = hitParams.Source.transform.forward;
+    Status.Add(new HitFollowthroughEffect(hitParams.HitConfig.RecoilStrength * forward, RecoilDuration));
+    Status.Add(new HitStopEffect(forward, hitParams.HitConfig.HitStopDuration.Ticks), s => {
+      //s.Add(new RecoilEffect(hitParams.HitConfig.RecoilStrength * forward));
     });
   }
 
