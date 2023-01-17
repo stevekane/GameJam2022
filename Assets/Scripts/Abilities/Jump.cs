@@ -9,18 +9,21 @@ public class Jump : Ability {
   public AnimationJobConfig Animation;
   public AudioClip LaunchSFX;
   public GameObject LaunchVFX;
+  public Timeval CoyoteTime = Timeval.FromAnimFrames(6, 60);
 
-  // Button press/release.
   bool Holding = true;
   int AirJumpsRemaining = 1;
+  // Coyote-time: We stay "grounded" for N ticks after falling off a ledge. Jumping makes us immediately not grounded.
+  int TicksSinceGrounded = 0, TicksSinceJump = 0;
+  bool IsConsideredGrounded => TicksSinceGrounded <= CoyoteTime.Ticks && TicksSinceJump > TicksSinceGrounded;
 
-  public override bool CanStart(AbilityMethod func) => Status.IsGrounded || AirJumpsRemaining > 0;
+  public override bool CanStart(AbilityMethod func) => IsConsideredGrounded || AirJumpsRemaining > 0;
 
   public override async Task MainAction(TaskScope scope) {
     try {
       Holding = true;
 
-      if (Status.IsGrounded) {
+      if (IsConsideredGrounded) {
         await AnimationDriver.Play(scope, Animation).WaitDone(scope);
       } else {
         // TOOD: play an aerial variant of the windup animation here
@@ -33,8 +36,10 @@ public class Jump : Ability {
         velocity = velocity * Mathf.Exp(-Time.fixedDeltaTime * Drag);
         Mover.Move(Time.fixedDeltaTime * velocity);
       }, "Jumping"));
+      if (!IsConsideredGrounded)
+        AirJumpsRemaining--;
+      TicksSinceJump = -1; // Set to 0 next FixedUpdate
 
-      AirJumpsRemaining--;
       await scope.Any(
         Waiter.All(
           Waiter.While(() => Holding),
@@ -50,7 +55,12 @@ public class Jump : Ability {
   }
 
   void FixedUpdate() {
-    if (Status.IsGrounded)
+    if (Status.IsGrounded) {
       AirJumpsRemaining = 1;
+      TicksSinceGrounded = 0;
+    } else {
+      TicksSinceGrounded++;
+    }
+    TicksSinceJump++;
   }
 }
