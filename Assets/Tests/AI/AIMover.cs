@@ -8,6 +8,7 @@ public class AIMover : MonoBehaviour {
   Status Status;
   NavMeshAgent NavMeshAgent;
   Jump Jump;
+  Teleport Teleport;
 
   void Awake() {
     this.InitComponent(out AbilityManager);
@@ -15,6 +16,7 @@ public class AIMover : MonoBehaviour {
     this.InitComponent(out Status);
     this.InitComponent(out NavMeshAgent);
     this.InitComponentFromChildren(out Jump, true);
+    this.InitComponentFromChildren(out Teleport, true);
     NavMeshAgent.updatePosition = false;
     NavMeshAgent.updateRotation = false;
   }
@@ -62,6 +64,8 @@ public class AIMover : MonoBehaviour {
       await FallOffLink(scope, dest);
     } else if (Jump) {
       await JumpOffLink(scope, dest);
+    } else if (Teleport) {
+      await TeleportOffLink(scope, dest);
     } else {
       // Stand here and be sad.
       NavMeshAgent.Warp(transform.position);
@@ -89,6 +93,12 @@ public class AIMover : MonoBehaviour {
         var dir = transform.position.TryGetDirection(dest) ?? OffMeshVelocity;
         OffMeshVelocity = dir.XZ().normalized;
       }));
+  }
+
+  async Task TeleportOffLink(TaskScope scope, Vector3 dest) {
+    OffMeshVelocity = Vector3.zero;
+    Teleport.Destination = dest;
+    await AbilityManager.TryRun(scope, Teleport.MainAction);
   }
 
   void OnDrawGizmos() {
