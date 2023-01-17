@@ -4,13 +4,12 @@ using UnityEngine;
 
 public static class VectorExtensions {
   // Projects a Vector3 to the XZ plane. Used when we only care about horizontal movement.
-  public static Vector3 XZ(this Vector3 v) {
-    return new Vector3(v.x, 0, v.z);
-  }
+  public static Vector3 XZ(this Vector3 v) => new (v.x, 0, v.z);
   public static void SetXZ(this ref Vector3 v, Vector3 a) {
     v.x = a.x;
     v.z = a.z;
   }
+  public static Vector3 XZ(this Vector2 v) => new(v.x, 0, v.y);
 
   public static Vector3? TryGetDirection(this Vector3 origin, Vector3 target) {
     var direction = (target-origin).normalized;
