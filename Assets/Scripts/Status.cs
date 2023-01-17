@@ -121,10 +121,10 @@ public class KnockbackEffect : StatusEffect {
     Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * Drag);
     status.Mover.Move(Velocity*Time.fixedDeltaTime);
     IsAirborne = Velocity.sqrMagnitude >= AIRBORNE_SPEED*AIRBORNE_SPEED;
-    if (status.IsInterruptible) {
-      status.CanMove = !IsAirborne;
-      status.CanRotate = !IsAirborne;
-      status.CanAttack = !IsAirborne;
+    if (IsAirborne) {
+      status.CanMove = false;
+      status.CanRotate = false;
+      status.CanAttack = false;
     }
     if (Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED)
       status.Remove(this);

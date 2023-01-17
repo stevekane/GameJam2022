@@ -20,6 +20,7 @@ public class Wolf : MonoBehaviour {
   Jump JumpAbility;
   TaskScope MainScope = new();
   float DesiredDistance;
+  Vector3? DesiredPosition = null;
 
   public static InlineEffect HurtStunEffect => new(s => {
     s.CanMove = false;
@@ -50,6 +51,8 @@ public class Wolf : MonoBehaviour {
   void OnDestroy() => MainScope.Dispose();
 
   Vector3 ChoosePosition(float desiredDist) {
+    if (DesiredPosition.HasValue)
+      return DesiredPosition.Value;
     var t = Target.transform;
     var delta = t.position.XZ() - transform.position.XZ();
     return transform.position + delta - (desiredDist - NavMeshAgent.stoppingDistance) * delta.normalized;
@@ -98,7 +101,15 @@ public class Wolf : MonoBehaviour {
     }
     if (ShouldMove && Status.CanAttack && !Status.IsGrounded && OverVoid()) {
       DesiredDistance = 0f;
+      if (NavMeshAgent.FindClosestEdge(out var hit)) {
+        var delta = hit.position - transform.position;
+        DesiredPosition = transform.position + delta + 2f*delta.XZ().normalized;
+      }
+      DashAbility.Target = Target;
+      await Abilities.TryRun(scope, DashAbility.MainAction);
       await Abilities.TryRun(scope, JumpAbility.MainAction);
+      await scope.Until(() => Status.IsGrounded);
+      DesiredPosition = null;
     }
   }
 
