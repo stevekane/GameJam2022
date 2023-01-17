@@ -189,8 +189,8 @@ MonoBehaviour:
       FramesPerSecond: 60
     - Millis: 166.66667
       FramesPerSecond: 60
-    BlendInFraction: 0
-    BlendOutFraction: 0.2
+    BlendInFraction: 0.1
+    BlendOutFraction: 0.1
   WindupVFXAttachment:
     Value: 0
     String: Hips
@@ -1423,9 +1423,6 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4220133813938994134, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6267623117969378882}
-    - targetCorrespondingSourceObject: {fileID: 4220133813938994134, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1864218777}
   m_SourcePrefab: {fileID: 100100000, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
 --- !u!4 &880638488746935958 stripped
@@ -1454,19 +1451,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4220133813938994134, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
   m_PrefabInstance: {fileID: 6296767573069671076}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6267623117969378882
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7922519930618417522}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e12c9c632fe31694bbbed2e413f30113, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  UseDesiredVelocity: 0
 --- !u!114 &1864218777
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1479,7 +1463,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45fc3eff05129114791763fd7d6c9292, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AIMover: {fileID: 6267623117969378882}
   NavMeshAgent: {fileID: 8561056575108005685}
   HardAttack: {fileID: 1425603670}
   Throw: {fileID: 1453535051}
@@ -1488,6 +1471,7 @@ MonoBehaviour:
   DesiredDistance: 2
   OutOfRangeDistance: 20
   DiveHeight: 10
+  MinDiveHeight: 5
   MaxDiveHeight: 100
 --- !u!4 &7922519931310200516 stripped
 Transform:

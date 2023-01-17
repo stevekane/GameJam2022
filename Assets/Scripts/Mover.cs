@@ -21,7 +21,7 @@ public class Mover : MonoBehaviour {
   AnimationDriver AnimationDriver;
   Attributes Attributes;
   Status Status;
-  Vector3 TeleportDelta;
+  Vector3? TeleportDestination;
   Vector3 MoveDelta;
   Quaternion RotationDelta;
 
@@ -53,7 +53,7 @@ public class Mover : MonoBehaviour {
   public void SetAim(Vector3 v) => AbilityManager.GetAxis(AxisTag.Aim).Update(0, new Vector2(v.x, v.z));
   public Vector3 GetMove() => AbilityManager.GetAxis(AxisTag.Move).XZ;
   public Vector3 GetAim() => AbilityManager.GetAxis(AxisTag.Aim).XZ.TryGetDirection() ?? transform.forward;
-  public void Teleport(Vector3 delta) => TeleportDelta += delta;
+  public void Teleport(Vector3 destination) => TeleportDestination = destination;
   public void Move(Vector3 delta) => MoveDelta += delta;
   public void Rotate(Quaternion delta) => RotationDelta *= delta;
   public void ResetVelocity() {
@@ -92,11 +92,12 @@ public class Mover : MonoBehaviour {
     Controller.Move(inputDelta + fallDelta + MoveDelta);
     MoveDelta = Vector3.zero;
 
-    if (TeleportDelta.sqrMagnitude > 0) {
-      transform.position = transform.position + TeleportDelta;
+    if (TeleportDestination.HasValue) {
+      Debug.Log("Teleport should have occurred");
+      transform.position = TeleportDestination.Value;
       ResetVelocity();
     }
-    TeleportDelta = Vector3.zero;
+    TeleportDestination = null;
 
     // Turn
     var turnSpeed = Attributes.GetValue(AttributeTag.TurnSpeed);
@@ -107,7 +108,7 @@ public class Mover : MonoBehaviour {
 
     // Animation
     var animator = AnimationDriver.Animator;
-    var orientedVelocity = Quaternion.Inverse(transform.rotation)*InputVelocity;
+    var orientedVelocity = Quaternion.Inverse(transform.rotation)*Velocity.XZ().normalized;
     animator.SetFloat("RightVelocity", orientedVelocity.x);
     animator.SetFloat("ForwardVelocity", orientedVelocity.z);
     animator.SetBool("IsGrounded", Status.IsGrounded);

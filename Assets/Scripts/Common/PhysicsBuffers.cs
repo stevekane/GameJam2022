@@ -53,8 +53,9 @@ public static class PhysicsQuery {
 
   public static bool GroundCheck(
   Vector3 origin,
+  out RaycastHit hit,
   float maxDistance = .2f) {
-    return Physics.Raycast(origin, Vector3.down, maxDistance, Defaults.Instance.EnvironmentLayerMask);
+    return Physics.Raycast(origin, Vector3.down, out hit, maxDistance, Defaults.Instance.EnvironmentLayerMask);
   }
 
   public static bool InFieldOfView(

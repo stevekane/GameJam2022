@@ -43,7 +43,8 @@ public class Dive : Ability {
     await scope.All(Animation.PauseAfterPhase(1), Fall);
     // Attack
     SFXManager.Instance.TryPlayOneShot(LandSFX);
-    VFXManager.Instance.TrySpawnWithParent(LandVFX, AvatarAttacher.GetBoneTransform(LandVFXAttachment));
+    var landVFXTransform = AvatarAttacher.GetBoneTransform(LandVFXAttachment);
+    VFXManager.Instance.TrySpawnEffect(LandVFX, landVFXTransform.position, landVFXTransform.rotation);
     Animation.Resume();
     await scope.Any(Animation.WaitPhase(2), HitHandler.Loop(Hitbox, new HitParams(HitConfig, Attributes)));
     // Recovery

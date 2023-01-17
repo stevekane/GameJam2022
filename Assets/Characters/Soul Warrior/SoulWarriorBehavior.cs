@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class SoulWarriorBehavior : MonoBehaviour {
-  [SerializeField] AIMover AIMover;
   [SerializeField] NavMeshAgent NavMeshAgent;
   [SerializeField] AttackAbility HardAttack;
   [SerializeField] Throw Throw;
@@ -12,6 +12,7 @@ public class SoulWarriorBehavior : MonoBehaviour {
   [SerializeField] float DesiredDistance = 1f;
   [SerializeField] float OutOfRangeDistance = 6f;
   [SerializeField] float DiveHeight = 15f;
+  [SerializeField] float MinDiveHeight = 5f;
   [SerializeField] float MaxDiveHeight = 100f;
 
   Vector3 SpawnOrigin;
@@ -22,6 +23,8 @@ public class SoulWarriorBehavior : MonoBehaviour {
   TaskScope MainScope = new();
 
   void Awake() {
+    NavMeshAgent.updatePosition = false;
+    NavMeshAgent.updateRotation = false;
     Mover = GetComponent<Mover>();
     Status = GetComponent<Status>();
     AbilityManager = GetComponent<AbilityManager>();
@@ -30,34 +33,22 @@ public class SoulWarriorBehavior : MonoBehaviour {
   void OnEnable() => SpawnOrigin = transform.position;
   void OnDestroy() => MainScope.Dispose();
 
-  void TrySetTeleportOverTarget() {
-    if (Target) {
-      Teleport.Destination = Target.position + DiveHeight * Vector3.up;
-    }
-  }
-
-  void TrySetTeleportBehindTarget() {
-    if (Target) {
-      var delta = (Target.position-transform.position).XZ();
-      var toTarget = delta.normalized;
-      Teleport.Destination = Target.position + DiveHeight * toTarget;
-    }
-  }
-
-  void TryLookAtTarget() {
-    if (Target) {
-      var delta = (Target.position-transform.position).XZ();
-      var toTarget = delta.normalized;
-      var distanceToTarget = delta.magnitude;
-      Mover.SetAim(toTarget);
-    }
-  }
-
   void TryMoveTowardsTarget() {
     var delta = (Target.position-transform.position).XZ();
     var toTarget = delta.normalized;
-    NavMeshAgent.destination = Target.position+Target.forward * DesiredDistance;
-    AIMover.SetMoveFromNavMeshAgent();
+    NavMeshAgent.nextPosition = transform.position;
+    if (NavMesh.SamplePosition(Target.position, out var hit, 1, NavMesh.AllAreas)) {
+      NavMeshAgent.destination = hit.position;
+    }
+    Mover.Move(Time.fixedDeltaTime * NavMeshAgent.velocity);
+    Mover.SetAim(toTarget);
+  }
+
+  async Task TeleportTo(TaskScope scope, Vector3 destination) {
+    Teleport.Destination = destination;
+    await scope.Until(() => AbilityManager.CanInvoke(Teleport.MainAction));
+    await AbilityManager.TryRun(scope, Teleport.MainAction);
+    NavMeshAgent.Warp(transform.position);
   }
 
   async Task Behavior(TaskScope scope) {
@@ -69,38 +60,61 @@ public class SoulWarriorBehavior : MonoBehaviour {
       var toPlayer = delta.normalized;
       var distanceToPlayer = delta.magnitude;
       if (Status.IsGrounded) {
-        if (distanceToPlayer < OutOfRangeDistance) {
-          await scope.Any(
-            Waiter.Repeat(TryLookAtTarget),
-            Waiter.Repeat(TryMoveTowardsTarget),
-            AbilityManager.TryRun(HardAttack.MainAction));
-        } else {
-          var diceRoll = Random.Range(0f, 1f);
-          if (diceRoll < .01f) {
-            await scope.Any(
-              Waiter.Repeat(TrySetTeleportOverTarget),
-              AbilityManager.TryRun(Teleport.MainAction));
-          } else if (diceRoll < .02f) {
-            await scope.Any(
-              Waiter.Repeat(TrySetTeleportBehindTarget),
-              AbilityManager.TryRun(Teleport.MainAction));
-          } else if (diceRoll < .03f) {
-            await scope.Any(
-              Waiter.Repeat(TryLookAtTarget),
-              AbilityManager.TryRun(Throw.MainAction));
-          } else {
-            TryLookAtTarget();
-            TryMoveTowardsTarget();
+        if (NavMeshAgent.isOnOffMeshLink && NavMeshAgent.currentOffMeshLinkData.valid) {
+          var linkData = NavMeshAgent.currentOffMeshLinkData;
+          var toStart = Vector3.Distance(transform.position, linkData.startPos);
+          var toEnd = Vector3.Distance(transform.position, linkData.endPos);
+          var dest = toStart < toEnd ? linkData.endPos : linkData.startPos;
+          var onPath = NavMeshAgent.path.corners.Any(c => Vector3.Distance(c, dest) < float.Epsilon);
+          if (onPath) {
+            await TeleportTo(scope, dest + 3 * Vector3.up);
           }
+          NavMeshAgent.CompleteOffMeshLink();
         }
-      } else {
-        if (PhysicsQuery.GroundCheck(transform.position, MaxDiveHeight)) {
-          await AbilityManager.TryRun(scope, Dive.MainAction);
-        } else {
-          Teleport.Destination = SpawnOrigin + DiveHeight * Vector3.up;
-          await AbilityManager.TryRun(scope, Teleport.MainAction);
-        }
+        TryMoveTowardsTarget();
       }
+      // if (Status.IsGrounded) {
+      //   if (NavMeshAgent.currentOffMeshLinkData.valid) {
+      //     var linkData = NavMeshAgent.currentOffMeshLinkData;
+      //     var toStart = Vector3.Distance(transform.position, linkData.startPos);
+      //     var toEnd = Vector3.Distance(transform.position, linkData.endPos);
+      //     var dest = toStart < toEnd ? linkData.endPos : linkData.startPos;
+      //     Debug.Log($"Teleporting to CURRENT {dest}");
+      //     Teleport.Destination = dest + 2 * Vector3.up;
+      //     await scope.Until(() => AbilityManager.CanInvoke(Teleport.MainAction));
+      //     await AbilityManager.TryRun(scope, Teleport.MainAction);
+      //     NavMeshAgent.Warp(transform.position);
+      //   } else if (NavMeshAgent.nextOffMeshLinkData.valid) {
+      //     var linkData = NavMeshAgent.nextOffMeshLinkData;
+      //     var toStart = Vector3.Distance(transform.position, linkData.startPos);
+      //     var toEnd = Vector3.Distance(transform.position, linkData.endPos);
+      //     var dest = toStart < toEnd ? linkData.endPos : linkData.startPos;
+      //     Debug.Log($"Teleporting to NEXT {dest}");
+      //     Teleport.Destination = dest + 2 * Vector3.up;
+      //     await scope.Until(() => AbilityManager.CanInvoke(Teleport.MainAction));
+      //     await AbilityManager.TryRun(scope, Teleport.MainAction);
+      //     NavMeshAgent.Warp(transform.position);
+      //   // } else if (distanceToPlayer < DesiredDistance) {
+      //     // await scope.Any(
+      //       // Waiter.Repeat(TryMoveTowardsTarget),
+      //       // AbilityManager.TryRun(HardAttack.MainAction));
+      //   } else {
+      //     TryMoveTowardsTarget();
+      //     // await scope.Any(
+      //     //   Waiter.Repeat(TryMoveTowardsTarget),
+      //     //   AbilityManager.TryRun(Throw.MainAction));
+      //   }
+      // } else {
+      //   if (PhysicsQuery.GroundCheck(transform.position, out var hit, MaxDiveHeight)) {
+      //     if (hit.distance > MinDiveHeight) {
+      //       await AbilityManager.TryRun(scope, Dive.MainAction);
+      //     }
+      //   } else {
+      //     Teleport.Destination = SpawnOrigin + DiveHeight * Vector3.up;
+      //     await scope.Until(() => AbilityManager.CanInvoke(Teleport.MainAction));
+      //     await AbilityManager.TryRun(scope, Teleport.MainAction);
+      //   }
+      // }
     }
     await scope.Tick();
   }
