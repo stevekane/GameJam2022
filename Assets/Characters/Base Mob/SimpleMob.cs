@@ -50,7 +50,8 @@ public class SimpleMob : MonoBehaviour {
       Waiter.Repeat(TryAim),
       Waiter.Repeat(TryMove),
       Waiter.Repeat(TryReposition),
-      Waiter.Repeat(TryStartAbility));
+      Waiter.Repeat(TryBlock),
+      Waiter.Repeat(TryAttack));
   }
 
   void TryFindTarget() {
@@ -85,54 +86,53 @@ public class SimpleMob : MonoBehaviour {
     await scope.Delay(RepositionDelay);
   }
 
-  async Task TryStartAbility(TaskScope scope) {
-    if (Status.IsGrounded && Status.CanAttack) {
-      if (Shield && TargetIsAttacking && TargetInRange(BlockRange)) {
-        await StartBlock(scope);
-      } else if (TargetInRange(AttackRange)) {
-        await StartAttack(scope);
-      }
+  async Task TryAttack(TaskScope scope) {
+    if (Status.IsGrounded && Status.CanAttack && !IsBlocking && TargetInRange(AttackRange)) {
+      await scope.Any(
+        Waiter.Until(() => Status.IsHurt),
+        async s => {
+          TaskFunc telegraph = TelegraphBehavior switch {
+            TelegraphBehaviors.TelegraphThenAttack => async s => await Flash.RunStrobe(s, Color.red, Timeval.FromMillis(150), 3),
+            TelegraphBehaviors.TelegraphDuringAttack => async s => { _ = Flash.RunStrobe(s, Color.red, Timeval.FromMillis(150), 3); await scope.Yield(); }
+            ,
+            TelegraphBehaviors.DontTelegraph => async s => await s.Yield(),
+            _ => null,
+          };
+          await telegraph(s);
+          if (MainAttack is Throw t)
+            t.Target = Target;
+          await AbilityManager.TryRun(s, MainAttack.MainAction);
+        });
+      await scope.Delay(AttackDelay);
     }
   }
 
-  async Task StartBlock(TaskScope scope) {
-    ShouldMove = false;
-    AbilityManager.TryInvoke(ShieldAbility.MainAction);
-    // Hold shield until .5s after target stops attacking, or shield dies.
-    await scope.Any(
-      TrueForDuration(Timeval.FromSeconds(.5f), () => !TargetIsAttacking),
-      Waiter.While(() => Shield != null));
-    await AbilityManager.TryRun(scope, ShieldAbility.MainRelease);
-    ShouldMove = true;
+  async Task TryBlock(TaskScope scope) {
+    if (!Shield)
+      await scope.Forever();
+    if (Status.IsGrounded && Status.CanAttack && !IsAttacking && TargetIsAttacking && TargetInRange(BlockRange)) {
+      ShouldMove = false;
+      AbilityManager.TryInvoke(ShieldAbility.MainAction);
+      // Hold shield until .5s after target stops attacking, or shield dies.
+      await scope.Any(
+        TrueForDuration(Timeval.FromSeconds(.5f), () => !TargetIsAttacking),
+        Waiter.While(() => Shield != null));
+      await AbilityManager.TryRun(scope, ShieldAbility.MainRelease);
+      ShouldMove = true;
 
-    TaskFunc TrueForDuration(Timeval waitTime, Func<bool> pred) => async (TaskScope scope) => {
-      var ticks = waitTime.Ticks;
-      while (ticks-- > 0) {
-        if (!pred())
-          ticks = waitTime.Ticks;
-        await scope.Tick();
-      }
-    };
+      TaskFunc TrueForDuration(Timeval waitTime, Func<bool> pred) => async (TaskScope scope) => {
+        var ticks = waitTime.Ticks;
+        while (ticks-- > 0) {
+          if (!pred())
+            ticks = waitTime.Ticks;
+          await scope.Tick();
+        }
+      };
+    }
   }
 
-  async Task StartAttack(TaskScope scope) {
-    await scope.Any(
-      Waiter.Until(() => Status.IsHurt),
-      async s => {
-        TaskFunc telegraph = TelegraphBehavior switch {
-          TelegraphBehaviors.TelegraphThenAttack => async s => await Flash.RunStrobe(s, Color.red, Timeval.FromMillis(150), 3),
-          TelegraphBehaviors.TelegraphDuringAttack => async s => { _ = Flash.RunStrobe(s, Color.red, Timeval.FromMillis(150), 3); await scope.Yield(); },
-          TelegraphBehaviors.DontTelegraph => async s => await s.Yield(),
-          _ => null,
-        };
-        await telegraph(s);
-        if (MainAttack is Throw t)
-          t.Target = Target;
-        await AbilityManager.TryRun(s, MainAttack.MainAction);
-      });
-    await scope.Delay(AttackDelay);
-  }
-
+  bool IsAttacking => MainAttack.IsRunning;
+  bool IsBlocking => ShieldAbility && ShieldAbility.IsRunning;
   bool TargetIsAttacking => TargetAbilities.Abilities.Any(a => a.IsRunning && a.HitConfigData != null);
   bool TargetInRange(float range) {
     var delta = (Target.position - transform.position);
