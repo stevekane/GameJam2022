@@ -10,7 +10,6 @@ public class PowerShield : MonoBehaviour {
   float Condition => 1 - (Mathf.Min(Damage.Points, MaxDamage) / MaxDamage);
 
   void OnHurt() {
-    Animator.SetTrigger("OnHurt");
     SFXManager.Instance.TryPlayOneShot(OnHurtSFX);
     VFXManager.Instance.TrySpawnEffect(OnHurtVFX, transform.position);
   }

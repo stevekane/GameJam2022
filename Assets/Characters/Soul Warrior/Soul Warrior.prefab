@@ -513,7 +513,7 @@ MonoBehaviour:
   Windup:
     Millis: 333.33334
     FramesPerSecond: 60
-  Spawn: 0
+  Spawn: 13
   ChannelVFX: {fileID: 5004110830200433158, guid: e8cd8df4f7ff541489a01ae1439a2204, type: 3}
   ChannelAudioSource: {fileID: 1453535050}
   SpawnVFX: {fileID: 0}
@@ -1284,6 +1284,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2426427713348801937, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994128, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -1419,6 +1423,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4220133813938994134, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 6267623117969378882}
+    - targetCorrespondingSourceObject: {fileID: 4220133813938994134, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1864218777}
   m_SourcePrefab: {fileID: 100100000, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
 --- !u!4 &880638488746935958 stripped
@@ -1447,6 +1454,19 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4220133813938994134, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
   m_PrefabInstance: {fileID: 6296767573069671076}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6267623117969378882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7922519930618417522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e12c9c632fe31694bbbed2e413f30113, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UseDesiredVelocity: 0
 --- !u!114 &1864218777
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1459,17 +1479,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45fc3eff05129114791763fd7d6c9292, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AIMover: {fileID: 6267623117969378882}
+  NavMeshAgent: {fileID: 8561056575108005685}
   HardAttack: {fileID: 1425603670}
   Throw: {fileID: 1453535051}
   Teleport: {fileID: 1451708492}
-  BackDash: {fileID: 663642652}
   Dive: {fileID: 881263288}
-  DesiredDistance: 1
+  DesiredDistance: 2
   OutOfRangeDistance: 20
   DiveHeight: 10
   MaxDiveHeight: 100
 --- !u!4 &7922519931310200516 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4220133813289122912, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
+  m_PrefabInstance: {fileID: 6296767573069671076}
+  m_PrefabAsset: {fileID: 0}
+--- !u!195 &8561056575108005685 stripped
+NavMeshAgent:
+  m_CorrespondingSourceObject: {fileID: 2426427713348801937, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
   m_PrefabInstance: {fileID: 6296767573069671076}
   m_PrefabAsset: {fileID: 0}

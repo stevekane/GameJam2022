@@ -32,8 +32,7 @@ public class Teleport : Ability {
       SFXManager.Instance.TryPlayOneShot(InSFX);
       VFXManager.Instance.TrySpawnEffect(InVFX, Destination+VFXOffset);
       Flash.Run();
-      Mover.Move(Destination-AbilityManager.transform.position);
-      Mover.ResetVelocity();
+      Mover.Teleport(Destination - transform.position);
       await scope.Tick(); // Important: Nothing should happen on this frame once the teleport concludes
     } finally {}
   }

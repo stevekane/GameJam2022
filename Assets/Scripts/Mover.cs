@@ -21,6 +21,7 @@ public class Mover : MonoBehaviour {
   AnimationDriver AnimationDriver;
   Attributes Attributes;
   Status Status;
+  Vector3 TeleportDelta;
   Vector3 MoveDelta;
   Quaternion RotationDelta;
 
@@ -52,6 +53,7 @@ public class Mover : MonoBehaviour {
   public void SetAim(Vector3 v) => AbilityManager.GetAxis(AxisTag.Aim).Update(0, new Vector2(v.x, v.z));
   public Vector3 GetMove() => AbilityManager.GetAxis(AxisTag.Move).XZ;
   public Vector3 GetAim() => AbilityManager.GetAxis(AxisTag.Aim).XZ.TryGetDirection() ?? transform.forward;
+  public void Teleport(Vector3 delta) => TeleportDelta += delta;
   public void Move(Vector3 delta) => MoveDelta += delta;
   public void Rotate(Quaternion delta) => RotationDelta *= delta;
   public void ResetVelocity() {
@@ -89,6 +91,12 @@ public class Mover : MonoBehaviour {
     var fallDelta = dt * FallVelocity;
     Controller.Move(inputDelta + fallDelta + MoveDelta);
     MoveDelta = Vector3.zero;
+
+    if (TeleportDelta.sqrMagnitude > 0) {
+      transform.position = transform.position + TeleportDelta;
+      ResetVelocity();
+    }
+    TeleportDelta = Vector3.zero;
 
     // Turn
     var turnSpeed = Attributes.GetValue(AttributeTag.TurnSpeed);

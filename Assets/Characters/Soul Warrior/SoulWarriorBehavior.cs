@@ -1,17 +1,20 @@
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class SoulWarriorBehavior : MonoBehaviour {
+  [SerializeField] AIMover AIMover;
+  [SerializeField] NavMeshAgent NavMeshAgent;
   [SerializeField] AttackAbility HardAttack;
   [SerializeField] Throw Throw;
   [SerializeField] Teleport Teleport;
-  [SerializeField] BackDash BackDash;
   [SerializeField] Dive Dive;
   [SerializeField] float DesiredDistance = 1f;
   [SerializeField] float OutOfRangeDistance = 6f;
   [SerializeField] float DiveHeight = 15f;
   [SerializeField] float MaxDiveHeight = 100f;
 
+  Vector3 SpawnOrigin;
   Mover Mover;
   Status Status;
   AbilityManager AbilityManager;
@@ -24,6 +27,7 @@ public class SoulWarriorBehavior : MonoBehaviour {
     AbilityManager = GetComponent<AbilityManager>();
   }
   void Start() => MainScope.Start(Waiter.Repeat(Behavior));
+  void OnEnable() => SpawnOrigin = transform.position;
   void OnDestroy() => MainScope.Dispose();
 
   void TrySetTeleportOverTarget() {
@@ -46,22 +50,18 @@ public class SoulWarriorBehavior : MonoBehaviour {
       var toTarget = delta.normalized;
       var distanceToTarget = delta.magnitude;
       Mover.SetAim(toTarget);
-      Mover.SetMove(toTarget);
     }
   }
 
   void TryMoveTowardsTarget() {
     var delta = (Target.position-transform.position).XZ();
     var toTarget = delta.normalized;
-    var distanceToTarget = delta.magnitude;
-    if (distanceToTarget < DesiredDistance) {
-      Mover.SetMove(Vector3.zero);
-    } else {
-      Mover.SetMove(toTarget);
-    }
+    NavMeshAgent.destination = Target.position+Target.forward * DesiredDistance;
+    AIMover.SetMoveFromNavMeshAgent();
   }
 
   async Task Behavior(TaskScope scope) {
+    Mover.SetMove(Vector3.zero);
     if (!Target) {
       Target = FindObjectOfType<Player>().transform;
     } else {
@@ -70,15 +70,10 @@ public class SoulWarriorBehavior : MonoBehaviour {
       var distanceToPlayer = delta.magnitude;
       if (Status.IsGrounded) {
         if (distanceToPlayer < OutOfRangeDistance) {
-          var diceRoll = Random.Range(0f, 1f);
-          if (diceRoll < .5f) {
-            await AbilityManager.TryRun(scope, BackDash.MainAction);
-          } else {
-            await scope.Any(
-              Waiter.Repeat(TryLookAtTarget),
-              Waiter.Repeat(TryMoveTowardsTarget),
-              AbilityManager.TryRun(HardAttack.MainAction));
-          }
+          await scope.Any(
+            Waiter.Repeat(TryLookAtTarget),
+            Waiter.Repeat(TryMoveTowardsTarget),
+            AbilityManager.TryRun(HardAttack.MainAction));
         } else {
           var diceRoll = Random.Range(0f, 1f);
           if (diceRoll < .01f) {
@@ -102,7 +97,7 @@ public class SoulWarriorBehavior : MonoBehaviour {
         if (PhysicsQuery.GroundCheck(transform.position, MaxDiveHeight)) {
           await AbilityManager.TryRun(scope, Dive.MainAction);
         } else {
-          Teleport.Destination = DiveHeight * Vector3.up;
+          Teleport.Destination = SpawnOrigin + DiveHeight * Vector3.up;
           await AbilityManager.TryRun(scope, Teleport.MainAction);
         }
       }
