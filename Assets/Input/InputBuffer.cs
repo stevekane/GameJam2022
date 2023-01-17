@@ -110,11 +110,6 @@ public class InputBuffer : MonoBehaviour {
 
   void UpdateOrAdd<K,V>(Dictionary<K,V> d, K k, V v) {
     d[k] = v;
-    // if (d.ContainsKey(k)) {
-    //   d[k] = v;
-    // } else {
-    //   d.Add(k, v);
-    // }
   }
 
   void Record(ButtonCode code, InputAction action) {
