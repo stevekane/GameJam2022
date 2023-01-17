@@ -185,7 +185,12 @@ public class HitFollowthroughEffect : TimedEffect {
   // Ignore subsequent hits.
   public override bool Merge(StatusEffect e) => true;
   public override void ApplyTimed(Status status) {
-    status.Mover.Move(Velocity*Time.fixedDeltaTime);
+    var delta = Velocity*Time.fixedDeltaTime;
+    if (status.IsGrounded && !status.IsOverGround(delta)) {
+      // dont
+    } else {
+      status.Mover.Move(delta);
+    }
     status.CanMove = false;
     status.CanRotate = false;
   }
@@ -262,21 +267,23 @@ public class Status : MonoBehaviour {
     Damage = GetComponent<Damage>();
   }
 
+  internal bool IsOverGround(Vector3 delta) {
+    const float GROUND_DISTANCE = .2f;
+    var cylinderHeight = Mathf.Max(0, CharacterController.height - 2*CharacterController.radius);
+    var offsetDistance = cylinderHeight / 2;
+    var offset = offsetDistance*Vector3.up;
+    var skinOffset = CharacterController.skinWidth*Vector3.up;
+    var position = transform.TransformPoint(CharacterController.center + skinOffset - offset) + delta;
+    var ray = new Ray(position, Vector3.down);
+    var hit = new RaycastHit();
+    var didHit = Physics.SphereCast(ray, CharacterController.radius, out hit, GROUND_DISTANCE, Defaults.Instance.EnvironmentLayerMask, QueryTriggerInteraction.Ignore);
+    return didHit && hit.collider.CompareTag(Defaults.Instance.GroundTag);
+  }
+
   private void FixedUpdate() {
     Modifiers.Clear();
 
-    const float GROUND_DISTANCE = .2f;
-    {
-      var cylinderHeight = Mathf.Max(0, CharacterController.height - 2*CharacterController.radius);
-      var offsetDistance = cylinderHeight / 2;
-      var offset = offsetDistance*Vector3.up;
-      var skinOffset = CharacterController.skinWidth*Vector3.up;
-      var position = transform.TransformPoint(CharacterController.center + skinOffset - offset);
-      var ray = new Ray(position, Vector3.down);
-      var hit = new RaycastHit();
-      var didHit = Physics.SphereCast(ray, CharacterController.radius, out hit, GROUND_DISTANCE, Defaults.Instance.EnvironmentLayerMask, QueryTriggerInteraction.Ignore);
-      IsGrounded = didHit && hit.collider.CompareTag(Defaults.Instance.GroundTag);
-    }
+    IsGrounded = IsOverGround(Vector3.zero);
     IsHurt = false;
 
     Tags = Upgrades.AbilityTags;
