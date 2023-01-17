@@ -101,12 +101,14 @@ public class Wolf : MonoBehaviour {
     }
     if (ShouldMove && Status.CanAttack && !Status.IsGrounded && OverVoid()) {
       DesiredDistance = 0f;
+      DashAbility.Target = Target;
+      await Abilities.TryRun(scope, DashAbility.MainAction);
+      // TODO: This sucks - it will only find a point on his old surface. There doesn't seem to be a way to find the nearest surface?
       if (NavMeshAgent.FindClosestEdge(out var hit)) {
         var delta = hit.position - transform.position;
         DesiredPosition = transform.position + delta + 2f*delta.XZ().normalized;
+        Debug.DrawRay(hit.position, Vector3.up*4f);
       }
-      DashAbility.Target = Target;
-      await Abilities.TryRun(scope, DashAbility.MainAction);
       await Abilities.TryRun(scope, JumpAbility.MainAction);
       await scope.Until(() => Status.IsGrounded);
       DesiredPosition = null;
