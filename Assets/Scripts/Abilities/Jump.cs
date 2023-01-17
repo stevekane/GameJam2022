@@ -14,7 +14,7 @@ public class Jump : Ability {
   bool Holding = true;
   int AirJumpsRemaining = 1;
 
-  public override bool CanStart(AbilityMethod func) => Status.IsGrounded ? true : AirJumpsRemaining > 0;
+  public override bool CanStart(AbilityMethod func) => Status.IsGrounded || AirJumpsRemaining > 0;
 
   public override async Task MainAction(TaskScope scope) {
     try {
