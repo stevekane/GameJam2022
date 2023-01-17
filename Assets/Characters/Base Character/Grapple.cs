@@ -77,26 +77,22 @@ public class Grapple : Ability {
     GrappleLine.SetPosition(0, HookOrigin.Transform.position);
   }
 
+  public override bool CanStart(AbilityMethod func) => AbilityManager.GetAxis(AxisTag.ReallyAim).XZ != Vector3.zero && Candidate;
+
   public override async Task MainAction(TaskScope scope) {
-    if (AbilityManager.GetAxis(AxisTag.ReallyAim).XZ == Vector3.zero)
-      return;  // TODO HACK: Allows this to share a button with SimpleDash. Should support gestures instead.
     try {
-      if (Candidate != null) {
-        Target = Candidate;
-        using (var activeEffect = Status.Add(ActiveEffect)) {
-          await scope.Any(
-            Waiter.Repeat(UpdateCurrentRotationFromTarget),
-            Waiter.Sequence(Windup, Throw, Waiter.Delay(HangDuration)));
-        }
-        using (var pullEffect = Status.Add(PullEffect)) {
-          await scope.Any(
-            Waiter.Repeat(UpdateCurrentRotationFromVelocity),
-            Waiter.Sequence(Pull, Waiter.Delay(HoldDuration)));
-        }
-        await scope.Run(Vault);
-      } else {
-        await scope.Tick();
+      Target = Candidate;
+      using (var activeEffect = Status.Add(ActiveEffect)) {
+        await scope.Any(
+          Waiter.Repeat(UpdateCurrentRotationFromTarget),
+          Waiter.Sequence(Windup, Throw, Waiter.Delay(HangDuration)));
       }
+      using (var pullEffect = Status.Add(PullEffect)) {
+        await scope.Any(
+          Waiter.Repeat(UpdateCurrentRotationFromVelocity),
+          Waiter.Sequence(Pull, Waiter.Delay(HoldDuration)));
+      }
+      await scope.Run(Vault);
     } finally {
       Target = null;
       CurrentRotation = 0;
