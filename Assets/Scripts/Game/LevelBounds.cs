@@ -18,7 +18,7 @@ public class LevelBounds : MonoBehaviour {
     if (pos.x <= Left) return new(1, 0, 0);
     if (pos.x >= Right) return new(-1, 0, 0);
     if (pos.y <= Bottom) return new(0, 1, 0);
-    if (pos.y >= Right) return new(0, -1, 0);
+    if (pos.y >= Top) return new(0, -1, 0);
     if (pos.z <= Front) return new(0, 0, 1);
     if (pos.z >= Back) return new(0, 0, -1);
     Debug.LogError($"Trying to get LevelBounds intersection normal while inbounds: {pos}");
