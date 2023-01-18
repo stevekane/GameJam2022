@@ -75,7 +75,7 @@ public class Wolf : MonoBehaviour {
       Waiter.Repeat(TryFindTarget),
       Waiter.Repeat(TryAim),
       Waiter.Repeat(TryMove),
-      Waiter.Repeat(TryJump),
+      Waiter.Repeat(TryRecover),
       Waiter.Repeat(TryReposition),
       Waiter.Repeat(TryAttackSequence));
   }
@@ -94,7 +94,7 @@ public class Wolf : MonoBehaviour {
       AIMover.SetMoveFromNavMeshAgent();
   }
 
-  async Task TryJump(TaskScope scope) {
+  async Task TryRecover(TaskScope scope) {
     bool OverVoid() {
       const float MAX_RAYCAST_DISTANCE = 1000;
       return !Physics.Raycast(transform.position, Vector3.down, MAX_RAYCAST_DISTANCE, Defaults.Instance.EnvironmentLayerMask);
@@ -103,13 +103,12 @@ public class Wolf : MonoBehaviour {
       DesiredDistance = 0f;
       DashAbility.Target = Target;
       await Abilities.TryRun(scope, DashAbility.MainAction);
-      // TODO: This sucks - it will only find a point on his old surface. There doesn't seem to be a way to find the nearest surface?
-      if (NavMeshAgent.FindClosestEdge(out var hit)) {
-        var delta = hit.position - transform.position;
-        DesiredPosition = transform.position + delta + 2f*delta.XZ().normalized;
-        Debug.DrawRay(hit.position, Vector3.up*4f);
-      }
+
+      var edge = NavMeshUtil.Instance.FindClosestPointOnEdge(transform.position);
+      var delta = edge - transform.position;
+      DesiredPosition = transform.position + delta + 2f*delta.XZ().normalized;
       await Abilities.TryRun(scope, JumpAbility.MainAction);
+
       await scope.Until(() => Status.IsGrounded);
       DesiredPosition = null;
     }
@@ -151,5 +150,11 @@ public class Wolf : MonoBehaviour {
     await Abilities.TryRun(scope, LightAbility.MainAction);
     await scope.Until(() => TargetInRange(AttackRange) && Status.CanAttack);
     await Abilities.TryRun(scope, HeavyAbility.MainAction);
+  }
+
+  void OnDrawGizmos() {
+    Gizmos.color = Color.magenta;
+    if (DesiredPosition.HasValue)
+      Gizmos.DrawWireSphere(DesiredPosition.Value, .5f);
   }
 }

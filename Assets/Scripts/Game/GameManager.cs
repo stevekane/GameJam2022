@@ -43,6 +43,7 @@ public class GameManager : MonoBehaviour {
       MobManager.Instance = MobManager;
       GrapplePointManager.Instance = GrapplePointManager;
       CameraManager.Instance = CameraManager;
+      this.InitComponentFromChildren(out NavMeshUtil.Instance);
       DontDestroyOnLoad(Instance.gameObject);
     }
   }
