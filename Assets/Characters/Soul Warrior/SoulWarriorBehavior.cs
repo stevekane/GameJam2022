@@ -51,11 +51,17 @@ public class SoulWarriorBehavior : MonoBehaviour {
     NavMeshAgent.Warp(transform.position);
   }
 
+  bool WasGrounded = true;
   async Task Behavior(TaskScope scope) {
     Mover.SetMove(Vector3.zero);
     if (!Target) {
       Target = FindObjectOfType<Player>().transform;
     } else {
+      // Hacks to update navmesh agent state to behave correctly.
+      if (!WasGrounded && Status.IsGrounded)
+        NavMeshAgent.Warp(transform.position);
+      WasGrounded = Status.IsGrounded;
+
       var delta = (Target.position-transform.position).XZ();
       var toPlayer = delta.normalized;
       var distanceToPlayer = delta.magnitude;
@@ -65,10 +71,7 @@ public class SoulWarriorBehavior : MonoBehaviour {
           var toStart = Vector3.Distance(transform.position, linkData.startPos);
           var toEnd = Vector3.Distance(transform.position, linkData.endPos);
           var dest = toStart < toEnd ? linkData.endPos : linkData.startPos;
-          var onPath = NavMeshAgent.path.corners.Any(c => Vector3.Distance(c, dest) < float.Epsilon);
-          if (onPath) {
-            await TeleportTo(scope, dest + 3 * Vector3.up);
-          }
+          await TeleportTo(scope, dest + 3 * Vector3.up);
           NavMeshAgent.CompleteOffMeshLink();
         }
         TryMoveTowardsTarget();
