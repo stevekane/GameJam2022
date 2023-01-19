@@ -20,7 +20,7 @@ public class AttackAbility : Ability {
 
   public override HitConfig HitConfigData => HitConfig;
 
-  public static InlineEffect InPlaceEffect = new(s => {
+  public static InlineEffect InPlaceEffect => new(s => {
     s.HasGravity = false;
     s.CanMove = false;
     s.CanRotate = false;
