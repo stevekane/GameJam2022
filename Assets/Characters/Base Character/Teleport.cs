@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -33,8 +34,9 @@ public class Teleport : Ability {
       VFXManager.Instance.TrySpawnEffect(InVFX, Destination+VFXOffset);
       Flash.Run();
       Mover.Teleport(Destination);
-      Debug.DrawLine(Destination, transform.position, Color.white, 3);
-      await scope.Tick(); // Important: Nothing should happen on this frame once the teleport concludes
+      // await scope.Tick(); // Important: Nothing should happen on this frame once the teleport concludes
+    } catch (Exception e) {
+      Debug.LogError($"TELEPORT CANCELED: {e.Message}");
     } finally {}
   }
 }

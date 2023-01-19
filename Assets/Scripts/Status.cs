@@ -206,7 +206,9 @@ public class Status : MonoBehaviour {
   internal Optional<Damage> Damage;
   Dictionary<AttributeTag, AttributeModifier> Modifiers = new();
 
-  public bool IsGrounded { get => GetBoolean(AttributeTag.IsGrounded); set => SetBoolean(AttributeTag.IsGrounded, value); }
+  public bool JustGrounded { get; private set; }
+  public bool IsGrounded { get; private set; }
+  public bool JustTookOff { get; private set; }
   public bool CanMove { get => GetBoolean(AttributeTag.MoveSpeed); set => SetBoolean(AttributeTag.MoveSpeed, value); }
   public bool CanRotate { get => GetBoolean(AttributeTag.TurnSpeed); set => SetBoolean(AttributeTag.TurnSpeed, value); }
   public bool HasGravity { get => GetBoolean(AttributeTag.HasGravity); set => SetBoolean(AttributeTag.HasGravity, value); }
@@ -283,8 +285,18 @@ public class Status : MonoBehaviour {
   private void FixedUpdate() {
     Modifiers.Clear();
 
-    IsGrounded = IsOverGround(Vector3.zero);
+    var wasGrounded = IsGrounded;
+    var isGrounded = IsOverGround(Vector3.zero);
+    IsGrounded = isGrounded;
+    JustGrounded = !wasGrounded && IsGrounded;
+    JustTookOff = wasGrounded && !IsGrounded;
     IsHurt = false;
+    if (JustGrounded) {
+      gameObject.SendMessage("OnLand", SendMessageOptions.DontRequireReceiver);
+    }
+    if (JustTookOff) {
+      gameObject.SendMessage("OnTakeoff", SendMessageOptions.DontRequireReceiver);
+    }
 
     Tags = Upgrades.AbilityTags;
 

@@ -1,7 +1,25 @@
 using System.Threading.Tasks;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
+
+public enum NavStatus { OffMesh, DirectPath, OnLink, HasLink }
+
+public static class NavigationExtensions {
+  public static NavStatus NavigationStatus(this NavMeshAgent agent) => agent switch {
+    { isOnNavMesh : false } => NavStatus.OffMesh,
+    { isOnNavMesh : true, isOnOffMeshLink : true, currentOffMeshLinkData : { valid: true } } => NavStatus.OnLink,
+    { isOnNavMesh : true, nextOffMeshLinkData : { valid : true } } => NavStatus.HasLink,
+    _ => NavStatus.DirectPath
+  };
+
+  public static bool OnNavMesh(this Transform transform, out NavMeshHit hit, float maxDistance = 1) {
+    return NavMesh.SamplePosition(transform.position, out hit, maxDistance, NavMesh.AllAreas);
+  }
+
+  public static bool OnNavMesh(this Transform transform, float maxDistance = 1) {
+    return NavMesh.SamplePosition(transform.position, out var hit, maxDistance, NavMesh.AllAreas);
+  }
+}
 
 public class SoulWarriorBehavior : MonoBehaviour {
   [SerializeField] NavMeshAgent NavMeshAgent;
@@ -21,8 +39,10 @@ public class SoulWarriorBehavior : MonoBehaviour {
   AbilityManager AbilityManager;
   Transform Target;
   TaskScope MainScope = new();
+  public NavStatus NavStatus;
 
   void Awake() {
+    SpawnOrigin = transform.position;
     NavMeshAgent.updatePosition = false;
     NavMeshAgent.updateRotation = false;
     Mover = GetComponent<Mover>();
@@ -32,93 +52,58 @@ public class SoulWarriorBehavior : MonoBehaviour {
   void Start() => MainScope.Start(Waiter.Repeat(Behavior));
   void OnEnable() => SpawnOrigin = transform.position;
   void OnDestroy() => MainScope.Dispose();
+  void OnLand() => NavMeshAgent.Warp(transform.position);
 
-  void TryMoveTowardsTarget() {
-    var delta = (Target.position-transform.position).XZ();
-    var toTarget = delta.normalized;
-    NavMeshAgent.nextPosition = transform.position;
-    if (NavMesh.SamplePosition(Target.position, out var hit, 1, NavMesh.AllAreas)) {
-      NavMeshAgent.destination = hit.position;
-    }
-    Mover.Move(Time.fixedDeltaTime * NavMeshAgent.velocity);
-    Mover.SetAim(toTarget);
+  async Task Aim(TaskScope scope) {
+    Mover.SetAim((Target.position-transform.position).normalized);
+    await scope.Tick();
   }
 
-  async Task TeleportTo(TaskScope scope, Vector3 destination) {
+  async Task Pursue(TaskScope scope) {
+    Mover.Move(Time.fixedDeltaTime * NavMeshAgent.velocity);
+    Mover.SetAim((Target.position-transform.position).normalized);
+    await scope.Tick();
+  }
+
+  async Task DiveOn(TaskScope scope) {
+    await scope.Until(() => AbilityManager.CanInvoke(Dive.MainAction));
+    await AbilityManager.TryRun(scope, Dive.MainAction);
+  }
+
+  TaskFunc TeleportTo(Vector3 destination) => async scope => {
     Teleport.Destination = destination;
     await scope.Until(() => AbilityManager.CanInvoke(Teleport.MainAction));
     await AbilityManager.TryRun(scope, Teleport.MainAction);
     NavMeshAgent.Warp(transform.position);
+  };
+
+  Vector3 DesiredPosition() {
+    return Target.position + DesiredDistance*Target.forward;
   }
 
-  bool WasGrounded = true;
   async Task Behavior(TaskScope scope) {
-    Mover.SetMove(Vector3.zero);
-    if (!Target) {
-      Target = FindObjectOfType<Player>().transform;
+    Target = FindObjectOfType<Player>().transform;
+    NavMeshAgent.nextPosition = transform.position;
+    NavMeshAgent.destination = DesiredPosition();
+    NavStatus = NavMeshAgent.NavigationStatus();
+    if (!Status.IsGrounded && !PhysicsQuery.GroundCheck(transform.position, out var groundHit, 100)) {
+      await scope.Run(TeleportTo(SpawnOrigin+DiveHeight*Vector3.up));
+      await scope.Tick();
+      await scope.Run(DiveOn);
+    } else if (Status.IsGrounded && NavStatus == NavStatus.HasLink && Target.OnNavMesh()) {
+      await scope.Run(TeleportTo(Target.position+DiveHeight*Vector3.up));
+      await scope.Run(DiveOn);
+    } else if (Status.IsGrounded && NavStatus == NavStatus.HasLink && !Target.OnNavMesh()) {
+      await scope.Run(Pursue);
+    } else if (Status.IsGrounded && NavStatus == NavStatus.DirectPath) {
+      await scope.Run(Pursue);
+    } else if (Status.IsGrounded && NavStatus == NavStatus.OnLink && !Target.OnNavMesh()) {
+      await scope.Run(TeleportTo(NavMeshAgent.currentOffMeshLinkData.endPos+NavMeshAgent.baseOffset*Vector3.up));
+    } else if (Status.IsGrounded && NavStatus == NavStatus.OnLink && Target.OnNavMesh()) {
+      await scope.Run(TeleportTo(Target.position+DiveHeight*Vector3.up));
+      await scope.Run(DiveOn);
     } else {
-      // Hacks to update navmesh agent state to behave correctly.
-      if (!WasGrounded && Status.IsGrounded)
-        NavMeshAgent.Warp(transform.position);
-      WasGrounded = Status.IsGrounded;
-
-      var delta = (Target.position-transform.position).XZ();
-      var toPlayer = delta.normalized;
-      var distanceToPlayer = delta.magnitude;
-      if (Status.IsGrounded) {
-        if (NavMeshAgent.isOnOffMeshLink && NavMeshAgent.currentOffMeshLinkData.valid) {
-          var linkData = NavMeshAgent.currentOffMeshLinkData;
-          var toStart = Vector3.Distance(transform.position, linkData.startPos);
-          var toEnd = Vector3.Distance(transform.position, linkData.endPos);
-          var dest = toStart < toEnd ? linkData.endPos : linkData.startPos;
-          await TeleportTo(scope, dest + 3 * Vector3.up);
-          NavMeshAgent.CompleteOffMeshLink();
-        }
-        TryMoveTowardsTarget();
-      }
-      // if (Status.IsGrounded) {
-      //   if (NavMeshAgent.currentOffMeshLinkData.valid) {
-      //     var linkData = NavMeshAgent.currentOffMeshLinkData;
-      //     var toStart = Vector3.Distance(transform.position, linkData.startPos);
-      //     var toEnd = Vector3.Distance(transform.position, linkData.endPos);
-      //     var dest = toStart < toEnd ? linkData.endPos : linkData.startPos;
-      //     Debug.Log($"Teleporting to CURRENT {dest}");
-      //     Teleport.Destination = dest + 2 * Vector3.up;
-      //     await scope.Until(() => AbilityManager.CanInvoke(Teleport.MainAction));
-      //     await AbilityManager.TryRun(scope, Teleport.MainAction);
-      //     NavMeshAgent.Warp(transform.position);
-      //   } else if (NavMeshAgent.nextOffMeshLinkData.valid) {
-      //     var linkData = NavMeshAgent.nextOffMeshLinkData;
-      //     var toStart = Vector3.Distance(transform.position, linkData.startPos);
-      //     var toEnd = Vector3.Distance(transform.position, linkData.endPos);
-      //     var dest = toStart < toEnd ? linkData.endPos : linkData.startPos;
-      //     Debug.Log($"Teleporting to NEXT {dest}");
-      //     Teleport.Destination = dest + 2 * Vector3.up;
-      //     await scope.Until(() => AbilityManager.CanInvoke(Teleport.MainAction));
-      //     await AbilityManager.TryRun(scope, Teleport.MainAction);
-      //     NavMeshAgent.Warp(transform.position);
-      //   // } else if (distanceToPlayer < DesiredDistance) {
-      //     // await scope.Any(
-      //       // Waiter.Repeat(TryMoveTowardsTarget),
-      //       // AbilityManager.TryRun(HardAttack.MainAction));
-      //   } else {
-      //     TryMoveTowardsTarget();
-      //     // await scope.Any(
-      //     //   Waiter.Repeat(TryMoveTowardsTarget),
-      //     //   AbilityManager.TryRun(Throw.MainAction));
-      //   }
-      // } else {
-      //   if (PhysicsQuery.GroundCheck(transform.position, out var hit, MaxDiveHeight)) {
-      //     if (hit.distance > MinDiveHeight) {
-      //       await AbilityManager.TryRun(scope, Dive.MainAction);
-      //     }
-      //   } else {
-      //     Teleport.Destination = SpawnOrigin + DiveHeight * Vector3.up;
-      //     await scope.Until(() => AbilityManager.CanInvoke(Teleport.MainAction));
-      //     await AbilityManager.TryRun(scope, Teleport.MainAction);
-      //   }
-      // }
+      await scope.Run(Aim);
     }
-    await scope.Tick();
   }
 }

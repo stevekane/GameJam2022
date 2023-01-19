@@ -93,7 +93,6 @@ public class Mover : MonoBehaviour {
     MoveDelta = Vector3.zero;
 
     if (TeleportDestination.HasValue) {
-      Debug.Log("Teleport should have occurred");
       transform.position = TeleportDestination.Value;
       ResetVelocity();
     }
