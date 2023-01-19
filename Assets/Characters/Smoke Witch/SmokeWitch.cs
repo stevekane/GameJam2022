@@ -32,6 +32,7 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
   AbilityManager IMobComponents.AbilityManager => AbilityManager;
   Status IMobComponents.Status => Status;
   Flash IMobComponents.Flash => Flash;
+  Mover IMobComponents.Mover => Mover;
   Transform IMobComponents.Target => Target;
 
   public void Awake() {
@@ -87,14 +88,14 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
       var delta = edge - transform.position;
       return transform.position + delta + 2f*delta.XZ().normalized;
     }
-    if (ShouldMove && Status.CanAttack && !Status.IsGrounded && InDanger()) {
+    if (ShouldMove && Status.CanAttack && InDanger()) {
       DesiredPosition = FindRecoverPosition();
       await AbilityManager.TryRun(scope, DashAbility.MainAction);
-
-      DesiredPosition = FindRecoverPosition();
-      await AbilityManager.TryRun(scope, JumpAbility.MainAction);
-
-      await scope.Until(() => Status.IsGrounded);
+      if (InDanger()) {
+        DesiredPosition = FindRecoverPosition();
+        await AbilityManager.TryRun(scope, JumpAbility.MainAction);
+        await scope.Until(() => Status.IsGrounded);
+      }
       DesiredPosition = null;
     }
   }
@@ -195,11 +196,13 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
     override public int Score => 1;
     override public Range StartRange => (6f, 14f);
     override public Range DuringRange => (0f, float.MaxValue);
-    override public float DesiredDistance => 4f;
+    override public float DesiredDistance => 2f;
     override public Timeval Cooldown => Timeval.FromMillis(250);
-    public override bool CanStart() => FacingTarget() && base.CanStart();
     protected override async Task Behavior(TaskScope scope) {
+      // Mob move logic should start moving torwards target due to new desired distance.
+      await scope.Any(Waiter.Until(() => MovingTowardsTarget()), Waiter.Millis(100));
       await StartAbility(scope, Owner.DashAbility);
+      await scope.Until(() => TargetInRange(0f, 4f) || !Owner.DashAbility.IsRunning);
     }
   }
 

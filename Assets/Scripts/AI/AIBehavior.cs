@@ -8,6 +8,7 @@ public interface IMobComponents {
   AbilityManager AbilityManager { get; }
   Status Status { get; }
   Flash Flash { get; }
+  Mover Mover { get; }
   Transform Target { get; }
   Transform transform { get; }
 }
@@ -79,6 +80,12 @@ abstract class AIBehavior {
   protected bool FacingTarget(float minDot = .8f) {
     var delta = (Mob.Target.position - Mob.transform.position);
     var dot = Vector3.Dot(Mob.transform.forward.XZ().normalized, delta.XZ().normalized);
+    return dot >= minDot;
+  }
+
+  protected bool MovingTowardsTarget(float minDot = .8f) {
+    var delta = (Mob.Target.position - Mob.transform.position);
+    var dot = Vector3.Dot(Mob.Mover.GetMove().normalized, delta.XZ().normalized);
     return dot >= minDot;
   }
 }
