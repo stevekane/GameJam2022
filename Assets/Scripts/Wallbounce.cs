@@ -16,7 +16,7 @@ public class Wallbounce : MonoBehaviour {
 
   void OnControllerColliderHit(ControllerColliderHit hit) {
     if ((Defaults.Instance.EnvironmentLayerMask & (1<<hit.gameObject.layer)) == 0) return;
-    if (hit.gameObject.tag == "Ground") return;
+    if (hit.gameObject.CompareTag(Defaults.Instance.GroundTag)) return;
     if (Status.Get<KnockbackEffect>() is var k && k != null) {
       if (Damage.Points > ExplodeAtDamage) {
         Status.Remove(k);

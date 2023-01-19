@@ -23,18 +23,15 @@ public class Teleport : Ability {
 
   public override async Task MainAction(TaskScope scope) {
     using var effect = Status.Add(TeleportEffect);
-    try {
-      var animationJob = AnimationDriver.Play(scope, Animation);
-      VFXManager.Instance.TrySpawnWithParent(ChannelVFX, FXTransform.Transform, Animation.Clip.length);
-      await animationJob.WaitDone(scope);
-      SFXManager.Instance.TryPlayOneShot(OutSFX);
-      VFXManager.Instance.TrySpawnEffect(OutVFX, AbilityManager.transform.position+VFXOffset);
-      SFXManager.Instance.TryPlayOneShot(InSFX);
-      VFXManager.Instance.TrySpawnEffect(InVFX, Destination+VFXOffset);
-      Flash.Run();
-      Mover.Teleport(Destination);
-      Debug.DrawLine(Destination, transform.position, Color.white, 3);
-      await scope.Tick(); // Important: Nothing should happen on this frame once the teleport concludes
-    } finally {}
+    var animationJob = AnimationDriver.Play(scope, Animation);
+    VFXManager.Instance.TrySpawnWithParent(ChannelVFX, FXTransform.Transform, Animation.Clip.length);
+    await animationJob.WaitDone(scope);
+    SFXManager.Instance.TryPlayOneShot(OutSFX);
+    VFXManager.Instance.TrySpawnEffect(OutVFX, AbilityManager.transform.position+VFXOffset);
+    SFXManager.Instance.TryPlayOneShot(InSFX);
+    VFXManager.Instance.TrySpawnEffect(InVFX, Destination+VFXOffset);
+    Flash.Run();
+    Mover.Teleport(Destination);
+    await scope.Tick(); // Important: Nothing should happen on this frame once the teleport concludes
   }
 }

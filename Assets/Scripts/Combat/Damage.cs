@@ -56,18 +56,19 @@ public class Damage : MonoBehaviour {
             s.Add(new HurtStunEffect(hitParams.HitConfig.StunDuration.Ticks));
             s.Add(new SlowFallDuration(hitParams.HitConfig.SlowFallDuration.Ticks));
             s.Add(new KnockbackEffect(knockbackVector * hitParams.GetKnockbackStrength(Points)));
+            s.Add(new HitFollowthroughEffect(hitParams.HitConfig.RecoilStrength * forward, RecoilDuration));
           });
       } else {
         Status.Add(new HitStopEffect(forward, hitParams.HitConfig.HitStopDuration.Ticks));
       }
-      Status.Add(new HitFollowthroughEffect(hitParams.HitConfig.RecoilStrength * forward, RecoilDuration));
+      // Status.Add(new HitFollowthroughEffect(hitParams.HitConfig.RecoilStrength * forward, RecoilDuration));
     }
   }
 
   void OnHit(HitParams hitParams) {
     var forward = hitParams.Source.transform.forward;
-    Status.Add(new HitFollowthroughEffect(hitParams.HitConfig.RecoilStrength * forward, RecoilDuration));
     Status.Add(new HitStopEffect(forward, hitParams.HitConfig.HitStopDuration.Ticks), s => {
+      s.Add(new HitFollowthroughEffect(hitParams.HitConfig.RecoilStrength * forward, RecoilDuration));
       //s.Add(new RecoilEffect(hitParams.HitConfig.RecoilStrength * forward));
     });
   }

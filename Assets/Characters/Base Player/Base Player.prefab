@@ -587,7 +587,7 @@ MonoBehaviour:
       Millis: 100
       FramesPerSecond: 60
     StunDuration:
-      Millis: 500
+      Millis: 166.66667
       FramesPerSecond: 60
     SlowFallDuration:
       Millis: 0
@@ -696,12 +696,12 @@ MonoBehaviour:
     KnockbackType: 0
     KnockbackAngle: 30
     RecoilStrength: 0
-    CameraShakeStrength: 1
+    CameraShakeStrength: 12
     HitStopDuration:
       Millis: 300
       FramesPerSecond: 30
     StunDuration:
-      Millis: 500
+      Millis: 1000
       FramesPerSecond: 30
     SlowFallDuration:
       Millis: 0
@@ -1182,7 +1182,7 @@ MonoBehaviour:
       Millis: 100
       FramesPerSecond: 60
     StunDuration:
-      Millis: 500
+      Millis: 166.66667
       FramesPerSecond: 60
     SlowFallDuration:
       Millis: 0
@@ -1216,13 +1216,13 @@ MonoBehaviour:
     Mask: {fileID: 0}
     Speed: 1
     PhaseDurations:
-    - Millis: 150
-      FramesPerSecond: 60
-    - Millis: 33.333332
+    - Millis: 83.333336
       FramesPerSecond: 60
     - Millis: 66.666664
       FramesPerSecond: 60
-    - Millis: 383.33334
+    - Millis: 100
+      FramesPerSecond: 60
+    - Millis: 366.66666
       FramesPerSecond: 60
     BlendInFraction: 0.1
     BlendOutFraction: 0.1
@@ -1296,12 +1296,12 @@ MonoBehaviour:
     KnockbackType: 1
     KnockbackAngle: 45
     RecoilStrength: 30
-    CameraShakeStrength: 1
+    CameraShakeStrength: 10
     HitStopDuration:
-      Millis: 500
+      Millis: 400
       FramesPerSecond: 30
     StunDuration:
-      Millis: 1000
+      Millis: 666.6667
       FramesPerSecond: 30
     SlowFallDuration:
       Millis: 0
@@ -1410,20 +1410,20 @@ MonoBehaviour:
       Base: 0
       Mult: 1
     Knockback:
-      Base: 6
-      Mult: 1
+      Base: 500
+      Mult: 0.1
     KnockbackType: 1
-    KnockbackAngle: 90
+    KnockbackAngle: 75
     RecoilStrength: 12
-    CameraShakeStrength: 4
+    CameraShakeStrength: 6
     HitStopDuration:
       Millis: 200
       FramesPerSecond: 30
     StunDuration:
-      Millis: 1000
+      Millis: 666.6667
       FramesPerSecond: 30
     SlowFallDuration:
-      Millis: 0
+      Millis: 666.6667
       FramesPerSecond: 30
   ChargeScaling:
     serializedVersion: 2
@@ -2204,6 +2204,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8540507123274114195, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1110940083044590820}
+    - targetCorrespondingSourceObject: {fileID: 8540507123274114195, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5325920940578638025}
   m_SourcePrefab: {fileID: 100100000, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
 --- !u!4 &3364079649355753498 stripped
 Transform:
@@ -2292,6 +2295,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ID: 0
+--- !u!208 &5325920940578638025
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3364079649355753500}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.5, y: 1, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 1, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!4 &3364079649997762474 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8540507123161146149, guid: dfb09c01894171a4cbddc8428b63bed2, type: 3}
