@@ -92,12 +92,12 @@ public class SoulWarriorBehavior : MonoBehaviour {
       await scope.Run(DiveOn);
     } else if (grounded && targetOnNavMesh && NavStatus == NavStatus.HasLink) {
       await scope.Run(TeleportTo(Target.position+DiveHeight*Vector3.up));
+    } else if (grounded && targetOnNavMesh && NavStatus == NavStatus.OnLink) {
+      await scope.Run(TeleportTo(Target.position+DiveHeight*Vector3.up));
     } else if (grounded && !targetOnNavMesh && NavStatus == NavStatus.HasLink) {
       Pursue();
     } else if (grounded && NavStatus == NavStatus.DirectPath) {
       Pursue();
-    } else if (grounded && targetOnNavMesh && NavStatus == NavStatus.OnLink) {
-      await scope.Run(TeleportTo(Target.position+DiveHeight*Vector3.up));
     } else {
       Aim();
     }

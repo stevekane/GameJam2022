@@ -15,6 +15,6 @@ public class CameraConfig : ScriptableObject {
   public float SHAKE_DECAY_EPSILON = -0.5f;
 
   [Tooltip("Max intensity of camera shake")]
-  [Range(0, 10)]
+  [Range(0, 100)]
   public float MAX_SHAKE_INTENSITY = 5;
 }
