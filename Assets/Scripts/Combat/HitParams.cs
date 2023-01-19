@@ -16,7 +16,9 @@ public class HitParams {
   public float GetKnockbackStrength(float defenderDamage) {
     //var defenderWeightFactor = 2f / (1f + DefenderAttributes.GetValue(AttributeTag.Weight));
     var defenderWeightFactor = 1f / DefenderAttributes.GetValue(AttributeTag.Weight);
-    return HitConfig.Knockback.Apply((defenderDamage/10f + (defenderDamage * Damage)/20f) * defenderWeightFactor * 1.4f + 18f);
+    var baseKnockback = (defenderDamage/10f + (defenderDamage * Damage)/20f) * defenderWeightFactor * 1.4f + 18f;
+    // TODO HACK: This is a different attribute formula.. maybe this is what we want in general?
+    return HitConfig.Knockback.Base + HitConfig.Knockback.Mult * baseKnockback;
   }
 
   // Useful if HitParams are reused for multiple calls to Hurtbox.TryAttack(), which will reset the Defender.
