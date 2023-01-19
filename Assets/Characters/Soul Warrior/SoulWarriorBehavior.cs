@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
@@ -32,6 +33,7 @@ public class SoulWarriorBehavior : MonoBehaviour {
   [SerializeField] float DiveHeight = 15f;
   [SerializeField] float MinDiveHeight = 5f;
   [SerializeField] float MaxDiveHeight = 100f;
+  [SerializeField] float MaxDiveRadius = 10f;
 
   Vector3 SpawnOrigin;
   Mover Mover;
@@ -54,27 +56,22 @@ public class SoulWarriorBehavior : MonoBehaviour {
   void OnDestroy() => MainScope.Dispose();
   void OnLand() => NavMeshAgent.Warp(transform.position);
 
-  async Task Aim(TaskScope scope) {
+  void Aim() {
     Mover.SetAim((Target.position-transform.position).normalized);
-    await scope.Tick();
   }
 
-  async Task Pursue(TaskScope scope) {
+  void Pursue() {
     Mover.Move(Time.fixedDeltaTime * NavMeshAgent.velocity);
     Mover.SetAim((Target.position-transform.position).normalized);
-    await scope.Tick();
   }
 
   async Task DiveOn(TaskScope scope) {
-    await scope.Until(() => AbilityManager.CanInvoke(Dive.MainAction));
     await AbilityManager.TryRun(scope, Dive.MainAction);
   }
 
   TaskFunc TeleportTo(Vector3 destination) => async scope => {
     Teleport.Destination = destination;
-    await scope.Until(() => AbilityManager.CanInvoke(Teleport.MainAction));
     await AbilityManager.TryRun(scope, Teleport.MainAction);
-    NavMeshAgent.Warp(transform.position);
   };
 
   Vector3 DesiredPosition() {
@@ -86,24 +83,25 @@ public class SoulWarriorBehavior : MonoBehaviour {
     NavMeshAgent.nextPosition = transform.position;
     NavMeshAgent.destination = DesiredPosition();
     NavStatus = NavMeshAgent.NavigationStatus();
-    if (!Status.IsGrounded && !PhysicsQuery.GroundCheck(transform.position, out var groundHit, 100)) {
+    var grounded = Status.IsGrounded;
+    var overGround = PhysicsQuery.GroundCheck(transform.position, out var groundHit, 1000);
+    var toTargetXZ = Vector3.Distance(Target.position.XZ(), transform.position.XZ());
+    var targetOnNavMesh = Target.OnNavMesh();
+    if (!grounded && !overGround) {
       await scope.Run(TeleportTo(SpawnOrigin+DiveHeight*Vector3.up));
-      await scope.Tick();
+    } else if (!grounded && overGround && toTargetXZ < MaxDiveRadius && groundHit.distance > MinDiveHeight) {
       await scope.Run(DiveOn);
-    } else if (Status.IsGrounded && NavStatus == NavStatus.HasLink && Target.OnNavMesh()) {
+    } else if (grounded && targetOnNavMesh && NavStatus == NavStatus.HasLink) {
       await scope.Run(TeleportTo(Target.position+DiveHeight*Vector3.up));
-      await scope.Run(DiveOn);
-    } else if (Status.IsGrounded && NavStatus == NavStatus.HasLink && !Target.OnNavMesh()) {
-      await scope.Run(Pursue);
-    } else if (Status.IsGrounded && NavStatus == NavStatus.DirectPath) {
-      await scope.Run(Pursue);
-    } else if (Status.IsGrounded && NavStatus == NavStatus.OnLink && !Target.OnNavMesh()) {
-      await scope.Run(TeleportTo(NavMeshAgent.currentOffMeshLinkData.endPos+NavMeshAgent.baseOffset*Vector3.up));
-    } else if (Status.IsGrounded && NavStatus == NavStatus.OnLink && Target.OnNavMesh()) {
+    } else if (grounded && !targetOnNavMesh && NavStatus == NavStatus.HasLink) {
+      Pursue();
+    } else if (grounded && NavStatus == NavStatus.DirectPath) {
+      Pursue();
+    } else if (grounded && targetOnNavMesh && NavStatus == NavStatus.OnLink) {
       await scope.Run(TeleportTo(Target.position+DiveHeight*Vector3.up));
-      await scope.Run(DiveOn);
     } else {
-      await scope.Run(Aim);
+      Aim();
     }
+    await scope.Tick();
   }
 }

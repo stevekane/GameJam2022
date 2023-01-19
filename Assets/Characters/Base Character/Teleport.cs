@@ -34,7 +34,7 @@ public class Teleport : Ability {
       VFXManager.Instance.TrySpawnEffect(InVFX, Destination+VFXOffset);
       Flash.Run();
       Mover.Teleport(Destination);
-      // await scope.Tick(); // Important: Nothing should happen on this frame once the teleport concludes
+      await scope.Tick(); // Important: Nothing should happen on this frame once the teleport concludes
     } catch (Exception e) {
       Debug.LogError($"TELEPORT CANCELED: {e.Message}");
     } finally {}
