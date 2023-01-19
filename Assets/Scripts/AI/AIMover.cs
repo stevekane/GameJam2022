@@ -102,13 +102,13 @@ public class AIMover : MonoBehaviour {
     await AbilityManager.TryRun(scope, Teleport.MainAction);
   }
 
-  void OnDrawGizmos() {
-    if (NavMeshAgent != null) {
-      Gizmos.color = NavMeshAgent.isOnOffMeshLink ? Color.green : Color.red;
-      Gizmos.DrawRay(transform.position + 4 * Vector3.up, 4 * Vector3.down);
-      Gizmos.DrawRay(transform.position + 3 * Vector3.up, NavMeshAgent.desiredVelocity);
-      Gizmos.color = Color.blue;
-      Gizmos.DrawRay(transform.position + 4 * Vector3.up, NavMeshAgent.velocity);
-    }
-  }
+  //void OnDrawGizmos() {
+  //  if (NavMeshAgent != null) {
+  //    Gizmos.color = NavMeshAgent.isOnOffMeshLink ? Color.green : Color.red;
+  //    Gizmos.DrawRay(transform.position + 4 * Vector3.up, 4 * Vector3.down);
+  //    Gizmos.DrawRay(transform.position + 3 * Vector3.up, NavMeshAgent.desiredVelocity);
+  //    Gizmos.color = Color.blue;
+  //    Gizmos.DrawRay(transform.position + 4 * Vector3.up, NavMeshAgent.velocity);
+  //  }
+  //}
 }

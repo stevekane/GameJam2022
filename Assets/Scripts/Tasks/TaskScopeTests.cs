@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -44,7 +45,7 @@ public class TaskScopeTests : MonoBehaviour {
           async (main) => {
             output += "start;";
             try {
-              await main.Ticks(1);
+              await main.Millis(16*1);
               main.Cancel();
               output += "before yield;";
               await main.Yield();
@@ -93,7 +94,7 @@ public class TaskScopeTests : MonoBehaviour {
         var output = "";
         await main.Any(
           async (child) => {
-            await child.Ticks(1);
+            await child.Millis(16*1);
             output += "child1;";
           },
           async (child) => {
@@ -120,7 +121,7 @@ public class TaskScopeTests : MonoBehaviour {
           try {
           await main.Any(
             async (child) => {
-              await child.Ticks(1);
+              await child.Millis(16*1);
               output += "child1;";
               main.Cancel();
               await child.Yield();
@@ -143,12 +144,12 @@ public class TaskScopeTests : MonoBehaviour {
         var output = "";
         var index = await main.Any(
           async (child) => {
-            await child.Ticks(1);
+            await child.Millis(16*1);
             output += "child1;";
           },
           async (child) => {
             try {
-              await child.Ticks(5);
+              await child.Millis(16*5);
               output += "child2;";
             } catch {
               output += "child2 cancel;";
@@ -169,11 +170,11 @@ public class TaskScopeTests : MonoBehaviour {
         var output = "";
         await main.All(
           async (child) => {
-            await child.Ticks(1);
+            await child.Millis(16*1);
             output += "child1;";
           },
           async (child) => {
-            await child.Ticks(2);
+            await child.Millis(16*2);
             output += "child2;";
           }
         );
@@ -189,19 +190,19 @@ public class TaskScopeTests : MonoBehaviour {
         var output = "";
         await main.All(
           async (child) => {
-            await child.Ticks(1);
+            await child.Millis(16*1);
             output += "child1;";
           },
           async (child) => {
             try {
-              await child.Ticks(4);
+              await child.Millis(16*4);
               output += "child2;";
             } catch {
               output += "child2 cancel;";
             }
           },
           async (child) => {
-            await child.Ticks(2);
+            await child.Millis(16*2);
             child.Cancel();
             output += "cancel;";
           }
@@ -210,7 +211,7 @@ public class TaskScopeTests : MonoBehaviour {
         output += "end";
         return output;
       },
-      ExpectedOutput = "child1;cancel;child2 cancel;end"
+      ExpectedOutput = "child1;child2 cancel;cancel;end"
     },
 
     new() {
@@ -222,17 +223,17 @@ public class TaskScopeTests : MonoBehaviour {
           async (child) => {
             try {
               output += "sub;";
-              await child.Ticks(1);
+              await child.Millis(16*1);
               output += "sub2;";
-              await child.Ticks(5);
+              await child.Millis(16*5);
             } catch {
               output += "sub cancel;";
             }
           });
         var cancel = main.Run(async (main) => {
-          await main.Ticks(2);
+          await main.Millis(16*2);
           child.Cancel();
-          await main.Ticks(1);
+          await main.Millis(16*1);
           output += "cancel;";
         });
         await main.AllTask(sub, cancel);
@@ -250,14 +251,14 @@ public class TaskScopeTests : MonoBehaviour {
           async (child) => {
             try {
               output += "sub;";
-              await child.Ticks(5);
+              await child.Millis(16*5);
               output += "sub2;";
             } catch {
               output += "sub cancel;";
             }
           });
         var cancel = main.Run(async (main) => {
-          await main.Ticks(1);
+          await main.Millis(16*1);
           output += "main;";
         });
         await main.AllTask(sub, cancel);
@@ -274,7 +275,7 @@ public class TaskScopeTests : MonoBehaviour {
           async (main) => {
             return await main.Run(
               async (main) => {
-                await main.Ticks(1);
+                await main.Millis(16*1);
                 return "cool;";
               });
           });
@@ -294,7 +295,7 @@ public class TaskScopeTests : MonoBehaviour {
             output += "received;";
           },
           async (child) => {
-            await child.Ticks(1);
+            await child.Millis(16*1);
             evt.Fire();
             output += "fired;";
           });
@@ -314,7 +315,7 @@ public class TaskScopeTests : MonoBehaviour {
             output += $"received {result};";
           },
           async (child) => {
-            await child.Ticks(1);
+            await child.Millis(16*1);
             evt.Fire("foo");
             output += "fired;";
           });
@@ -338,7 +339,7 @@ public class TaskScopeTests : MonoBehaviour {
             evt.Fire("1");
             evt.Fire("2");
             evt.Fire("3");
-            await child.Tick();
+            await child.Millis(16);
             evt.Fire("4");
             output += "fired;";
           });
@@ -347,5 +348,39 @@ public class TaskScopeTests : MonoBehaviour {
       },
       ExpectedOutput = "received 1,2,3;fired;end"
     },
+    new() {
+      Name = "exceptionsInAll",
+      Test = async (TaskScope main) => {
+        var caught = false;
+        var output = "";
+        async Task Throw1(TaskScope scope) {
+          await scope.Yield();
+          throw new Exception("Throw1");
+        }
+        async Task Throw2(TaskScope scope) {
+          await scope.Millis(3000);
+          output += "didnt throw;";
+          throw new Exception("Throw2");
+        }
+        async Task Behavior(TaskScope scope) {
+          try {
+            await scope.All(
+              Waiter.Repeat(Throw1),
+              Waiter.Repeat(Throw2));
+          } catch (Exception e) {
+            output += $"caught {e.Message};";
+            caught = true;
+          }
+        }
+        main.Start(Behavior);
+        while (!caught) {
+          await main.Yield();
+        }
+        output += "done";
+        return output;
+      },
+      ExpectedOutput = "caught Throw1;done"
+    },
+
   };
 }

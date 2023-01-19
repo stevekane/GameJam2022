@@ -4,9 +4,6 @@ using UnityEngine.Serialization;
 public class Effects : MonoBehaviour {
   [SerializeField] Vector3 VFXOffset;
 
-  [SerializeField] GameObject OnDeathVFX;
-  [SerializeField] AudioClip OnDeathSFX;
-
   [Header("OnHurt")]
   [FormerlySerializedAs("VFX")]
   [SerializeField] GameObject OnHurtVFX;
@@ -15,8 +12,15 @@ public class Effects : MonoBehaviour {
   [Header("OnHit")]
   [SerializeField] GameObject OnHitVFX;
   [SerializeField] AudioClip OnHitSFX;
+
   [SerializeField] GameObject OnParryVFX;
   [SerializeField] AudioClip OnParrySFX;
+
+  [SerializeField] GameObject OnDeathVFX;
+  [SerializeField] AudioClip OnDeathSFX;
+
+  [SerializeField] Renderer Renderer;
+  Status Status;
 
   void OnDeath(Vector3 normal) {
     var position = transform.position+transform.TransformVector(VFXOffset);
@@ -47,5 +51,13 @@ public class Effects : MonoBehaviour {
     var rotation = Quaternion.LookRotation(direction.normalized);
     VFXManager.Instance.TrySpawnEffect(OnParryVFX, position, rotation);
     SFXManager.Instance.TryPlayOneShot(OnParrySFX);
+  }
+
+  void Awake() {
+    this.InitComponent(out Status);
+  }
+  void FixedUpdate() {
+    if (Renderer)
+      Renderer.enabled = Status.IsHittable;
   }
 }

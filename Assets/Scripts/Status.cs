@@ -231,6 +231,8 @@ public class Status : MonoBehaviour {
 
   List<StatusEffect> Added = new();
   public StatusEffect Add(StatusEffect effect, OnEffectComplete onComplete = null) {
+    Debug.Assert(!Active.Contains(effect), $"Effect {effect} is getting reused");
+    Debug.Assert(!Added.Contains(effect), $"Effect {effect} is getting reused");
     effect.Status = this;
     var count = Active.Count;
     var existing = Active.FirstOrDefault((e) => e.GetType() == effect.GetType()) ?? Added.FirstOrDefault((e) => e.GetType() == effect.GetType());
