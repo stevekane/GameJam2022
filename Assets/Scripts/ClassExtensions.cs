@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 public static class VectorExtensions {
@@ -195,6 +196,13 @@ public static class ArrayLikeExtensions {
       }
     }
     return -1;
+  }
+
+  public static void Shuffle<T>(this IList<T> list) {
+    for (int n = list.Count-1; n > 0; n--) {
+      int k = UnityEngine.Random.Range(0, n+1);
+      (list[k], list[n]) = (list[n], list[k]);
+    }
   }
 }
 
