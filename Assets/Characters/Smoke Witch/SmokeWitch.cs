@@ -13,7 +13,8 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
   public Ability GroundLauncherAttack;
   public Ability AirSpikeAttack;
 
-  SmokeWitchBehavior[] Sequences;
+  SmokeWitchBehavior[] GapCloseBehaviors;
+  SmokeWitchBehavior[] AttackBehaviors;
   Status Status;
   Transform Target;
   NavMeshAgent NavMeshAgent;
@@ -46,13 +47,16 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
     this.InitComponentFromChildren(out ThrowAbility);
     this.InitComponentFromChildren(out DashAbility);
     this.InitComponentFromChildren(out JumpAbility);
-    Sequences = new SmokeWitchBehavior[] {
+    AttackBehaviors = new SmokeWitchBehavior[] {
       new Melee1(),
       new Melee2(),
-      new DashBehavior(),
       new ThrowSequence()
     };
-    Sequences.ForEach(s => s.Owner = this);
+    AttackBehaviors.ForEach(s => s.Owner = this);
+    GapCloseBehaviors = new SmokeWitchBehavior[] {
+      new DashBehavior(),
+    };
+    GapCloseBehaviors.ForEach(s => s.Owner = this);
   }
 
   void Start() => MainScope.Start(Behavior);
@@ -65,6 +69,7 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
       Waiter.Repeat(TryMove),
       Waiter.Repeat(TryRecover),
       Waiter.Repeat(TryReposition),
+      Waiter.Repeat(TryGapClose),
       Waiter.Repeat(TryAttackSequence));
   }
 
@@ -106,26 +111,21 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
   }
 
   AIBehavior CurrentAttack;
-  async Task TryAttackSequence(TaskScope scope) {
-    if (Target && Status.CanAttack && ChooseAttackSequence() is var seq && seq != null) {
-      CurrentAttack = seq;
-      await seq.Run(scope);
-      CurrentAttack = null;
+  async Task TryGapClose(TaskScope scope) {
+    if (Target && Status.CanAttack && CurrentAttack == null && AIBehavior.ChooseBehavior(GapCloseBehaviors) is var b && b != null) {
+      CurrentAttack = b;
+      await b.Run(scope);
+      if (CurrentAttack == b)  // Can be cancelled by attack sequence
+        CurrentAttack = null;
     }
   }
 
-  // Choose one of the startable sequences using a weighted random pick.
-  AIBehavior ChooseAttackSequence() {
-    var usableSequences = Sequences.Where(seq => seq.CanStart());
-    var totalScore = usableSequences.Sum(seq => seq.Score);
-    var chosenScore = UnityEngine.Random.Range(0f, totalScore);
-    var score = 0f;
-    foreach (var seq in usableSequences) {
-      score += seq.Score;
-      if (chosenScore <= score)
-        return seq;
+  async Task TryAttackSequence(TaskScope scope) {
+    if (Target && Status.CanAttack && AIBehavior.ChooseBehavior(AttackBehaviors) is var b && b != null) {
+      CurrentAttack = b;
+      await b.Run(scope);
+      CurrentAttack = null;
     }
-    return null;
   }
 
   //AttackSequence CurrentAttack;
@@ -197,7 +197,7 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
     override public Range StartRange => (6f, 14f);
     override public Range DuringRange => (0f, float.MaxValue);
     override public float DesiredDistance => 2f;
-    override public Timeval Cooldown => Timeval.FromMillis(250);
+    override public Timeval Cooldown => Timeval.FromMillis(300);
     protected override async Task Behavior(TaskScope scope) {
       // Mob move logic should start moving torwards target due to new desired distance.
       await scope.Any(Waiter.Until(() => MovingTowardsTarget()), Waiter.Millis(100));

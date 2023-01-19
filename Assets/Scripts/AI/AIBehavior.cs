@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -18,7 +19,7 @@ public interface IMobComponents {
 // Behaviors have preferred ranges for starting and ending. See below.
 abstract class AIBehavior {
   abstract public IMobComponents Mob { get; }
-  // A weighting mechanism, for use by agents.
+  // A weighting mechanism, for use with ChooseBehavior.
   abstract public int Score { get; }
   // If the target is within this range of distances, we can start the behavior and any abilities within.
   abstract public Range StartRange { get; }
@@ -36,6 +37,20 @@ abstract class AIBehavior {
     await scope.Any(Behavior, Waiter.While(() => TargetInXZRange(DuringRange.Item1, DuringRange.Item2) && !Mob.Status.IsHurt));
     if (Cooldown != null)
       await scope.Delay(Cooldown);
+  }
+
+  // Choose one of the startable behaviors using a weighted random pick.
+  public static AIBehavior ChooseBehavior(AIBehavior[] behaviors) {
+    var usableBehaviors = behaviors.Where(b => b.CanStart());
+    var totalScore = usableBehaviors.Sum(b => b.Score);
+    var chosenScore = UnityEngine.Random.Range(0f, totalScore);
+    var score = 0f;
+    foreach (var b in usableBehaviors) {
+      score += b.Score;
+      if (chosenScore <= score)
+        return b;
+    }
+    return null;
   }
 
   // Helper functions for behaviors:
