@@ -66,13 +66,20 @@ abstract class AIBehavior {
     await scope.Until(() => TargetInRange(StartRange.Item1, StartRange.Item2) && CanInvoke(ability));
     Mob.AbilityManager.TryInvoke(ability.MainAction);
   }
+  protected async Task ReleaseAbilityWhenInRange(TaskScope scope, Ability ability) {
+    await scope.Until(() => CanInvoke(ability));
+    Mob.AbilityManager.TryInvoke(ability.MainAction);
+    await scope.Until(() => TargetInRange(StartRange.Item1, StartRange.Item2) && CanInvoke(ability.MainRelease));
+    Mob.AbilityManager.TryInvoke(ability.MainRelease);
+  }
   protected async Task TelegraphThenAttack(TaskScope scope) => await Mob.Flash.RunStrobe(scope, Color.red, Timeval.FromMillis(150), 3);
   protected async Task TelegraphDuringAttack(TaskScope scope) { _ = TelegraphThenAttack(scope); await scope.Yield(); }
 
   // If we can never invoke an ability given our state, just return true and let the invocation fail.
-  protected bool CanInvoke(Ability ability) => Mob.AbilityManager.CanInvoke(ability.MainAction) || !CanEverInvoke(ability);
-  protected bool CanEverInvoke(Ability ability) {
-    var trigger = ability.GetTriggerCondition(ability.MainAction);
+  protected bool CanInvoke(Ability ability) => CanInvoke(ability.MainAction);
+  protected bool CanInvoke(AbilityMethod method) => Mob.AbilityManager.CanInvoke(method) || !CanEverInvoke(method);
+  protected bool CanEverInvoke(AbilityMethod method) {
+    var trigger = ((Ability)method.Target).GetTriggerCondition(method);
     return 0 switch {
       _ when trigger.Tags.HasAllFlags(AbilityTag.Grounded) && !Mob.Status.IsGrounded => false,
       _ when trigger.Tags.HasAllFlags(AbilityTag.Airborne) && Mob.Status.IsGrounded => false,

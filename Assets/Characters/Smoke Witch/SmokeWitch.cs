@@ -236,12 +236,13 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
   }
 
   class Melee2 : GroundMeleeBehavior {
+    override public int Score => 100000;
     protected override async Task Behavior(TaskScope scope) {
       await TelegraphDuringAttack(scope);
       await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
       await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
       await StartAbilityWhenInRange(scope, Owner.GroundLauncherAttack);
-      await StartAbilityWhenInRange(scope, Owner.GroundHeavyAttack);
+      await ReleaseAbilityWhenInRange(scope, Owner.GroundHeavyAttack);
     }
   }
 
@@ -250,7 +251,7 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
       await TelegraphDuringAttack(scope);
       await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
       await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
-      await StartAbilityWhenInRange(scope, Owner.GroundHeavyAttack);
+      await ReleaseAbilityWhenInRange(scope, Owner.GroundHeavyAttack);
     }
   }
 
