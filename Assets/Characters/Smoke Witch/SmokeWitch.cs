@@ -50,6 +50,9 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
     AttackBehaviors = new SmokeWitchBehavior[] {
       new Melee1(),
       new Melee2(),
+      new Melee3(),
+      new Air1(),
+      new Air2(),
       new ThrowSequence()
     };
     AttackBehaviors.ForEach(s => s.Owner = this);
@@ -183,6 +186,7 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
     override public Range StartRange => (0f, 4f);
     override public Range DuringRange => (0f, 12f);
     public override bool CanStart() => Mob.Status.IsGrounded && base.CanStart();
+    protected bool RequiredGrounded = true;
   }
 
   abstract class AirMeleeBehavior : SmokeWitchBehavior {
@@ -225,7 +229,7 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
       await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
       await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
       await StartAbilityWhenInRange(scope, Owner.GroundLauncherAttack);
-      await scope.Millis(750);
+      await scope.Millis(550);
       await StartAbility(scope, Owner.JumpAbility);
       await StartAbilityWhenInRange(scope, Owner.AirSpikeAttack);
     }
@@ -238,6 +242,32 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
       await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
       await StartAbilityWhenInRange(scope, Owner.GroundLauncherAttack);
       await StartAbilityWhenInRange(scope, Owner.GroundHeavyAttack);
+    }
+  }
+
+  class Melee3 : GroundMeleeBehavior {
+    protected override async Task Behavior(TaskScope scope) {
+      await TelegraphDuringAttack(scope);
+      await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
+      await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
+      await StartAbilityWhenInRange(scope, Owner.GroundHeavyAttack);
+    }
+  }
+
+  class Air1 : AirMeleeBehavior {
+    override public Timeval Cooldown => Timeval.FromMillis(500);
+    protected override async Task Behavior(TaskScope scope) {
+      await TelegraphDuringAttack(scope);
+      await StartAbilityWhenInRange(scope, Owner.AirSpikeAttack);
+    }
+  }
+
+  class Air2 : AirMeleeBehavior {
+    override public Timeval Cooldown => Timeval.FromMillis(500);
+    protected override async Task Behavior(TaskScope scope) {
+      await TelegraphDuringAttack(scope);
+      await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
+      await StartAbilityWhenInRange(scope, Owner.AirSpikeAttack);
     }
   }
 }

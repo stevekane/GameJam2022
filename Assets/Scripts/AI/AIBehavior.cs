@@ -32,15 +32,18 @@ abstract class AIBehavior {
   protected abstract Task Behavior(TaskScope scope);
 
   public virtual bool CanStart() => TargetInRange(StartRange.Item1, StartRange.Item2);
+  public virtual bool CanContinue() => TargetInXZRange(DuringRange.Item1, DuringRange.Item2) && !Mob.Status.IsHurt;
   public async Task Run(TaskScope scope) {
-    //Debug.Log($"Sequence: {this}");
-    await scope.Any(Behavior, Waiter.While(() => TargetInXZRange(DuringRange.Item1, DuringRange.Item2) && !Mob.Status.IsHurt));
+    //Debug.Log($"Sequence START: {this} {Timeval.TickCount}");
+    await scope.Any(Behavior, Waiter.While(() => CanContinue()));
+    await scope.While(() => Mob.AbilityManager.Running.Any());
     if (Cooldown != null)
       await scope.Delay(Cooldown);
+    //Debug.Log($"Sequence END: {this} {Timeval.TickCount}");
   }
 
   // Choose one of the startable behaviors using a weighted random pick.
-  public static AIBehavior ChooseBehavior(AIBehavior[] behaviors) {
+  public static T ChooseBehavior<T>(T[] behaviors) where T: AIBehavior {
     var usableBehaviors = behaviors.Where(b => b.CanStart());
     var totalScore = usableBehaviors.Sum(b => b.Score);
     var chosenScore = UnityEngine.Random.Range(0f, totalScore);
