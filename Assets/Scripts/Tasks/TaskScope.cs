@@ -148,15 +148,25 @@ public class TaskScope : IDisposable {
   }
   public async Task AllTask(params Task[] tasks) {
     ThrowIfCancelled();
-    await Task.WhenAll(tasks);
+    using TaskScope scope = new(this);
+    await Task.WhenAll(tasks.Select(t => AllInner(scope, async s => await t)));
   }
   public async Task All(params TaskFunc[] fs) {
     ThrowIfCancelled();
     using TaskScope scope = new(this);
     try {
-      await Task.WhenAll(fs.Select(f => f(scope)));
+      await Task.WhenAll(fs.Select(f => AllInner(scope, f)));
     } finally {
       ThrowIfCancelled();
+    }
+  }
+  async Task AllInner(TaskScope scope, TaskFunc f) {
+    try {
+      await f(scope);
+    } catch (OperationCanceledException) {
+    } catch (Exception e) {
+      scope.Cancel();
+      throw e;
     }
   }
   public async Task ListenFor(IEventSource evt) {
