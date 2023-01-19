@@ -48,10 +48,10 @@ MonoBehaviour:
   StartDistanceNear: 0
   StartDistanceFar: 16
   GapCloser:
-    Ability: {fileID: 0}
+    Ability: {fileID: 70856360}
     DesiredDistance: 4
     Cooldown:
-      Millis: 1
+      Millis: 333.33334
       FramesPerSecond: 60
   Setup:
     CancelIfDistanceExceeds: 12
@@ -2517,10 +2517,10 @@ MonoBehaviour:
   StartDistanceNear: 0
   StartDistanceFar: 16
   GapCloser:
-    Ability: {fileID: 0}
-    DesiredDistance: 0
+    Ability: {fileID: 70856360}
+    DesiredDistance: 4
     Cooldown:
-      Millis: 1
+      Millis: 333.33334
       FramesPerSecond: 60
   Setup:
     CancelIfDistanceExceeds: 10
@@ -3273,7 +3273,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994128, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994128, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3446,8 +3446,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DefensiveRange: 8
   AttackCooldown:
-    Millis: 2000
+    Millis: 1333.3334
     FramesPerSecond: 60
+  GroundLightAttack: {fileID: 1695491032}
+  GroundHeavyAttack: {fileID: 652589413}
+  GroundLauncherAttack: {fileID: 2136314949}
+  AirSpikeAttack: {fileID: 774783624}
 --- !u!4 &960416853382759760 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4220133813289122912, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
