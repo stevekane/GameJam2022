@@ -238,6 +238,9 @@ MonoBehaviour:
   DashDuration:
     Millis: 333.33334
     FramesPerSecond: 60
+  ResidualImagePeriod:
+    Millis: 50
+    FramesPerSecond: 60
   Animation:
     Clip: {fileID: 7400000, guid: 10c638eb3be7fba4ca0ac3ca09c7ba41, type: 2}
     Mask: {fileID: 0}
@@ -808,11 +811,11 @@ MonoBehaviour:
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
     Speed: 1
     PhaseDurations:
-    - Millis: 66.666664
+    - Millis: 400
       FramesPerSecond: 60
     - Millis: 50
       FramesPerSecond: 60
-    - Millis: 83.333336
+    - Millis: 250
       FramesPerSecond: 60
     - Millis: 83.333336
       FramesPerSecond: 60
@@ -1063,11 +1066,11 @@ MonoBehaviour:
     Mask: {fileID: 0}
     Speed: 1
     PhaseDurations:
-    - Millis: 133.33334
+    - Millis: 250
       FramesPerSecond: 60
     - Millis: 33.333332
       FramesPerSecond: 60
-    - Millis: 83.33331
+    - Millis: 250
       FramesPerSecond: 60
     - Millis: 0
       FramesPerSecond: 60
@@ -1404,11 +1407,11 @@ MonoBehaviour:
     Mask: {fileID: 0}
     Speed: 1
     PhaseDurations:
-    - Millis: 150
-      FramesPerSecond: 60
-    - Millis: 33.333332
+    - Millis: 83.333336
       FramesPerSecond: 60
     - Millis: 66.666664
+      FramesPerSecond: 60
+    - Millis: 100
       FramesPerSecond: 60
     - Millis: 383.33334
       FramesPerSecond: 60
@@ -2248,7 +2251,7 @@ MonoBehaviour:
       Base: 0
       Mult: 1
     Knockback:
-      Base: 120
+      Base: 100
       Mult: 0
     KnockbackType: 1
     KnockbackAngle: 90
@@ -2292,11 +2295,11 @@ MonoBehaviour:
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
     Speed: 1
     PhaseDurations:
-    - Millis: 83.333336
+    - Millis: 250
       FramesPerSecond: 60
     - Millis: 50
       FramesPerSecond: 60
-    - Millis: 16.66671
+    - Millis: 250
       FramesPerSecond: 60
     - Millis: 133.3333
       FramesPerSecond: 60
@@ -3326,7 +3329,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994130, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: BaseAttributes.Array.data[2].Modifier.Base
-      value: 320
+      value: 720
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994134, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_Name
