@@ -6,6 +6,7 @@ public class SimpleDash : Ability {
   public float MinMoveSpeed = 60f;
   public float TurnSpeed = 60f;
   public Timeval DashDuration = Timeval.FromSeconds(.3f);
+  public Timeval ResidualImagePeriod = Timeval.FromMillis(50);
   public AnimationJobConfig Animation;
   public AudioClip LaunchSFX;
   public GameObject LaunchVFX;
@@ -38,6 +39,7 @@ public class SimpleDash : Ability {
       AirDashRemaining--;
       await scope.Any(
         Waiter.Delay(DashDuration),
+        Waiter.Repeat(SpawnResidualImage),
         Waiter.Repeat(Move(dir.normalized)),
         MakeCancellable);
     } finally {
@@ -53,6 +55,13 @@ public class SimpleDash : Ability {
     Mover.Move(desiredSpeed * Time.fixedDeltaTime * dir);
     await scope.Tick();
   };
+
+  async Task SpawnResidualImage(TaskScope scope) {
+    if (Status.TryGetComponent(out ResidualImageRenderer renderer)) {
+      renderer.Render();
+    }
+    await scope.Delay(ResidualImagePeriod);
+  }
 
   async Task MakeCancellable(TaskScope scope) {
     await scope.Millis((int)(DashDuration.Millis / 3));

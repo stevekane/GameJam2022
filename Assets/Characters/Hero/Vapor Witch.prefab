@@ -427,7 +427,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: bc7ce4173f77cb14584df01058caea92, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 0.5
   m_Pitch: 1
   Loop: 0
@@ -2078,6 +2078,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4993060326678392, guid: 9984be23625843a48a44d88aae5669f2, type: 3}
   m_PrefabInstance: {fileID: 1177319805}
   m_PrefabAsset: {fileID: 0}
+--- !u!137 &137220081378220047 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 137220080205635954, guid: 9984be23625843a48a44d88aae5669f2, type: 3}
+  m_PrefabInstance: {fileID: 1177319805}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3793970160756772406
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2256,13 +2261,34 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5721055261477748728, guid: 2ccced675f4c0ef499cef4968999ce55, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1411434893}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3364079649355753500, guid: 2ccced675f4c0ef499cef4968999ce55, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2420684578958310681}
   m_SourcePrefab: {fileID: 100100000, guid: 2ccced675f4c0ef499cef4968999ce55, type: 3}
 --- !u!1 &1876170755166610986 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3364079649355753500, guid: 2ccced675f4c0ef499cef4968999ce55, type: 3}
   m_PrefabInstance: {fileID: 3793970160756772406}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2420684578958310681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1876170755166610986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d628ac167580f954d85351bcf29394cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SkinnedMeshRenderer: {fileID: 137220081378220047}
+  Material: {fileID: 2100000, guid: 14db0444269688c4d88b8004bd3d7d81, type: 2}
+  Opacity: 0.75
+  Color: {r: 0.09411765, g: 0.09411765, b: 0.09411765, a: 1}
+  LifeTime: 1
+  LayerName: Visual
 --- !u!4 &1876170755166610988 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3364079649355753498, guid: 2ccced675f4c0ef499cef4968999ce55, type: 3}
