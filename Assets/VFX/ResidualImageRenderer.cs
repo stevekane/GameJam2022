@@ -2,11 +2,12 @@ using UnityEngine;
 
 public class ResidualImageRenderer : MonoBehaviour {
   [SerializeField] SkinnedMeshRenderer SkinnedMeshRenderer;
-  [SerializeField] Material Material;
-  [SerializeField, Range(0,1)] float Opacity = 1;
-  [SerializeField] Color Color = Color.black;
-  [SerializeField] float LifeTime = 1;
   [SerializeField] string LayerName = "Visual";
+  [SerializeField] Material Material;
+  [Range(0,1)]
+  public float Opacity = 1;
+  public Color Color = Color.black;
+  public float LifeTime = 1;
 
   public void Render() {
     var mesh = new Mesh();
