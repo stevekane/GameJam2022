@@ -27,7 +27,7 @@ public class AbilityManager : MonoBehaviour {
   }
 
   public void InterruptAbilities() => Abilities.Where(a => a.IsRunning && !a.ActiveTags.HasAllFlags(AbilityTag.Uninterruptible)).ForEach(a => a.Stop());
-  public void CancelAbilities() => Abilities.Where(a => a.IsRunning && a.ActiveTags.HasAllFlags(AbilityTag.Cancellable)).ForEach(a => a.Stop());
+  public void CancelAbilities() => Abilities.Where(a => a.IsRunning && a.ActiveTags.HasAllFlags(AbilityTag.Cancellable | AbilityTag.OnlyOne)).ForEach(a => { a.Stop(); Debug.Log($"Cancel {a}"); });
 
   public void RegisterAxis(AxisTag tag, AxisState axis) {
     TagToAxis[tag] = axis;
