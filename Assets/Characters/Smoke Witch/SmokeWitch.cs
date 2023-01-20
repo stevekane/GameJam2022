@@ -241,7 +241,7 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
       await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
       await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
       await StartAbilityWhenInRange(scope, Owner.GroundLauncherAttack);
-      await StartAbilityWhenInRange(scope, Owner.GroundHeavyAttack);
+      await ReleaseAbilityWhenInRange(scope, Owner.GroundHeavyAttack);
     }
   }
 
@@ -250,7 +250,7 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
       await TelegraphDuringAttack(scope);
       await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
       await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
-      await StartAbilityWhenInRange(scope, Owner.GroundHeavyAttack);
+      await ReleaseAbilityWhenInRange(scope, Owner.GroundHeavyAttack);
     }
   }
 
