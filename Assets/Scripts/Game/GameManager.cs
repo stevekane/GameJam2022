@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour {
   public MobManager MobManager;
   public GrapplePointManager GrapplePointManager;
   public CameraManager CameraManager;
+  public DebugUI DebugUI;
 
   [Header("Player")]
   public GameObject PlayerPrefab;
@@ -43,6 +44,7 @@ public class GameManager : MonoBehaviour {
       MobManager.Instance = MobManager;
       GrapplePointManager.Instance = GrapplePointManager;
       CameraManager.Instance = CameraManager;
+      this.InitComponentFromChildren(out DebugUI.Instance);
       this.InitComponentFromChildren(out NavMeshUtil.Instance);
       DontDestroyOnLoad(Instance.gameObject);
     }

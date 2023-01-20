@@ -48,7 +48,7 @@ MonoBehaviour:
   StartDistanceNear: 0
   StartDistanceFar: 16
   GapCloser:
-    Ability: {fileID: 70856360}
+    Ability: {fileID: 0}
     DesiredDistance: 4
     Cooldown:
       Millis: 333.33334
@@ -194,6 +194,9 @@ GameObject:
   m_Component:
   - component: {fileID: 70856359}
   - component: {fileID: 70856360}
+  - component: {fileID: 412699595072769340}
+  - component: {fileID: 5494065966899213954}
+  - component: {fileID: 998061185649448118}
   m_Layer: 0
   m_Name: Dash
   m_TagString: Untagged
@@ -232,11 +235,11 @@ MonoBehaviour:
   - Tags: 49
     RequiredOwnerTags: 0
     EnergyCost: 0
-  MaxMoveSpeed: 30
-  MinMoveSpeed: 30
+  MaxMoveSpeed: 40
+  MinMoveSpeed: 40
   TurnSpeed: 30
   DashDuration:
-    Millis: 333.33334
+    Millis: 166.66667
     FramesPerSecond: 60
   ResidualImagePeriod:
     Millis: 50
@@ -251,8 +254,105 @@ MonoBehaviour:
     BlendInFraction: 0.05
     BlendOutFraction: 0.15
   LaunchSFX: {fileID: 8300000, guid: 10c28a03acd49694e8db907df2dd45f9, type: 3}
-  LaunchVFX: {fileID: 100000, guid: e53da0fb627b93d419d10d2f7be0ee52, type: 3}
+  LaunchVFX: {fileID: 6392598723085688633, guid: 62f62b1e2b20c9e499065aa59a123c93, type: 3}
   VFXOffset: {x: 0, y: 1, z: 0}
+  VisualEffect: {fileID: 412699595072769340}
+--- !u!2083052967 &412699595072769340
+VisualEffect:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 70856358}
+  m_Enabled: 1
+  m_Asset: {fileID: 8926484042661614526, guid: 01e54d80491f29d48b96324780994f03, type: 3}
+  m_InitialEventName: 
+  m_InitialEventNameOverriden: 1
+  m_StartSeed: 0
+  m_ResetSeedOnPlay: 1
+  m_AllowInstancing: 1
+  m_ResourceVersion: 1
+  m_PropertySheet:
+    m_Float:
+      m_Array: []
+    m_Vector2f:
+      m_Array: []
+    m_Vector3f:
+      m_Array:
+      - m_Value: {x: 0, y: 0, z: 0}
+        m_Name: Transform
+        m_Overridden: 1
+    m_Vector4f:
+      m_Array: []
+    m_Uint:
+      m_Array: []
+    m_Int:
+      m_Array: []
+    m_Matrix4x4f:
+      m_Array: []
+    m_AnimationCurve:
+      m_Array: []
+    m_Gradient:
+      m_Array: []
+    m_NamedObject:
+      m_Array: []
+    m_Bool:
+      m_Array: []
+--- !u!73398921 &5494065966899213954
+VFXRenderer:
+  serializedVersion: 1
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 70856358}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!114 &998061185649448118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 70856358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdafc37f32b176349b1684c4455b98e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ExecuteInEditor: 1
+  m_Bindings: []
+  m_VisualEffect: {fileID: 412699595072769340}
 --- !u!1 &111269087
 GameObject:
   m_ObjectHideFlags: 0
@@ -2358,7 +2458,7 @@ MonoBehaviour:
   StartDistanceNear: 0
   StartDistanceFar: 16
   GapCloser:
-    Ability: {fileID: 70856360}
+    Ability: {fileID: 0}
     DesiredDistance: 4
     Cooldown:
       Millis: 333.33334
@@ -3281,7 +3381,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994128, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994128, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_LocalPosition.x

@@ -684,14 +684,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   VFXOffset: {x: 0, y: 1, z: 0}
-  OnDeathVFX: {fileID: 6823200998282874702, guid: 66edd668d395145479f4c24dc6e837f8, type: 3}
-  OnDeathSFX: {fileID: 8300000, guid: 5072a94fa6887024985a35d9cf66c949, type: 3}
   OnHurtVFX: {fileID: 6823200998282874702, guid: 2b6a06a648736ae4993a61f1b526a89a, type: 3}
   OnHurtSFX: {fileID: 8300000, guid: 3df9bbbc130ccb344af5f3fc793a630f, type: 3}
   OnHitVFX: {fileID: 1995403933065894, guid: bf3228cec72bf65469800c0e55477fbd, type: 3}
   OnHitSFX: {fileID: 0}
   OnParryVFX: {fileID: 2955623459812423943, guid: f5507a8c6a22c404ab324980c4e8a11b, type: 3}
   OnParrySFX: {fileID: 8300000, guid: 0e270ecb84908054a9d6f727dbea974e, type: 3}
+  OnDeathVFX: {fileID: 6823200998282874702, guid: 66edd668d395145479f4c24dc6e837f8, type: 3}
+  OnDeathSFX: {fileID: 8300000, guid: 5072a94fa6887024985a35d9cf66c949, type: 3}
+  Renderer: {fileID: 0}
 --- !u!114 &8540507123274114219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -754,6 +755,8 @@ MonoBehaviour:
   AudioClip: {fileID: 8300000, guid: 4218f46b43e534f4dbdd7c725af99e62, type: 3}
   Effect: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
   Explosion: {fileID: 159918, guid: dd127aeec3eb80342924ba6a37f77936, type: 3}
+  MaxAngle: 70
+  MinSpeed: 50
 --- !u!114 &3790946257131143859
 MonoBehaviour:
   m_ObjectHideFlags: 0

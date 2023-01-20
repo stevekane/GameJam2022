@@ -5,25 +5,29 @@ public class Wallbounce : MonoBehaviour {
   public AudioClip AudioClip;
   public GameObject Effect;
   public GameObject Explosion;
+  public float MaxAngle = 70f;
+  public float MinSpeed = 50f;
   float ExplodeAtDamage = float.PositiveInfinity;
   Damage Damage;
   Status Status;
+  float MinDot;
 
   void Awake() {
-    Damage = GetComponentInParent<Damage>();
-    Status = GetComponentInParent<Status>();
+    this.InitComponentFromParent(out Damage);
+    this.InitComponentFromParent(out Status);
+    MinDot = Mathf.Cos(MaxAngle * Mathf.Deg2Rad);
   }
 
   void OnControllerColliderHit(ControllerColliderHit hit) {
     if ((Defaults.Instance.EnvironmentLayerMask & (1<<hit.gameObject.layer)) == 0) return;
-    if (hit.gameObject.CompareTag(Defaults.Instance.GroundTag)) return;
+    //if (hit.gameObject.CompareTag(Defaults.Instance.GroundTag)) return;
     if (Status.Get<KnockbackEffect>() is var k && k != null) {
       if (Damage.Points > ExplodeAtDamage) {
         Status.Remove(k);
         Instantiate(Explosion, transform.position, Quaternion.identity);
         if (Damage.TryGetComponent(out Defender d))
           d.Die();
-      } else {
+      } else if (Vector3.Dot(-k.Velocity.normalized, hit.normal) > MinDot && k.Velocity.sqrMagnitude > MinSpeed*MinSpeed) {
         SFXManager.Instance.TryPlayOneShot(AudioClip);
         VFXManager.Instance.TrySpawnEffect(Effect, hit.point);
         Vector3 bounceVel;
@@ -31,7 +35,7 @@ public class Wallbounce : MonoBehaviour {
           var bounceDelta = k.WallbounceTarget.Value - hit.point;
           bounceVel = KnockbackEffect.GetSpeedToTravelDistance(bounceDelta.magnitude) * bounceDelta.normalized;
         } else {
-          bounceVel = Vector3.Reflect(k.Velocity, hit.normal.XZ());
+          bounceVel = Vector3.Reflect(k.Velocity, hit.normal);
         }
         Status.Remove(k);
         // Note we drop WallbounceTarget for the new knockback. If it bounces again, we use normal reflection to avoid getting stuck.
