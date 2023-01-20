@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -18,10 +19,10 @@ public class AnimationJobConfig {
 
 public class AnimationJob {
   PlayableGraph Graph;
-  AnimationJobConfig Animation;
+  public AnimationJobConfig Animation;
   AnimationDriver Driver;
-  public AnimationLayerMixerPlayable Mixer;
-  AnimationClipPlayable Clip;
+  public int InputPort = -1;
+  public AnimationClipPlayable Clip;
   double DesiredSpeed = 1;
   public bool IsRunning { get; private set; } = false;
   public int CurrentFrame { get; private set; } = -1;
@@ -35,7 +36,6 @@ public class AnimationJob {
     Driver = driver;
     Animation = animation;
     Clip = AnimationClipPlayable.Create(Graph, Animation.Clip);
-    Mixer = AnimationLayerMixerPlayable.Create(Graph, 2);
 
     // TODO: Legacy. Update all old anims and remove this.
     if (Animation.PhaseDurations.Length == 0 && NumPhases == 1) {
@@ -61,7 +61,7 @@ public class AnimationJob {
   public TaskFunc WaitPhase(int phase) => s => WaitPhase(s, phase);
   public async Task WaitPhase(TaskScope scope, int phase) {
     var time = GetPhaseEndTime(phase);
-    while (Clip.GetTime() < time && IsRunning)
+    while (IsRunning && Clip.GetTime() < time)
       await scope.Yield();
   }
   public TaskFunc PauseAfterPhase(int phase) => s => PauseAfterPhase(s, phase);
@@ -89,11 +89,8 @@ public class AnimationJob {
 
   // TDO: condense start/run?
   public void Start() {
-    Clip.SetSpeed(DesiredSpeed * Animation.Speed * Driver.speed);
+    Clip.SetSpeed(DesiredSpeed * Animation.Speed * Driver.Speed);
     Clip.SetDuration(Animation.Clip.length);
-    Mixer.ConnectInput(1, Clip, 0, 1);
-    if (Animation.Mask)
-      Mixer.SetLayerMaskFromAvatarMask(1, Animation.Mask);
     Driver.Connect(this);
     IsRunning = true;
   }
@@ -102,8 +99,6 @@ public class AnimationJob {
     IsRunning = false;
     if (Clip.IsValid())
       Clip.Destroy();
-    if (Mixer.IsValid())
-      Mixer.Destroy();
     Driver.Disconnect(this);
   }
 
@@ -128,8 +123,8 @@ public class AnimationJob {
       while (IsRunning && Clip.IsValid()) {
         UpdateCurrentFrame();
         UpdateCurrentPhase();
-        Mixer.SetInputWeight(1, BlendWeight());
-        Clip.SetSpeed(DesiredSpeed * Animation.Speed * Driver.speed);
+        Driver.Mixer.SetInputWeight(InputPort, BlendWeight());
+        Clip.SetSpeed(DesiredSpeed * Animation.Speed * Driver.Speed);
         if (Clip.IsDone())
           break;
         await scope.Yield();
@@ -168,12 +163,13 @@ public class AnimationJob {
 public class AnimationDriver : MonoBehaviour {
   public Animator Animator;
   public float BaseSpeed { get; private set; }
-  public double speed => Animator.speed;
+  public double Speed => Animator.speed;
   PlayableGraph Graph;
   AnimatorControllerPlayable AnimatorController;
+  public AnimationLayerMixerPlayable Mixer;
   AnimationPlayableOutput Output;
 
-  AnimationJob Job = null;
+  List<AnimationJob> Jobs = new();
 
   void Awake() {
     #if UNITY_EDITOR
@@ -184,7 +180,9 @@ public class AnimationDriver : MonoBehaviour {
     Graph = PlayableGraph.Create("Animation Driver");
     Output = AnimationPlayableOutput.Create(Graph, "Animation Driver", Animator);
     AnimatorController = AnimatorControllerPlayable.Create(Graph, Animator.runtimeAnimatorController);
-    Output.SetSourcePlayable(AnimatorController);
+    Mixer = AnimationLayerMixerPlayable.Create(Graph, 2);
+    Mixer.ConnectInput(0, AnimatorController, 0, 1);
+    Output.SetSourcePlayable(Mixer);
     Graph.Play();
     BaseSpeed = Animator.speed;
   }
@@ -203,32 +201,27 @@ public class AnimationDriver : MonoBehaviour {
     Animator.SetSpeed(BaseSpeed);
   }
 
-
   public void Connect(AnimationJob job) {
-    job.Mixer.ConnectInput(0, AnimatorController, 0, 1);
-    Output.SetSourcePlayable(job.Mixer);
+    job.InputPort = Mixer.AddInput(job.Clip, 0, 1);
+    if (job.Animation.Mask)  // is InputPort the right arg here?
+      Mixer.SetLayerMaskFromAvatarMask((uint)job.InputPort, job.Animation.Mask);
+    Jobs.Add(job);
   }
 
   public void Disconnect(AnimationJob job) {
-    if (job == Job)  // Ignore Disconnect from inactive jobs.
-      Output.SetSourcePlayable(AnimatorController);
+    Mixer.DisconnectInput(job.InputPort);
+    Jobs.Remove(job);
+    if (Jobs.Count == 0)
+      Mixer.SetInputCount(1);
   }
 
-  public AnimationJob Play(TaskScope scope, AnimationClip clip) => Play(scope, new AnimationJobConfig() { Clip = clip });
   public AnimationJob Play(TaskScope scope, AnimationJobConfig animation) {
-    Job?.Stop();
     var job = new AnimationJob(this, Graph, animation);
-    Job = job;
-    _ = Run(scope);
+    job.Start();
+    _ = job.Run(scope);
     return job;
   }
 
-  async Task Run(TaskScope scope) {
-    try {
-      Job.Start();
-      await Job.Run(scope);
-    } finally {
-      Job = null;
-    }
+  async Task Run(TaskScope scope, AnimationJob job) {
   }
 }

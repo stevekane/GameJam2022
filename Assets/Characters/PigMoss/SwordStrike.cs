@@ -29,7 +29,7 @@ namespace PigMoss {
 
     public override async Task MainAction(TaskScope scope) {
       try {
-        var animation = AnimationDriver.Play(scope, Clip);
+        var animation = AnimationDriver.Play(scope, new() { Clip = Clip });  // TODO: FIXME!
         var windup = animation.WaitFrame(ActiveFrameStart.AnimFrames);
         var lookAt = Waiter.Repeat(Mover.TryLookAt, BlackBoard.Target);
         await scope.Any(windup, lookAt);

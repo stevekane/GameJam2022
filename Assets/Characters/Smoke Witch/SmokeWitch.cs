@@ -23,7 +23,7 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
   AIMover AIMover;
   AbilityManager AbilityManager;
   Throw ThrowAbility;
-  SimpleDash DashAbility;
+  BurstDash DashAbility;
   Jump JumpAbility;
   TaskScope MainScope = new();
   float DesiredDistance => CurrentAttack?.DesiredDistance ?? DefensiveRange;
