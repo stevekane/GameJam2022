@@ -49,7 +49,6 @@ public class AttackAbility : Ability {
     if (RecoveryCancelable)
       Tags.AddFlags(AbilityTag.Cancellable);
     await scope.Run(Animation.WaitDone);
-    Debug.Log($"{this} done");
   }
 
   void OnHit(Hurtbox target) {
