@@ -43,7 +43,6 @@ public class NavMeshUtil : MonoBehaviour {
 
 #if UNITY_EDITOR
   public bool DrawEdges = true;
-#endif
   void OnValidate() {
     if (DrawEdges)
       CreateNavMeshPoints();
@@ -65,4 +64,5 @@ public class NavMeshUtil : MonoBehaviour {
     //  Gizmos.DrawLine(v1 + Vector3.up, v3 + Vector3.up);
     //}
   }
+#endif
 }

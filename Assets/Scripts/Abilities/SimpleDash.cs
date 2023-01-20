@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class SimpleDash : Ability {
   public float MaxMoveSpeed = 120f;
@@ -11,6 +12,7 @@ public class SimpleDash : Ability {
   public AudioClip LaunchSFX;
   public GameObject LaunchVFX;
   public Vector3 VFXOffset;
+  public VisualEffect VisualEffect;
 
   public static InlineEffect ScriptedMove => new(s => {
     s.HasGravity = false;
@@ -35,6 +37,7 @@ public class SimpleDash : Ability {
       using var invulnEffect = Status.Add(Invulnerable);
       SFXManager.Instance.TryPlayOneShot(LaunchSFX);
       VFXManager.Instance.TrySpawnEffect(LaunchVFX, transform.position + VFXOffset, transform.rotation);
+      VisualEffect.Play();
       AnimationDriver.Play(scope, Animation);
       AirDashRemaining--;
       await scope.Any(
@@ -43,6 +46,7 @@ public class SimpleDash : Ability {
         Waiter.Repeat(Move(dir.normalized)),
         MakeCancellable);
     } finally {
+      VisualEffect.Stop();
     }
   }
 
