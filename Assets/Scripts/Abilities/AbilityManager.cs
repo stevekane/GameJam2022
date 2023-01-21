@@ -90,7 +90,7 @@ public class AbilityManager : MonoBehaviour {
       CancelAbilities();
     }
     Energy?.Value.Consume(trigger.EnergyCost);
-    ability.Start(method);
+    ability.StartTask(method);
   }
 
   void Awake() {

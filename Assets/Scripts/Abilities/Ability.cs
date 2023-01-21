@@ -36,7 +36,7 @@ public abstract class Ability : MonoBehaviour {
   public virtual HitConfig HitConfigData => null;
 
   public virtual bool CanStart(AbilityMethod func) => true;
-  public void Start(AbilityMethod func) {
+  public void StartTask(AbilityMethod func) {
     ActiveTasks.Add(func);
     MainScope.Start(s => TaskRunner(s, func));
   }
