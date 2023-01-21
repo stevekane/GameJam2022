@@ -17,7 +17,9 @@ public class Jump : Ability {
   int TicksSinceGrounded = 0, TicksSinceJump = 0;
   bool IsConsideredGrounded => TicksSinceGrounded <= CoyoteTime.Ticks && TicksSinceJump > TicksSinceGrounded;
 
-  public override bool CanStart(AbilityMethod func) => IsConsideredGrounded || AirJumpsRemaining > 0;
+  public override bool CanStart(AbilityMethod func) =>
+    func == MainRelease ? true :
+    IsConsideredGrounded || AirJumpsRemaining > 0;
 
   public override async Task MainAction(TaskScope scope) {
     try {

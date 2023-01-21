@@ -25,6 +25,7 @@ public class SimpleDash : Ability {
   }, "DashInvulnerable");
 
   public override bool CanStart(AbilityMethod func) =>
+    func == MainRelease ? true :
     AbilityManager.GetAxis(AxisTag.ReallyAim).XZ == Vector3.zero &&
     (Status.IsGrounded || AirDashRemaining > 0);
 
