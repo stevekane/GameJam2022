@@ -65,7 +65,6 @@ public class BurstDash : Ability {
     dir = Vector3.RotateTowards(dir, targetDir.normalized, TurnSpeed/360f, 0f);
     Status.transform.forward = dir;
     impulse *= Mathf.Exp(-Time.fixedDeltaTime * Drag);
-    DebugUI.Log(this, $"imp={impulse}");
     if (impulse < MinImpulse)
       scope.Cancel();
     Mover.Move(impulse * desiredSpeed * Time.fixedDeltaTime * dir);
