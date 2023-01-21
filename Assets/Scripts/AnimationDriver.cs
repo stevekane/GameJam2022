@@ -209,8 +209,8 @@ public class AnimationDriver : MonoBehaviour {
   }
 
   public void Disconnect(AnimationJob job) {
-    Mixer.DisconnectInput(job.InputPort);
-    Jobs.Remove(job);
+    if (Jobs.Remove(job))
+      Mixer.DisconnectInput(job.InputPort);
     if (Jobs.Count == 0)
       Mixer.SetInputCount(1);
   }

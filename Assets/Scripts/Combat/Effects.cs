@@ -54,10 +54,10 @@ public class Effects : MonoBehaviour {
   }
 
   void Awake() {
-    this.InitComponent(out Status);
+    this.InitComponent(out Status, optional:true);
   }
   void FixedUpdate() {
-    if (Renderer)
+    if (Renderer && Status)
       Renderer.enabled = Status.IsHittable;
   }
 }
