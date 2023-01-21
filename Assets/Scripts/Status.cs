@@ -178,21 +178,35 @@ public class RecoilEffect : StatusEffect {
 
 // Some forward-translation juice for melee hits to convey momentum.
 public class HitFollowthroughEffect : TimedEffect {
-  public Vector3 Velocity;
-  public HitFollowthroughEffect(Vector3 velocity, Timeval duration) : base(duration.Ticks) {
+  Vector3 Velocity;
+  List<Status> Defenders = new();
+  public HitFollowthroughEffect(Vector3 velocity, Timeval duration, GameObject defender) : base(duration.Ticks) {
     Velocity = velocity;
+    MaybeAddDefender(defender);
   }
-  // Ignore subsequent hits.
-  public override bool Merge(StatusEffect e) => true;
+  public override bool Merge(StatusEffect e) {
+    ((HitFollowthroughEffect)e).Defenders.ForEach(d => MaybeAddDefender(d.gameObject));
+    return true;
+  }
+  void MaybeAddDefender(GameObject defender) {
+    if (defender && defender.TryGetComponent(out Status status) && status.IsHittable && status.IsInterruptible)
+      Defenders.Add(status);
+  }
   public override void ApplyTimed(Status status) {
+    if (Defenders.Count == 0)
+      return;
+    var remaining = Defenders.Where(d => d != null);
     var delta = Velocity*Time.fixedDeltaTime;
-    if (status.IsGrounded && !status.IsOverGround(delta)) {
-      // dont
-    } else {
-      status.Mover.Move(delta);
+    if (CanMove(status, delta) && remaining.Any(s => CanMove(s, delta))) {
+      Move(status, delta);
     }
-    status.CanMove = false;
-    status.CanRotate = false;
+    remaining.ForEach(s => { if (CanMove(s, delta)) Move(s, delta); });
+  }
+  public bool CanMove(Status target, Vector3 delta) => !target.IsGrounded || target.IsOverGround(delta);
+  public void Move(Status target, Vector3 delta) {
+    target.Mover.Move(delta);
+    target.CanMove = false;
+    target.CanRotate = false;
   }
 }
 
