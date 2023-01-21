@@ -7,6 +7,8 @@ public class AttackAbility : Ability {
   [SerializeField] bool InPlace = false;
   [SerializeField] bool RecoveryCancelable = true;
   [SerializeField] Timeval ChargeEnd;
+  [SerializeField] AvatarMask MaskDuringCharge = null;
+  [SerializeField] AvatarMask MaskAfterCharge = null;
   [SerializeField] HitConfig HitConfig;
   [SerializeField] AnimationCurve ChargeScaling = AnimationCurve.Linear(0f, .5f, 1f, 1f);
   [SerializeField] AnimationJobConfig AttackAnimation;
@@ -32,7 +34,11 @@ public class AttackAbility : Ability {
     using var effect = InPlace ? Status.Add(InPlaceEffect) : null;
     if (Chargeable) {
       var startFrame = Timeval.TickCount;
+      if (MaskDuringCharge)
+        AnimationDriver.Mixer.SetLayerMaskFromAvatarMask((uint)Animation.InputPort, MaskDuringCharge);
       await scope.Any(Charge, ListenFor(MainRelease));
+      if (MaskAfterCharge)
+        AnimationDriver.Mixer.SetLayerMaskFromAvatarMask((uint)Animation.InputPort, MaskAfterCharge);
       var numFrames = Timeval.TickCount - startFrame;
       var chargeScaling = ChargeScaling.Evaluate((float)numFrames / ChargeEnd.Ticks);
       await scope.Run(Animation.WaitPhase(0));
