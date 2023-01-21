@@ -36,9 +36,13 @@ public abstract class Ability : MonoBehaviour {
   public virtual HitConfig HitConfigData => null;
 
   public virtual bool CanStart(AbilityMethod func) => true;
-  public void MaybeStartTask(AbilityMethod func) {
-    MainScope.Start(s => TaskRunner(s, func));
+  public void StartTask(AbilityMethod func) {
     ActiveTasks.Add(func);
+    MainScope.Start(s => TaskRunner(s, func));
+  }
+  public Task Run(TaskScope scope, AbilityMethod func) {
+    ActiveTasks.Add(func);
+    return TaskRunner(scope, func);
   }
   public async Task TaskRunner(TaskScope scope, AbilityMethod func) {
     try {

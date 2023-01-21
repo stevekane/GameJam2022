@@ -27,6 +27,7 @@ public class BurstDash : Ability {
   }, "DashInvulnerable");
 
   public override bool CanStart(AbilityMethod func) =>
+    func == MainRelease ? true :
     !IsRunning &&
     AbilityManager.GetAxis(AxisTag.ReallyAim).XZ == Vector3.zero &&
     (Status.IsGrounded || AirDashRemaining > 0);

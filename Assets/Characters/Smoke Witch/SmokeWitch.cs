@@ -1,9 +1,7 @@
 using System.Threading.Tasks;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
-
-using Range = System.ValueTuple<float, float>;
+using System.Collections.Generic;
 
 public class SmokeWitch : MonoBehaviour, IMobComponents {
   public float DefensiveRange = 8f;
@@ -13,8 +11,8 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
   public Ability GroundLauncherAttack;
   public Ability AirSpikeAttack;
 
-  SmokeWitchBehavior[] GapCloseBehaviors;
-  SmokeWitchBehavior[] AttackBehaviors;
+  List<AIBehavior> GapCloseBehaviors = new();
+  List<AIBehavior> AttackBehaviors = new();
   Status Status;
   Transform Target;
   NavMeshAgent NavMeshAgent;
@@ -47,19 +45,7 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
     this.InitComponentFromChildren(out ThrowAbility);
     this.InitComponentFromChildren(out DashAbility);
     this.InitComponentFromChildren(out JumpAbility);
-    AttackBehaviors = new SmokeWitchBehavior[] {
-      new Melee1(),
-      new Melee2(),
-      new Melee3(),
-      new Air1(),
-      new Air2(),
-      new ThrowSequence()
-    };
-    AttackBehaviors.ForEach(s => s.Owner = this);
-    GapCloseBehaviors = new SmokeWitchBehavior[] {
-      new DashBehavior(),
-    };
-    GapCloseBehaviors.ForEach(s => s.Owner = this);
+    InitBehaviors();
   }
 
   void Start() => MainScope.Start(Behavior);
@@ -176,98 +162,93 @@ public class SmokeWitch : MonoBehaviour, IMobComponents {
       Gizmos.DrawWireSphere(DesiredPosition.Value, .5f);
   }
 
-  abstract class SmokeWitchBehavior : AIBehavior {
-    public SmokeWitch Owner;
-    override public IMobComponents Mob => Owner;
-  }
-
-  abstract class GroundMeleeBehavior : SmokeWitchBehavior {
-    override public int Score => 1;
-    override public Range StartRange => (0f, 4f);
-    override public Range DuringRange => (0f, 12f);
-    public override bool CanStart() => Mob.Status.IsGrounded && base.CanStart();
-    protected bool RequiredGrounded = true;
-  }
-
-  abstract class AirMeleeBehavior : SmokeWitchBehavior {
-    override public int Score => 1;
-    override public Range StartRange => (0f, 4f);
-    override public Range DuringRange => (0f, 12f);
-    public override bool CanStart() => !Mob.Status.IsGrounded && base.CanStart();
-  }
-
-  class DashBehavior : SmokeWitchBehavior {
-    override public int Score => 1;
-    override public Range StartRange => (6f, 14f);
-    override public Range DuringRange => (0f, float.MaxValue);
-    override public float DesiredDistance => 2f;
-    override public Timeval Cooldown => Timeval.FromMillis(300);
-    protected override async Task Behavior(TaskScope scope) {
-      // Mob move logic should start moving torwards target due to new desired distance.
-      await scope.Any(Waiter.Until(() => MovingTowardsTarget()), Waiter.Millis(100));
-      await StartAbility(scope, Owner.DashAbility);
-      await scope.Until(() => TargetInRange(0f, 4f) || !Owner.DashAbility.IsRunning);
+  void InitBehaviors() {
+    void Melee(AIBehavior b) {
+      b.Score = 1;
+      b.StartRange = (0f, 4f);
+      b.DuringRange = (0f, 12f);
+      b.DesiredDistance = 3f;
     }
-  }
-
-  class ThrowSequence : SmokeWitchBehavior {
-    override public int Score => 1;
-    override public Range StartRange => (16f, float.MaxValue);
-    override public Range DuringRange => (14f, float.MaxValue);
-    override public float DesiredDistance => 18f;
-    override public Timeval Cooldown => Timeval.FromMillis(1000);
-    public override bool CanStart() => !Owner.InDanger() && base.CanStart();
-    protected override async Task Behavior(TaskScope scope) {
-      Owner.ThrowAbility.Target = Mob.Target;
-      await StartAbility(scope, Owner.ThrowAbility);
+    void Ground(AIBehavior b) {
+      b.CanStart = () => Status.IsGrounded;
     }
-  }
-
-  class Melee1 : GroundMeleeBehavior {
-    protected override async Task Behavior(TaskScope scope) {
-      await TelegraphDuringAttack(scope);
-      await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
-      await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
-      await StartAbilityWhenInRange(scope, Owner.GroundLauncherAttack);
-      await scope.Millis(550);
-      await StartAbility(scope, Owner.JumpAbility);
-      await StartAbilityWhenInRange(scope, Owner.AirSpikeAttack);
+    void Air(AIBehavior b) {
+      b.CanStart = () => !Status.IsGrounded;
     }
-  }
-
-  class Melee2 : GroundMeleeBehavior {
-    protected override async Task Behavior(TaskScope scope) {
-      await TelegraphDuringAttack(scope);
-      await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
-      await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
-      await StartAbilityWhenInRange(scope, Owner.GroundLauncherAttack);
-      await ReleaseAbilityWhenInRange(scope, Owner.GroundHeavyAttack);
-    }
-  }
-
-  class Melee3 : GroundMeleeBehavior {
-    protected override async Task Behavior(TaskScope scope) {
-      await TelegraphDuringAttack(scope);
-      await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
-      await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
-      await ReleaseAbilityWhenInRange(scope, Owner.GroundHeavyAttack);
-    }
-  }
-
-  class Air1 : AirMeleeBehavior {
-    override public Timeval Cooldown => Timeval.FromMillis(500);
-    protected override async Task Behavior(TaskScope scope) {
-      await TelegraphDuringAttack(scope);
-      await StartAbilityWhenInRange(scope, Owner.AirSpikeAttack);
-    }
-  }
-
-  class Air2 : AirMeleeBehavior {
-    override public Timeval Cooldown => Timeval.FromMillis(500);
-    protected override async Task Behavior(TaskScope scope) {
-      await TelegraphDuringAttack(scope);
-      await StartAbilityWhenInRange(scope, Owner.GroundLightAttack);
-      await StartAbilityWhenInRange(scope, Owner.AirSpikeAttack);
-    }
+    // Ground melee.
+    AttackBehaviors.Add(new AIBehavior(this).With(Ground).With(Melee).With((b) => {
+      b.Behavior = async (scope) => {
+        await b.TelegraphDuringAttack(scope);
+        await b.StartAbilityWhenInRange(scope, GroundLightAttack);
+        await b.StartAbilityWhenInRange(scope, GroundLightAttack);
+        await b.StartAbilityWhenInRange(scope, GroundLauncherAttack);
+        await scope.Millis(550);
+        await b.StartAbility(scope, JumpAbility);
+        await b.StartAbilityWhenInRange(scope, AirSpikeAttack);
+      };
+    }));
+    // Ground melee.
+    AttackBehaviors.Add(new AIBehavior(this).With(Ground).With(Melee).With((b) => {
+      b.Behavior = async (scope) => {
+        await b.TelegraphDuringAttack(scope);
+        await b.StartAbilityWhenInRange(scope, GroundLightAttack);
+        await b.StartAbilityWhenInRange(scope, GroundLightAttack);
+        await b.StartAbilityWhenInRange(scope, GroundLauncherAttack);
+        await b.ReleaseAbilityWhenInRange(scope, GroundHeavyAttack);
+      };
+    }));
+    // Ground melee.
+    AttackBehaviors.Add(new AIBehavior(this).With(Ground).With(Melee).With((b) => {
+      b.Behavior = async (scope) => {
+        await b.TelegraphDuringAttack(scope);
+        await b.StartAbilityWhenInRange(scope, GroundLightAttack);
+        await b.StartAbilityWhenInRange(scope, GroundLightAttack);
+        await b.ReleaseAbilityWhenInRange(scope, GroundHeavyAttack);
+      };
+    }));
+    // Air melee.
+    AttackBehaviors.Add(new AIBehavior(this).With(Air).With(Melee).With((b) => {
+      b.Cooldown = Timeval.FromMillis(500);
+      b.Behavior = async (scope) => {
+        await b.TelegraphDuringAttack(scope);
+        await b.StartAbilityWhenInRange(scope, AirSpikeAttack);
+      };
+    }));
+    // Air melee.
+    AttackBehaviors.Add(new AIBehavior(this).With(Air).With(Melee).With((b) => {
+      b.Cooldown = Timeval.FromMillis(500);
+      b.Behavior = async (scope) => {
+        await b.TelegraphDuringAttack(scope);
+        await b.StartAbilityWhenInRange(scope, GroundLightAttack);
+        await b.StartAbilityWhenInRange(scope, AirSpikeAttack);
+      };
+    }));
+    // Ranged fireball.
+    AttackBehaviors.Add(new AIBehavior(this).With((b) => {
+      b.Score = 1;
+      b.StartRange = (16f, float.MaxValue);
+      b.DuringRange = (14f, float.MaxValue);
+      b.DesiredDistance = 18f;
+      b.Cooldown = Timeval.FromMillis(1000);
+      b.CanStart = () => !InDanger();
+      b.Behavior = async (scope) => {
+        ThrowAbility.Target = Target;
+        await b.StartAbility(scope, ThrowAbility);
+      };
+    }));
+    // Dash in.
+    GapCloseBehaviors.Add(new AIBehavior(this).With((b) => {
+      b.Score = 1;
+      b.StartRange = (6f, 14f);
+      b.DuringRange = (0f, float.MaxValue);
+      b.DesiredDistance = 2f;
+      b.Cooldown = Timeval.FromMillis(300);
+      b.Behavior = async (scope) => {
+        // Mob move logic should start moving torwards target due to new desired distance.
+        await scope.Any(Waiter.Until(() => b.MovingTowardsTarget()), Waiter.Millis(100));
+        await b.StartAbility(scope, DashAbility);
+        await scope.Until(() => b.TargetInRange(0f, 4f) || !DashAbility.IsRunning);
+      };
+    }));
   }
 }

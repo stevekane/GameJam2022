@@ -6,12 +6,12 @@ public class CycleAbility : Ability {
   int CycleIndex = 0;
   int NextIndex => (CycleIndex + 1) % Abilities.Count;
 
-  public override AbilityTag ActiveTags => Abilities[CycleIndex].ActiveTags;
+  public override AbilityTag ActiveTags => Tags | Abilities[CycleIndex].ActiveTags;
 
   public override bool CanStart(AbilityMethod func) => Abilities[NextIndex].CanStart(Abilities[NextIndex].MainAction);
   public override async Task MainAction(TaskScope scope) {
     CycleIndex = NextIndex;
     AbilityMethod method = Abilities[CycleIndex].MainAction;
-    await AbilityManager.TryRun(scope, method);
+    await Abilities[CycleIndex].Run(scope, method);
   }
 }

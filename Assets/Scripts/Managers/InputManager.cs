@@ -84,7 +84,7 @@ public class InputManager : MonoBehaviour {
   }
 
   public void Consume(ButtonCode code, ButtonPressType type) {
-    Buffer.UpdateOrAdd((code, type), 0);
+    Buffer.Remove((code, type));
   }
 
   void Awake() {
@@ -124,9 +124,8 @@ public class InputManager : MonoBehaviour {
       ButtonPressType.JustUp => action.WasReleasedThisFrame,
       _ => null
     };
-    if (func()) {
-      Buffer.UpdateOrAdd((code, type), Timeval.TickCount);
-    }
+    if (func())
+      Buffer[(code, type)] = Timeval.TickCount;
 
     if (Buffer.TryGetValue((code, type), out int tickCount) && Timeval.TickCount - tickCount <= InputBufferTickLength)
       evt.Fire();

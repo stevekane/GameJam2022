@@ -212,12 +212,4 @@ public static class DictionaryExtensions {
       dictionary.Add(key, value = createFunc());
     return value;
   }
-
-  public static void UpdateOrAdd<K,V>(this Dictionary<K,V> d, K k, V v) {
-    if (d.ContainsKey(k)) {
-      d[k] = v;
-    } else {
-      d.Add(k, v);
-    }
-  }
 }
