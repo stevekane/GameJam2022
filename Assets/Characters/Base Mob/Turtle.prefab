@@ -118,9 +118,6 @@ MonoBehaviour:
   Chargeable: 1
   InPlace: 0
   RecoveryCancelable: 1
-  ChargeEnd:
-    Millis: 1000
-    FramesPerSecond: 60
   HitConfig:
     Damage:
       Base: 0
@@ -165,6 +162,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  ChargeMaxDuration:
+    Millis: 1000
+    FramesPerSecond: 60
   AttackAnimation:
     Clip: {fileID: 7400000, guid: 62766a0642318924eaec6b6094e7cf70, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
@@ -306,16 +306,12 @@ MonoBehaviour:
     Mask: {fileID: 0}
     Speed: 1
     PhaseDurations:
-    - Millis: 16.666668
+    - Millis: 16.666666
       FramesPerSecond: 60
-    BlendInFraction: 0
-    BlendOutFraction: 0
-  WindupDuration:
-    Millis: 0
-    FramesPerSecond: 60
-  RecoveryDuration:
-    Millis: 66.666664
-    FramesPerSecond: 60
+    - Millis: 133.33333
+      FramesPerSecond: 60
+    BlendInFraction: 0.423
+    BlendOutFraction: 0.446
   Shield: {fileID: 268572201568636213}
 --- !u!1 &5297261439439992158
 GameObject:
@@ -686,19 +682,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994128, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994128, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -5.3603616
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994128, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.0000009536743
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994128, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 4.863657
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994128, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_LocalRotation.w
@@ -742,7 +738,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994134, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994159, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: Renderer
