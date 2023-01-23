@@ -6,11 +6,9 @@ public class AttackAbility : Ability {
   [SerializeField] bool Chargeable;
   [SerializeField] bool InPlace = false;
   [SerializeField] bool RecoveryCancelable = true;
-  [SerializeField] Timeval ChargeEnd;
-  [SerializeField] AvatarMask MaskDuringCharge = null;
-  [SerializeField] AvatarMask MaskAfterCharge = null;
   [SerializeField] HitConfig HitConfig;
   [SerializeField] AnimationCurve ChargeScaling = AnimationCurve.Linear(0f, .5f, 1f, 1f);
+  [SerializeField] Timeval ChargeMaxDuration = Timeval.FromSeconds(1f);
   [SerializeField] AnimationJobConfig AttackAnimation;
   [SerializeField] TriggerEvent Hitbox;
   [SerializeField] Parrybox Parrybox;
@@ -33,14 +31,9 @@ public class AttackAbility : Ability {
     HitConfig hitConfig = HitConfig;
     using var effect = InPlace ? Status.Add(InPlaceEffect) : null;
     if (Chargeable) {
-      var startFrame = Timeval.TickCount;
-      if (MaskDuringCharge)
-        AnimationDriver.Mixer.SetLayerMaskFromAvatarMask((uint)Animation.InputPort, MaskDuringCharge);
       await scope.Any(Charge, ListenFor(MainRelease));
-      if (MaskAfterCharge)
-        AnimationDriver.Mixer.SetLayerMaskFromAvatarMask((uint)Animation.InputPort, MaskAfterCharge);
-      var numFrames = Timeval.TickCount - startFrame;
-      var chargeScaling = ChargeScaling.Evaluate((float)numFrames / ChargeEnd.Ticks);
+      //await scope.Any(Charge, ListenFor(MainRelease), Waiter.Repeat(() => DebugUI.Log(this, $"charge={NumTicksCharged}")));
+      var chargeScaling = ChargeScaling.Evaluate((float)NumTicksCharged / ChargeMaxDuration.Ticks);
       await scope.Run(Animation.WaitPhase(0));
       hitConfig = hitConfig.Scale(chargeScaling);
     } else {
@@ -61,11 +54,14 @@ public class AttackAbility : Ability {
     AbilityManager.Energy?.Value.Add(1);
   }
 
+  int NumTicksCharged => ChargeStartTick != null ? Timeval.TickCount - ChargeStartTick.Value : 0;
+  int? ChargeStartTick;
   async Task Charge(TaskScope scope) {
+    ChargeStartTick = null;
     try {
-      await Animation.WaitFrame(1)(scope);
-      Animation.Pause();
-      await scope.Delay(ChargeEnd);
+      await scope.Run(Animation.PauseAfterPhase(0));
+      ChargeStartTick = Timeval.TickCount;
+      await scope.Delay(ChargeMaxDuration);
     } finally {
       Animation.Resume();
     }

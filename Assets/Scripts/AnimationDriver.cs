@@ -75,12 +75,6 @@ public class AnimationJob {
     while (CurrentFrame < frame && IsRunning)
       await scope.Yield();
   }
-  public TaskFunc PauseAtFrame(int frame) => s => PauseAtFrame(s, frame);
-  public async Task PauseAtFrame(TaskScope scope, int frame) {
-    while (CurrentFrame < frame && IsRunning)
-      await scope.Yield();
-    Pause();
-  }
   public TaskFunc WaitDone() => s => WaitDone(s);
   public async Task WaitDone(TaskScope scope) {
     while (IsRunning)
