@@ -1,55 +1,87 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class DynamicTrailMeshRenderer : MonoBehaviour {
+  [SerializeField] Mesh TestMesh;
   [SerializeField] Transform T0;
   [SerializeField] Transform T1;
   [SerializeField] Material Material;
-  [SerializeField] int MaxSegments = 256;
   [SerializeField] float MaxTrailDistance = 5;
+  [SerializeField] float MaxSpawnSpeed = 5;
+  [SerializeField] Timeval SegmentDuration = Timeval.FromMillis(100);
 
+  public bool Emitting = true;
+
+  Vector3 P0;
+  Vector3 P1;
   List<Vector3> Trail0 = new();
   List<Vector3> Trail1 = new();
+  List<float> SpawnSpeeds0 = new();
+  List<float> SpawnSpeeds1 = new();
+  List<float> DeathTimes = new();
   float[] Distances0 = new float[0];
   float[] Distances1 = new float[0];
-  GameObject Root;
-  MeshFilter MeshFilter;
-  MeshRenderer MeshRenderer;
+  Mesh Mesh;
+  Material MaterialInstance;
 
-  void Start() {
+  void OnEnable() {
     Trail0 = new();
     Trail1 = new();
+    DeathTimes = new();
+    P0 = T0.position;
+    P1 = T1.position;
     Trail0.Add(T0.position);
     Trail1.Add(T1.position);
-    Root = new GameObject("Dynamic Trail");
-    Root.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
-    MeshFilter = Root.AddComponent<MeshFilter>();
-    MeshFilter.mesh = new();
-    MeshRenderer = Root.AddComponent<MeshRenderer>();
-    MeshRenderer.material = Material;
+    DeathTimes.Add(Time.time + SegmentDuration.Seconds);
+    SpawnSpeeds0.Add(0);
+    SpawnSpeeds1.Add(0);
+    Mesh = new();
+    MaterialInstance = new Material(Material);
   }
 
-  void OnDestroy() {
-    Destroy(Root);
+  void OnDisable() {
+    Trail0.Clear();
+    Trail1.Clear();
+    DeathTimes.Clear();
+    SpawnSpeeds0.Clear();
+    SpawnSpeeds1.Clear();
+    Mesh.Clear();
   }
 
   void LateUpdate() {
-    RecordPositions();
+    if (Emitting)
+      RecordPositions();
     RemoveOldPositions();
     ComputeDistances();
     RenderToMesh();
   }
 
   void RemoveOldPositions() {
-    if (Trail0.Count > MaxSegments) {
-      Trail0.RemoveAt(0);
-      Trail1.RemoveAt(0);
+    var cutCount = 0;
+    for (var i = 0; i < DeathTimes.Count; i++) {
+      var time = DeathTimes[i];
+      if (Time.time >= time) {
+        cutCount++;
+      } else {
+        break;
+      }
     }
+    Trail0.RemoveRange(0, cutCount);
+    Trail1.RemoveRange(0, cutCount);
+    DeathTimes.RemoveRange(0, cutCount);
+    SpawnSpeeds0.RemoveRange(0, cutCount);
+    SpawnSpeeds1.RemoveRange(0, cutCount);
   }
 
   void RecordPositions() {
     Trail0.Add(T0.position);
     Trail1.Add(T1.position);
+    DeathTimes.Add(Time.time + SegmentDuration.Seconds);
+    SpawnSpeeds0.Add((Vector3.Distance(T0.position, P0))/SegmentDuration.Seconds);
+    SpawnSpeeds1.Add((Vector3.Distance(T1.position, P1))/SegmentDuration.Seconds);
+    P0 = T0.position;
+    P1 = T1.position;
   }
 
   // TODO: Allocation here is stupid.. fucking programming
@@ -65,23 +97,31 @@ public class DynamicTrailMeshRenderer : MonoBehaviour {
       d1 += Vector3.Distance(Trail1[i], Trail1[i+1]);
       Distances1[i] = d1;
     }
-    Distances0[Distances0.Length-1] = 0;
-    Distances1[Distances1.Length-1] = 0;
+    if (Distances0.Length > 0) {
+      Distances0[Distances0.Length-1] = 0;
+      Distances1[Distances1.Length-1] = 0;
+    }
   }
 
   void RenderToMesh() {
     List<Vector3> Vertices = new();
-    List<Vector2> UVs = new();
+    List<Vector4> UVs = new();
     List<int> Triangles = new();
     for (var i = 0; i < Trail0.Count; i++) {
       Vertices.Add(Trail0[i]);
       Vertices.Add(Trail1[i]);
     }
-    for (var i = 0; i < Distances0.Length; i++) {
-      UVs.Add(new Vector2(Distances0[i], 0));
-      UVs.Add(new Vector2(Distances1[i], 1));
+    for (var i = 0; i < DeathTimes.Count; i++) {
+      var start = DeathTimes[i]-SegmentDuration.Seconds;
+      var end = DeathTimes[i];
+      var normalizedAge = Mathf.InverseLerp(start, end, Time.time);
+      var age = normalizedAge*SegmentDuration.Seconds;
+      var spawnVelocity0 = SpawnSpeeds0[i];
+      var spawnVelocity1 = SpawnSpeeds1[i];
+      var falloff = 1;
+      UVs.Add(new Vector4(Distances0[i], age, spawnVelocity0, falloff));
+      UVs.Add(new Vector4(Distances1[i], age, spawnVelocity1, falloff));
     }
-    // triangles are
     var total = (Vertices.Count - 2) / 2;
     for (var i = 0; i < total; i++) {
       Triangles.Add(i*2+0);
@@ -91,23 +131,13 @@ public class DynamicTrailMeshRenderer : MonoBehaviour {
       Triangles.Add(i*2+3);
       Triangles.Add(i*2+1);
     }
-    MeshFilter.mesh.Clear();
-    MeshFilter.mesh.SetVertices(Vertices);
-    MeshFilter.mesh.SetUVs(0, UVs);
-    MeshFilter.mesh.SetTriangles(Triangles, 0);
-  }
-
-  void OnDrawGizmosSelected() {
-    for (var i = 1; i < Trail0.Count; i++) {
-      var color0 = Color.Lerp(Color.black, Color.white, 1-Mathf.Clamp01(Mathf.InverseLerp(0, MaxTrailDistance, Distances0[i])));
-      var color1 = Color.Lerp(Color.black, Color.white, 1-Mathf.Clamp01(Mathf.InverseLerp(0, MaxTrailDistance, Distances1[i])));
-      var connectorColor = Color.Lerp(color0, color1, .5f);
-      Gizmos.color = color0;
-      Gizmos.DrawLine(Trail0[i-1], Trail0[i]);
-      Gizmos.color = color1;
-      Gizmos.DrawLine(Trail1[i-1], Trail1[i]);
-      Gizmos.color = connectorColor;
-      Gizmos.DrawLine(Trail0[i], Trail1[i]);
-    }
+    Mesh.Clear();
+    Mesh.SetVertices(Vertices);
+    Mesh.SetUVs(0, UVs);
+    Mesh.SetTriangles(Triangles, 0);
+    MaterialInstance.SetFloat("_MaxVelocity", MaxSpawnSpeed);
+    MaterialInstance.SetFloat("_MaxDistance", MaxTrailDistance);
+    MaterialInstance.SetFloat("_MaxAge", SegmentDuration.Seconds);
+    Graphics.DrawMesh(Mesh, Vector3.zero, Quaternion.identity, MaterialInstance, 0);
   }
 }
