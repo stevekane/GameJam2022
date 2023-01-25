@@ -23,7 +23,7 @@ public class DynamicTrailMeshRenderer : MonoBehaviour {
   float[] Distances0 = new float[0];
   float[] Distances1 = new float[0];
   Mesh Mesh;
-  Material MaterialInstance;
+  [SerializeField] Material MaterialInstance;
 
   void OnEnable() {
     Trail0 = new();

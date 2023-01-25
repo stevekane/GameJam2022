@@ -36,14 +36,21 @@ public class ControllableMeshStrip : MonoBehaviour {
 
     // Record distances
     float d0 = 0;
-    float d1 = 0;
+    // float d1 = 0;
     var Distances0 = new float[Trail0.Count];
     var Distances1 = new float[Trail1.Count];
     for (var i = Trail0.Count-2; i >= 0; i--) {
-      d0 += Vector3.Distance(Trail0[i], Trail0[i+1]);
+      var distance0 = Vector3.Distance(Trail0[i], Trail0[i+1]);
+      var distance1 = Vector3.Distance(Trail1[i], Trail1[i+1]);
+      var distanceAverage = (distance0+distance1)/2;
+      d0 += distanceAverage;
+      // d1 += distanceAverage;
       Distances0[i] = d0;
-      d1 += Vector3.Distance(Trail1[i], Trail1[i+1]);
-      Distances1[i] = d1;
+      Distances1[i] = d0;
+      // d0 += Vector3.Distance(Trail0[i], Trail0[i+1]);
+      // Distances0[i] = d0;
+      // d1 += Vector3.Distance(Trail1[i], Trail1[i+1]);
+      // Distances1[i] = d1;
     }
     Distances0[Distances0.Length-1] = 0;
     Distances1[Distances1.Length-1] = 0;
@@ -61,7 +68,7 @@ public class ControllableMeshStrip : MonoBehaviour {
       var spawnVelocity = 10;
       var falloff = 1;
       UVs.Add(new Vector4(Distances0[i], age, spawnVelocity, falloff));
-      UVs.Add(new Vector4(Distances1[i], age, spawnVelocity, falloff / 4));
+      UVs.Add(new Vector4(Distances1[i], age, spawnVelocity, 0));
     }
     var total = (Vertices.Count - 2) / 2;
     for (var i = 0; i < total; i++) {
