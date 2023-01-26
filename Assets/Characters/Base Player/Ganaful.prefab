@@ -57,6 +57,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7611903099117154963}
   - component: {fileID: 7313220171320023290}
+  - component: {fileID: 4798699499280213866}
+  - component: {fileID: 9079334239051631010}
   m_Layer: 10
   m_Name: Weapon Trail
   m_TagString: Untagged
@@ -93,15 +95,66 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a3c26666ca5a2a48b0cfe74cc4ef4f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MeshFilter: {fileID: 4798699499280213866}
+  MeshRenderer: {fileID: 9079334239051631010}
   T0: {fileID: 3818304402130984562}
   T1: {fileID: 5195846158009286066}
-  Material: {fileID: 2100000, guid: e1b0065f7cd200f41aee7de0f39e4bc2, type: 2}
-  MaxTrailDistance: 5
+  MaxTrailDistance: 3
   MaxSpawnSpeed: 5
   SegmentDuration:
-    Millis: 200
+    Millis: 100
     FramesPerSecond: 60
   Emitting: 0
+--- !u!33 &4798699499280213866
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1333380499845527883}
+  m_Mesh: {fileID: 0}
+--- !u!23 &9079334239051631010
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1333380499845527883}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: e1b0065f7cd200f41aee7de0f39e4bc2, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &3115504341481992904
 GameObject:
   m_ObjectHideFlags: 0
@@ -1328,7 +1381,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3364079649355753498, guid: 2ccced675f4c0ef499cef4968999ce55, type: 3}
       propertyPath: m_RootOrder
-      value: 28
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3364079649355753498, guid: 2ccced675f4c0ef499cef4968999ce55, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1379,6 +1432,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 3233604364288256296}
     - target: {fileID: 3364079649355753509, guid: 2ccced675f4c0ef499cef4968999ce55, type: 3}
+      propertyPath: WeaponTrail
+      value: 
+      objectReference: {fileID: 7313220171320023290}
+    - target: {fileID: 3364079649355753509, guid: 2ccced675f4c0ef499cef4968999ce55, type: 3}
       propertyPath: WeaponTrailRenderer
       value: 
       objectReference: {fileID: 7313220171320023290}
@@ -1390,6 +1447,10 @@ PrefabInstance:
       propertyPath: SkinnedMeshRenderer
       value: 
       objectReference: {fileID: 3233604364288256296}
+    - target: {fileID: 8447770974935871757, guid: 2ccced675f4c0ef499cef4968999ce55, type: 3}
+      propertyPath: SpinSpeed
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9036106942931413425, guid: 2ccced675f4c0ef499cef4968999ce55, type: 3}
       propertyPath: m_Avatar
       value: 
