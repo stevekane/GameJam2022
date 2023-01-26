@@ -22,6 +22,20 @@ public class Effects : MonoBehaviour {
   [SerializeField] Renderer Renderer;
   Status Status;
 
+  [SerializeField] DynamicTrailMeshRenderer WeaponTrailRenderer;
+
+  void OnAttackStart() {
+    if (WeaponTrailRenderer != null) {
+      WeaponTrailRenderer.Emitting = true;
+    }
+  }
+
+  void OnAttackEnd() {
+    if (WeaponTrailRenderer != null) {
+      WeaponTrailRenderer.Emitting = false;
+    }
+  }
+
   void OnDeath(Vector3 normal) {
     var position = transform.position+transform.TransformVector(VFXOffset);
     var rotation = Quaternion.LookRotation(normal.normalized);

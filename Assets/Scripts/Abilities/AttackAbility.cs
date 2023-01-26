@@ -30,24 +30,29 @@ public class AttackAbility : Ability {
     Animation = AnimationDriver.Play(scope, AttackAnimation);
     HitConfig hitConfig = HitConfig;
     using var effect = InPlace ? Status.Add(InPlaceEffect) : null;
-    if (Chargeable) {
-      await scope.Any(Charge, ListenFor(MainRelease));
-      //await scope.Any(Charge, ListenFor(MainRelease), Waiter.Repeat(() => DebugUI.Log(this, $"charge={NumTicksCharged}")));
-      var chargeScaling = ChargeScaling.Evaluate((float)NumTicksCharged / ChargeMaxDuration.Ticks);
-      await scope.Run(Animation.WaitPhase(0));
-      hitConfig = hitConfig.Scale(chargeScaling);
-    } else {
-      await scope.Run(Animation.WaitPhase(0));
+    try {
+      Status.gameObject.SendMessage("OnAttackStart", SendMessageOptions.DontRequireReceiver);
+      if (Chargeable) {
+        await scope.Any(Charge, ListenFor(MainRelease));
+        //await scope.Any(Charge, ListenFor(MainRelease), Waiter.Repeat(() => DebugUI.Log(this, $"charge={NumTicksCharged}")));
+        var chargeScaling = ChargeScaling.Evaluate((float)NumTicksCharged / ChargeMaxDuration.Ticks);
+        await scope.Run(Animation.WaitPhase(0));
+        hitConfig = hitConfig.Scale(chargeScaling);
+      } else {
+        await scope.Run(Animation.WaitPhase(0));
+      }
+      var rotation = AbilityManager.transform.rotation;
+      var vfxOrigin = AbilityManager.transform.TransformPoint(AttackVFXOffset);
+      SFXManager.Instance.TryPlayOneShot(AttackSFX);
+      VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
+      await scope.Any(Animation.WaitPhase(1), HitHandler.Loop(Hitbox, Parrybox, new HitParams(HitConfig, Attributes), OnHit));
+      await scope.Run(Animation.WaitPhase(2));
+      if (RecoveryCancelable)
+        Tags.AddFlags(AbilityTag.Cancellable);
+      await scope.Run(Animation.WaitDone);
+    } finally {
+      Status.gameObject.SendMessage("OnAttackEnd", SendMessageOptions.DontRequireReceiver);
     }
-    var rotation = AbilityManager.transform.rotation;
-    var vfxOrigin = AbilityManager.transform.TransformPoint(AttackVFXOffset);
-    SFXManager.Instance.TryPlayOneShot(AttackSFX);
-    VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
-    await scope.Any(Animation.WaitPhase(1), HitHandler.Loop(Hitbox, Parrybox, new HitParams(HitConfig, Attributes), OnHit));
-    await scope.Run(Animation.WaitPhase(2));
-    if (RecoveryCancelable)
-      Tags.AddFlags(AbilityTag.Cancellable);
-    await scope.Run(Animation.WaitDone);
   }
 
   void OnHit(Hurtbox target) {

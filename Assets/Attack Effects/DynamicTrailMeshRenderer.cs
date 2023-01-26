@@ -3,7 +3,6 @@ using UnityEngine;
 
 [ExecuteInEditMode]
 public class DynamicTrailMeshRenderer : MonoBehaviour {
-  [SerializeField] Mesh TestMesh;
   [SerializeField] Transform T0;
   [SerializeField] Transform T1;
   [SerializeField] Material Material;
@@ -23,7 +22,7 @@ public class DynamicTrailMeshRenderer : MonoBehaviour {
   float[] Distances0 = new float[0];
   float[] Distances1 = new float[0];
   Mesh Mesh;
-  [SerializeField] Material MaterialInstance;
+  Material MaterialInstance;
 
   void OnEnable() {
     Trail0 = new();
