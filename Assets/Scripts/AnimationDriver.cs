@@ -223,11 +223,11 @@ public struct MixerJobData {
   // Returns the AvatarMaskBodyPart for the region of the avatar tree given by `t`, which must be a descendent
   // of avatarRoot.
   AvatarMaskBodyPart GetAvatarMaskBodyPart(Transform avatarRoot, Avatar avatar, Transform t) {
+    if (avatar == null || t == avatarRoot)
+      return AvatarMaskBodyPart.Root;
     var hb = avatar.humanDescription.human.FirstOrDefault(hb => hb.boneName == t.name);
     if (hb.boneName == t.name && HumanNameToBodyPart.TryGetValue(hb.humanName, out var bodyPart))
       return bodyPart;
-    if (t == avatarRoot)
-      return AvatarMaskBodyPart.Root;
     return GetAvatarMaskBodyPart(avatarRoot, avatar, t.parent);
   }
 }
