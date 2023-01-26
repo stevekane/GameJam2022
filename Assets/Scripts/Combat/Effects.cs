@@ -22,17 +22,17 @@ public class Effects : MonoBehaviour {
   [SerializeField] Renderer Renderer;
   Status Status;
 
-  [SerializeField] DynamicTrailMeshRenderer WeaponTrailRenderer;
+  [SerializeField] WeaponTrail WeaponTrail;
 
   void OnAttackStart() {
-    if (WeaponTrailRenderer != null) {
-      WeaponTrailRenderer.Emitting = true;
+    if (WeaponTrail != null) {
+      WeaponTrail.Emitting = true;
     }
   }
 
   void OnAttackEnd() {
-    if (WeaponTrailRenderer != null) {
-      WeaponTrailRenderer.Emitting = false;
+    if (WeaponTrail != null) {
+      WeaponTrail.Emitting = false;
     }
   }
 

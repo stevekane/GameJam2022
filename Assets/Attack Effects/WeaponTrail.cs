@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
-public class DynamicTrailMeshRenderer : MonoBehaviour {
+[RequireComponent(typeof(MeshFilter))]
+[RequireComponent(typeof(MeshRenderer))]
+public class WeaponTrail : MonoBehaviour {
+  [SerializeField] MeshFilter MeshFilter;
+  [SerializeField] MeshRenderer MeshRenderer;
   [SerializeField] Transform T0;
   [SerializeField] Transform T1;
-  [SerializeField] Material Material;
   [SerializeField] float MaxTrailDistance = 5;
   [SerializeField] float MaxSpawnSpeed = 5;
   [SerializeField] Timeval SegmentDuration = Timeval.FromMillis(100);
@@ -22,7 +24,6 @@ public class DynamicTrailMeshRenderer : MonoBehaviour {
   float[] Distances0 = new float[0];
   float[] Distances1 = new float[0];
   Mesh Mesh;
-  Material MaterialInstance;
 
   void OnEnable() {
     Trail0 = new();
@@ -36,7 +37,7 @@ public class DynamicTrailMeshRenderer : MonoBehaviour {
     SpawnSpeeds0.Add(0);
     SpawnSpeeds1.Add(0);
     Mesh = new();
-    MaterialInstance = new Material(Material);
+    MeshFilter.mesh = Mesh;
   }
 
   void OnDisable() {
@@ -107,8 +108,8 @@ public class DynamicTrailMeshRenderer : MonoBehaviour {
     List<Vector4> UVs = new();
     List<int> Triangles = new();
     for (var i = 0; i < Trail0.Count; i++) {
-      Vertices.Add(Trail0[i]);
-      Vertices.Add(Trail1[i]);
+      Vertices.Add(transform.InverseTransformPoint(Trail0[i]));
+      Vertices.Add(transform.InverseTransformPoint(Trail1[i]));
     }
     for (var i = 0; i < DeathTimes.Count; i++) {
       var start = DeathTimes[i]-SegmentDuration.Seconds;
@@ -134,9 +135,8 @@ public class DynamicTrailMeshRenderer : MonoBehaviour {
     Mesh.SetVertices(Vertices);
     Mesh.SetUVs(0, UVs);
     Mesh.SetTriangles(Triangles, 0);
-    MaterialInstance.SetFloat("_MaxVelocity", MaxSpawnSpeed);
-    MaterialInstance.SetFloat("_MaxDistance", MaxTrailDistance);
-    MaterialInstance.SetFloat("_MaxAge", SegmentDuration.Seconds);
-    Graphics.DrawMesh(Mesh, Vector3.zero, Quaternion.identity, MaterialInstance, 0);
+    MeshRenderer.material.SetFloat("_MaxVelocity", MaxSpawnSpeed);
+    MeshRenderer.material.SetFloat("_MaxDistance", MaxTrailDistance);
+    MeshRenderer.material.SetFloat("_MaxAge", SegmentDuration.Seconds);
   }
 }

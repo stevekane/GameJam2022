@@ -31,7 +31,6 @@ public class AttackAbility : Ability {
     HitConfig hitConfig = HitConfig;
     using var effect = InPlace ? Status.Add(InPlaceEffect) : null;
     try {
-      Status.gameObject.SendMessage("OnAttackStart", SendMessageOptions.DontRequireReceiver);
       if (Chargeable) {
         await scope.Any(Charge, ListenFor(MainRelease));
         //await scope.Any(Charge, ListenFor(MainRelease), Waiter.Repeat(() => DebugUI.Log(this, $"charge={NumTicksCharged}")));
@@ -43,15 +42,17 @@ public class AttackAbility : Ability {
       }
       var rotation = AbilityManager.transform.rotation;
       var vfxOrigin = AbilityManager.transform.TransformPoint(AttackVFXOffset);
+      Status.gameObject.SendMessage("OnAttackStart", SendMessageOptions.DontRequireReceiver);
       SFXManager.Instance.TryPlayOneShot(AttackSFX);
       VFXManager.Instance.TrySpawn2DEffect(AttackVFX, vfxOrigin, rotation);
       await scope.Any(Animation.WaitPhase(1), HitHandler.Loop(Hitbox, Parrybox, new HitParams(HitConfig, Attributes), OnHit));
       await scope.Run(Animation.WaitPhase(2));
+      Status.gameObject?.SendMessage("OnAttackEnd", SendMessageOptions.DontRequireReceiver);
       if (RecoveryCancelable)
         Tags.AddFlags(AbilityTag.Cancellable);
       await scope.Run(Animation.WaitDone);
     } finally {
-      Status.gameObject.SendMessage("OnAttackEnd", SendMessageOptions.DontRequireReceiver);
+      Status.gameObject?.SendMessage("OnAttackEnd", SendMessageOptions.DontRequireReceiver);
     }
   }
 
