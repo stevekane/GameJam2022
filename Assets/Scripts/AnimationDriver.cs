@@ -161,6 +161,7 @@ public class AnimationJob {
   }
 }
 
+[Serializable]
 public struct MixerJobData {
   public NativeArray<ReadWriteTransformHandle> BoneHandles;
   public NativeArray<int> BoneParents;
@@ -177,8 +178,6 @@ public struct MixerJobData {
       BoneHandles[i] = ReadWriteTransformHandle.Bind(animator, transforms[i]);
       BoneParents[i] = Array.FindIndex(transforms, t => t == transforms[i].parent);
     }
-    ReverseBaseLayerRotation = true;
-    MeshSpaceRotations = true;
     BoneActivesPerLayer = new(0, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
 
     var self = this;
@@ -283,7 +282,7 @@ public class AnimationDriver : MonoBehaviour {
   PlayableGraph Graph;
   AnimatorControllerPlayable AnimatorController;
   public AnimationScriptPlayable Mixer;
-  MixerJobData MixerJobData = new();
+  [SerializeField] MixerJobData MixerJobData = new();
   AnimationPlayableOutput Output;
 
   List<AnimationJob> Jobs = new();
