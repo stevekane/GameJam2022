@@ -116,11 +116,11 @@ public class WeaponTrail : MonoBehaviour {
       var end = DeathTimes[i];
       var normalizedAge = Mathf.InverseLerp(start, end, Time.time);
       var age = normalizedAge*SegmentDuration.Seconds;
-      var spawnVelocity0 = SpawnSpeeds0[i];
-      var spawnVelocity1 = SpawnSpeeds1[i];
       var falloff = 1;
-      UVs.Add(new Vector4(Distances0[i], age, spawnVelocity0, falloff));
-      UVs.Add(new Vector4(Distances1[i], age, spawnVelocity1, falloff));
+      var averageDistance = (Distances0[i]+Distances1[i])/2;
+      var averageSpawnSpeed = (SpawnSpeeds0[i]+SpawnSpeeds1[i])/2;
+      UVs.Add(new Vector4(averageDistance, age, averageSpawnSpeed, falloff));
+      UVs.Add(new Vector4(averageDistance, age, averageSpawnSpeed, falloff));
     }
     var total = (Vertices.Count - 2) / 2;
     for (var i = 0; i < total; i++) {
