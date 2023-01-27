@@ -15,10 +15,11 @@ Use data from attack animation stream to blend between running cycles.
 Blend result of blended running cycles with attack.
 */
 [Serializable]
-public struct BlendTreeNode {
+public struct BlendTreeNode : IComparable<BlendTreeNode> {
   public AnimationClip Clip;
   public float Value;
   public float YRotation;
+  public int CompareTo(BlendTreeNode b) => Value.CompareTo(b.Value);
 }
 
 public class BlendTreeBehaviour : PlayableBehaviour {
@@ -57,10 +58,12 @@ public class BlendTreeBehaviour : PlayableBehaviour {
   }
 
   public void SetNodes(BlendTreeNode[] nodes) {
-    Nodes = nodes;
-    ClipPlayables = new AnimationClipPlayable[nodes.Length];
-    Mixer.SetInputCount(nodes.Length);
-    for (var i = 0; i < nodes.Length; i++) {
+    Nodes = new BlendTreeNode[nodes.Length];
+    nodes.CopyTo(Nodes, 0);
+    Array.Sort(Nodes);
+    ClipPlayables = new AnimationClipPlayable[Nodes.Length];
+    Mixer.SetInputCount(Nodes.Length);
+    for (var i = 0; i < Nodes.Length; i++) {
       var node = Nodes[i];
       var playable = AnimationClipPlayable.Create(Playable.GetGraph(), node.Clip);
       playable.SetSpeed(node.Clip.length / CycleSpeed);
