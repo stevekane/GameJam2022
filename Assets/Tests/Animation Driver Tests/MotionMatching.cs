@@ -58,9 +58,7 @@ public class BlendTreeBehaviour : PlayableBehaviour {
   }
 
   public void SetNodes(BlendTreeNode[] nodes) {
-    Nodes = new BlendTreeNode[nodes.Length];
-    nodes.CopyTo(Nodes, 0);
-    Array.Sort(Nodes);
+    Nodes = nodes.SortedCopy();
     ClipPlayables = new AnimationClipPlayable[Nodes.Length];
     Mixer.SetInputCount(Nodes.Length);
     for (var i = 0; i < Nodes.Length; i++) {

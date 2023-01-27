@@ -155,6 +155,13 @@ public static class AnimationClipExtensions {
 }
 
 public static class ArrayLikeExtensions {
+  public static T[] SortedCopy<T>(this T[] xs) {
+    var ys = new T[xs.Length];
+    xs.CopyTo(ys, 0);
+    Array.Sort(ys);
+    return ys;
+  }
+
   public static void ForEach<T>(this IEnumerable<T> xs, Action<T> p) {
     foreach (var x in xs) {
       p(x);
