@@ -90,6 +90,8 @@ public class BlendTreeBehaviour : PlayableBehaviour {
 public class MotionMatching : MonoBehaviour {
   public Animator Animator;
   public AvatarMask LowerBodyMask;
+  public AvatarMask UpperBodyMask;
+  public AnimationClip UpperBodyClip;
   public BlendTreeNode[] LowerBodyNodes;
   public AnimationCurve BlendCurve;
   [Range(.1f, 10)]
@@ -102,8 +104,11 @@ public class MotionMatching : MonoBehaviour {
   public float TorsoTwist;
   public PlayableGraph Graph;
   public AnimationPlayableOutput Output;
+  public AnimationClipPlayable UpperBodyPlayable;
   public AnimationLayerMixerPlayable FinalMixer;
   public ScriptPlayable<BlendTreeBehaviour> BlendTreePlayable;
+  public MixerJobData MixerJobData = new();
+  public AnimationScriptPlayable JobMixer;
   public BlendTreeBehaviour BlendTree;
 
   void Start() {
@@ -115,10 +120,29 @@ public class MotionMatching : MonoBehaviour {
     BlendTree.Value = TorsoTwist;
     BlendTree.Transform = transform;
     BlendTree.SetNodes(LowerBodyNodes);
-    FinalMixer = AnimationLayerMixerPlayable.Create(Graph, 1);
+    UpperBodyPlayable = AnimationClipPlayable.Create(Graph, UpperBodyClip);
+    // BEGIN MESH SPACE MIXER
+    // MixerJobData.Init(Animator);
+    // MixerJobData.SetLayerMaskFromAvatarMask(0, LowerBodyMask);
+    // MixerJobData.SetLayerMaskFromAvatarMask(0, UpperBodyMask);
+    // JobMixer = AnimationScriptPlayable.Create(Graph, new MixerJob() { Data = MixerJobData });
+    // JobMixer.SetProcessInputs(false);
+    // JobMixer.AddInput(BlendTreePlayable, 0, 1f);
+    // JobMixer.AddInput(UpperBodyPlayable, 1, 1f);
+    // MixerJobData.SetLayerMaskFromAvatarMask(0, LowerBodyMask);
+    // MixerJobData.SetLayerMaskFromAvatarMask(1, LowerBodyMask);
+    // END MESH SPACE MIXER
+
+    // BEGIN LAYER MIXER
+    FinalMixer = AnimationLayerMixerPlayable.Create(Graph, 2);
     FinalMixer.TryAddLayerMaskFromAvatarMask(0, LowerBodyMask);
+    FinalMixer.TryAddLayerMaskFromAvatarMask(1, UpperBodyMask);
+    FinalMixer.SetInputWeight(0, 1);
+    FinalMixer.SetInputWeight(1, 1);
+    // END LAYER MIXER
     Output = AnimationPlayableOutput.Create(Graph, "Motion Matching", Animator);
     Graph.Connect(BlendTreePlayable, 0, FinalMixer, 0);
+    Graph.Connect(UpperBodyPlayable, 0, FinalMixer, 1);
     Output.SetSourcePlayable(FinalMixer);
     Graph.Play();
   }

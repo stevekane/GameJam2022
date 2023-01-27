@@ -423,7 +423,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6502182839619065283, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
       propertyPath: m_LocalRotation.x
@@ -700,6 +700,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Animator: {fileID: 1341994672}
   LowerBodyMask: {fileID: 31900000, guid: 1f5ade7e72a587a44b5ba70317d32ed5, type: 2}
+  UpperBodyMask: {fileID: 31900000, guid: 6e6820349387bdf4ba462cf80d9fd59d, type: 2}
+  UpperBodyClip: {fileID: 7400000, guid: 7589b5aa8fc5fae4f8f9ef740ad6725f, type: 2}
   LowerBodyNodes:
   - Clip: {fileID: 7400000, guid: d0f60014c672e4a4bb865a869e0adb51, type: 2}
     Value: -90
@@ -739,6 +741,9 @@ MonoBehaviour:
   MinTwist: -90
   MaxTwist: 90
   TorsoTwist: 0
+  MixerJobData:
+    ReverseBaseLayerRotation: 1
+    MeshSpaceRotations: 1
 --- !u!1 &1373729938
 GameObject:
   m_ObjectHideFlags: 0
@@ -862,11 +867,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6502182839619065283, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.0010098193
+      value: -0.0010098196
       objectReference: {fileID: 0}
     - target: {fileID: 6502182839619065283, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.08165814
+      value: -0.081658155
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5866666021909216657, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
