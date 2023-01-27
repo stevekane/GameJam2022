@@ -2,6 +2,22 @@ using System;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Animations;
+
+public static class AnimationExtensions {
+  public static bool TryAddLayerMaskFromAvatarMask(
+    this AnimationLayerMixerPlayable layerMixer,
+    int layerIndex,
+    AvatarMask mask) {
+      if (mask) {
+        layerMixer.SetLayerMaskFromAvatarMask((uint)layerIndex, mask);
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+}
 
 public static class VectorExtensions {
   // Projects a Vector3 to the XZ plane. Used when we only care about horizontal movement.
