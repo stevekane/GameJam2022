@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -9,10 +11,6 @@ public class GameManager : MonoBehaviour {
 
   public static GameManager Instance;
 
-  // Subsystems now depend on this class, so we need it. But not every scene wants a game loop.
-  // Would probably be better to disentangle the game loop from the game singleton.
-  public bool ManageGameLoop = true;
-
   [Header("Subsystems")]
   public Defaults Defaults;
   public SFXManager SFXManager;
@@ -21,7 +19,6 @@ public class GameManager : MonoBehaviour {
   public MobManager MobManager;
   public GrapplePointManager GrapplePointManager;
   public CameraManager CameraManager;
-  public DebugUI DebugUI;
 
   [Header("Player")]
   public GameObject PlayerPrefab;
@@ -72,48 +69,77 @@ public class GameManager : MonoBehaviour {
   };
 
   async Task Run(TaskScope scope) {
-    while (!ManageGameLoop) {
-      if (!ManageGameLoop && Input.GetKeyDown(KeyCode.Backspace)) {
-        await Await(scope, SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name));
-      } else {
-        await scope.Tick();
-      }
+    while (true) {
+      await scope.Any(WaitForInput, GameLoop);
+      await scope.Tick();
     }
-    while (ManageGameLoop) {
-      // Spawn and configure the player
-      Player = FindObjectOfType<Player>();
-      Player = Player ?? Instantiate(PlayerPrefab, PlayerSpawn.position, PlayerSpawn.rotation).GetComponent<Player>();
-      SaveData.LoadFromFile();
+  }
 
-      // Setup camera to target the player
-      //PlayerVirtualCamera.Instance.Follow = Player.transform;
-
-      // TODO: Eliminate this hack to allow loaded upgrades to apply before opening the shop
-      await scope.Ticks(2);
-      // Wait for the player to purchase upgrades
-      var shop = FindObjectOfType<Shop>();
-      if (shop != null) {
-        shop.Open();
-        await scope.Until(() => !shop.IsOpen);
+  static KeyCode[] StartEncounterKeys = new[] { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3 };
+  async Task WaitForInput(TaskScope scope) {
+    while (true) {
+      if (Input.GetKeyDown(KeyCode.Backspace)) {
+        await ReloadScene(scope);
+        return;
+      } else if (Array.FindIndex(StartEncounterKeys, k => Input.GetKeyDown(k)) is var idx && idx >= 0) {
+        await ReloadScene(scope);
+        StartEncounter(idx);
+        return;
       }
-
-      // Begin GameLoop
-      var encounter = FindObjectOfType<Encounter>();
-      var encounterDefeated = EncounterDefeated(encounter);
-      var playerDeath = PlayerDeath(Player);
-      var outcome = await scope.Any(encounterDefeated, playerDeath);
-      Debug.Log(outcome switch {
-        0 => "You win",
-        _ => "You lose"
-      });
-      SaveData.SaveToFile();
-      Destroy(Player.gameObject);
-      await scope.Millis(3000);
-      // End GameLoop
-
-      // Cleanup references and reload the scene
-      await Await(scope, SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name));
+      await scope.Tick();
     }
+  }
+
+  async Task GameLoop(TaskScope scope) {
+    // Spawn and configure the player
+    Player = FindObjectOfType<Player>();
+    Player = Player ?? Instantiate(PlayerPrefab, PlayerSpawn.position, PlayerSpawn.rotation).GetComponent<Player>();
+    SaveData.LoadFromFile();
+    DebugUI.Log(this, $"looping");
+    // Setup camera to target the player
+    //PlayerVirtualCamera.Instance.Follow = Player.transform;
+
+    // TODO: Eliminate this hack to allow loaded upgrades to apply before opening the shop
+    await scope.Ticks(2);
+    // Wait for the player to purchase upgrades
+    if (FindObjectOfType<Shop>() is var shop && shop != null) {
+      shop.Open();
+      await scope.Until(() => !shop.IsOpen);
+    }
+
+    // Begin encounter
+    var encounter = await FindEncounter(scope);
+    var encounterDefeated = EncounterDefeated(encounter);
+    var playerDeath = PlayerDeath(Player);
+    var outcome = await scope.Any(encounterDefeated, playerDeath);
+    Debug.Log(outcome switch {
+      0 => "You win",
+      _ => "You lose"
+    });
+
+    SaveData.SaveToFile();
+
+    Destroy(Player.gameObject);
+    await scope.Millis(3000);
+
+    await ReloadScene(scope);
+  }
+
+  void StartEncounter(int index) {
+    var encounters = FindObjectsOfType<Encounter>(true);
+    encounters.ForEach((e, i) => e.gameObject.SetActive(i == index));
+  }
+
+  async Task<Encounter> FindEncounter(TaskScope scope) {
+    while (true) {
+      if (FindObjectOfType<Encounter>() is var encounter && encounter != null)
+        return encounter;
+      await scope.Millis(1000);
+    }
+  }
+
+  async Task ReloadScene(TaskScope scope) {
+    await Await(scope, SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name));
   }
 
   void SetPlayerInputsEnabled(GameObject player, bool isEnabled) {
