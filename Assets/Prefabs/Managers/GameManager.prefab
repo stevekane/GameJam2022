@@ -195,6 +195,50 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TextUI: {fileID: 2099931826}
+--- !u!1 &159388423275076844
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1871381427077240117}
+  - component: {fileID: 2818219920998554807}
+  m_Layer: 0
+  m_Name: PlayerManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1871381427077240117
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 159388423275076844}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2320604253984722449}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2818219920998554807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 159388423275076844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b547229fbf66644cb6fb6d999c0d2a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2438599627160442252
 GameObject:
   m_ObjectHideFlags: 0
@@ -230,6 +274,7 @@ Transform:
   - {fileID: 8970819236641759570}
   - {fileID: 5830417630241389433}
   - {fileID: 5030305013953000145}
+  - {fileID: 1871381427077240117}
   - {fileID: 2146899588387849055}
   - {fileID: 8943343125011706077}
   - {fileID: 644938812}
@@ -249,7 +294,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 155763a58652c754c882cd5270011336, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ManageGameLoop: 0
   Defaults: {fileID: 2108860027064489209}
   SFXManager: {fileID: 890327845329776198}
   VFXManager: {fileID: 8970819236641759571}

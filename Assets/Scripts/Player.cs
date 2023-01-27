@@ -7,4 +7,12 @@ public class Player : MonoBehaviour {
   void OnDeath(Vector3 normal) {
     Dead = true;
   }
+
+  void Awake() {
+    PlayerManager.Instance.RegisterPlayer(this);
+  }
+
+  void OnDestroy() {
+    PlayerManager.Instance.UnregisterPlayer(this);
+  }
 }

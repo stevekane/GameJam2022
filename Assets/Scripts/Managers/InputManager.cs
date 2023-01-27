@@ -49,7 +49,6 @@ public class AxisState {
 }
 
 public class InputManager : MonoBehaviour {
-  public int PlayerIndex = 0;
   public int InputBufferTickLength = 10;
   public float StickDeadZone;
   bool InputEnabled = true;
@@ -58,8 +57,6 @@ public class InputManager : MonoBehaviour {
   AxisState AxisLeft = new();
   AxisState AxisRight = new();
   PlayerInputActions Controls;
-  Dictionary<ButtonCode, int> Releases = new();
-  Dictionary<ButtonCode, int> Holds = new();
 
   public IEventSource ButtonEvent(ButtonCode code, ButtonPressType type) {
     if (!Buttons.TryGetValue((code, type), out EventSource evt))
@@ -87,21 +84,11 @@ public class InputManager : MonoBehaviour {
     Buffer.Remove((code, type));
   }
 
-  void Awake() {
-    Controls = new();
-    // Restrict devices so different controllers are owned by different players.
-    if (PlayerIndex == 0) {
-      Controls.devices = new InputDevice[] {
-        Keyboard.current,
-        Mouse.current,
-        Gamepad.all.First(g => g.name.Contains("DualShock"))
-      };
-    } else if (PlayerIndex == 1) {
-      Controls.devices = new InputDevice[] {
-        Gamepad.all.Last(g => g.name.Contains("DualShock"))
-      };
-    }
+  public void AssignDevices(InputDevice[] devices) {
+    Controls.devices = devices;
   }
+
+  void Awake() => Controls = new();
   void OnEnable() => Controls.Enable();
   void OnDisable() => Controls.Disable();
 

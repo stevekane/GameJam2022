@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -43,6 +42,7 @@ public class GameManager : MonoBehaviour {
       CameraManager.Instance = CameraManager;
       this.InitComponentFromChildren(out DebugUI.Instance, true);
       this.InitComponentFromChildren(out NavMeshUtil.Instance);
+      this.InitComponentFromChildren(out PlayerManager.Instance);
       DontDestroyOnLoad(Instance.gameObject);
     }
   }
@@ -93,7 +93,7 @@ public class GameManager : MonoBehaviour {
   async Task GameLoop(TaskScope scope) {
     // Spawn and configure the player
     Player = FindObjectOfType<Player>();
-    Player = Player ?? Instantiate(PlayerPrefab, PlayerSpawn.position, PlayerSpawn.rotation).GetComponent<Player>();
+    Player = Player ?? SpawnPlayer();
     SaveData.LoadFromFile();
     DebugUI.Log(this, $"looping");
     // Setup camera to target the player
@@ -140,6 +140,10 @@ public class GameManager : MonoBehaviour {
 
   async Task ReloadScene(TaskScope scope) {
     await Await(scope, SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name));
+  }
+
+  public Player SpawnPlayer() {
+    return Instantiate(PlayerPrefab, PlayerSpawn.position, PlayerSpawn.rotation).GetComponent<Player>();
   }
 
   void SetPlayerInputsEnabled(GameObject player, bool isEnabled) {
