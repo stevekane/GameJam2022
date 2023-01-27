@@ -2,6 +2,8 @@ using System;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Animations;
+using UnityEngine.Animations.Rigging;
+using Unity.Mathematics;
 
 /*
 Construct playable graph.
@@ -47,14 +49,11 @@ public class BlendTreeBehaviour : PlayableBehaviour {
   }
 
   public override void PrepareFrame(Playable playable, FrameData info) {
-    var rotation = 0f;
     for (var i = 0; i < Nodes.Length; i++) {
       var weight = Weight(i, Value, Nodes);
-      rotation += weight * Nodes[i].YRotation;
       Mixer.SetInputWeight(i, weight);
       ClipPlayables[i].SetSpeed(Nodes[i].Clip.length / CycleSpeed);
     }
-    Transform.rotation = Quaternion.Euler(0, rotation, 0);
   }
 
   public void SetNodes(BlendTreeNode[] nodes) {
@@ -87,8 +86,22 @@ public class BlendTreeBehaviour : PlayableBehaviour {
   }
 }
 
+public struct SampleJob : IAnimationJob {
+  public quaternion Rotation;
+  public ReadOnlyTransformHandle Handle;
+  public SampleJob(quaternion rotation, ReadOnlyTransformHandle handle) {
+    Rotation = rotation;
+    Handle = handle;
+  }
+  public void ProcessRootMotion(AnimationStream stream) {}
+  public void ProcessAnimation(AnimationStream stream) {
+    Rotation = Handle.GetRotation(stream.GetInputStream(0));
+  }
+}
+
 public class MotionMatching : MonoBehaviour {
   public Animator Animator;
+  public Transform HipTransform;
   public AvatarMask LowerBodyMask;
   public AvatarMask UpperBodyMask;
   public AnimationClip UpperBodyClip;
@@ -109,6 +122,7 @@ public class MotionMatching : MonoBehaviour {
   public ScriptPlayable<BlendTreeBehaviour> BlendTreePlayable;
   public MixerJobData MixerJobData = new();
   public AnimationScriptPlayable JobMixer;
+  public AnimationScriptPlayable Sampler;
   public BlendTreeBehaviour BlendTree;
 
   void Start() {
@@ -121,29 +135,39 @@ public class MotionMatching : MonoBehaviour {
     BlendTree.Transform = transform;
     BlendTree.SetNodes(LowerBodyNodes);
     UpperBodyPlayable = AnimationClipPlayable.Create(Graph, UpperBodyClip);
+    Output = AnimationPlayableOutput.Create(Graph, "Motion Matching", Animator);
+
+    // BEGIN UPPER BODY SAMPLER
+    Sampler = AnimationScriptPlayable.Create(Graph, new SampleJob {
+      Rotation = quaternion.identity,
+      Handle = ReadOnlyTransformHandle.Bind(Animator, HipTransform)
+    });
+    Sampler.SetProcessInputs(true);
+    Sampler.AddInput(UpperBodyPlayable, 0, 1);
+
     // BEGIN MESH SPACE MIXER
-    // MixerJobData.Init(Animator);
-    // MixerJobData.SetLayerMaskFromAvatarMask(0, LowerBodyMask);
-    // MixerJobData.SetLayerMaskFromAvatarMask(0, UpperBodyMask);
-    // JobMixer = AnimationScriptPlayable.Create(Graph, new MixerJob() { Data = MixerJobData });
-    // JobMixer.SetProcessInputs(false);
-    // JobMixer.AddInput(BlendTreePlayable, 0, 1f);
-    // JobMixer.AddInput(UpperBodyPlayable, 1, 1f);
-    // MixerJobData.SetLayerMaskFromAvatarMask(0, LowerBodyMask);
-    // MixerJobData.SetLayerMaskFromAvatarMask(1, LowerBodyMask);
+    MixerJobData.Init(Animator);
+    MixerJobData.SetLayerMaskFromAvatarMask(0, LowerBodyMask);
+    MixerJobData.SetLayerMaskFromAvatarMask(1, UpperBodyMask);
+    JobMixer = AnimationScriptPlayable.Create(Graph, new MixerJob() { Data = MixerJobData });
+    JobMixer.SetProcessInputs(false);
+    JobMixer.SetInputCount(2);
+    Graph.Connect(BlendTreePlayable, 0, JobMixer, 0);
+    Graph.Connect(Sampler, 0, JobMixer, 1);
+    Output.SetSourcePlayable(JobMixer);
     // END MESH SPACE MIXER
 
     // BEGIN LAYER MIXER
-    FinalMixer = AnimationLayerMixerPlayable.Create(Graph, 2);
-    FinalMixer.TryAddLayerMaskFromAvatarMask(0, LowerBodyMask);
-    FinalMixer.TryAddLayerMaskFromAvatarMask(1, UpperBodyMask);
-    FinalMixer.SetInputWeight(0, 1);
-    FinalMixer.SetInputWeight(1, 1);
+    // FinalMixer = AnimationLayerMixerPlayable.Create(Graph, 2);
+    // FinalMixer.TryAddLayerMaskFromAvatarMask(0, LowerBodyMask);
+    // FinalMixer.TryAddLayerMaskFromAvatarMask(1, UpperBodyMask);
+    // FinalMixer.SetInputWeight(0, 1);
+    // FinalMixer.SetInputWeight(1, 1);
+    // Graph.Connect(BlendTreePlayable, 0, FinalMixer, 0);
+    // Graph.Connect(UpperBodyPlayable, 0, FinalMixer, 1);
+    // Output.SetSourcePlayable(FinalMixer);
     // END LAYER MIXER
-    Output = AnimationPlayableOutput.Create(Graph, "Motion Matching", Animator);
-    Graph.Connect(BlendTreePlayable, 0, FinalMixer, 0);
-    Graph.Connect(UpperBodyPlayable, 0, FinalMixer, 1);
-    Output.SetSourcePlayable(FinalMixer);
+
     Graph.Play();
   }
 
@@ -154,6 +178,9 @@ public class MotionMatching : MonoBehaviour {
   void Update() {
     var delta = (MaxTwist-MinTwist) / 2 * Mathf.Sin(2 * Mathf.PI * Time.time / TwistPeriod);
     var midpoint = (MaxTwist + MinTwist) / 2;
+    var hipRotation = Sampler.GetJobData<SampleJob>().Rotation;
+    var alongHips = math.forward(hipRotation);
+    Debug.DrawRay(HipTransform.position, alongHips * 5, Color.blue);
     TorsoTwist = delta + midpoint;
     BlendTree.Value = TorsoTwist;
     BlendTree.CycleSpeed = CycleSpeed;

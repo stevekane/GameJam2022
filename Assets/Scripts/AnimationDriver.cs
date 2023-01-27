@@ -1,16 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.Playables;
-using static UnityEditor.Experimental.GraphView.GraphView;
-using static UnityEngine.Rendering.VirtualTexturing.Debugging;
 
 [Serializable]
 public class AnimationJobConfig {
@@ -182,8 +178,6 @@ public struct MixerJobData {
 
     var self = this;
     BoneBodyParts = transforms.Select(t => self.GetAvatarMaskBodyPart(animator.avatarRoot, animator.avatar, t)).ToArray();
-
-    SetLayerMaskFromAvatarMask(0, null);
   }
 
   public void Dispose() {
@@ -297,6 +291,7 @@ public class AnimationDriver : MonoBehaviour {
     Output = AnimationPlayableOutput.Create(Graph, "Animation Driver", Animator);
     AnimatorController = AnimatorControllerPlayable.Create(Graph, Animator.runtimeAnimatorController);
     MixerJobData.Init(Animator);
+    MixerJobData.SetLayerMaskFromAvatarMask(0, null);
     Mixer = AnimationScriptPlayable.Create(Graph, new MixerJob() { Data = MixerJobData });
     Mixer.SetProcessInputs(false);
     Mixer.AddInput(AnimatorController, 0, 1f);

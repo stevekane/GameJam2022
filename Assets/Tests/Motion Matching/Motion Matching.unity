@@ -123,6 +123,30 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &393186122 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
+  m_PrefabInstance: {fileID: 978652322}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &393186125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 393186122}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 135a45e1b7bce30449d1eeccdf70aa63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  YRotation: -90
+  HipBone: {fileID: 559085494}
+--- !u!4 &559085494 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5465940246521907071, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
+  m_PrefabInstance: {fileID: 978652322}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &801518294
 GameObject:
   m_ObjectHideFlags: 0
@@ -411,11 +435,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -6857788192064577062, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.0014586973
+      value: -0.0014586975
       objectReference: {fileID: 0}
     - target: {fileID: -6857788192064577062, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.0608089
+      value: -0.06080891
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
       propertyPath: m_Name
@@ -423,15 +447,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6502182839619065283, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.001009819
+      value: -0.0010098194
       objectReference: {fileID: 0}
     - target: {fileID: 6502182839619065283, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.08165812
+      value: -0.08165815
       objectReference: {fileID: 0}
     - target: {fileID: 7833114641849259454, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
       propertyPath: m_Enabled
@@ -440,7 +464,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 393186125}
   m_SourcePrefab: {fileID: 100100000, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
 --- !u!1 &989762937
 GameObject:
@@ -699,6 +726,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Animator: {fileID: 1341994672}
+  HipTransform: {fileID: 2010852521}
   LowerBodyMask: {fileID: 31900000, guid: 1f5ade7e72a587a44b5ba70317d32ed5, type: 2}
   UpperBodyMask: {fileID: 31900000, guid: 6e6820349387bdf4ba462cf80d9fd59d, type: 2}
   UpperBodyClip: {fileID: 7400000, guid: 7589b5aa8fc5fae4f8f9ef740ad6725f, type: 2}
@@ -867,11 +895,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6502182839619065283, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.0010098196
+      value: -0.0010098197
       objectReference: {fileID: 0}
     - target: {fileID: 6502182839619065283, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.081658155
+      value: -0.08165816
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5866666021909216657, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
@@ -1048,3 +1076,8 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
+--- !u!4 &2010852521 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5465940246521907071, guid: 8ab458ea7d2dcc643b2ab41ada7f6d21, type: 3}
+  m_PrefabInstance: {fileID: 1434429585}
+  m_PrefabAsset: {fileID: 0}
