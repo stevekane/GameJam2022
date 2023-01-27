@@ -142,14 +142,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   VFXOffset: {x: 0, y: 2, z: 0}
-  OnDeathVFX: {fileID: 0}
-  OnDeathSFX: {fileID: 0}
   OnHurtVFX: {fileID: 1995403933065894, guid: bf3228cec72bf65469800c0e55477fbd, type: 3}
   OnHurtSFX: {fileID: 8300000, guid: cd13436b01a4b5b4082c89e180d10dc3, type: 3}
   OnHitVFX: {fileID: 0}
   OnHitSFX: {fileID: 0}
   OnParryVFX: {fileID: 0}
   OnParrySFX: {fileID: 0}
+  OnDeathVFX: {fileID: 0}
+  OnDeathSFX: {fileID: 0}
+  Renderer: {fileID: 0}
+  WeaponTrailRenderer: {fileID: 0}
 --- !u!95 &2828648347040857723
 Animator:
   serializedVersion: 5
@@ -289,7 +291,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1000010501181352, guid: 337b9a8595c80834c9975492b52613be, type: 3}
       propertyPath: m_Name
-      value: skull shield
+      value: skull shield parent
       objectReference: {fileID: 0}
     - target: {fileID: 4000010364152744, guid: 337b9a8595c80834c9975492b52613be, type: 3}
       propertyPath: m_LocalPosition.x
