@@ -2,6 +2,22 @@ using System;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Animations;
+
+public static class AnimationExtensions {
+  public static bool TryAddLayerMaskFromAvatarMask(
+    this AnimationLayerMixerPlayable layerMixer,
+    int layerIndex,
+    AvatarMask mask) {
+      if (mask) {
+        layerMixer.SetLayerMaskFromAvatarMask((uint)layerIndex, mask);
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+}
 
 public static class VectorExtensions {
   // Projects a Vector3 to the XZ plane. Used when we only care about horizontal movement.
@@ -139,6 +155,13 @@ public static class AnimationClipExtensions {
 }
 
 public static class ArrayLikeExtensions {
+  public static T[] SortedCopy<T>(this T[] xs) {
+    var ys = new T[xs.Length];
+    xs.CopyTo(ys, 0);
+    Array.Sort(ys);
+    return ys;
+  }
+
   public static void ForEach<T>(this IEnumerable<T> xs, Action<T> p) {
     foreach (var x in xs) {
       p(x);
