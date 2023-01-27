@@ -20,4 +20,21 @@ public class SpawnWaveRandom : SpawnWave {
     var tasks = Mobs.Select((mob, i) => SpawnData.Spawn(scope, spawners[i], mob, wave));
     await scope.AllTask(tasks.ToArray());
   }
+
+#if UNITY_EDITOR
+  [ContextMenu("Snap Locations to Ground")]
+  public void SnapToGround() {
+    foreach (var spawner in PossibleLocations) {
+      if (Physics.Raycast(new Ray(spawner.position, Vector3.down), out var hit, float.MaxValue, Layers.EnvironmentMask))
+        spawner.position = hit.point;
+    }
+  }
+#endif
+
+  void OnDrawGizmosSelected() {
+    Gizmos.color = Color.red;
+    foreach (var spawner in PossibleLocations) {
+      Gizmos.DrawCube(spawner.position, Vector3.one);
+    }
+  }
 }

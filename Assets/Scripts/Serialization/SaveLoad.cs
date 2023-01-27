@@ -43,15 +43,22 @@ public class SaveData {
 
   // TODO: use async IO
   public static void SaveToFile() {
-    var json = SaveToJson();
-    File.WriteAllTextAsync(FilePath, json);
-    Debug.Log($"Saved to ${FilePath}");
+    try {
+      var json = SaveToJson();
+      File.WriteAllTextAsync(FilePath, json);
+    } catch (Exception e) {
+      Debug.Log($"Save failed: {e}");
+    }
   }
   public static void LoadFromFile() {
-    if (!File.Exists(FilePath))
-      return;
-    var json = File.ReadAllText(FilePath);
-    LoadFromJson(json);
+    try {
+      if (!File.Exists(FilePath))
+        return;
+      var json = File.ReadAllText(FilePath);
+      LoadFromJson(json);
+    } catch (Exception e) {
+      Debug.Log($"Load failed: {e}");
+    }
   }
 
   static string SaveToJson() {

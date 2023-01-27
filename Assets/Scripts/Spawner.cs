@@ -8,7 +8,7 @@ public class Spawner : SpawnData {
 
 #if UNITY_EDITOR
   [ContextMenu("Snap to Ground")]
-  public void TestFlash() {
+  public void SnapToGround() {
     if (Physics.Raycast(new Ray(transform.position, Vector3.down), out var hit, float.MaxValue, Layers.EnvironmentMask))
       transform.position = hit.point;
   }
