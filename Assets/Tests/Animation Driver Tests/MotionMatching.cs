@@ -4,6 +4,7 @@ using UnityEngine.Playables;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
 using Unity.Mathematics;
+using UnityEngine.Profiling;
 
 /*
 Construct playable graph.
@@ -91,15 +92,18 @@ public class BlendTreeBehaviour : PlayableBehaviour {
 }
 
 public struct SampleJob : IAnimationJob {
-  public quaternion Rotation;
+  public float Angle;
   public ReadOnlyTransformHandle Handle;
   public SampleJob(ReadOnlyTransformHandle handle) {
-    Rotation = quaternion.identity;
+    Angle = 0f;
     Handle = handle;
   }
   public void ProcessRootMotion(AnimationStream stream) {}
   public void ProcessAnimation(AnimationStream stream) {
-    Rotation = Handle.GetRotation(stream.GetInputStream(0));
+    var rotation = Handle.GetRotation(stream.GetInputStream(0));
+    var alongHips = math.forward(rotation);
+    var alongHipsXZ = new float3(alongHips.x, 0, alongHips.z);
+    Angle = Vector3.SignedAngle(alongHipsXZ, new float3(0, 0, 1), new float3(0, 1, 0));
   }
 }
 
@@ -128,6 +132,7 @@ public class MotionMatching : MonoBehaviour {
   public AnimationScriptPlayable JobMixer;
   public AnimationScriptPlayable Sampler;
   public BlendTreeBehaviour BlendTree;
+  public bool SamplerAtEnd = true;
 
   void Start() {
     Graph = PlayableGraph.Create("Motion Matching");
@@ -146,7 +151,6 @@ public class MotionMatching : MonoBehaviour {
       Handle = ReadOnlyTransformHandle.Bind(Animator, HipTransform)
     });
     Sampler.SetProcessInputs(true);
-    Sampler.AddInput(UpperBodyPlayable, 0, 1);
 
     // BEGIN MESH SPACE MIXER
     MixerJobData.Init(Animator);
@@ -157,9 +161,18 @@ public class MotionMatching : MonoBehaviour {
     });
     JobMixer.SetProcessInputs(false);
     JobMixer.SetInputCount(2);
-    Graph.Connect(BlendTreePlayable, 0, JobMixer, 0);
-    Graph.Connect(Sampler, 0, JobMixer, 1);
-    Output.SetSourcePlayable(JobMixer);
+    JobMixer.SetInputWeight(1, 1f);
+    if (SamplerAtEnd) {
+      Graph.Connect(BlendTreePlayable, 0, JobMixer, 0);
+      Graph.Connect(UpperBodyPlayable, 0, JobMixer, 1);
+      Sampler.AddInput(JobMixer, 0, 1f);
+      Output.SetSourcePlayable(Sampler);
+    } else {
+      Sampler.AddInput(UpperBodyPlayable, 0, 1f);
+      Graph.Connect(BlendTreePlayable, 0, JobMixer, 0);
+      Graph.Connect(Sampler, 0, JobMixer, 1);
+      Output.SetSourcePlayable(JobMixer);
+    }
     // END MESH SPACE MIXER
 
     Graph.Play();
@@ -171,13 +184,9 @@ public class MotionMatching : MonoBehaviour {
 
   void Update() {
     var samplerData = Sampler.GetJobData<SampleJob>();
-    var hipRotation = samplerData.Rotation;
-    var alongHips = math.forward(hipRotation);
-    var alongHipsXZ = new float3(alongHips.x, 0, alongHips.z);
-    var angle = Vector3.SignedAngle(alongHipsXZ, new float3(0,0,1), new float3(0,1,0));
 
-    TorsoTwist = angle;
-    BlendTree.Value = angle;
+    TorsoTwist = samplerData.Angle;
+    BlendTree.Value = samplerData.Angle;
     BlendTree.CycleSpeed = CycleSpeed;
     BlendTree.BlendCurve = BlendCurve;
   }
