@@ -10,11 +10,11 @@ Construct playable graph.
 
 + Loop the running animation.
 + Create mixer out of the looping running cycles.
-Add an attack animation.
-Read data from the attack animation stream.
-Mix attack animation with the looping running.
-Use data from attack animation stream to blend between running cycles.
-Blend result of blended running cycles with attack.
++ Add an attack animation.
++ Read data from the attack animation stream.
++ Mix attack animation with the looping running.
++ Use data from attack animation stream to blend between running cycles.
++ Blend result of blended running cycles with attack.
 */
 [Serializable]
 public struct BlendTreeNode : IComparable<BlendTreeNode> {
