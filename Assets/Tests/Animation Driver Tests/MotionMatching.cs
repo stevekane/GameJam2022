@@ -20,7 +20,6 @@ Construct playable graph.
 public struct BlendTreeNode : IComparable<BlendTreeNode> {
   public AnimationClip Clip;
   public float Value;
-  public float YRotation;
   public int CompareTo(BlendTreeNode b) => Value.CompareTo(b.Value);
 }
 
