@@ -108,8 +108,11 @@ public class Mover : MonoBehaviour {
     // Animation
     var animator = AnimationDriver.Animator;
     var orientedVelocity = Quaternion.Inverse(transform.rotation)*Velocity.XZ().normalized;
+    var inputSpeed = InputVelocity.magnitude;
+    const float MOVE_CYCLE_DISTANCE = 5; // distance moved by the walk cycle at full speed... very bullshit
     animator.SetFloat("RightVelocity", orientedVelocity.x);
     animator.SetFloat("ForwardVelocity", orientedVelocity.z);
+    animator.SetFloat("Speed", inputSpeed / MOVE_CYCLE_DISTANCE);
     animator.SetBool("IsGrounded", Status.IsGrounded);
     animator.SetBool("IsHurt", Status.IsHurt);
     AnimationDriver.SetSpeed(localTimeScale < 1 ? localTimeScale : AnimationDriver.BaseSpeed);
