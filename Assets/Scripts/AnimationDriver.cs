@@ -281,6 +281,7 @@ public class AnimationDriver : MonoBehaviour {
   AnimatorControllerPlayable AnimatorController;
   public AnimationScriptPlayable Mixer;
   [SerializeField] MixerJobData MixerJobData = new();
+  AnimationScriptPlayable HipSampler;
   AnimationPlayableOutput Output;
 
   List<AnimationJob> Jobs = new();
@@ -299,7 +300,14 @@ public class AnimationDriver : MonoBehaviour {
     Mixer = AnimationScriptPlayable.Create(Graph, new MixerJob() { Data = MixerJobData });
     Mixer.SetProcessInputs(false);
     Mixer.AddInput(AnimatorController, 0, 1f);
-    Output.SetSourcePlayable(Mixer);
+
+    HipSampler = AnimationScriptPlayable.Create(Graph, new SampleJob(
+      ReadOnlyTransformHandle.Bind(Animator, Animator.avatarRoot),
+      ReadOnlyTransformHandle.Bind(Animator, AvatarAttacher.FindBoneTransform(Animator, AvatarBone.Hips))));
+    HipSampler.SetProcessInputs(true);
+    HipSampler.AddInput(Mixer, 0, 1f);
+
+    Output.SetSourcePlayable(HipSampler);
     Graph.Play();
     BaseSpeed = Animator.speed;
   }
@@ -349,5 +357,10 @@ public class AnimationDriver : MonoBehaviour {
     var job = Mixer.GetJobData<MixerJob>();
     job.Data = MixerJobData;
     Mixer.SetJobData(job);
+  }
+
+  void Update() {
+    var hipData = HipSampler.GetJobData<SampleJob>();
+    //Debug.Log($"Hip angle = {hipData.Angle}");
   }
 }

@@ -4,7 +4,6 @@ using UnityEngine.Playables;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
 using Unity.Mathematics;
-using UnityEngine.Profiling;
 
 /*
 Construct playable graph.
@@ -93,16 +92,23 @@ public class BlendTreeBehaviour : PlayableBehaviour {
 
 public struct SampleJob : IAnimationJob {
   public float Angle;
-  public ReadOnlyTransformHandle Handle;
-  public SampleJob(ReadOnlyTransformHandle handle) {
+  public ReadOnlyTransformHandle RootHandle;
+  public ReadOnlyTransformHandle TargetHandle;
+  public SampleJob(ReadOnlyTransformHandle rootHandle, ReadOnlyTransformHandle targetHandle) {
+    RootHandle = rootHandle;
+    TargetHandle = targetHandle;
     Angle = 0f;
-    Handle = handle;
   }
   public void ProcessRootMotion(AnimationStream stream) {}
   public void ProcessAnimation(AnimationStream stream) {
-    var rotation = Handle.GetRotation(stream.GetInputStream(0));
-    var alongHips = math.forward(rotation);
+    var rootRotation = RootHandle.GetRotation(stream.GetInputStream(0));
+    var rotation = TargetHandle.GetRotation(stream.GetInputStream(0));
+    //var localRotation = TargetHandle.GetLocalRotation(stream.GetInputStream(0));
+    var localRotation = math.inverse(rootRotation) * rotation;
+    var alongHips = math.forward(localRotation);
     var alongHipsXZ = new float3(alongHips.x, 0, alongHips.z);
+    //Angle = Vector3.SignedAngle(alongHipsXZ, new float3(0, 0, 1), new float3(0, 1, 0));
+    //Angle = Vector3.SignedAngle(alongHipsXZ, rootRotation * new float3(0, 0, 1), rootRotation * new float3(0, 1, 0));
     Angle = Vector3.SignedAngle(alongHipsXZ, new float3(0, 0, 1), new float3(0, 1, 0));
   }
 }
@@ -147,9 +153,9 @@ public class MotionMatching : MonoBehaviour {
     Output = AnimationPlayableOutput.Create(Graph, "Motion Matching", Animator);
 
     // BEGIN UPPER BODY SAMPLER
-    Sampler = AnimationScriptPlayable.Create(Graph, new SampleJob {
-      Handle = ReadOnlyTransformHandle.Bind(Animator, HipTransform)
-    });
+    Sampler = AnimationScriptPlayable.Create(Graph, new SampleJob(
+      ReadOnlyTransformHandle.Bind(Animator, Animator.avatarRoot),
+      ReadOnlyTransformHandle.Bind(Animator, HipTransform)));
     Sampler.SetProcessInputs(true);
 
     // BEGIN MESH SPACE MIXER
@@ -184,7 +190,6 @@ public class MotionMatching : MonoBehaviour {
 
   void Update() {
     var samplerData = Sampler.GetJobData<SampleJob>();
-
     TorsoTwist = samplerData.Angle;
     BlendTree.Value = samplerData.Angle;
     BlendTree.CycleSpeed = CycleSpeed;

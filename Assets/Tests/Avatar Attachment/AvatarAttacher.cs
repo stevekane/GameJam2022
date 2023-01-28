@@ -29,6 +29,13 @@ public class AvatarAttacher: MonoBehaviour {
   Dictionary<AvatarBone, Transform> BoneToTransform = new();
 
   public Transform GetBoneTransform(AvatarBone bone) => BoneToTransform[bone];
+  public static Transform FindBoneTransform(Animator animator, AvatarBone bone) {
+    var boneName = bone.ToString();
+    var hb = animator.avatar.humanDescription.human.FirstOrDefault(hb => hb.humanName == boneName);
+    if (hb.humanName == boneName)
+      return animator.transform.FindDescendant(hb.boneName);
+    return null;
+  }
 
   void Awake() {
     GetComponentsInChildren<AvatarAttachment>().ForEach(TryReparent);
