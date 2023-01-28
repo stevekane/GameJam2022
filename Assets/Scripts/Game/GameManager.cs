@@ -97,7 +97,6 @@ public class GameManager : MonoBehaviour {
     if (!Player)  // No player prefab means don't run a game loop
       await scope.Forever();
     SaveData.LoadFromFile();
-    DebugUI.Log(this, $"looping");
     // Setup camera to target the player
     //PlayerVirtualCamera.Instance.Follow = Player.transform;
 
