@@ -234,14 +234,12 @@ public struct MixerJob : IAnimationJob {
   }
   public void ProcessAnimation(AnimationStream stream) {
     var baseStream = stream.GetInputStream(0);
-    var baseWeight = stream.GetInputWeight(0);
     for (var i = 0; i < Data.BoneHandles.Length; i++) {
       var handle = Data.BoneHandles[i];
       int layer = FindInputStreamForBone(stream, i);
       var inStream = stream.GetInputStream(layer);
-      var inWeight = stream.GetInputWeight(layer);
-      handle.SetLocalPosition(stream, Blend(handle.GetLocalPosition(baseStream), handle.GetLocalPosition(inStream), inWeight));
-      handle.SetLocalScale(stream, Blend(handle.GetLocalScale(baseStream), handle.GetLocalScale(inStream), inWeight));
+      handle.SetLocalPosition(stream, handle.GetLocalPosition(inStream));
+      handle.SetLocalScale(stream, handle.GetLocalScale(inStream));
       var boneIsTopmostActive = Data.BoneActivesPerLayer[layer][i] && Data.BoneParents[i] >= 0 && !Data.BoneActivesPerLayer[layer][Data.BoneParents[i]];
       if (boneIsTopmostActive) {
         // If our parent bone is disabled in this layer, do some special shit to try to preserve the animation's intent for this bone.
@@ -255,14 +253,12 @@ public struct MixerJob : IAnimationJob {
           var baseParentRotation = Quaternion.Inverse(RootRotation(baseStream)) * parentHandle.GetRotation(baseStream);
           rotation = Quaternion.Inverse(baseParentRotation) * rotation;
         }
-        handle.SetLocalRotation(stream, Blend(handle.GetLocalRotation(baseStream), rotation, inWeight));
+        handle.SetLocalRotation(stream, rotation);
       } else {
-        handle.SetLocalRotation(stream, Blend(handle.GetLocalRotation(baseStream), handle.GetLocalRotation(inStream), inWeight));
+        handle.SetLocalRotation(stream, handle.GetLocalRotation(inStream));
       }
     }
   }
-  Vector3 Blend(Vector3 a, Vector3 b, float weight) => Vector3.Lerp(a, b, weight);
-  Quaternion Blend(Quaternion a, Quaternion b, float weight) => Quaternion.Slerp(a, b, weight);
   Quaternion RootRotation(AnimationStream stream) => Data.BoneHandles[0].GetRotation(stream);
   int FindInputStreamForBone(AnimationStream stream, int boneIdx) {
     for (var layer = stream.inputStreamCount-1; layer >= 0; layer--) {
