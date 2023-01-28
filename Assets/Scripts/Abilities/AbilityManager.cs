@@ -23,7 +23,7 @@ public class AbilityManager : MonoBehaviour {
 
   public void InitAbilities(Ability[] abilities) {
     Abilities = abilities;
-    Abilities.ForEach(a => a.AbilityManager = this);
+    Abilities.ForEach(a => a.Character = GetComponent<Character>());
   }
 
   IEnumerable<Ability> Interruptible => Abilities.Where(a => a.IsRunning && !a.ActiveTags.HasAllFlags(AbilityTag.Uninterruptible));
@@ -100,7 +100,7 @@ public class AbilityManager : MonoBehaviour {
   }
   void OnDestroy() {
     Abilities.ForEach(a => a.Stop());
-    Abilities.ForEach(a => a.AbilityManager = null);
+    Abilities.ForEach(a => a.Character = null);
     MainScope.Dispose();
   }
   void FixedUpdate() {

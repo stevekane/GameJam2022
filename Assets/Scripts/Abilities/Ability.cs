@@ -17,13 +17,14 @@ public class TriggerCondition {
 
 [Serializable]
 public abstract class Ability : MonoBehaviour {
-  public AbilityManager AbilityManager { get; set; }
-  public AvatarAttacher AvatarAttacher => AbilityManager?.GetComponent<AvatarAttacher>();
-  public AnimationDriver AnimationDriver => AbilityManager?.GetComponent<AnimationDriver>();
-  public BlackBoard BlackBoard => AbilityManager?.GetComponent<BlackBoard>();
-  public Attributes Attributes => AbilityManager?.GetComponent<Attributes>();
-  public Status Status => AbilityManager?.GetComponent<Status>();
-  public Mover Mover => AbilityManager?.GetComponent<Mover>();
+  public Character Character { get; set; }
+  public AbilityManager AbilityManager => Character?.AbilityManager;
+  public AvatarAttacher AvatarAttacher => Character?.AvatarAttacher;
+  public AnimationDriver AnimationDriver => Character?.AnimationDriver;
+  public BlackBoard BlackBoard => Character?.GetComponent<BlackBoard>();
+  public Attributes Attributes => Character?.Attributes;
+  public Status Status => Character?.Status;
+  public Mover Mover => Character?.Mover;
   public List<TriggerCondition> TriggerConditions = new();
   Dictionary<AbilityMethod, TriggerCondition> TriggerConditionsMap = new();
   [HideInInspector] protected AbilityTag Tags;  // Inherited from the Trigger when started
