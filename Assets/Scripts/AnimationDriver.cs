@@ -236,8 +236,9 @@ public struct MixerJob : IAnimationJob {
   }
   public void ProcessRootMotion(AnimationStream stream) {
     // I don't know what this shit is used for.
-    //stream.velocity = topStream.velocity;
-    //stream.angularVelocity = topStream.angularVelocity;
+    var baseStream = stream.GetInputStream(0);
+    stream.velocity = baseStream.velocity;
+    stream.angularVelocity = baseStream.angularVelocity;
   }
   public void ProcessAnimation(AnimationStream stream) {
     var baseStream = stream.GetInputStream(0);
