@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.Playables;
+using UnityEngine.Rendering;
 
 [Serializable]
 public class AnimationJobConfig {
@@ -227,6 +229,11 @@ public struct MixerJobData {
 
 public struct MixerJob : IAnimationJob {
   public MixerJobData Data;
+  public float Angle;
+  public MixerJob(MixerJobData data) {
+    Data = data;
+    Angle = 0f;
+  }
   public void ProcessRootMotion(AnimationStream stream) {
     // I don't know what this shit is used for.
     //stream.velocity = topStream.velocity;
@@ -234,7 +241,6 @@ public struct MixerJob : IAnimationJob {
   }
   public void ProcessAnimation(AnimationStream stream) {
     var baseStream = stream.GetInputStream(0);
-    var baseWeight = stream.GetInputWeight(0);
     for (var i = 0; i < Data.BoneHandles.Length; i++) {
       var handle = Data.BoneHandles[i];
       int layer = FindInputStreamForBone(stream, i);
@@ -244,6 +250,10 @@ public struct MixerJob : IAnimationJob {
       handle.SetLocalScale(stream, Blend(handle.GetLocalScale(baseStream), handle.GetLocalScale(inStream), inWeight));
       var boneIsTopmostActive = Data.BoneActivesPerLayer[layer][i] && Data.BoneParents[i] >= 0 && !Data.BoneActivesPerLayer[layer][Data.BoneParents[i]];
       if (boneIsTopmostActive) {
+        // TODO HACK: untangle this hip angle sampling and make a better mixer.
+        var parentHandle = Data.BoneHandles[Data.BoneParents[i]];
+        ReadHipAngle(parentHandle, inStream);
+
         // If our parent bone is disabled in this layer, do some special shit to try to preserve the animation's intent for this bone.
         // First, use a "mesh-space" rotation - figure out the total rotation that WOULD be imparted on this bone and apply it locally.
         Quaternion rotation = Data.MeshSpaceRotations ?
@@ -251,7 +261,6 @@ public struct MixerJob : IAnimationJob {
           handle.GetLocalRotation(inStream);
         if (Data.ReverseBaseLayerRotation) {
           // Next, reverse the rotation that our base layer applies to our parent bone.
-          var parentHandle = Data.BoneHandles[Data.BoneParents[i]];
           var baseParentRotation = Quaternion.Inverse(RootRotation(baseStream)) * parentHandle.GetRotation(baseStream);
           rotation = Quaternion.Inverse(baseParentRotation) * rotation;
         }
@@ -260,6 +269,14 @@ public struct MixerJob : IAnimationJob {
         handle.SetLocalRotation(stream, Blend(handle.GetLocalRotation(baseStream), handle.GetLocalRotation(inStream), inWeight));
       }
     }
+  }
+  public void ReadHipAngle(ReadWriteTransformHandle handle, AnimationStream stream) {
+    var rootRotation = RootRotation(stream);
+    var rotation = handle.GetRotation(stream);
+    //var localRotation = TargetHandle.GetLocalRotation(stream);
+    var localRotation = Quaternion.Inverse(rootRotation) * rotation;
+    var alongHips = localRotation * Vector3.forward;
+    Angle = Vector3.SignedAngle(alongHips.XZ(), Vector3.forward, Vector3.up);
   }
   Vector3 Blend(Vector3 a, Vector3 b, float weight) => Vector3.Lerp(a, b, weight);
   Quaternion Blend(Quaternion a, Quaternion b, float weight) => Quaternion.Slerp(a, b, weight);
@@ -281,7 +298,6 @@ public class AnimationDriver : MonoBehaviour {
   AnimatorControllerPlayable AnimatorController;
   public AnimationScriptPlayable Mixer;
   [SerializeField] MixerJobData MixerJobData = new();
-  AnimationScriptPlayable HipSampler;
   AnimationPlayableOutput Output;
 
   List<AnimationJob> Jobs = new();
@@ -297,17 +313,10 @@ public class AnimationDriver : MonoBehaviour {
     AnimatorController = AnimatorControllerPlayable.Create(Graph, Animator.runtimeAnimatorController);
     MixerJobData.Init(Animator);
     MixerJobData.SetLayerMaskFromAvatarMask(0, null);
-    Mixer = AnimationScriptPlayable.Create(Graph, new MixerJob() { Data = MixerJobData });
+    Mixer = AnimationScriptPlayable.Create(Graph, new MixerJob(MixerJobData));
     Mixer.SetProcessInputs(false);
     Mixer.AddInput(AnimatorController, 0, 1f);
-
-    HipSampler = AnimationScriptPlayable.Create(Graph, new SampleJob(
-      ReadOnlyTransformHandle.Bind(Animator, Animator.avatarRoot),
-      ReadOnlyTransformHandle.Bind(Animator, AvatarAttacher.FindBoneTransform(Animator, AvatarBone.Hips))));
-    HipSampler.SetProcessInputs(true);
-    HipSampler.AddInput(Mixer, 0, 1f);
-
-    Output.SetSourcePlayable(HipSampler);
+    Output.SetSourcePlayable(Mixer);
     Graph.Play();
     BaseSpeed = Animator.speed;
   }
@@ -316,6 +325,8 @@ public class AnimationDriver : MonoBehaviour {
     Graph.Destroy();
     MixerJobData.Dispose();
   }
+
+  public float TorsoRotation => Mixer.GetJobData<MixerJob>().Angle;
 
   public void SetSpeed(float speed) {
     Animator.SetSpeed(speed);
@@ -357,10 +368,5 @@ public class AnimationDriver : MonoBehaviour {
     var job = Mixer.GetJobData<MixerJob>();
     job.Data = MixerJobData;
     Mixer.SetJobData(job);
-  }
-
-  void Update() {
-    var hipData = HipSampler.GetJobData<SampleJob>();
-    //Debug.Log($"Hip angle = {hipData.Angle}");
   }
 }

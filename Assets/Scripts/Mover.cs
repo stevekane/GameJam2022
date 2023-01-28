@@ -110,6 +110,7 @@ public class Mover : MonoBehaviour {
     var orientedVelocity = Quaternion.Inverse(transform.rotation)*Velocity.XZ().normalized;
     var inputSpeed = InputVelocity.magnitude;
     const float MOVE_CYCLE_DISTANCE = 5; // distance moved by the walk cycle at full speed... very bullshit
+    animator.SetFloat("TorsoRotation", AnimationDriver.TorsoRotation);
     animator.SetFloat("RightVelocity", orientedVelocity.x);
     animator.SetFloat("ForwardVelocity", orientedVelocity.z);
     animator.SetFloat("Speed", inputSpeed / MOVE_CYCLE_DISTANCE);

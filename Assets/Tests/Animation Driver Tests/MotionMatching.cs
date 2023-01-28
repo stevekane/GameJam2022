@@ -103,12 +103,9 @@ public struct SampleJob : IAnimationJob {
   public void ProcessAnimation(AnimationStream stream) {
     var rootRotation = RootHandle.GetRotation(stream.GetInputStream(0));
     var rotation = TargetHandle.GetRotation(stream.GetInputStream(0));
-    //var localRotation = TargetHandle.GetLocalRotation(stream.GetInputStream(0));
     var localRotation = math.inverse(rootRotation) * rotation;
     var alongHips = math.forward(localRotation);
     var alongHipsXZ = new float3(alongHips.x, 0, alongHips.z);
-    //Angle = Vector3.SignedAngle(alongHipsXZ, new float3(0, 0, 1), new float3(0, 1, 0));
-    //Angle = Vector3.SignedAngle(alongHipsXZ, rootRotation * new float3(0, 0, 1), rootRotation * new float3(0, 1, 0));
     Angle = Vector3.SignedAngle(alongHipsXZ, new float3(0, 0, 1), new float3(0, 1, 0));
   }
 }
@@ -138,7 +135,6 @@ public class MotionMatching : MonoBehaviour {
   public AnimationScriptPlayable JobMixer;
   public AnimationScriptPlayable Sampler;
   public BlendTreeBehaviour BlendTree;
-  public bool SamplerAtEnd = true;
 
 /*
 Character has four states currently:
@@ -187,17 +183,11 @@ The lower body should have a blend tree that uses the hip rotation
     JobMixer.SetProcessInputs(false);
     JobMixer.SetInputCount(2);
     JobMixer.SetInputWeight(1, 1f);
-    if (SamplerAtEnd) {
-      Graph.Connect(BlendTreePlayable, 0, JobMixer, 0);
-      Graph.Connect(UpperBodyPlayable, 0, JobMixer, 1);
-      Sampler.AddInput(JobMixer, 0, 1f);
-      Output.SetSourcePlayable(Sampler);
-    } else {
-      Sampler.AddInput(UpperBodyPlayable, 0, 1f);
-      Graph.Connect(BlendTreePlayable, 0, JobMixer, 0);
-      Graph.Connect(Sampler, 0, JobMixer, 1);
-      Output.SetSourcePlayable(JobMixer);
-    }
+
+    Sampler.AddInput(UpperBodyPlayable, 0, 1f);
+    Graph.Connect(BlendTreePlayable, 0, JobMixer, 0);
+    Graph.Connect(Sampler, 0, JobMixer, 1);
+    Output.SetSourcePlayable(JobMixer);
     // END MESH SPACE MIXER
 
     Graph.Play();
