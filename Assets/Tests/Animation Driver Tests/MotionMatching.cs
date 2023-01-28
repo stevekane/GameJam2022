@@ -140,6 +140,25 @@ public class MotionMatching : MonoBehaviour {
   public BlendTreeBehaviour BlendTree;
   public bool SamplerAtEnd = true;
 
+/*
+Character has four states currently:
+
+  Grounded stationary
+    Fullbody
+  Grounded moving
+    Upperbody
+
+  Airborne
+    Full body
+  Grounded stunned
+    Full body
+  Airborne stunned
+    Full body
+
+In states that have driven upper body motion
+The lower body should have a blend tree that uses the hip rotation
+*/
+
   void Start() {
     Graph = PlayableGraph.Create("Motion Matching");
     BlendTreePlayable = ScriptPlayable<BlendTreeBehaviour>.Create(Graph, 1);
