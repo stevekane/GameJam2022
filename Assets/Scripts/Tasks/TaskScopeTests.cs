@@ -11,6 +11,7 @@ public class TaskScopeTests : MonoBehaviour {
     public string ExpectedOutput;
 
     public async Task Run() {
+      //Debug.Log($"Test {Name} running...");
       using TaskScope scope = new();
       var output = await Test(scope);
       if (output != ExpectedOutput) {
@@ -381,6 +382,39 @@ public class TaskScopeTests : MonoBehaviour {
       },
       ExpectedOutput = "caught Throw1;done"
     },
-
+    new() {
+      Name = "exceptionsInAny",
+      Test = async (TaskScope main) => {
+        var done = false;
+        var output = "";
+        async Task Throw1(TaskScope scope) {
+          await scope.Tick();
+          throw new Exception("Throw1");
+        }
+        async Task Throw2(TaskScope scope) {
+          await scope.Millis(3000);
+          output += "didnt throw;";
+          throw new Exception("Throw2");
+        }
+        async Task Behavior(TaskScope scope) {
+          try {
+            await scope.Any(
+              Waiter.Repeat(Throw1),
+              Waiter.Repeat(Throw2));
+          } catch (Exception e) {
+            output += $"caught {e.Message};";
+          } finally {
+            done = true;
+          }
+        }
+        main.Start(Behavior);
+        while (!done) {
+          await main.Yield();
+        }
+        output += "done";
+        return output;
+      },
+      ExpectedOutput = "caught One or more errors occurred. (Throw1);done"
+    },
   };
 }

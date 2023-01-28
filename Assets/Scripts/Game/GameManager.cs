@@ -94,6 +94,8 @@ public class GameManager : MonoBehaviour {
     // Spawn and configure the player
     Player = FindObjectOfType<Player>();
     Player = Player ?? SpawnPlayer();
+    if (!Player)  // No player prefab means don't run a game loop
+      await scope.Forever();
     SaveData.LoadFromFile();
     DebugUI.Log(this, $"looping");
     // Setup camera to target the player
@@ -143,7 +145,9 @@ public class GameManager : MonoBehaviour {
   }
 
   public Player SpawnPlayer() {
-    return Instantiate(PlayerPrefab, PlayerSpawn.position, PlayerSpawn.rotation).GetComponent<Player>();
+    if (PlayerPrefab)
+      return Instantiate(PlayerPrefab, PlayerSpawn.position, PlayerSpawn.rotation).GetComponent<Player>();
+    return null;
   }
 
   void SetPlayerInputsEnabled(GameObject player, bool isEnabled) {

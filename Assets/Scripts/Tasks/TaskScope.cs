@@ -122,6 +122,8 @@ public class TaskScope : IDisposable {
   public async Task<int> AnyTask(params Task[] tasks) {
     ThrowIfCancelled();
     var which = await Task.WhenAny(tasks);
+    if (which.IsFaulted)
+      throw which.Exception;
     return tasks.IndexOf(which);
   }
   public async Task<int> Any(params TaskFunc[] fs) {
@@ -130,6 +132,8 @@ public class TaskScope : IDisposable {
     try {
       var tasks = fs.Select(f => f(scope)).ToArray();
       var which = await Task.WhenAny(tasks);
+      if (which.IsFaulted)
+        throw which.Exception;
       return tasks.IndexOf(which);
     } finally {
       ThrowIfCancelled();
@@ -140,8 +144,10 @@ public class TaskScope : IDisposable {
     using TaskScope scope = new(this);
     try {
       var tasks = fs.Select(f => f(scope)).ToArray();
-      var result = await Task.WhenAny(tasks);
-      return await result;
+      var which = await Task.WhenAny(tasks);
+      if (which.IsFaulted)
+        throw which.Exception;
+      return await which;
     } finally {
       ThrowIfCancelled();
     }
