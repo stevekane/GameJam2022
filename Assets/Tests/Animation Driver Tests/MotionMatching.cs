@@ -76,6 +76,10 @@ public class BlendTreeBehaviour : PlayableBehaviour {
       return 0;
     } else if (maxIndex == 0) {
       return 1;
+    } else if (index == minIndex && value < nodes[minIndex].Value) {
+      return 1;
+    } else if (index == maxIndex && value > nodes[maxIndex].Value) {
+      return 1;
     } else if (index > minIndex && value >= nodes[index-1].Value && value <= nodes[index].Value) {
       return BlendCurve.Evaluate(Mathf.InverseLerp(nodes[index-1].Value, nodes[index].Value, value));
     } else if (index < maxIndex && value >= nodes[index].Value && value <= nodes[index+1].Value) {
@@ -89,8 +93,8 @@ public class BlendTreeBehaviour : PlayableBehaviour {
 public struct SampleJob : IAnimationJob {
   public quaternion Rotation;
   public ReadOnlyTransformHandle Handle;
-  public SampleJob(quaternion rotation, ReadOnlyTransformHandle handle) {
-    Rotation = rotation;
+  public SampleJob(ReadOnlyTransformHandle handle) {
+    Rotation = quaternion.identity;
     Handle = handle;
   }
   public void ProcessRootMotion(AnimationStream stream) {}
@@ -139,7 +143,6 @@ public class MotionMatching : MonoBehaviour {
 
     // BEGIN UPPER BODY SAMPLER
     Sampler = AnimationScriptPlayable.Create(Graph, new SampleJob {
-      Rotation = quaternion.identity,
       Handle = ReadOnlyTransformHandle.Bind(Animator, HipTransform)
     });
     Sampler.SetProcessInputs(true);
@@ -149,24 +152,15 @@ public class MotionMatching : MonoBehaviour {
     MixerJobData.Init(Animator);
     MixerJobData.SetLayerMaskFromAvatarMask(0, LowerBodyMask);
     MixerJobData.SetLayerMaskFromAvatarMask(1, UpperBodyMask);
-    JobMixer = AnimationScriptPlayable.Create(Graph, new MixerJob() { Data = MixerJobData });
+    JobMixer = AnimationScriptPlayable.Create(Graph, new MixerJob() {
+      Data = MixerJobData
+    });
     JobMixer.SetProcessInputs(false);
     JobMixer.SetInputCount(2);
     Graph.Connect(BlendTreePlayable, 0, JobMixer, 0);
     Graph.Connect(Sampler, 0, JobMixer, 1);
     Output.SetSourcePlayable(JobMixer);
     // END MESH SPACE MIXER
-
-    // BEGIN LAYER MIXER
-    // FinalMixer = AnimationLayerMixerPlayable.Create(Graph, 2);
-    // FinalMixer.TryAddLayerMaskFromAvatarMask(0, LowerBodyMask);
-    // FinalMixer.TryAddLayerMaskFromAvatarMask(1, UpperBodyMask);
-    // FinalMixer.SetInputWeight(0, 1);
-    // FinalMixer.SetInputWeight(1, 1);
-    // Graph.Connect(BlendTreePlayable, 0, FinalMixer, 0);
-    // Graph.Connect(UpperBodyPlayable, 0, FinalMixer, 1);
-    // Output.SetSourcePlayable(FinalMixer);
-    // END LAYER MIXER
 
     Graph.Play();
   }
@@ -176,13 +170,14 @@ public class MotionMatching : MonoBehaviour {
   }
 
   void Update() {
-    var delta = (MaxTwist-MinTwist) / 2 * Mathf.Sin(2 * Mathf.PI * Time.time / TwistPeriod);
-    var midpoint = (MaxTwist + MinTwist) / 2;
-    var hipRotation = Sampler.GetJobData<SampleJob>().Rotation;
+    var samplerData = Sampler.GetJobData<SampleJob>();
+    var hipRotation = samplerData.Rotation;
     var alongHips = math.forward(hipRotation);
-    Debug.DrawRay(HipTransform.position, alongHips * 5, Color.blue);
-    TorsoTwist = delta + midpoint;
-    BlendTree.Value = TorsoTwist;
+    var alongHipsXZ = new float3(alongHips.x, 0, alongHips.z);
+    var angle = Vector3.SignedAngle(alongHipsXZ, new float3(0,0,1), new float3(0,1,0));
+
+    TorsoTwist = angle;
+    BlendTree.Value = angle;
     BlendTree.CycleSpeed = CycleSpeed;
     BlendTree.BlendCurve = BlendCurve;
   }
