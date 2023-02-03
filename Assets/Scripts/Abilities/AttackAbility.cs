@@ -20,8 +20,12 @@ public class AttackAbility : Ability {
 
   public override HitConfig HitConfigData => HitConfig;
 
+  public static AttributeModifier InPlaceModifier = new() { Mult = .2f };
+
   public static InlineEffect InPlaceEffect => new(s => {
-    s.HasGravity = false;
+    s.AddAttributeModifier(AttributeTag.Gravity, InPlaceModifier);
+    s.AddAttributeModifier(AttributeTag.MaxFallSpeed, InPlaceModifier);
+    //s.HasGravity = false;
     s.CanMove = false;
     s.CanRotate = false;
   }, "InPlace");
