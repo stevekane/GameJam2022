@@ -214,6 +214,19 @@ public class PolymorphicGraph : MonoBehaviour {
     AudioMixer.ConnectInput(0, AudioTrackPlayable, 0, 1);
     AudioTrackBehavior.Initialize(AudioTrack);
     audioOutput.SetSourcePlayable(AudioMixer);
+
+    foreach (var track in TimelineAsset.GetOutputTracks()) {
+      if (track is UnityEngine.Timeline.AnimationTrack) {
+        var animTrack = (UnityEngine.Timeline.AnimationTrack)track;
+        Debug.Log($"Animation Track {track.name}");
+      } else if (track is UnityEngine.Timeline.AudioTrack) {
+        var audioTrack = (UnityEngine.Timeline.AudioTrack)track;
+        Debug.Log("Audio Track {track.name}");
+      } else {
+        Debug.Log("Mystery track");
+      }
+    }
+
     Graph.Play();
   }
 

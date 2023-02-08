@@ -807,6 +807,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1206889971}
   - component: {fileID: 1206889972}
+  - component: {fileID: 1206889973}
   m_Layer: 0
   m_Name: Polymorphic Graph
   m_TagString: Untagged
@@ -928,7 +929,38 @@ MonoBehaviour:
       EndTime: 2.9
   Animator: {fileID: 1331307492}
   AudioSource: {fileID: 1391611955}
-  TimelineAsset: {fileID: 0}
+  TimelineAsset: {fileID: 11400000, guid: f9a697cc513723343bfb3631716b63ec, type: 2}
+--- !u!320 &1206889973
+PlayableDirector:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1206889970}
+  m_Enabled: 0
+  serializedVersion: 3
+  m_PlayableAsset: {fileID: 11400000, guid: f9a697cc513723343bfb3631716b63ec, type: 2}
+  m_InitialState: 1
+  m_WrapMode: 1
+  m_DirectorUpdateMode: 1
+  m_InitialTime: 0
+  m_SceneBindings:
+  - key: {fileID: -8078331415689444720, guid: 4934c10bc08d32c4f9dcabd4fbe6f42c, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: -1445643140030621280, guid: 4934c10bc08d32c4f9dcabd4fbe6f42c, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: 6007377602408072017, guid: 4934c10bc08d32c4f9dcabd4fbe6f42c, type: 2}
+    value: {fileID: 0}
+  - key: {fileID: 8435750792583002971, guid: f9a697cc513723343bfb3631716b63ec, type: 2}
+    value: {fileID: 1331307492}
+  - key: {fileID: -7134815436987307844, guid: f9a697cc513723343bfb3631716b63ec, type: 2}
+    value: {fileID: 1331307492}
+  - key: {fileID: 5091973676726036663, guid: f9a697cc513723343bfb3631716b63ec, type: 2}
+    value: {fileID: 1391611955}
+  - key: {fileID: 8435750792583002971, guid: 2651d25b5fa82344681ae4b4d983062f, type: 2}
+    value: {fileID: 0}
+  m_ExposedReferences:
+    m_References: []
 --- !u!1001 &1331307490
 PrefabInstance:
   m_ObjectHideFlags: 0
