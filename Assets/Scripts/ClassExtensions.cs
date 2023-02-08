@@ -100,6 +100,9 @@ public static class MonoExtensions {
   }
 
   public static Transform FindDescendant(this Transform t, string name) {
+    if (t.name == name)
+      return t;
+
     for (var i = 0; i < t.childCount; i++) {
       var child = t.GetChild(i);
       if (child.name == name) {

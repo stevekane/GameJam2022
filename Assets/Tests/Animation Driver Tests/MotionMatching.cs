@@ -110,6 +110,7 @@ public struct SampleJob : IAnimationJob {
 }
 
 public class MotionMatching : MonoBehaviour {
+  public SkinnedMeshRenderer SkinnedMeshRenderer;
   public Animator Animator;
   public Transform HipTransform;
   public AvatarMask LowerBodyMask;
@@ -190,6 +191,19 @@ The lower body should have a blend tree that uses the hip rotation
     // END MESH SPACE MIXER
 
     Graph.Play();
+
+    // TODO: HACKY API TESTING
+    // var mask = new AvatarMask();
+    var mask = UpperBodyMask;
+    for (var i = 0; i < SkinnedMeshRenderer.bones.Length; i++) {
+      var bone = SkinnedMeshRenderer.bones[i];
+      var boneIndex = bone;
+      if (!mask.GetTransformActive(i))
+        continue;
+      Debug.Log($"{bone.name} is active");
+    }
+    // END HACKY API TESTING
+
   }
 
   void OnDestroy() {
