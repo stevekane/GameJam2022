@@ -15,6 +15,7 @@ public class SpawnWaveRandom : SpawnWave {
   }
 
   public override async Task Spawn(TaskScope scope, int wave) {
+    UnityEngine.Random.InitState((int)System.DateTime.Now.Ticks);  // why do I need to call this EXACTLY HERE?
     var spawners = PossibleLocations.ToList();
     spawners.Shuffle();
     var tasks = Mobs.Select((mob, i) => SpawnData.Spawn(scope, spawners[i], mob, wave));
