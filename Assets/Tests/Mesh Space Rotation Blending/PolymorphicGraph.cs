@@ -208,22 +208,26 @@ public class PolymorphicGraph : MonoBehaviour {
     AnimationLayerMixer.ConnectInput(1, AnimationTrackPlayable, 0);
     AnimationLayerMixer.SetInputWeight(1, 1);
     AnimationTrackBehavior.Initialize(AnimationTrack);
-    animationOutput.SetSourcePlayable(AnimationLayerMixer);
+    // animationOutput.SetSourcePlayable(AnimationLayerMixer);
 
     var audioOutput = AudioPlayableOutput.Create(Graph, "Audio Output", AudioSource);
     AudioMixer.ConnectInput(0, AudioTrackPlayable, 0, 1);
     AudioTrackBehavior.Initialize(AudioTrack);
-    audioOutput.SetSourcePlayable(AudioMixer);
+    // audioOutput.SetSourcePlayable(AudioMixer);
 
-    foreach (var track in TimelineAsset.GetOutputTracks()) {
-      if (track is UnityEngine.Timeline.AnimationTrack) {
-        var animTrack = (UnityEngine.Timeline.AnimationTrack)track;
-        Debug.Log($"Animation Track {track.name}");
-      } else if (track is UnityEngine.Timeline.AudioTrack) {
-        var audioTrack = (UnityEngine.Timeline.AudioTrack)track;
-        Debug.Log("Audio Track {track.name}");
-      } else {
-        Debug.Log("Mystery track");
+    var timelinePlayable = TimelineAsset.CreatePlayable(Graph, gameObject);
+    var outputTrackCount = TimelineAsset.outputTrackCount;
+    for (var i = 0; i < outputTrackCount; i++) {
+      var track = TimelineAsset.GetOutputTrack(i);
+      foreach (var output in track.outputs) {
+        var targetType = output.outputTargetType;
+        var playableOutput = targetType switch {
+          _ when targetType == typeof(Animator) => AnimationPlayableOutput.Create(Graph, track.name, Animator),
+          _ when targetType == typeof(AudioSource) => AudioPlayableOutput.Create(Graph, track.name, AudioSource),
+          _ => PlayableOutput.Null
+        };
+        playableOutput.SetSourcePlayable(timelinePlayable, i);
+        Debug.Log($"Created output {playableOutput} for track {track} because of targetType {targetType}");
       }
     }
 
