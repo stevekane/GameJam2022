@@ -241,6 +241,7 @@ public struct MixerJob : IAnimationJob {
     stream.angularVelocity = baseStream.angularVelocity;
   }
   public void ProcessAnimation(AnimationStream stream) {
+    Angle = 0f;
     var baseStream = stream.GetInputStream(0);
     for (var i = 0; i < Data.BoneHandles.Length; i++) {
       var handle = Data.BoneHandles[i];
