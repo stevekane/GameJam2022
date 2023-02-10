@@ -48,10 +48,6 @@ public class SlotBehavior : PlayableBehaviour {
     Playables.ForEach(PlayableExtensions.SafeDestroy);
   }
 
-  public override void PrepareFrame(Playable playable, FrameData info) {
-    Debug.Log(AudioMixer.GetInputCount());
-  }
-
   public void PlayAnimation(Playable playable, int outputIndex = 0) {
     AnimationMixer.AddInput(playable, outputIndex, 1);
   }
@@ -86,6 +82,7 @@ public class CharacterAnimationGraph : MonoBehaviour {
     DefaultSlotPlayable = ScriptPlayable<SlotBehavior>.Create(Graph);
     DefaultSlotPlayable.SetTraversalMode(PlayableTraversalMode.Passthrough);
     DefaultSlot = DefaultSlotPlayable.GetBehaviour();
+    Debug.LogWarning("Reconnect animator controller to animation mixer of characteranimationgraph");
     // AnimationLayerMixer.AddInput(AnimatorController, 0, 1);
     AnimationLayerMixer.AddInput(DefaultSlotPlayable, sourceOutputIndex: 0, 1);
     AudioMixer.AddInput(DefaultSlotPlayable, sourceOutputIndex: 1, 1);
@@ -96,8 +93,5 @@ public class CharacterAnimationGraph : MonoBehaviour {
 
   void OnDestroy() {
     Graph.Destroy();
-  }
-
-  void Update() {
   }
 }
