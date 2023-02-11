@@ -1,0 +1,60 @@
+We are going to learn about the GraphView API in Unity.
+
+The goal is to make a hello world Graph and then possibly
+to move on to making a GraphView for our PlayableGraph that
+doesn't suck.
+
+GraphUI elements derive from GraphElement derives from ModelUI
+
+GraphElement is a ModelUI that is a direct child of a GraphView (think Nodes/Edges)
+ModelUI.Setup is Init
+UpdateFromModel is used to update UI wrt changes in the Model
+UI uses property bindings
+
+I think the gist more or less is that BuildUI constructs the UI object
+while UpdateFromModel just transfers properties that are bound from
+the model object to the ui object already existing.
+
+There is a notion of a PartList defined by whatever is generated in BuildPartList
+which seems to be a sort of comprehensive list of "child parts" or something kind
+of like that but it seems like perhaps these are not recursive things but rather
+"features" of this particular node. For example, they cite that a node has two parts:
+title and port container.
+
+If you want the graph to be able to affect the model, you need to define Commands
+and send then on the CommandDispatcher. These commands can be processed to affect
+the model itself. This is pretty standard stuff.
+
+The Command class has a statuc method on it called DefaultHandler which accepts
+the GraphToolState and the specific Command class it is defined in.
+
+N.B. You need to manage the undo stack yourself in these commands.
+
+You register your handlers of comands using RegisterCommandHandler and passing it the
+type and static method.
+
+INodeModel is a node
+IPortNode is node with connections
+  There are subclasses for convenience here:
+    IInOutPortsNode input/output nodes
+    ISingleInputPort
+    ISingleOutputPort
+    IConstantNodeModel
+    IVariableNodeModel
+IEdgeModel represents an edge connected to IPortModel
+IPortModel connection point for edges. Owned by IPortNode
+IConstant
+IVariable (external)
+IPlacemat (group nodes thing)
+IStickyNote
+IBadgeModel (augment some parent model. used for displaying values on ports and errors)
+IGraphModel is the whole graph
+  Nodes
+  Edges
+  Badges
+  Sticky Notes
+  Placemats
+  Variables
+  Portals
+IGraphAsset
+IBlackboardGraphModel

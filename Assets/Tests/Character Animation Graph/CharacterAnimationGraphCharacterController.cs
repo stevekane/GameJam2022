@@ -42,6 +42,10 @@ public class CharacterAnimationGraphCharacterController : MonoBehaviour {
     return timelinePlayable;
   }
 
+  void Start() {
+    Debug.LogWarning("Replace playable.SafeDestroy with Graph.DestroySubgraph(playable)");
+  }
+
   void Update() {
     if (CurrentPlayable.IsValid() && CurrentPlayable.IsDone()) {
       // TODO: SafeDestroy recursively destroys all inputs to this node but the noop nodes
