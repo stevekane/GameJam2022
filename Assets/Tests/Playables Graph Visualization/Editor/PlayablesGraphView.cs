@@ -4,41 +4,45 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Animations;
 using UnityEngine.Audio;
+using UnityEngine.Timeline;
 using UnityEditor.Experimental.GraphView;
 
-public struct PlayableGraphConnection {
-  static PlayableGraphConnection NullGraph = new();
-  public Playable Source;
-  public Playable Destination;
-  public int SourceOutputPort;
-  public int DestinationInputPort;
-  public static PlayableGraphConnection Null => NullGraph;
+public struct ConnectedOutput {
+  static ConnectedOutput NullGraph = new();
+  public static ConnectedOutput Null => NullGraph;
+  public readonly Playable Destination;
+  public readonly int PortIndex;
   public bool IsNull() => Equals(NullGraph);
+  public ConnectedOutput(Playable destination, int portIndex) {
+    Destination = destination;
+    PortIndex = portIndex;
+  }
 }
 
 public static class PlayableGraphExtensions {
   public static List<Playable> OriginalOutputs = new();
   public static List<Playable> AffectedOutputs = new();
-  public static PlayableGraphConnection Connection(
-  this PlayableGraph graph,
-  Playable destination,
-  int destinationInputPort) {
-    if (destination.IsNull())
-      return PlayableGraphConnection.Null;
-    var destinationInputPortCount = destination.GetInputCount();
+  public static ConnectedOutput Connection(this Playable playable, int portIndex) {
+    if (playable.IsNull())
+      return ConnectedOutput.Null;
+    var destinationInputPortCount = playable.GetInputCount();
     var maxDestinationInputPort = destinationInputPortCount-1;
-    if (destinationInputPort > maxDestinationInputPort)
-      return PlayableGraphConnection.Null;
-    var source = destination.GetInput(destinationInputPort);
+    if (portIndex > maxDestinationInputPort)
+      return ConnectedOutput.Null;
+    var source = playable.GetInput(portIndex);
     if (source.IsNull())
-      return PlayableGraphConnection.Null;
+      return ConnectedOutput.Null;
+    var sourceOutputCount = source.GetOutputCount();
+    if (sourceOutputCount <= 1)
+      return new ConnectedOutput(source, 0);
+
     OriginalOutputs.Clear();
     AffectedOutputs.Clear();
-    var sourceOutputCount = source.GetOutputCount();
     for (var o = 0; o < sourceOutputCount; o++) {
       OriginalOutputs.Add(source.GetOutput(o));
     }
-    destination.DisconnectInput(destinationInputPort);
+    // TODO: What to do when playable.CanChangeInputs is false?
+    // playable.DisconnectInput(portIndex);
     for (var o = 0; o < sourceOutputCount; o++) {
       AffectedOutputs.Add(source.GetOutput(o));
     }
@@ -48,25 +52,13 @@ public static class PlayableGraphExtensions {
         sourceOutputPort = o;
       }
     }
-    destination.ConnectInput(destinationInputPort, source, sourceOutputPort);
-    return new PlayableGraphConnection {
-      Source = source,
-      Destination = destination,
-      SourceOutputPort = sourceOutputPort,
-      DestinationInputPort = destinationInputPort
-    };
+    // playable.ConnectInput(portIndex, source, sourceOutputPort);
+    return new ConnectedOutput(source, sourceOutputPort);
   }
 }
 
-namespace PlayblesGraphVisualization {
+namespace PlayablesGraphVisualization {
   public class PlayablesGraphView : GraphView {
-    const int WIDTH = 60;
-    const int HEIGHT = 40;
-    const int X_GAP = 250;
-    const int Y_GAP = 150;
-
-    PlayableGraph Graph;
-
     public PlayablesGraphView() {
       this.AddManipulator(new ContentDragger());
       this.AddManipulator(new ContentZoomer());
@@ -75,39 +67,20 @@ namespace PlayblesGraphVisualization {
       this.StretchToParentSize();
     }
 
-    public void Setup() {
-      Graph = PlayableGraph.Create("Visualization Test Graph");
-      var animClipPlayable1 = AnimationClipPlayable.Create(Graph, null);
-      var animClipPlayable2 = AnimationClipPlayable.Create(Graph, null);
-      var crossedPassthrough = ScriptPlayable<NoopBehavior>.Create(Graph);
-      var animationMixer = AnimationMixerPlayable.Create(Graph);
-      var noopPlayable = ScriptPlayable<NoopBehavior>.Create(Graph);
-      var orphanedAnimationClipPlayable = AnimationClipPlayable.Create(Graph, null);
-      var animationOutput = AnimationPlayableOutput.Create(Graph, "Animation Output", null);
-      crossedPassthrough.AddInput(animClipPlayable1, 0, 1);
-      crossedPassthrough.AddInput(animClipPlayable2, 0, 1);
-      crossedPassthrough.SetOutputCount(2);
-      animationMixer.AddInput(crossedPassthrough, 1, 1);
-      animationMixer.AddInput(crossedPassthrough, 0, 1);
-      noopPlayable.AddInput(animationMixer, 0, 1);
-      animationOutput.SetSourcePlayable(noopPlayable, 0);
-
+    public void Render(PlayableGraph graph) {
       var outputNodeMap = new Dictionary<PlayableOutput, PlayablesNode>();
       var playableNodeMap = new Dictionary<Playable, PlayablesNode>();
-      var edges = new List<Edge>();
+      var edges = new List<PlayablesEdge>();
 
       void Connect(Playable parent, PlayablesNode parentNode, int inputIndex, int depth, int height) {
         var playable = parent.GetInput(inputIndex);
         if (!playable.IsNull()) {
-          var connection = parent.GetGraph().Connection(parent, inputIndex);
+          var connection = parent.Connection(inputIndex);
           var node = playableNodeMap.GetOrAdd(playable, delegate {
-            return Create(-X_GAP * depth, Y_GAP * height, playable);
+            return Create(depth, height, playable);
           });
           if (!connection.IsNull()) {
-            var edge = new Edge {
-              input = parentNode.Inputs[connection.DestinationInputPort],
-              output = node.Outputs[connection.SourceOutputPort]
-            };
+            var edge = new PlayablesEdge(node, connection.PortIndex, parentNode, inputIndex);
             edges.Add(edge);
             var inputCount = playable.GetInputCount();
             for (var i = 0; i < inputCount; i++) {
@@ -117,17 +90,17 @@ namespace PlayblesGraphVisualization {
         }
       }
 
-      var outputCount = Graph.GetOutputCount();
+      var outputCount = graph.GetOutputCount();
       for (var o = 0; o < outputCount; o++) {
-        var output = Graph.GetOutput(o);
-        var outputNode = Create(0, Y_GAP * o, output);
+        var output = graph.GetOutput(o);
+        var outputNode = Create(0, o, output);
         outputNodeMap.Add(output, outputNode);
         var source = output.GetSourcePlayable();
         if (!source.IsNull()) {
           var node = playableNodeMap.GetOrAdd(source, delegate {
-            return Create(-X_GAP, Y_GAP * o, source);
+            return Create(1, o, source);
           });
-          var edge = new Edge { output = node.Outputs[0], input = outputNode.Inputs[0] };
+          var edge = new PlayablesEdge(node, 0, outputNode, 0);
           edges.Add(edge);
           var inputCount = source.GetInputCount();
           for (var i = 0; i < inputCount; i++) {
@@ -136,26 +109,29 @@ namespace PlayblesGraphVisualization {
         }
       }
 
+      void Layout(PlayablesNode node) {
+        const int WIDTH = 60;
+        const int HEIGHT = 40;
+        const int X_GAP = 250;
+        const int Y_GAP = 250;
+        node.SetPosition(new Rect(node.Depth * -X_GAP, node.Height * Y_GAP, WIDTH, HEIGHT));
+      }
+
+      outputNodeMap.Values.ForEach(Layout);
+      playableNodeMap.Values.ForEach(Layout);
       outputNodeMap.Values.ForEach(AddElement);
       playableNodeMap.Values.ForEach(AddElement);
       edges.ForEach(AddElement);
     }
 
-    public void Teardown() {
-      if (Graph.IsValid()) {
-        Graph.Destroy();
-      }
-    }
-
-    PlayablesNode Create(int x, int y, Playable playable) {
+    PlayablesNode Create(int depth, int height, Playable playable) {
       var node = new PlayablesNode { title = PlayableName(playable) };
       var inputCount = playable.GetInputCount();
       for (var i = 0; i < inputCount; i++) {
         var orientation = Orientation.Horizontal;
         var direction = Direction.Input;
         var capacity = Port.Capacity.Single;
-        var port = node.InstantiatePort(orientation, direction, capacity, typeof(int));
-        port.portName = i.ToString();
+        var port = node.InstantiatePort(orientation, direction, capacity, null);
         node.Inputs.Add(port);
         node.inputContainer.Add(port);
       }
@@ -164,38 +140,45 @@ namespace PlayblesGraphVisualization {
         var orientation = Orientation.Horizontal;
         var direction = Direction.Input;
         var capacity = Port.Capacity.Single;
-        var port = node.InstantiatePort(orientation, direction, capacity, typeof(int));
-        port.portName = i.ToString();
+        var port = node.InstantiatePort(orientation, direction, capacity, null);
         node.Outputs.Add(port);
         node.outputContainer.Add(port);
       }
+      node.Depth = depth;
+      node.Height = height;
       node.RefreshExpandedState();
       node.RefreshPorts();
-      node.SetPosition(new Rect(x, y, WIDTH, HEIGHT));
       return node;
     }
 
-    PlayablesNode Create(int x, int y, PlayableOutput output) {
+    PlayablesNode Create(int depth, int height, PlayableOutput output) {
       var node = new PlayablesNode { title = OutputName(output) };
       var orientation = Orientation.Horizontal;
       var direction = Direction.Input;
       var capacity = Port.Capacity.Single;
-      var port = node.InstantiatePort(orientation, direction, capacity, typeof(int));
-      port.portName = "source";
+      var port = node.InstantiatePort(orientation, direction, capacity, null);
       node.Inputs.Add(port);
       node.inputContainer.Add(port);
+      node.Depth = depth;
+      node.Height = height;
       node.RefreshExpandedState();
       node.RefreshPorts();
-      node.SetPosition(new Rect(x, y, WIDTH, HEIGHT));
       return node;
     }
 
     string PlayableName(Playable playable) {
       var type = playable.GetPlayableType();
       return type switch {
-        _ when type == typeof(AnimationClipPlayable) => "Animation Clip",
-        _ when type == typeof(AnimationMixerPlayable) => "Animation Mixer",
-        _ when type == typeof(AnimationLayerMixerPlayable) => "Animation Layer Mixer",
+        _ when type == typeof(AnimationClipPlayable) => "Animation",
+        _ when type == typeof(AnimationMixerPlayable) => "Mixer",
+        _ when type == typeof(AnimatorControllerPlayable) => "Animator",
+        _ when type == typeof(AnimationLayerMixerPlayable) => "Layers",
+        _ when type == typeof(AudioClipPlayable) => "Audio",
+        _ when type == typeof(AudioMixer) => "Mixer",
+        _ when type == typeof(TimelinePlayable) => "Timeline",
+        _ when type.ToString().Contains("AnimationPose") => "Pose",
+        _ when type.ToString().Contains("AnimationOffset") => "Offset",
+        _ when type.ToString().Contains("AnimationMotionXToDelta") => "MotionXToDelta",
         _ => type.ToString()
       };
     }
