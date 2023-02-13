@@ -48,13 +48,13 @@ public class CharacterAnimationGraphCharacterController : MonoBehaviour {
 
   void Update() {
     if (CurrentPlayable.IsValid() && CurrentPlayable.IsDone()) {
-      // TODO: SafeDestroy recursively destroys all inputs to this node but the noop nodes
+      // TODO: DestroySuggraph recursively destroys all inputs to this node but the noop nodes
       // that currently get placed between the timeline's outputs and the mixer won't get cleaned
       // up properly and probably leak.
       // I think maybe these noop nodes should be an implementation detail inside the Slot
       // since no one should have to care about such a stupid fucking detail
       Debug.Log("Tick");
-      CurrentPlayable.SafeDestroy();
+      AnimationGraph.Graph.DestroySubgraph(CurrentPlayable);
       CurrentPlayable = Playable.Null;
     }
     if (CurrentPlayable.IsNull()) {
