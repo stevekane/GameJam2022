@@ -72,7 +72,7 @@ public class CharacterAnimationGraph : MonoBehaviour {
   public PlayableGraph Graph { get; private set; }
   public SlotBehavior DefaultSlot { get; private set; }
 
-  void Start() {
+  void Awake() {
     Graph = PlayableGraph.Create("Character Animation Graph");
     AnimatorController = AnimatorControllerPlayable.Create(Graph, Animator.runtimeAnimatorController);
     AnimationLayerMixer = AnimationLayerMixerPlayable.Create(Graph);

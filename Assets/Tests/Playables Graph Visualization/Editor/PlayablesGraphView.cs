@@ -35,14 +35,15 @@ public static class PlayableGraphExtensions {
     var sourceOutputCount = source.GetOutputCount();
     if (sourceOutputCount <= 1)
       return new ConnectedOutput(source, 0);
+    if (!source.CanChangeInputs())
+      return new ConnectedOutput(source, 0);
 
     OriginalOutputs.Clear();
     AffectedOutputs.Clear();
     for (var o = 0; o < sourceOutputCount; o++) {
       OriginalOutputs.Add(source.GetOutput(o));
     }
-    // TODO: What to do when playable.CanChangeInputs is false?
-    // playable.DisconnectInput(portIndex);
+    playable.DisconnectInput(portIndex);
     for (var o = 0; o < sourceOutputCount; o++) {
       AffectedOutputs.Add(source.GetOutput(o));
     }
@@ -52,7 +53,7 @@ public static class PlayableGraphExtensions {
         sourceOutputPort = o;
       }
     }
-    // playable.ConnectInput(portIndex, source, sourceOutputPort);
+    playable.ConnectInput(portIndex, source, sourceOutputPort);
     return new ConnectedOutput(source, sourceOutputPort);
   }
 }
@@ -64,7 +65,6 @@ namespace PlayablesGraphVisualization {
       this.AddManipulator(new ContentZoomer());
       this.AddManipulator(new ClickSelector());
       this.AddManipulator(new RectangleSelector());
-      this.StretchToParentSize();
     }
 
     public void Render(PlayableGraph graph) {
@@ -109,16 +109,35 @@ namespace PlayablesGraphVisualization {
         }
       }
 
-      void Layout(PlayablesNode node) {
+      void Layout(IEnumerable<PlayablesNode> nodes) {
         const int WIDTH = 60;
         const int HEIGHT = 40;
-        const int X_GAP = 250;
-        const int Y_GAP = 250;
-        node.SetPosition(new Rect(node.Depth * -X_GAP, node.Height * Y_GAP, WIDTH, HEIGHT));
+        const int X_GAP = 200;
+        const int SLOT_SPACING = 40;
+        for (var i = 0; i < 10; i++) {
+          var offsets = new List<int>();
+          var layerOffset = 0;
+          // layem out accounting for their heights
+          foreach (var node in nodes) {
+            if (node.Depth == i) {
+              offsets.Add(layerOffset);
+              layerOffset += (1+Mathf.Max(node.Inputs.Count, node.Outputs.Count)) * SLOT_SPACING;
+            }
+          }
+          // move them all to the center line
+          var index = 0;
+          foreach (var node in nodes) {
+            if (node.Depth == i) {
+              var x = node.Depth * -X_GAP;
+              var y = offsets[index++] - layerOffset/2;
+              node.SetPosition(new Rect(x, y, WIDTH, HEIGHT));
+            }
+          }
+        }
       }
 
-      outputNodeMap.Values.ForEach(Layout);
-      playableNodeMap.Values.ForEach(Layout);
+      Layout(outputNodeMap.Values);
+      Layout(playableNodeMap.Values);
       outputNodeMap.Values.ForEach(AddElement);
       playableNodeMap.Values.ForEach(AddElement);
       edges.ForEach(AddElement);
@@ -174,7 +193,7 @@ namespace PlayablesGraphVisualization {
         _ when type == typeof(AnimatorControllerPlayable) => "Animator",
         _ when type == typeof(AnimationLayerMixerPlayable) => "Layers",
         _ when type == typeof(AudioClipPlayable) => "Audio",
-        _ when type == typeof(AudioMixer) => "Mixer",
+        _ when type == typeof(AudioMixerPlayable) => "Mixer",
         _ when type == typeof(TimelinePlayable) => "Timeline",
         _ when type.ToString().Contains("AnimationPose") => "Pose",
         _ when type.ToString().Contains("AnimationOffset") => "Offset",

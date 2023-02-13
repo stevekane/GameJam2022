@@ -2,9 +2,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Animations;
+using UnityEngine.UIElements;
 using UnityEngine.Audio;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.UIElements;
 
 namespace PlayablesGraphVisualization {
   public class PlayablesGraphEditorWindow : EditorWindow {
@@ -16,6 +18,7 @@ namespace PlayablesGraphVisualization {
 
     PlayableGraph SampleGraph;
     List<PlayableGraph> Graphs;
+    Button ChangeGraphButton;
     PlayablesGraphView GraphView;
 
     PlayableGraph CreateSampleGraph() {
@@ -37,14 +40,36 @@ namespace PlayablesGraphVisualization {
       return graph;
     }
 
+    void OnChangeGraphClick() {
+      var menu = new GenericMenu();
+      for (var i = 0; i < Graphs.Count; i++) {
+        var graph = Graphs[i];
+        var name = graph.GetEditorName();
+        var index = i;
+        menu.AddItem(new GUIContent(name), false, delegate {
+          GraphView.graphElements.ForEach(GraphView.RemoveElement);
+          GraphView.Render(Graphs[index]);
+        });
+      }
+      menu.ShowAsContext();
+    }
+
     void OnEnable() {
       UnityEditor.Playables.Utility.graphCreated += OnGraphCreated;
       UnityEditor.Playables.Utility.destroyingGraph += OnGraphDestroyed;
+      ChangeGraphButton = new Button { text = "Change Graph" };
+      ChangeGraphButton.clicked += OnChangeGraphClick;
       Graphs = new(UnityEditor.Playables.Utility.GetAllGraphs());
       GraphView = new PlayablesGraphView();
       GraphView.name = "Playables Graph";
-      GraphView.Render(Graphs[Graphs.Count-1]);
+      if (Graphs.Count > 0)
+        GraphView.Render(Graphs[0]);
+      // TODO: This is clumsy manual ordering. Seems like it should be possible to lay out the elements
+      // in a smarter way using USS and flex grow and all that shit... good enough for now?
+      rootVisualElement.Add(ChangeGraphButton);
       rootVisualElement.Add(GraphView);
+      GraphView.PlaceBehind(ChangeGraphButton);
+      GraphView.StretchToParentSize();
     }
 
     void Update() {
@@ -56,9 +81,12 @@ namespace PlayablesGraphVisualization {
     void OnDisable() {
       UnityEditor.Playables.Utility.graphCreated -= OnGraphCreated;
       UnityEditor.Playables.Utility.destroyingGraph -= OnGraphDestroyed;
-      Graphs = null;
+      ChangeGraphButton.clicked -= OnChangeGraphClick;
+      rootVisualElement.Remove(ChangeGraphButton);
       rootVisualElement.Remove(GraphView);
+      ChangeGraphButton = null;
       GraphView = null;
+      Graphs = null;
     }
 
     void OnGraphCreated(PlayableGraph graph) {
