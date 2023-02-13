@@ -37,10 +37,12 @@ public class Damage : MonoBehaviour {
 
   Mover Mover;
   Status Status;
+  Vibrator Vibrator;
 
   void Awake() {
     Mover = GetComponent<Mover>();
     Status = GetComponent<Status>();
+    Vibrator = GetComponent<Vibrator>();
   }
 
   static readonly Timeval RecoilDuration = Timeval.FromAnimFrames(12, 60);
@@ -51,23 +53,27 @@ public class Damage : MonoBehaviour {
       var forward = hitParams.Source.transform.forward;
       if (Status.IsInterruptible) {
         Mover.ResetVelocityAndMovementEffects();
-        Status.Add(new HitStopEffect(forward, hitParams.HitConfig.HitStopDuration.Ticks),
+        Vibrator.VibrateOnHurt(forward, hitParams.GetHitStopDuration(Points).Ticks);
+        Status.Add(new HitStopEffect(forward, hitParams.GetHitStopDuration(Points).Ticks),
           s => {
-            s.Add(new HurtStunEffect(hitParams.HitConfig.StunDuration.Ticks));
+            s.Add(new HurtStunEffect(hitParams.GetHurtStunDuration(Points).Ticks));
             s.Add(new SlowFallDuration(hitParams.HitConfig.SlowFallDuration.Ticks));
             s.Add(new KnockbackEffect(knockbackVector * hitParams.GetKnockbackStrength(Points)));
             //s.Add(new HitFollowthroughEffect(hitParams.HitConfig.RecoilStrength * forward, RecoilDuration));
           });
       } else {
-        Status.Add(new HitStopEffect(forward, hitParams.HitConfig.HitStopDuration.Ticks));
+        Vibrator.VibrateOnHurt(forward, hitParams.GetHitStopDuration(Points).Ticks);
+        Status.Add(new HitStopEffect(forward, hitParams.GetHitStopDuration(Points).Ticks));
       }
       // Status.Add(new HitFollowthroughEffect(hitParams.HitConfig.RecoilStrength * forward, RecoilDuration));
     }
   }
 
   void OnHit(HitParams hitParams) {
+    var defenderDamage = hitParams.Defender.GetComponent<Damage>();
     var forward = hitParams.Source.transform.forward;
-    Status.Add(new HitStopEffect(forward, hitParams.HitConfig.HitStopDuration.Ticks), s => {
+    Vibrator.VibrateOnHit(forward, hitParams.GetHitStopDuration(defenderDamage.Points).Ticks);
+    Status.Add(new HitStopEffect(forward, hitParams.GetHitStopDuration(defenderDamage.Points).Ticks), s => {
       s.Add(new HitFollowthroughEffect(hitParams.HitConfig.RecoilStrength * forward, RecoilDuration, hitParams.Defender));
       //s.Add(new RecoilEffect(hitParams.HitConfig.RecoilStrength * forward));
     });
