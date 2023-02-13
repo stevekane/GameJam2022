@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class HitParams {
@@ -20,6 +21,15 @@ public class HitParams {
     // TODO HACK: This is a different attribute formula.. maybe this is what we want in general?
     return HitConfig.Knockback.Base + HitConfig.Knockback.Mult * baseKnockback;
   }
+
+  // Scale hitstop and hurtstun duration based on damage.
+  static AnimationCurve StunScaling = AnimationCurve.Linear(0, 1f, 1, 3f); // 1-3x duration
+  float ScaleDuration(float baseDuration, float defenderDamage) =>
+    baseDuration * StunScaling.Evaluate(defenderDamage / 100f);
+  public Timeval GetHitStopDuration(float defenderDamage) =>
+    Timeval.FromSeconds(ScaleDuration(HitConfig.HitStopDuration.Seconds, defenderDamage));
+  public Timeval GetHurtStunDuration(float defenderDamage) =>
+    Timeval.FromSeconds(ScaleDuration(HitConfig.HitStopDuration.Seconds, defenderDamage));
 
   // Useful if HitParams are reused for multiple calls to Hurtbox.TryAttack(), which will reset the Defender.
   public HitParams Clone() => new() {
@@ -45,4 +55,5 @@ public class HitParams {
     Source = source;
     AttackerTeamID = attacker.GetComponent<Team>().ID;
   }
+
 }

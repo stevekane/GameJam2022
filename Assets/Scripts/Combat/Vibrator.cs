@@ -19,27 +19,17 @@ public class Vibrator : MonoBehaviour {
     FramesRemaining = Mathf.Max(FramesRemaining,frames);
   }
 
-  public void VibrateThisFrame(Vector3 axis, float amplitude) {
-    Axis = axis;
-    Amplitude = amplitude;
-    FramesRemaining++;
-  }
+  public void VibrateOnHit(Vector3 axis, int frames) => Vibrate(axis, frames, HitAmplitude);
+  public void VibrateOnHurt(Vector3 axis, int frames) => Vibrate(axis, frames, HurtAmplitude);
 
   void Start() {
+    Target = GetComponent<AvatarAttacher>()?.GetBoneTransform(AvatarBone.Hips)?.parent ?? Target;
     LocalPosition = Target.transform.localPosition;
-  }
-
-  void OnHit(HitParams hitParams) {
-    Vibrate(hitParams.KnockbackVector, HitDuration.Ticks, HitAmplitude);
-  }
-
-  void OnHurt(HitParams hitParams) {
-    Vibrate(hitParams.KnockbackVector, HurtDuration.Ticks, HurtAmplitude);
   }
 
   void FixedUpdate() {
     if (FramesRemaining > 0) {
-      Sign = Sign == -1 ? 1 : -1;
+      Sign *= -1;
       Target.transform.localPosition = LocalPosition+Sign*Amplitude*Axis;
       FramesRemaining--;
     } else {
