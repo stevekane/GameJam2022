@@ -190,6 +190,7 @@ namespace PlayablesGraphVisualization {
       return type switch {
         _ when type == typeof(AnimationClipPlayable) => "Animation",
         _ when type == typeof(AnimationMixerPlayable) => "Mixer",
+        _ when type == typeof(AnimationScriptPlayable) => "AnimationScript",
         _ when type == typeof(AnimatorControllerPlayable) => "Animator",
         _ when type == typeof(AnimationLayerMixerPlayable) => "Layers",
         _ when type == typeof(AudioClipPlayable) => "Audio",
