@@ -1,61 +1,92 @@
+using Unity.Burst;
+using Unity.Mathematics;
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 using UnityEngine.Animations.Rigging;
-using Unity.Collections;
 
-/*
-Let's create a job that masks out bones from the AnimationStream using an AvatarMask.
-*/
+[BurstCompile]
+public struct BlendPerBoneJob : IAnimationJob {
+  public NativeList<ReadWriteTransformHandle> BaseHandles;
+  public NativeList<ReadWriteTransformHandle> BlendHandles;
 
-public struct AnimationMaskJob : IAnimationJob {
-  public AvatarMask Mask;
-  public NativeArray<ReadWriteTransformHandle> Handles;
-  public void ProcessRootMotion(AnimationStream stream) {}
+  public void ProcessRootMotion(AnimationStream stream) {
+    var baseStream = stream.GetInputStream(0);
+    stream.velocity = baseStream.velocity;
+    stream.angularVelocity = baseStream.angularVelocity;
+  }
+
   public void ProcessAnimation(AnimationStream stream) {
-    var data = Handles[0].GetLocalRotation(stream);
+    var baseStream = stream.GetInputStream(0);
+    var blendStream = stream.GetInputStream(1);
+    var blendWeight = stream.GetInputWeight(1);
+    var baseHandleCount = BaseHandles.Length;
+    for (var i = 0; i < baseHandleCount; i++) {
+      BaseHandles[i].CopyTRS(baseStream, stream);
+    }
+    var blendHandleCount = BlendHandles.Length;
+    for (var i = 0; i < blendHandleCount; i++) {
+      var handle = BlendHandles[i];
+      handle.GetGlobalTR(baseStream, out var basePosition, out var baseRotation);
+      handle.GetGlobalTR(blendStream, out var blendPosition, out var blendRotation);
+      var position = math.lerp(basePosition, blendPosition, blendWeight);
+      var rotation = math.slerp(baseRotation, blendRotation, blendWeight);
+      handle.SetGlobalTR(stream, position, rotation);
+    }
   }
 }
 
 public class MeshSpaceRotationMixer: MonoBehaviour {
   [SerializeField] Animator Animator;
-  [SerializeField] SkinnedMeshRenderer SkinnedMeshRenderer;
-  [SerializeField] AnimationClip LowerBodyClip;
-  [SerializeField] AnimationClip UpperBodyClip;
-  [SerializeField] Avatar Avatar;
-  [SerializeField] AvatarMask LowerBodyMask;
-  [SerializeField] AvatarMask UpperBodyMask;
+  [SerializeField] AnimationClip SlotClip;
   [SerializeField] Transform RootBone;
+  [SerializeField] Transform SpineBone;
+  [Range(0,1)]
+  [SerializeField] float MixerBlend;
 
   PlayableGraph Graph;
-  AnimationClipPlayable Lower;
-  AnimationClipPlayable Upper;
-  NativeArray<ReadWriteTransformHandle> Handles;
+  AnimationScriptPlayable BlendPerBone;
+  NativeList<ReadWriteTransformHandle> BaseHandles;
+  NativeList<ReadWriteTransformHandle> BlendHandles;
 
-  NativeArray<ReadWriteTransformHandle> SetupMaskHandles(Transform root, Animator animator, AvatarMask mask) {
-    var handles = new NativeArray<ReadWriteTransformHandle>(mask.transformCount, Allocator.Persistent);
-    for (var i = 0; i < mask.transformCount; i++) {
-      var active = mask.GetTransformActive(i);
-      var path = mask.GetTransformPath(i);
-      var transform = root.Find(path);
-      handles[i] = ReadWriteTransformHandle.Bind(animator, transform);
+  void CollectBoneHandles(Transform t, NativeList<ReadWriteTransformHandle> list) {
+    if (t == SpineBone)
+      list = BlendHandles;
+    list.Add(ReadWriteTransformHandle.Bind(Animator, t));
+    var childCount = t.childCount;
+    for (var i = 0; i < childCount; i++) {
+      CollectBoneHandles(t.GetChild(i), list);
     }
-    return handles;
   }
 
   void Start() {
-    // var desc = Avatar.humanDescription;
-    // Graph = PlayableGraph.Create("Mesh-space Rotation");
-    // Lower = AnimationClipPlayable.Create(Graph, LowerBodyClip);
-    // Upper = AnimationClipPlayable.Create(Graph, UpperBodyClip);
-    // var output = AnimationPlayableOutput.Create(Graph, )
-    // Graph.Play();
+    BaseHandles = new(Allocator.Persistent);
+    BlendHandles = new(Allocator.Persistent);
+    CollectBoneHandles(RootBone, BaseHandles);
+    Graph = PlayableGraph.Create("MeshSpaceRotation");
+    var animController = AnimatorControllerPlayable.Create(Graph, Animator.runtimeAnimatorController);
+    var slotClip = AnimationClipPlayable.Create(Graph, SlotClip);
+    var blendPerBoneJob = new BlendPerBoneJob {
+      BaseHandles = BaseHandles,
+      BlendHandles = BlendHandles
+    };
+    BlendPerBone = AnimationScriptPlayable.Create(Graph, blendPerBoneJob);
+    var animOutput = AnimationPlayableOutput.Create(Graph, "Animation Output", Animator);
+    BlendPerBone.SetProcessInputs(false);
+    BlendPerBone.AddInput(animController, 0, 1);
+    BlendPerBone.AddInput(slotClip, 0, MixerBlend);
+    animOutput.SetSourcePlayable(BlendPerBone, 0);
+    Graph.Play();
   }
 
   void OnDestroy() {
-    // Graph.Destroy();
+    Graph.Destroy();
+    BaseHandles.Dispose();
+    BlendHandles.Dispose();
   }
 
   void Update() {
+    BlendPerBone.SetInputWeight(1, MixerBlend);
   }
 }
