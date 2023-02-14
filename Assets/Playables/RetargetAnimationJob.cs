@@ -3,6 +3,7 @@ using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
 
 public struct RetargetingJob : IAnimationJob {
+  public bool UseRootMotion;
   public NativeArray<ReadWriteTransformHandle> SourceHandles;
   public NativeArray<ReadWriteTransformHandle> TargetHandles;
 
@@ -11,10 +12,15 @@ public struct RetargetingJob : IAnimationJob {
   NativeArray<ReadWriteTransformHandle> targetHandles) {
     SourceHandles = sourceHandles;
     TargetHandles = targetHandles;
+    UseRootMotion = false;
   }
 
   public void ProcessRootMotion(AnimationStream stream) {
-    // TODO: Should something happen here?
+    if (UseRootMotion) {
+      var lower = stream.GetInputStream(0);
+      stream.velocity = lower.velocity;
+      stream.angularVelocity = lower.angularVelocity;
+    }
   }
 
   public void ProcessAnimation(AnimationStream stream) {
