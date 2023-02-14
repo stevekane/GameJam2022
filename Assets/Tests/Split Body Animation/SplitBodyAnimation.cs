@@ -22,9 +22,12 @@ public class SplitBodyAnimation : MonoBehaviour {
     Graph = PlayableGraph.Create("Split Body Animation");
     var lowerClip = AnimationClipPlayable.Create(Graph, LowerClip);
     var upperClip = AnimationClipPlayable.Create(Graph, UpperClip);
+    var upperMixer = AnimationMixerPlayable.Create(Graph);
     SplitBodyMixer = new SplitBodyMixer(Graph, Animator, SplitBodySpec.LowerRoot, SplitBodySpec.UpperRoot);
-    SplitBodyMixer.Playable.ConnectInput(0, lowerClip, 0, 1);
-    SplitBodyMixer.Playable.ConnectInput(1, upperClip, 0, 1);
+    upperMixer.AddInput(lowerClip, 0, 1);
+    upperMixer.AddInput(upperClip, 0, 0);
+    SplitBodyMixer.Playable.ConnectInput(0, lowerClip, 1, 1);
+    SplitBodyMixer.Playable.ConnectInput(1, upperMixer, 1, 1);
     var output = AnimationPlayableOutput.Create(Graph, "Animation", Animator);
     output.SetSourcePlayable(SplitBodyMixer.Playable);
     Graph.Play();

@@ -18,30 +18,6 @@ public struct OscillateJob: IAnimationJob {
   }
 }
 
-public struct RetargetingJob : IAnimationJob {
-  public NativeArray<ReadWriteTransformHandle> SourceHandles;
-  public NativeArray<ReadWriteTransformHandle> TargetHandles;
-  public RetargetingJob(
-  NativeArray<ReadWriteTransformHandle> sourceHandles,
-  NativeArray<ReadWriteTransformHandle> targetHandles) {
-    SourceHandles = sourceHandles;
-    TargetHandles = targetHandles;
-  }
-  public void ProcessRootMotion(AnimationStream stream) {}
-  public void ProcessAnimation(AnimationStream stream) {
-    for (var i = 0; i < SourceHandles.Length; i++) {
-      var source = SourceHandles[i];
-      var target = TargetHandles[i];
-      target.SetLocalTRS(
-        stream,
-        source.GetLocalPosition(stream.GetInputStream(0)),
-        source.GetLocalRotation(stream.GetInputStream(0)),
-        source.GetLocalScale(stream.GetInputStream(0))
-      );
-    }
-  }
-}
-
 public class SkeletalRetargeting : MonoBehaviour {
   public Animator Animator;
   public Transform[] SkeletonTransforms;

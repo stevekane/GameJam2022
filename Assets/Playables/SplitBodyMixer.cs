@@ -1,5 +1,6 @@
 using Unity.Burst;
 using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Animations;
@@ -22,19 +23,16 @@ public struct SplitBodyMixerJob : IAnimationJob {
     var lower = stream.GetInputStream(0);
     var upper = stream.GetInputStream(1);
     for (var i = 0; i < LowerBones.Length; i++) {
-      CopyTRS(lower, stream, LowerBones[i]);
+      LowerBones[i].CopyTRS(lower, stream);
     }
     for (var i = 0; i < UpperBones.Length; i++) {
-      CopyTRS(upper, stream, UpperBones[i]);
+      UpperBones[i].CopyTRS(upper, stream);
     }
-  }
-
-  void CopyTRS(AnimationStream source, AnimationStream target, ReadWriteTransformHandle handle) {
-    handle.SetLocalTRS(
-      target,
-      handle.GetLocalPosition(source),
-      handle.GetLocalRotation(source),
-      handle.GetLocalScale(source));
+    var hipsLowerRotation = LowerRootBone.GetRotation(lower);
+    var hipsUpperRotation = LowerRootBone.GetRotation(upper);
+    var spineUpperRotation = UpperRootBone.GetRotation(upper);
+    var rotation = math.inverse(hipsLowerRotation) * hipsUpperRotation * spineUpperRotation;
+    UpperRootBone.SetLocalRotation(stream, rotation);
   }
 }
 
