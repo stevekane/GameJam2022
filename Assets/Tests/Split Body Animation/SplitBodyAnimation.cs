@@ -5,12 +5,6 @@ using UnityEngine.Playables;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
 
-[Serializable]
-public struct SplitBodySpec {
-  public Transform LowerRoot;
-  public Transform UpperRoot;
-}
-
 public class SplitBodyAnimation : MonoBehaviour {
   [SerializeField] Animator Animator;
   [SerializeField] Transform RootBone;

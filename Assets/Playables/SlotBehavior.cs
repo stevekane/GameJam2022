@@ -7,6 +7,7 @@ public class SlotBehavior : PlayableBehaviour {
   Playable Playable;
   AnimationMixerPlayable AnimationMixer;
   AudioMixerPlayable AudioMixer;
+  Playable CurrentPlayable;
 
   public override void OnPlayableCreate(Playable playable) {
     Playable = playable;
@@ -24,10 +25,12 @@ public class SlotBehavior : PlayableBehaviour {
   }
 
   public void PlayAnimation(Playable playable, int outputIndex = 0) {
+    CurrentPlayable = playable;
     AnimationMixer.AddInput(playable, outputIndex, 1);
   }
 
   public void PlayAudio(Playable playable, int outputIndex = 0) {
+    CurrentPlayable = Playable;
     AudioMixer.AddInput(playable, outputIndex, 1);
   }
 }
