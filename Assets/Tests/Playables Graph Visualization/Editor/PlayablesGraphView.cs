@@ -37,7 +37,10 @@ public static class PlayableGraphExtensions {
       return new ConnectedOutput(source, 0);
     if (!source.CanChangeInputs())
       return new ConnectedOutput(source, 0);
+    return new ConnectedOutput(source, 0);
 
+    /*
+    TODO: This doesn't really work in practice. These mutations break running graphs
     OriginalOutputs.Clear();
     AffectedOutputs.Clear();
     for (var o = 0; o < sourceOutputCount; o++) {
@@ -55,6 +58,7 @@ public static class PlayableGraphExtensions {
     }
     playable.ConnectInput(portIndex, source, sourceOutputPort);
     return new ConnectedOutput(source, sourceOutputPort);
+    */
   }
 }
 

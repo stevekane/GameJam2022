@@ -20,8 +20,10 @@ public class SlotBehavior : PlayableBehaviour {
   }
 
   public override void OnPlayableDestroy(Playable playable) {
-    Graph.DestroySubgraph(AnimationMixer);
-    Graph.DestroySubgraph(AudioMixer);
+    if (Graph.IsValid()) {
+      Graph.DestroySubgraph(AnimationMixer);
+      Graph.DestroySubgraph(AudioMixer);
+    }
   }
 
   public void PlayAnimation(Playable playable, int outputIndex = 0) {
