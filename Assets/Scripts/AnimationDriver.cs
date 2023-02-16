@@ -214,12 +214,15 @@ public class AnimationDriver : MonoBehaviour {
     Graph = PlayableGraph.Create("Animation Driver");
     var output = AnimationPlayableOutput.Create(Graph, "Animation Driver", Animator);
     AnimatorController = AnimatorControllerPlayable.Create(Graph, Animator.runtimeAnimatorController);
-    Mixer = AnimationLayerMixerPlayable.Create(Graph, 2);
+    Mixer = AnimationLayerMixerPlayable.Create(Graph, 3);
     Mixer.ConnectInput(0, DualSampler(hipsBone, out LowerRoot, spineBone, out LowerSpine), 0, 1f);
-    Mixer.ConnectInput(1, DualSampler(hipsBone, out UpperRoot, spineBone, out UpperSpine), 0, 1f);
-    WholeBodySlot = new Slot { Input = Mixer.GetInput(0).GetInput(0), MixerInputPort = 0 };
-    UpperBodySlot = new Slot { Input = Mixer.GetInput(1).GetInput(0), MixerInputPort = 1 };
-    WholeBodySlot.Input.AddInput(AnimatorController, 0, 1f);
+    Mixer.ConnectInput(1, ScriptPlayable<NoopBehavior>.Create(Graph), 0, 1f);
+    Mixer.ConnectInput(2, DualSampler(hipsBone, out UpperRoot, spineBone, out UpperSpine), 0, 1f);
+    Mixer.GetInput(0).GetInput(0).AddInput(AnimatorController, 0, 1f);
+    WholeBodySlot = new Slot { Input = Mixer.GetInput(1), MixerInputPort = 1 };
+    UpperBodySlot = new Slot { Input = Mixer.GetInput(2).GetInput(0), MixerInputPort = 2 };
+    Mixer.SetInputWeight(WholeBodySlot.MixerInputPort, 0f);
+    Mixer.SetInputWeight(UpperBodySlot.MixerInputPort, 0f);
     Mixer.SetLayerMaskFromAvatarMask((uint)UpperBodySlot.MixerInputPort, Defaults.Instance.UpperBodyMask);
     SpineCorrector = NewSpineCorrector(spineBone);
     SpineCorrector.AddInput(Mixer, 0, 1f);
@@ -263,16 +266,17 @@ public class AnimationDriver : MonoBehaviour {
       data.IsActive = true;
       SpineCorrector.SetJobData(data);
     }
-    if (slot == WholeBodySlot && slot.Input.GetInputCount() == 1) {
-      slot.Input.DisconnectInput(0);
-      slot.Input.SetInputCount(0);
+    if (slot == WholeBodySlot) {
+      Mixer.SetInputWeight(0, 0f);
     }
     slot.Input.AddInput(job.Clip, 0, 1f);
+    Mixer.SetInputWeight(slot.MixerInputPort, 1f);
     slot.CurrentJob = job;
   }
 
   public void Disconnect(AnimationJob job) {
     if (SlotForJob(job) is var slot && slot != null) {
+      Mixer.SetInputWeight(slot.MixerInputPort, 0f);
       slot.Input.DisconnectInput(0);
       slot.Input.SetInputCount(0);
       if (slot == UpperBodySlot) {
@@ -281,7 +285,7 @@ public class AnimationDriver : MonoBehaviour {
         SpineCorrector.SetJobData(data);
       }
       if (slot == WholeBodySlot) {
-        slot.Input.AddInput(AnimatorController, 0, 1f);
+        Mixer.SetInputWeight(1, 1f);
       }
       slot.CurrentJob = null;
     }
