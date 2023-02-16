@@ -217,14 +217,12 @@ public class AnimationDriver : MonoBehaviour {
     AnimatorController = AnimatorControllerPlayable.Create(Graph, Animator.runtimeAnimatorController);
     Mixer = AnimationLayerMixerPlayable.Create(Graph, 3);
     Mixer.ConnectInput(0, DualSampler(hipsBone, out LowerRoot, spineBone, out LowerSpine), 0, 1f);
-    Mixer.ConnectInput(1, AnimationScriptPlayable.Create(Graph, new AnimationNoopJob()), 0, 1f);
+    Mixer.ConnectInput(1, AnimationScriptPlayable.Create(Graph, new AnimationNoopJob(), 1), 0, 1f);
     Mixer.ConnectInput(2, DualSampler(hipsBone, out UpperRoot, spineBone, out UpperSpine), 0, 1f);
-    Mixer.GetInput(0).GetInput(0).AddInput(AnimatorController, 0, 1f);
-    WholeBodySlot = new Slot { Playable = Mixer.GetInput(1), MixerInputPort = 1 };
-    UpperBodySlot = new Slot { Playable = Mixer.GetInput(2).GetInput(0), MixerInputPort = 2 };
-    Mixer.SetInputWeight(WholeBodySlot.MixerInputPort, 0f);
-    Mixer.SetInputWeight(UpperBodySlot.MixerInputPort, 0f);
-    Mixer.SetLayerMaskFromAvatarMask((uint)UpperBodySlot.MixerInputPort, Defaults.Instance.UpperBodyMask);
+    Mixer.GetInput(0).GetInput(0).ConnectInput(0, AnimatorController, 0, 1f);
+    WholeBodySlot = new Slot { Playable = Mixer.GetInput(1) };
+    UpperBodySlot = new Slot { Playable = Mixer.GetInput(2).GetInput(0) };
+    Mixer.SetLayerMaskFromAvatarMask(2, Defaults.Instance.UpperBodyMask);
     SpineCorrector = NewSpineCorrector(spineBone);
     SpineCorrector.AddInput(Mixer, 0, 1f);
     output.SetSourcePlayable(SpineCorrector);
@@ -242,7 +240,7 @@ public class AnimationDriver : MonoBehaviour {
 
   public float TorsoRotation {
     get {
-      var upperHips = Quaternion.Slerp(Quaternion.identity, UpperRoot[0], UpperWeight);
+      var upperHips = Quaternion.Slerp(Quaternion.identity, UpperRoot[0], UpperBodySlot.InputWeight);
       var hipsForward = upperHips * Vector3.forward;
       var angle = Vector3.SignedAngle(hipsForward.XZ(), Vector3.forward, Vector3.up);
       return angle;
@@ -260,7 +258,7 @@ public class AnimationDriver : MonoBehaviour {
   }
   public void SetInputWeight(AnimationJob job, float weight) {
     if (SlotForJob(job) is var slot && slot != null)
-      Mixer.SetInputWeight(slot.MixerInputPort, weight);
+      slot.Playable.SetInputWeight(0, weight);
   }
 
   public void Connect(AnimationJob job) {
@@ -268,16 +266,13 @@ public class AnimationDriver : MonoBehaviour {
     var slot = job.Animation.Mask == Defaults.Instance.UpperBodyMask ? UpperBodySlot : WholeBodySlot;
     if (slot.CurrentJob != null)
       slot.CurrentJob.Stop();
-    slot.Playable.AddInput(job.Clip, 0, 1f);
-    Mixer.SetInputWeight(slot.MixerInputPort, 1f);
+    slot.Playable.ConnectInput(0, job.Clip, 0, 1f);
     slot.CurrentJob = job;
   }
 
   public void Disconnect(AnimationJob job) {
     if (SlotForJob(job) is var slot && slot != null) {
-      Mixer.SetInputWeight(slot.MixerInputPort, 0f);
       slot.Playable.DisconnectInput(0);
-      slot.Playable.SetInputCount(0);
       slot.CurrentJob = null;
     }
   }
@@ -289,17 +284,19 @@ public class AnimationDriver : MonoBehaviour {
     return job;
   }
 
-  float UpperWeight => UpperBodySlot.CurrentJob != null ? Mixer.GetInputWeight(UpperBodySlot.MixerInputPort) : 0f;
   void Update() {
     var data = SpineCorrector.GetJobData<SpineRotationJob>();
-    data.UpperWeight = UpperWeight;
+    data.UpperWeight = UpperBodySlot.InputWeight;
     SpineCorrector.SetJobData(data);
+    // Update mixer input weights based on the slot state. Could do this differently, but this is the cleanest IMO.
+    Mixer.SetInputWeight(1, WholeBodySlot.InputWeight);
+    Mixer.SetInputWeight(2, UpperBodySlot.InputWeight);
   }
 
   class Slot {
     public Playable Playable;
     public AnimationJob CurrentJob;
-    public int MixerInputPort;
+    public float InputWeight => Playable.GetInput(0).IsNull() ? 0f : Playable.GetInputWeight(0);
   }
   Slot WholeBodySlot;
   Slot UpperBodySlot;
@@ -321,14 +318,14 @@ public class AnimationDriver : MonoBehaviour {
     value = new(1, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
     value[0] = quaternion.identity;
     var job = new SampleLocalRotationJob { Handle = ReadOnlyTransformHandle.Bind(Animator, t), Value = value };
-    var playable = AnimationScriptPlayable.Create(Graph, job);
+    var playable = AnimationScriptPlayable.Create(Graph, job, 1);
     return playable;
   }
 
   AnimationScriptPlayable DualSampler(Transform hip, out NativeArray<quaternion> hipRot, Transform spine, out NativeArray<quaternion> spineRot) {
     var hipSampler = Sampler(hip, out hipRot);
     var spineSampler = Sampler(spine, out spineRot);
-    hipSampler.AddInput(spineSampler, 0, 1f);
+    hipSampler.ConnectInput(0, spineSampler, 0, 1f);
     return hipSampler;
   }
 
