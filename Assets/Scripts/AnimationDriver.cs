@@ -260,7 +260,7 @@ public class AnimationDriver : MonoBehaviour {
       slot.CurrentJob.Stop();
     if (slot == UpperBodySlot) {
       var data = SpineCorrector.GetJobData<SpineRotationJob>();
-      data.IsActive = false;
+      data.IsActive = true;
       SpineCorrector.SetJobData(data);
     }
     if (slot == WholeBodySlot && slot.Input.GetInputCount() == 1) {
