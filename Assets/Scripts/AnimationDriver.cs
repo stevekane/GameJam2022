@@ -173,7 +173,7 @@ struct SampleLocalRotationJob : IAnimationJob {
 
 [BurstCompile]
 struct SpineRotationJob : IAnimationJob {
-  public bool IsActive;
+  public float UpperWeight;
   public NativeArray<quaternion> LowerRoot;
   public NativeArray<quaternion> UpperRoot;
   public NativeArray<quaternion> LowerSpine;
@@ -181,15 +181,15 @@ struct SpineRotationJob : IAnimationJob {
   public ReadWriteTransformHandle SpineHandle;
   public void ProcessRootMotion(AnimationStream stream) { }
   public void ProcessAnimation(AnimationStream stream) {
-    if (!IsActive)
-      return;
+    //if (UpperWeight == 0f)
+    //  return;
     var hipsLowerRotation = LowerRoot[0];
     var hipsUpperRotation = UpperRoot[0];
     var spineLowerRotation = LowerSpine[0];
     var spineUpperRotation = UpperSpine[0];
     spineUpperRotation = math.mul(hipsUpperRotation, spineUpperRotation);
     spineUpperRotation = math.mul(math.inverse(hipsLowerRotation), spineUpperRotation);
-    spineUpperRotation = math.slerp(spineLowerRotation, spineUpperRotation, 1);
+    spineUpperRotation = math.slerp(spineLowerRotation, spineUpperRotation, UpperWeight);
     SpineHandle.SetLocalRotation(stream, spineUpperRotation);
   }
 }
@@ -219,8 +219,9 @@ public class AnimationDriver : MonoBehaviour {
     Mixer.ConnectInput(1, ScriptPlayable<NoopBehavior>.Create(Graph), 0, 1f);
     Mixer.ConnectInput(2, DualSampler(hipsBone, out UpperRoot, spineBone, out UpperSpine), 0, 1f);
     Mixer.GetInput(0).GetInput(0).AddInput(AnimatorController, 0, 1f);
-    WholeBodySlot = new Slot { Input = Mixer.GetInput(1), MixerInputPort = 1 };
-    UpperBodySlot = new Slot { Input = Mixer.GetInput(2).GetInput(0), MixerInputPort = 2 };
+    WholeBodySlot = new Slot { Playable = Mixer.GetInput(1), MixerInputPort = 1 };
+    UpperBodySlot = new Slot { Playable = Mixer.GetInput(2).GetInput(0), MixerInputPort = 2 };
+    WholeBodySlot.Playable.SetTraversalMode(PlayableTraversalMode.Passthrough);
     Mixer.SetInputWeight(WholeBodySlot.MixerInputPort, 0f);
     Mixer.SetInputWeight(UpperBodySlot.MixerInputPort, 0f);
     Mixer.SetLayerMaskFromAvatarMask((uint)UpperBodySlot.MixerInputPort, Defaults.Instance.UpperBodyMask);
@@ -239,6 +240,7 @@ public class AnimationDriver : MonoBehaviour {
     Graph.Destroy();
   }
 
+  // TODO: do some math with the upper and lower root bone
   public float TorsoRotation => 0f;
 
   public void SetSpeed(float speed) {
@@ -261,15 +263,10 @@ public class AnimationDriver : MonoBehaviour {
     var slot = job.Animation.Mask == Defaults.Instance.UpperBodyMask ? UpperBodySlot : WholeBodySlot;
     if (slot.CurrentJob != null)
       slot.CurrentJob.Stop();
-    if (slot == UpperBodySlot) {
-      var data = SpineCorrector.GetJobData<SpineRotationJob>();
-      data.IsActive = true;
-      SpineCorrector.SetJobData(data);
-    }
     if (slot == WholeBodySlot) {
       Mixer.SetInputWeight(0, 0f);
     }
-    slot.Input.AddInput(job.Clip, 0, 1f);
+    slot.Playable.AddInput(job.Clip, 0, 1f);
     Mixer.SetInputWeight(slot.MixerInputPort, 1f);
     slot.CurrentJob = job;
   }
@@ -277,15 +274,10 @@ public class AnimationDriver : MonoBehaviour {
   public void Disconnect(AnimationJob job) {
     if (SlotForJob(job) is var slot && slot != null) {
       Mixer.SetInputWeight(slot.MixerInputPort, 0f);
-      slot.Input.DisconnectInput(0);
-      slot.Input.SetInputCount(0);
-      if (slot == UpperBodySlot) {
-        var data = SpineCorrector.GetJobData<SpineRotationJob>();
-        data.IsActive = false;
-        SpineCorrector.SetJobData(data);
-      }
+      slot.Playable.DisconnectInput(0);
+      slot.Playable.SetInputCount(0);
       if (slot == WholeBodySlot) {
-        Mixer.SetInputWeight(1, 1f);
+        Mixer.SetInputWeight(0, 1f);
       }
       slot.CurrentJob = null;
     }
@@ -298,8 +290,14 @@ public class AnimationDriver : MonoBehaviour {
     return job;
   }
 
+  void Update() {
+    var data = SpineCorrector.GetJobData<SpineRotationJob>();
+    data.UpperWeight = UpperBodySlot.CurrentJob != null ? Mixer.GetInputWeight(UpperBodySlot.MixerInputPort) : 0f;
+    SpineCorrector.SetJobData(data);
+  }
+
   class Slot {
-    public Playable Input;
+    public Playable Playable;
     public AnimationJob CurrentJob;
     public int MixerInputPort;
   }
@@ -335,7 +333,7 @@ public class AnimationDriver : MonoBehaviour {
 
   AnimationScriptPlayable NewSpineCorrector(Transform spine) {
     var job = new SpineRotationJob {
-      IsActive = false,
+      UpperWeight = 0f,
       LowerRoot = LowerRoot,
       UpperRoot = UpperRoot,
       LowerSpine = LowerSpine,
