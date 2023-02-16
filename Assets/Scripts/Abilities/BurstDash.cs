@@ -44,13 +44,13 @@ public class BurstDash : Ability {
       var dir = AbilityManager.GetAxis(AxisTag.Move).XZ.TryGetDirection() ?? AbilityManager.transform.forward;
       using var invulnEffect = Status.Add(Invulnerable);
       SFXManager.Instance.TryPlayOneShot(LaunchSFX);
-      VFXManager.Instance.TrySpawnEffect(LaunchVFX, transform.position + VFXOffset, transform.rotation);
-      VisualEffect.Play();
+      //VFXManager.Instance.TrySpawnEffect(LaunchVFX, transform.position + VFXOffset, transform.rotation);
+      //VisualEffect.Play();
       AnimationDriver.Play(scope, Animation);
       AirDashRemaining--;
       await scope.Any(
         Waiter.Delay(DashDuration),
-        Waiter.Repeat(SpawnResidualImage),
+        //Waiter.Repeat(SpawnResidualImage),
         Waiter.Repeat(Move(dir.normalized, Impulse)),
         MakeCancellable);
     } finally {

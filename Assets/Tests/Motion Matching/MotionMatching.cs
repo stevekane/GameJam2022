@@ -4,6 +4,9 @@ using UnityEngine.Playables;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
 using Unity.Mathematics;
+using System.Collections.Generic;
+using System.Linq;
+using Unity.Collections;
 
 /*
 Construct playable graph.
@@ -106,6 +109,139 @@ public struct SampleJob : IAnimationJob {
     var alongHips = math.forward(localRotation);
     var alongHipsXZ = new float3(alongHips.x, 0, alongHips.z);
     Angle = Vector3.SignedAngle(alongHipsXZ, new float3(0, 0, 1), new float3(0, 1, 0));
+  }
+}
+
+[Serializable]
+public struct MixerJobData {
+  public NativeArray<ReadWriteTransformHandle> BoneHandles;
+  public NativeArray<int> BoneParents;
+  public NativeArray<NativeArray<bool>> BoneActivesPerLayer;
+  public bool ReverseBaseLayerRotation;
+  public bool MeshSpaceRotations;
+
+  AvatarMaskBodyPart[] BoneBodyParts;  // Main thread only.
+  public void Init(Animator animator) {
+    var transforms = animator.avatarRoot.GetComponentsInChildren<Transform>();
+    BoneHandles = new(transforms.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+    BoneParents = new(transforms.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+    for (int i = 0; i < transforms.Length; i++) {
+      BoneHandles[i] = ReadWriteTransformHandle.Bind(animator, transforms[i]);
+      BoneParents[i] = Array.FindIndex(transforms, t => t == transforms[i].parent);
+    }
+    BoneActivesPerLayer = new(0, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+
+    var self = this;
+    BoneBodyParts = transforms.Select(t => self.GetAvatarMaskBodyPart(animator.avatarRoot, animator.avatar, t)).ToArray();
+  }
+
+  public void Dispose() {
+    BoneHandles.Dispose();
+    BoneParents.Dispose();
+    BoneActivesPerLayer.Dispose();
+  }
+
+  // Adds a new layer to our BoneMaskPerLayer cache, and turns its bones on/off depending on whether they
+  // are enabled by `mask` - defaults to ON if `mask` is null.
+  public void SetLayerMaskFromAvatarMask(int layer, AvatarMask mask) {
+    var old = BoneActivesPerLayer;
+    BoneActivesPerLayer = new(layer+1, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+    NativeArray<NativeArray<bool>>.Copy(old, BoneActivesPerLayer, layer);
+    var boneActives = BoneActivesPerLayer[layer] = new(BoneBodyParts.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+    for (int bone = 0; bone < BoneBodyParts.Length; bone++)
+      boneActives[bone] = mask ? mask.GetHumanoidBodyPartActive(BoneBodyParts[bone]) : true;
+    old.Dispose();
+  }
+
+  static Dictionary<string, AvatarMaskBodyPart> HumanNameToBodyPart = new() {
+    {"Root", AvatarMaskBodyPart.Root },
+    {"Spine", AvatarMaskBodyPart.Body },
+    {"Head", AvatarMaskBodyPart.Head },
+    {"LeftUpperLeg", AvatarMaskBodyPart.LeftLeg },
+    {"RightUpperLeg", AvatarMaskBodyPart.RightLeg },
+    {"LeftShoulder", AvatarMaskBodyPart.LeftArm },
+    {"RightShoulder", AvatarMaskBodyPart.RightArm },
+    //{"LeftHand", AvatarMaskBodyPart.LeftFingers }, // fuck fingers
+    //{"RightHand", AvatarMaskBodyPart.RightFingers },
+    {"LeftFoot", AvatarMaskBodyPart.LeftFootIK },
+    {"RightFoot", AvatarMaskBodyPart.RightFootIK },
+    {"LeftHand", AvatarMaskBodyPart.LeftHandIK },
+    {"RightHand", AvatarMaskBodyPart.RightHandIK },
+  };
+  // Returns the AvatarMaskBodyPart for the region of the avatar tree given by `t`, which must be a descendent
+  // of avatarRoot.
+  AvatarMaskBodyPart GetAvatarMaskBodyPart(Transform avatarRoot, Avatar avatar, Transform t) {
+    if (avatar == null || t == avatarRoot)
+      return AvatarMaskBodyPart.Root;
+    var hb = avatar.humanDescription.human.FirstOrDefault(hb => hb.boneName == t.name);
+    if (hb.boneName == t.name && HumanNameToBodyPart.TryGetValue(hb.humanName, out var bodyPart))
+      return bodyPart;
+    return GetAvatarMaskBodyPart(avatarRoot, avatar, t.parent);
+  }
+}
+
+public struct MixerJob : IAnimationJob {
+  public MixerJobData Data;
+  public float Angle;
+  public MixerJob(MixerJobData data) {
+    Data = data;
+    Angle = 0f;
+  }
+  public void ProcessRootMotion(AnimationStream stream) {
+    // I don't know what this shit is used for.
+    var baseStream = stream.GetInputStream(0);
+    stream.velocity = baseStream.velocity;
+    stream.angularVelocity = baseStream.angularVelocity;
+  }
+  public void ProcessAnimation(AnimationStream stream) {
+    Angle = 0f;
+    var baseStream = stream.GetInputStream(0);
+    for (var i = 0; i < Data.BoneHandles.Length; i++) {
+      var handle = Data.BoneHandles[i];
+      int layer = FindInputStreamForBone(stream, i);
+      var inStream = stream.GetInputStream(layer);
+      var inWeight = stream.GetInputWeight(layer);
+      handle.SetLocalPosition(stream, Blend(handle.GetLocalPosition(baseStream), handle.GetLocalPosition(inStream), inWeight));
+      handle.SetLocalScale(stream, Blend(handle.GetLocalScale(baseStream), handle.GetLocalScale(inStream), inWeight));
+      var boneIsTopmostActive = Data.BoneActivesPerLayer[layer][i] && Data.BoneParents[i] >= 0 && !Data.BoneActivesPerLayer[layer][Data.BoneParents[i]];
+      if (boneIsTopmostActive) {
+        // TODO HACK: untangle this hip angle sampling and make a better mixer.
+        var parentHandle = Data.BoneHandles[Data.BoneParents[i]];
+        ReadHipAngle(parentHandle, inStream);
+
+        // If our parent bone is disabled in this layer, do some special shit to try to preserve the animation's intent for this bone.
+        // First, use a "mesh-space" rotation - figure out the total rotation that WOULD be imparted on this bone and apply it locally.
+        Quaternion rotation = Data.MeshSpaceRotations ?
+          Quaternion.Inverse(RootRotation(inStream)) * handle.GetRotation(inStream) :
+          handle.GetLocalRotation(inStream);
+        if (Data.ReverseBaseLayerRotation) {
+          // Next, reverse the rotation that our base layer applies to our parent bone.
+          var baseParentRotation = Quaternion.Inverse(RootRotation(baseStream)) * parentHandle.GetRotation(baseStream);
+          rotation = Quaternion.Inverse(baseParentRotation) * rotation;
+        }
+        handle.SetLocalRotation(stream, Blend(handle.GetLocalRotation(baseStream), rotation, inWeight));
+      } else {
+        handle.SetLocalRotation(stream, Blend(handle.GetLocalRotation(baseStream), handle.GetLocalRotation(inStream), inWeight));
+      }
+    }
+  }
+  public void ReadHipAngle(ReadWriteTransformHandle handle, AnimationStream stream) {
+    var rootRotation = RootRotation(stream);
+    var rotation = handle.GetRotation(stream);
+    //var localRotation = TargetHandle.GetLocalRotation(stream);
+    var localRotation = Quaternion.Inverse(rootRotation) * rotation;
+    var alongHips = localRotation * Vector3.forward;
+    Angle = Vector3.SignedAngle(alongHips.XZ(), Vector3.forward, Vector3.up);
+  }
+  Vector3 Blend(Vector3 a, Vector3 b, float weight) => Vector3.Lerp(a, b, weight);
+  Quaternion Blend(Quaternion a, Quaternion b, float weight) => Quaternion.Slerp(a, b, weight);
+  Quaternion RootRotation(AnimationStream stream) => Data.BoneHandles[0].GetRotation(stream);
+  int FindInputStreamForBone(AnimationStream stream, int boneIdx) {
+    for (var layer = stream.inputStreamCount-1; layer >= 0; layer--) {
+      if (Data.BoneActivesPerLayer[layer][boneIdx] && stream.GetInputStream(layer).isValid)
+        return layer;
+    }
+    return 0;  // default to top layer
   }
 }
 

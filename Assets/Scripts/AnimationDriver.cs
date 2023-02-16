@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Traditional;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
@@ -9,6 +11,7 @@ using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.Playables;
 using UnityEngine.Rendering;
+using UnityEngine.UIElements;
 
 [Serializable]
 public class AnimationJobConfig {
@@ -26,7 +29,6 @@ public class AnimationJob {
   PlayableGraph Graph;
   public AnimationJobConfig Animation;
   AnimationDriver Driver;
-  public int InputPort = -1;
   public AnimationClipPlayable Clip;
   double DesiredSpeed = 1;
   public bool IsRunning { get; private set; } = false;
@@ -122,7 +124,7 @@ public class AnimationJob {
       while (IsRunning && Clip.IsValid()) {
         UpdateCurrentFrame();
         UpdateCurrentPhase();
-        Driver.Mixer.SetInputWeight(InputPort, BlendWeight());
+        Driver.SetInputWeight(this, BlendWeight());
         Clip.SetSpeed(DesiredSpeed * Animation.Speed * Driver.Speed);
         if (Clip.IsDone())
           break;
@@ -159,136 +161,36 @@ public class AnimationJob {
   }
 }
 
-[Serializable]
-public struct MixerJobData {
-  public NativeArray<ReadWriteTransformHandle> BoneHandles;
-  public NativeArray<int> BoneParents;
-  public NativeArray<NativeArray<bool>> BoneActivesPerLayer;
-  public bool ReverseBaseLayerRotation;
-  public bool MeshSpaceRotations;
-
-  AvatarMaskBodyPart[] BoneBodyParts;  // Main thread only.
-  public void Init(Animator animator) {
-    var transforms = animator.avatarRoot.GetComponentsInChildren<Transform>();
-    BoneHandles = new(transforms.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-    BoneParents = new(transforms.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-    for (int i = 0; i < transforms.Length; i++) {
-      BoneHandles[i] = ReadWriteTransformHandle.Bind(animator, transforms[i]);
-      BoneParents[i] = Array.FindIndex(transforms, t => t == transforms[i].parent);
-    }
-    BoneActivesPerLayer = new(0, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-
-    var self = this;
-    BoneBodyParts = transforms.Select(t => self.GetAvatarMaskBodyPart(animator.avatarRoot, animator.avatar, t)).ToArray();
-  }
-
-  public void Dispose() {
-    BoneHandles.Dispose();
-    BoneParents.Dispose();
-    BoneActivesPerLayer.Dispose();
-  }
-
-  // Adds a new layer to our BoneMaskPerLayer cache, and turns its bones on/off depending on whether they
-  // are enabled by `mask` - defaults to ON if `mask` is null.
-  public void SetLayerMaskFromAvatarMask(int layer, AvatarMask mask) {
-    var old = BoneActivesPerLayer;
-    BoneActivesPerLayer = new(layer+1, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-    NativeArray<NativeArray<bool>>.Copy(old, BoneActivesPerLayer, layer);
-    var boneActives = BoneActivesPerLayer[layer] = new(BoneBodyParts.Length, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-    for (int bone = 0; bone < BoneBodyParts.Length; bone++)
-      boneActives[bone] = mask ? mask.GetHumanoidBodyPartActive(BoneBodyParts[bone]) : true;
-    old.Dispose();
-  }
-
-  static Dictionary<string, AvatarMaskBodyPart> HumanNameToBodyPart = new() {
-    {"Root", AvatarMaskBodyPart.Root },
-    {"Spine", AvatarMaskBodyPart.Body },
-    {"Head", AvatarMaskBodyPart.Head },
-    {"LeftUpperLeg", AvatarMaskBodyPart.LeftLeg },
-    {"RightUpperLeg", AvatarMaskBodyPart.RightLeg },
-    {"LeftShoulder", AvatarMaskBodyPart.LeftArm },
-    {"RightShoulder", AvatarMaskBodyPart.RightArm },
-    //{"LeftHand", AvatarMaskBodyPart.LeftFingers }, // fuck fingers
-    //{"RightHand", AvatarMaskBodyPart.RightFingers },
-    {"LeftFoot", AvatarMaskBodyPart.LeftFootIK },
-    {"RightFoot", AvatarMaskBodyPart.RightFootIK },
-    {"LeftHand", AvatarMaskBodyPart.LeftHandIK },
-    {"RightHand", AvatarMaskBodyPart.RightHandIK },
-  };
-  // Returns the AvatarMaskBodyPart for the region of the avatar tree given by `t`, which must be a descendent
-  // of avatarRoot.
-  AvatarMaskBodyPart GetAvatarMaskBodyPart(Transform avatarRoot, Avatar avatar, Transform t) {
-    if (avatar == null || t == avatarRoot)
-      return AvatarMaskBodyPart.Root;
-    var hb = avatar.humanDescription.human.FirstOrDefault(hb => hb.boneName == t.name);
-    if (hb.boneName == t.name && HumanNameToBodyPart.TryGetValue(hb.humanName, out var bodyPart))
-      return bodyPart;
-    return GetAvatarMaskBodyPart(avatarRoot, avatar, t.parent);
+[BurstCompile]
+struct SampleLocalRotationJob : IAnimationJob {
+  public ReadOnlyTransformHandle Handle;
+  public NativeArray<quaternion> Value;
+  public void ProcessRootMotion(AnimationStream stream) { }
+  public void ProcessAnimation(AnimationStream stream) {
+    Value[0] = Handle.GetLocalRotation(stream);
   }
 }
 
-public struct MixerJob : IAnimationJob {
-  public MixerJobData Data;
-  public float Angle;
-  public MixerJob(MixerJobData data) {
-    Data = data;
-    Angle = 0f;
-  }
-  public void ProcessRootMotion(AnimationStream stream) {
-    // I don't know what this shit is used for.
-    var baseStream = stream.GetInputStream(0);
-    stream.velocity = baseStream.velocity;
-    stream.angularVelocity = baseStream.angularVelocity;
-  }
+[BurstCompile]
+struct SpineRotationJob : IAnimationJob {
+  public bool IsActive;
+  public NativeArray<quaternion> LowerRoot;
+  public NativeArray<quaternion> UpperRoot;
+  public NativeArray<quaternion> LowerSpine;
+  public NativeArray<quaternion> UpperSpine;
+  public ReadWriteTransformHandle SpineHandle;
+  public void ProcessRootMotion(AnimationStream stream) { }
   public void ProcessAnimation(AnimationStream stream) {
-    Angle = 0f;
-    var baseStream = stream.GetInputStream(0);
-    for (var i = 0; i < Data.BoneHandles.Length; i++) {
-      var handle = Data.BoneHandles[i];
-      int layer = FindInputStreamForBone(stream, i);
-      var inStream = stream.GetInputStream(layer);
-      var inWeight = stream.GetInputWeight(layer);
-      handle.SetLocalPosition(stream, Blend(handle.GetLocalPosition(baseStream), handle.GetLocalPosition(inStream), inWeight));
-      handle.SetLocalScale(stream, Blend(handle.GetLocalScale(baseStream), handle.GetLocalScale(inStream), inWeight));
-      var boneIsTopmostActive = Data.BoneActivesPerLayer[layer][i] && Data.BoneParents[i] >= 0 && !Data.BoneActivesPerLayer[layer][Data.BoneParents[i]];
-      if (boneIsTopmostActive) {
-        // TODO HACK: untangle this hip angle sampling and make a better mixer.
-        var parentHandle = Data.BoneHandles[Data.BoneParents[i]];
-        ReadHipAngle(parentHandle, inStream);
-
-        // If our parent bone is disabled in this layer, do some special shit to try to preserve the animation's intent for this bone.
-        // First, use a "mesh-space" rotation - figure out the total rotation that WOULD be imparted on this bone and apply it locally.
-        Quaternion rotation = Data.MeshSpaceRotations ?
-          Quaternion.Inverse(RootRotation(inStream)) * handle.GetRotation(inStream) :
-          handle.GetLocalRotation(inStream);
-        if (Data.ReverseBaseLayerRotation) {
-          // Next, reverse the rotation that our base layer applies to our parent bone.
-          var baseParentRotation = Quaternion.Inverse(RootRotation(baseStream)) * parentHandle.GetRotation(baseStream);
-          rotation = Quaternion.Inverse(baseParentRotation) * rotation;
-        }
-        handle.SetLocalRotation(stream, Blend(handle.GetLocalRotation(baseStream), rotation, inWeight));
-      } else {
-        handle.SetLocalRotation(stream, Blend(handle.GetLocalRotation(baseStream), handle.GetLocalRotation(inStream), inWeight));
-      }
-    }
-  }
-  public void ReadHipAngle(ReadWriteTransformHandle handle, AnimationStream stream) {
-    var rootRotation = RootRotation(stream);
-    var rotation = handle.GetRotation(stream);
-    //var localRotation = TargetHandle.GetLocalRotation(stream);
-    var localRotation = Quaternion.Inverse(rootRotation) * rotation;
-    var alongHips = localRotation * Vector3.forward;
-    Angle = Vector3.SignedAngle(alongHips.XZ(), Vector3.forward, Vector3.up);
-  }
-  Vector3 Blend(Vector3 a, Vector3 b, float weight) => Vector3.Lerp(a, b, weight);
-  Quaternion Blend(Quaternion a, Quaternion b, float weight) => Quaternion.Slerp(a, b, weight);
-  Quaternion RootRotation(AnimationStream stream) => Data.BoneHandles[0].GetRotation(stream);
-  int FindInputStreamForBone(AnimationStream stream, int boneIdx) {
-    for (var layer = stream.inputStreamCount-1; layer >= 0; layer--) {
-      if (Data.BoneActivesPerLayer[layer][boneIdx] && stream.GetInputStream(layer).isValid)
-        return layer;
-    }
-    return 0;  // default to top layer
+    if (!IsActive)
+      return;
+    var hipsLowerRotation = LowerRoot[0];
+    var hipsUpperRotation = UpperRoot[0];
+    var spineLowerRotation = LowerSpine[0];
+    var spineUpperRotation = UpperSpine[0];
+    spineUpperRotation = math.mul(hipsUpperRotation, spineUpperRotation);
+    spineUpperRotation = math.mul(math.inverse(hipsLowerRotation), spineUpperRotation);
+    spineUpperRotation = math.slerp(spineLowerRotation, spineUpperRotation, 1);
+    SpineHandle.SetLocalRotation(stream, spineUpperRotation);
   }
 }
 
@@ -297,63 +199,91 @@ public class AnimationDriver : MonoBehaviour {
   public float BaseSpeed { get; private set; }
   public double Speed => Animator.speed;
   PlayableGraph Graph;
+  public AnimationLayerMixerPlayable Mixer;
   AnimatorControllerPlayable AnimatorController;
-  public AnimationScriptPlayable Mixer;
-  [SerializeField] MixerJobData MixerJobData = new();
-  AnimationPlayableOutput Output;
-
-  List<AnimationJob> Jobs = new();
+  AnimationScriptPlayable SpineCorrector;
 
   void Awake() {
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     if (!Animator) {
       Debug.LogError($"AnimationDriver must have Animator reference to initialize", this);
     }
-    #endif
+#endif
+    var hipsBone = AvatarAttacher.FindBoneTransform(Animator, AvatarBone.Hips);
+    var spineBone = AvatarAttacher.FindBoneTransform(Animator, AvatarBone.Spine);
     Graph = PlayableGraph.Create("Animation Driver");
-    Output = AnimationPlayableOutput.Create(Graph, "Animation Driver", Animator);
+    var output = AnimationPlayableOutput.Create(Graph, "Animation Driver", Animator);
     AnimatorController = AnimatorControllerPlayable.Create(Graph, Animator.runtimeAnimatorController);
-    MixerJobData.Init(Animator);
-    MixerJobData.SetLayerMaskFromAvatarMask(0, null);
-    Mixer = AnimationScriptPlayable.Create(Graph, new MixerJob(MixerJobData));
-    Mixer.SetProcessInputs(false);
-    Mixer.AddInput(AnimatorController, 0, 1f);
-    Output.SetSourcePlayable(Mixer);
+    Mixer = AnimationLayerMixerPlayable.Create(Graph, 2);
+    Mixer.ConnectInput(0, DualSampler(hipsBone, out LowerRoot, spineBone, out LowerSpine), 0, 1f);
+    Mixer.ConnectInput(1, DualSampler(hipsBone, out UpperRoot, spineBone, out UpperSpine), 0, 1f);
+    WholeBodySlot = new Slot { Input = Mixer.GetInput(0).GetInput(0), MixerInputPort = 0 };
+    UpperBodySlot = new Slot { Input = Mixer.GetInput(1).GetInput(0), MixerInputPort = 1 };
+    WholeBodySlot.Input.AddInput(AnimatorController, 0, 1f);
+    Mixer.SetLayerMaskFromAvatarMask((uint)UpperBodySlot.MixerInputPort, Defaults.Instance.UpperBodyMask);
+    SpineCorrector = NewSpineCorrector(spineBone);
+    SpineCorrector.AddInput(Mixer, 0, 1f);
+    output.SetSourcePlayable(SpineCorrector);
     Graph.Play();
     BaseSpeed = Animator.speed;
   }
 
   void OnDestroy() {
+    LowerSpine.Dispose();
+    LowerRoot.Dispose();
+    UpperSpine.Dispose();
+    UpperRoot.Dispose();
     Graph.Destroy();
-    MixerJobData.Dispose();
   }
 
-  public float TorsoRotation => Mixer.GetJobData<MixerJob>().Angle;
+  public float TorsoRotation => 0f;
 
   public void SetSpeed(float speed) {
     Animator.SetSpeed(speed);
   }
-
   public void Pause() {
     Animator.SetSpeed(0);
   }
-
   public void Resume() {
     Animator.SetSpeed(BaseSpeed);
   }
+  public void SetInputWeight(AnimationJob job, float weight) {
+    var port = SlotForJob(job)?.MixerInputPort ?? 0;
+    if (port > 0)
+      Mixer.SetInputWeight(port, weight);
+  }
 
   public void Connect(AnimationJob job) {
-    job.InputPort = Mixer.AddInput(job.Clip, 0, 1f);
-    SetLayerMaskFromAvatarMask(job.InputPort, job.Animation.Mask);
-    Jobs.Add(job);
+    Debug.Assert(job.Animation.Mask == Defaults.Instance.UpperBodyMask || job.Animation.Mask == null);
+    var slot = job.Animation.Mask == Defaults.Instance.UpperBodyMask ? UpperBodySlot : WholeBodySlot;
+    if (slot.CurrentJob != null)
+      slot.CurrentJob.Stop();
+    if (slot == UpperBodySlot) {
+      var data = SpineCorrector.GetJobData<SpineRotationJob>();
+      data.IsActive = false;
+      SpineCorrector.SetJobData(data);
+    }
+    if (slot == WholeBodySlot && slot.Input.GetInputCount() == 1) {
+      slot.Input.DisconnectInput(0);
+      slot.Input.SetInputCount(0);
+    }
+    slot.Input.AddInput(job.Clip, 0, 1f);
+    slot.CurrentJob = job;
   }
 
   public void Disconnect(AnimationJob job) {
-    if (Jobs.Remove(job))
-      Mixer.DisconnectInput(job.InputPort);
-    if (Jobs.Count == 0) {
-      Mixer.SetInputCount(1);
-      SetLayerMaskFromAvatarMask(0, null);  // reset BoneMaskPerLayer
+    if (SlotForJob(job) is var slot && slot != null) {
+      slot.Input.DisconnectInput(0);
+      slot.Input.SetInputCount(0);
+      if (slot == UpperBodySlot) {
+        var data = SpineCorrector.GetJobData<SpineRotationJob>();
+        data.IsActive = false;
+        SpineCorrector.SetJobData(data);
+      }
+      if (slot == WholeBodySlot) {
+        slot.Input.AddInput(AnimatorController, 0, 1f);
+      }
+      slot.CurrentJob = null;
     }
   }
 
@@ -364,11 +294,51 @@ public class AnimationDriver : MonoBehaviour {
     return job;
   }
 
-  void SetLayerMaskFromAvatarMask(int layer, AvatarMask mask) {
-    Debug.Assert(layer+1 == Mixer.GetInputCount(), "Oops I assumed we would only add masks to new layers");
-    MixerJobData.SetLayerMaskFromAvatarMask(layer, mask);
-    var job = Mixer.GetJobData<MixerJob>();
-    job.Data = MixerJobData;
-    Mixer.SetJobData(job);
+  class Slot {
+    public Playable Input;
+    public AnimationJob CurrentJob;
+    public int MixerInputPort;
+  }
+  Slot WholeBodySlot;
+  Slot UpperBodySlot;
+  Slot SlotForJob(AnimationJob job) {
+    Slot port = 0 switch {
+      _ when job == WholeBodySlot.CurrentJob => WholeBodySlot,
+      _ when job == UpperBodySlot.CurrentJob => UpperBodySlot,
+      _ => null,
+    };
+    return port;
+  }
+
+  NativeArray<quaternion> LowerRoot;
+  NativeArray<quaternion> UpperRoot;
+  NativeArray<quaternion> LowerSpine;
+  NativeArray<quaternion> UpperSpine;
+
+  AnimationScriptPlayable Sampler(Transform t, out NativeArray<quaternion> value) {
+    value = new(1, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+    var job = new SampleLocalRotationJob { Handle = ReadOnlyTransformHandle.Bind(Animator, t), Value = value };
+    var playable = AnimationScriptPlayable.Create(Graph, job);
+    return playable;
+  }
+
+  AnimationScriptPlayable DualSampler(Transform hip, out NativeArray<quaternion> hipRot, Transform spine, out NativeArray<quaternion> spineRot) {
+    var hipSampler = Sampler(hip, out hipRot);
+    var spineSampler = Sampler(spine, out spineRot);
+    hipSampler.AddInput(spineSampler, 0, 1f);
+    return hipSampler;
+  }
+
+  AnimationScriptPlayable NewSpineCorrector(Transform spine) {
+    var job = new SpineRotationJob {
+      IsActive = false,
+      LowerRoot = LowerRoot,
+      UpperRoot = UpperRoot,
+      LowerSpine = LowerSpine,
+      UpperSpine = UpperSpine,
+      SpineHandle = ReadWriteTransformHandle.Bind(Animator, spine)
+    };
+    var playable = AnimationScriptPlayable.Create(Graph, job);
+    return playable;
   }
 }
