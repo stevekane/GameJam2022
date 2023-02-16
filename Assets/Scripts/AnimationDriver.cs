@@ -242,7 +242,7 @@ public class AnimationDriver : MonoBehaviour {
 
   public float TorsoRotation {
     get {
-      var upperHips = (Quaternion)UpperRoot[0];
+      var upperHips = Quaternion.Slerp(Quaternion.identity, UpperRoot[0], UpperWeight);
       var hipsForward = upperHips * Vector3.forward;
       var angle = Vector3.SignedAngle(hipsForward.XZ(), Vector3.forward, Vector3.up);
       return angle;
@@ -279,10 +279,6 @@ public class AnimationDriver : MonoBehaviour {
       slot.Playable.DisconnectInput(0);
       slot.Playable.SetInputCount(0);
       slot.CurrentJob = null;
-      if (slot == UpperBodySlot) {
-        UpperRoot[0] = quaternion.identity;
-        UpperSpine[0] = quaternion.identity;
-      }
     }
   }
 
@@ -293,9 +289,10 @@ public class AnimationDriver : MonoBehaviour {
     return job;
   }
 
+  float UpperWeight => UpperBodySlot.CurrentJob != null ? Mixer.GetInputWeight(UpperBodySlot.MixerInputPort) : 0f;
   void Update() {
     var data = SpineCorrector.GetJobData<SpineRotationJob>();
-    data.UpperWeight = UpperBodySlot.CurrentJob != null ? Mixer.GetInputWeight(UpperBodySlot.MixerInputPort) : 0f;
+    data.UpperWeight = UpperWeight;
     SpineCorrector.SetJobData(data);
   }
 
