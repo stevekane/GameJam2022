@@ -16,7 +16,6 @@ public class CharacterRotationTester : MonoBehaviour {
   [SerializeField] float Distance = 5;
   [SerializeField] float VaultSpeedMultiplier = 1.25f;
   [SerializeField] float Gravity = -20f;
-  [SerializeField] float VaultDrag = 2f;
   [SerializeField] Timeval WindupDuration = Timeval.FromMillis(250);
   [SerializeField] Timeval ThrowDuration = Timeval.FromMillis(100);
   [SerializeField] Timeval VaultDuration = Timeval.FromSeconds(1);

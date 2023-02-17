@@ -6,7 +6,6 @@ public class AnimationPhaseTest : Ability {
 
   public AnimationJob Animation;
   public int Which = 0;
-  int Frame = 0;
   int Phase = 0;
   AnimationEventListener Events;
 

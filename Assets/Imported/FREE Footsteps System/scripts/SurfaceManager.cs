@@ -64,8 +64,9 @@ public class SurfaceManager : MonoBehaviour {
 			TerrainData terrainData = terrain.terrainData;
 			float[] textureMix = GetTerrainTextureMix(worldPos, terrainData, terrain.GetPosition());
 			int textureIndex = GetTextureIndex(worldPos, textureMix);
-			textureName = terrainData.splatPrototypes[textureIndex].texture.name;
-		}
+			//textureName = terrainData.splatPrototypes[textureIndex].texture.name;
+			Debug.Assert(false, "MP disabled because of warning");
+    }
 		// Case when the ground is a normal mesh.
 		else {
 			textureName = GetMeshMaterialAtPoint(worldPos, ray);
@@ -90,10 +91,11 @@ public class SurfaceManager : MonoBehaviour {
 			TerrainData terrainData = terrain.terrainData;
 			float[] textureMix = GetTerrainTextureMix(worldPos, terrainData, terrain.GetPosition());
 			int textureIndex = GetTextureIndex(worldPos, textureMix);
-			textureName = terrainData.splatPrototypes[textureIndex].texture.name;
-		}
-		// Case when the ground is a normal mesh.
-		else {
+			//textureName = terrainData.splatPrototypes[textureIndex].texture.name;
+			Debug.Assert(false, "MP disabled because of warning");
+    }
+    // Case when the ground is a normal mesh.
+    else {
 			textureName = GetMeshMaterialAtPoint(worldPos, new Ray(Vector3.zero, Vector3.zero));
 		}
 		// Searching for the found texture / material name in registered materials.

@@ -28,10 +28,8 @@ public class SoulWarriorBehavior : MonoBehaviour {
   [SerializeField] Teleport Teleport;
   [SerializeField] Dive Dive;
   [SerializeField] float DesiredDistance = 1f;
-  [SerializeField] float OutOfRangeDistance = 6f;
   [SerializeField] float DiveHeight = 15f;
   [SerializeField] float MinDiveHeight = 5f;
-  [SerializeField] float MaxDiveHeight = 100f;
   [SerializeField] float MaxDiveRadius = 10f;
 
   Vector3 SpawnOrigin;
