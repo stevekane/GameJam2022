@@ -1,3 +1,4 @@
+using GraphVisualizer;
 using System;
 using System.Threading.Tasks;
 using Unity.Burst;
@@ -6,7 +7,9 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.Audio;
 using UnityEngine.Playables;
+using UnityEngine.Timeline;
 
 [Serializable]
 public class AnimationJobConfig {
@@ -197,11 +200,12 @@ struct AnimationNoopJob : IAnimationJob {
 
 public class AnimationDriver : MonoBehaviour {
   public Animator Animator;
+  public AudioSource AudioSource;
   public float BaseSpeed { get; private set; }
   public double Speed => Animator.speed;
   PlayableGraph Graph;
-  AnimationLayerMixerPlayable Mixer;
-  AnimatorControllerPlayable AnimatorController;
+  AnimationLayerMixerPlayable AnimationMixer;
+  AudioMixerPlayable AudioMixer;
   AnimationScriptPlayable SpineCorrector;
 
   void Awake() {
@@ -210,24 +214,36 @@ public class AnimationDriver : MonoBehaviour {
       Debug.LogError($"AnimationDriver must have Animator reference to initialize", this);
     }
 #endif
+    BaseSpeed = Animator.speed;
+
     var hipsBone = AvatarAttacher.FindBoneTransform(Animator, AvatarBone.Hips);
     var spineBone = AvatarAttacher.FindBoneTransform(Animator, AvatarBone.Spine);
     Graph = PlayableGraph.Create("Animation Driver");
-    var output = AnimationPlayableOutput.Create(Graph, "Animation Driver", Animator);
-    AnimatorController = AnimatorControllerPlayable.Create(Graph, Animator.runtimeAnimatorController);
-    Mixer = AnimationLayerMixerPlayable.Create(Graph, 3);
-    Graph.Connect(DualSampler(hipsBone, out LowerRoot, spineBone, out LowerSpine), 0, Mixer, 0, 1f);
-    Graph.Connect(AnimationScriptPlayable.Create(Graph, new AnimationNoopJob(), 1), 0, Mixer, 1, 1f);
-    Graph.Connect(DualSampler(hipsBone, out UpperRoot, spineBone, out UpperSpine), 0, Mixer, 2, 1f);
-    Graph.Connect(AnimatorController, 0, Mixer.GetInput(0).GetInput(0), 0, 1f);
-    WholeBodySlot = new Slot { Playable = Mixer.GetInput(1) };
-    UpperBodySlot = new Slot { Playable = Mixer.GetInput(2).GetInput(0) };
-    Mixer.SetLayerMaskFromAvatarMask(2, Defaults.Instance.UpperBodyMask);
-    SpineCorrector = NewSpineCorrector(spineBone);
-    Graph.Connect(Mixer, 0, SpineCorrector, 0, 1f);
-    output.SetSourcePlayable(SpineCorrector);
+
+    // Animation subgraph
+    var animatorController = AnimatorControllerPlayable.Create(Graph, Animator.runtimeAnimatorController);
+    AnimationMixer = AnimationLayerMixerPlayable.Create(Graph, 3);
+    Graph.Connect(DualSampler(hipsBone, out LowerRoot, spineBone, out LowerSpine), 0, AnimationMixer, 0, 1f);
+    Graph.Connect(AnimationScriptPlayable.Create(Graph, new AnimationNoopJob(), 1), 0, AnimationMixer, 1, 1f);
+    Graph.Connect(DualSampler(hipsBone, out UpperRoot, spineBone, out UpperSpine), 0, AnimationMixer, 2, 1f);
+    Graph.Connect(animatorController, 0, AnimationMixer.GetInput(0).GetInput(0), 0, 1f);
+    Graph.Connect(AnimationMixer, 0, SpineCorrector = NewSpineCorrector(spineBone), 0, 1f);
+    var animationOutput = AnimationPlayableOutput.Create(Graph, "Animation Driver Animations", Animator);
+    animationOutput.SetSourcePlayable(SpineCorrector);
+
+    // Audio subgraph
+    AudioMixer = AudioMixerPlayable.Create(Graph, 2);
+    Graph.Connect(AudioSlot(), 0, AudioMixer, 0, 1f);
+    Graph.Connect(AudioSlot(), 0, AudioMixer, 1, 1f);
+    var audioOutput = AudioPlayableOutput.Create(Graph, "Animation Driver Audio", AudioSource);
+    audioOutput.SetSourcePlayable(AudioMixer);
+
+    // Slots
+    WholeBodySlot = new Slot { AnimationInput = AnimationMixer.GetInput(1), AudioInput = AudioMixer.GetInput(0) };
+    UpperBodySlot = new Slot { AnimationInput = AnimationMixer.GetInput(2).GetInput(0), AudioInput = AudioMixer.GetInput(1) };
+    AnimationMixer.SetLayerMaskFromAvatarMask(2, Defaults.Instance.UpperBodyMask);
+
     Graph.Play();
-    BaseSpeed = Animator.speed;
   }
 
   void OnDestroy() {
@@ -258,7 +274,7 @@ public class AnimationDriver : MonoBehaviour {
   }
   public void SetInputWeight(AnimationJob job, float weight) {
     if (SlotForJob(job) is var slot && slot != null)
-      slot.Playable.SetInputWeight(0, weight);
+      slot.AnimationInput.SetInputWeight(0, weight);
   }
 
   public void Connect(AnimationJob job) {
@@ -266,13 +282,13 @@ public class AnimationDriver : MonoBehaviour {
     var slot = job.Animation.Mask == Defaults.Instance.UpperBodyMask ? UpperBodySlot : WholeBodySlot;
     if (slot.CurrentJob != null)
       slot.CurrentJob.Stop();
-    Graph.Connect(job.Clip, 0, slot.Playable, 0, 1f);
+    Graph.Connect(job.Clip, 0, slot.AnimationInput, 0, 1f);
     slot.CurrentJob = job;
   }
 
   public void Disconnect(AnimationJob job) {
     if (SlotForJob(job) is var slot && slot != null) {
-      slot.Playable.DisconnectInput(0);
+      slot.AnimationInput.DisconnectInput(0);
       slot.CurrentJob = null;
     }
   }
@@ -284,19 +300,57 @@ public class AnimationDriver : MonoBehaviour {
     return job;
   }
 
+  public Playable PlayTimeline(TaskScope scope, TimelineAsset timeline) {
+    var playable = timeline.CreatePlayable(Graph, gameObject);
+    playable.SetOutputCount(timeline.outputTrackCount);
+    var slot = WholeBodySlot;
+    for (int i = 0; i < timeline.outputTrackCount; i++) {
+      var track = timeline.GetOutputTrack(i);
+      foreach (var output in track.outputs) {
+        Debug.Log($"Attempting to connect track {i} of type {output.outputTargetType}");
+        if (output.outputTargetType == typeof(Animator)) {
+          if (slot.AnimationInput.GetInput(0).IsNull())
+            Graph.Connect(playable, i, slot.AnimationInput, 0, 1f);
+        } else if (output.outputTargetType == typeof(AudioSource)) {
+          if (slot.AudioInput.GetInput(0).IsNull()) {
+            var noop = ScriptPlayable<NoopBehavior>.Create(Graph, 1);
+            Graph.Connect(playable, i, noop, 0, 1f);
+            Graph.Connect(noop, 0, slot.AudioInput, 0, 1f);
+          }
+        }
+      }
+    }
+    _ = RunTimeline(scope, slot, playable);
+    return playable;
+  }
+
+  async Task RunTimeline(TaskScope scope, Slot slot, Playable playable) {
+    try {
+      while (true) {
+        if (playable.IsValid() && playable.IsDone())
+          break;
+        await scope.Yield();
+      }
+    } finally {
+      slot.AnimationInput.DisconnectInput(0);
+      slot.AudioInput.DisconnectInput(0);
+    }
+  }
+
   void Update() {
     var data = SpineCorrector.GetJobData<SpineRotationJob>();
     data.UpperWeight = UpperBodySlot.InputWeight;
     SpineCorrector.SetJobData(data);
     // Update mixer input weights based on the slot state. Could do this differently, but this is the cleanest IMO.
-    Mixer.SetInputWeight(1, WholeBodySlot.InputWeight);
-    Mixer.SetInputWeight(2, UpperBodySlot.InputWeight);
+    AnimationMixer.SetInputWeight(1, WholeBodySlot.InputWeight);
+    AnimationMixer.SetInputWeight(2, UpperBodySlot.InputWeight);
   }
 
   class Slot {
-    public Playable Playable;
+    public Playable AnimationInput;
+    public Playable AudioInput;
     public AnimationJob CurrentJob;
-    public float InputWeight => Playable.GetInput(0).IsNull() ? 0f : Playable.GetInputWeight(0);
+    public float InputWeight => AnimationInput.GetInput(0).IsNull() ? 0f : AnimationInput.GetInputWeight(0);
   }
   Slot WholeBodySlot;
   Slot UpperBodySlot;
@@ -327,6 +381,11 @@ public class AnimationDriver : MonoBehaviour {
     var spineSampler = Sampler(spine, out spineRot);
     Graph.Connect(spineSampler, 0, hipSampler, 0, 1f);
     return hipSampler;
+  }
+
+  Playable AudioSlot() {
+    var mixer = AudioMixerPlayable.Create(Graph, 1);
+    return mixer;
   }
 
   AnimationScriptPlayable NewSpineCorrector(Transform spine) {
