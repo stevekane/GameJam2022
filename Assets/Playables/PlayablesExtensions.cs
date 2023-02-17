@@ -1,8 +1,9 @@
 using Unity.Mathematics;
 using UnityEngine.Animations;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.Playables;
 
-public static class PlayablesExtensions  {
+public static class PlayablesExtensions {
   public static void CopyTRS(
   this ReadWriteTransformHandle handle,
   AnimationStream source,
@@ -40,5 +41,12 @@ public static class PlayablesExtensions  {
       math.slerp(baseRotation, blendRotation, blendWeight),
       math.lerp(baseScale, blendScale, blendWeight)
     );
+  }
+
+  public static bool Connect<U, V>(this PlayableGraph graph, U source, int sourceOutputPort, V destination, int destinationInputPort, float weight) where U : struct, IPlayable where V : struct, IPlayable {
+    if (!graph.Connect(source, sourceOutputPort, destination, destinationInputPort))
+      return false;
+    destination.SetInputWeight(destinationInputPort, weight);
+    return true;
   }
 }

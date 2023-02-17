@@ -200,7 +200,7 @@ public class AnimationDriver : MonoBehaviour {
   public float BaseSpeed { get; private set; }
   public double Speed => Animator.speed;
   PlayableGraph Graph;
-  public AnimationLayerMixerPlayable Mixer;
+  AnimationLayerMixerPlayable Mixer;
   AnimatorControllerPlayable AnimatorController;
   AnimationScriptPlayable SpineCorrector;
 
@@ -216,15 +216,15 @@ public class AnimationDriver : MonoBehaviour {
     var output = AnimationPlayableOutput.Create(Graph, "Animation Driver", Animator);
     AnimatorController = AnimatorControllerPlayable.Create(Graph, Animator.runtimeAnimatorController);
     Mixer = AnimationLayerMixerPlayable.Create(Graph, 3);
-    Mixer.ConnectInput(0, DualSampler(hipsBone, out LowerRoot, spineBone, out LowerSpine), 0, 1f);
-    Mixer.ConnectInput(1, AnimationScriptPlayable.Create(Graph, new AnimationNoopJob(), 1), 0, 1f);
-    Mixer.ConnectInput(2, DualSampler(hipsBone, out UpperRoot, spineBone, out UpperSpine), 0, 1f);
-    Mixer.GetInput(0).GetInput(0).ConnectInput(0, AnimatorController, 0, 1f);
+    Graph.Connect(DualSampler(hipsBone, out LowerRoot, spineBone, out LowerSpine), 0, Mixer, 0, 1f);
+    Graph.Connect(AnimationScriptPlayable.Create(Graph, new AnimationNoopJob(), 1), 0, Mixer, 1, 1f);
+    Graph.Connect(DualSampler(hipsBone, out UpperRoot, spineBone, out UpperSpine), 0, Mixer, 2, 1f);
+    Graph.Connect(AnimatorController, 0, Mixer.GetInput(0).GetInput(0), 0, 1f);
     WholeBodySlot = new Slot { Playable = Mixer.GetInput(1) };
     UpperBodySlot = new Slot { Playable = Mixer.GetInput(2).GetInput(0) };
     Mixer.SetLayerMaskFromAvatarMask(2, Defaults.Instance.UpperBodyMask);
     SpineCorrector = NewSpineCorrector(spineBone);
-    SpineCorrector.AddInput(Mixer, 0, 1f);
+    Graph.Connect(Mixer, 0, SpineCorrector, 0, 1f);
     output.SetSourcePlayable(SpineCorrector);
     Graph.Play();
     BaseSpeed = Animator.speed;
@@ -266,7 +266,7 @@ public class AnimationDriver : MonoBehaviour {
     var slot = job.Animation.Mask == Defaults.Instance.UpperBodyMask ? UpperBodySlot : WholeBodySlot;
     if (slot.CurrentJob != null)
       slot.CurrentJob.Stop();
-    slot.Playable.ConnectInput(0, job.Clip, 0, 1f);
+    Graph.Connect(job.Clip, 0, slot.Playable, 0, 1f);
     slot.CurrentJob = job;
   }
 
@@ -325,7 +325,7 @@ public class AnimationDriver : MonoBehaviour {
   AnimationScriptPlayable DualSampler(Transform hip, out NativeArray<quaternion> hipRot, Transform spine, out NativeArray<quaternion> spineRot) {
     var hipSampler = Sampler(hip, out hipRot);
     var spineSampler = Sampler(spine, out spineRot);
-    hipSampler.ConnectInput(0, spineSampler, 0, 1f);
+    Graph.Connect(spineSampler, 0, hipSampler, 0, 1f);
     return hipSampler;
   }
 
@@ -338,7 +338,7 @@ public class AnimationDriver : MonoBehaviour {
       UpperSpine = UpperSpine,
       SpineHandle = ReadWriteTransformHandle.Bind(Animator, spine)
     };
-    var playable = AnimationScriptPlayable.Create(Graph, job);
+    var playable = AnimationScriptPlayable.Create(Graph, job, 1);
     return playable;
   }
 }
