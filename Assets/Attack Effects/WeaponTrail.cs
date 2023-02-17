@@ -3,6 +3,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
+[ExecuteInEditMode]
 public class WeaponTrail : MonoBehaviour {
   [SerializeField] MeshFilter MeshFilter;
   [SerializeField] MeshRenderer MeshRenderer;
@@ -37,6 +38,10 @@ public class WeaponTrail : MonoBehaviour {
     SpawnSpeeds0.Add(0);
     SpawnSpeeds1.Add(0);
     Mesh = new();
+    // Steve - intention here is to create a copy of the sharedMaterial
+    // but then to refer to this material by "sharedMaterial". If this works
+    // as intended, it should allow materials to be modified in edit mode
+    MeshRenderer.material = new Material(MeshRenderer.sharedMaterial);
     MeshFilter.mesh = Mesh;
   }
 
@@ -135,8 +140,8 @@ public class WeaponTrail : MonoBehaviour {
     Mesh.SetVertices(Vertices);
     Mesh.SetUVs(0, UVs);
     Mesh.SetTriangles(Triangles, 0);
-    MeshRenderer.material.SetFloat("_MaxVelocity", MaxSpawnSpeed);
-    MeshRenderer.material.SetFloat("_MaxDistance", MaxTrailDistance);
-    MeshRenderer.material.SetFloat("_MaxAge", SegmentDuration.Seconds);
+    MeshRenderer.sharedMaterial.SetFloat("_MaxVelocity", MaxSpawnSpeed);
+    MeshRenderer.sharedMaterial.SetFloat("_MaxDistance", MaxTrailDistance);
+    MeshRenderer.sharedMaterial.SetFloat("_MaxAge", SegmentDuration.Seconds);
   }
 }
