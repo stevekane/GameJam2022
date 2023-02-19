@@ -23,6 +23,12 @@ public class AnimationJobConfig {
   public float BlendOutFraction;
 }
 
+[Serializable]
+public struct TimelineBindings {
+  public Collider Hitbox;
+  public WeaponTrail WeaponTrail;
+}
+
 public class AnimationJob {
   PlayableGraph Graph;
   public AnimationJobConfig Animation;
@@ -300,14 +306,34 @@ public class AnimationDriver : MonoBehaviour {
     return job;
   }
 
-  public Playable PlayTimeline(TaskScope scope, TimelineAsset timeline) {
+  public Playable PlayTimeline(TaskScope scope, TimelineAsset timeline, TimelineBindings bindings = default) {
     var playable = timeline.CreatePlayable(Graph, gameObject);
     playable.SetOutputCount(timeline.outputTrackCount);
     var slot = WholeBodySlot;
     for (int i = 0; i < timeline.outputTrackCount; i++) {
       var track = timeline.GetOutputTrack(i);
+      var trackType = track.GetType();
+
+      // Check for special track types and attach associated bindings
+      if (trackType == typeof(HitboxTrackAsset)) {
+        // accessing inputs to check if sanity happens or not
+        var input = playable.GetInput(i);
+        var type = input.GetPlayableType();
+        var trackPlayable = (ScriptPlayable<HitBoxTrackMixer>)input;
+        var trackMixer = trackPlayable.GetBehaviour();
+        // We probably need to create some kind of generic output for the graph.
+        // I have no idea how this works and think should look at a graph generated
+        // by playing a timeline via playable director for inspiration
+        // TODO: Somehow, here we need to bind the track...whatever that even means
+        // it's the "playerData" parameter that magically gets fed to the ProcessFrame call
+        Debug.Log($"Found Hitbox track with mixer {input}:{type}");
+      } else if (trackType == typeof(WeaponTrailTrackAsset)) {
+        var input = playable.GetInput(i);
+        var type = input.GetPlayableType();
+        Debug.Log($"Found WeaponTrail track with output {input}:{type}");
+      }
+
       foreach (var output in track.outputs) {
-        Debug.Log($"Attempting to connect track {i} of type {output.outputTargetType}");
         if (output.outputTargetType == typeof(Animator)) {
           if (slot.AnimationInput.GetInput(0).IsNull())
             Graph.Connect(playable, i, slot.AnimationInput, 0, 1f);
