@@ -18,12 +18,14 @@ public class TimelineMiner : MonoBehaviour {
   [SerializeField] BoundTimeline BoundTimeline;
 
   PlayableGraph Graph;
-  Playable TimelinePlayable;
+  ScriptPlayable<TimelinePlayable> Timeline;
 
   void Start() {
     Graph = PlayableGraph.Create("Timeline Stripper");
-    TimelinePlayable = BoundTimeline.TimelineAsset.CreatePlayable(Graph, gameObject);
-    TimelinePlayable.SetOutputCount(BoundTimeline.TimelineAsset.outputTrackCount);
+    Timeline = TimelinePlayable.Create(Graph, BoundTimeline.TimelineAsset.GetRootTracks(), gameObject, false, false);
+    Timeline.SetTime(0);
+    Timeline.SetDuration(BoundTimeline.TimelineAsset.duration);
+    Timeline.SetOutputCount(BoundTimeline.TimelineAsset.outputTrackCount);
     for (var i = 0; i < BoundTimeline.TimelineAsset.outputTrackCount; i++) {
       var track = BoundTimeline.TimelineAsset.GetOutputTrack(i);
       if (!track.CanCreateTrackMixer())
@@ -38,12 +40,10 @@ public class TimelineMiner : MonoBehaviour {
           Type type when type == typeof(WeaponTrail) => ObjectPlayableOutput(Graph, track.name, BoundTimeline.WeaponTrail),
           _ => PlayableOutput.Null
         };
-        playableOutput.SetSourcePlayable(TimelinePlayable, i);
+        playableOutput.SetSourcePlayable(Timeline, i);
       }
     }
     Graph.Play();
-    // Debug.LogWarning("Stop destroying the timeline playable");
-    // Graph.DestroySubgraph(TimelinePlayable);
   }
 
   PlayableOutput ObjectPlayableOutput(PlayableGraph graph, string name, UnityEngine.Object obj) {
