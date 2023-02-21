@@ -1,18 +1,27 @@
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Timeline;
-using UnityEngine.Playables;
 
 public class TimelineAttack : Ability {
-  [SerializeField] TimelineAsset TimelineAsset;
-  [SerializeField] TimelineBindings TimelineBindings;
+  [SerializeField] TimelineTaskConfig Timeline;
+  [SerializeField] HitConfig HitConfig;
+  TriggerEvent Hitbox;
+
+  void Start() {
+    this.InitComponentFromChildren(out Hitbox);
+  }
 
   public override async Task MainAction(TaskScope scope) {
     try {
-      var timeline = AnimationDriver.PlayTimeline(scope, TimelineAsset, TimelineBindings);
-      await scope.Until(delegate { return timeline.IsDone(); });
+      var timeline = AnimationDriver.PlayTimeline(scope, Timeline);
+      await scope.Any(
+        timeline.WaitDone,
+        HitHandler.LoopTimeline(Hitbox, null, new HitParams(HitConfig, Attributes), OnHit));
     } finally {
       Debug.Log("Timeline done");
     }
+  }
+
+  void OnHit(Hurtbox target) {
+    AbilityManager.Energy?.Value.Add(1);
   }
 }

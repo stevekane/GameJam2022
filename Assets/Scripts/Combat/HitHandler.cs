@@ -36,4 +36,26 @@ public static class HitHandler {
       if (parrybox) parrybox.EnableCollision = false;
     }
   };
+
+  public static TaskFunc LoopTimeline(TriggerEvent hitbox, Parrybox parrybox, HitParams hitParams, Action<Hurtbox> onHit = null) => async (TaskScope scope) => {
+    Parrybox parried = null;
+    List<Hurtbox> hits = new();
+    int lastHit = 0;
+    using var listener = new ScopedListener<Collider>(hitbox.OnTriggerStaySource, hit => {
+      if (hit.TryGetComponent(out Parrybox pb) && pb.TryParry(hitParams))
+        parried = pb;
+      if (hit.TryGetComponent(out Hurtbox hurtbox) && !hits.Contains(hurtbox) && hurtbox.CanBeHurtBy(hitParams))
+        hits.Add(hurtbox);
+    });
+    while (!parried) {
+      while (lastHit < hits.Count) {
+        var hb = hits[lastHit++];
+        if (hb.CanBeHurtBy(hitParams)) {
+          onHit?.Invoke(hb);
+          hb.TryAttack(hitParams.Clone());
+        }
+      }
+      await scope.Tick();
+    }
+  };
 }

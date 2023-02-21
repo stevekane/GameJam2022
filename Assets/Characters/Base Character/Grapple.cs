@@ -13,7 +13,6 @@ public class Grapple : Ability {
   [SerializeField] Animator Animator;
   [SerializeField] float AimLocalTimeDilation = 1;
   [SerializeField] float PullSpeed = 15;
-  [SerializeField] float TurnSpeed = 360;
   [SerializeField] float RotationSpeed = 180;
   [SerializeField] float VaultSpeedMultiplier = 1.25f;
   [SerializeField] float VaultDrag = 2;

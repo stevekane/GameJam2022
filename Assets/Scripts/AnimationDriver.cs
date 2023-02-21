@@ -17,10 +17,8 @@ public class AnimationJobConfig {
   public AvatarMask Mask = null;
   public float Speed = 1;
   public Timeval[] PhaseDurations;
-  [Range(0,1)]
-  public float BlendInFraction;
-  [Range(0,1)]
-  public float BlendOutFraction;
+  [Range(0, 1)] public float BlendInFraction;
+  [Range(0, 1)] public float BlendOutFraction;
 }
 
 [Serializable]
@@ -29,7 +27,20 @@ public struct TimelineBindings {
   public WeaponTrail WeaponTrail;
 }
 
-public class AnimationJob {
+[Serializable]
+public class TimelineTaskConfig {
+  public TimelineAsset Asset;
+  public TimelineBindings Bindings;
+  public AvatarMask Mask = null;
+  [Range(0, 1)] public float BlendInFraction;
+  [Range(0, 1)] public float BlendOutFraction;
+}
+
+public interface IPlayableTask {
+  public void Stop();
+}
+
+public class AnimationJob : IPlayableTask {
   PlayableGraph Graph;
   public AnimationJobConfig Animation;
   AnimationDriver Driver;
@@ -165,6 +176,66 @@ public class AnimationJob {
   }
 }
 
+public class TimelineTask : IPlayableTask {
+  AnimationDriver Driver;
+  internal TimelineTaskConfig Config;
+  internal Playable Playable;
+  bool IsRunning => Playable.IsValid() && !Playable.IsDone();
+
+  public TimelineTask(AnimationDriver driver, PlayableGraph graph, TimelineTaskConfig config) {
+    Driver = driver;
+    Config = config;
+
+    Playable = config.Asset.CreatePlayable(graph, Driver.gameObject);
+    Playable.SetOutputCount(config.Asset.outputTrackCount);
+  }
+
+  public void Start() {
+    //Clip.SetSpeed(DesiredSpeed * Animation.Speed * Driver.Speed);
+    //Clip.SetDuration(Animation.Clip.length);
+    Driver.Connect(this);
+  }
+
+  public void Stop() {
+    if (Playable.IsValid())
+      Playable.Destroy();  // TODO: destroy other things?
+    Driver.Disconnect(this);
+  }
+
+  public TaskFunc WaitDone() => s => WaitDone(s);
+  public async Task WaitDone(TaskScope scope) {
+    while (IsRunning)
+      await scope.Yield();
+  }
+
+  public async Task Run(TaskScope scope) {
+    try {
+      while (Playable.IsValid()) {
+        if (Playable.IsDone())
+          break;
+        Driver.SetInputWeight(this, BlendWeight());
+        await scope.Yield();
+      }
+    } finally {
+      Stop();
+    }
+  }
+
+  float BlendWeight() {
+    var fraction = Playable.GetTime()/Playable.GetDuration();
+    // blending out
+    if (this.Config.BlendOutFraction > 0 && fraction >= (1-Config.BlendOutFraction)) {
+      return 1-(float)(fraction-(1-Config.BlendOutFraction))/Config.BlendOutFraction;
+      // blending in
+    } else if (Config.BlendInFraction > 0 && fraction <= Config.BlendInFraction) {
+      return (float)fraction/Config.BlendInFraction;
+      // full blending
+    } else {
+      return 1;
+    }
+  }
+}
+
 [BurstCompile]
 struct SampleLocalRotationJob : IAnimationJob {
   public ReadOnlyTransformHandle Handle;
@@ -278,7 +349,8 @@ public class AnimationDriver : MonoBehaviour {
   public void Resume() {
     Animator.SetSpeed(BaseSpeed);
   }
-  public void SetInputWeight(AnimationJob job, float weight) {
+  public void SetInputWeight(IPlayableTask job, float weight) {
+    // TODO: set audio input weight?
     if (SlotForJob(job) is var slot && slot != null)
       slot.AnimationInput.SetInputWeight(0, weight);
   }
@@ -292,46 +364,35 @@ public class AnimationDriver : MonoBehaviour {
     slot.CurrentJob = job;
   }
 
-  public void Disconnect(AnimationJob job) {
-    if (SlotForJob(job) is var slot && slot != null) {
-      slot.AnimationInput.DisconnectInput(0);
-      slot.CurrentJob = null;
-    }
-  }
+  public void Connect(TimelineTask job) {
+    var slot = UpperBodySlot;  // TODO
+    if (slot.CurrentJob != null)
+      slot.CurrentJob.Stop();
 
-  public AnimationJob Play(TaskScope scope, AnimationJobConfig animation) {
-    var job = new AnimationJob(this, Graph, animation);
-    job.Start();
-    _ = job.Run(scope);
-    return job;
-  }
-
-  public Playable PlayTimeline(TaskScope scope, TimelineAsset timeline, TimelineBindings bindings = default) {
-    var playable = timeline.CreatePlayable(Graph, gameObject);
-    playable.SetOutputCount(timeline.outputTrackCount);
-    var slot = WholeBodySlot;
+    var playable = job.Playable;
+    var timeline = job.Config.Asset;
     for (int i = 0; i < timeline.outputTrackCount; i++) {
       var track = timeline.GetOutputTrack(i);
-      var trackType = track.GetType();
+      //var trackType = track.GetType();
 
-      // Check for special track types and attach associated bindings
-      if (trackType == typeof(HitboxTrackAsset)) {
-        // accessing inputs to check if sanity happens or not
-        var input = playable.GetInput(i);
-        var type = input.GetPlayableType();
-        var trackPlayable = (ScriptPlayable<HitBoxTrackMixer>)input;
-        var trackMixer = trackPlayable.GetBehaviour();
-        // We probably need to create some kind of generic output for the graph.
-        // I have no idea how this works and think should look at a graph generated
-        // by playing a timeline via playable director for inspiration
-        // TODO: Somehow, here we need to bind the track...whatever that even means
-        // it's the "playerData" parameter that magically gets fed to the ProcessFrame call
-        Debug.Log($"Found Hitbox track with mixer {input}:{type}");
-      } else if (trackType == typeof(WeaponTrailTrackAsset)) {
-        var input = playable.GetInput(i);
-        var type = input.GetPlayableType();
-        Debug.Log($"Found WeaponTrail track with output {input}:{type}");
-      }
+      //// Check for special track types and attach associated bindings
+      //if (trackType == typeof(HitboxTrackAsset)) {
+      //  // accessing inputs to check if sanity happens or not
+      //  var input = playable.GetInput(i);
+      //  var type = input.GetPlayableType();
+      //  var trackPlayable = (ScriptPlayable<HitBoxTrackMixer>)input;
+      //  var trackMixer = trackPlayable.GetBehaviour();
+      //  // We probably need to create some kind of generic output for the graph.
+      //  // I have no idea how this works and think should look at a graph generated
+      //  // by playing a timeline via playable director for inspiration
+      //  // TODO: Somehow, here we need to bind the track...whatever that even means
+      //  // it's the "playerData" parameter that magically gets fed to the ProcessFrame call
+      //  Debug.Log($"Found Hitbox track with mixer {input}:{type}");
+      //} else if (trackType == typeof(WeaponTrailTrackAsset)) {
+      //  var input = playable.GetInput(i);
+      //  var type = input.GetPlayableType();
+      //  Debug.Log($"Found WeaponTrail track with output {input}:{type}");
+      //}
 
       foreach (var output in track.outputs) {
         if (output.outputTargetType == typeof(Animator)) {
@@ -343,24 +404,41 @@ public class AnimationDriver : MonoBehaviour {
             Graph.Connect(playable, i, noop, 0, 1f);
             Graph.Connect(noop, 0, slot.AudioInput, 0, 1f);
           }
+        } else {
+          var playableOutput = output.outputTargetType switch {
+            Type type when type == typeof(Collider) => ObjectPlayableOutput(Graph, track.name, job.Config.Bindings.Hitbox),
+            Type type when type == typeof(WeaponTrail) => ObjectPlayableOutput(Graph, track.name, job.Config.Bindings.WeaponTrail),
+            _ => PlayableOutput.Null
+          };
+          if (!playableOutput.IsOutputNull())
+            playableOutput.SetSourcePlayable(playable, i);
         }
       }
     }
-    _ = RunTimeline(scope, slot, playable);
-    return playable;
+
+    slot.CurrentJob = job;
   }
 
-  async Task RunTimeline(TaskScope scope, Slot slot, Playable playable) {
-    try {
-      while (true) {
-        if (playable.IsValid() && playable.IsDone())
-          break;
-        await scope.Yield();
-      }
-    } finally {
+  public void Disconnect(IPlayableTask job) {
+    if (SlotForJob(job) is var slot && slot != null) {
       slot.AnimationInput.DisconnectInput(0);
       slot.AudioInput.DisconnectInput(0);
+      slot.CurrentJob = null;
     }
+  }
+
+  public AnimationJob Play(TaskScope scope, AnimationJobConfig animation) {
+    var job = new AnimationJob(this, Graph, animation);
+    job.Start();
+    _ = job.Run(scope);
+    return job;
+  }
+
+  public TimelineTask PlayTimeline(TaskScope scope, TimelineTaskConfig config) {
+    var task = new TimelineTask(this, Graph, config);
+    task.Start();
+    _ = task.Run(scope);
+    return task;
   }
 
   void Update() {
@@ -375,12 +453,12 @@ public class AnimationDriver : MonoBehaviour {
   class Slot {
     public Playable AnimationInput;
     public Playable AudioInput;
-    public AnimationJob CurrentJob;
+    public IPlayableTask CurrentJob;
     public float InputWeight => AnimationInput.GetInput(0).IsNull() ? 0f : AnimationInput.GetInputWeight(0);
   }
   Slot WholeBodySlot;
   Slot UpperBodySlot;
-  Slot SlotForJob(AnimationJob job) {
+  Slot SlotForJob(IPlayableTask job) {
     Slot port = 0 switch {
       _ when job == WholeBodySlot.CurrentJob => WholeBodySlot,
       _ when job == UpperBodySlot.CurrentJob => UpperBodySlot,
@@ -412,6 +490,13 @@ public class AnimationDriver : MonoBehaviour {
   Playable AudioSlot() {
     var mixer = AudioMixerPlayable.Create(Graph, 1);
     return mixer;
+  }
+
+  PlayableOutput ObjectPlayableOutput(PlayableGraph graph, string name, UnityEngine.Object obj) {
+    var output = ScriptPlayableOutput.Create(graph, name);
+    output.SetUserData(obj);
+    output.SetReferenceObject(obj);
+    return output;
   }
 
   AnimationScriptPlayable NewSpineCorrector(Transform spine) {
