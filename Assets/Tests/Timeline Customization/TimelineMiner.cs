@@ -14,6 +14,22 @@ public class BoundTimeline {
   public WeaponTrail WeaponTrail;
 }
 
+/*
+Today's goals:
+
+  Play(Timeline, Duration)
+  Stop(Timeline, Duration)
+  Pause(Timeline)
+  Setup system that connects timelines to a graph for various statically-known outputs
+  Create three separate timelines for the phases of the test attack
+  Play them in sequence with small blending transitions and evaluate the result
+  Create and test OnPlayableCreate/OnPlayableDestroy hooks for custom TrackMixers like Hitbox that do setup/teardown
+  Create and test custom AnimationTrack with own mixer that does not include built-in tracks AbsoluteToRoot transform
+  Make the slot for an AnimationTrack an exposed Attribute on the Track
+  Try to set custom background color / icon for custom tracks
+  Try to make the default length of new hitbox tracks / weapontrail tracks shorter
+*/
+
 public class TimelineMiner : MonoBehaviour {
   [SerializeField] BoundTimeline BoundTimeline;
 
