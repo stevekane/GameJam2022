@@ -14,13 +14,18 @@ Today's goals:
   Pause(Timeline) -- built into playables API
   Resume(Timeline) -- built into playables API
   Setup system that connects timelines to a graph for various statically-known outputs
+
   Create three separate timelines for the phases of the test attack
   Play them in sequence with small blending transitions and evaluate the result
   Create and test OnPlayableCreate/OnPlayableDestroy hooks for custom TrackMixers like Hitbox that do setup/teardown
   Create and test custom AnimationTrack with own mixer that does not include built-in tracks AbsoluteToRoot transform
+  Create and test movement track which is sort of like root motion except driven through code
   Make the slot for an AnimationTrack an exposed Attribute on the Track
   Try to set custom background color / icon for custom tracks
   Try to make the default length of new hitbox tracks / weapontrail tracks shorter
+
+  TESTS
+    + Confirm that a single node connected to multiple outputs processes two unique playerDatas per frame.
 */
 
 public class TimelineAudioMixer : PlayableBehaviour {
@@ -97,9 +102,6 @@ public class TimelineMiner : MonoBehaviour {
     AudioMixer = ScriptPlayable<TimelineAudioMixer>.Create(AudioGraph);
     AudioOutput = AudioPlayableOutput.Create(AudioGraph, "Audio", AudioSource);
     AudioOutput.SetSourcePlayable(AudioMixer.GetBehaviour().AudioMixer);
-
-    // Current Timeline
-    CurrentFixedTimeline = ScriptPlayable<TimelinePlayable>.Null;
   }
 
   void OnDestroy() {
