@@ -12,7 +12,7 @@ public class ShieldAbility : Ability {
     }, "ShieldInvulnerable");
 
   public override async Task MainAction(TaskScope scope) {
-    AnimationJob animation = null;
+    AnimationTask animation = null;
     try {
       animation = AnimationDriver.Play(scope, BlockAnimation);
       await animation.PauseAfterPhase(scope, 0);

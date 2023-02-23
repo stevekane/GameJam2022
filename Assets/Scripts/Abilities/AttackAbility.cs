@@ -16,7 +16,7 @@ public class AttackAbility : Ability {
   [SerializeField] GameObject AttackVFX;
   [SerializeField] AudioClip AttackSFX;
 
-  [NonSerialized] AnimationJob Animation = null;
+  [NonSerialized] AnimationTask Animation = null;
 
   public override HitConfig HitConfigData => HitConfig;
 

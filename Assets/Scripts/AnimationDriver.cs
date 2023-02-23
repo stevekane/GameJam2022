@@ -40,7 +40,7 @@ public interface IPlayableTask {
   public void Stop();
 }
 
-public class AnimationJob : IPlayableTask {
+public class AnimationTask : IPlayableTask {
   PlayableGraph Graph;
   public AnimationJobConfig Animation;
   AnimationDriver Driver;
@@ -53,7 +53,7 @@ public class AnimationJob : IPlayableTask {
   public AnimationEvent[] Phases => Animation.Clip.events;
   public int NumPhases => Phases.Length+1;
 
-  public AnimationJob(AnimationDriver driver, PlayableGraph graph, AnimationJobConfig animation) {
+  public AnimationTask(AnimationDriver driver, PlayableGraph graph, AnimationJobConfig animation) {
     Graph = graph;
     Driver = driver;
     Animation = animation;
@@ -350,28 +350,28 @@ public class AnimationDriver : MonoBehaviour {
   public void Resume() {
     Animator.SetSpeed(BaseSpeed);
   }
-  public void SetInputWeight(IPlayableTask job, float weight) {
+  public void SetInputWeight(IPlayableTask task, float weight) {
     // TODO: set audio input weight?
-    if (SlotForJob(job) is var slot && slot != null)
+    if (SlotForTask(task) is var slot && slot != null)
       slot.AnimationInput.SetInputWeight(0, weight);
   }
 
-  public void Connect(AnimationJob job) {
-    Debug.Assert(job.Animation.Mask == Defaults.Instance.UpperBodyMask || job.Animation.Mask == null);
-    var slot = job.Animation.Mask == Defaults.Instance.UpperBodyMask ? UpperBodySlot : WholeBodySlot;
-    if (slot.CurrentJob != null)
-      slot.CurrentJob.Stop();
-    Graph.Connect(job.Clip, 0, slot.AnimationInput, 0, 1f);
-    slot.CurrentJob = job;
+  public void Connect(AnimationTask task) {
+    Debug.Assert(task.Animation.Mask == Defaults.Instance.UpperBodyMask || task.Animation.Mask == null);
+    var slot = task.Animation.Mask == Defaults.Instance.UpperBodyMask ? UpperBodySlot : WholeBodySlot;
+    if (slot.CurrentTask != null)
+      slot.CurrentTask.Stop();
+    Graph.Connect(task.Clip, 0, slot.AnimationInput, 0, 1f);
+    slot.CurrentTask = task;
   }
 
-  public void Connect(TimelineTask job) {
+  public void Connect(TimelineTask task) {
     var slot = UpperBodySlot;  // TODO
-    if (slot.CurrentJob != null)
-      slot.CurrentJob.Stop();
+    if (slot.CurrentTask != null)
+      slot.CurrentTask.Stop();
 
-    var playable = job.Playable;
-    var timeline = job.Config.Asset;
+    var playable = task.Playable;
+    var timeline = task.Config.Asset;
     for (int i = 0; i < timeline.outputTrackCount; i++) {
       var track = timeline.GetOutputTrack(i);
       //var trackType = track.GetType();
@@ -407,8 +407,8 @@ public class AnimationDriver : MonoBehaviour {
           }
         } else {
           var playableOutput = output.outputTargetType switch {
-            Type type when type == typeof(Collider) => ObjectPlayableOutput(Graph, track.name, job.Config.Bindings.Hitbox),
-            Type type when type == typeof(WeaponTrail) => ObjectPlayableOutput(Graph, track.name, job.Config.Bindings.WeaponTrail),
+            Type type when type == typeof(Collider) => ObjectPlayableOutput(Graph, track.name, task.Config.Bindings.Hitbox),
+            Type type when type == typeof(WeaponTrail) => ObjectPlayableOutput(Graph, track.name, task.Config.Bindings.WeaponTrail),
             _ => PlayableOutput.Null
           };
           if (!playableOutput.IsOutputNull())
@@ -417,11 +417,11 @@ public class AnimationDriver : MonoBehaviour {
       }
     }
 
-    slot.CurrentJob = job;
+    slot.CurrentTask = task;
   }
 
-  public void Disconnect(IPlayableTask job) {
-    if (SlotForJob(job) is var slot && slot != null) {
+  public void Disconnect(IPlayableTask task) {
+    if (SlotForTask(task) is var slot && slot != null) {
       // Delete all generated outputs (which for now is everything but animation and audio).
       var outputCount = Graph.GetOutputCount();
       var dynamicOutputs = Enumerable.Range(0, outputCount)
@@ -433,15 +433,15 @@ public class AnimationDriver : MonoBehaviour {
 
       slot.AnimationInput.DisconnectInput(0);
       slot.AudioInput.DisconnectInput(0);
-      slot.CurrentJob = null;
+      slot.CurrentTask = null;
     }
   }
 
-  public AnimationJob Play(TaskScope scope, AnimationJobConfig animation) {
-    var job = new AnimationJob(this, Graph, animation);
-    job.Start();
-    _ = job.Run(scope);
-    return job;
+  public AnimationTask Play(TaskScope scope, AnimationJobConfig animation) {
+    var task = new AnimationTask(this, Graph, animation);
+    task.Start();
+    _ = task.Run(scope);
+    return task;
   }
 
   public TimelineTask PlayTimeline(TaskScope scope, TimelineTaskConfig config) {
@@ -463,15 +463,15 @@ public class AnimationDriver : MonoBehaviour {
   class Slot {
     public Playable AnimationInput;
     public Playable AudioInput;
-    public IPlayableTask CurrentJob;
+    public IPlayableTask CurrentTask;
     public float InputWeight => AnimationInput.GetInput(0).IsNull() ? 0f : AnimationInput.GetInputWeight(0);
   }
   Slot WholeBodySlot;
   Slot UpperBodySlot;
-  Slot SlotForJob(IPlayableTask job) {
+  Slot SlotForTask(IPlayableTask task) {
     Slot port = 0 switch {
-      _ when job == WholeBodySlot.CurrentJob => WholeBodySlot,
-      _ when job == UpperBodySlot.CurrentJob => UpperBodySlot,
+      _ when task == WholeBodySlot.CurrentTask => WholeBodySlot,
+      _ when task == UpperBodySlot.CurrentTask => UpperBodySlot,
       _ => null,
     };
     return port;
