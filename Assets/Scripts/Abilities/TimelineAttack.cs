@@ -8,6 +8,7 @@ public class TimelineAttack : Ability {
 
   void Start() {
     this.InitComponentFromChildren(out Hitbox);
+    Timeline.Bindings.Ability = this;
   }
 
   public override async Task MainAction(TaskScope scope) {

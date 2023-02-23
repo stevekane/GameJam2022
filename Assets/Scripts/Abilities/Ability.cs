@@ -67,6 +67,7 @@ public abstract class Ability : MonoBehaviour {
   // Main entry points, bound to JustDown/JustUp for player.
   public virtual Task MainAction(TaskScope scope) => null;
   public virtual Task MainRelease(TaskScope scope) => null;
+  public void SetCancellable() => Tags.AddFlags(AbilityTag.Cancellable);
   public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
   public void Stop() {
     Tags = 0;

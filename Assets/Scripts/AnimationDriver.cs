@@ -25,6 +25,7 @@ public class AnimationJobConfig {
 public struct TimelineBindings {
   public Collider Hitbox;
   public WeaponTrail WeaponTrail;
+  public Ability Ability;
 }
 
 [Serializable]
@@ -407,6 +408,7 @@ public class AnimationDriver : MonoBehaviour {
           var playableOutput = output.outputTargetType switch {
             Type type when type == typeof(Collider) => ObjectPlayableOutput(Graph, track.name, task.Config.Bindings.Hitbox),
             Type type when type == typeof(WeaponTrail) => ObjectPlayableOutput(Graph, track.name, task.Config.Bindings.WeaponTrail),
+            Type type when type == typeof(Ability) => ObjectPlayableOutput(Graph, track.name, task.Config.Bindings.Ability),
             _ => PlayableOutput.Null
           };
           if (!playableOutput.IsOutputNull())
