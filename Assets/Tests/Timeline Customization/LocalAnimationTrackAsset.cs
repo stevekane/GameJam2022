@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEngine.Playables;
 using UnityEngine.Animations;
+using System.Collections.Generic;
 
 [TrackColor(.25f, .25f, .75f)]
 [TrackBindingType(typeof(Animator))]
@@ -22,5 +23,9 @@ public class LocalAnimationTrackAsset : TrackAsset {
       Debug.Log($"Added props from {asset.clip.name}");
       driver.AddFromClip(asset.clip);
     }
+  }
+
+  public override IEnumerable<PlayableBinding> outputs {
+    get { yield return AnimationPlayableBinding.Create(name, this); }
   }
 }

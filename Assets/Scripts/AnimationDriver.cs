@@ -1,5 +1,5 @@
-using GraphVisualizer;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Unity.Burst;
 using Unity.Collections;
@@ -113,9 +113,9 @@ public class AnimationJob : IPlayableTask {
 
   public void Stop() {
     IsRunning = false;
+    Driver.Disconnect(this);
     if (Clip.IsValid())
       Clip.Destroy();
-    Driver.Disconnect(this);
   }
 
   float BlendWeight() {
@@ -179,7 +179,7 @@ public class AnimationJob : IPlayableTask {
 public class TimelineTask : IPlayableTask {
   AnimationDriver Driver;
   internal TimelineTaskConfig Config;
-  internal Playable Playable;
+  public Playable Playable { get; private set; }
   bool IsRunning => Playable.IsValid() && !Playable.IsDone();
 
   public TimelineTask(AnimationDriver driver, PlayableGraph graph, TimelineTaskConfig config) {
@@ -191,15 +191,15 @@ public class TimelineTask : IPlayableTask {
   }
 
   public void Start() {
-    //Clip.SetSpeed(DesiredSpeed * Animation.Speed * Driver.Speed);
-    //Clip.SetDuration(Animation.Clip.length);
+    Playable.SetSpeed(Driver.Speed);
+    Playable.SetDuration(Config.Asset.duration);
     Driver.Connect(this);
   }
 
   public void Stop() {
+    Driver.Disconnect(this);
     if (Playable.IsValid())
       Playable.Destroy();  // TODO: destroy other things?
-    Driver.Disconnect(this);
   }
 
   public TaskFunc WaitDone() => s => WaitDone(s);
@@ -214,6 +214,7 @@ public class TimelineTask : IPlayableTask {
         if (Playable.IsDone())
           break;
         Driver.SetInputWeight(this, BlendWeight());
+        Playable.SetSpeed(Driver.Speed);
         await scope.Yield();
       }
     } finally {
@@ -421,6 +422,15 @@ public class AnimationDriver : MonoBehaviour {
 
   public void Disconnect(IPlayableTask job) {
     if (SlotForJob(job) is var slot && slot != null) {
+      // Delete all generated outputs (which for now is everything but animation and audio).
+      var outputCount = Graph.GetOutputCount();
+      var dynamicOutputs = Enumerable.Range(0, outputCount)
+        .Select(i => Graph.GetOutput(i))
+        .Where(o => !o.IsPlayableOutputOfType<AnimationPlayableOutput>() && !o.IsPlayableOutputOfType<AudioPlayableOutput>())
+        .ToArray();
+      foreach (var output in dynamicOutputs)
+        Graph.DestroyOutput(output);
+
       slot.AnimationInput.DisconnectInput(0);
       slot.AudioInput.DisconnectInput(0);
       slot.CurrentJob = null;
