@@ -271,8 +271,8 @@ struct SpineRotationJob : IAnimationJob {
 
 [BurstCompile]
 struct AnimationNoopJob : IAnimationJob {
-  public void ProcessRootMotion(AnimationStream stream) { }
-  public void ProcessAnimation(AnimationStream stream) { }
+  public void ProcessRootMotion(AnimationStream stream) {}
+  public void ProcessAnimation(AnimationStream stream) {}
 }
 
 public class AnimationDriver : MonoBehaviour {

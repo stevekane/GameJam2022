@@ -28,6 +28,38 @@ Today's goals:
     + Confirm that a single node connected to multiple outputs processes two unique playerDatas per frame.
 */
 
+/*
+What about three fundamental graphs:
+
+  Animation (GameTime)
+  Audio (DSP)
+  Logic (Manual in FixedUpdate)
+
+Each graph may support playing various subgraphs by type:
+
+  Animation supports anything that targets an Animator
+  Audio supports anything targeting an AudioSource
+  Logic supports anything targeting a UnityObject
+*/
+
+/*
+Thinking hard about how this would work.
+
+  Animator behavior can be dictated solely by interacting with a runtimeAnimatorController which in turn drives
+  the behavior of the graph generated from that controller.
+
+  This is sort of confusing because Animator itself is somehow the "target" of some eventual AnimationStream.
+  This means that if you want your own means of driving an animator you must give that thing a name.
+  For example, you could have an AnimationGraph which can play Animations directly but also can play tracks
+  from a pure animation timeline.
+
+  These animation timelines can contain tracks that target different slots in the graph which the AnimationGraph
+  will use to determine where to play a given AnimationTrack.
+
+  You tell the AnimationGraph what TimelineAsset to play and it will strip that asset for suitable tracks
+  which it then uses to construst a TimelinePlayable which can be connected to the AnimationGraph.
+*/
+
 public class TimelineAudioMixer : PlayableBehaviour {
   Playable Playable;
   PlayableGraph Graph;
@@ -127,19 +159,9 @@ public class TimelineMiner : MonoBehaviour {
     }
   }
 
-  IEnumerable<TrackAsset> Tracks(TimelineAsset timelineAsset, Predicate<Type> predicate) {
-    foreach (var track in timelineAsset.GetOutputTracks()) {
-      foreach (var output in track.outputs) {
-        if (predicate(output.outputTargetType)) {
-          yield return track;
-        }
-      }
-    }
-  }
-
   public (ScriptPlayable<TimelinePlayable>, ScriptPlayable<TimelinePlayable>) Play(TimelineAsset timelineAsset, float fadeInDuration) {
     // TODO: Fade in
-    var fixedTracks = Tracks(timelineAsset, type => type != typeof(AudioSource));
+    var fixedTracks = timelineAsset.Tracks(type => type != typeof(AudioSource));
     var fixedTimeline = TimelinePlayable.Create(FixedGraph, fixedTracks, gameObject, false, false);
     fixedTimeline.SetTime(0);
     fixedTimeline.SetDuration(timelineAsset.duration);
@@ -156,7 +178,7 @@ public class TimelineMiner : MonoBehaviour {
         }
       }
     }
-    var audioTracks = Tracks(timelineAsset, type => type == typeof(AudioSource));
+    var audioTracks = timelineAsset.Tracks(type => type == typeof(AudioSource));
     var audioTimeline = TimelinePlayable.Create(AudioGraph, audioTracks, gameObject, false, false);
     audioTimeline.SetTime(0);
     audioTimeline.SetDuration(timelineAsset.duration);
