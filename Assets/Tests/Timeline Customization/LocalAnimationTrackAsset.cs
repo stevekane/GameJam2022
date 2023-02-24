@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEngine.Playables;
@@ -11,6 +12,12 @@ public class LocalAnimationTrackAsset : TrackAsset {
     return AnimationMixerPlayable.Create(graph, inputCount);
   }
 
+  public override IEnumerable<PlayableBinding> outputs {
+    get {
+      yield return AnimationPlayableBinding.Create("Animation Binding", this);
+    }
+  }
+
   public override void GatherProperties(PlayableDirector director, IPropertyCollector driver) {
     var animator = director.GetGenericBinding(this) as Animator;
     if (animator == null)
@@ -19,7 +26,6 @@ public class LocalAnimationTrackAsset : TrackAsset {
       var asset = clip.asset as AnimationPlayableAsset;
       if (asset == null)
         continue;
-      Debug.Log($"Added props from {asset.clip.name}");
       driver.AddFromClip(asset.clip);
     }
   }
