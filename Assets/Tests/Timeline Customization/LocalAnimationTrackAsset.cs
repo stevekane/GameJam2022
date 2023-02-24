@@ -30,8 +30,4 @@ public class LocalAnimationTrackAsset : TrackAsset {
       driver.AddFromClip(asset.clip);
     }
   }
-
-  public override IEnumerable<PlayableBinding> outputs {
-    get { yield return AnimationPlayableBinding.Create(name, this); }
-  }
 }
