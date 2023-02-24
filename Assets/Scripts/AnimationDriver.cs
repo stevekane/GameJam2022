@@ -378,11 +378,11 @@ public class AnimationDriver : MonoBehaviour {
     for (int i = 0; i < timeline.outputTrackCount; i++) {
       var track = timeline.GetOutputTrack(i);
       foreach (var output in track.outputs) {
-        if (track is LocalAnimationTrackAsset || track is UnityEngine.Timeline.AnimationTrack) {
+        if (track is LocalAnimationTrackAsset || track is AnimationTrack) {
           Debug.Assert(track is LocalAnimationTrackAsset);
           if (slot.AnimationInput.GetInput(0).IsNull())
             Graph.Connect(playable, i, slot.AnimationInput, 0, 1f);
-        } else if (track is UnityEngine.Timeline.AudioTrack) {
+        } else if (track is AudioTrack) {
           if (slot.AudioInput.GetInput(0).IsNull()) {
             var noop = ScriptPlayable<NoopBehavior>.Create(Graph, 1);
             Graph.Connect(playable, i, noop, 0, 1f);
