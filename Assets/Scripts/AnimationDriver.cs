@@ -215,9 +215,7 @@ public class TimelineTask : IPlayableTask {
 
   public async Task Run(TaskScope scope) {
     try {
-      while (Playable.IsValid()) {
-        if (Playable.IsDone())
-          break;
+      while (IsRunning) {
         Driver.SetInputWeight(this, BlendWeight());
         Playable.SetSpeed(Driver.Speed);
         await scope.Yield();

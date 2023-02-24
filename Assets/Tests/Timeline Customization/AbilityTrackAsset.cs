@@ -9,25 +9,3 @@ public class AbilityTrackAsset : TrackAsset {
     return ScriptPlayable<AbilityTrackMixer>.Create(graph, inputCount);
   }
 }
-
-public class AbilityTrackMixer : PlayableBehaviour {
-  public override void ProcessFrame(Playable playable, FrameData info, object playerData) {
-    var ability = playerData as Ability;
-    if (!ability)
-      return;
-    var inputCount = playable.GetInputCount();
-    var active = false;
-    for (var i = 0; i < inputCount; i++)
-      active = active || playable.GetInputWeight(i) > 0;
-    if (active)
-      ability.SetCancellable();
-  }
-}
-
-public class AbilityClipAsset : PlayableAsset {
-  public override Playable CreatePlayable(PlayableGraph graph, GameObject owner) {
-    return ScriptPlayable<AbilityTrackBehavior>.Create(graph);
-  }
-}
-
-public class AbilityTrackBehavior : PlayableBehaviour { }
