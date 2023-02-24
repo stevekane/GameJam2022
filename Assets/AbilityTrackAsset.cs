@@ -24,10 +24,4 @@ public class AbilityTrackMixer : PlayableBehaviour {
   }
 }
 
-public class AbilityClipAsset : PlayableAsset {
-  public override Playable CreatePlayable(PlayableGraph graph, GameObject owner) {
-    return ScriptPlayable<AbilityTrackBehavior>.Create(graph);
-  }
-}
-
 public class AbilityTrackBehavior : PlayableBehaviour { }
