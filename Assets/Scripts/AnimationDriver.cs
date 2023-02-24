@@ -378,21 +378,23 @@ public class AnimationDriver : MonoBehaviour {
     for (int i = 0; i < timeline.outputTrackCount; i++) {
       var track = timeline.GetOutputTrack(i);
       foreach (var output in track.outputs) {
-        if (output.outputTargetType == typeof(Animator)) {
+        if (track is LocalAnimationTrackAsset || track is UnityEngine.Timeline.AnimationTrack) {
+          Debug.Assert(track is LocalAnimationTrackAsset);
           if (slot.AnimationInput.GetInput(0).IsNull())
             Graph.Connect(playable, i, slot.AnimationInput, 0, 1f);
-        } else if (output.outputTargetType == typeof(AudioSource)) {
+        } else if (track is UnityEngine.Timeline.AudioTrack) {
           if (slot.AudioInput.GetInput(0).IsNull()) {
             var noop = ScriptPlayable<NoopBehavior>.Create(Graph, 1);
             Graph.Connect(playable, i, noop, 0, 1f);
             Graph.Connect(noop, 0, slot.AudioInput, 0, 1f);
           }
         } else {
-          var playableOutput = output.outputTargetType switch {
-            Type type when type == typeof(Collider) => ObjectPlayableOutput(Graph, track.name, task.Config.Bindings.Hitbox),
-            Type type when type == typeof(WeaponTrail) => ObjectPlayableOutput(Graph, track.name, task.Config.Bindings.WeaponTrail),
-            Type type when type == typeof(Ability) => ObjectPlayableOutput(Graph, track.name, task.Config.Bindings.Ability),
-            _ => PlayableOutput.Null
+          var playableOutput = 0 switch {
+            _ when track is HitboxTrackAsset => ObjectPlayableOutput(Graph, track.name, task.Config.Bindings.Hitbox),
+            _ when track is WeaponTrailTrackAsset => ObjectPlayableOutput(Graph, track.name, task.Config.Bindings.WeaponTrail),
+            _ when track is AbilityTrackAsset => ObjectPlayableOutput(Graph, track.name, task.Config.Bindings.Ability),
+            _ when track is AudioOneshotTrackAsset => ObjectPlayableOutput(Graph, track.name, SFXManager.Instance.AudioSource),
+            _ => ObjectPlayableOutput(Graph, track.name, null),
           };
           if (!playableOutput.IsOutputNull())
             playableOutput.SetSourcePlayable(playable, i);

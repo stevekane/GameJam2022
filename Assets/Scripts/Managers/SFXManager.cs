@@ -6,7 +6,7 @@ public class SFXManager : MonoBehaviour {
 
   public AudioClip FallSFX;
 
-  [SerializeField] AudioSource AudioSource;
+  [SerializeField] public AudioSource AudioSource;
   List<AudioClip> ClipsPlayedThisFrame = new();  // TODO: is this a good idea?
 
   void FixedUpdate() {
