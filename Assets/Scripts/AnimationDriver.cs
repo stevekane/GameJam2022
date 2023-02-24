@@ -1,5 +1,5 @@
-using GraphVisualizer;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Unity.Burst;
 using Unity.Collections;
@@ -25,6 +25,7 @@ public class AnimationJobConfig {
 public struct TimelineBindings {
   public Collider Hitbox;
   public WeaponTrail WeaponTrail;
+  public Ability Ability;
 }
 
 [Serializable]
@@ -40,50 +41,48 @@ public interface IPlayableTask {
   public void Stop();
 }
 
-public class AnimationJob : IPlayableTask {
+public class AnimationTask : IPlayableTask {
   PlayableGraph Graph;
-  public AnimationJobConfig Animation;
+  public AnimationJobConfig Config;
   AnimationDriver Driver;
-  public AnimationClipPlayable Clip;
   double DesiredSpeed = 1;
+  public AnimationClipPlayable Playable { get; private set; }
   public bool IsRunning { get; private set; } = false;
   public int CurrentFrame { get; private set; } = -1;
   public int CurrentPhase { get; private set; } = 0;
-  public int NumFrames => (int)(Animation.Clip.length*Animation.Clip.frameRate+1);
-  public AnimationEvent[] Phases => Animation.Clip.events;
+  public int NumFrames => (int)(Config.Clip.length*Config.Clip.frameRate+1);
+  public AnimationEvent[] Phases => Config.Clip.events;
   public int NumPhases => Phases.Length+1;
 
-  public AnimationJob(AnimationDriver driver, PlayableGraph graph, AnimationJobConfig animation) {
+  public AnimationTask(AnimationDriver driver, PlayableGraph graph, AnimationJobConfig config) {
     Graph = graph;
     Driver = driver;
-    Animation = animation;
-    Clip = AnimationClipPlayable.Create(Graph, Animation.Clip);
+    Config = config;
+    Playable = AnimationClipPlayable.Create(Graph, Config.Clip);
 
     // TODO: Legacy. Update all old anims and remove this.
-    if (Animation.PhaseDurations.Length == 0 && NumPhases == 1) {
-      Animation.PhaseDurations = new[] { Timeval.FromSeconds(Animation.Clip.length) };
+    if (Config.PhaseDurations.Length == 0 && NumPhases == 1) {
+      Config.PhaseDurations = new[] { Timeval.FromSeconds(Config.Clip.length) };
     }
 
-    Debug.Assert(Animation.PhaseDurations.Length == NumPhases,
-      $"Number of phase durations should match the number of phases (animation events + 1) for clip {animation.Clip}");
+    Debug.Assert(Config.PhaseDurations.Length == NumPhases,
+      $"Number of phase durations should match the number of phases (animation events + 1) for clip {config.Clip}");
     SetPhaseDuration();
   }
 
-  public void SetSpeed(double speed) => DesiredSpeed = speed;
-
   public void Pause() {
-    if (Clip.IsValid())
-      Clip.Pause();
+    if (Playable.IsValid())
+      Playable.Pause();
   }
   public void Resume() {
-    if (Clip.IsValid())
-      Clip.Play();
+    if (Playable.IsValid())
+      Playable.Play();
   }
 
   public TaskFunc WaitPhase(int phase) => s => WaitPhase(s, phase);
   public async Task WaitPhase(TaskScope scope, int phase) {
     var time = GetPhaseEndTime(phase);
-    while (IsRunning && Clip.GetTime() < time)
+    while (IsRunning && Playable.GetTime() < time)
       await scope.Yield();
   }
   public TaskFunc PauseAfterPhase(int phase) => s => PauseAfterPhase(s, phase);
@@ -105,29 +104,29 @@ public class AnimationJob : IPlayableTask {
 
   // TDO: condense start/run?
   public void Start() {
-    Clip.SetSpeed(DesiredSpeed * Animation.Speed * Driver.Speed);
-    Clip.SetDuration(Animation.Clip.length);
+    Playable.SetSpeed(DesiredSpeed * Config.Speed * Driver.Speed);
+    Playable.SetDuration(Config.Clip.length);
     Driver.Connect(this);
     IsRunning = true;
   }
 
   public void Stop() {
     IsRunning = false;
-    if (Clip.IsValid())
-      Clip.Destroy();
     Driver.Disconnect(this);
+    if (Playable.IsValid())
+      Playable.Destroy();
   }
 
   float BlendWeight() {
-    var time = Clip.GetTime();
-    var duration = Clip.GetDuration();
+    var time = Playable.GetTime();
+    var duration = Playable.GetDuration();
     var fraction = time/duration;
     // blending out
-    if (Animation.BlendOutFraction > 0 && fraction >= (1-Animation.BlendOutFraction)) {
-      return 1-(float)(fraction-(1-Animation.BlendOutFraction))/Animation.BlendOutFraction;
+    if (Config.BlendOutFraction > 0 && fraction >= (1-Config.BlendOutFraction)) {
+      return 1-(float)(fraction-(1-Config.BlendOutFraction))/Config.BlendOutFraction;
     // blending in
-    } else if (Animation.BlendInFraction > 0 && fraction <= Animation.BlendInFraction) {
-      return (float)fraction/Animation.BlendInFraction;
+    } else if (Config.BlendInFraction > 0 && fraction <= Config.BlendInFraction) {
+      return (float)fraction/Config.BlendInFraction;
     // full blending
     } else {
       return 1;
@@ -136,12 +135,12 @@ public class AnimationJob : IPlayableTask {
 
   public async Task Run(TaskScope scope) {
     try {
-      while (IsRunning && Clip.IsValid()) {
+      while (IsRunning && Playable.IsValid()) {
         UpdateCurrentFrame();
         UpdateCurrentPhase();
         Driver.SetInputWeight(this, BlendWeight());
-        Clip.SetSpeed(DesiredSpeed * Animation.Speed * Driver.Speed);
-        if (Clip.IsDone())
+        Playable.SetSpeed(DesiredSpeed * Config.Speed * Driver.Speed);
+        if (Playable.IsDone())
           break;
         await scope.Yield();
       }
@@ -152,14 +151,14 @@ public class AnimationJob : IPlayableTask {
   }
 
   void UpdateCurrentFrame() {
-    var clip = Clip.GetAnimationClip();
+    var clip = Playable.GetAnimationClip();
     var frames = (clip.length*clip.frameRate+1)/* / Animator.speed*/;
-    var interpolant = (float)(Clip.GetTime()/clip.length);
+    var interpolant = (float)(Playable.GetTime()/clip.length);
     CurrentFrame = (int)Mathf.Lerp(0, frames, interpolant);
   }
   // TODO: This doesn't support looping.
   void UpdateCurrentPhase() {
-    var time = Clip.GetTime();
+    var time = Playable.GetTime();
     var oldPhase = CurrentPhase;
     while (CurrentPhase < Phases.Length && time >= Phases[CurrentPhase].time)
       CurrentPhase++;
@@ -168,9 +167,9 @@ public class AnimationJob : IPlayableTask {
   }
 
   float GetPhaseStartTime(int phase) => phase-1 < 0 ? 0 : Phases[phase-1].time;
-  float GetPhaseEndTime(int phase) => phase < Phases.Length ? Phases[phase].time : Animation.Clip.length;
+  float GetPhaseEndTime(int phase) => phase < Phases.Length ? Phases[phase].time : Config.Clip.length;
   void SetPhaseDuration() {
-    var duration = Animation.PhaseDurations[CurrentPhase];
+    var duration = Config.PhaseDurations[CurrentPhase];
     var clipDuration = GetPhaseEndTime(CurrentPhase) - GetPhaseStartTime(CurrentPhase);
     DesiredSpeed = duration.Seconds == 0f ? float.MaxValue : clipDuration/duration.Seconds;
   }
@@ -179,7 +178,7 @@ public class AnimationJob : IPlayableTask {
 public class TimelineTask : IPlayableTask {
   AnimationDriver Driver;
   internal TimelineTaskConfig Config;
-  internal Playable Playable;
+  public Playable Playable { get; private set; }
   bool IsRunning => Playable.IsValid() && !Playable.IsDone();
 
   public TimelineTask(AnimationDriver driver, PlayableGraph graph, TimelineTaskConfig config) {
@@ -191,15 +190,15 @@ public class TimelineTask : IPlayableTask {
   }
 
   public void Start() {
-    //Clip.SetSpeed(DesiredSpeed * Animation.Speed * Driver.Speed);
-    //Clip.SetDuration(Animation.Clip.length);
+    Playable.SetSpeed(Driver.Speed);
+    Playable.SetDuration(Config.Asset.duration);
     Driver.Connect(this);
   }
 
   public void Stop() {
+    Driver.Disconnect(this);
     if (Playable.IsValid())
       Playable.Destroy();  // TODO: destroy other things?
-    Driver.Disconnect(this);
   }
 
   public TaskFunc WaitDone() => s => WaitDone(s);
@@ -214,6 +213,7 @@ public class TimelineTask : IPlayableTask {
         if (Playable.IsDone())
           break;
         Driver.SetInputWeight(this, BlendWeight());
+        Playable.SetSpeed(Driver.Speed);
         await scope.Yield();
       }
     } finally {
@@ -349,28 +349,28 @@ public class AnimationDriver : MonoBehaviour {
   public void Resume() {
     Animator.SetSpeed(BaseSpeed);
   }
-  public void SetInputWeight(IPlayableTask job, float weight) {
+  public void SetInputWeight(IPlayableTask task, float weight) {
     // TODO: set audio input weight?
-    if (SlotForJob(job) is var slot && slot != null)
+    if (SlotForTask(task) is var slot && slot != null)
       slot.AnimationInput.SetInputWeight(0, weight);
   }
 
-  public void Connect(AnimationJob job) {
-    Debug.Assert(job.Animation.Mask == Defaults.Instance.UpperBodyMask || job.Animation.Mask == null);
-    var slot = job.Animation.Mask == Defaults.Instance.UpperBodyMask ? UpperBodySlot : WholeBodySlot;
-    if (slot.CurrentJob != null)
-      slot.CurrentJob.Stop();
-    Graph.Connect(job.Clip, 0, slot.AnimationInput, 0, 1f);
-    slot.CurrentJob = job;
+  public void Connect(AnimationTask task) {
+    Debug.Assert(task.Config.Mask == Defaults.Instance.UpperBodyMask || task.Config.Mask == null);
+    var slot = task.Config.Mask == Defaults.Instance.UpperBodyMask ? UpperBodySlot : WholeBodySlot;
+    if (slot.CurrentTask != null)
+      slot.CurrentTask.Stop();
+    Graph.Connect(task.Playable, 0, slot.AnimationInput, 0, 1f);
+    slot.CurrentTask = task;
   }
 
-  public void Connect(TimelineTask job) {
+  public void Connect(TimelineTask task) {
     var slot = UpperBodySlot;  // TODO
-    if (slot.CurrentJob != null)
-      slot.CurrentJob.Stop();
+    if (slot.CurrentTask != null)
+      slot.CurrentTask.Stop();
 
-    var playable = job.Playable;
-    var timeline = job.Config.Asset;
+    var playable = task.Playable;
+    var timeline = task.Config.Asset;
     for (int i = 0; i < timeline.outputTrackCount; i++) {
       var track = timeline.GetOutputTrack(i);
       //var trackType = track.GetType();
@@ -406,8 +406,9 @@ public class AnimationDriver : MonoBehaviour {
           }
         } else {
           var playableOutput = output.outputTargetType switch {
-            Type type when type == typeof(Collider) => ObjectPlayableOutput(Graph, track.name, job.Config.Bindings.Hitbox),
-            Type type when type == typeof(WeaponTrail) => ObjectPlayableOutput(Graph, track.name, job.Config.Bindings.WeaponTrail),
+            Type type when type == typeof(Collider) => ObjectPlayableOutput(Graph, track.name, task.Config.Bindings.Hitbox),
+            Type type when type == typeof(WeaponTrail) => ObjectPlayableOutput(Graph, track.name, task.Config.Bindings.WeaponTrail),
+            Type type when type == typeof(Ability) => ObjectPlayableOutput(Graph, track.name, task.Config.Bindings.Ability),
             _ => PlayableOutput.Null
           };
           if (!playableOutput.IsOutputNull())
@@ -416,22 +417,31 @@ public class AnimationDriver : MonoBehaviour {
       }
     }
 
-    slot.CurrentJob = job;
+    slot.CurrentTask = task;
   }
 
-  public void Disconnect(IPlayableTask job) {
-    if (SlotForJob(job) is var slot && slot != null) {
+  public void Disconnect(IPlayableTask task) {
+    if (SlotForTask(task) is var slot && slot != null) {
+      // Delete all generated outputs (which for now is everything but animation and audio).
+      var outputCount = Graph.GetOutputCount();
+      var dynamicOutputs = Enumerable.Range(0, outputCount)
+        .Select(i => Graph.GetOutput(i))
+        .Where(o => !o.IsPlayableOutputOfType<AnimationPlayableOutput>() && !o.IsPlayableOutputOfType<AudioPlayableOutput>())
+        .ToArray();
+      foreach (var output in dynamicOutputs)
+        Graph.DestroyOutput(output);
+
       slot.AnimationInput.DisconnectInput(0);
       slot.AudioInput.DisconnectInput(0);
-      slot.CurrentJob = null;
+      slot.CurrentTask = null;
     }
   }
 
-  public AnimationJob Play(TaskScope scope, AnimationJobConfig animation) {
-    var job = new AnimationJob(this, Graph, animation);
-    job.Start();
-    _ = job.Run(scope);
-    return job;
+  public AnimationTask Play(TaskScope scope, AnimationJobConfig animation) {
+    var task = new AnimationTask(this, Graph, animation);
+    task.Start();
+    _ = task.Run(scope);
+    return task;
   }
 
   public TimelineTask PlayTimeline(TaskScope scope, TimelineTaskConfig config) {
@@ -453,15 +463,15 @@ public class AnimationDriver : MonoBehaviour {
   class Slot {
     public Playable AnimationInput;
     public Playable AudioInput;
-    public IPlayableTask CurrentJob;
+    public IPlayableTask CurrentTask;
     public float InputWeight => AnimationInput.GetInput(0).IsNull() ? 0f : AnimationInput.GetInputWeight(0);
   }
   Slot WholeBodySlot;
   Slot UpperBodySlot;
-  Slot SlotForJob(IPlayableTask job) {
+  Slot SlotForTask(IPlayableTask task) {
     Slot port = 0 switch {
-      _ when job == WholeBodySlot.CurrentJob => WholeBodySlot,
-      _ when job == UpperBodySlot.CurrentJob => UpperBodySlot,
+      _ when task == WholeBodySlot.CurrentTask => WholeBodySlot,
+      _ when task == UpperBodySlot.CurrentTask => UpperBodySlot,
       _ => null,
     };
     return port;

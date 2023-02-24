@@ -14,7 +14,7 @@ public class Dive : Ability {
   [SerializeField] AudioClip LandSFX;
   [SerializeField] TriggerEvent Hitbox;
 
-  [NonSerialized] AnimationJob Animation = null;
+  [NonSerialized] AnimationTask Animation = null;
 
   public override HitConfig HitConfigData => HitConfig;
 

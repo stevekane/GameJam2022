@@ -4,7 +4,7 @@ using UnityEngine;
 public class AnimationPhaseTest : Ability {
   public AnimationJobConfig AnimationConfig;
 
-  public AnimationJob Animation;
+  public AnimationTask Animation;
   public int Which = 0;
   int Phase = 0;
   AnimationEventListener Events;
