@@ -1,7 +1,9 @@
+using UnityEngine;
 using UnityEngine.Playables;
 
 public class WeaponTrailTrackMixer : PlayableBehaviour {
   public override void ProcessFrame(Playable playable, FrameData info, object playerData) {
+    Debug.Log(playerData.GetType());
     var weaponTrail = (WeaponTrail)playerData;
     if (!weaponTrail)
       return;

@@ -375,17 +375,38 @@ public class AnimationDriver : MonoBehaviour {
 
     var playable = task.Playable;
     var timeline = task.Config.Asset;
+    /*
+    Note from Steve about more Unity bullshit:
+
+    Timeline Assets for reasons passing understanding may elect to emit "Marker Tracks"
+    seemingly at random and regardless of whether or not you actually HAVE any markers.
+
+    This is obviously an obscenity but here we are.
+
+    For now, what I think this means is that when we are wiring up ports, we must
+    assume that any unwanted markertrack is to be omitted from the outputs.
+
+    What this means though is that if you have 5 input tracks in your timeline you should
+    assume the possibility of having more than 5 output tracks.
+
+    When you try to wire up an output track, you should wire the output port of the current
+    input port - the total count of "skipped" outputs you have encountered;
+    */
+    var skippedOutputs = 0;
     for (int i = 0; i < timeline.outputTrackCount; i++) {
       var track = timeline.GetOutputTrack(i);
       foreach (var output in track.outputs) {
-        if (track is LocalAnimationTrackAsset || track is AnimationTrack) {
+        if (track is MarkerTrack) {
+          skippedOutputs++;
+          Debug.LogWarning($"{timeline.name} tried to emit Marker Track");
+        } else if (track is LocalAnimationTrackAsset || track is AnimationTrack) {
           Debug.Assert(track is LocalAnimationTrackAsset);
           if (slot.AnimationInput.GetInput(0).IsNull())
-            Graph.Connect(playable, i, slot.AnimationInput, 0, 1f);
+            Graph.Connect(playable, i - skippedOutputs, slot.AnimationInput, 0, 1f);
         } else if (track is AudioTrack) {
           if (slot.AudioInput.GetInput(0).IsNull()) {
             var noop = ScriptPlayable<NoopBehavior>.Create(Graph, 1);
-            Graph.Connect(playable, i, noop, 0, 1f);
+            Graph.Connect(playable, i - skippedOutputs, noop, 0, 1f);
             Graph.Connect(noop, 0, slot.AudioInput, 0, 1f);
           }
         } else {
@@ -397,7 +418,7 @@ public class AnimationDriver : MonoBehaviour {
             _ => ObjectPlayableOutput(Graph, track.name, null),
           };
           if (!playableOutput.IsOutputNull())
-            playableOutput.SetSourcePlayable(playable, i);
+            playableOutput.SetSourcePlayable(playable, i - skippedOutputs);
         }
       }
     }
