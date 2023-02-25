@@ -1,5 +1,3 @@
-using UnityEngine;
-using UnityEngine.Timeline;
 using UnityEngine.Playables;
 
 public class AbilityTrackMixer : PlayableBehaviour {
@@ -15,5 +13,3 @@ public class AbilityTrackMixer : PlayableBehaviour {
       ability.SetCancellable();
   }
 }
-
-public class AbilityTrackBehavior : PlayableBehaviour { }
