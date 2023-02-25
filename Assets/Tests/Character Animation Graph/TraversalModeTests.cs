@@ -17,7 +17,7 @@ We want to observe who gets ProcessFrame called on them
 class SingleOutput : PlayableBehaviour {
   public string name;
   public override void ProcessFrame(Playable playable, FrameData info, object playerData) {
-    Debug.Log("${name} {info.frameId}");
+    Debug.Log($"{name} {info.frameId}");
   }
 }
 class MultiOutput : PlayableBehaviour {
@@ -36,13 +36,18 @@ public class TraversalModeTests : MonoBehaviour {
     Graph = PlayableGraph.Create("TraversalModeTests");
     Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
     Graph.Play();
-    var output = ScriptPlayableOutput.Create(Graph, "Output");
+    var output1 = ScriptPlayableOutput.Create(Graph, "Output 1");
+    var output2 = ScriptPlayableOutput.Create(Graph, "Output 2");
     var input1 = ScriptPlayable<SingleOutput>.Create(Graph);
+    input1.GetBehaviour().name = "Input 1";
     var input2 = ScriptPlayable<SingleOutput>.Create(Graph);
+    input2.GetBehaviour().name = "Input 2";
     Mixer = ScriptPlayable<MultiOutput>.Create(Graph);
     Mixer.AddInput(input1, 0, 1);
     Mixer.AddInput(input2, 0, 1);
-    output.SetSourcePlayable(Mixer, 0);
+    Mixer.SetOutputCount(Mixer.GetInputCount());
+    output1.SetSourcePlayable(Mixer, 0);
+    output2.SetSourcePlayable(Mixer, 1);
   }
 
   void Update() {
