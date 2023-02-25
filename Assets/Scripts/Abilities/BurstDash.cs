@@ -50,7 +50,7 @@ public class BurstDash : Ability {
       AirDashRemaining--;
       await scope.Any(
         Waiter.Delay(DashDuration),
-        //Waiter.Repeat(SpawnResidualImage),
+        Waiter.Repeat(SpawnResidualImage),
         Waiter.Repeat(Move(dir.normalized, Impulse)),
         MakeCancellable);
     } finally {
