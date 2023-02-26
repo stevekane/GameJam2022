@@ -375,23 +375,6 @@ public class AnimationDriver : MonoBehaviour {
 
     var playable = task.Playable;
     var timeline = task.Config.Asset;
-    /*
-    Note from Steve about more Unity bullshit:
-
-    Timeline Assets for reasons passing understanding may elect to emit "Marker Tracks"
-    seemingly at random and regardless of whether or not you actually HAVE any markers.
-
-    This is obviously an obscenity but here we are.
-
-    For now, what I think this means is that when we are wiring up ports, we must
-    assume that any unwanted markertrack is to be omitted from the outputs.
-
-    What this means though is that if you have 5 input tracks in your timeline you should
-    assume the possibility of having more than 5 output tracks.
-
-    When you try to wire up an output track, you should wire the output port of the current
-    input port - the total count of "skipped" outputs you have encountered;
-    */
     var skippedOutputs = 0;
     for (int i = 0; i < timeline.outputTrackCount; i++) {
       var track = timeline.GetOutputTrack(i);
