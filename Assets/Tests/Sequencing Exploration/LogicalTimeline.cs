@@ -9,6 +9,7 @@ public class LogicalTimeline : MonoBehaviour {
   public static int FixedFrame;
   public static EventSource FixedTick = new();
 
+  [SerializeField] RuntimeAnimatorController AnimatorController;
   [SerializeField] InputManager InputManager;
   [SerializeField] AnimationClip Clip;
   [SerializeField] float BlendInFraction = .05f;
@@ -22,6 +23,12 @@ public class LogicalTimeline : MonoBehaviour {
   PlayableGraph Graph;
 
   /*
+  Findings:
+    AnimatorController probably should not be supplied to the Animator. Instead,
+    get a reference to the RuntimeAnimatorController yourself and attach it to
+    your graph. This prevents the Graph and the Animator component from double-updating
+    the Controller causing some weird issues when playing w/ a graph.
+
   Notes:
 
     Start/Awake and OnDestroy are not symmetric.
@@ -36,14 +43,10 @@ public class LogicalTimeline : MonoBehaviour {
     Time.fixedDeltaTime = 1f / Timeval.FixedUpdatePerSecond;
     Scope = new TaskScope();
     InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Listen(StartAttack);
-    if (Animator.updateMode == AnimatorUpdateMode.AnimatePhysics)
-      Debug.LogError("YOU MUST START ANIMATOR IN NORMAL UPDATE MODE. PHYSICS MODE SET AT RUNTIME");
-    Animator.applyRootMotion = false;
-    Animator.updateMode = AnimatorUpdateMode.AnimatePhysics;
     Graph = PlayableGraph.Create("Logical Timeline");
-    Graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
+    Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
     Graph.Play();
-    var animController = AnimatorControllerPlayable.Create(Graph, Animator.runtimeAnimatorController);
+    var animController = AnimatorControllerPlayable.Create(Graph, AnimatorController);
     LayerMixer = AnimationLayerMixerPlayable.Create(Graph);
     LayerMixer.SetInputCount(2);
     LayerMixer.ConnectInput(0, animController, 0, 1);
@@ -58,6 +61,7 @@ public class LogicalTimeline : MonoBehaviour {
   }
 
   void FixedUpdate() {
+    Graph.Evaluate(Time.fixedDeltaTime);
     FixedFrame++;
     FixedTick.Fire();
   }
