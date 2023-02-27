@@ -17,7 +17,7 @@ public class AudioOneshotTrackMixer : PlayableBehaviour {
     for (var i = 0; i < inputCount; i++) {
       if (playable.GetInputWeight(i) > 0 && !InputsHavePlayed[i]) {
         var audio = (AudioClipPlayable)playable.GetInput(i);
-        SFXManager.Instance.TryPlayOneShot(audio.GetClip());
+        audioSource.PlayOneShot(audio.GetClip());
         InputsHavePlayed[i] = true;
       }
     }
