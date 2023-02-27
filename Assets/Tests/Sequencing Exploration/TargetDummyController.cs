@@ -12,11 +12,17 @@ public class TargetDummyController : MonoBehaviour {
   [SerializeField] AudioClip HurtLeftSFX;
   [SerializeField] AudioClip HurtRightSFX;
   [SerializeField] AudioClip HurtForwardSFX;
+  [SerializeField] float HurtLeftStartTime;
+  [SerializeField] float HurtRightStartTime;
+  [SerializeField] float HurtForwardStartTime;
 
   [Header("Visual Effects")]
   [SerializeField] GameObject OnHurtVFX;
-  [SerializeField] Timeval HitStopDuration = Timeval.FromAnimFrames(20, 60);
   [SerializeField, Range(0,1)] float HitStopSpeed = .1f;
+
+  [Header("Physics")]
+  [SerializeField] Vector3 Gravity = new Vector3(0, -10, 0);
+  [SerializeField] float Friction = .25f;
 
   [Header("Components")]
   [SerializeField] Animator Animator;
@@ -24,15 +30,16 @@ public class TargetDummyController : MonoBehaviour {
   [SerializeField] AudioSource AudioSource;
   [SerializeField] Vibrator Vibrator;
 
+  [Header("State")]
+  [SerializeField] Vector3 Velocity;
+  [SerializeField] float LocalTimeScale = 1;
+  [SerializeField] float LocalAnimationTimeScale = 1;
+
   AnimatorControllerPlayable AnimatorControllerPlayable;
   PlayableGraph Graph;
   TaskScope Scope;
-  Vector3 Velocity;
-  Vector3 Acceleration;
 
   int HitStopFramesRemaining;
-  float KnockbackTimeRemaining;
-  float KnockbackStrength;
 
   void Start() {
     Scope = new();
@@ -50,23 +57,22 @@ public class TargetDummyController : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    Graph.Evaluate(Time.fixedDeltaTime);
+    var dt = Time.fixedDeltaTime * LocalTimeScale;
+    var animDt = LocalAnimationTimeScale * Time.fixedDeltaTime;
+    Graph.Evaluate(animDt);
     if (HitStopFramesRemaining > 0) {
-      AnimatorControllerPlayable.SetSpeed(HitStopSpeed);
+      LocalTimeScale = HitStopSpeed;
+      LocalAnimationTimeScale = Mathf.MoveTowards(LocalTimeScale, HitStopSpeed, .1f);
       HitStopFramesRemaining--;
     } else {
+      LocalTimeScale = 1;
+      LocalAnimationTimeScale = 1;
       HitStopFramesRemaining = 0;
-      AnimatorControllerPlayable.SetSpeed(1);
     }
-    if (KnockbackTimeRemaining > 0) {
-      // TODO: This is a pretty hacky and approximate way to get knockback to be
-      // throttled by hitstop. There are def better ways...
-      var dt = Time.fixedDeltaTime * (float)AnimatorControllerPlayable.GetSpeed();
-      Controller.Move(dt * KnockbackStrength * -transform.forward);
-      KnockbackTimeRemaining -= dt;
-    } else {
-      KnockbackTimeRemaining = 0;
-    }
+    var verticalVelocity = Controller.isGrounded ? dt * Gravity.y : Controller.velocity.y + dt * Gravity.y;
+    var planarVelocity = Mathf.Exp(-dt * Friction) * Velocity;
+    Velocity = new Vector3(planarVelocity.x, verticalVelocity, planarVelocity.z);
+    Controller.Move(dt * Velocity);
   }
 
   void OnHurt(Hitbox hitbox) {
@@ -79,19 +85,28 @@ public class TargetDummyController : MonoBehaviour {
     var vfxRotation = directionalRotation * transform.rotation;
     var vfx = Instantiate(OnHurtVFX, transform.position + Vector3.up, vfxRotation);
     Destroy(vfx, 3);
-    HitStopFramesRemaining = HitStopDuration.Ticks;
-    Vibrator.VibrateOnHurt(vfxRotation * transform.forward, HitStopDuration.Ticks);
+    HitStopFramesRemaining = hitbox.HitStopDuration.Ticks;
+    Vibrator.VibrateOnHurt(vfxRotation * transform.forward, hitbox.HitStopDuration.Ticks);
     Animator.SetTrigger(hitbox.HitDirection switch {
       HitDirection.Left => "HurtLeft",
       HitDirection.Right => "HurtRight",
       _ => "HurtForward"
     });
-    AudioSource.PlayOneShot(hitbox.HitDirection switch {
+    var sfxGameObject = new GameObject();
+    var sfxSource = sfxGameObject.AddComponent<AudioSource>();
+    sfxSource.playOnAwake = false;
+    sfxSource.clip = hitbox.HitDirection switch {
       HitDirection.Left => HurtLeftSFX,
       HitDirection.Right => HurtRightSFX,
       _ => HurtForwardSFX
-    });
-    KnockbackStrength = hitbox.KnockbackStrength;
-    KnockbackTimeRemaining = hitbox.KnockbackDuration.Seconds;
+    };
+    sfxSource.Play();
+    sfxSource.time = hitbox.HitDirection switch {
+      HitDirection.Left => HurtLeftStartTime,
+      HitDirection.Right => HurtRightStartTime,
+      _ => HurtForwardStartTime
+    };
+    Destroy(sfxGameObject, 3);
+    Velocity += -transform.forward * hitbox.KnockbackStrength;
   }
 }

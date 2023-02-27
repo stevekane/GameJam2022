@@ -31,15 +31,15 @@ public enum HitDirection {
 public struct HitboxClip : IEquatable<HitboxClip> {
   public int StartFrame;
   public int EndFrame;
+  public Timeval HitStopDuration;
   public float KnockbackStrength;
-  public Timeval KnockbackDuration;
   public HitDirection HitDirection;
   public float CameraShakeIntensity;
   public static bool operator ==(HitboxClip a, HitboxClip b) {
     return a.StartFrame == b.StartFrame
         && a.EndFrame == b.EndFrame
+        && a.HitStopDuration == b.HitStopDuration
         && a.KnockbackStrength == b.KnockbackStrength
-        && a.KnockbackDuration == b.KnockbackDuration
         && a.HitDirection == b.HitDirection
         && a.CameraShakeIntensity == b.CameraShakeIntensity;
   }
@@ -72,7 +72,6 @@ public class LogicalTimeline : MonoBehaviour {
 
   [Header("Visual Effects")]
   [SerializeField] GameObject OnHitVFX;
-  [SerializeField] Timeval HitStopDuration = Timeval.FromAnimFrames(20, 60);
   [SerializeField, Range(0, 1)] float HitStopSpeed = .1f;
 
   [Header("Attack")]
@@ -91,6 +90,9 @@ public class LogicalTimeline : MonoBehaviour {
   [SerializeField] WeaponTrail WeaponTrail;
   [SerializeField] Hitbox Hitbox;
   [SerializeField] Vibrator Vibrator;
+
+  [Header("State")]
+  [SerializeField] float LocalTimeScale = 1;
 
   TaskScope Scope;
   AnimationLayerMixerPlayable LayerMixer;
@@ -125,22 +127,24 @@ public class LogicalTimeline : MonoBehaviour {
   }
 
   void FixedUpdate() {
+    var dt = LocalTimeScale * Time.fixedDeltaTime;
+    Graph.Evaluate(dt);
     if (HitStopFramesRemaining > 0) {
-      LayerMixer.SetSpeed(HitStopSpeed);
+      LocalTimeScale = HitStopSpeed;
       HitStopFramesRemaining--;
     } else {
-      LayerMixer.SetSpeed(1);
+      LocalTimeScale = 1;
     }
-    Graph.Evaluate(Time.fixedDeltaTime);
     FixedFrame++;
     FixedTick.Fire();
   }
 
   void OnHit(TestHurtBox testHurtBox) {
+    Debug.Log("Hit");
     var vfx = Instantiate(OnHitVFX, testHurtBox.transform.position + Vector3.up, transform.rotation);
     Destroy(vfx, 3);
-    Vibrator.VibrateOnHit(transform.forward, HitStopDuration.Ticks);
-    HitStopFramesRemaining = HitStopDuration.Ticks;
+    Vibrator.VibrateOnHit(transform.forward, Hitbox.HitStopDuration.Ticks);
+    HitStopFramesRemaining = Hitbox.HitStopDuration.Ticks;
     HitboxStillActive = false;
   }
 
@@ -158,8 +162,6 @@ public class LogicalTimeline : MonoBehaviour {
   }
 
   async Task Attack(TaskScope scope) {
-    var frame0 = FixedFrame;
-    var time0 = Time.time;
     var playable = AnimationClipPlayable.Create(Graph, Clip);
     playable.SetTime(0);
     playable.SetDuration(Clip.length);
@@ -180,7 +182,7 @@ public class LogicalTimeline : MonoBehaviour {
         if (hb.HasValue) {
           if (hb != activeHitbox) {
             Hitbox.KnockbackStrength = hb.Value.KnockbackStrength;
-            Hitbox.KnockbackDuration = hb.Value.KnockbackDuration;
+            Hitbox.HitStopDuration = hb.Value.HitStopDuration;
             Hitbox.HitDirection = hb.Value.HitDirection;
             Hitbox.CameraShakeIntensity = hb.Value.CameraShakeIntensity;
             HitboxStillActive = true;
@@ -211,7 +213,6 @@ public class LogicalTimeline : MonoBehaviour {
       HitboxStillActive = true;
       Hitbox.enabled = false;
       playable.Destroy();
-      Debug.Log($"{FixedFrame-frame0} Fixed Frames {Time.time-time0} seconds");
     }
   }
 
