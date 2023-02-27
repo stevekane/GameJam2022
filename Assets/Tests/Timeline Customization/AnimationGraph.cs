@@ -37,8 +37,6 @@ public class AnimationGraph : MonoBehaviour {
     Graph.Destroy();
   }
 
-  // This is the original implementation that uses a timeline and all that.
-  // I am trying a solution where I compile my own playable for each animation track
   public ScriptPlayable<TimelinePlayable> PlayTimeline(TimelineAsset timelineAsset) {
     var tracks = timelineAsset.Tracks(type => type == typeof(Animator));
     var playable = TimelinePlayable.Create(Graph, tracks, gameObject, false, false);
@@ -58,33 +56,6 @@ public class AnimationGraph : MonoBehaviour {
     CurrentTimeline = playable;
     return playable;
   }
-
-  /*
-  public Playable PlayTimeline(TimelineAsset timelineAsset) {
-    var clip = AnimationClipPlayable.Create(Graph, AnimationClip);
-    clip.SetApplyPlayableIK(true);
-    clip.SetApplyFootIK(true);
-    LayerMixer.AddInput(clip, 0, 1);
-    return clip;
-    // var tracks = timelineAsset.Tracks(type => type == typeof(Animator));
-    // foreach (var track in tracks) {
-    //   if (track.muted)
-    //     continue;
-    //   var mixer = AnimationMixerPlayable.Create(Graph, 0);
-    //   var animTrack = track;
-    //   foreach (var clip in track.GetClips()) {
-    //     var clipPlayable = AnimationClipPlayable.Create(Graph, AnimationClip);
-    //     // var clipPlayable = AnimationClipPlayable.Create(Graph, clip.animationClip);
-    //     // clipPlayable.SetApplyFootIK(true);
-    //     mixer.AddInput(clipPlayable, 0, 1);
-    //   }
-    //   var layerMixer = AnimationLayerMixerPlayable.Create(Graph, 0);
-    //   layerMixer.AddInput(mixer, 0, 1);
-    //   Mixer.AddInput(layerMixer, 0, 1);
-    // }
-    // return LayerMixer;
-  }
-  */
 
   public void Stop() {
     var inputCount = Mixer.GetInputCount();

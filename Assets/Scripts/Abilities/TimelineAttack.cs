@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Timeline;
 
 public class TimelineAttack : Ability {
   [SerializeField] TimelineTaskConfig Timeline;
@@ -12,13 +13,13 @@ public class TimelineAttack : Ability {
   }
 
   public override async Task MainAction(TaskScope scope) {
+    TimelinePlayable tl;
     try {
       var timeline = AnimationDriver.PlayTimeline(scope, Timeline);
       await scope.Any(
         timeline.WaitDone,
         HitHandler.LoopTimeline(Hitbox, null, new HitParams(HitConfig, Attributes), OnHit));
     } finally {
-      Debug.Log("Timeline done");
     }
   }
 

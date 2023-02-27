@@ -1,3 +1,4 @@
+using UnityEngine;
 using UnityEngine.Playables;
 
 public class WeaponTrailTrackMixer : PlayableBehaviour {

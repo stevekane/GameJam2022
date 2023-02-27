@@ -375,17 +375,21 @@ public class AnimationDriver : MonoBehaviour {
 
     var playable = task.Playable;
     var timeline = task.Config.Asset;
+    var skippedOutputs = 0;
     for (int i = 0; i < timeline.outputTrackCount; i++) {
       var track = timeline.GetOutputTrack(i);
       foreach (var output in track.outputs) {
-        if (track is LocalAnimationTrackAsset || track is AnimationTrack) {
+        if (track is MarkerTrack) {
+          skippedOutputs++;
+          Debug.LogWarning($"{timeline.name} tried to emit Marker Track");
+        } else if (track is LocalAnimationTrackAsset || track is AnimationTrack) {
           Debug.Assert(track is LocalAnimationTrackAsset);
           if (slot.AnimationInput.GetInput(0).IsNull())
-            Graph.Connect(playable, i, slot.AnimationInput, 0, 1f);
+            Graph.Connect(playable, i - skippedOutputs, slot.AnimationInput, 0, 1f);
         } else if (track is AudioTrack) {
           if (slot.AudioInput.GetInput(0).IsNull()) {
             var noop = ScriptPlayable<NoopBehavior>.Create(Graph, 1);
-            Graph.Connect(playable, i, noop, 0, 1f);
+            Graph.Connect(playable, i - skippedOutputs, noop, 0, 1f);
             Graph.Connect(noop, 0, slot.AudioInput, 0, 1f);
           }
         } else {
@@ -397,7 +401,7 @@ public class AnimationDriver : MonoBehaviour {
             _ => ObjectPlayableOutput(Graph, track.name, null),
           };
           if (!playableOutput.IsOutputNull())
-            playableOutput.SetSourcePlayable(playable, i);
+            playableOutput.SetSourcePlayable(playable, i - skippedOutputs);
         }
       }
     }
