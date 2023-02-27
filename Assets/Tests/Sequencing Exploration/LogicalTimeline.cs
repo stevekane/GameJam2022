@@ -1,43 +1,90 @@
 using System;
-using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Animations;
 
+[Serializable]
+public struct Clip {
+  public int StartFrame;
+  public int EndFrame;
+  public Clip(int start, int end) {
+    StartFrame = start;
+    EndFrame = end;
+  }
+}
+
+[Serializable]
+public class WeaponTrailTrack {
+  public List<Clip> Clips;
+}
+
+public enum HitDirection {
+  Forward,
+  Left,
+  Right,
+  Down,
+  Up
+}
+
+[Serializable]
+public struct HitboxClip {
+  public int StartFrame;
+  public int EndFrame;
+  public float KnockbackStrength;
+  public Timeval KnockbackDuration;
+  public HitDirection HitDirection;
+  public float CameraShakeIntensity;
+}
+
+[Serializable]
+public class HitboxTrack {
+  public List<HitboxClip> Clips;
+}
+
+[Serializable]
+public struct AudioOneShotClip {
+  public int Frame;
+  public AudioClip Clip;
+}
+
+[Serializable]
+public class AudioOneShotTrack {
+  public List<AudioOneShotClip> Clips;
+}
+
 public class LogicalTimeline : MonoBehaviour {
   public static int FixedFrame;
   public static EventSource FixedTick = new();
 
+  [Header("Animation")]
   [SerializeField] RuntimeAnimatorController AnimatorController;
+
+  [Header("Visual Effects")]
+  [SerializeField] GameObject OnHitVFX;
+
+  [Header("Attack")]
   [SerializeField] InputManager InputManager;
   [SerializeField] AnimationClip Clip;
   [SerializeField] float BlendInFraction = .05f;
   [SerializeField] float BlendOutFraction = .05f;
+  [SerializeField] WeaponTrailTrack WeaponTrailTrack;
+  [SerializeField] HitboxTrack HitboxTrack;
+  [SerializeField] AudioOneShotTrack AudioOneShotTrack;
+
+  [Header("Components")]
   [SerializeField] CharacterController Controller;
   [SerializeField] Animator Animator;
   [SerializeField] AudioSource AudioSource;
+  [SerializeField] WeaponTrail WeaponTrail;
+  [SerializeField] Hitbox Hitbox;
+  [SerializeField] Vibrator Vibrator;
 
   TaskScope Scope;
   AnimationLayerMixerPlayable LayerMixer;
   PlayableGraph Graph;
-
-  /*
-  Findings:
-    AnimatorController probably should not be supplied to the Animator. Instead,
-    get a reference to the RuntimeAnimatorController yourself and attach it to
-    your graph. This prevents the Graph and the Animator component from double-updating
-    the Controller causing some weird issues when playing w/ a graph.
-
-  Notes:
-
-    Start/Awake and OnDestroy are not symmetric.
-      Start/Awake won't be called if script is disabled but OnDestroy IS called
-
-    Animator STARTING in Physics update Mode will be glitchy when you start an animation
-    Animator update mode changed to Pysics in code DOES work. I have tested this indeed
-    is updating in Physics for both the animator and the playable;
-  */
 
   void Start() {
     Time.fixedDeltaTime = 1f / Timeval.FixedUpdatePerSecond;
@@ -60,20 +107,24 @@ public class LogicalTimeline : MonoBehaviour {
     Graph.Destroy();
   }
 
+  void OnAnimatorMove() {
+    Controller.Move(Animator.deltaPosition);
+  }
+
   void FixedUpdate() {
     Graph.Evaluate(Time.fixedDeltaTime);
     FixedFrame++;
     FixedTick.Fire();
   }
 
-  void OnAnimatorMove() {
-    Controller.Move(Animator.deltaPosition);
+  void OnHit(TestHurtBox testHurtBox) {
+    var vfx = Instantiate(OnHitVFX, testHurtBox.transform.position + Vector3.up, transform.rotation);
+    Destroy(vfx, 3);
+    Vibrator.VibrateOnHit(transform.forward, 10);
   }
 
   void StartAttack() {
     InputManager.Consume(ButtonCode.West, ButtonPressType.JustDown);
-    // StartCoroutine(AttackAnimatorOnTicks());
-    // StartCoroutine(AttackAnimator());
     Scope.Start(Attack);
   }
 
@@ -83,7 +134,6 @@ public class LogicalTimeline : MonoBehaviour {
     var playable = AnimationClipPlayable.Create(Graph, Clip);
     playable.SetTime(0);
     playable.SetDuration(Clip.length);
-    LayerMixer.SetInputWeight(1, 1);
     try {
       LayerMixer.DisconnectInput(1);
       LayerMixer.ConnectInput(1, playable, 0, 1);
@@ -92,6 +142,18 @@ public class LogicalTimeline : MonoBehaviour {
         var fraction = (float)i / (float)ticks;
         var weight = BlendWeight(BlendInFraction, BlendOutFraction, fraction) ;
         LayerMixer.SetInputWeight(1, weight);
+        WeaponTrail.Emitting = WeaponTrailTrack.Clips.Any(clip => i >= clip.StartFrame && i <= clip.EndFrame);
+        Hitbox.Collider.enabled = HitboxTrack.Clips.Any(clip => i >= clip.StartFrame && i <= clip.EndFrame);
+        // TODO: Probably should only register hit once per hurtbox per hitbox phase...
+        var hb = HitboxTrack.Clips.FirstOrDefault(clip => i >= clip.StartFrame && i <= clip.EndFrame);
+        Hitbox.KnockbackStrength = hb.KnockbackStrength;
+        Hitbox.KnockbackDuration = hb.KnockbackDuration;
+        Hitbox.HitDirection = hb.HitDirection;
+        Hitbox.CameraShakeIntensity = hb.CameraShakeIntensity;
+        var oneshot = AudioOneShotTrack.Clips.FirstOrDefault(clip => i == clip.Frame);
+        if (oneshot.Clip) {
+          AudioSource.PlayOneShot(oneshot.Clip);
+        }
         await scope.ListenFor(FixedTick);
       }
     } catch (Exception e) {
@@ -99,37 +161,11 @@ public class LogicalTimeline : MonoBehaviour {
     } finally {
       LayerMixer.DisconnectInput(1);
       LayerMixer.SetInputWeight(1, 0);
+      WeaponTrail.Emitting = false;
+      Hitbox.enabled = false;
       playable.Destroy();
       Debug.Log($"{FixedFrame-frame0} Fixed Frames {Time.time-time0} seconds");
     }
-  }
-
-  // Uses the passage of time to ultimately exit the process
-  IEnumerator AttackAnimator() {
-    Animator.SetTrigger("Attack");
-    var frame0 = FixedFrame;
-    var time0 = Time.time;
-    var duration = Clip.length;
-    var elapsed = 0f;
-    while (elapsed < duration) {
-      elapsed += Time.deltaTime;
-      yield return null;
-    }
-    Debug.Log($"{FixedFrame-frame0} Fixed Frames {Time.time-time0} seconds");
-  }
-
-  // Waits a number of ticks corresponding to the length in fixed ticks of the clip
-  IEnumerator AttackAnimatorOnTicks() {
-    Debug.Log(Time.fixedDeltaTime);
-    Animator.SetTrigger("Attack");
-    var frame0 = FixedFrame;
-    var time0 = Time.time;
-    var duration = Clip.length;
-    var ticks = Mathf.RoundToInt(Clip.length * Timeval.FixedUpdatePerSecond);
-    for (var i = 0; i < ticks; i++) {
-      yield return new WaitForFixedUpdate();
-    }
-    Debug.Log($"{FixedFrame-frame0} Fixed Frames {Time.time-time0} seconds");
   }
 
   float BlendWeight(float blendInFraction, float blendOutFraction, float fraction) {
