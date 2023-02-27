@@ -25,18 +25,26 @@ public enum HitDirection {
   Forward,
   Left,
   Right,
-  Down,
-  Up
 }
 
 [Serializable]
-public struct HitboxClip {
+public struct HitboxClip : IEquatable<HitboxClip> {
   public int StartFrame;
   public int EndFrame;
   public float KnockbackStrength;
   public Timeval KnockbackDuration;
   public HitDirection HitDirection;
   public float CameraShakeIntensity;
+  public static bool operator ==(HitboxClip a, HitboxClip b) {
+    return a.StartFrame == b.StartFrame
+        && a.EndFrame == b.EndFrame
+        && a.KnockbackStrength == b.KnockbackStrength
+        && a.KnockbackDuration == b.KnockbackDuration
+        && a.HitDirection == b.HitDirection
+        && a.CameraShakeIntensity == b.CameraShakeIntensity;
+  }
+  public static bool operator !=(HitboxClip a, HitboxClip b) => !(a==b);
+  public bool Equals(HitboxClip other) => this == other;
 }
 
 [Serializable]
@@ -64,6 +72,8 @@ public class LogicalTimeline : MonoBehaviour {
 
   [Header("Visual Effects")]
   [SerializeField] GameObject OnHitVFX;
+  [SerializeField] Timeval HitStopDuration = Timeval.FromAnimFrames(20, 60);
+  [SerializeField, Range(0, 1)] float HitStopSpeed = .1f;
 
   [Header("Attack")]
   [SerializeField] InputManager InputManager;
@@ -85,6 +95,9 @@ public class LogicalTimeline : MonoBehaviour {
   TaskScope Scope;
   AnimationLayerMixerPlayable LayerMixer;
   PlayableGraph Graph;
+
+  int HitStopFramesRemaining;
+  public bool HitboxStillActive = true;
 
   void Start() {
     Time.fixedDeltaTime = 1f / Timeval.FixedUpdatePerSecond;
@@ -112,6 +125,12 @@ public class LogicalTimeline : MonoBehaviour {
   }
 
   void FixedUpdate() {
+    if (HitStopFramesRemaining > 0) {
+      LayerMixer.SetSpeed(HitStopSpeed);
+      HitStopFramesRemaining--;
+    } else {
+      LayerMixer.SetSpeed(1);
+    }
     Graph.Evaluate(Time.fixedDeltaTime);
     FixedFrame++;
     FixedTick.Fire();
@@ -120,12 +139,22 @@ public class LogicalTimeline : MonoBehaviour {
   void OnHit(TestHurtBox testHurtBox) {
     var vfx = Instantiate(OnHitVFX, testHurtBox.transform.position + Vector3.up, transform.rotation);
     Destroy(vfx, 3);
-    Vibrator.VibrateOnHit(transform.forward, 10);
+    Vibrator.VibrateOnHit(transform.forward, HitStopDuration.Ticks);
+    HitStopFramesRemaining = HitStopDuration.Ticks;
+    HitboxStillActive = false;
   }
 
   void StartAttack() {
     InputManager.Consume(ButtonCode.West, ButtonPressType.JustDown);
     Scope.Start(Attack);
+  }
+
+  public T? FirstFound<T>(IEnumerable<T> ts, Predicate<T> predicate) where T : struct {
+    foreach (var t in ts) {
+      if (predicate(t))
+        return t;
+    }
+    return null;
   }
 
   async Task Attack(TaskScope scope) {
@@ -138,18 +167,35 @@ public class LogicalTimeline : MonoBehaviour {
       LayerMixer.DisconnectInput(1);
       LayerMixer.ConnectInput(1, playable, 0, 1);
       var ticks = Mathf.RoundToInt(Clip.length * Timeval.FixedUpdatePerSecond);
-      for (var i = 0; i < ticks; i++) {
-        var fraction = (float)i / (float)ticks;
+      var activeHitbox = default(HitboxClip);
+      while (!playable.IsDone()) {
+        var fraction = (float)(playable.GetTime() / playable.GetDuration());
+        var i = (int)(fraction * ticks);
         var weight = BlendWeight(BlendInFraction, BlendOutFraction, fraction) ;
         LayerMixer.SetInputWeight(1, weight);
-        WeaponTrail.Emitting = WeaponTrailTrack.Clips.Any(clip => i >= clip.StartFrame && i <= clip.EndFrame);
-        Hitbox.Collider.enabled = HitboxTrack.Clips.Any(clip => i >= clip.StartFrame && i <= clip.EndFrame);
-        // TODO: Probably should only register hit once per hurtbox per hitbox phase...
-        var hb = HitboxTrack.Clips.FirstOrDefault(clip => i >= clip.StartFrame && i <= clip.EndFrame);
-        Hitbox.KnockbackStrength = hb.KnockbackStrength;
-        Hitbox.KnockbackDuration = hb.KnockbackDuration;
-        Hitbox.HitDirection = hb.HitDirection;
-        Hitbox.CameraShakeIntensity = hb.CameraShakeIntensity;
+        var wt = FirstFound(WeaponTrailTrack.Clips, clip => i >= clip.StartFrame && i <= clip.EndFrame);
+        WeaponTrail.Emitting = wt.HasValue;
+        var hb = FirstFound(HitboxTrack.Clips, clip => i >= clip.StartFrame && i <= clip.EndFrame);
+        // new hitbox
+        if (hb.HasValue) {
+          if (hb != activeHitbox) {
+            Hitbox.KnockbackStrength = hb.Value.KnockbackStrength;
+            Hitbox.KnockbackDuration = hb.Value.KnockbackDuration;
+            Hitbox.HitDirection = hb.Value.HitDirection;
+            Hitbox.CameraShakeIntensity = hb.Value.CameraShakeIntensity;
+            HitboxStillActive = true;
+            Hitbox.Collider.enabled = true;
+          // same hitbox
+          } else if (hb == activeHitbox && HitboxStillActive) {
+            HitboxStillActive = true;
+            Hitbox.Collider.enabled = true;
+          } else {
+            Hitbox.Collider.enabled = false;
+          }
+          activeHitbox = hb.Value;
+        } else {
+          Hitbox.Collider.enabled = false;
+        }
         var oneshot = AudioOneShotTrack.Clips.FirstOrDefault(clip => i == clip.Frame);
         if (oneshot.Clip) {
           AudioSource.PlayOneShot(oneshot.Clip);
@@ -162,6 +208,7 @@ public class LogicalTimeline : MonoBehaviour {
       LayerMixer.DisconnectInput(1);
       LayerMixer.SetInputWeight(1, 0);
       WeaponTrail.Emitting = false;
+      HitboxStillActive = true;
       Hitbox.enabled = false;
       playable.Destroy();
       Debug.Log($"{FixedFrame-frame0} Fixed Frames {Time.time-time0} seconds");

@@ -15,6 +15,8 @@ public class TargetDummyController : MonoBehaviour {
 
   [Header("Visual Effects")]
   [SerializeField] GameObject OnHurtVFX;
+  [SerializeField] Timeval HitStopDuration = Timeval.FromAnimFrames(20, 60);
+  [SerializeField, Range(0,1)] float HitStopSpeed = .1f;
 
   [Header("Components")]
   [SerializeField] Animator Animator;
@@ -22,10 +24,14 @@ public class TargetDummyController : MonoBehaviour {
   [SerializeField] AudioSource AudioSource;
   [SerializeField] Vibrator Vibrator;
 
+  AnimatorControllerPlayable AnimatorControllerPlayable;
   PlayableGraph Graph;
   TaskScope Scope;
+  Vector3 Velocity;
+  Vector3 Acceleration;
 
-  int KnockbackFramesRemaining;
+  int HitStopFramesRemaining;
+  float KnockbackTimeRemaining;
   float KnockbackStrength;
 
   void Start() {
@@ -33,9 +39,9 @@ public class TargetDummyController : MonoBehaviour {
     Graph = PlayableGraph.Create("Target Dummy");
     Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
     Graph.Play();
-    var animatorController = AnimatorControllerPlayable.Create(Graph, AnimatorController);
+    AnimatorControllerPlayable = AnimatorControllerPlayable.Create(Graph, AnimatorController);
     var output = AnimationPlayableOutput.Create(Graph, "Animation Output", Animator);
-    output.SetSourcePlayable(animatorController);
+    output.SetSourcePlayable(AnimatorControllerPlayable);
   }
 
   void OnDestroy() {
@@ -45,9 +51,21 @@ public class TargetDummyController : MonoBehaviour {
 
   void FixedUpdate() {
     Graph.Evaluate(Time.fixedDeltaTime);
-    if (KnockbackFramesRemaining > 0) {
-      Controller.Move(Time.fixedDeltaTime * KnockbackStrength * -transform.forward);
-      KnockbackFramesRemaining--;
+    if (HitStopFramesRemaining > 0) {
+      AnimatorControllerPlayable.SetSpeed(HitStopSpeed);
+      HitStopFramesRemaining--;
+    } else {
+      HitStopFramesRemaining = 0;
+      AnimatorControllerPlayable.SetSpeed(1);
+    }
+    if (KnockbackTimeRemaining > 0) {
+      // TODO: This is a pretty hacky and approximate way to get knockback to be
+      // throttled by hitstop. There are def better ways...
+      var dt = Time.fixedDeltaTime * (float)AnimatorControllerPlayable.GetSpeed();
+      Controller.Move(dt * KnockbackStrength * -transform.forward);
+      KnockbackTimeRemaining -= dt;
+    } else {
+      KnockbackTimeRemaining = 0;
     }
   }
 
@@ -61,7 +79,8 @@ public class TargetDummyController : MonoBehaviour {
     var vfxRotation = directionalRotation * transform.rotation;
     var vfx = Instantiate(OnHurtVFX, transform.position + Vector3.up, vfxRotation);
     Destroy(vfx, 3);
-    Vibrator.VibrateOnHurt(vfxRotation * transform.forward, 10);
+    HitStopFramesRemaining = HitStopDuration.Ticks;
+    Vibrator.VibrateOnHurt(vfxRotation * transform.forward, HitStopDuration.Ticks);
     Animator.SetTrigger(hitbox.HitDirection switch {
       HitDirection.Left => "HurtLeft",
       HitDirection.Right => "HurtRight",
@@ -73,6 +92,6 @@ public class TargetDummyController : MonoBehaviour {
       _ => HurtForwardSFX
     });
     KnockbackStrength = hitbox.KnockbackStrength;
-    KnockbackFramesRemaining = hitbox.KnockbackDuration.Ticks;
+    KnockbackTimeRemaining = hitbox.KnockbackDuration.Seconds;
   }
 }
