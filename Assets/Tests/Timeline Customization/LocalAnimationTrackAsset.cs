@@ -7,6 +7,7 @@ using System.Collections.Generic;
 [TrackColor(.25f, .25f, .75f)]
 [TrackBindingType(typeof(Animator))]
 [TrackClipType(typeof(AnimationPlayableAsset), false)]
+[TrackClipType(typeof(AnimationSegmentClipAsset), true)]
 public class LocalAnimationTrackAsset : TrackAsset {
   public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount) {
     return AnimationMixerPlayable.Create(graph, inputCount);
