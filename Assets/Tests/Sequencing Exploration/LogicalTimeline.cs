@@ -178,8 +178,8 @@ public class LogicalTimeline : MonoBehaviour {
         var wt = FirstFound(WeaponTrailTrack.Clips, clip => i >= clip.StartFrame && i <= clip.EndFrame);
         WeaponTrail.Emitting = wt.HasValue;
         var hb = FirstFound(HitboxTrack.Clips, clip => i >= clip.StartFrame && i <= clip.EndFrame);
-        // new hitbox
         if (hb.HasValue) {
+          // new hitbox
           if (hb != activeHitbox) {
             Hitbox.KnockbackStrength = hb.Value.KnockbackStrength;
             Hitbox.HitStopDuration = hb.Value.HitStopDuration;
