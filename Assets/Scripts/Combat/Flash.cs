@@ -49,11 +49,11 @@ public class Flash : MonoBehaviour {
     StartCoroutine(FlashRoutine(FlashColor, Duration));
   }
 
-  void OnHurt(HitParams hitParams) {
-    EndFlash();
-    StopAllCoroutines();
-    StartCoroutine(FlashRoutine(FlashColor, Duration));
-  }
+  // void OnHurt(HitParams hitParams) {
+  //   EndFlash();
+  //   StopAllCoroutines();
+  //   StartCoroutine(FlashRoutine(FlashColor, Duration));
+  // }
 
   void StartFlash(Color color) {
     foreach (var material in PreviousColors.Keys) {
@@ -97,7 +97,7 @@ public class Flash : MonoBehaviour {
   }
 
   bool SighUsingTwoDifferentMechanismsForAsyncIsFun = false;
-  IEnumerator StrobeRoutine(Color color, Timeval eachDuration, int repeat) {
+  public IEnumerator StrobeRoutine(Color color, Timeval eachDuration, int repeat) {
     StorePreviousColors();
 
     for (int i = 0; i < repeat; i++) {

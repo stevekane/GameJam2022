@@ -18,6 +18,8 @@ public class TargetDummyController : MonoBehaviour {
 
   [Header("Visual Effects")]
   [SerializeField] GameObject OnHurtVFX;
+  [SerializeField] ParticleSystem KnockbackSmoke;
+  [SerializeField] float KnockbackSmokeMinimumSpeed = 5;
   [SerializeField, Range(0,1)] float HitStopSpeed = .1f;
 
   [Header("Physics")]
@@ -29,6 +31,7 @@ public class TargetDummyController : MonoBehaviour {
   [SerializeField] CharacterController Controller;
   [SerializeField] AudioSource AudioSource;
   [SerializeField] Vibrator Vibrator;
+  [SerializeField] SimpleFlash SimpleFlash;
 
   [Header("State")]
   [SerializeField] Vector3 Velocity;
@@ -57,11 +60,8 @@ public class TargetDummyController : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    var dt = Time.fixedDeltaTime * LocalTimeScale;
-    var animDt = LocalAnimationTimeScale * Time.fixedDeltaTime;
-    Graph.Evaluate(animDt);
     if (HitStopFramesRemaining > 0) {
-      LocalTimeScale = HitStopSpeed;
+      LocalTimeScale = 0;
       LocalAnimationTimeScale = Mathf.MoveTowards(LocalTimeScale, HitStopSpeed, .1f);
       HitStopFramesRemaining--;
     } else {
@@ -69,9 +69,15 @@ public class TargetDummyController : MonoBehaviour {
       LocalAnimationTimeScale = 1;
       HitStopFramesRemaining = 0;
     }
+    var dt = Time.fixedDeltaTime * LocalTimeScale;
+    var animDt = LocalAnimationTimeScale * Time.fixedDeltaTime;
     var verticalVelocity = Controller.isGrounded ? dt * Gravity.y : Controller.velocity.y + dt * Gravity.y;
     var planarVelocity = Mathf.Exp(-dt * Friction) * Velocity;
     Velocity = new Vector3(planarVelocity.x, verticalVelocity, planarVelocity.z);
+    if (Velocity.magnitude > KnockbackSmokeMinimumSpeed) {
+      KnockbackSmoke.Emit(1);
+    }
+    Graph.Evaluate(animDt);
     Controller.Move(dt * Velocity);
   }
 
@@ -86,6 +92,7 @@ public class TargetDummyController : MonoBehaviour {
     var vfx = Instantiate(OnHurtVFX, transform.position + Vector3.up, vfxRotation);
     Destroy(vfx, 3);
     HitStopFramesRemaining = hitbox.HitStopDuration.Ticks;
+    SimpleFlash.TicksRemaining = 20;
     Vibrator.VibrateOnHurt(vfxRotation * transform.forward, hitbox.HitStopDuration.Ticks);
     Animator.SetTrigger(hitbox.HitDirection switch {
       HitDirection.Left => "HurtLeft",

@@ -67,6 +67,9 @@ public class LogicalTimeline : MonoBehaviour {
   public static int FixedFrame;
   public static EventSource FixedTick = new();
 
+  [Header("Input")]
+  [SerializeField] InputManager InputManager;
+
   [Header("Animation")]
   [SerializeField] RuntimeAnimatorController AnimatorController;
 
@@ -75,8 +78,8 @@ public class LogicalTimeline : MonoBehaviour {
   [SerializeField, Range(0, 1)] float HitStopSpeed = .1f;
 
   [Header("Attack")]
-  [SerializeField] InputManager InputManager;
   [SerializeField] AnimationClip Clip;
+  [SerializeField] float AnimationSpeed = 1;
   [SerializeField] float BlendInFraction = .05f;
   [SerializeField] float BlendOutFraction = .05f;
   [SerializeField] WeaponTrailTrack WeaponTrailTrack;
@@ -163,6 +166,7 @@ public class LogicalTimeline : MonoBehaviour {
 
   async Task Attack(TaskScope scope) {
     var playable = AnimationClipPlayable.Create(Graph, Clip);
+    playable.SetSpeed(AnimationSpeed);
     playable.SetTime(0);
     playable.SetDuration(Clip.length);
     try {
