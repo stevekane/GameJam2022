@@ -96,10 +96,36 @@ public class LogicalTimeline : MonoBehaviour {
 
   [Header("State")]
   [SerializeField] float LocalTimeScale = 1;
+  [SerializeField] List<TargetDummyController> Targets;
+
 
   TaskScope Scope;
   AnimationLayerMixerPlayable LayerMixer;
   PlayableGraph Graph;
+
+  /*
+  There is a deep and interesting/troubling issue here.
+
+  When you playback an animation, the discrete frames that are IN that animation
+  may not actually be processed. It is possible to skip over an entire "frame" of
+  animation data and thus miss the events associated with that frame.
+
+  For example, if your playback rate is 2x then you will only logically evaluate
+  every 2nd frame in the underlying animation on each logical update.
+
+  Thus, if you rely on certain events to ALWAYS happen regardless of playback rate
+  such as denoting changes in state or whatever then you must play every logical frame
+  in the animation during processing. This is quite the stringent requirement
+  but the alternative is even weirder: you end up needing to process events from the past
+  along with events happening now on the same logical frame.
+
+  Thus, upon really thinking hard about this, I suspect what you may need to do
+  is play the animations at a known framerate and ONLY allow animation to be paused
+  but never "slowed down" or modulated in any continuous manner.
+
+  Then, every logical tick of the game should align with exactly 1 logical frame in the
+  timeline and thus the events associated with that moment can be
+  */
 
   int HitStopFramesRemaining;
   public bool HitboxStillActive = true;
@@ -143,7 +169,9 @@ public class LogicalTimeline : MonoBehaviour {
   }
 
   void OnHit(TestHurtBox testHurtBox) {
-    Debug.Log("Hit");
+    if (testHurtBox.Owner.TryGetComponent(out TargetDummyController targetDummy) && !Targets.Contains(targetDummy)) {
+      Targets.Add(targetDummy);
+    }
     var vfx = Instantiate(OnHitVFX, testHurtBox.transform.position + Vector3.up, transform.rotation);
     Destroy(vfx, 3);
     Vibrator.VibrateOnHit(transform.forward, Hitbox.HitStopDuration.Ticks);
@@ -213,6 +241,7 @@ public class LogicalTimeline : MonoBehaviour {
     } finally {
       LayerMixer.DisconnectInput(1);
       LayerMixer.SetInputWeight(1, 0);
+      Targets.Clear();
       WeaponTrail.Emitting = false;
       HitboxStillActive = true;
       Hitbox.enabled = false;
