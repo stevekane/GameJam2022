@@ -45,6 +45,11 @@ public class AbilityManager : MonoBehaviour {
     return evt;
   }
   public bool TryInvoke(AbilityMethod method) {
+    if (Status.IsFallen) {
+      if (Status.Get<FallenEffect>() is var fallen && fallen != null)
+        _ = fallen.RecoverySequence(MainScope);
+      return false;
+    }
     if (CanInvoke(method) is var can && can)
       Invoke(method);
     return can;
@@ -79,7 +84,6 @@ public class AbilityManager : MonoBehaviour {
     //  Debug.Log($"Trying to start {ability}.{method.Method.Name} but cant because {failReason}");
     return failReason == 0;
   }
-
   void Invoke(AbilityMethod method) {
     var ability = (Ability)method.Target;
     var trigger = ability.GetTriggerCondition(method);

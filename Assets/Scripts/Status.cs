@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public delegate void OnEffectComplete(Status status);
@@ -210,6 +211,33 @@ public class HitFollowthroughEffect : TimedEffect {
   }
 }
 
+public class FallenEffect : StatusEffect {
+  AnimationJobConfig RecoveryAnimation;
+  public FallenEffect(AnimationJobConfig recover) => RecoveryAnimation = recover;
+  public override bool Merge(StatusEffect e) => true;
+  public override void Apply(Status status) {
+    status.IsFallen = true;
+    if (status.IsGrounded) {
+      status.CanMove = false;
+      status.CanRotate = false;
+    }
+  }
+
+  // TODO: This doesn't feel like the right place for this...
+  bool Recovering = false;
+  public async Task RecoverySequence(TaskScope scope) {
+    if (Recovering) return;
+    try {
+      Recovering = true;
+      if (Status.IsGrounded)
+        await Status.AnimationDriver.Play(scope, RecoveryAnimation).WaitDone(scope);
+      Status.Remove(this);
+    } finally {
+      Recovering = false;
+    }
+  }
+}
+
 public class Status : MonoBehaviour {
   public List<StatusEffect> Active = new();
   internal AnimationDriver AnimationDriver;
@@ -220,9 +248,11 @@ public class Status : MonoBehaviour {
   internal Optional<Damage> Damage;
   Dictionary<AttributeTag, AttributeModifier> Modifiers = new();
 
-  public bool JustGrounded { get; private set; }
   public bool IsGrounded { get; private set; }
+  public bool JustGrounded { get; private set; }
   public bool JustTookOff { get; private set; }
+  public bool IsFallen { get; set; }
+  public bool IsHurt { get; set; }
   public bool CanMove { get => GetBoolean(AttributeTag.MoveSpeed); set => SetBoolean(AttributeTag.MoveSpeed, value); }
   public bool CanRotate { get => GetBoolean(AttributeTag.TurnSpeed); set => SetBoolean(AttributeTag.TurnSpeed, value); }
   public bool HasGravity { get => GetBoolean(AttributeTag.HasGravity); set => SetBoolean(AttributeTag.HasGravity, value); }
@@ -230,7 +260,6 @@ public class Status : MonoBehaviour {
   public bool IsInterruptible { get => GetBoolean(AttributeTag.IsInterruptible); set => SetBoolean(AttributeTag.IsInterruptible, value); }
   public bool IsHittable { get => GetBoolean(AttributeTag.IsHittable); set => SetBoolean(AttributeTag.IsHittable, value); }
   public bool IsDamageable { get => GetBoolean(AttributeTag.IsDamageable); set => SetBoolean(AttributeTag.IsDamageable, value); }
-  public bool IsHurt { get => GetBoolean(AttributeTag.IsHurt); set => SetBoolean(AttributeTag.IsHurt, value); }
   public AbilityTag Tags = 0;
 
   // All booleans default to true. Set to false after Modifiers.Clear() if you want otherwise.
@@ -302,11 +331,11 @@ public class Status : MonoBehaviour {
     Modifiers.Clear();
 
     var wasGrounded = IsGrounded;
-    var isGrounded = IsOverGround(Vector3.zero);
-    IsGrounded = isGrounded;
+    IsGrounded = IsOverGround(Vector3.zero);
     JustGrounded = !wasGrounded && IsGrounded;
     JustTookOff = wasGrounded && !IsGrounded;
     IsHurt = false;
+    IsFallen = false;
     if (JustGrounded) {
       gameObject.SendMessage("OnLand", SendMessageOptions.DontRequireReceiver);
     }

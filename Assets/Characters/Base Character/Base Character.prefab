@@ -657,9 +657,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Animator: {fileID: 8540507124463013524}
-  MixerJobData:
-    ReverseBaseLayerRotation: 1
-    MeshSpaceRotations: 1
+  AudioSource: {fileID: 0}
 --- !u!114 &8540507123274114223
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -684,6 +682,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 589031cb649129f4595d6562a2fa54c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  FallenRecoverAnimation:
+    Clip: {fileID: 7400000, guid: 5691b60ce45301d4e82883502ec92880, type: 2}
+    Mask: {fileID: 0}
+    Speed: 1
+    PhaseDurations:
+    - Millis: 383.3333
+      FramesPerSecond: 60
+    BlendInFraction: 0.1
+    BlendOutFraction: 0.1
   <Points>k__BackingField: 0
 --- !u!114 &6765661457513728133
 MonoBehaviour:
@@ -1211,6 +1218,10 @@ PrefabInstance:
     - target: {fileID: 5448694335462969499, guid: f84b3b27a81e0fe41821db213c8eab26, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8085598916693720510, guid: f84b3b27a81e0fe41821db213c8eab26, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

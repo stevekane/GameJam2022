@@ -116,6 +116,7 @@ public class Mover : MonoBehaviour {
     animator.SetFloat("Speed", inputSpeed / MOVE_CYCLE_DISTANCE);
     animator.SetBool("IsGrounded", Status.IsGrounded);
     animator.SetBool("IsHurt", Status.IsHurt);
+    animator.SetBool("IsFallen", Status.IsFallen);
     AnimationDriver.SetSpeed(localTimeScale < 1 ? localTimeScale : AnimationDriver.BaseSpeed);
   }
 }

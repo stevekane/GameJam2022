@@ -33,6 +33,8 @@ public static class KnockbackTypeExtensions {
 }
 
 public class Damage : MonoBehaviour {
+  // TODO: This doesn't belong here...
+  [SerializeField] AnimationJobConfig FallenRecoverAnimation;
   [field:SerializeField] public float Points { get; private set; }
 
   Mover Mover;
@@ -56,16 +58,16 @@ public class Damage : MonoBehaviour {
         Vibrator.VibrateOnHurt(forward, hitParams.GetHitStopDuration(Points).Ticks);
         Status.Add(new HitStopEffect(forward, hitParams.GetHitStopDuration(Points).Ticks),
           s => {
+            if (knockbackVector.sqrMagnitude > 0)
+              s.Add(new FallenEffect(FallenRecoverAnimation));
             s.Add(new HurtStunEffect(hitParams.GetHurtStunDuration(Points).Ticks));
             s.Add(new SlowFallDuration(hitParams.HitConfig.SlowFallDuration.Ticks));
             s.Add(new KnockbackEffect(knockbackVector * hitParams.GetKnockbackStrength(Points)));
-            //s.Add(new HitFollowthroughEffect(hitParams.HitConfig.RecoilStrength * forward, RecoilDuration));
           });
       } else {
         Vibrator.VibrateOnHurt(forward, hitParams.GetHitStopDuration(Points).Ticks);
         Status.Add(new HitStopEffect(forward, hitParams.GetHitStopDuration(Points).Ticks));
       }
-      // Status.Add(new HitFollowthroughEffect(hitParams.HitConfig.RecoilStrength * forward, RecoilDuration));
     }
   }
 
