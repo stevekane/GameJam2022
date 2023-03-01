@@ -60,13 +60,13 @@ public class Wolf : MonoBehaviour {
   bool TargetInXZRange(float range) {
     var delta = (Target.position - transform.position);
     var dist = range;
-    return delta.XZ().sqrMagnitude < dist*dist;
+    return delta.XZ().sqrMagnitude < dist.Sqr();
   }
 
   bool TargetInRange(float range) {
     var delta = (Target.position - transform.position);
     var dist = range;
-    return delta.y < dist && delta.XZ().sqrMagnitude < dist*dist;
+    return delta.y < dist && delta.XZ().sqrMagnitude < dist.Sqr();
   }
 
   async Task Behavior(TaskScope scope) {

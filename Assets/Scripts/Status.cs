@@ -120,13 +120,13 @@ public class KnockbackEffect : StatusEffect {
   public override void Apply(Status status) {
     Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * Drag);
     status.Mover.Move(Velocity*Time.fixedDeltaTime);
-    IsAirborne = Velocity.sqrMagnitude >= AIRBORNE_SPEED*AIRBORNE_SPEED;
+    IsAirborne = Velocity.sqrMagnitude >= AIRBORNE_SPEED.Sqr();
     if (IsAirborne) {
       status.CanMove = false;
       status.CanRotate = false;
       status.CanAttack = false;
     }
-    if (Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED)
+    if (Velocity.sqrMagnitude < DONE_SPEED.Sqr())
       status.Remove(this);
   }
 }
@@ -171,7 +171,7 @@ public class RecoilEffect : StatusEffect {
     status.Mover.Move(Velocity*Time.fixedDeltaTime);
     status.CanMove = false;
     status.CanRotate = false;
-    if (Velocity.sqrMagnitude < DONE_SPEED*DONE_SPEED)
+    if (Velocity.sqrMagnitude < DONE_SPEED.Sqr())
       status.Remove(this);
   }
 }

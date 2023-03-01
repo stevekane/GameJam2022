@@ -53,10 +53,9 @@ public static class NullableExtensions {
   }
 }
 
-public static class IntExtensions {
-  public static int ScaleBy(this int i, float f) {
-    return (int)((float)i*f);
-  }
+public static class NumberExtensions {
+  public static float Sqr(this float f) => f*f;
+  public static int ScaleBy(this int i, float f) => (int)((float)i*f);
 }
 
 public static class FlagLikeExtensions {

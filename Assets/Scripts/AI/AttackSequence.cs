@@ -110,6 +110,6 @@ public class AttackSequence : MonoBehaviour {
   }
   bool TargetInRange(float range) {
     var delta = (Target.position - Self.position);
-    return delta.y < range && delta.XZ().sqrMagnitude < range*range;
+    return delta.y < range && delta.XZ().sqrMagnitude < range.Sqr();
   }
 }
