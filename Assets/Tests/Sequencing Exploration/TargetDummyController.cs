@@ -71,7 +71,10 @@ public class TargetDummyController : MonoBehaviour {
     }
     var dt = Time.fixedDeltaTime * LocalTimeScale;
     var animDt = LocalAnimationTimeScale * Time.fixedDeltaTime;
-    var verticalVelocity = Controller.isGrounded ? dt * Gravity.y : Controller.velocity.y + dt * Gravity.y;
+    var verticalVelocity = dt * Gravity.y;
+    if (Controller.isGrounded) {
+      verticalVelocity += Controller.velocity.y;
+    }
     var planarVelocity = Mathf.Exp(-dt * Friction) * Velocity;
     Velocity = new Vector3(planarVelocity.x, verticalVelocity, planarVelocity.z);
     if (Velocity.magnitude > KnockbackSmokeMinimumSpeed) {
@@ -79,6 +82,10 @@ public class TargetDummyController : MonoBehaviour {
     }
     Graph.Evaluate(animDt);
     Controller.Move(dt * Velocity);
+  }
+
+  void OnSynchronizedMove(Vector3 deltaPosition) {
+    Controller.Move(deltaPosition);
   }
 
   void OnHurt(Hitbox hitbox) {

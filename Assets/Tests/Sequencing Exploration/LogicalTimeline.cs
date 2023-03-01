@@ -47,6 +47,24 @@ public struct HitboxClip : IEquatable<HitboxClip> {
   public bool Equals(HitboxClip other) => this == other;
 }
 
+public enum AttackPhase {
+  Windup,
+  Active,
+  Recovery
+}
+
+[Serializable]
+public struct PhaseClip {
+  public int StartFrame;
+  public int EndFrame;
+  public AttackPhase Phase;
+}
+
+[Serializable]
+public class PhaseClipTrack {
+  public List<PhaseClip> Clips;
+}
+
 [Serializable]
 public class HitboxTrack {
   public List<HitboxClip> Clips;
@@ -75,7 +93,6 @@ public class LogicalTimeline : MonoBehaviour {
 
   [Header("Visual Effects")]
   [SerializeField] GameObject OnHitVFX;
-  [SerializeField, Range(0, 1)] float HitStopSpeed = .1f;
 
   [Header("Attack")]
   [SerializeField] AnimationClip Clip;
@@ -84,6 +101,7 @@ public class LogicalTimeline : MonoBehaviour {
   [SerializeField] float BlendOutFraction = .05f;
   [SerializeField] WeaponTrailTrack WeaponTrailTrack;
   [SerializeField] HitboxTrack HitboxTrack;
+  [SerializeField] PhaseClipTrack PhaseClipTrack;
   [SerializeField] AudioOneShotTrack AudioOneShotTrack;
 
   [Header("Components")]
@@ -96,39 +114,42 @@ public class LogicalTimeline : MonoBehaviour {
 
   [Header("State")]
   [SerializeField] float LocalTimeScale = 1;
-  [SerializeField] List<TargetDummyController> Targets;
+  [SerializeField] List<GameObject> Targets;
 
 
   TaskScope Scope;
   AnimationLayerMixerPlayable LayerMixer;
   PlayableGraph Graph;
 
-  /*
-  There is a deep and interesting/troubling issue here.
-
-  When you playback an animation, the discrete frames that are IN that animation
-  may not actually be processed. It is possible to skip over an entire "frame" of
-  animation data and thus miss the events associated with that frame.
-
-  For example, if your playback rate is 2x then you will only logically evaluate
-  every 2nd frame in the underlying animation on each logical update.
-
-  Thus, if you rely on certain events to ALWAYS happen regardless of playback rate
-  such as denoting changes in state or whatever then you must play every logical frame
-  in the animation during processing. This is quite the stringent requirement
-  but the alternative is even weirder: you end up needing to process events from the past
-  along with events happening now on the same logical frame.
-
-  Thus, upon really thinking hard about this, I suspect what you may need to do
-  is play the animations at a known framerate and ONLY allow animation to be paused
-  but never "slowed down" or modulated in any continuous manner.
-
-  Then, every logical tick of the game should align with exactly 1 logical frame in the
-  timeline and thus the events associated with that moment can be
-  */
-
   int HitStopFramesRemaining;
   public bool HitboxStillActive = true;
+  public AttackPhase Phase;
+
+  /*
+  1. Pull to best target optimal position
+  2. Transfer Linker root motion to targets
+  3. Align attacker with best target for subsequent hits
+  4. Allow stick motion outside some cone to steer the attacker
+  5. Turn toward / Away from attacker on hit
+  */
+
+  /*
+  Melee Aim Assist
+
+    On attack start, search for target in a cone in front of the player.
+    Pick the best target to attack based on angle and distance.
+      We have a desired position to be to hit this target.
+        Snap the attacker to this position on each frame of windup (stupid solution)
+        Snap the attacker's orientation to face this target on each frame of windup
+    This system runs during Windup phase of an attack
+    The active phase will populate a set of hit targets
+    The recovery phase will move with root motion only
+  */
+
+  /*
+  Capture unique targets for a given attack.
+  Reset these targets at attack start and end.
+  */
 
   void Start() {
     Time.fixedDeltaTime = 1f / Timeval.FixedUpdatePerSecond;
@@ -152,14 +173,18 @@ public class LogicalTimeline : MonoBehaviour {
   }
 
   void OnAnimatorMove() {
-    Controller.Move(Animator.deltaPosition);
+    const SendMessageOptions MESSAGE_OPTIONS = SendMessageOptions.DontRequireReceiver;
+    var dp = Animator.deltaPosition;
+    var message = "OnSynchronizedMove";
+    Controller.Move(dp);
+    Targets.ForEach(target => target.SendMessage(message, dp, MESSAGE_OPTIONS));
   }
 
   void FixedUpdate() {
     var dt = LocalTimeScale * Time.fixedDeltaTime;
     Graph.Evaluate(dt);
     if (HitStopFramesRemaining > 0) {
-      LocalTimeScale = HitStopSpeed;
+      LocalTimeScale = 0;
       HitStopFramesRemaining--;
     } else {
       LocalTimeScale = 1;
@@ -169,8 +194,8 @@ public class LogicalTimeline : MonoBehaviour {
   }
 
   void OnHit(TestHurtBox testHurtBox) {
-    if (testHurtBox.Owner.TryGetComponent(out TargetDummyController targetDummy) && !Targets.Contains(targetDummy)) {
-      Targets.Add(targetDummy);
+    if (!Targets.Contains(testHurtBox.Owner)) {
+      Targets.Add(testHurtBox.Owner);
     }
     var vfx = Instantiate(OnHitVFX, testHurtBox.transform.position + Vector3.up, transform.rotation);
     Destroy(vfx, 3);
@@ -207,6 +232,8 @@ public class LogicalTimeline : MonoBehaviour {
         var i = (int)(fraction * ticks);
         var weight = BlendWeight(BlendInFraction, BlendOutFraction, fraction) ;
         LayerMixer.SetInputWeight(1, weight);
+        var phase = FirstFound(PhaseClipTrack.Clips, clip => i > clip.StartFrame && i <= clip.EndFrame);
+        Phase = phase.HasValue ? phase.Value.Phase : AttackPhase.Windup;
         var wt = FirstFound(WeaponTrailTrack.Clips, clip => i >= clip.StartFrame && i <= clip.EndFrame);
         WeaponTrail.Emitting = wt.HasValue;
         var hb = FirstFound(HitboxTrack.Clips, clip => i >= clip.StartFrame && i <= clip.EndFrame);
