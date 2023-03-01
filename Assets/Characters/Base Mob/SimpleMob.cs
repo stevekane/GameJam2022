@@ -135,7 +135,7 @@ public class SimpleMob : MonoBehaviour {
   bool TargetIsAttacking => TargetAbilities.Abilities.Any(a => a.IsRunning && a.HitConfigData != null);
   bool TargetInRange(float range) {
     var delta = (Target.position - transform.position);
-    return delta.y < range && delta.XZ().sqrMagnitude < range*range;
+    return delta.y < range && delta.XZ().sqrMagnitude < range.Sqr();
   }
   Vector3 ChaseTarget(float desiredDist) {
     var delta = Target.transform.position.XZ() - transform.position.XZ();

@@ -27,7 +27,7 @@ public class Wallbounce : MonoBehaviour {
         Instantiate(Explosion, transform.position, Quaternion.identity);
         if (Damage.TryGetComponent(out Defender d))
           d.Die();
-      } else if (Vector3.Dot(-k.Velocity.normalized, hit.normal) > MinDot && k.Velocity.sqrMagnitude > MinSpeed*MinSpeed) {
+      } else if (Vector3.Dot(-k.Velocity.normalized, hit.normal) > MinDot && k.Velocity.sqrMagnitude > MinSpeed.Sqr()) {
         SFXManager.Instance.TryPlayOneShot(AudioClip);
         VFXManager.Instance.TrySpawnEffect(Effect, hit.point);
         Vector3 bounceVel;

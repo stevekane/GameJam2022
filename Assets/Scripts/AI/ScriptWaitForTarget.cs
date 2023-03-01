@@ -9,6 +9,6 @@ public class ScriptWaitForTarget : ScriptTask {
 
   bool TargetInRange(Transform self, Transform target, float range) {
     var delta = (target.position - self.position);
-    return delta.y < range && delta.XZ().sqrMagnitude < range*range;
+    return delta.y < range && delta.XZ().sqrMagnitude < range.Sqr();
   }
 }
