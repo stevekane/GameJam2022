@@ -89,7 +89,12 @@ public class TargetDummyController : MonoBehaviour {
   }
 
   void OnHurt(Hitbox hitbox) {
+    // camera shake
     CameraShaker.Instance.Shake(hitbox.CameraShakeIntensity);
+    // turn towards attacker
+    var toAttacker = hitbox.Owner.transform.position-transform.position;
+    transform.rotation = Quaternion.LookRotation(toAttacker, transform.up);
+    // spawn directional vfx
     var directionalRotation = hitbox.HitDirection switch {
       HitDirection.Left => Quaternion.Euler(0, -145, 0),
       HitDirection.Right => Quaternion.Euler(0, 145, 0),
@@ -98,14 +103,19 @@ public class TargetDummyController : MonoBehaviour {
     var vfxRotation = directionalRotation * transform.rotation;
     var vfx = Instantiate(OnHurtVFX, transform.position + Vector3.up, vfxRotation);
     Destroy(vfx, 3);
+    // hitstop
     HitStopFramesRemaining = hitbox.HitStopDuration.Ticks;
+    // hitflash
     SimpleFlash.TicksRemaining = 20;
+    // vibration
     Vibrator.VibrateOnHurt(vfxRotation * transform.forward, hitbox.HitStopDuration.Ticks);
+    // hit reaction animation
     Animator.SetTrigger(hitbox.HitDirection switch {
       HitDirection.Left => "HurtLeft",
       HitDirection.Right => "HurtRight",
       _ => "HurtForward"
     });
+    // sound effects
     var sfxGameObject = new GameObject();
     var sfxSource = sfxGameObject.AddComponent<AudioSource>();
     sfxSource.playOnAwake = false;
@@ -121,6 +131,7 @@ public class TargetDummyController : MonoBehaviour {
       _ => HurtForwardStartTime
     };
     Destroy(sfxGameObject, 3);
+    // knockback
     Velocity += -transform.forward * hitbox.KnockbackStrength;
   }
 }

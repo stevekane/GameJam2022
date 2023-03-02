@@ -131,16 +131,16 @@ public class LogicalTimeline : MonoBehaviour {
   public int AttackFrame;
 
   /*
-  1. Pull to best target optimal position
-  2. Transfer Linker root motion to targets
-  3. Align attacker with best target for subsequent hits
+  + 1. Pull to best target optimal position
+  + 2. Transfer Linker root motion to targets
+  + 3. Align attacker with best target for subsequent hits
   4. Allow stick motion outside some cone to steer the attacker
   5. Turn toward / Away from attacker on hit
   */
 
   void Start() {
     Time.fixedDeltaTime = 1f / Timeval.FixedUpdatePerSecond;
-    Scope = new TaskScope();
+     Scope = new TaskScope();
     InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Listen(StartAttack);
     Graph = PlayableGraph.Create("Logical Timeline");
     Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
@@ -162,6 +162,7 @@ public class LogicalTimeline : MonoBehaviour {
   void OnAnimatorMove() {
     const SendMessageOptions MESSAGE_OPTIONS = SendMessageOptions.DontRequireReceiver;
     var dp = Animator.deltaPosition;
+    // move to target
     if (Phase == AttackPhase.Windup) {
       var phaseDuration = PhaseEndFrame-PhaseStartFrame;
       var phaseFraction = Mathf.InverseLerp(PhaseStartFrame, PhaseEndFrame, AttackFrame);
@@ -171,6 +172,15 @@ public class LogicalTimeline : MonoBehaviour {
       var toIdealPosition = idealPosition-transform.position;
       var toIdealPositionDelta = toIdealPosition / remainingFrames;
       dp = Vector3.Lerp(dp, toIdealPosition, phaseFraction);
+    }
+    // turn to target
+    if (Phase == AttackPhase.Windup) {
+      var phaseDuration = PhaseEndFrame-PhaseStartFrame;
+      var phaseFraction = Mathf.InverseLerp(PhaseStartFrame, PhaseEndFrame, AttackFrame);
+      var remainingFrames = PhaseEndFrame-AttackFrame+1;
+      var toTarget = Target.transform.position-transform.position;
+      var desiredRotation = Quaternion.LookRotation(toTarget.normalized, transform.up);
+      transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, phaseFraction);
     }
     var message = "OnSynchronizedMove";
     Controller.Move(dp);
