@@ -48,21 +48,23 @@ public class Damage : MonoBehaviour {
   }
 
   static readonly Timeval RecoilDuration = Timeval.FromAnimFrames(12, 60);
+  static readonly float MinKnockbackForFallen = 20f;
   void OnHurt(HitParams hitParams) {
     AddPoints(hitParams.Damage);
     if (Status) {
       var knockbackVector = hitParams.KnockbackVector;
+      var knockbackStrength = hitParams.GetKnockbackStrength(Points);
       var forward = hitParams.Source.transform.forward;
       if (Status.IsInterruptible) {
         Mover.ResetVelocityAndMovementEffects();
         Vibrator.VibrateOnHurt(forward, hitParams.GetHitStopDuration(Points).Ticks);
         Status.Add(new HitStopEffect(forward, hitParams.GetHitStopDuration(Points).Ticks),
           s => {
-            if (knockbackVector.sqrMagnitude > 0)
+            if (knockbackStrength > MinKnockbackForFallen)
               s.Add(new FallenEffect(FallenRecoverAnimation));
             s.Add(new HurtStunEffect(hitParams.GetHurtStunDuration(Points).Ticks));
             s.Add(new SlowFallDuration(hitParams.HitConfig.SlowFallDuration.Ticks));
-            s.Add(new KnockbackEffect(knockbackVector * hitParams.GetKnockbackStrength(Points)));
+            s.Add(new KnockbackEffect(knockbackVector * knockbackStrength));
           });
       } else {
         Vibrator.VibrateOnHurt(forward, hitParams.GetHitStopDuration(Points).Ticks);
