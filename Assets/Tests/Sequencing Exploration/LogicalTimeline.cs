@@ -48,6 +48,7 @@ public struct HitboxClip : IEquatable<HitboxClip> {
 }
 
 public enum AttackPhase {
+  None,
   Windup,
   Active,
   Recovery
@@ -96,6 +97,7 @@ public class LogicalTimeline : MonoBehaviour {
 
   [Header("Attack")]
   [SerializeField] AnimationClip Clip;
+  [SerializeField] float IdealStrikeDistance = 1;
   [SerializeField] float AnimationSpeed = 1;
   [SerializeField] float BlendInFraction = .05f;
   [SerializeField] float BlendOutFraction = .05f;
@@ -113,17 +115,20 @@ public class LogicalTimeline : MonoBehaviour {
   [SerializeField] Vibrator Vibrator;
 
   [Header("State")]
+  [SerializeField] TargetDummyController Target;
   [SerializeField] float LocalTimeScale = 1;
   [SerializeField] List<GameObject> Targets;
-
 
   TaskScope Scope;
   AnimationLayerMixerPlayable LayerMixer;
   PlayableGraph Graph;
 
-  int HitStopFramesRemaining;
+  public int HitStopFramesRemaining;
   public bool HitboxStillActive = true;
-  public AttackPhase Phase;
+  public AttackPhase Phase = AttackPhase.None;
+  public int PhaseStartFrame;
+  public int PhaseEndFrame;
+  public int AttackFrame;
 
   /*
   1. Pull to best target optimal position
@@ -131,24 +136,6 @@ public class LogicalTimeline : MonoBehaviour {
   3. Align attacker with best target for subsequent hits
   4. Allow stick motion outside some cone to steer the attacker
   5. Turn toward / Away from attacker on hit
-  */
-
-  /*
-  Melee Aim Assist
-
-    On attack start, search for target in a cone in front of the player.
-    Pick the best target to attack based on angle and distance.
-      We have a desired position to be to hit this target.
-        Snap the attacker to this position on each frame of windup (stupid solution)
-        Snap the attacker's orientation to face this target on each frame of windup
-    This system runs during Windup phase of an attack
-    The active phase will populate a set of hit targets
-    The recovery phase will move with root motion only
-  */
-
-  /*
-  Capture unique targets for a given attack.
-  Reset these targets at attack start and end.
   */
 
   void Start() {
@@ -175,6 +162,16 @@ public class LogicalTimeline : MonoBehaviour {
   void OnAnimatorMove() {
     const SendMessageOptions MESSAGE_OPTIONS = SendMessageOptions.DontRequireReceiver;
     var dp = Animator.deltaPosition;
+    if (Phase == AttackPhase.Windup) {
+      var phaseDuration = PhaseEndFrame-PhaseStartFrame;
+      var phaseFraction = Mathf.InverseLerp(PhaseStartFrame, PhaseEndFrame, AttackFrame);
+      var remainingFrames = PhaseEndFrame-AttackFrame+1;
+      var toTarget = Target.transform.position-transform.position;
+      var idealPosition = Target.transform.position-toTarget.normalized * IdealStrikeDistance;
+      var toIdealPosition = idealPosition-transform.position;
+      var toIdealPositionDelta = toIdealPosition / remainingFrames;
+      dp = Vector3.Lerp(dp, toIdealPosition, phaseFraction);
+    }
     var message = "OnSynchronizedMove";
     Controller.Move(dp);
     Targets.ForEach(target => target.SendMessage(message, dp, MESSAGE_OPTIONS));
@@ -222,6 +219,7 @@ public class LogicalTimeline : MonoBehaviour {
     playable.SetSpeed(AnimationSpeed);
     playable.SetTime(0);
     playable.SetDuration(Clip.length);
+    Phase = AttackPhase.None;
     try {
       LayerMixer.DisconnectInput(1);
       LayerMixer.ConnectInput(1, playable, 0, 1);
@@ -233,7 +231,14 @@ public class LogicalTimeline : MonoBehaviour {
         var weight = BlendWeight(BlendInFraction, BlendOutFraction, fraction) ;
         LayerMixer.SetInputWeight(1, weight);
         var phase = FirstFound(PhaseClipTrack.Clips, clip => i > clip.StartFrame && i <= clip.EndFrame);
-        Phase = phase.HasValue ? phase.Value.Phase : AttackPhase.Windup;
+        if (phase.HasValue) {
+          Phase = phase.Value.Phase;
+          PhaseStartFrame = phase.Value.StartFrame;
+          PhaseEndFrame = phase.Value.EndFrame;
+          AttackFrame = i;
+        } else {
+          Phase = AttackPhase.None;
+        }
         var wt = FirstFound(WeaponTrailTrack.Clips, clip => i >= clip.StartFrame && i <= clip.EndFrame);
         WeaponTrail.Emitting = wt.HasValue;
         var hb = FirstFound(HitboxTrack.Clips, clip => i >= clip.StartFrame && i <= clip.EndFrame);
@@ -272,6 +277,7 @@ public class LogicalTimeline : MonoBehaviour {
       WeaponTrail.Emitting = false;
       HitboxStillActive = true;
       Hitbox.enabled = false;
+      Phase = AttackPhase.None;
       playable.Destroy();
     }
   }
