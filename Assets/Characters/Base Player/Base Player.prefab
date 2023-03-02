@@ -1994,6 +1994,7 @@ MonoBehaviour:
     RequiredOwnerTags: 0
     EnergyCost: 0
   Speed: 60
+  WallJumpHorizontalSpeed: 30
   Drag: 5
   MinDuration:
     Millis: 33.333332
@@ -2007,6 +2008,15 @@ MonoBehaviour:
     Speed: 1
     PhaseDurations:
     - Millis: 33.333336
+      FramesPerSecond: 60
+    BlendInFraction: 0
+    BlendOutFraction: 0
+  WallJumpAnimation:
+    Clip: {fileID: 7400000, guid: e26f39c9a20a7ae46a525516e42f8fc2, type: 2}
+    Mask: {fileID: 0}
+    Speed: 1
+    PhaseDurations:
+    - Millis: 100
       FramesPerSecond: 60
     BlendInFraction: 0
     BlendOutFraction: 0

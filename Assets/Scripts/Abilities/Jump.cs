@@ -3,10 +3,12 @@ using UnityEngine;
 
 public class Jump : Ability {
   public float Speed = 60f;
+  public float WallJumpHorizontalSpeed = 30f;
   public float Drag = 5f;
   public Timeval MinDuration = Timeval.FromSeconds(.1f);
   public Timeval MaxDuration = Timeval.FromSeconds(.5f);
   public AnimationJobConfig Animation;
+  public AnimationJobConfig WallJumpAnimation;
   public AudioClip LaunchSFX;
   public GameObject LaunchVFX;
   public Timeval CoyoteTime = Timeval.FromAnimFrames(6, 60);
@@ -19,20 +21,23 @@ public class Jump : Ability {
 
   public override bool CanStart(AbilityMethod func) =>
     func == MainRelease ? true :
-    IsConsideredGrounded || AirJumpsRemaining > 0;
+    IsConsideredGrounded || Status.IsWallSliding || AirJumpsRemaining > 0;
 
   public override async Task MainAction(TaskScope scope) {
     try {
       Holding = true;
 
+      var velocity = Speed * Vector3.up;
       if (IsConsideredGrounded) {
         await AnimationDriver.Play(scope, Animation).WaitDone(scope);
+      } else if (Status.IsWallSliding) {
+        await AnimationDriver.Play(scope, WallJumpAnimation).WaitDone(scope);
+        velocity += -transform.forward * WallJumpHorizontalSpeed;
       } else {
         // TOOD: play an aerial variant of the windup animation here
       }
       SFXManager.Instance.TryPlayOneShot(LaunchSFX);
       VFXManager.Instance.TrySpawnEffect(LaunchVFX, transform.position, transform.rotation);
-      var velocity = Speed * Vector3.up;
       using var effect = Status.Add(new InlineEffect(s => {
         s.HasGravity = false;
         velocity = velocity * Mathf.Exp(-Time.fixedDeltaTime * Drag);

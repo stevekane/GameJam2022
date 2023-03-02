@@ -69,6 +69,12 @@ public class Mover : MonoBehaviour {
     Status.Remove(Status.Get<VaultEffect>());
   }
 
+  Vector3 WallSlideNormal;
+  void OnControllerColliderHit(ControllerColliderHit hit) {
+    if ((Defaults.Instance.EnvironmentLayerMask & (1<<hit.gameObject.layer)) == 0) return;
+    WallSlideNormal = hit.normal;
+  }
+
   public void FixedUpdate() {
     var desiredMoveDir = GetMove();
     var desiredFacing = GetAim();
@@ -84,7 +90,10 @@ public class Mover : MonoBehaviour {
       Status { HasGravity: true, IsGrounded: false } => FallSpeed + gravity,
       _ => 0
     };
-    FallSpeed = Mathf.Min(FallSpeed, Attributes.GetValue(AttributeTag.MaxFallSpeed));
+    var maxFallSpeed = Attributes.GetValue(AttributeTag.MaxFallSpeed);
+    if (Status.IsWallSliding)
+      maxFallSpeed *= .2f;
+    FallSpeed = Mathf.Min(FallSpeed, maxFallSpeed);
     MoveVelocity = MoveDelta / Time.fixedDeltaTime;
     Velocity = InputVelocity + FallVelocity + MoveVelocity;
     var inputDelta = dt * InputVelocity;
@@ -99,10 +108,14 @@ public class Mover : MonoBehaviour {
     TeleportDestination = null;
 
     // Turn
-    var turnSpeed = Attributes.GetValue(AttributeTag.TurnSpeed);
-    var localTurnSpeed = localTimeScale * turnSpeed;
-    var desiredRotation = RotationFromDesired(transform.rotation, localTurnSpeed, desiredFacing);
-    transform.rotation = desiredRotation * RotationDelta;
+    if (Status.IsWallSliding) {
+      transform.rotation = Quaternion.LookRotation(-WallSlideNormal);
+    } else {
+      var turnSpeed = Attributes.GetValue(AttributeTag.TurnSpeed);
+      var localTurnSpeed = localTimeScale * turnSpeed;
+      var desiredRotation = RotationFromDesired(transform.rotation, localTurnSpeed, desiredFacing);
+      transform.rotation = desiredRotation * RotationDelta;
+    }
     RotationDelta = Quaternion.identity;
 
     // Animation
@@ -115,6 +128,7 @@ public class Mover : MonoBehaviour {
     animator.SetFloat("ForwardVelocity", orientedVelocity.z);
     animator.SetFloat("Speed", inputSpeed / MOVE_CYCLE_DISTANCE);
     animator.SetBool("IsGrounded", Status.IsGrounded);
+    animator.SetBool("IsWallSliding", Status.IsWallSliding);
     animator.SetBool("IsHurt", Status.IsHurt);
     animator.SetBool("IsFallen", Status.IsFallen);
     AnimationDriver.SetSpeed(localTimeScale < 1 ? localTimeScale : AnimationDriver.BaseSpeed);

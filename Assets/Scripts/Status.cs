@@ -251,6 +251,7 @@ public class Status : MonoBehaviour {
   public bool IsGrounded { get; private set; }
   public bool JustGrounded { get; private set; }
   public bool JustTookOff { get; private set; }
+  public bool IsWallSliding { get; private set; }
   public bool IsFallen { get; set; }
   public bool IsHurt { get; set; }
   public bool CanMove { get => GetBoolean(AttributeTag.MoveSpeed); set => SetBoolean(AttributeTag.MoveSpeed, value); }
@@ -334,6 +335,7 @@ public class Status : MonoBehaviour {
     IsGrounded = IsOverGround(Vector3.zero);
     JustGrounded = !wasGrounded && IsGrounded;
     JustTookOff = wasGrounded && !IsGrounded;
+    IsWallSliding = !IsGrounded && Mover.Velocity.y < 0f && CharacterController.collisionFlags.HasFlag(CollisionFlags.CollidedSides);
     IsHurt = false;
     IsFallen = false;
     if (JustGrounded) {
