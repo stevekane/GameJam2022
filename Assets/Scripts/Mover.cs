@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
@@ -67,6 +68,7 @@ public class Mover : MonoBehaviour {
     ResetVelocity();
     Status.Remove(Status.Get<KnockbackEffect>());
     Status.Remove(Status.Get<VaultEffect>());
+    AbilityManager.Running.ForEach(a => { if (a is Grapple) a.Stop(); });
   }
 
   Vector3 WallSlideNormal;
