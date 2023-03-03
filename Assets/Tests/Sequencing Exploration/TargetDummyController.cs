@@ -4,6 +4,12 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Animations;
 
+public enum DefenderState {
+  Vulnerable,
+  Blocking,
+  Parrying
+}
+
 public class TargetDummyController : MonoBehaviour {
   [Header("Animation")]
   [SerializeField] RuntimeAnimatorController AnimatorController;
@@ -12,9 +18,6 @@ public class TargetDummyController : MonoBehaviour {
   [SerializeField] AudioClip HurtLeftSFX;
   [SerializeField] AudioClip HurtRightSFX;
   [SerializeField] AudioClip HurtForwardSFX;
-  [SerializeField] float HurtLeftStartTime;
-  [SerializeField] float HurtRightStartTime;
-  [SerializeField] float HurtForwardStartTime;
 
   [Header("Visual Effects")]
   [SerializeField] GameObject OnHurtVFX;
@@ -37,6 +40,7 @@ public class TargetDummyController : MonoBehaviour {
   [SerializeField] Vector3 Velocity;
   [SerializeField] float LocalTimeScale = 1;
   [SerializeField] float LocalAnimationTimeScale = 1;
+  [SerializeField] DefenderState State;
 
   AnimatorControllerPlayable AnimatorControllerPlayable;
   PlayableGraph Graph;
@@ -88,50 +92,69 @@ public class TargetDummyController : MonoBehaviour {
     Controller.Move(deltaPosition);
   }
 
-  void OnHurt(Hitbox hitbox) {
-    // camera shake
-    CameraShaker.Instance.Shake(hitbox.CameraShakeIntensity);
-    // turn towards attacker
+  void OnContact(MeleeContact contact) {
+    switch (State) {
+      case DefenderState.Vulnerable:
+        OnHurt(contact);
+        contact.Hitbox.Owner?.SendMessage("OnHit", contact);
+      break;
+      case DefenderState.Blocking:
+        OnBlock(contact);
+        contact.Hitbox.Owner?.SendMessage("OnBlocked", contact);
+      break;
+      case DefenderState.Parrying:
+        OnParry(contact);
+        contact.Hitbox.Owner?.SendMessage("OnParried", contact);
+      break;
+    }
+  }
+
+  void OnHurt(MeleeContact contact) {
+    var hitbox = contact.Hitbox;
     var toAttacker = hitbox.Owner.transform.position-transform.position;
     transform.rotation = Quaternion.LookRotation(toAttacker, transform.up);
-    // spawn directional vfx
-    var directionalRotation = hitbox.HitDirection switch {
-      HitDirection.Left => Quaternion.Euler(0, -145, 0),
-      HitDirection.Right => Quaternion.Euler(0, 145, 0),
-      _ => Quaternion.Euler(0, 180, 0)
-    };
-    var vfxRotation = directionalRotation * transform.rotation;
-    var vfx = Instantiate(OnHurtVFX, transform.position + Vector3.up, vfxRotation);
-    Destroy(vfx, 3);
-    // hitstop
+    CameraShaker.Instance.Shake(hitbox.CameraShakeIntensity);
     HitStopFramesRemaining = hitbox.HitStopDuration.Ticks;
-    // hitflash
     SimpleFlash.TicksRemaining = 20;
-    // vibration
-    Vibrator.VibrateOnHurt(vfxRotation * transform.forward, hitbox.HitStopDuration.Ticks);
-    // hit reaction animation
+    Destroy(DirectionalVFX(transform, OnHurtVFX, hitbox.HitDirection), 3);
+    Vibrator.VibrateOnHurt(DirectionalVibration(transform, hitbox.HitDirection), hitbox.HitStopDuration.Ticks);
     Animator.SetTrigger(hitbox.HitDirection switch {
       HitDirection.Left => "HurtLeft",
       HitDirection.Right => "HurtRight",
       _ => "HurtForward"
     });
-    // sound effects
-    var sfxGameObject = new GameObject();
-    var sfxSource = sfxGameObject.AddComponent<AudioSource>();
-    sfxSource.playOnAwake = false;
-    sfxSource.clip = hitbox.HitDirection switch {
+    var sfx = hitbox.HitDirection switch {
       HitDirection.Left => HurtLeftSFX,
       HitDirection.Right => HurtRightSFX,
       _ => HurtForwardSFX
     };
-    sfxSource.Play();
-    sfxSource.time = hitbox.HitDirection switch {
-      HitDirection.Left => HurtLeftStartTime,
-      HitDirection.Right => HurtRightStartTime,
-      _ => HurtForwardStartTime
-    };
-    Destroy(sfxGameObject, 3);
-    // knockback
+    AudioSource.PlayOneShot(sfx);
     Velocity += -transform.forward * hitbox.KnockbackStrength;
+  }
+
+  void OnParry(MeleeContact contact) {
+    Debug.Log("Parry");
+  }
+
+  void OnBlock(MeleeContact contact) {
+    Debug.Log("Block");
+  }
+
+  GameObject DirectionalVFX(Transform transform, GameObject prefab, HitDirection hitDirection) {
+    var directionalRotation = hitDirection switch {
+      HitDirection.Left => Quaternion.Euler(0, -145, 0),
+      HitDirection.Right => Quaternion.Euler(0, 145, 0),
+      _ => Quaternion.Euler(0, 180, 0)
+    };
+    var vfxRotation = directionalRotation * transform.rotation;
+    return Instantiate(OnHurtVFX, transform.position + Vector3.up, vfxRotation);
+  }
+
+  Vector3 DirectionalVibration(Transform transform, HitDirection hitDirection) {
+    return hitDirection switch {
+      HitDirection.Left => Quaternion.Euler(0, -145, 0),
+      HitDirection.Right => Quaternion.Euler(0, 145, 0),
+      _ => Quaternion.Euler(0, 180, 0)
+    } * transform.forward;
   }
 }

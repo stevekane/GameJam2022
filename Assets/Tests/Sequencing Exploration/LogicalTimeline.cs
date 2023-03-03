@@ -136,7 +136,52 @@ public class LogicalTimeline : MonoBehaviour {
   + 2. Transfer Linker root motion to targets
   + 3. Align attacker with best target for subsequent hits
   4. Allow stick motion outside some cone to steer the attacker
-  5. Turn toward / Away from attacker on hit
+  + 5. Turn toward / Away from attacker on hit
+  */
+
+  /*
+  Target Dummy should be set to block, parry, or be hit.
+  Blocking target dummies hold a blocking guard pose.
+  Parrying target dummies launch parry attacks whenever their attacker enters windup.
+
+  Hit
+    Shake
+    Blood
+    FlashVFX
+    HitStop
+    FlashRed
+    Vibrate
+    HurtReaction
+    HurtSFX
+    RootMotionMatching
+    Knockback
+  Block
+    Shake / 2
+    Sparks
+    FlashVFX
+    HitStop / 2
+    FlashWhite
+    Vibrate / 2
+    BlockReaction
+    BlockSFX
+    RootMotionMatching
+    NO KNOCKBACK
+  Parry
+    Shake
+    Sparks
+    ParryVFX
+    HitStop * 2
+    Flash Blue
+    Vibrate Attacker
+    Vibrate Defender
+    ParrySFX
+    Knockback the attacker
+    Play Parried Animation on Attacker
+    Cancel Attacker's attack
+
+  Hurtbox calls onHurt on the defender
+  OnHurt decides outcome of the attack
+  OnHurt calls OnHit, OnParry, OnBlock on the attacker
   */
 
   void Start() {
@@ -161,7 +206,6 @@ public class LogicalTimeline : MonoBehaviour {
   }
 
   void OnAnimatorMove() {
-    const SendMessageOptions MESSAGE_OPTIONS = SendMessageOptions.DontRequireReceiver;
     var dp = Animator.deltaPosition;
     // move to target
     if (Phase == AttackPhase.Windup) {
@@ -183,9 +227,10 @@ public class LogicalTimeline : MonoBehaviour {
       var desiredRotation = Quaternion.LookRotation(toTarget.normalized, transform.up);
       transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, phaseFraction);
     }
-    var message = "OnSynchronizedMove";
+    if (Phase != AttackPhase.None) {
+      Targets.ForEach(target => target.SendMessage("OnSynchronizedMove", dp));
+    }
     Controller.Move(dp);
-    Targets.ForEach(target => target.SendMessage(message, dp, MESSAGE_OPTIONS));
   }
 
   void FixedUpdate() {
@@ -215,15 +260,25 @@ public class LogicalTimeline : MonoBehaviour {
     FixedTick.Fire();
   }
 
-  void OnHit(TestHurtBox testHurtBox) {
-    if (!Targets.Contains(testHurtBox.Owner)) {
-      Targets.Add(testHurtBox.Owner);
+  void OnHit(MeleeContact contact) {
+    var hurtbox = contact.Hurtbox;
+    if (!Targets.Contains(hurtbox.Owner)) {
+      Targets.Add(hurtbox.Owner);
     }
-    var vfx = Instantiate(OnHitVFX, testHurtBox.transform.position + Vector3.up, transform.rotation);
+    var vfx = Instantiate(OnHitVFX, hurtbox.transform.position + Vector3.up, transform.rotation);
     Destroy(vfx, 3);
     Vibrator.VibrateOnHit(transform.forward, Hitbox.HitStopDuration.Ticks);
     HitStopFramesRemaining = Hitbox.HitStopDuration.Ticks;
     HitboxStillActive = false;
+  }
+
+  void OnBlocked(MeleeContact contact) {
+    Debug.Log("Blocked");
+  }
+
+  void OnParried(MeleeContact contact) {
+    Debug.Log("Parried");
+    Scope.Cancel();
   }
 
   void StartAttack() {
