@@ -88,6 +88,7 @@ public class LogicalTimeline : MonoBehaviour {
 
   [Header("Input")]
   [SerializeField] InputManager InputManager;
+  [SerializeField] float MovementSpeed = 10;
 
   [Header("Animation")]
   [SerializeField] RuntimeAnimatorController AnimatorController;
@@ -140,7 +141,7 @@ public class LogicalTimeline : MonoBehaviour {
 
   void Start() {
     Time.fixedDeltaTime = 1f / Timeval.FixedUpdatePerSecond;
-     Scope = new TaskScope();
+    Scope = new TaskScope();
     InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Listen(StartAttack);
     Graph = PlayableGraph.Create("Logical Timeline");
     Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
@@ -189,6 +190,20 @@ public class LogicalTimeline : MonoBehaviour {
 
   void FixedUpdate() {
     var dt = LocalTimeScale * Time.fixedDeltaTime;
+    var movementInput = InputManager.Axis(AxisCode.AxisLeft);
+    var screenDirection = movementInput.XY;
+    var movementMagnitude = screenDirection.magnitude;
+    var camera = Camera.main; // TODO: slow way to access camera
+    var worldSpaceDirection = camera.transform.TransformDirection(screenDirection);
+    worldSpaceDirection.y = 0;
+    worldSpaceDirection = worldSpaceDirection.normalized;
+    if (Phase == AttackPhase.None) {
+      if (movementMagnitude > 0) {
+        transform.rotation = Quaternion.LookRotation(worldSpaceDirection);
+      }
+      Controller.Move(dt * movementMagnitude * MovementSpeed * worldSpaceDirection);
+    }
+
     Graph.Evaluate(dt);
     if (HitStopFramesRemaining > 0) {
       LocalTimeScale = 0;
