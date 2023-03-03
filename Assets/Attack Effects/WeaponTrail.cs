@@ -41,7 +41,9 @@ public class WeaponTrail : MonoBehaviour {
     // Steve - intention here is to create a copy of the sharedMaterial
     // but then to refer to this material by "sharedMaterial". If this works
     // as intended, it should allow materials to be modified in edit mode
-    MeshRenderer.material = new Material(MeshRenderer.sharedMaterial);
+    // MP - This seems to be causing some weirdness with the material randomly
+    // resetting to null in the editor.
+    //MeshRenderer.material = new Material(MeshRenderer.sharedMaterial);
     MeshFilter.mesh = Mesh;
   }
 
