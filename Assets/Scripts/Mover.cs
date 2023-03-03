@@ -100,7 +100,8 @@ public class Mover : MonoBehaviour {
     Velocity = InputVelocity + FallVelocity + MoveVelocity;
     var inputDelta = dt * InputVelocity;
     var fallDelta = dt * FallVelocity;
-    Controller.Move(inputDelta + fallDelta + MoveDelta);
+    var wallSlideDelta = Status.IsWallSliding ? WallSlideNormal*-.1f : Vector3.zero;
+    Controller.Move(inputDelta + fallDelta + MoveDelta + wallSlideDelta);
     MoveDelta = Vector3.zero;
 
     if (TeleportDestination.HasValue) {
