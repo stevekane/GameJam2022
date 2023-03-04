@@ -131,59 +131,6 @@ public class LogicalTimeline : MonoBehaviour {
   public int PhaseEndFrame;
   public int AttackFrame;
 
-  /*
-  + 1. Pull to best target optimal position
-  + 2. Transfer Linker root motion to targets
-  + 3. Align attacker with best target for subsequent hits
-  4. Allow stick motion outside some cone to steer the attacker
-  + 5. Turn toward / Away from attacker on hit
-  */
-
-  /*
-  Target Dummy should be set to block, parry, or be hit.
-  Blocking target dummies hold a blocking guard pose.
-  Parrying target dummies launch parry attacks whenever their attacker enters windup.
-
-  Hit
-    Shake
-    Blood
-    FlashVFX
-    HitStop
-    FlashRed
-    Vibrate
-    HurtReaction
-    HurtSFX
-    RootMotionMatching
-    Knockback
-  Block
-    Shake / 2
-    Sparks
-    FlashVFX
-    HitStop / 2
-    FlashWhite
-    Vibrate / 2
-    BlockReaction
-    BlockSFX
-    RootMotionMatching
-    NO KNOCKBACK
-  Parry
-    Shake
-    Sparks
-    ParryVFX
-    HitStop * 2
-    Flash Blue
-    Vibrate Attacker
-    Vibrate Defender
-    ParrySFX
-    Knockback the attacker
-    Play Parried Animation on Attacker
-    Cancel Attacker's attack
-
-  Hurtbox calls onHurt on the defender
-  OnHurt decides outcome of the attack
-  OnHurt calls OnHit, OnParry, OnBlock on the attacker
-  */
-
   void Start() {
     Time.fixedDeltaTime = 1f / Timeval.FixedUpdatePerSecond;
     Scope = new TaskScope();
@@ -249,13 +196,13 @@ public class LogicalTimeline : MonoBehaviour {
       Controller.Move(dt * movementMagnitude * MovementSpeed * worldSpaceDirection);
     }
 
-    Graph.Evaluate(dt);
     if (HitStopFramesRemaining > 0) {
       LocalTimeScale = 0;
       HitStopFramesRemaining--;
     } else {
       LocalTimeScale = 1;
     }
+    Graph.Evaluate(dt);
     FixedFrame++;
     FixedTick.Fire();
   }
@@ -265,20 +212,35 @@ public class LogicalTimeline : MonoBehaviour {
     if (!Targets.Contains(hurtbox.Owner)) {
       Targets.Add(hurtbox.Owner);
     }
-    var vfx = Instantiate(OnHitVFX, hurtbox.transform.position + Vector3.up, transform.rotation);
-    Destroy(vfx, 3);
+    Destroy(Instantiate(OnHitVFX, hurtbox.transform.position + Vector3.up, transform.rotation), 3);
     Vibrator.VibrateOnHit(transform.forward, Hitbox.HitStopDuration.Ticks);
     HitStopFramesRemaining = Hitbox.HitStopDuration.Ticks;
     HitboxStillActive = false;
+    Debug.Log("Hit");
   }
 
   void OnBlocked(MeleeContact contact) {
-    Debug.Log("Blocked");
+    var hurtbox = contact.Hurtbox;
+    if (!Targets.Contains(hurtbox.Owner)) {
+      Targets.Add(hurtbox.Owner);
+    }
+    Destroy(Instantiate(OnHitVFX, hurtbox.transform.position + Vector3.up, transform.rotation), 3);
+    Vibrator.VibrateOnHit(transform.forward, Hitbox.HitStopDuration.Ticks / 2);
+    HitStopFramesRemaining = Hitbox.HitStopDuration.Ticks / 2;
+    HitboxStillActive = false;
+    Debug.Log("Block");
   }
 
   void OnParried(MeleeContact contact) {
-    Debug.Log("Parried");
-    Scope.Cancel();
+    Debug.Log($"FRAME {FixedFrame} PHASE {Phase}");
+    var hurtbox = contact.Hurtbox;
+    Destroy(Instantiate(OnHitVFX, hurtbox.transform.position + Vector3.up, transform.rotation), 3);
+    Vibrator.VibrateOnHurt(transform.forward, Hitbox.HitStopDuration.Ticks * 2);
+    HitStopFramesRemaining = Hitbox.HitStopDuration.Ticks * 2;
+    HitboxStillActive = false;
+    Scope.Dispose();
+    Scope = new();
+    Animator.SetTrigger("Parried");
   }
 
   void StartAttack() {
@@ -351,12 +313,14 @@ public class LogicalTimeline : MonoBehaviour {
     } catch (Exception e) {
       Debug.LogWarning(e.Message);
     } finally {
+      Debug.Log("Cleanup called");
       LayerMixer.DisconnectInput(1);
       LayerMixer.SetInputWeight(1, 0);
       Targets.Clear();
       WeaponTrail.Emitting = false;
+      HitStopFramesRemaining = 0;
       HitboxStillActive = true;
-      Hitbox.enabled = false;
+      Hitbox.Collider.enabled = false;
       Phase = AttackPhase.None;
       playable.Destroy();
     }
