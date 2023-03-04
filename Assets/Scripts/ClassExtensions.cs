@@ -21,6 +21,7 @@ public static class AnimationExtensions {
 
 public static class VectorExtensions {
   // Projects a Vector3 to the XZ plane. Used when we only care about horizontal movement.
+  public static Vector2 XZ2(this Vector3 v) => new (v.x, v.z);
   public static Vector3 XZ(this Vector3 v) => new (v.x, 0, v.z);
   public static void SetXZ(this ref Vector3 v, Vector3 a) {
     v.x = a.x;
