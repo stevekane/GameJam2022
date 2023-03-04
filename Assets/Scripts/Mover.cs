@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
@@ -67,6 +68,7 @@ public class Mover : MonoBehaviour {
     ResetVelocity();
     Status.Remove(Status.Get<KnockbackEffect>());
     Status.Remove(Status.Get<VaultEffect>());
+    AbilityManager.Running.ForEach(a => { if (a is Grapple) a.Stop(); });
   }
 
   Vector3 WallSlideNormal;
@@ -98,7 +100,8 @@ public class Mover : MonoBehaviour {
     Velocity = InputVelocity + FallVelocity + MoveVelocity;
     var inputDelta = dt * InputVelocity;
     var fallDelta = dt * FallVelocity;
-    Controller.Move(inputDelta + fallDelta + MoveDelta);
+    var wallSlideDelta = Status.IsWallSliding ? WallSlideNormal*-.1f : Vector3.zero;
+    Controller.Move(inputDelta + fallDelta + MoveDelta + wallSlideDelta);
     MoveDelta = Vector3.zero;
 
     if (TeleportDestination.HasValue) {

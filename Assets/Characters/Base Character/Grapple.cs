@@ -30,6 +30,7 @@ public class Grapple : Ability {
   [SerializeField] GameObject HitVFX;
   [SerializeField] GameObject VaultVFX;
 
+  public GrapplePoint ScriptedTarget { get; set; }
   GrapplePoint Candidate;
   GrapplePoint Target;
   Vector3 Velocity;
@@ -53,22 +54,23 @@ public class Grapple : Ability {
     var bestScore = float.MaxValue;
     var eye = transform.position;
     Candidate = null;
-    foreach (var grapplePoint in GrapplePointManager.Instance.Points) {
-      var isVisible = grapplePoint.transform.IsVisibleFrom(eye, Defaults.Instance.GrapplePointLayerMask, QueryTriggerInteraction.Collide);
-      var dist = Vector3.Distance(transform.position, grapplePoint.transform.position);
-      var angle = Mathf.Abs(Vector3.Angle(direction, (grapplePoint.transform.position - eye).XZ()));
-      var score = angle > 180f ? float.MaxValue : 100f*(angle/180f) + dist;
-      if (isVisible && score < bestScore) {
-        Candidate = grapplePoint;
-        bestScore = score;
+    if (aiming) {
+      foreach (var grapplePoint in GrapplePointManager.Instance.Points) {
+        var isVisible = grapplePoint.transform.IsVisibleFrom(eye, Defaults.Instance.GrapplePointLayerMask, QueryTriggerInteraction.Collide);
+        var dist = Vector3.Distance(transform.position, grapplePoint.transform.position);
+        var angle = Mathf.Abs(Vector3.Angle(direction, (grapplePoint.transform.position - eye).XZ()));
+        var score = angle > 180f ? float.MaxValue : 100f*(angle/180f) + dist;
+        if (isVisible && score < bestScore) {
+          Candidate = grapplePoint;
+          bestScore = score;
+        }
+      }
+      if (Candidate != null) {
+        Status.AddNextTick(s => s.AddAttributeModifier(AttributeTag.LocalTimeScale, AttributeModifier.Times(AimLocalTimeDilation)));
+        GrappleAimLine.SetPosition(1, Candidate.transform.position);
       }
     }
-    if (Candidate != null) {
-      if (aiming)
-        Status.AddNextTick(s => s.AddAttributeModifier(AttributeTag.LocalTimeScale, AttributeModifier.Times(AimLocalTimeDilation)));
-      GrappleAimLine.enabled = aiming;
-      GrappleAimLine.SetPosition(1, Candidate.transform.position);
-    }
+    GrappleAimLine.enabled = aiming;
   }
 
   void LateUpdate() {
@@ -76,11 +78,11 @@ public class Grapple : Ability {
     GrappleLine.SetPosition(0, HookOrigin.Transform.position);
   }
 
-  public override bool CanStart(AbilityMethod func) => AbilityManager.GetAxis(AxisTag.ReallyAim).XZ != Vector3.zero && Candidate;
+  public override bool CanStart(AbilityMethod func) => Candidate ?? ScriptedTarget;
 
   public override async Task MainAction(TaskScope scope) {
     try {
-      Target = Candidate;
+      Target = Candidate ?? ScriptedTarget;
       using (var activeEffect = Status.Add(ActiveEffect)) {
         await scope.Any(
           Waiter.Repeat(UpdateCurrentRotationFromTarget),
