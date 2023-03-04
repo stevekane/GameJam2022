@@ -18,12 +18,19 @@ public class TargetDummyController : MonoBehaviour {
   [SerializeField] AudioClip HurtLeftSFX;
   [SerializeField] AudioClip HurtRightSFX;
   [SerializeField] AudioClip HurtForwardSFX;
+  [SerializeField] AudioClip BlockSFX;
+  [SerializeField] AudioClip ParrySFX;
 
   [Header("Visual Effects")]
   [SerializeField] GameObject OnHurtVFX;
+  [SerializeField] GameObject OnBlockVFX;
+  [SerializeField] GameObject OnParryVFX;
   [SerializeField] ParticleSystem KnockbackSmoke;
   [SerializeField] float KnockbackSmokeMinimumSpeed = 5;
   [SerializeField, Range(0,1)] float HitStopSpeed = .1f;
+  [SerializeField, ColorUsage(true, true)] Color HurtFlashColor = Color.red;
+  [SerializeField, ColorUsage(true, true)] Color ParryFlashColor = Color.blue;
+  [SerializeField, ColorUsage(true, true)] Color BlockFlashColor = Color.white;
 
   [Header("Physics")]
   [SerializeField] Vector3 Gravity = new Vector3(0, -10, 0);
@@ -84,6 +91,7 @@ public class TargetDummyController : MonoBehaviour {
     if (Velocity.magnitude > KnockbackSmokeMinimumSpeed) {
       KnockbackSmoke.Emit(1);
     }
+    Animator.SetInteger("State", (int)State);
     Graph.Evaluate(animDt);
     Controller.Move(dt * Velocity);
   }
@@ -115,6 +123,7 @@ public class TargetDummyController : MonoBehaviour {
     transform.rotation = Quaternion.LookRotation(toAttacker, transform.up);
     CameraShaker.Instance.Shake(hitbox.CameraShakeIntensity);
     HitStopFramesRemaining = hitbox.HitStopDuration.Ticks;
+    SimpleFlash.FlashColor = HurtFlashColor;
     SimpleFlash.TicksRemaining = 20;
     Destroy(DirectionalVFX(transform, OnHurtVFX, hitbox.HitDirection), 3);
     Vibrator.VibrateOnHurt(DirectionalVibration(transform, hitbox.HitDirection), hitbox.HitStopDuration.Ticks);
@@ -133,11 +142,31 @@ public class TargetDummyController : MonoBehaviour {
   }
 
   void OnParry(MeleeContact contact) {
-    Debug.Log("Parry");
+    var hitbox = contact.Hitbox;
+    var toAttacker = hitbox.Owner.transform.position-transform.position;
+    transform.rotation = Quaternion.LookRotation(toAttacker, transform.up);
+    CameraShaker.Instance.Shake(hitbox.CameraShakeIntensity);
+    HitStopFramesRemaining = hitbox.HitStopDuration.Ticks * 2;
+    SimpleFlash.FlashColor = ParryFlashColor;
+    SimpleFlash.TicksRemaining = 20;
+    Destroy(DirectionalVFX(transform, OnParryVFX, hitbox.HitDirection), 3);
+    Vibrator.VibrateOnHurt(DirectionalVibration(transform, hitbox.HitDirection), hitbox.HitStopDuration.Ticks);
+    // Animator.SetTrigger("Parry");
+    AudioSource.PlayOneShot(ParrySFX);
   }
 
   void OnBlock(MeleeContact contact) {
-    Debug.Log("Block");
+    var hitbox = contact.Hitbox;
+    var toAttacker = hitbox.Owner.transform.position-transform.position;
+    transform.rotation = Quaternion.LookRotation(toAttacker, transform.up);
+    CameraShaker.Instance.Shake(hitbox.CameraShakeIntensity / 2);
+    HitStopFramesRemaining = hitbox.HitStopDuration.Ticks / 2;
+    SimpleFlash.FlashColor = BlockFlashColor;
+    SimpleFlash.TicksRemaining = 20;
+    Destroy(DirectionalVFX(transform, OnBlockVFX, hitbox.HitDirection), 3);
+    Vibrator.VibrateOnHurt(DirectionalVibration(transform, hitbox.HitDirection), hitbox.HitStopDuration.Ticks);
+    Animator.SetTrigger("Block");
+    AudioSource.PlayOneShot(BlockSFX);
   }
 
   GameObject DirectionalVFX(Transform transform, GameObject prefab, HitDirection hitDirection) {
@@ -147,7 +176,7 @@ public class TargetDummyController : MonoBehaviour {
       _ => Quaternion.Euler(0, 180, 0)
     };
     var vfxRotation = directionalRotation * transform.rotation;
-    return Instantiate(OnHurtVFX, transform.position + Vector3.up, vfxRotation);
+    return Instantiate(prefab, transform.position + Vector3.up, vfxRotation);
   }
 
   Vector3 DirectionalVibration(Transform transform, HitDirection hitDirection) {

@@ -4,9 +4,9 @@ using UnityEngine;
 public class SimpleFlash : MonoBehaviour {
   [SerializeField] GameObject RendererRoot;
   [SerializeField] string ColorName = "_EmissionColor";
-  [ColorUsage(showAlpha: true, hdr: true)]
-  [SerializeField] Color FlashColor = Color.white;
 
+  [ColorUsage(showAlpha: true, hdr: true)]
+  public  Color FlashColor = Color.white;
   public int TicksRemaining;
   public int OnTicks;
   public int OffTicks;
