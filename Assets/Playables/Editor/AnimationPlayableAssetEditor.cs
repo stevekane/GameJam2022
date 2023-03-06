@@ -27,15 +27,17 @@ public class AnimationSegmentClipAssetEditor : Editor {
     var editorClip = Selection.activeObject;
     var clipProp = editorClip.GetType().GetField("m_Clip", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
     var timelineClip = clipProp.GetValue(editorClip) as TimelineClip;
+    var clip = timelineClip.animationClip;
+    var frameRate = GetFrameRate(timelineClip);
 
     EditorGUILayout.Space();
     EditorGUI.indentLevel--;
-    EditorGUILayout.LabelField("Clip Segment Timings");
+    EditorGUILayout.LabelField($"Clip Segment Timings (total is {clip.length}s, {clip.length * frameRate} frames)");
     EditorGUI.indentLevel++;
     EditorGUI.BeginChangeCheck();
-    var newClipStart = TimeField("Clip Start", timelineClip.clipIn, timelineClip);
+    var newClipStart = TimeField("Clip Start", timelineClip.clipIn, frameRate);
     var clipEndProp = serializedObject.FindProperty("ClipEnd");
-    var newClipEnd = TimeField("Clip End", clipEndProp.doubleValue, timelineClip);
+    var newClipEnd = TimeField("Clip End", clipEndProp.doubleValue, frameRate);
     if (EditorGUI.EndChangeCheck()) {
       timelineClip.clipIn = newClipStart;
       clipEndProp.doubleValue = newClipEnd;
@@ -45,9 +47,9 @@ public class AnimationSegmentClipAssetEditor : Editor {
     timelineClip.timeScale = newDuration / timelineClip.duration;
   }
 
-  double TimeField(string labelText, double seconds, TimelineClip clip) {
+  double GetFrameRate(TimelineClip clip) => clip.GetParentTrack()?.timelineAsset?.editorSettings.frameRate ?? 60f;
+  double TimeField(string labelText, double seconds, double frameRate) {
     const float kSpacingSubLabel = 4f;
-    var frameRate = clip.GetParentTrack()?.timelineAsset?.editorSettings.frameRate ?? 60f;
     var rect = EditorGUILayout.GetControlRect();
     rect = EditorGUI.PrefixLabel(rect, new GUIContent(labelText));
     var secondsRect = new Rect(rect.xMin, rect.yMin, rect.width / 2 - kSpacingSubLabel, rect.height);
