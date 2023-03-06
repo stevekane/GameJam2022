@@ -256,6 +256,15 @@ public class LogicalTimeline : MonoBehaviour {
     return null;
   }
 
+  /*
+  Initialization:
+
+    Set the AttackPhase
+    Setup the Animation playback
+
+    Every frame:
+      GetValue from each track and perform action with it
+  */
   async Task Attack(TaskScope scope) {
     var playable = AnimationClipPlayable.Create(Graph, Clip);
     playable.SetSpeed(AnimationSpeed);
