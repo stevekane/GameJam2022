@@ -27,20 +27,19 @@ public class AnimationJobConfig {
 }
 
 [Serializable]
-public struct TimelineBindings {
-  public Collider Hitbox;
-  public WeaponTrail WeaponTrail;
-  public Ability Ability;
+public struct TimelineTrackBinding {
+  public TrackAsset Track;
+  public UnityEngine.Object Binding;
 }
 
 [Serializable]
 public class TimelineTaskConfig {
   public TimelineAsset Asset;
-  public TimelineBindings Bindings;
   public AvatarMask Mask = null;
   public AnimationSlot Slot;
   [Range(0, 1)] public float BlendInFraction;
   [Range(0, 1)] public float BlendOutFraction;
+  public TimelineTrackBinding[] Bindings;
 }
 
 public interface IPlayableTask {
@@ -394,11 +393,11 @@ public class AnimationDriver : MonoBehaviour {
           }
         } else {
           var playableOutput = 0 switch {
-            _ when track is HitboxTrackAsset => ObjectPlayableOutput(Graph, track.name, task.Config.Bindings.Hitbox),
-            _ when track is WeaponTrailTrackAsset => ObjectPlayableOutput(Graph, track.name, task.Config.Bindings.WeaponTrail),
-            _ when track is AbilityTrackAsset => ObjectPlayableOutput(Graph, track.name, task.Config.Bindings.Ability),
-            _ when track is AudioOneshotTrackAsset => ObjectPlayableOutput(Graph, track.name, SFXManager.Instance.AudioSource),
-            _ => ObjectPlayableOutput(Graph, track.name, null),
+            _ when track is HitboxTrackAsset => ObjectPlayableOutput(Graph, track, task.Config),
+            _ when track is WeaponTrailTrackAsset => ObjectPlayableOutput(Graph, track, task.Config),
+            _ when track is AbilityTrackAsset => ObjectPlayableOutput(Graph, track, task.Config),
+            _ when track is AudioOneshotTrackAsset => ObjectPlayableOutputObj(Graph, track, SFXManager.Instance.AudioSource),
+            _ => ObjectPlayableOutputObj(Graph, track, null),
           };
           if (!playableOutput.IsOutputNull())
             playableOutput.SetSourcePlayable(playable, i - skippedOutputs);
@@ -491,8 +490,13 @@ public class AnimationDriver : MonoBehaviour {
     return mixer;
   }
 
-  PlayableOutput ObjectPlayableOutput(PlayableGraph graph, string name, UnityEngine.Object obj) {
-    var output = ScriptPlayableOutput.Create(graph, name);
+  PlayableOutput ObjectPlayableOutput(PlayableGraph graph, TrackAsset track, TimelineTaskConfig config) {
+    var binding = config.Bindings.FirstOrDefault(b => b.Track.GetInstanceID() == track.GetInstanceID());
+    return ObjectPlayableOutputObj(graph, track, binding.Binding);
+  }
+
+  PlayableOutput ObjectPlayableOutputObj(PlayableGraph graph, TrackAsset track, UnityEngine.Object obj) {
+    var output = ScriptPlayableOutput.Create(graph, track.name);
     output.SetUserData(obj);
     output.SetReferenceObject(obj);
     return output;
