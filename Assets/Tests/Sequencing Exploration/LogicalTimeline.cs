@@ -118,8 +118,8 @@ public class LogicalTimeline : MonoBehaviour {
   [Header("State")]
   [SerializeField] TargetDummyController Target;
   [SerializeField] float LocalTimeScale = 1;
-  [SerializeField] List<GameObject> Targets;
 
+  HashSet<GameObject> Targets = new();
   TaskScope Scope;
   AnimationLayerMixerPlayable LayerMixer;
   PlayableGraph Graph;
@@ -152,34 +152,6 @@ public class LogicalTimeline : MonoBehaviour {
     Graph.Destroy();
   }
 
-  void OnAnimatorMove() {
-    var dp = Animator.deltaPosition;
-    // move to target
-    if (Phase == AttackPhase.Windup) {
-      var phaseDuration = PhaseEndFrame-PhaseStartFrame;
-      var phaseFraction = Mathf.InverseLerp(PhaseStartFrame, PhaseEndFrame, AttackFrame);
-      var remainingFrames = PhaseEndFrame-AttackFrame+1;
-      var toTarget = Target.transform.position-transform.position;
-      var idealPosition = Target.transform.position-toTarget.normalized * IdealStrikeDistance;
-      var toIdealPosition = idealPosition-transform.position;
-      var toIdealPositionDelta = toIdealPosition / remainingFrames;
-      dp = Vector3.Lerp(dp, toIdealPosition, phaseFraction);
-    }
-    // turn to target
-    if (Phase == AttackPhase.Windup) {
-      var phaseDuration = PhaseEndFrame-PhaseStartFrame;
-      var phaseFraction = Mathf.InverseLerp(PhaseStartFrame, PhaseEndFrame, AttackFrame);
-      var remainingFrames = PhaseEndFrame-AttackFrame+1;
-      var toTarget = Target.transform.position-transform.position;
-      var desiredRotation = Quaternion.LookRotation(toTarget.normalized, transform.up);
-      transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, phaseFraction);
-    }
-    if (Phase != AttackPhase.None) {
-      Targets.ForEach(target => target.SendMessage("OnSynchronizedMove", dp));
-    }
-    Controller.Move(dp);
-  }
-
   void FixedUpdate() {
     var dt = LocalTimeScale * Time.fixedDeltaTime;
     var movementInput = InputManager.Axis(AxisCode.AxisLeft);
@@ -207,34 +179,54 @@ public class LogicalTimeline : MonoBehaviour {
     FixedTick.Fire();
   }
 
-  void OnHit(MeleeContact contact) {
-    var hurtbox = contact.Hurtbox;
-    if (!Targets.Contains(hurtbox.Owner)) {
-      Targets.Add(hurtbox.Owner);
+  void OnAnimatorMove() {
+    var dp = Animator.deltaPosition;
+    // move to target
+    if (Phase == AttackPhase.Windup) {
+      var phaseDuration = PhaseEndFrame-PhaseStartFrame;
+      var phaseFraction = Mathf.InverseLerp(PhaseStartFrame, PhaseEndFrame, AttackFrame);
+      var remainingFrames = PhaseEndFrame-AttackFrame+1;
+      var toTarget = Target.transform.position-transform.position;
+      var idealPosition = Target.transform.position-toTarget.normalized * IdealStrikeDistance;
+      var toIdealPosition = idealPosition-transform.position;
+      var toIdealPositionDelta = toIdealPosition / remainingFrames;
+      dp = Vector3.Lerp(dp, toIdealPosition, phaseFraction);
     }
-    Destroy(Instantiate(OnHitVFX, hurtbox.transform.position + Vector3.up, transform.rotation), 3);
+    // turn to target
+    if (Phase == AttackPhase.Windup) {
+      var phaseDuration = PhaseEndFrame-PhaseStartFrame;
+      var phaseFraction = Mathf.InverseLerp(PhaseStartFrame, PhaseEndFrame, AttackFrame);
+      var remainingFrames = PhaseEndFrame-AttackFrame+1;
+      var toTarget = Target.transform.position-transform.position;
+      var desiredRotation = Quaternion.LookRotation(toTarget.normalized, transform.up);
+      transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, phaseFraction);
+    }
+    if (Phase != AttackPhase.None) {
+      foreach (var target in Targets) {
+        target.SendMessage("OnSynchronizedMove", dp);
+      }
+    }
+    Controller.Move(dp);
+  }
+
+  void OnHit(MeleeContact contact) {
+    Targets.Add(contact.Hurtbox.Owner);
+    Destroy(Instantiate(OnHitVFX, contact.Hurtbox.transform.position + Vector3.up, transform.rotation), 3);
     Vibrator.VibrateOnHit(transform.forward, Hitbox.HitStopDuration.Ticks);
     HitStopFramesRemaining = Hitbox.HitStopDuration.Ticks;
     HitboxStillActive = false;
-    Debug.Log("Hit");
   }
 
   void OnBlocked(MeleeContact contact) {
-    var hurtbox = contact.Hurtbox;
-    if (!Targets.Contains(hurtbox.Owner)) {
-      Targets.Add(hurtbox.Owner);
-    }
-    Destroy(Instantiate(OnHitVFX, hurtbox.transform.position + Vector3.up, transform.rotation), 3);
+    Targets.Add(contact.Hurtbox.Owner);
+    Destroy(Instantiate(OnHitVFX, contact.Hurtbox.transform.position + Vector3.up, transform.rotation), 3);
     Vibrator.VibrateOnHit(transform.forward, Hitbox.HitStopDuration.Ticks / 2);
     HitStopFramesRemaining = Hitbox.HitStopDuration.Ticks / 2;
     HitboxStillActive = false;
-    Debug.Log("Block");
   }
 
   void OnParried(MeleeContact contact) {
-    Debug.Log($"FRAME {FixedFrame} PHASE {Phase}");
-    var hurtbox = contact.Hurtbox;
-    Destroy(Instantiate(OnHitVFX, hurtbox.transform.position + Vector3.up, transform.rotation), 3);
+    Destroy(Instantiate(OnHitVFX, contact.Hurtbox.transform.position + Vector3.up, transform.rotation), 3);
     Vibrator.VibrateOnHurt(transform.forward, Hitbox.HitStopDuration.Ticks * 2);
     HitStopFramesRemaining = Hitbox.HitStopDuration.Ticks * 2;
     HitboxStillActive = false;
@@ -256,15 +248,6 @@ public class LogicalTimeline : MonoBehaviour {
     return null;
   }
 
-  /*
-  Initialization:
-
-    Set the AttackPhase
-    Setup the Animation playback
-
-    Every frame:
-      GetValue from each track and perform action with it
-  */
   async Task Attack(TaskScope scope) {
     var playable = AnimationClipPlayable.Create(Graph, Clip);
     playable.SetSpeed(AnimationSpeed);
