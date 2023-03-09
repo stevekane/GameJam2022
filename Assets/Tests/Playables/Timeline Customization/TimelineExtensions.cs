@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Timeline;
 
 public static class TimelineExtensions {
@@ -13,5 +14,14 @@ public static class TimelineExtensions {
         }
       }
     }
+  }
+
+  public static int TickDuration(
+  this TimelineAsset timelineAsset,
+  int ticksPerSecond) {
+    var seconds = timelineAsset.durationMode == TimelineAsset.DurationMode.BasedOnClips
+      ? timelineAsset.duration
+      : timelineAsset.fixedDuration;
+    return Mathf.RoundToInt((float)seconds * ticksPerSecond);
   }
 }

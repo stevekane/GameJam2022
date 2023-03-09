@@ -21,12 +21,6 @@ public class WeaponTrailTrack {
   public List<Clip> Clips;
 }
 
-public enum HitDirection {
-  Forward,
-  Left,
-  Right,
-}
-
 [Serializable]
 public struct HitboxClip : IEquatable<HitboxClip> {
   public int StartFrame;
@@ -114,6 +108,7 @@ public class LogicalTimeline : MonoBehaviour {
   [SerializeField] WeaponTrail WeaponTrail;
   [SerializeField] Hitbox Hitbox;
   [SerializeField] Vibrator Vibrator;
+  [SerializeField] MeleeAttackAbility ThreeHitComboAbility;
 
   [Header("State")]
   [SerializeField] TargetDummyController Target;
@@ -121,8 +116,9 @@ public class LogicalTimeline : MonoBehaviour {
 
   HashSet<GameObject> Targets = new();
   TaskScope Scope;
-  AnimationLayerMixerPlayable LayerMixer;
-  PlayableGraph Graph;
+
+  public AnimationLayerMixerPlayable LayerMixer;
+  public PlayableGraph Graph;
 
   public int HitStopFramesRemaining;
   public bool HitboxStillActive = true;
@@ -142,8 +138,8 @@ public class LogicalTimeline : MonoBehaviour {
     LayerMixer = AnimationLayerMixerPlayable.Create(Graph);
     LayerMixer.SetInputCount(2);
     LayerMixer.ConnectInput(0, animController, 0, 1);
-    var output = AnimationPlayableOutput.Create(Graph, "Animation", Animator);
-    output.SetSourcePlayable(LayerMixer);
+    // var output = AnimationPlayableOutput.Create(Graph, "Animation", Animator);
+    // output.SetSourcePlayable(LayerMixer);
   }
 
   void OnDestroy() {
@@ -213,7 +209,7 @@ public class LogicalTimeline : MonoBehaviour {
     Targets.Add(contact.Hurtbox.Owner);
     Destroy(Instantiate(OnHitVFX, contact.Hurtbox.transform.position + Vector3.up, transform.rotation), 3);
     Vibrator.VibrateOnHit(transform.forward, Hitbox.HitStopDuration.Ticks);
-    HitStopFramesRemaining = Hitbox.HitStopDuration.Ticks;
+    HitStopFramesRemaining = contact.Hitbox.HitStopDuration.Ticks;
     HitboxStillActive = false;
   }
 
@@ -221,14 +217,14 @@ public class LogicalTimeline : MonoBehaviour {
     Targets.Add(contact.Hurtbox.Owner);
     Destroy(Instantiate(OnHitVFX, contact.Hurtbox.transform.position + Vector3.up, transform.rotation), 3);
     Vibrator.VibrateOnHit(transform.forward, Hitbox.HitStopDuration.Ticks / 2);
-    HitStopFramesRemaining = Hitbox.HitStopDuration.Ticks / 2;
+    HitStopFramesRemaining = contact.Hitbox.HitStopDuration.Ticks / 2;
     HitboxStillActive = false;
   }
 
   void OnParried(MeleeContact contact) {
     Destroy(Instantiate(OnHitVFX, contact.Hurtbox.transform.position + Vector3.up, transform.rotation), 3);
     Vibrator.VibrateOnHurt(transform.forward, Hitbox.HitStopDuration.Ticks * 2);
-    HitStopFramesRemaining = Hitbox.HitStopDuration.Ticks * 2;
+    HitStopFramesRemaining = contact.Hitbox.HitStopDuration.Ticks * 2;
     HitboxStillActive = false;
     Scope.Dispose();
     Scope = new();
@@ -237,7 +233,7 @@ public class LogicalTimeline : MonoBehaviour {
 
   void StartAttack() {
     InputManager.Consume(ButtonCode.West, ButtonPressType.JustDown);
-    Scope.Start(Attack);
+    Scope.Start(ThreeHitComboAbility.Attack);
   }
 
   public T? FirstFound<T>(IEnumerable<T> ts, Predicate<T> predicate) where T : struct {
@@ -246,6 +242,16 @@ public class LogicalTimeline : MonoBehaviour {
         return t;
     }
     return null;
+  }
+
+  public void Connect(Playable playable, int outputIndex) {
+    LayerMixer.DisconnectInput(1);
+    LayerMixer.ConnectInput(1, playable, outputIndex, 1);
+  }
+
+  public void Disconnect() {
+    LayerMixer.DisconnectInput(1);
+    LayerMixer.SetInputWeight(1, 0);
   }
 
   async Task Attack(TaskScope scope) {
