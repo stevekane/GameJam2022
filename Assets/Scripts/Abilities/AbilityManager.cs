@@ -88,7 +88,6 @@ public class AbilityManager : MonoBehaviour {
     var ability = (Ability)method.Target;
     var trigger = ability.GetTriggerCondition(method);
     Debug.Assert(CanInvoke(method), $"{ability} event fired when it shouldn't - all code paths should have checked ShouldFire");
-    GetEvent(method).Fire();
     if (trigger.Tags.HasAllFlags(AbilityTag.CancelOthers)) {
       //Debug.Log($"{ability}.{method.Method.Name} starting, will cancel <{string.Join(",", Cancellable)}>");
       CancelAbilities();

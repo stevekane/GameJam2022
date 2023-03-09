@@ -12,7 +12,6 @@ public class TriggerCondition {
   public AbilityTag Tags = 0;
   public AbilityTag RequiredOwnerTags = 0;
   public float EnergyCost = 0f;
-  public HashSet<AttributeTag> RequiredOwnerAttribs = new();
 }
 
 [Serializable]
@@ -47,9 +46,10 @@ public abstract class Ability : MonoBehaviour {
   }
   public async Task TaskRunner(TaskScope scope, AbilityMethod func) {
     try {
-      var trigger = TriggerConditionsMap[func];
+      var trigger = TriggerConditionsMap.GetValueOrDefault(func) ?? TriggerCondition.Empty;
       Tags.AddFlags(trigger.Tags);
       scope.ThrowIfCancelled();
+      AbilityManager.GetEvent(func).Fire();
       if (func(scope) is var task && task != null) { // Can return null if used only as a key for the event.
         // Well this is hella specific. Is there a more general way to handle this?
         var uninterruptible = trigger.Tags.HasFlag(AbilityTag.Uninterruptible);
@@ -76,7 +76,7 @@ public abstract class Ability : MonoBehaviour {
   }
   public void Awake() {
     TriggerConditionsMap[MainAction] = TriggerConditions.Count > 0 ? TriggerConditions[0] : new();
-    TriggerConditionsMap[MainRelease] = new();  // TODO: input buffering breaks unless we always consume release events
+    TriggerConditionsMap[MainRelease] = TriggerCondition.Empty;  // TODO: input buffering breaks unless we always consume release events
     //TriggerConditionsMap[MainRelease] = TriggerCondition.BlockIfNotRunning;
     MainScope = new();
   }
