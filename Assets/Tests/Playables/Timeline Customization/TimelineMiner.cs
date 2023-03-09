@@ -98,7 +98,6 @@ public class TimelineMiner : MonoBehaviour {
   PlayableGraph FixedGraph;
   AnimationMixerPlayable AnimationMixer;
   AnimationPlayableOutput AnimationOutput;
-  ScriptPlayable<HitboxOutputMixer> HitboxMixer;
   ScriptPlayableOutput HitboxOutput;
   ScriptPlayable<WeaponTrailOutputMixer> WeaponTrailMixer;
   ScriptPlayableOutput WeaponTrailOutput;
@@ -118,10 +117,8 @@ public class TimelineMiner : MonoBehaviour {
     AnimationMixer = AnimationMixerPlayable.Create(FixedGraph);
     AnimationOutput = AnimationPlayableOutput.Create(FixedGraph, "Animator", Animator);
     AnimationOutput.SetSourcePlayable(AnimationMixer);
-    HitboxMixer = ScriptPlayable<HitboxOutputMixer>.Create(FixedGraph);
     HitboxOutput = ScriptPlayableOutput.Create(FixedGraph, "Hitbox");
     HitboxOutput.SetUserData(Hitbox);
-    HitboxOutput.SetSourcePlayable(HitboxMixer);
     WeaponTrailMixer = ScriptPlayable<WeaponTrailOutputMixer>.Create(FixedGraph);
     WeaponTrailOutput = ScriptPlayableOutput.Create(FixedGraph, "WeaponTrail");
     WeaponTrailOutput.SetUserData(WeaponTrail);
@@ -171,8 +168,6 @@ public class TimelineMiner : MonoBehaviour {
         var type = output.outputTargetType;
         if (type == typeof(Animator)) {
           AnimationMixer.AddInput(fixedTimeline, port, 1);
-        } else if (type == typeof(Collider)) {
-          HitboxMixer.AddInput(fixedTimeline, port, 1);
         } else if (type == typeof(WeaponTrail)) {
           WeaponTrailMixer.AddInput(fixedTimeline, port, 1);
         }
