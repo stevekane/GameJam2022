@@ -1,10 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Playables;
-using UnityEngine.Animations;
 
 public class LogicalTimeline : MonoBehaviour {
   public static int FixedFrame;
@@ -40,7 +36,6 @@ public class LogicalTimeline : MonoBehaviour {
   HashSet<GameObject> Targets = new();
   TaskScope Scope;
 
-  public AnimationLayerMixerPlayable LayerMixer;
   public PlayableGraph Graph;
 
   public int HitStopFramesRemaining;
@@ -56,12 +51,6 @@ public class LogicalTimeline : MonoBehaviour {
     Graph = PlayableGraph.Create("Logical Timeline");
     Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
     Graph.Play();
-    var animController = AnimatorControllerPlayable.Create(Graph, AnimatorController);
-    LayerMixer = AnimationLayerMixerPlayable.Create(Graph);
-    LayerMixer.SetInputCount(2);
-    LayerMixer.ConnectInput(0, animController, 0, 1);
-    // var output = AnimationPlayableOutput.Create(Graph, "Animation", Animator);
-    // output.SetSourcePlayable(LayerMixer);
   }
 
   void OnDestroy() {
@@ -148,6 +137,14 @@ public class LogicalTimeline : MonoBehaviour {
     Vibrator.VibrateOnHurt(transform.forward, Hitbox.HitboxParams.HitStopDuration.Ticks * 2);
     HitStopFramesRemaining = contact.Hitbox.HitboxParams.HitStopDuration.Ticks * 2;
     HitboxStillActive = false;
+    // TODO: I believe the OnPlayableDestroy hook needs to be used on the AnimatorGraph
+    // behavior to stop the animation playing on the remote graph as well...
+    // I'm not entirely sure though
+    // TODO: Currently, when you hit the target dummy, there seems to be some delay
+    // introduced that causes the AnimationGraph to hold onto its animation while
+    // the Timeline is cleaned up after concluding.
+    // I think the AnimationGraph may need to be updated somehow respecting LocalTimeScale?
+    // This needs to be investigated with fresh eyes
     Scope.Dispose();
     Scope = new();
     Animator.SetTrigger("Parried");
@@ -156,24 +153,6 @@ public class LogicalTimeline : MonoBehaviour {
   void StartAttack() {
     InputManager.Consume(ButtonCode.West, ButtonPressType.JustDown);
     Scope.Start(ThreeHitComboAbility.Attack);
-  }
-
-  public T? FirstFound<T>(IEnumerable<T> ts, Predicate<T> predicate) where T : struct {
-    foreach (var t in ts) {
-      if (predicate(t))
-        return t;
-    }
-    return null;
-  }
-
-  public void Connect(Playable playable, int outputIndex) {
-    LayerMixer.DisconnectInput(1);
-    LayerMixer.ConnectInput(1, playable, outputIndex, 1);
-  }
-
-  public void Disconnect() {
-    LayerMixer.DisconnectInput(1);
-    LayerMixer.SetInputWeight(1, 0);
   }
 
   float BlendWeight(float blendInFraction, float blendOutFraction, float fraction) {

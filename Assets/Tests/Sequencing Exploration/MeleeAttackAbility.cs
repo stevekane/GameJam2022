@@ -18,7 +18,6 @@ public class MeleeAttackAbility : MonoBehaviour {
     var tracks = bindings.Select(binding => binding.Track);
     var timeline = TimelinePlayable.Create(graph, tracks, gameObject, false, false);
     var outputs = new List<PlayableOutput>(bindings.Length);
-    var duration = TimelineTaskConfig.Asset.TickDuration(Timeval.FixedUpdatePerSecond);
     timeline.SetDuration(TimelineTaskConfig.Asset.duration); // TODO: not sure if correct. depends on durationmode
     timeline.SetTime(0);
     timeline.SetOutputCount(timeline.GetInputCount());
@@ -31,13 +30,10 @@ public class MeleeAttackAbility : MonoBehaviour {
       outputs.Add(output);
     }
     try {
-      for (var i = 0; i <= duration; i++) {
-        await scope.ListenFor(LogicalTimeline.FixedTick);
-      }
+      await scope.Until(() => timeline.IsDone());
     } catch (Exception e) {
       Debug.LogWarning($"MeleeAttackAbility caught {e.Message}");
     } finally {
-      LogicalTimeline.Disconnect();
       outputs.ForEach(graph.DestroyOutput);
       graph.DestroySubgraph(timeline);
     }
