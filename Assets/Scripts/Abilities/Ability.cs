@@ -53,7 +53,11 @@ public abstract class Ability : MonoBehaviour {
         // Well this is hella specific. Is there a more general way to handle this?
         var uninterruptible = trigger.Tags.HasFlag(AbilityTag.Uninterruptible);
         using var uninterruptibleEffect = uninterruptible ? Status.Add(new UninterruptibleEffect()) : null;
-        await task;
+        if (task.IsFaulted) {
+          throw task.Exception; // Not sure why this sometimes doesn't happen simply by awaiting the task.
+        } else {
+          await task;
+        }
       }
     } catch (OperationCanceledException) {
     } finally {
