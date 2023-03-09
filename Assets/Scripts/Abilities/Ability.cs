@@ -24,8 +24,7 @@ public abstract class Ability : MonoBehaviour {
   public Attributes Attributes => Character?.Attributes;
   public Status Status => Character?.Status;
   public Mover Mover => Character?.Mover;
-  public List<TriggerCondition> TriggerConditions = new();
-  Dictionary<AbilityMethod, TriggerCondition> TriggerConditionsMap = new();
+  public TriggerCondition TriggerCondition = new();
   [HideInInspector] protected AbilityTag Tags;  // Inherited from the Trigger when started
   TaskScope MainScope = new();
   List<AbilityMethod> ActiveTasks = new();  // TODO(Task): could just be a refcount instead?
@@ -46,7 +45,7 @@ public abstract class Ability : MonoBehaviour {
   }
   public async Task TaskRunner(TaskScope scope, AbilityMethod func) {
     try {
-      var trigger = TriggerConditionsMap.GetValueOrDefault(func) ?? TriggerCondition.Empty;
+      var trigger = GetTriggerCondition(func);
       Tags.AddFlags(trigger.Tags);
       scope.ThrowIfCancelled();
       AbilityManager.GetEvent(func).Fire();
@@ -68,16 +67,11 @@ public abstract class Ability : MonoBehaviour {
   public virtual Task MainAction(TaskScope scope) => null;
   public virtual Task MainRelease(TaskScope scope) => null;
   public void SetCancellable() => Tags.AddFlags(AbilityTag.Cancellable);
-  public TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerConditionsMap.GetValueOrDefault(method, TriggerCondition.Empty);
+  public TriggerCondition GetTriggerCondition(AbilityMethod method) =>
+      method == MainAction ? TriggerCondition : TriggerCondition.Empty;
   public void Stop() {
     Tags = 0;
     MainScope.Dispose();
-    MainScope = new();
-  }
-  public void Awake() {
-    TriggerConditionsMap[MainAction] = TriggerConditions.Count > 0 ? TriggerConditions[0] : new();
-    TriggerConditionsMap[MainRelease] = TriggerCondition.Empty;  // TODO: input buffering breaks unless we always consume release events
-    //TriggerConditionsMap[MainRelease] = TriggerCondition.BlockIfNotRunning;
     MainScope = new();
   }
   public void OnDestroy() => Stop();
