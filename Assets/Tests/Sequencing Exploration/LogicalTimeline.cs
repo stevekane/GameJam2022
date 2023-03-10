@@ -10,9 +10,6 @@ public class LogicalTimeline : MonoBehaviour {
   [SerializeField] InputManager InputManager;
   [SerializeField] float MovementSpeed = 10;
 
-  [Header("Animation")]
-  [SerializeField] RuntimeAnimatorController AnimatorController;
-
   [Header("Visual Effects")]
   [SerializeField] GameObject OnHitVFX;
 
@@ -24,20 +21,18 @@ public class LogicalTimeline : MonoBehaviour {
   [SerializeField] CharacterController Controller;
   [SerializeField] Animator Animator;
   [SerializeField] AudioSource AudioSource;
-  [SerializeField] WeaponTrail WeaponTrail;
-  [SerializeField] Hitbox Hitbox;
   [SerializeField] Vibrator Vibrator;
   [SerializeField] MeleeAttackAbility ThreeHitComboAbility;
 
   [Header("State")]
   [SerializeField] TargetDummyController Target;
-  [SerializeField] float LocalTimeScale = 1;
 
   HashSet<GameObject> Targets = new();
   TaskScope Scope;
 
   public PlayableGraph Graph;
 
+  public float LocalTimeScale = 1;
   public int HitStopFramesRemaining;
   public bool HitboxStillActive = true;
   public int PhaseStartFrame;
@@ -119,7 +114,7 @@ public class LogicalTimeline : MonoBehaviour {
   void OnHit(MeleeContact contact) {
     Targets.Add(contact.Hurtbox.Owner);
     Destroy(Instantiate(OnHitVFX, contact.Hurtbox.transform.position + Vector3.up, transform.rotation), 3);
-    Vibrator.VibrateOnHit(transform.forward, Hitbox.HitboxParams.HitStopDuration.Ticks);
+    Vibrator.VibrateOnHit(transform.forward, contact.Hitbox.HitboxParams.HitStopDuration.Ticks);
     HitStopFramesRemaining = contact.Hitbox.HitboxParams.HitStopDuration.Ticks;
     HitboxStillActive = false;
   }
@@ -127,24 +122,19 @@ public class LogicalTimeline : MonoBehaviour {
   void OnBlocked(MeleeContact contact) {
     Targets.Add(contact.Hurtbox.Owner);
     Destroy(Instantiate(OnHitVFX, contact.Hurtbox.transform.position + Vector3.up, transform.rotation), 3);
-    Vibrator.VibrateOnHit(transform.forward, Hitbox.HitboxParams.HitStopDuration.Ticks / 2);
+    Vibrator.VibrateOnHit(transform.forward, contact.Hitbox.HitboxParams.HitStopDuration.Ticks / 2);
     HitStopFramesRemaining = contact.Hitbox.HitboxParams.HitStopDuration.Ticks / 2;
     HitboxStillActive = false;
   }
 
   void OnParried(MeleeContact contact) {
     Destroy(Instantiate(OnHitVFX, contact.Hurtbox.transform.position + Vector3.up, transform.rotation), 3);
-    Vibrator.VibrateOnHurt(transform.forward, Hitbox.HitboxParams.HitStopDuration.Ticks * 2);
+    Vibrator.VibrateOnHurt(transform.forward, contact.Hitbox.HitboxParams.HitStopDuration.Ticks * 2);
     HitStopFramesRemaining = contact.Hitbox.HitboxParams.HitStopDuration.Ticks * 2;
     HitboxStillActive = false;
     // TODO: I believe the OnPlayableDestroy hook needs to be used on the AnimatorGraph
     // behavior to stop the animation playing on the remote graph as well...
     // I'm not entirely sure though
-    // TODO: Currently, when you hit the target dummy, there seems to be some delay
-    // introduced that causes the AnimationGraph to hold onto its animation while
-    // the Timeline is cleaned up after concluding.
-    // I think the AnimationGraph may need to be updated somehow respecting LocalTimeScale?
-    // This needs to be investigated with fresh eyes
     Scope.Dispose();
     Scope = new();
     Animator.SetTrigger("Parried");

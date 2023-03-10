@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Animations;
@@ -139,7 +138,6 @@ public class TargetDummyController : MonoBehaviour {
     };
     AudioSource.PlayOneShot(sfx);
     Velocity += -transform.forward * hitbox.HitboxParams.KnockbackStrength;
-    Debug.Log(Velocity);
   }
 
   void OnParry(MeleeContact contact) {

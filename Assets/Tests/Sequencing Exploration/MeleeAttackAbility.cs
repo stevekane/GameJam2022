@@ -15,16 +15,18 @@ public class MeleeAttackAbility : MonoBehaviour {
   public async Task Attack(TaskScope scope) {
     var graph = LogicalTimeline.Graph;
     var bindings = TimelineTaskConfig.Bindings;
-    var tracks = bindings.Select(binding => binding.Track);
+    var tracks = bindings.Select(binding => binding.Track).Where(track => !track.muted);
     var timeline = TimelinePlayable.Create(graph, tracks, gameObject, false, false);
     var outputs = new List<PlayableOutput>(bindings.Length);
-    timeline.SetDuration(TimelineTaskConfig.Asset.duration); // TODO: not sure if correct. depends on durationmode
+    var duration = TimelineTaskConfig.Asset.duration;
+    timeline.SetDuration(duration);
     timeline.SetTime(0);
     timeline.SetOutputCount(timeline.GetInputCount());
     foreach (var (track, port) in tracks.WithIndex()) {
-      var playable = timeline.GetInput(port);
+      var trackMixer = timeline.GetInput(port);
       var binding = bindings[port];
       var output = ScriptPlayableOutput.Create(graph, track.name);
+      trackMixer.SetDuration(duration);
       output.SetUserData(binding.Binding);
       output.SetSourcePlayable(timeline, port);
       outputs.Add(output);

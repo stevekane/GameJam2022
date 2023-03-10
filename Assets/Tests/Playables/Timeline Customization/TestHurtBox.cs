@@ -14,7 +14,10 @@ public class TestHurtBox : MonoBehaviour {
 
   void OnTriggerEnter(Collider collider) {
     if (collider.TryGetComponent(out Hitbox hitbox)) {
-      Owner?.SendMessage("OnContact", new MeleeContact(hitbox, this));
+      if (!hitbox.Targets.Contains(gameObject)) {
+        hitbox.Targets.Add(gameObject);
+        Owner?.SendMessage("OnContact", new MeleeContact(hitbox, this));
+      }
     }
   }
 }

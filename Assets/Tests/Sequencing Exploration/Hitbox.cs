@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum HitDirection {
@@ -19,4 +20,5 @@ public class Hitbox : MonoBehaviour {
   public GameObject Owner;
   public Collider Collider;
   public HitboxParams HitboxParams;
+  public List<GameObject> Targets = new();
 }

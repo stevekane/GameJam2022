@@ -11,8 +11,8 @@ public class HitBoxTrackMixer : PlayableBehaviour {
     hitbox.Collider.enabled = false;
     for (var i = 0; i < inputCount; i++) {
       if (playable.GetInputWeight(i) > 0) {
-        var clip = (ScriptPlayable<HitboxClipBehavior>)playable.GetInput(i);
-        var behavior = clip.GetBehaviour();
+        var clipPlayable = (ScriptPlayable<HitboxClipBehavior>)playable.GetInput(i);
+        var behavior = clipPlayable.GetBehaviour();
         hitbox.Collider.enabled = true;
         hitbox.HitboxParams = behavior.HitboxParams;
       }

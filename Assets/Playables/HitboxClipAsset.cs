@@ -1,8 +1,18 @@
 using UnityEngine;
 using UnityEngine.Playables;
 
-public class HitboxClipBehavior : PlayableBehaviour {
+public class HitboxClipBehavior : TaskBehavior {
   public HitboxParams HitboxParams;
+
+  public override void Setup(Playable playable) {
+    var hitbox = (Hitbox)UserData;
+    hitbox.Targets.Clear();
+  }
+
+  public override void Cleanup(Playable playable) {
+    var hitbox = (Hitbox)UserData;
+    hitbox.Targets.Clear();
+  }
 }
 
 public class HitboxClipAsset : PlayableAsset {

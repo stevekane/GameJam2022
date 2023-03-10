@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
-public class AnimatorGraphClipBehavior : PlayableBehaviour {
+public class AnimatorGraphClipBehavior : TaskBehavior {
   public AnimationClip Clip;
 }
 
