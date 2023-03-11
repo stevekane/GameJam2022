@@ -90,6 +90,8 @@ public class LogicalTimeline : MonoBehaviour {
   }
 
   void StartAttack() {
+    Scope.Dispose();
+    Scope = new();
     InputManager.Consume(ButtonCode.West, ButtonPressType.JustDown);
     Scope.Start(ThreeHitComboAbility.Attack);
   }
