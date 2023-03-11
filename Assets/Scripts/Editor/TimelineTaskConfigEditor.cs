@@ -16,7 +16,12 @@ public class TimelineTaskConfigConfigDrawer : PropertyDrawer {
   void EnsureTracksMatchAsset(SerializedProperty property) {
     var config = (TimelineTaskConfig)property.boxedValue;
     var asset = config.Asset;
-    var realBindings = asset.GetOutputTracks().Select(t => new TimelineTrackBinding { Track = t }).ToArray();
+    if (asset == null)
+      return;
+    var realBindings = asset.GetOutputTracks()
+      .Where(t => !t.isEmpty)
+      .Select(t => new TimelineTrackBinding { Track = t })
+      .ToArray();
     var missingTrack = false;
     for (int i = 0; i < realBindings.Length; i++) {
       var configIdx = Array.FindIndex(config.Bindings, c => c.Track?.GetInstanceID() == realBindings[i].Track.GetInstanceID());

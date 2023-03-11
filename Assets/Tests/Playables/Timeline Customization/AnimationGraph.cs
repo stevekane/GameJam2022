@@ -5,7 +5,6 @@ using UnityEngine.Timeline;
 
 public class AnimationGraph : MonoBehaviour {
   [SerializeField] Animator Animator;
-  [SerializeField] AnimationClip AnimationClip;
 
   PlayableGraph Graph;
   ScriptPlayable<TimelinePlayable> CurrentTimeline;

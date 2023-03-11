@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Animations;
@@ -121,36 +120,36 @@ public class TargetDummyController : MonoBehaviour {
     var hitbox = contact.Hitbox;
     var toAttacker = hitbox.Owner.transform.position-transform.position;
     transform.rotation = Quaternion.LookRotation(toAttacker, transform.up);
-    CameraShaker.Instance.Shake(hitbox.CameraShakeIntensity);
-    HitStopFramesRemaining = hitbox.HitStopDuration.Ticks;
+    CameraShaker.Instance.Shake(hitbox.HitboxParams.CameraShakeIntensity);
+    HitStopFramesRemaining = hitbox.HitboxParams.HitStopDuration.Ticks;
     SimpleFlash.FlashColor = HurtFlashColor;
     SimpleFlash.TicksRemaining = 20;
-    Destroy(DirectionalVFX(transform, OnHurtVFX, hitbox.HitDirection), 3);
-    Vibrator.VibrateOnHurt(DirectionalVibration(transform, hitbox.HitDirection), hitbox.HitStopDuration.Ticks);
-    Animator.SetTrigger(hitbox.HitDirection switch {
+    Destroy(DirectionalVFX(transform, OnHurtVFX, hitbox.HitboxParams.HitDirection), 3);
+    Vibrator.VibrateOnHurt(DirectionalVibration(transform, hitbox.HitboxParams.HitDirection), hitbox.HitboxParams.HitStopDuration.Ticks);
+    Animator.SetTrigger(hitbox.HitboxParams.HitDirection switch {
       HitDirection.Left => "HurtLeft",
       HitDirection.Right => "HurtRight",
       _ => "HurtForward"
     });
-    var sfx = hitbox.HitDirection switch {
+    var sfx = hitbox.HitboxParams.HitDirection switch {
       HitDirection.Left => HurtLeftSFX,
       HitDirection.Right => HurtRightSFX,
       _ => HurtForwardSFX
     };
     AudioSource.PlayOneShot(sfx);
-    Velocity += -transform.forward * hitbox.KnockbackStrength;
+    Velocity += -transform.forward * hitbox.HitboxParams.KnockbackStrength;
   }
 
   void OnParry(MeleeContact contact) {
     var hitbox = contact.Hitbox;
     var toAttacker = hitbox.Owner.transform.position-transform.position;
     transform.rotation = Quaternion.LookRotation(toAttacker, transform.up);
-    CameraShaker.Instance.Shake(hitbox.CameraShakeIntensity);
-    HitStopFramesRemaining = hitbox.HitStopDuration.Ticks * 2;
+    CameraShaker.Instance.Shake(hitbox.HitboxParams.CameraShakeIntensity);
+    HitStopFramesRemaining = hitbox.HitboxParams.HitStopDuration.Ticks * 2;
     SimpleFlash.FlashColor = ParryFlashColor;
     SimpleFlash.TicksRemaining = 20;
-    Destroy(DirectionalVFX(transform, OnParryVFX, hitbox.HitDirection), 3);
-    Vibrator.VibrateOnHurt(DirectionalVibration(transform, hitbox.HitDirection), hitbox.HitStopDuration.Ticks);
+    Destroy(DirectionalVFX(transform, OnParryVFX, hitbox.HitboxParams.HitDirection), 3);
+    Vibrator.VibrateOnHurt(DirectionalVibration(transform, hitbox.HitboxParams.HitDirection), hitbox.HitboxParams.HitStopDuration.Ticks);
     // Animator.SetTrigger("Parry");
     AudioSource.PlayOneShot(ParrySFX);
   }
@@ -159,12 +158,12 @@ public class TargetDummyController : MonoBehaviour {
     var hitbox = contact.Hitbox;
     var toAttacker = hitbox.Owner.transform.position-transform.position;
     transform.rotation = Quaternion.LookRotation(toAttacker, transform.up);
-    CameraShaker.Instance.Shake(hitbox.CameraShakeIntensity / 2);
-    HitStopFramesRemaining = hitbox.HitStopDuration.Ticks / 2;
+    CameraShaker.Instance.Shake(hitbox.HitboxParams.CameraShakeIntensity / 2);
+    HitStopFramesRemaining = hitbox.HitboxParams.HitStopDuration.Ticks / 2;
     SimpleFlash.FlashColor = BlockFlashColor;
     SimpleFlash.TicksRemaining = 20;
-    Destroy(DirectionalVFX(transform, OnBlockVFX, hitbox.HitDirection), 3);
-    Vibrator.VibrateOnHurt(DirectionalVibration(transform, hitbox.HitDirection), hitbox.HitStopDuration.Ticks);
+    Destroy(DirectionalVFX(transform, OnBlockVFX, hitbox.HitboxParams.HitDirection), 3);
+    Vibrator.VibrateOnHurt(DirectionalVibration(transform, hitbox.HitboxParams.HitDirection), hitbox.HitboxParams.HitStopDuration.Ticks);
     Animator.SetTrigger("Block");
     AudioSource.PlayOneShot(BlockSFX);
   }
