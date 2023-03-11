@@ -2,8 +2,20 @@ using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEngine.Playables;
 
-public class AnimatorGraphTrackBehavior : PlayableBehaviour {
+public class AnimatorGraphTrackBehavior : TaskBehavior {
+  /*
+  TODO:
+
+  I don't think the mixer should be doing this work. I think it'd make more sense
+  to move this logic to the clips and make use of Setup/Cleanup to ensure that
+  any running clip is appropriately disconnected from the AnimatorGraph.
+
+  1. Use OnPlayableDestroy to see if we can disconnect correctly.
+  2. Use TaskBehavior to use Cleanup to disconnect
+  3. Move this logic to the clips?
+  */
   public override void ProcessFrame(Playable playable, FrameData info, object playerData) {
+    base.ProcessFrame(playable, info, playerData);
     var animatorGraph = playerData as AnimatorGraph;
     var inputCount = playable.GetInputCount();
     var activeClip = Playable.Null;
@@ -25,6 +37,11 @@ public class AnimatorGraphTrackBehavior : PlayableBehaviour {
     } else {
       animatorGraph.Disconnect();
     }
+  }
+
+  public override void Cleanup(Playable playable) {
+    var animatorGraph = (AnimatorGraph)UserData;
+    animatorGraph.Disconnect();
   }
 }
 
