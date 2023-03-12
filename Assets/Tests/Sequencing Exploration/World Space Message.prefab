@@ -197,7 +197,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6464981004119939749}
-  m_LocalRotation: {x: 0.5, y: 1.6284528e-30, z: -9.4018775e-31, w: 0.8660254}
+  m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
   m_LocalPosition: {x: 0, y: 2.25, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -230,11 +230,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e02f304ba60bb5b4289aa5f5a9851506, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AlphaSmoothing: 0.25
+  AlphaSmoothing: 0.05
   VelocitySmoothing: 0.25
-  InitialSpeed: 5
-  Duration:
-    Millis: 500
-    FramesPerSecond: 60
-  Velocity: {x: 0, y: 0, z: 0}
+  VelocityDamping: 0.99
+  TargetVelocity: {x: 0, y: 1, z: 0}
   Text: {fileID: 6464981003033966608}
+  LocalScale: {x: 0, y: 0, z: 0}
+  LocalVelocity: {x: 0, y: 0, z: 0}

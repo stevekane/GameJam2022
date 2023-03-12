@@ -15,7 +15,7 @@ public class WorldSpaceMessageManager : MonoBehaviour {
 
   public WorldSpaceMessage SpawnMessage(string message, Vector3 position) {
     var worldSpaceMessage = Instantiate(Prefab, position, Quaternion.identity, transform);
-    worldSpaceMessage.SetMessage(message);
+    worldSpaceMessage.Message = message;
     return worldSpaceMessage;
   }
 }

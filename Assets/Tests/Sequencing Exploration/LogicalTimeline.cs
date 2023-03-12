@@ -75,8 +75,6 @@ public class LogicalTimeline : MonoBehaviour {
   }
 
   void OnHit(MeleeContact contact) {
-    var damageString = contact.Hitbox.HitboxParams.Damage.ToString();
-    WorldSpaceMessageManager.Instance.SpawnMessage(damageString, contact.Hurtbox.transform.position + 2 * Vector3.up);
     MeleeAttackTargeting.Victims.Add(contact.Hurtbox.Owner.gameObject);
     Destroy(Instantiate(OnHitVFX, contact.Hurtbox.transform.position + Vector3.up, transform.rotation), 3);
     Vibrator.VibrateOnHit(transform.forward, contact.Hitbox.HitboxParams.HitStopDuration.Ticks);

@@ -137,6 +137,15 @@ public class TargetDummyController : MonoBehaviour {
       _ => HurtForwardSFX
     };
     AudioSource.PlayOneShot(sfx);
+    var damagePosition = transform.position + 2 * Vector3.up;
+    var damageString = contact.Hitbox.HitboxParams.Damage.ToString();
+    var damageMessage = WorldSpaceMessageManager.Instance.SpawnMessage(damageString, damagePosition);
+    var damageVelocityWorldSpace = HitDirectionVector(transform, contact.Hitbox.HitboxParams.HitDirection);
+    var damageVelocityLocalSpace = Camera.main.worldToCameraMatrix * damageVelocityWorldSpace;
+    var isStrong = contact.Hitbox.HitboxParams.Damage > 100 || contact.Hitbox.HitboxParams.KnockbackStrength > 50;
+    damageMessage.LocalVelocity = damageVelocityLocalSpace * (isStrong ? 15 : 10);
+    damageMessage.LocalScale = (isStrong ? 1.5f : 1) * Vector3.one;
+    Destroy(damageMessage.gameObject, 2);
     Velocity += -transform.forward * hitbox.HitboxParams.KnockbackStrength;
   }
 
@@ -166,6 +175,14 @@ public class TargetDummyController : MonoBehaviour {
     Vibrator.VibrateOnHurt(DirectionalVibration(transform, hitbox.HitboxParams.HitDirection), hitbox.HitboxParams.HitStopDuration.Ticks);
     Animator.SetTrigger("Block");
     AudioSource.PlayOneShot(BlockSFX);
+  }
+
+  Vector3 HitDirectionVector(Transform transform, HitDirection hitDirection) {
+    return hitDirection switch {
+      HitDirection.Left => Quaternion.Euler(0, -145, 0),
+      HitDirection.Right => Quaternion.Euler(0, 145, 0),
+      _ => Quaternion.Euler(0, 180, 0)
+    } * transform.forward;
   }
 
   GameObject DirectionalVFX(Transform transform, GameObject prefab, HitDirection hitDirection) {
