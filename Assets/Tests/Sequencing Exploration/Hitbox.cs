@@ -14,6 +14,7 @@ public struct HitboxParams {
   public Timeval HitStopDuration;
   public float KnockbackStrength;
   public float CameraShakeIntensity;
+  public float Damage;
 }
 
 public class Hitbox : MonoBehaviour {
