@@ -19,12 +19,14 @@ public class TargetDummyController : MonoBehaviour {
   [SerializeField] AudioClip HurtForwardSFX;
   [SerializeField] AudioClip BlockSFX;
   [SerializeField] AudioClip ParrySFX;
+  [SerializeField] AudioClip WallBounceSFX;
 
   [Header("Visual Effects")]
   [SerializeField] GameObject OnHurtVFX;
   [SerializeField] GameObject OnBlockVFX;
   [SerializeField] GameObject OnParryVFX;
   [SerializeField] ParticleSystem KnockbackSmoke;
+  [SerializeField] ParticleSystem WallBounceDebris;
   [SerializeField] float KnockbackSmokeMinimumSpeed = 5;
   [SerializeField, Range(0,1)] float HitStopSpeed = .1f;
   [SerializeField, ColorUsage(true, true)] Color HurtFlashColor = Color.red;
@@ -95,6 +97,23 @@ public class TargetDummyController : MonoBehaviour {
     Controller.Move(dt * Velocity);
   }
 
+  void OnControllerColliderHit(ControllerColliderHit hit) {
+    var collider = hit.collider;
+    var velocity = hit.controller.velocity;
+    var speed = velocity.magnitude;
+    if (collider.gameObject.CompareTag("Wall") && speed > 20 && HitStopFramesRemaining <= 0) {
+      var impactParticles = Instantiate(WallBounceDebris, hit.point, Quaternion.LookRotation(hit.normal));
+      Destroy(impactParticles.gameObject, 3);
+      AudioSource.PlayOneShot(WallBounceSFX);
+      Vibrator.Vibrate(hit.normal, 16, .1f);
+      HitStopFramesRemaining = 16;
+      Animator.SetTrigger("HurtBack");
+      CameraShaker.Instance.Shake(20);
+      Velocity = Vector3.Reflect(Velocity / 2, hit.normal);
+      transform.right = Vector3.Reflect(transform.right, hit.normal);
+    }
+  }
+
   void OnSynchronizedMove(Vector3 deltaPosition) {
     Controller.Move(deltaPosition);
   }
@@ -129,7 +148,7 @@ public class TargetDummyController : MonoBehaviour {
     Animator.SetTrigger(hitbox.HitboxParams.HitDirection switch {
       HitDirection.Left => "HurtLeft",
       HitDirection.Right => "HurtRight",
-      _ => "HurtForward"
+      _ => "HurtFront"
     });
     var sfx = hitbox.HitboxParams.HitDirection switch {
       HitDirection.Left => HurtLeftSFX,
@@ -152,13 +171,14 @@ public class TargetDummyController : MonoBehaviour {
   void OnParry(MeleeContact contact) {
     var hitbox = contact.Hitbox;
     var toAttacker = hitbox.Owner.transform.position-transform.position;
+    var hitParams = hitbox.HitboxParams;
     transform.rotation = Quaternion.LookRotation(toAttacker, transform.up);
-    CameraShaker.Instance.Shake(hitbox.HitboxParams.CameraShakeIntensity);
-    HitStopFramesRemaining = hitbox.HitboxParams.HitStopDuration.Ticks * 2;
+    CameraShaker.Instance.Shake(hitParams.CameraShakeIntensity);
+    HitStopFramesRemaining = hitParams.HitStopDuration.Ticks * 2;
     SimpleFlash.FlashColor = ParryFlashColor;
     SimpleFlash.TicksRemaining = 20;
-    Destroy(DirectionalVFX(transform, OnParryVFX, hitbox.HitboxParams.HitDirection), 3);
-    Vibrator.VibrateOnHurt(DirectionalVibration(transform, hitbox.HitboxParams.HitDirection), hitbox.HitboxParams.HitStopDuration.Ticks);
+    Destroy(DirectionalVFX(transform, OnParryVFX, hitParams.HitDirection), 3);
+    Vibrator.VibrateOnHurt(DirectionalVibration(transform, hitParams.HitDirection), hitParams.HitStopDuration.Ticks);
     // Animator.SetTrigger("Parry");
     AudioSource.PlayOneShot(ParrySFX);
   }
