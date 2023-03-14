@@ -2,14 +2,15 @@ using UnityEngine;
 
 public class MeleeAimAssist : MonoBehaviour {
   [SerializeField] CharacterController Controller;
+  [SerializeField] MeleeAttackTargeting MeleeAttackTargeting;
 
   public int TotalTicks;
   public int Ticks;
   public float IdealDistance;
 
   void FixedUpdate() {
-    if (TotalTicks > 0) {
-      var target = FindObjectOfType<TargetDummyController>();
+    var target = MeleeAttackTargeting.BestCandidate;
+    if (TotalTicks > 0 && target) {
       var fraction = (float)Ticks / (float)TotalTicks;
       var toTarget = target.transform.position-transform.position;
       var idealPosition = target.transform.position-toTarget.normalized * IdealDistance;

@@ -17,14 +17,11 @@ public class LogicalTimeline : MonoBehaviour {
   [SerializeField] Animator Animator;
   [SerializeField] Vibrator Vibrator;
   [SerializeField] MeleeAttackAbility ThreeHitComboAbility;
-
-  [Header("State")]
-  [SerializeField] TargetDummyController Target;
+  [SerializeField] MeleeAttackTargeting MeleeAttackTargeting;
 
   TaskScope Scope;
 
   public PlayableGraph Graph;
-
   public float LocalTimeScale = 1;
   public int HitStopFramesRemaining;
 
@@ -42,6 +39,16 @@ public class LogicalTimeline : MonoBehaviour {
     Scope.Dispose();
     Graph.Destroy();
   }
+
+  /*
+  A few things here I'd like to test.
+
+    Multi-target hitting
+    Target selection
+    Target stickiness
+    Multi-target with interuption
+    Stick steering with threshold requirement to select next candidate target
+  */
 
   void FixedUpdate() {
     var dt = LocalTimeScale * Time.fixedDeltaTime;
@@ -68,12 +75,14 @@ public class LogicalTimeline : MonoBehaviour {
   }
 
   void OnHit(MeleeContact contact) {
+    MeleeAttackTargeting.Victims.Add(contact.Hurtbox.Owner.gameObject);
     Destroy(Instantiate(OnHitVFX, contact.Hurtbox.transform.position + Vector3.up, transform.rotation), 3);
     Vibrator.VibrateOnHit(transform.forward, contact.Hitbox.HitboxParams.HitStopDuration.Ticks);
     HitStopFramesRemaining = contact.Hitbox.HitboxParams.HitStopDuration.Ticks;
   }
 
   void OnBlocked(MeleeContact contact) {
+    MeleeAttackTargeting.Victims.Add(contact.Hurtbox.Owner.gameObject);
     Destroy(Instantiate(OnHitVFX, contact.Hurtbox.transform.position + Vector3.up, transform.rotation), 3);
     Vibrator.VibrateOnHit(transform.forward, contact.Hitbox.HitboxParams.HitStopDuration.Ticks / 2);
     HitStopFramesRemaining = contact.Hitbox.HitboxParams.HitStopDuration.Ticks / 2;
@@ -90,6 +99,8 @@ public class LogicalTimeline : MonoBehaviour {
   }
 
   void StartAttack() {
+    Scope.Dispose();
+    Scope = new();
     InputManager.Consume(ButtonCode.West, ButtonPressType.JustDown);
     Scope.Start(ThreeHitComboAbility.Attack);
   }
