@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Animations;
+using UnityEngine.Rendering.Universal;
 
 public enum DefenderState {
   Vulnerable,
@@ -27,6 +28,7 @@ public class TargetDummyController : MonoBehaviour {
   [SerializeField] GameObject OnParryVFX;
   [SerializeField] ParticleSystem KnockbackSmoke;
   [SerializeField] ParticleSystem WallBounceDebris;
+  [SerializeField] DecalProjector WallBounceDecal;
   [SerializeField] float KnockbackSmokeMinimumSpeed = 5;
   [SerializeField, Range(0,1)] float HitStopSpeed = .1f;
   [SerializeField, ColorUsage(true, true)] Color HurtFlashColor = Color.red;
@@ -43,6 +45,7 @@ public class TargetDummyController : MonoBehaviour {
   [SerializeField] AudioSource AudioSource;
   [SerializeField] Vibrator Vibrator;
   [SerializeField] SimpleFlash SimpleFlash;
+  [SerializeField] RootMotion RootMotion;
 
   [Header("State")]
   [SerializeField] Vector3 Velocity;
@@ -61,6 +64,7 @@ public class TargetDummyController : MonoBehaviour {
     Graph = PlayableGraph.Create("Target Dummy");
     Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
     Graph.Play();
+    // RootMotion.enabled = true;
     AnimatorControllerPlayable = AnimatorControllerPlayable.Create(Graph, AnimatorController);
     var output = AnimationPlayableOutput.Create(Graph, "Animation Output", Animator);
     output.SetSourcePlayable(AnimatorControllerPlayable);
@@ -71,7 +75,14 @@ public class TargetDummyController : MonoBehaviour {
     Graph.Destroy();
   }
 
+  void Update() {
+    if (Input.GetMouseButtonDown(1)) {
+      State = State == DefenderState.Vulnerable ? DefenderState.Blocking : DefenderState.Vulnerable;
+    }
+  }
+
   void FixedUpdate() {
+
     if (HitStopFramesRemaining > 0) {
       LocalTimeScale = 0;
       LocalAnimationTimeScale = Mathf.MoveTowards(LocalTimeScale, HitStopSpeed, .1f);
@@ -102,11 +113,14 @@ public class TargetDummyController : MonoBehaviour {
     var velocity = hit.controller.velocity;
     var speed = velocity.magnitude;
     if (collider.gameObject.CompareTag("Wall") && speed > 20 && HitStopFramesRemaining <= 0) {
-      var impactParticles = Instantiate(WallBounceDebris, hit.point, Quaternion.LookRotation(hit.normal));
+      var centerPoint = hit.collider.ClosestPoint(transform.position + Vector3.up);
+      var impactParticles = Instantiate(WallBounceDebris, centerPoint + hit.normal, Quaternion.LookRotation(hit.normal));
       Destroy(impactParticles.gameObject, 3);
+      var decal = Instantiate(WallBounceDecal, centerPoint + hit.normal * .1f, Quaternion.LookRotation(-hit.normal));
+      Destroy(decal.gameObject, 3);
       AudioSource.PlayOneShot(WallBounceSFX);
-      Vibrator.Vibrate(hit.normal, 16, .1f);
-      HitStopFramesRemaining = 16;
+      Vibrator.Vibrate(hit.normal, 12, .1f);
+      HitStopFramesRemaining = 12;
       Animator.SetTrigger("HurtBack");
       CameraShaker.Instance.Shake(20);
       Velocity = Vector3.Reflect(Velocity / 2, hit.normal);
@@ -144,7 +158,7 @@ public class TargetDummyController : MonoBehaviour {
     SimpleFlash.FlashColor = HurtFlashColor;
     SimpleFlash.TicksRemaining = 20;
     Destroy(DirectionalVFX(transform, OnHurtVFX, hitbox.HitboxParams.HitDirection), 3);
-    Vibrator.VibrateOnHurt(DirectionalVibration(transform, hitbox.HitboxParams.HitDirection), hitbox.HitboxParams.HitStopDuration.Ticks);
+    Vibrator.VibrateOnHurt(HitDirectionVector(transform, hitbox.HitboxParams.HitDirection), hitbox.HitboxParams.HitStopDuration.Ticks);
     Animator.SetTrigger(hitbox.HitboxParams.HitDirection switch {
       HitDirection.Left => "HurtLeft",
       HitDirection.Right => "HurtRight",
@@ -178,7 +192,7 @@ public class TargetDummyController : MonoBehaviour {
     SimpleFlash.FlashColor = ParryFlashColor;
     SimpleFlash.TicksRemaining = 20;
     Destroy(DirectionalVFX(transform, OnParryVFX, hitParams.HitDirection), 3);
-    Vibrator.VibrateOnHurt(DirectionalVibration(transform, hitParams.HitDirection), hitParams.HitStopDuration.Ticks);
+    Vibrator.VibrateOnHurt(HitDirectionVector(transform, hitParams.HitDirection), hitParams.HitStopDuration.Ticks);
     // Animator.SetTrigger("Parry");
     AudioSource.PlayOneShot(ParrySFX);
   }
@@ -192,7 +206,7 @@ public class TargetDummyController : MonoBehaviour {
     SimpleFlash.FlashColor = BlockFlashColor;
     SimpleFlash.TicksRemaining = 20;
     Destroy(DirectionalVFX(transform, OnBlockVFX, hitbox.HitboxParams.HitDirection), 3);
-    Vibrator.VibrateOnHurt(DirectionalVibration(transform, hitbox.HitboxParams.HitDirection), hitbox.HitboxParams.HitStopDuration.Ticks);
+    Vibrator.VibrateOnHurt(HitDirectionVector(transform, hitbox.HitboxParams.HitDirection), hitbox.HitboxParams.HitStopDuration.Ticks);
     Animator.SetTrigger("Block");
     AudioSource.PlayOneShot(BlockSFX);
   }
@@ -213,13 +227,5 @@ public class TargetDummyController : MonoBehaviour {
     };
     var vfxRotation = directionalRotation * transform.rotation;
     return Instantiate(prefab, transform.position + Vector3.up, vfxRotation);
-  }
-
-  Vector3 DirectionalVibration(Transform transform, HitDirection hitDirection) {
-    return hitDirection switch {
-      HitDirection.Left => Quaternion.Euler(0, -145, 0),
-      HitDirection.Right => Quaternion.Euler(0, 145, 0),
-      _ => Quaternion.Euler(0, 180, 0)
-    } * transform.forward;
   }
 }
