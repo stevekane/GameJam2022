@@ -40,16 +40,6 @@ public class LogicalTimeline : MonoBehaviour {
     Graph.Destroy();
   }
 
-  /*
-  A few things here I'd like to test.
-
-    Multi-target hitting
-    Target selection
-    Target stickiness
-    Multi-target with interuption
-    Stick steering with threshold requirement to select next candidate target
-  */
-
   void FixedUpdate() {
     var dt = LocalTimeScale * Time.fixedDeltaTime;
     var movementInput = InputManager.Axis(AxisCode.AxisLeft);
@@ -59,14 +49,11 @@ public class LogicalTimeline : MonoBehaviour {
     var worldSpaceDirection = camera.transform.TransformDirection(screenDirection);
     worldSpaceDirection.y = 0;
     worldSpaceDirection = worldSpaceDirection.normalized;
-    // TODO: Need some other way of detecting if the character is controllable or not
-    // if (Phase == AttackPhase.None) {
-    //   if (movementMagnitude > 0) {
-    //     transform.rotation = Quaternion.LookRotation(worldSpaceDirection);
-    //   }
-    //   Controller.Move(dt * movementMagnitude * MovementSpeed * worldSpaceDirection);
-    // }
-
+    Animator.SetFloat("Speed", movementMagnitude);
+    if (movementMagnitude > 0) {
+      transform.rotation = Quaternion.LookRotation(worldSpaceDirection);
+    }
+    Controller.Move(dt * movementMagnitude * MovementSpeed * worldSpaceDirection);
     LocalTimeScale = HitStopFramesRemaining > 0 ? 0 : 1;
     HitStopFramesRemaining = Mathf.Max(0, HitStopFramesRemaining-1);
     Graph.Evaluate(dt);
@@ -99,9 +86,9 @@ public class LogicalTimeline : MonoBehaviour {
   }
 
   void StartAttack() {
+    InputManager.Consume(ButtonCode.West, ButtonPressType.JustDown);
     Scope.Dispose();
     Scope = new();
-    InputManager.Consume(ButtonCode.West, ButtonPressType.JustDown);
     Scope.Start(ThreeHitComboAbility.Attack);
   }
 }
