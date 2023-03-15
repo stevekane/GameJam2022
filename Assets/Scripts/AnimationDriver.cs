@@ -440,6 +440,8 @@ public class AnimationDriver : MonoBehaviour {
   }
 
   void Update() {
+    if (SpineCorrector.IsNull())
+      return;  // hack to fix annoying error when compiling with debugger attached
     var data = SpineCorrector.GetJobData<SpineRotationJob>();
     data.UpperWeight = UpperBodySlot.InputWeight;
     SpineCorrector.SetJobData(data);

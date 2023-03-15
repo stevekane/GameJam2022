@@ -193,6 +193,15 @@ public static class ArrayLikeExtensions {
     }
   }
 
+  public static void Remove<T>(this List<T> xs, Predicate<T> predicate, Action<T> action) {
+    for (var i = xs.Count-1; i >= 0; i--) {
+      if (predicate(xs[i])) {
+        action(xs[i]);
+        xs.RemoveAt(i);
+      }
+    }
+  }
+
   public static Vector3 Sum<T>(this IEnumerable<T> xs, Func<T, Vector3> f) {
     var sum = Vector3.zero;
     foreach (var x in xs) {
