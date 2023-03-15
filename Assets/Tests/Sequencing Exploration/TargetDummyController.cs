@@ -82,7 +82,6 @@ public class TargetDummyController : MonoBehaviour {
   }
 
   void FixedUpdate() {
-
     if (HitStopFramesRemaining > 0) {
       LocalTimeScale = 0;
       LocalAnimationTimeScale = Mathf.MoveTowards(LocalTimeScale, HitStopSpeed, .1f);
@@ -152,8 +151,8 @@ public class TargetDummyController : MonoBehaviour {
   void OnHurt(MeleeContact contact) {
     var hitbox = contact.Hitbox;
     var toAttacker = hitbox.Owner.transform.position-transform.position;
-    if (toAttacker.sqrMagnitude > 0)
-      transform.rotation = Quaternion.LookRotation(toAttacker.XZ().normalized, transform.up);
+    var forward = toAttacker.XZ().normalized.TryGetDirection() ?? transform.forward;
+    transform.rotation = Quaternion.LookRotation(forward, transform.up);
     CameraShaker.Instance.Shake(hitbox.HitboxParams.CameraShakeIntensity);
     HitStopFramesRemaining = hitbox.HitboxParams.HitStopDuration.Ticks;
     SimpleFlash.FlashColor = HurtFlashColor;
@@ -187,8 +186,8 @@ public class TargetDummyController : MonoBehaviour {
     var hitbox = contact.Hitbox;
     var hitParams = hitbox.HitboxParams;
     var toAttacker = hitbox.Owner.transform.position-transform.position;
-    if (toAttacker.sqrMagnitude > 0)
-      transform.rotation = Quaternion.LookRotation(toAttacker.XZ().normalized, transform.up);
+    var forward = toAttacker.XZ().normalized.TryGetDirection() ?? transform.forward;
+    transform.rotation = Quaternion.LookRotation(forward, transform.up);
     CameraShaker.Instance.Shake(hitParams.CameraShakeIntensity);
     HitStopFramesRemaining = hitParams.HitStopDuration.Ticks * 2;
     SimpleFlash.FlashColor = ParryFlashColor;
@@ -202,8 +201,8 @@ public class TargetDummyController : MonoBehaviour {
   void OnBlock(MeleeContact contact) {
     var hitbox = contact.Hitbox;
     var toAttacker = hitbox.Owner.transform.position-transform.position;
-    if (toAttacker.sqrMagnitude > 0)
-      transform.rotation = Quaternion.LookRotation(toAttacker.XZ().normalized, transform.up);
+    var forward = toAttacker.XZ().normalized.TryGetDirection() ?? transform.forward;
+    transform.rotation = Quaternion.LookRotation(forward, transform.up);
     CameraShaker.Instance.Shake(hitbox.HitboxParams.CameraShakeIntensity / 2);
     HitStopFramesRemaining = hitbox.HitboxParams.HitStopDuration.Ticks / 2;
     SimpleFlash.FlashColor = BlockFlashColor;
