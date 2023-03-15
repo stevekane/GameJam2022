@@ -19,10 +19,12 @@ public class LogicalTimeline : MonoBehaviour {
   [SerializeField] MeleeAttackAbility ThreeHitComboAbility;
   [SerializeField] MeleeAttackTargeting MeleeAttackTargeting;
 
+  [Header("State")]
+  [SerializeField] LocalTime LocalTime;
+
   TaskScope Scope;
 
   public PlayableGraph Graph;
-  public float LocalTimeScale = 1;
   public int HitStopFramesRemaining;
 
   void Start() {
@@ -41,7 +43,7 @@ public class LogicalTimeline : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    var dt = LocalTimeScale * Time.fixedDeltaTime;
+    var dt = LocalTime.FixedDeltaTime;
     var movementInput = InputManager.Axis(AxisCode.AxisLeft);
     var screenDirection = movementInput.XY;
     var movementMagnitude = screenDirection.magnitude;
@@ -54,7 +56,7 @@ public class LogicalTimeline : MonoBehaviour {
       transform.rotation = Quaternion.LookRotation(worldSpaceDirection);
     }
     Controller.Move(dt * movementMagnitude * MovementSpeed * worldSpaceDirection);
-    LocalTimeScale = HitStopFramesRemaining > 0 ? 0 : 1;
+    LocalTime.TimeScale = HitStopFramesRemaining > 0 ? 0 : 1;
     HitStopFramesRemaining = Mathf.Max(0, HitStopFramesRemaining-1);
     Graph.Evaluate(dt);
     FixedFrame++;
