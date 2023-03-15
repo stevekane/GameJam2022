@@ -1,6 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class MeleeAttackTarget {
+  public GameObject GameObject;
+  public float Distance;
+  public float Angle;
+  public int Priority;
+}
+
 public class MeleeAttackTargeting : MonoBehaviour {
   public LayerMask LayerMask;
   public QueryTriggerInteraction TriggerInteraction;
@@ -43,4 +50,16 @@ public class MeleeAttackTargeting : MonoBehaviour {
     }
     Victims.RemoveWhere(victim => !Candidates.Contains(victim));
   }
+
+  #if UNITY_EDITOR
+  void OnDrawGizmos() {
+    if (Candidates == null)
+      return;
+
+    var eyeOffset = Vector3.up;
+    foreach (var candidate in Candidates) {
+      Gizmos.DrawLine(transform.position + eyeOffset, candidate.transform.position + eyeOffset);
+    }
+  }
+  #endif
 }

@@ -152,7 +152,8 @@ public class TargetDummyController : MonoBehaviour {
   void OnHurt(MeleeContact contact) {
     var hitbox = contact.Hitbox;
     var toAttacker = hitbox.Owner.transform.position-transform.position;
-    transform.rotation = Quaternion.LookRotation(toAttacker, transform.up);
+    if (toAttacker.sqrMagnitude > 0)
+      transform.rotation = Quaternion.LookRotation(toAttacker.XZ().normalized, transform.up);
     CameraShaker.Instance.Shake(hitbox.HitboxParams.CameraShakeIntensity);
     HitStopFramesRemaining = hitbox.HitboxParams.HitStopDuration.Ticks;
     SimpleFlash.FlashColor = HurtFlashColor;
@@ -184,9 +185,10 @@ public class TargetDummyController : MonoBehaviour {
 
   void OnParry(MeleeContact contact) {
     var hitbox = contact.Hitbox;
-    var toAttacker = hitbox.Owner.transform.position-transform.position;
     var hitParams = hitbox.HitboxParams;
-    transform.rotation = Quaternion.LookRotation(toAttacker, transform.up);
+    var toAttacker = hitbox.Owner.transform.position-transform.position;
+    if (toAttacker.sqrMagnitude > 0)
+      transform.rotation = Quaternion.LookRotation(toAttacker.XZ().normalized, transform.up);
     CameraShaker.Instance.Shake(hitParams.CameraShakeIntensity);
     HitStopFramesRemaining = hitParams.HitStopDuration.Ticks * 2;
     SimpleFlash.FlashColor = ParryFlashColor;
@@ -200,7 +202,8 @@ public class TargetDummyController : MonoBehaviour {
   void OnBlock(MeleeContact contact) {
     var hitbox = contact.Hitbox;
     var toAttacker = hitbox.Owner.transform.position-transform.position;
-    transform.rotation = Quaternion.LookRotation(toAttacker, transform.up);
+    if (toAttacker.sqrMagnitude > 0)
+      transform.rotation = Quaternion.LookRotation(toAttacker.XZ().normalized, transform.up);
     CameraShaker.Instance.Shake(hitbox.HitboxParams.CameraShakeIntensity / 2);
     HitStopFramesRemaining = hitbox.HitboxParams.HitStopDuration.Ticks / 2;
     SimpleFlash.FlashColor = BlockFlashColor;
