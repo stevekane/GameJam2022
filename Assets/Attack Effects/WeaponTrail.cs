@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -63,6 +62,8 @@ public class WeaponTrail : MonoBehaviour {
     RemoveOldPositions();
     ComputeDistances();
     RenderToMesh();
+    P0 = T0.position;
+    P1 = T1.position;
   }
 
   void RemoveOldPositions() {
@@ -92,51 +93,29 @@ public class WeaponTrail : MonoBehaviour {
     P1 = p1;
   }
 
-  // The basic idea here is to assume the weapon is swinging in a circular arc around an anchor point.
-  // We start with an old and a new line segment for the weapon position in world space. Process:
-  // 1. Find the anchor point based on the intersection of the old and new line segments in the XZ-plane.
-  // 2. Rotate the old line segment around the anchor point towards the new line segment.
-  // 3. Record positions as we rotate until we reach the new line segment.
+  // Simple interpolation between 2 line segments. Use linear interpolation of the inner point's position (p0),
+  // and of the line segment's rotation angle (segment to newSegment), to find the outer point's interpolated positions.
+  public int MaxIterations = 8;
   void InterpolatePositions() {
     var newP0 = T0.position;
     var newP1 = T1.position;
-    var anchor = FindAnchor(P0, P1, newP0, newP1);
-    var delta0 = P0 - anchor;
-    var delta1 = P1 - anchor;
-    var newDelta0 = newP0 - anchor;
-    var newDelta1 = newP1 - anchor;
+    var curP0 = P0;
+    var segment = P1 - P0;
+    var newSegment = newP1 - newP0;
     const float epsilon = .1f;
-    const float minTurnSpeed = .1f;
     const float magSpeed = .1f;
-    const int maxIterations = 8;
-    var angle = Vector3.Angle(delta1, newDelta1) * Mathf.Deg2Rad;
-    var turnSpeed = Mathf.Max(minTurnSpeed, angle / maxIterations);
-    for (int i = 0; i < maxIterations; i++) {
-      delta0 = Vector3.RotateTowards(delta0, newDelta0, turnSpeed, magSpeed);
-      delta1 = Vector3.RotateTowards(delta1, newDelta1, turnSpeed, magSpeed);
-      if ((newDelta1 - delta1).sqrMagnitude < epsilon.Sqr())
+    const float minTurnSpeed = .1f;
+    var angle = Vector3.Angle(segment, newSegment) * Mathf.Deg2Rad;
+    var turnSpeed = Mathf.Max(minTurnSpeed, angle / MaxIterations);
+    for (int i = 0; i < MaxIterations; i++) {
+      curP0 = Vector3.MoveTowards(curP0, newP0, magSpeed);
+      segment = Vector3.RotateTowards(segment, newSegment, turnSpeed, magSpeed);
+      var curP1 = curP0 + segment;
+      if ((curP1 - newP1).sqrMagnitude < epsilon.Sqr())
         break;
-      var curP0 = anchor + delta0;
-      var curP1 = anchor + delta1;
       RecordPosition(curP0, curP1);
     }
     RecordPosition(newP0, newP1);
-  }
-
-  Vector3 FindAnchor(Vector3 p0, Vector3 p1, Vector3 newP0, Vector3 newP1) {
-    var ix = LineIntersection(p0.XZ2(), p1.XZ2(), newP0.XZ2(), newP1.XZ2()) ?? newP0.XZ2();
-    return new(ix.x, newP0.y, ix.y);
-  }
-  public Vector2? LineIntersection(Vector2 A1, Vector2 A2, Vector2 B1, Vector2 B2) {
-    float tmp = (B2.x - B1.x) * (A2.y - A1.y) - (B2.y - B1.y) * (A2.x - A1.x);
-    if (tmp == 0)
-      return null;
-
-    float mu = ((A1.x - B1.x) * (A2.y - A1.y) - (A1.y - B1.y) * (A2.x - A1.x)) / tmp;
-    return new Vector2(
-      B1.x + (B2.x - B1.x) * mu,
-      B1.y + (B2.y - B1.y) * mu
-    );
   }
 
   // TODO: Allocation here is stupid.. fucking programming
@@ -195,7 +174,7 @@ public class WeaponTrail : MonoBehaviour {
     MeshRenderer.sharedMaterial.SetFloat("_MaxAge", SegmentDuration.Seconds);
   }
 
-#if false
+#if true
   void OnDrawGizmos() {
     Gizmos.color = Color.yellow;
     for (int i = 0; i < Trail0.Count; i++) {
