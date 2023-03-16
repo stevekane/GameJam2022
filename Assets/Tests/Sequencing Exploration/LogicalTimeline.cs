@@ -17,18 +17,27 @@ public class LogicalTimeline : MonoBehaviour {
   [SerializeField] Animator Animator;
   [SerializeField] Vibrator Vibrator;
   [SerializeField] MeleeAttackAbility ThreeHitComboAbility;
+  [SerializeField] JumpAbility JumpAbility;
+  [SerializeField] DoubleJumpAbility DoubleJumpAbility;
   [SerializeField] MeleeAttackTargeting MeleeAttackTargeting;
+
+  [Header("State")]
+  [SerializeField] SplitGravity Gravity;
+  [SerializeField] float AirAcceleration = 1;
+  [SerializeField] float MaxAirSpeed = 15;
+  [SerializeField] LocalTime LocalTime;
+  [SerializeField] Velocity Velocity;
 
   TaskScope Scope;
 
   public PlayableGraph Graph;
-  public float LocalTimeScale = 1;
   public int HitStopFramesRemaining;
 
   void Start() {
     Time.fixedDeltaTime = 1f / Timeval.FixedUpdatePerSecond;
     Scope = new TaskScope();
     InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Listen(StartAttack);
+    InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Listen(Jump);
     Graph = PlayableGraph.Create("Logical Timeline");
     Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
     Graph.Play();
@@ -36,12 +45,13 @@ public class LogicalTimeline : MonoBehaviour {
 
   void OnDestroy() {
     InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Unlisten(StartAttack);
+    InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Unlisten(Jump);
     Scope.Dispose();
     Graph.Destroy();
   }
 
   void FixedUpdate() {
-    var dt = LocalTimeScale * Time.fixedDeltaTime;
+    var dt = LocalTime.FixedDeltaTime;
     var movementInput = InputManager.Axis(AxisCode.AxisLeft);
     var screenDirection = movementInput.XY;
     var movementMagnitude = screenDirection.magnitude;
@@ -49,16 +59,35 @@ public class LogicalTimeline : MonoBehaviour {
     var worldSpaceDirection = camera.transform.TransformDirection(screenDirection);
     worldSpaceDirection.y = 0;
     worldSpaceDirection = worldSpaceDirection.normalized;
-    Animator.SetFloat("Speed", movementMagnitude);
     if (movementMagnitude > 0) {
       transform.rotation = Quaternion.LookRotation(worldSpaceDirection);
     }
-    Controller.Move(dt * movementMagnitude * MovementSpeed * worldSpaceDirection);
-    LocalTimeScale = HitStopFramesRemaining > 0 ? 0 : 1;
+    var planeVelocity = Vector3.zero;
+    if (Controller.isGrounded) {
+      planeVelocity = movementMagnitude * MovementSpeed * worldSpaceDirection;
+      if (Velocity.Value.y > 0) {
+        Velocity.Value.y += dt * Gravity.Value;
+      } else {
+        Velocity.Value.y = dt * Gravity.Value;
+      }
+    } else {
+      var airVelocity = Velocity.Value + dt * AirAcceleration * movementMagnitude * worldSpaceDirection;
+      airVelocity.y = 0;
+      var airSpeed = airVelocity.magnitude;
+      var airDirection = airVelocity.normalized;
+      planeVelocity = Mathf.Min(MaxAirSpeed, airSpeed) * airDirection;
+      Velocity.Value.y += dt * Gravity.Value;
+    }
+    Velocity.Value.x = planeVelocity.x;
+    Velocity.Value.z = planeVelocity.z;
+    Controller.Move(dt * Velocity.Value);
+    LocalTime.TimeScale = HitStopFramesRemaining > 0 ? 0 : 1;
     HitStopFramesRemaining = Mathf.Max(0, HitStopFramesRemaining-1);
     Graph.Evaluate(dt);
     FixedFrame++;
     FixedTick.Fire();
+    Animator.SetFloat("Speed", movementMagnitude);
+    Animator.SetBool("Grounded", Controller.isGrounded);
   }
 
   void OnHit(MeleeContact contact) {
@@ -90,5 +119,16 @@ public class LogicalTimeline : MonoBehaviour {
     Scope.Dispose();
     Scope = new();
     Scope.Start(ThreeHitComboAbility.Attack);
+  }
+
+  void Jump() {
+    InputManager.Consume(ButtonCode.South, ButtonPressType.JustDown);
+    Scope.Dispose();
+    Scope = new();
+    if (Controller.isGrounded) {
+      Scope.Start(JumpAbility.Jump);
+    } else {
+      Scope.Start(DoubleJumpAbility.Jump);
+    }
   }
 }

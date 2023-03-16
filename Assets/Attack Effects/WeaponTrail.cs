@@ -5,6 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer))]
 [ExecuteInEditMode]
 public class WeaponTrail : MonoBehaviour {
+  [SerializeField] LocalTime LocalTime;
   [SerializeField] MeshFilter MeshFilter;
   [SerializeField] MeshRenderer MeshRenderer;
   [SerializeField] Transform T0;
@@ -34,7 +35,7 @@ public class WeaponTrail : MonoBehaviour {
     P1 = T1.position;
     Trail0.Add(T0.position);
     Trail1.Add(T1.position);
-    DeathTimes.Add(Time.time + SegmentDuration.Seconds);
+    DeathTimes.Add(LocalTime.Time + SegmentDuration.Seconds);
     SpawnSpeeds0.Add(0);
     SpawnSpeeds1.Add(0);
     Mesh = new();
@@ -70,7 +71,8 @@ public class WeaponTrail : MonoBehaviour {
     var cutCount = 0;
     for (var i = 0; i < DeathTimes.Count; i++) {
       var time = DeathTimes[i];
-      if (Time.time >= time) {
+      var currentTime = LocalTime == null ? Time.time : LocalTime.Time;
+      if (currentTime >= time) {
         cutCount++;
       } else {
         break;
@@ -86,7 +88,8 @@ public class WeaponTrail : MonoBehaviour {
   void RecordPosition(Vector3 p0, Vector3 p1) {
     Trail0.Add(p0);
     Trail1.Add(p1);
-    DeathTimes.Add(Time.time + SegmentDuration.Seconds);
+    var currentTime = LocalTime == null ? Time.time : LocalTime.Time;
+    DeathTimes.Add(currentTime + SegmentDuration.Seconds);
     SpawnSpeeds0.Add((Vector3.Distance(p0, P0))/SegmentDuration.Seconds);
     SpawnSpeeds1.Add((Vector3.Distance(p1, P1))/SegmentDuration.Seconds);
     P0 = p0;
@@ -149,7 +152,8 @@ public class WeaponTrail : MonoBehaviour {
     for (var i = 0; i < DeathTimes.Count; i++) {
       var start = DeathTimes[i]-SegmentDuration.Seconds;
       var end = DeathTimes[i];
-      var normalizedAge = Mathf.InverseLerp(start, end, Time.time);
+      var currentTime = LocalTime == null ? Time.time : LocalTime.Time;
+      var normalizedAge = Mathf.InverseLerp(start, end, currentTime);
       var age = normalizedAge*SegmentDuration.Seconds;
       var falloff = 1;
       var averageDistance = (Distances0[i]+Distances1[i])/2;

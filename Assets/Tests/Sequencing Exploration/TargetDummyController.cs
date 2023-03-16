@@ -48,9 +48,8 @@ public class TargetDummyController : MonoBehaviour {
   [SerializeField] RootMotion RootMotion;
 
   [Header("State")]
-  [SerializeField] Vector3 Velocity;
-  [SerializeField] float LocalTimeScale = 1;
-  [SerializeField] float LocalAnimationTimeScale = 1;
+  [SerializeField] LocalTime LocalTime;
+  [SerializeField] Velocity Velocity;
   [SerializeField] DefenderState State;
 
   AnimatorControllerPlayable AnimatorControllerPlayable;
@@ -82,30 +81,26 @@ public class TargetDummyController : MonoBehaviour {
   }
 
   void FixedUpdate() {
-
     if (HitStopFramesRemaining > 0) {
-      LocalTimeScale = 0;
-      LocalAnimationTimeScale = Mathf.MoveTowards(LocalTimeScale, HitStopSpeed, .1f);
+      LocalTime.TimeScale = 0;
       HitStopFramesRemaining--;
     } else {
-      LocalTimeScale = 1;
-      LocalAnimationTimeScale = 1;
+      LocalTime.TimeScale = 1;
       HitStopFramesRemaining = 0;
     }
-    var dt = Time.fixedDeltaTime * LocalTimeScale;
-    var animDt = LocalAnimationTimeScale * Time.fixedDeltaTime;
+    var dt = LocalTime.FixedDeltaTime;
     var verticalVelocity = dt * Gravity.y;
     if (Controller.isGrounded) {
       verticalVelocity += Controller.velocity.y;
     }
-    var planarVelocity = Mathf.Exp(-dt * Friction) * Velocity;
-    Velocity = new Vector3(planarVelocity.x, verticalVelocity, planarVelocity.z);
-    if (Velocity.magnitude > KnockbackSmokeMinimumSpeed) {
+    var planarVelocity = Mathf.Exp(-dt * Friction) * Velocity.Value;
+    Velocity.Value = new Vector3(planarVelocity.x, verticalVelocity, planarVelocity.z);
+    if (Velocity.Value.magnitude > KnockbackSmokeMinimumSpeed) {
       KnockbackSmoke.Emit(1);
     }
     Animator.SetInteger("State", (int)State);
-    Graph.Evaluate(animDt);
-    Controller.Move(dt * Velocity);
+    Graph.Evaluate(dt);
+    Controller.Move(dt * Velocity.Value);
   }
 
   void OnControllerColliderHit(ControllerColliderHit hit) {
@@ -123,7 +118,7 @@ public class TargetDummyController : MonoBehaviour {
       HitStopFramesRemaining = 12;
       Animator.SetTrigger("HurtBack");
       CameraShaker.Instance.Shake(20);
-      Velocity = Vector3.Reflect(Velocity / 2, hit.normal);
+      Velocity.Value = Vector3.Reflect(Velocity.Value / 2, hit.normal);
       transform.right = Vector3.Reflect(transform.right, hit.normal);
     }
   }
@@ -152,8 +147,8 @@ public class TargetDummyController : MonoBehaviour {
   void OnHurt(MeleeContact contact) {
     var hitbox = contact.Hitbox;
     var toAttacker = hitbox.Owner.transform.position-transform.position;
-    if (toAttacker.sqrMagnitude > 0)
-      transform.rotation = Quaternion.LookRotation(toAttacker.XZ().normalized, transform.up);
+    var forward = toAttacker.XZ().normalized.TryGetDirection() ?? transform.forward;
+    transform.rotation = Quaternion.LookRotation(forward, transform.up);
     CameraShaker.Instance.Shake(hitbox.HitboxParams.CameraShakeIntensity);
     HitStopFramesRemaining = hitbox.HitboxParams.HitStopDuration.Ticks;
     SimpleFlash.FlashColor = HurtFlashColor;
@@ -180,15 +175,15 @@ public class TargetDummyController : MonoBehaviour {
     damageMessage.LocalVelocity = damageVelocityLocalSpace * (isStrong ? 15 : 10);
     damageMessage.LocalScale = (isStrong ? 1.5f : 1) * Vector3.one;
     Destroy(damageMessage.gameObject, 2);
-    Velocity += -transform.forward * hitbox.HitboxParams.KnockbackStrength;
+    Velocity.Value += -transform.forward * hitbox.HitboxParams.KnockbackStrength;
   }
 
   void OnParry(MeleeContact contact) {
     var hitbox = contact.Hitbox;
     var hitParams = hitbox.HitboxParams;
     var toAttacker = hitbox.Owner.transform.position-transform.position;
-    if (toAttacker.sqrMagnitude > 0)
-      transform.rotation = Quaternion.LookRotation(toAttacker.XZ().normalized, transform.up);
+    var forward = toAttacker.XZ().normalized.TryGetDirection() ?? transform.forward;
+    transform.rotation = Quaternion.LookRotation(forward, transform.up);
     CameraShaker.Instance.Shake(hitParams.CameraShakeIntensity);
     HitStopFramesRemaining = hitParams.HitStopDuration.Ticks * 2;
     SimpleFlash.FlashColor = ParryFlashColor;
@@ -202,8 +197,8 @@ public class TargetDummyController : MonoBehaviour {
   void OnBlock(MeleeContact contact) {
     var hitbox = contact.Hitbox;
     var toAttacker = hitbox.Owner.transform.position-transform.position;
-    if (toAttacker.sqrMagnitude > 0)
-      transform.rotation = Quaternion.LookRotation(toAttacker.XZ().normalized, transform.up);
+    var forward = toAttacker.XZ().normalized.TryGetDirection() ?? transform.forward;
+    transform.rotation = Quaternion.LookRotation(forward, transform.up);
     CameraShaker.Instance.Shake(hitbox.HitboxParams.CameraShakeIntensity / 2);
     HitStopFramesRemaining = hitbox.HitboxParams.HitStopDuration.Ticks / 2;
     SimpleFlash.FlashColor = BlockFlashColor;
