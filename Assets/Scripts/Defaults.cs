@@ -10,6 +10,7 @@ public class Defaults : MonoBehaviour {
 
   [Header("Physics")]
   public LayerMask EnvironmentLayerMask;
+  public LayerMask BuildingLayerMask;
   public LayerMask GrapplePointLayerMask;
   public string GroundTag = "Ground";
 

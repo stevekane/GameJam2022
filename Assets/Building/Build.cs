@@ -8,9 +8,10 @@ public class Build : Ability {
   [SerializeField] Material GhostMaterial;
   BuildObject GhostInstance;
   bool IsBuildCellValid = false;
-  const float GridSize = 1f;
 
-  Dictionary<Vector2Int, BuildGridCell> Cells = new();
+  BuildGrid Grid = new();
+
+  public BuildObject SetBuildPrefab(BuildObject obj) => BuildPrefab = obj;
 
   public override bool CanStart(AbilityMethod func) => 0 switch {
     _ when func == AcceptAction => IsRunning,
@@ -20,15 +21,16 @@ public class Build : Ability {
   };
 
   public override async Task MainAction(TaskScope scope) {
+    var debugThing = Instantiate(VFXManager.Instance.DebugIndicatorPrefab);
     try {
-      var characterCell = WorldToGrid(Character.transform.position);
+      var characterCell = BuildGrid.WorldToGrid(Character.transform.position);
       var halfBuildSize = (BuildPrefab.Size + new Vector2Int(6, 6)) / 2;  // rounds up
       var buildDir = Character.transform.forward.XZ2();
       var buildCell = Vector2Int.FloorToInt(characterCell + buildDir*halfBuildSize);
       var buildDelta = buildCell - characterCell;
       var yOffset = Character.transform.position.y;
-      CreateGridCells(characterCell, Character.transform.position.y);
-      GhostInstance = Instantiate(BuildPrefab, GridToWorld(buildCell, yOffset), Quaternion.identity);
+      Grid.CreateGridCells(GridCellPrefab, characterCell, Character.transform.position.y);
+      GhostInstance = Instantiate(BuildPrefab, BuildGrid.GridToWorld(BuildPrefab, buildCell, yOffset), Quaternion.identity);
       ApplyGhostMaterial(GhostInstance.gameObject);
       GhostInstance.gameObject.SetActive(true);
       Vector2Int? lastBuildCell = null;
@@ -36,23 +38,24 @@ public class Build : Ability {
         WaitForAccept,
         ListenFor(CancelAction),
         Waiter.Repeat(async s => {
-          characterCell = WorldToGrid(Character.transform.position);
+          characterCell = BuildGrid.WorldToGrid(Character.transform.position);
           buildCell = Vector2Int.FloorToInt(characterCell + buildDir*halfBuildSize);
           if (lastBuildCell != buildCell) {
-            IsBuildCellValid = IsValidBuildPos(buildCell);
+            IsBuildCellValid = Grid.IsValidBuildPos(BuildPrefab, buildCell);
             if (lastBuildCell.HasValue)
-              UpdateCellState(lastBuildCell.Value, BuildGridCell.State.Empty);
-            UpdateCellState(buildCell, IsBuildCellValid ? BuildGridCell.State.Valid : BuildGridCell.State.Invalid);
+              Grid.UpdateCellState(BuildPrefab, lastBuildCell.Value, BuildGridCell.State.Empty);
+            Grid.UpdateCellState(BuildPrefab, buildCell, IsBuildCellValid ? BuildGridCell.State.Valid : BuildGridCell.State.Invalid);
             lastBuildCell = buildCell;
           }
           //DebugUI.Log(this, $"build={BuildDestination} char={CharacterPosition} chargrid={characterGrid} buildDir={buildDir}");
-          GhostInstance.transform.position = GridToWorld(buildCell, yOffset);
+          GhostInstance.transform.position = BuildGrid.GridToWorld(BuildPrefab, buildCell, yOffset);
+          debugThing.transform.position = BuildGrid.GridToWorld(buildCell, yOffset);
           await scope.Tick();
         }));
     } finally {
       Destroy(GhostInstance.gameObject);
-      Cells.ForEach(c => c.Value.gameObject.Destroy());
-      Cells.Clear();
+      Destroy(debugThing);
+      Grid.Clear();
     }
   }
 
@@ -60,9 +63,14 @@ public class Build : Ability {
     while (true) {
       await ListenFor(AcceptAction)(scope);
       if (IsBuildCellValid) {
+        var center = BuildGrid.WorldToGrid(GhostInstance.transform.position);
+        var (bottomLeft, topRight) = BuildGrid.GetBuildingBounds(BuildPrefab, center);
+        Debug.Log($"Placing {BuildPrefab} at {center} tr={GhostInstance.transform.position} bounds={bottomLeft}, {topRight}");
         var obj = Instantiate(BuildPrefab, GhostInstance.transform.position, GhostInstance.transform.rotation);
         obj.gameObject.SetActive(true);
-        break;
+        FindObjectsOfType<Machine>().ForEach(m => m.UpdateOutputCells());
+        if (!BuildPrefab.CanPlaceMultiple)
+          break;
       }
     }
   }
@@ -72,57 +80,6 @@ public class Build : Ability {
   public Task RotateAction(TaskScope scope) {
     GhostInstance.transform.rotation *= Quaternion.AngleAxis(90f, Vector3.up);
     return null;
-  }
-
-  bool IsValidBuildPos(Vector2Int center) {
-    var halfBuildSize = (BuildPrefab.Size + new Vector2Int(1, 1)) / 2;  // rounds up
-    for (int x = center.x - halfBuildSize.x; x <= center.x + halfBuildSize.x; x++) {
-      for (int y = center.y - halfBuildSize.y; y <= center.y + halfBuildSize.y; y++) {
-        var pos = new Vector2Int(x, y);
-        if (!Cells.ContainsKey(pos)) return false;
-      }
-    }
-    return true;
-  }
-
-  void UpdateCellState(Vector2Int center, BuildGridCell.State state) {
-    var halfBuildSize = (BuildPrefab.Size + new Vector2Int(1, 1)) / 2;  // rounds up
-    for (int x = center.x - halfBuildSize.x; x <= center.x + halfBuildSize.x; x++) {
-      for (int y = center.y - halfBuildSize.y; y <= center.y + halfBuildSize.y; y++) {
-        var pos = new Vector2Int(x, y);
-        if (Cells.TryGetValue(pos, out var c))
-          c.SetState(state);
-      }
-    }
-  }
-
-  Vector2Int WorldToGrid(Vector3 worldPos) {
-    worldPos *= 1f/GridSize;
-    return new((int)worldPos.x, (int)worldPos.z);
-  }
-
-  Vector3 GridToWorld(Vector2Int gridPos, float yOffset = 0f) {
-    return new(gridPos.x*GridSize + GridSize*.5f, yOffset, gridPos.y*GridSize + GridSize*.5f);
-  }
-
-  void CreateGridCells(Vector2Int center, float y) {
-    var toVisit = new Queue<Vector2Int>();
-    toVisit.Enqueue(center);
-    while (toVisit.TryDequeue(out var pos)) {
-      if (Cells.ContainsKey(pos))
-        continue;
-      var worldPos = GridToWorld(pos, y);
-      const float epsilon = .01f;
-      if (!Physics.Raycast(worldPos + Vector3.up*10f, Vector3.down, out var hit, 11f, Defaults.Instance.EnvironmentLayerMask)
-        || hit.point.y > y+epsilon)
-        continue;
-      var indicator = Instantiate(GridCellPrefab, worldPos, Quaternion.identity);
-      Cells.Add(pos, indicator);
-      toVisit.Enqueue(pos + Vector2Int.left);
-      toVisit.Enqueue(pos + Vector2Int.right);
-      toVisit.Enqueue(pos + Vector2Int.up);
-      toVisit.Enqueue(pos + Vector2Int.down);
-    }
   }
 
   void ApplyGhostMaterial(GameObject obj) {
