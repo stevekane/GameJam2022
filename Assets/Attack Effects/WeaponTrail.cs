@@ -141,6 +141,7 @@ public class WeaponTrail : MonoBehaviour {
   }
 
   void RenderToMesh() {
+    if (!Mesh) return;
     List<Vector3> Vertices = new();
     List<Vector4> UVs = new();
     List<int> Triangles = new();

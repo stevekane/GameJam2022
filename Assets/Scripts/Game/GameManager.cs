@@ -43,6 +43,7 @@ public class GameManager : MonoBehaviour {
       this.InitComponentFromChildren(out DebugUI.Instance, true);
       this.InitComponentFromChildren(out NavMeshUtil.Instance);
       this.InitComponentFromChildren(out PlayerManager.Instance);
+      this.InitComponentFromChildren(out ItemFlowManager.Instance);
       DontDestroyOnLoad(Instance.gameObject);
     }
   }
