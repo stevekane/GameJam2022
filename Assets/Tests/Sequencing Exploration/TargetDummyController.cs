@@ -105,7 +105,7 @@ public class TargetDummyController : MonoBehaviour {
 
   void OnControllerColliderHit(ControllerColliderHit hit) {
     var collider = hit.collider;
-    var velocity = hit.controller.velocity;
+    var velocity = Velocity.Value;
     var speed = velocity.magnitude;
     if (collider.gameObject.CompareTag("Wall") && speed > 20 && HitStopFramesRemaining <= 0) {
       var centerPoint = hit.collider.ClosestPoint(transform.position + Vector3.up);

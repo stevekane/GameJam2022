@@ -94,7 +94,7 @@ BlendTree:
   m_Childs:
   - serializedVersion: 2
     m_Motion: {fileID: 7400000, guid: 9b47bd9e3b792054d9f1d8320fe0403b, type: 3}
-    m_Threshold: 0
+    m_Threshold: 3
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1
     m_CycleOffset: 0
@@ -102,25 +102,25 @@ BlendTree:
     m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: 7400000, guid: c55708165ee5d0c49aa26e5ba59fe391, type: 3}
-    m_Threshold: 0.5
+    m_Threshold: 10
     m_Position: {x: 0, y: 0}
-    m_TimeScale: 1
+    m_TimeScale: 1.5
     m_CycleOffset: 0
     m_DirectBlendParameter: Blend
     m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: 7400000, guid: 04f0842c5d1dba749a6ed3e3091bf41b, type: 3}
-    m_Threshold: 1
+    m_Threshold: 16
     m_Position: {x: 0, y: 0}
-    m_TimeScale: 1
+    m_TimeScale: 1.5
     m_CycleOffset: 0
     m_DirectBlendParameter: Blend
     m_Mirror: 0
   m_BlendParameter: Speed
   m_BlendParameterY: Blend
-  m_MinThreshold: 0
-  m_MaxThreshold: 1
-  m_UseAutomaticThresholds: 1
+  m_MinThreshold: 3
+  m_MaxThreshold: 16
+  m_UseAutomaticThresholds: 0
   m_NormalizedBlendValues: 0
   m_BlendType: 0
 --- !u!1101 &-6052347596323878390
@@ -299,19 +299,19 @@ AnimatorStateMachine:
     m_Position: {x: 510, y: 110, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -1692016531133749495}
-    m_Position: {x: 100, y: -80, z: 0}
+    m_Position: {x: 20, y: -10, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 3961701487603890047}
-    m_Position: {x: 100, y: -220, z: 0}
+    m_Position: {x: 180, y: -180, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 2403135584685347272}
-    m_Position: {x: 100, y: -150, z: 0}
+    m_Position: {x: 20, y: -100, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 5348742921672694465}
-    m_Position: {x: 360, y: -150, z: 0}
+    m_Position: {x: 440, y: -180, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -2919328517407683942}
-    m_Position: {x: 360, y: -220, z: 0}
+    m_Position: {x: 610, y: -40, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
@@ -414,31 +414,31 @@ AnimatorController:
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: Blend
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: Speed
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: Jump
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: Grounded
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 1
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
@@ -716,7 +716,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.1
+  m_TransitionDuration: 0
   m_TransitionOffset: 0
   m_ExitTime: 0.70394737
   m_HasExitTime: 0

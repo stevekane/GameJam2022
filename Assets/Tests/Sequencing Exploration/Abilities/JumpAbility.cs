@@ -2,8 +2,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public class JumpAbility : MonoBehaviour {
-  [SerializeField] TimelineTaskConfig TimelineTaskConfig;
-  [SerializeField] LogicalTimeline LogicalTimeline;
   [SerializeField] AudioClip SFX;
   [SerializeField] int StartupTicks;
   [SerializeField] float JumpStrength;

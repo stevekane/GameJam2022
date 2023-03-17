@@ -26,8 +26,6 @@ public class AnimatorGraph : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    if (CurrentPlayable.IsDone())
-      Debug.Log("Done");
     Graph.Evaluate(Time.fixedDeltaTime);
   }
 
