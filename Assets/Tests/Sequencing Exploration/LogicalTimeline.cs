@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Playables;
-using UnityEngine.Rendering.Universal;
 
 public class LogicalTimeline : MonoBehaviour {
   public static int FixedFrame;
@@ -8,9 +7,6 @@ public class LogicalTimeline : MonoBehaviour {
 
   [Header("Input")]
   [SerializeField] InputManager InputManager;
-  [SerializeField] AudioClip FootStepSFX;
-  [SerializeField] GameObject FootStepVFX;
-  [SerializeField] DecalProjector FootStepDecal;
 
   [Header("Visual Effects")]
   [SerializeField] GameObject OnHitVFX;
@@ -37,11 +33,11 @@ public class LogicalTimeline : MonoBehaviour {
   [SerializeField] LocalTime LocalTime;
   [SerializeField] Velocity Velocity;
   [SerializeField] Traditional.Grounded Grounded;
+  [SerializeField] HitStop HitStop;
 
   TaskScope Scope;
 
   public PlayableGraph Graph;
-  public int HitStopFramesRemaining;
 
   void Start() {
     Time.fixedDeltaTime = 1f / Timeval.FixedUpdatePerSecond;
@@ -63,6 +59,7 @@ public class LogicalTimeline : MonoBehaviour {
   }
 
   void FixedUpdate() {
+    // PROCESS INPUT
     var camera = Camera.main; // TODO: slow way to access camera
     var dt = LocalTime.FixedDeltaTime;
     var movementInput = InputManager.Axis(AxisCode.AxisLeft);
@@ -76,6 +73,11 @@ public class LogicalTimeline : MonoBehaviour {
       movementMagnitude = 1;
     }
 
+    // UPDATE LOCAL TIME and systems which effect it
+    LocalTime.TimeScale = HitStop.TicksRemaining > 0 ? 0 : 1;
+    HitStop.TicksRemaining = Mathf.Max(0, HitStop.TicksRemaining-1);
+
+    // COMPUTE MOTION OF CHARACTER
     var planeVelocity = Vector3.zero;
     if (Grounded.Value) {
       planeVelocity = movementMagnitude * MovementSpeed.Value * worldSpaceDirection;
@@ -95,44 +97,35 @@ public class LogicalTimeline : MonoBehaviour {
     Velocity.Value.x = planeVelocity.x;
     Velocity.Value.z = planeVelocity.z;
     Controller.Move(dt * Velocity.Value);
-    LocalTime.TimeScale = HitStopFramesRemaining > 0 ? 0 : 1;
-    HitStopFramesRemaining = Mathf.Max(0, HitStopFramesRemaining-1);
     Graph.Evaluate(dt);
+
+    // FIRE FIXED FRAME STUFF (REMOVE THIS)
     FixedFrame++;
     FixedTick.Fire();
+
+    // UPDATE THE ANIMATOR (MOVE TO SEPARATE SYSTEM)
     Animator.SetFloat("Speed", movementMagnitude * MovementSpeed.Value);
     Animator.SetBool("Grounded", Grounded.Value);
-  }
-
-  void OnFootStep(string footName) {
-    var targetBone = footName == "Left" ? AvatarBone.LeftFoot : AvatarBone.RightFoot;
-    var targetFoot = AvatarAttacher.FindBoneTransform(Animator, targetBone);
-    if (MovementSpeed.Value > 10) {
-      ResidualImageRenderer.Render();
-      Destroy(Instantiate(FootStepVFX, targetFoot.transform.position, targetFoot.transform.rotation), 2);
-      Destroy(Instantiate(FootStepDecal, targetFoot.transform.position, Quaternion.LookRotation(Vector3.down)), 2);
-    }
-    AudioSource.PlayClipAtPoint(FootStepSFX, targetFoot.position);
   }
 
   void OnHit(MeleeContact contact) {
     MeleeAttackTargeting.Victims.Add(contact.Hurtbox.Owner.gameObject);
     Destroy(Instantiate(OnHitVFX, contact.Hurtbox.transform.position + Vector3.up, transform.rotation), 3);
     Vibrator.VibrateOnHit(transform.forward, contact.Hitbox.HitboxParams.HitStopDuration.Ticks);
-    HitStopFramesRemaining = contact.Hitbox.HitboxParams.HitStopDuration.Ticks;
+    HitStop.TicksRemaining = contact.Hitbox.HitboxParams.HitStopDuration.Ticks;
   }
 
   void OnBlocked(MeleeContact contact) {
     MeleeAttackTargeting.Victims.Add(contact.Hurtbox.Owner.gameObject);
     Destroy(Instantiate(OnHitVFX, contact.Hurtbox.transform.position + Vector3.up, transform.rotation), 3);
     Vibrator.VibrateOnHit(transform.forward, contact.Hitbox.HitboxParams.HitStopDuration.Ticks / 2);
-    HitStopFramesRemaining = contact.Hitbox.HitboxParams.HitStopDuration.Ticks / 2;
+    HitStop.TicksRemaining = contact.Hitbox.HitboxParams.HitStopDuration.Ticks / 2;
   }
 
   void OnParried(MeleeContact contact) {
     Destroy(Instantiate(OnHitVFX, contact.Hurtbox.transform.position + Vector3.up, transform.rotation), 3);
     Vibrator.VibrateOnHurt(transform.forward, contact.Hitbox.HitboxParams.HitStopDuration.Ticks * 2);
-    HitStopFramesRemaining = contact.Hitbox.HitboxParams.HitStopDuration.Ticks * 2;
+    HitStop.TicksRemaining = contact.Hitbox.HitboxParams.HitStopDuration.Ticks * 2;
     Scope.Dispose();
     Scope = new();
     Debug.Log("OnParried");
