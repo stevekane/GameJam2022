@@ -1,8 +1,13 @@
 using UnityEngine;
 using UnityEngine.Playables;
 
-public class AudioOneshotClipBehavior : PlayableBehaviour {
+public class AudioOneshotClipBehavior : TaskBehavior {
   public AudioClip Clip;
+
+  public override void Setup(Playable playable) {
+    var audioSource = (AudioSource)UserData;
+    audioSource.PlayOneShot(Clip);
+  }
 }
 
 public class AudioOneshotClipAsset : PlayableAsset {

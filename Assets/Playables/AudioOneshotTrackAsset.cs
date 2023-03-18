@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEngine.Playables;
 
+public class AudioOneshotTrackMixer : TaskBehavior {}
+
 [TrackBindingType(typeof(AudioSource))]
 [TrackClipType(typeof(AudioOneshotClipAsset))]
 public class AudioOneshotTrackAsset : TrackAsset {

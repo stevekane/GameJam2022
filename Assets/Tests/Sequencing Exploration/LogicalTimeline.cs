@@ -25,6 +25,7 @@ public class LogicalTimeline : MonoBehaviour {
   [SerializeField] MeleeAttackTargeting MeleeAttackTargeting;
 
   [Header("State")]
+  [SerializeField] PersonalCamera PersonalCamera;
   [SerializeField] SplitGravity Gravity;
   [SerializeField] MaxMovementSpeed MaxMovementSpeed;
   [SerializeField] MovementSpeed MovementSpeed;
@@ -59,16 +60,11 @@ public class LogicalTimeline : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    // PROCESS INPUT
-    var camera = Camera.main; // TODO: slow way to access camera
-    var dt = LocalTime.FixedDeltaTime;
-    var movementInput = InputManager.Axis(AxisCode.AxisLeft);
-    var screenDirection = movementInput.XY;
-    var movementMagnitude = screenDirection.magnitude;
-    var worldSpaceDirection = camera.transform.TransformDirection(screenDirection);
-    worldSpaceDirection.y = 0;
-    worldSpaceDirection = worldSpaceDirection.normalized;
-    if (movementMagnitude > 0) {
+    var worldSpaceDirection = InputManager.Axis(AxisCode.AxisLeft).XZFrom(PersonalCamera.Current);
+    var movementMagnitude = 0;
+    if (worldSpaceDirection.sqrMagnitude > 0) {
+      // TODO: Do we actually change orientation right away like this?
+      // TODO: Should localtimescale shit take priority over inputs?
       transform.rotation = Quaternion.LookRotation(worldSpaceDirection);
       movementMagnitude = 1;
     }
@@ -78,6 +74,7 @@ public class LogicalTimeline : MonoBehaviour {
     HitStop.TicksRemaining = Mathf.Max(0, HitStop.TicksRemaining-1);
 
     // COMPUTE MOTION OF CHARACTER
+    var dt = LocalTime.FixedDeltaTime;
     var planeVelocity = Vector3.zero;
     if (Grounded.Value) {
       planeVelocity = movementMagnitude * MovementSpeed.Value * worldSpaceDirection;

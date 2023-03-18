@@ -35,6 +35,13 @@ public class AxisState {
   public Vector2 XY;
   public Vector3 RawXZ;
   public Vector3 XZ;
+  public Vector3 XZFrom(Camera camera) {
+    var movementMagnitude = XY.magnitude;
+    var worldSpaceDirection = camera.transform.TransformDirection(XY);
+    worldSpaceDirection.y = 0;
+    worldSpaceDirection = worldSpaceDirection.normalized;
+    return worldSpaceDirection;
+  }
   public void Update(float deadZone, Vector2 raw) {
     RawXY = raw;
     RawXZ = new Vector3(raw.x, 0, raw.y);
