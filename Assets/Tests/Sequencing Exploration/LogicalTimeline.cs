@@ -42,10 +42,10 @@ public class LogicalTimeline : MonoBehaviour {
 
   void Start() {
     Time.fixedDeltaTime = 1f / Timeval.FixedUpdatePerSecond;
-    Scope = new TaskScope();
     InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Listen(StartAttack);
     InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Listen(Jump);
     InputManager.ButtonEvent(SprintAbility.ButtonCode, ButtonPressType.JustDown).Listen(StartSprint);
+    Scope = new TaskScope();
     Graph = PlayableGraph.Create("Logical Timeline");
     Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
     Graph.Play();
@@ -68,10 +68,6 @@ public class LogicalTimeline : MonoBehaviour {
       transform.rotation = Quaternion.LookRotation(worldSpaceDirection);
       movementMagnitude = 1;
     }
-
-    // UPDATE LOCAL TIME and systems which effect it
-    LocalTime.TimeScale = HitStop.TicksRemaining > 0 ? 0 : 1;
-    HitStop.TicksRemaining = Mathf.Max(0, HitStop.TicksRemaining-1);
 
     // COMPUTE MOTION OF CHARACTER
     var dt = LocalTime.FixedDeltaTime;
@@ -125,7 +121,6 @@ public class LogicalTimeline : MonoBehaviour {
     HitStop.TicksRemaining = contact.Hitbox.HitboxParams.HitStopDuration.Ticks * 2;
     Scope.Dispose();
     Scope = new();
-    Debug.Log("OnParried");
     Animator.SetTrigger("Parried");
   }
 

@@ -50,13 +50,12 @@ public class TargetDummyController : MonoBehaviour {
   [Header("State")]
   [SerializeField] LocalTime LocalTime;
   [SerializeField] Velocity Velocity;
+  [SerializeField] HitStop HitStop;
   [SerializeField] DefenderState State;
 
   AnimatorControllerPlayable AnimatorControllerPlayable;
   PlayableGraph Graph;
   TaskScope Scope;
-
-  int HitStopFramesRemaining;
 
   void Start() {
     Scope = new();
@@ -73,28 +72,7 @@ public class TargetDummyController : MonoBehaviour {
     Graph.Destroy();
   }
 
-  void Update() {
-    if (Input.GetMouseButtonDown(1)) {
-      State = State == DefenderState.Vulnerable ? DefenderState.Blocking : DefenderState.Vulnerable;
-    }
-  }
-
-  /*
-  A general observation: We probably do not ever want to allow the character to rotate
-  on any axis other than Y. We have already "fixed" one possible source of errant rotation
-  being rotation that comes from a look angle set from a zero-length vector.
-
-  It seems here, we have encountered another instance of errant rotation: when the character's
-  transform is reflected around a hit normal.
-  */
   void FixedUpdate() {
-    if (HitStopFramesRemaining > 0) {
-      LocalTime.TimeScale = 0;
-      HitStopFramesRemaining--;
-    } else {
-      LocalTime.TimeScale = 1;
-      HitStopFramesRemaining = 0;
-    }
     var dt = LocalTime.FixedDeltaTime;
     var verticalVelocity = dt * Gravity.y;
     if (Controller.isGrounded) {
@@ -114,7 +92,7 @@ public class TargetDummyController : MonoBehaviour {
     var collider = hit.collider;
     var velocity = Velocity.Value;
     var speed = velocity.magnitude;
-    if (collider.gameObject.CompareTag("Wall") && speed > 20 && HitStopFramesRemaining <= 0) {
+    if (collider.gameObject.CompareTag("Wall") && speed > 20 && HitStop.TicksRemaining <= 0) {
       var centerPoint = hit.collider.ClosestPoint(transform.position + Vector3.up);
       var particleOrigin = centerPoint + hit.normal;
       var particleForward = Quaternion.LookRotation(hit.normal);
@@ -126,7 +104,7 @@ public class TargetDummyController : MonoBehaviour {
       Destroy(decal.gameObject, 3);
       AudioSource.PlayOneShot(WallBounceSFX);
       Vibrator.Vibrate(hit.normal, 12, .1f);
-      HitStopFramesRemaining = 12;
+      HitStop.TicksRemaining = 12;
       Animator.SetTrigger("HurtBack");
       CameraShaker.Instance.Shake(20);
       Velocity.Value = Vector3.Reflect(Velocity.Value / 2, hit.normal);
@@ -161,7 +139,7 @@ public class TargetDummyController : MonoBehaviour {
     var forward = toAttacker.XZ().normalized.TryGetDirection() ?? transform.forward;
     transform.rotation = Quaternion.LookRotation(forward, transform.up);
     CameraShaker.Instance.Shake(hitbox.HitboxParams.CameraShakeIntensity);
-    HitStopFramesRemaining = hitbox.HitboxParams.HitStopDuration.Ticks;
+    HitStop.TicksRemaining = hitbox.HitboxParams.HitStopDuration.Ticks;
     SimpleFlash.FlashColor = HurtFlashColor;
     SimpleFlash.TicksRemaining = 20;
     Destroy(DirectionalVFX(transform, OnHurtVFX, hitbox.HitboxParams.HitDirection), 3);
@@ -196,7 +174,7 @@ public class TargetDummyController : MonoBehaviour {
     var forward = toAttacker.XZ().normalized.TryGetDirection() ?? transform.forward;
     transform.rotation = Quaternion.LookRotation(forward, transform.up);
     CameraShaker.Instance.Shake(hitParams.CameraShakeIntensity);
-    HitStopFramesRemaining = hitParams.HitStopDuration.Ticks * 2;
+    HitStop.TicksRemaining = hitParams.HitStopDuration.Ticks * 2;
     SimpleFlash.FlashColor = ParryFlashColor;
     SimpleFlash.TicksRemaining = 20;
     Destroy(DirectionalVFX(transform, OnParryVFX, hitParams.HitDirection), 3);
@@ -211,7 +189,7 @@ public class TargetDummyController : MonoBehaviour {
     var forward = toAttacker.XZ().normalized.TryGetDirection() ?? transform.forward;
     transform.rotation = Quaternion.LookRotation(forward, transform.up);
     CameraShaker.Instance.Shake(hitbox.HitboxParams.CameraShakeIntensity / 2);
-    HitStopFramesRemaining = hitbox.HitboxParams.HitStopDuration.Ticks / 2;
+    HitStop.TicksRemaining = hitbox.HitboxParams.HitStopDuration.Ticks / 2;
     SimpleFlash.FlashColor = BlockFlashColor;
     SimpleFlash.TicksRemaining = 20;
     Destroy(DirectionalVFX(transform, OnBlockVFX, hitbox.HitboxParams.HitDirection), 3);
