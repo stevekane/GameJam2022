@@ -63,7 +63,6 @@ public class TargetDummyController : MonoBehaviour {
     Graph = PlayableGraph.Create("Target Dummy");
     Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
     Graph.Play();
-    // RootMotion.enabled = true;
     AnimatorControllerPlayable = AnimatorControllerPlayable.Create(Graph, AnimatorController);
     var output = AnimationPlayableOutput.Create(Graph, "Animation Output", Animator);
     output.SetSourcePlayable(AnimatorControllerPlayable);
@@ -80,6 +79,14 @@ public class TargetDummyController : MonoBehaviour {
     }
   }
 
+  /*
+  A general observation: We probably do not ever want to allow the character to rotate
+  on any axis other than Y. We have already "fixed" one possible source of errant rotation
+  being rotation that comes from a look angle set from a zero-length vector.
+
+  It seems here, we have encountered another instance of errant rotation: when the character's
+  transform is reflected around a hit normal.
+  */
   void FixedUpdate() {
     if (HitStopFramesRemaining > 0) {
       LocalTime.TimeScale = 0;
@@ -109,9 +116,13 @@ public class TargetDummyController : MonoBehaviour {
     var speed = velocity.magnitude;
     if (collider.gameObject.CompareTag("Wall") && speed > 20 && HitStopFramesRemaining <= 0) {
       var centerPoint = hit.collider.ClosestPoint(transform.position + Vector3.up);
-      var impactParticles = Instantiate(WallBounceDebris, centerPoint + hit.normal, Quaternion.LookRotation(hit.normal));
+      var particleOrigin = centerPoint + hit.normal;
+      var particleForward = Quaternion.LookRotation(hit.normal);
+      var impactParticles = Instantiate(WallBounceDebris, particleOrigin, particleForward);
       Destroy(impactParticles.gameObject, 3);
-      var decal = Instantiate(WallBounceDecal, centerPoint + hit.normal * .1f, Quaternion.LookRotation(-hit.normal));
+      var decalOrigin = centerPoint + hit.normal * .1f;
+      var decalForward = Quaternion.LookRotation(-hit.normal);
+      var decal = Instantiate(WallBounceDecal, decalOrigin, decalForward);
       Destroy(decal.gameObject, 3);
       AudioSource.PlayOneShot(WallBounceSFX);
       Vibrator.Vibrate(hit.normal, 12, .1f);
@@ -119,7 +130,7 @@ public class TargetDummyController : MonoBehaviour {
       Animator.SetTrigger("HurtBack");
       CameraShaker.Instance.Shake(20);
       Velocity.Value = Vector3.Reflect(Velocity.Value / 2, hit.normal);
-      transform.right = Vector3.Reflect(transform.right, hit.normal);
+      transform.right = Vector3.Reflect(transform.right, hit.normal.XZ());
     }
   }
 
