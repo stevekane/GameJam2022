@@ -20,17 +20,21 @@ public class Build : Ability {
     _ => true
   };
 
+  // TODO: better handling of distance (here and halfBuildSize)
+  const float MaxBuildDist = 6f;
   public override async Task MainAction(TaskScope scope) {
     var debugThing = Instantiate(VFXManager.Instance.DebugIndicatorPrefab);
+    var realMoveAxis = AbilityManager.CaptureAxis(AxisTag.Move);
+    var realAimAxis = AbilityManager.CaptureAxis(AxisTag.Aim);
     try {
       var characterCell = BuildGrid.WorldToGrid(Character.transform.position);
+      var yOffset = Character.transform.position.y;
       var halfBuildSize = (BuildPrefab.Size + new Vector2Int(6, 6)) / 2;  // rounds up
       var buildDir = Character.transform.forward.XZ2();
       var buildCell = Vector2Int.FloorToInt(characterCell + buildDir*halfBuildSize);
-      var buildDelta = buildCell - characterCell;
-      var yOffset = Character.transform.position.y;
+      var buildTarget = BuildGrid.GridToWorld(BuildPrefab, buildCell, yOffset);
       Grid.CreateGridCells(GridCellPrefab, characterCell, Character.transform.position.y);
-      GhostInstance = Instantiate(BuildPrefab, BuildGrid.GridToWorld(BuildPrefab, buildCell, yOffset), Quaternion.identity);
+      GhostInstance = Instantiate(BuildPrefab, buildTarget, Quaternion.identity);
       ApplyGhostMaterial(GhostInstance.gameObject);
       GhostInstance.gameObject.SetActive(true);
       Vector2Int? lastBuildCell = null;
@@ -38,8 +42,14 @@ public class Build : Ability {
         WaitForAccept,
         ListenFor(CancelAction),
         Waiter.Repeat(async s => {
-          characterCell = BuildGrid.WorldToGrid(Character.transform.position);
-          buildCell = Vector2Int.FloorToInt(characterCell + buildDir*halfBuildSize);
+          buildTarget += realMoveAxis.XZ * Mover.WalkSpeed * Time.fixedDeltaTime;
+          var buildDelta = buildTarget - Character.transform.position;
+          var moveAxis = new Vector3(
+            Mathf.Abs(buildDelta.x) < MaxBuildDist ? 0 : realMoveAxis.XZ.x,
+            0f,
+            Mathf.Abs(buildDelta.z) < MaxBuildDist ? 0 : realMoveAxis.XZ.z);
+          Mover.SetMoveAim(moveAxis, moveAxis);
+          buildCell = BuildGrid.WorldToGrid(buildTarget);
           if (lastBuildCell != buildCell) {
             IsBuildCellValid = Grid.IsValidBuildPos(BuildPrefab, buildCell);
             if (lastBuildCell.HasValue)
@@ -53,6 +63,8 @@ public class Build : Ability {
           await scope.Tick();
         }));
     } finally {
+      AbilityManager.UncaptureAxis(AxisTag.Move, realMoveAxis);
+      AbilityManager.UncaptureAxis(AxisTag.Aim, realAimAxis);
       Destroy(GhostInstance.gameObject);
       Destroy(debugThing);
       Grid.Clear();

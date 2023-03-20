@@ -11,10 +11,9 @@ using UnityEngine.AI;
 // [RequireComponent(typeof(Attributes))]
 // [RequireComponent(typeof(Status))]
 public class Mover : MonoBehaviour {
-  public static Quaternion RotationFromDesired(Quaternion rotation, float speed, Vector3 desiredForward) {
+  public static Quaternion RotationFromDesired(Quaternion rotation, float degreesDelta, Vector3 desiredForward) {
     var desiredRotation = Quaternion.LookRotation(desiredForward);
-    var degrees = speed * Time.fixedDeltaTime;
-    return Quaternion.RotateTowards(rotation, desiredRotation, degrees);
+    return Quaternion.RotateTowards(rotation, desiredRotation, degreesDelta);
   }
 
   CharacterController Controller;
@@ -31,6 +30,7 @@ public class Mover : MonoBehaviour {
   public Vector3 MoveVelocity { get; private set; }
   public Vector3 Velocity { get; private set; }
   public float FallSpeed { get; private set; }
+  public float WalkSpeed => Attributes.GetValue(AttributeTag.MoveSpeed) * Attributes.GetValue(AttributeTag.LocalTimeScale, 1);
 
   public void Awake() {
     this.InitComponent(out Controller);
@@ -86,7 +86,7 @@ public class Mover : MonoBehaviour {
     // Move
     var moveSpeed = Attributes.GetValue(AttributeTag.MoveSpeed);
     var gravity = dt * Attributes.GetValue(AttributeTag.Gravity);
-    InputVelocity = localTimeScale * moveSpeed * desiredMoveDir;
+    InputVelocity = moveSpeed * desiredMoveDir;
     FallSpeed = Status switch {
       Status { HasGravity: true, IsGrounded: true } => gravity,
       Status { HasGravity: true, IsGrounded: false } => FallSpeed + gravity,
@@ -114,9 +114,8 @@ public class Mover : MonoBehaviour {
     if (Status.IsWallSliding) {
       transform.rotation = Quaternion.LookRotation(-WallSlideNormal);
     } else {
-      var turnSpeed = Attributes.GetValue(AttributeTag.TurnSpeed);
-      var localTurnSpeed = localTimeScale * turnSpeed;
-      var desiredRotation = RotationFromDesired(transform.rotation, localTurnSpeed, desiredFacing);
+      var turnDelta = dt * Attributes.GetValue(AttributeTag.TurnSpeed);
+      var desiredRotation = RotationFromDesired(transform.rotation, turnDelta, desiredFacing);
       transform.rotation = desiredRotation * RotationDelta;
     }
     RotationDelta = Quaternion.identity;
