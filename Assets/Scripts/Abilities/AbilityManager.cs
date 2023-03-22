@@ -39,6 +39,14 @@ public class AbilityManager : MonoBehaviour {
       TagToAxis[tag] = axis = new();
     return axis;
   }
+  public AxisState CaptureAxis(AxisTag tag) {
+    var realAxis = GetAxis(tag);
+    TagToAxis[tag] = new();
+    return realAxis;
+  }
+  public void UncaptureAxis(AxisTag tag, AxisState oldAxis) {
+    TagToAxis[tag] = oldAxis;
+  }
   public IEventSource GetEvent(AbilityMethod method) {
     if (!MethodToEvent.TryGetValue(method, out EventSource evt))
       MethodToEvent[method] = evt = new();
