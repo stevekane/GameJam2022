@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Playables;
+using UnityEngine.SceneManagement;
 
 public class LogicalTimeline : MonoBehaviour {
   public static int FixedFrame;
@@ -39,7 +40,7 @@ public class LogicalTimeline : MonoBehaviour {
 
   public Ledge Ledge;
   public bool Hanging;
-  public bool ClimbingUp;
+  public float HangAngle;
   public Vector3 HangOffset = new Vector3(0, -2, -1);
   public Vector3 LeftHandHangOffset;
   public Vector3 RightHandHangOffset;
@@ -53,16 +54,23 @@ public class LogicalTimeline : MonoBehaviour {
     InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Listen(StartAttack);
     InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Listen(Jump);
     InputManager.ButtonEvent(SprintAbility.ButtonCode, ButtonPressType.JustDown).Listen(StartSprint);
+    InputManager.ButtonEvent(ButtonCode.L2, ButtonPressType.JustDown).Listen(ReloadWholeScene);
     Scope = new TaskScope();
     Graph = PlayableGraph.Create("Logical Timeline");
     Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
     Graph.Play();
   }
 
+  void ReloadWholeScene() {
+    InputManager.Consume(ButtonCode.L2, ButtonPressType.JustDown);
+    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+  }
+
   void OnDestroy() {
     InputManager.ButtonEvent(ButtonCode.West, ButtonPressType.JustDown).Unlisten(StartAttack);
     InputManager.ButtonEvent(ButtonCode.South, ButtonPressType.JustDown).Unlisten(Jump);
     InputManager.ButtonEvent(ButtonCode.R2, ButtonPressType.JustDown).Unlisten(StartSprint);
+    InputManager.ButtonEvent(ButtonCode.L2, ButtonPressType.JustDown).Unlisten(ReloadWholeScene);
     Scope.Dispose();
     Graph.Destroy();
   }
@@ -73,8 +81,6 @@ public class LogicalTimeline : MonoBehaviour {
     if (Hanging) {
       transform.forward = Ledge.Pivot.forward;
       transform.position = Ledge.Pivot.position + transform.TransformVector(HangOffset);
-    } else if (ClimbingUp) {
-      // transform.forward = Ledge.Pivot.forward;
     } else {
       if (worldSpaceDirection.sqrMagnitude > 0) {
         // TODO: Do we actually change orientation right away like this?
@@ -84,18 +90,24 @@ public class LogicalTimeline : MonoBehaviour {
       }
     }
 
-    if (Hanging)
-      HandIKWeight = 1;
+    // Steve - I'm moving this here before our physics calculations to see what effect
+    // it has on the way abilities can influence physics. Overall, I'd like physics calcs
+    // to happen "after" abilities run or in some sense "before" they run...
+    // FIRE FIXED FRAME STUFF (REMOVE THIS)
+    FixedFrame++;
+    FixedTick.Fire();
 
-    if (Hanging || ClimbingUp) {
+    if (Hanging) {
+      HandIKWeight = 1;
       Controller.enabled = false;
     } else {
+      HandIKWeight = 0;
       Controller.enabled = true;
     }
 
     // COMPUTE MOTION OF CHARACTER
     var dt = LocalTime.FixedDeltaTime;
-    if (Hanging || ClimbingUp) {
+    if (Hanging) {
       Velocity.Value = Vector3.zero;
     } else {
       var planeVelocity = Vector3.zero;
@@ -120,48 +132,20 @@ public class LogicalTimeline : MonoBehaviour {
     }
     Graph.Evaluate(dt);
 
-    // FIRE FIXED FRAME STUFF (REMOVE THIS)
-    FixedFrame++;
-    FixedTick.Fire();
-
     // UPDATE THE ANIMATOR (MOVE TO SEPARATE SYSTEM)
     Animator.SetFloat("Speed", movementMagnitude * MovementSpeed.Value);
     Animator.SetBool("Grounded", Grounded.Value);
     Animator.SetBool("Hanging", Hanging);
   }
 
-  void OnAnimatorMove() {
-    if (ClimbingUp) {
-      transform.position += Animator.deltaPosition;
-      transform.rotation *= Animator.deltaRotation;
-    }
-  }
-
   float HandIKWeight;
-  async Task ClimbUp(TaskScope scope) {
-    try {
-      Hanging = false;
-      ClimbingUp = true;
-      Animator.SetTrigger("ClimbUp");
-      for (var i = 0; i < 10; i++) {
-        HandIKWeight = 1;
-        await scope.ListenFor(LogicalTimeline.FixedTick);
-      }
-      HandIKWeight = 0;
-      for (var i = 0; i < 20; i++) {
-        await scope.ListenFor(LogicalTimeline.FixedTick);
-      }
-    } finally {
-      ClimbingUp = false;
-    }
-  }
 
   void OnAnimatorIK() {
     Animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, HandIKWeight);
     Animator.SetIKPositionWeight(AvatarIKGoal.RightHand, HandIKWeight);
     Animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, HandIKWeight);
     Animator.SetIKRotationWeight(AvatarIKGoal.RightHand, HandIKWeight);
-    if (Hanging || ClimbingUp) {
+    if (Hanging) {
       var leftHand = AvatarAttacher.FindBoneTransform(Animator, AvatarBone.LeftHand);
       var rightHand = AvatarAttacher.FindBoneTransform(Animator, AvatarBone.RightHand);
       var leftHandTarget = Ledge.Pivot.position + transform.TransformVector(LeftHandHangOffset);
@@ -176,7 +160,18 @@ public class LogicalTimeline : MonoBehaviour {
 
   void OnLedgeEnter(Ledge l) {
     Ledge = l;
-    Hanging = true;
+  }
+
+  void OnLedgeExit(Ledge l) {
+    Ledge = null;
+  }
+
+  void OnLedgeStay(Ledge l) {
+    if (!Hanging) {
+      var validAngle = Vector3.Angle(transform.forward, l.Pivot.forward) <= HangAngle;
+      var isFalling = Velocity.Value.y < -2;
+      Hanging = validAngle && isFalling;
+    }
   }
 
   void OnHit(MeleeContact contact) {
@@ -211,12 +206,13 @@ public class LogicalTimeline : MonoBehaviour {
 
   void Jump() {
     InputManager.Consume(ButtonCode.South, ButtonPressType.JustDown);
-    if (Hanging) {
-      Scope.Start(ClimbUp);
+    Hanging = false;
+    Scope.Dispose();
+    Scope = new();
+    if (Grounded.Value) {
+      Scope.Start(JumpAbility.Jump);
     } else {
-      Scope.Dispose();
-      Scope = new();
-      Scope.Start(Grounded.Value ? JumpAbility.Jump : DoubleJumpAbility.Jump);
+      Scope.Start(DoubleJumpAbility.Jump);
     }
   }
 
