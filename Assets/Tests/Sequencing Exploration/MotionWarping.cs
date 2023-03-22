@@ -9,7 +9,6 @@ public enum RotationMatch {
 public class MotionWarping : MonoBehaviour {
   [SerializeField] Animator Animator;
   [SerializeField] InputManager InputManager;
-  [SerializeField] int wait;
 
   public int frame;
   public int total;
@@ -39,9 +38,6 @@ public class MotionWarping : MonoBehaviour {
 
   async Task Anim(TaskScope scope) {
     try {
-      for (var i = 0; i < wait; i++) {
-        await scope.ListenFor(LogicalTimeline.FixedTick);
-      }
       Animator.SetTrigger("Attack");
       for (var i = 0; i < 20; i++) {
         await scope.ListenFor(LogicalTimeline.FixedTick);
@@ -56,8 +52,6 @@ public class MotionWarping : MonoBehaviour {
     }
   }
 
-  // TODO: Do we constrain Y-axis motion? Currently...weird y-translation happens
-  // TODO: Do we want this warp function? It seems there are potentially a lot of possible functions
   Vector3 WarpMotion(Vector3 position, Vector3 target, Vector3 deltaPosition, int frame, int total) {
     var fraction = (float)frame/(float)total;
     var warpDelta = (target-position) / (total-frame);

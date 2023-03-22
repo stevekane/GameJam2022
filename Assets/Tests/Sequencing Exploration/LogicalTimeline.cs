@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Playables;
 
@@ -36,6 +37,13 @@ public class LogicalTimeline : MonoBehaviour {
   [SerializeField] Traditional.Grounded Grounded;
   [SerializeField] HitStop HitStop;
 
+  public Ledge Ledge;
+  public bool Hanging;
+  public bool ClimbingUp;
+  public Vector3 HangOffset = new Vector3(0, -2, -1);
+  public Vector3 LeftHandHangOffset;
+  public Vector3 RightHandHangOffset;
+
   TaskScope Scope;
 
   public PlayableGraph Graph;
@@ -60,36 +68,56 @@ public class LogicalTimeline : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    var worldSpaceDirection = InputManager.Axis(AxisCode.AxisLeft).XZFrom(PersonalCamera.Current);
     var movementMagnitude = 0;
-    if (worldSpaceDirection.sqrMagnitude > 0) {
-      // TODO: Do we actually change orientation right away like this?
-      // TODO: Should localtimescale shit take priority over inputs?
-      transform.rotation = Quaternion.LookRotation(worldSpaceDirection);
-      movementMagnitude = 1;
+    var worldSpaceDirection = InputManager.Axis(AxisCode.AxisLeft).XZFrom(PersonalCamera.Current);
+    if (Hanging) {
+      transform.forward = Ledge.Pivot.forward;
+      transform.position = Ledge.Pivot.position + transform.TransformVector(HangOffset);
+    } else if (ClimbingUp) {
+      // transform.forward = Ledge.Pivot.forward;
+    } else {
+      if (worldSpaceDirection.sqrMagnitude > 0) {
+        // TODO: Do we actually change orientation right away like this?
+        // TODO: Should localtimescale shit take priority over inputs?
+        transform.rotation = Quaternion.LookRotation(worldSpaceDirection);
+        movementMagnitude = 1;
+      }
+    }
+
+    if (Hanging)
+      HandIKWeight = 1;
+
+    if (Hanging || ClimbingUp) {
+      Controller.enabled = false;
+    } else {
+      Controller.enabled = true;
     }
 
     // COMPUTE MOTION OF CHARACTER
     var dt = LocalTime.FixedDeltaTime;
-    var planeVelocity = Vector3.zero;
-    if (Grounded.Value) {
-      planeVelocity = movementMagnitude * MovementSpeed.Value * worldSpaceDirection;
-      if (Velocity.Value.y > 0) {
-        Velocity.Value.y += dt * Gravity.Value;
-      } else {
-        Velocity.Value.y = dt * Gravity.Value;
-      }
+    if (Hanging || ClimbingUp) {
+      Velocity.Value = Vector3.zero;
     } else {
-      var airVelocity = Velocity.Value + dt * Acceleration.Value * movementMagnitude * worldSpaceDirection;
-      airVelocity.y = 0;
-      var airSpeed = airVelocity.magnitude;
-      var airDirection = airVelocity.normalized;
-      planeVelocity = Mathf.Min(MaxMovementSpeed.Value, airSpeed) * airDirection;
-      Velocity.Value.y += dt * Gravity.Value;
+      var planeVelocity = Vector3.zero;
+      if (Grounded.Value) {
+        planeVelocity = movementMagnitude * MovementSpeed.Value * worldSpaceDirection;
+        if (Velocity.Value.y > 0) {
+          Velocity.Value.y += dt * Gravity.Value;
+        } else {
+          Velocity.Value.y = dt * Gravity.Value;
+        }
+      } else {
+        var airVelocity = Velocity.Value + dt * Acceleration.Value * movementMagnitude * worldSpaceDirection;
+        airVelocity.y = 0;
+        var airSpeed = airVelocity.magnitude;
+        var airDirection = airVelocity.normalized;
+        planeVelocity = Mathf.Min(MaxMovementSpeed.Value, airSpeed) * airDirection;
+        Velocity.Value.y += dt * Gravity.Value;
+      }
+      Velocity.Value.x = planeVelocity.x;
+      Velocity.Value.z = planeVelocity.z;
+      Controller.Move(dt * Velocity.Value);
     }
-    Velocity.Value.x = planeVelocity.x;
-    Velocity.Value.z = planeVelocity.z;
-    Controller.Move(dt * Velocity.Value);
     Graph.Evaluate(dt);
 
     // FIRE FIXED FRAME STUFF (REMOVE THIS)
@@ -99,6 +127,56 @@ public class LogicalTimeline : MonoBehaviour {
     // UPDATE THE ANIMATOR (MOVE TO SEPARATE SYSTEM)
     Animator.SetFloat("Speed", movementMagnitude * MovementSpeed.Value);
     Animator.SetBool("Grounded", Grounded.Value);
+    Animator.SetBool("Hanging", Hanging);
+  }
+
+  void OnAnimatorMove() {
+    if (ClimbingUp) {
+      transform.position += Animator.deltaPosition;
+      transform.rotation *= Animator.deltaRotation;
+    }
+  }
+
+  float HandIKWeight;
+  async Task ClimbUp(TaskScope scope) {
+    try {
+      Hanging = false;
+      ClimbingUp = true;
+      Animator.SetTrigger("ClimbUp");
+      for (var i = 0; i < 10; i++) {
+        HandIKWeight = 1;
+        await scope.ListenFor(LogicalTimeline.FixedTick);
+      }
+      HandIKWeight = 0;
+      for (var i = 0; i < 20; i++) {
+        await scope.ListenFor(LogicalTimeline.FixedTick);
+      }
+    } finally {
+      ClimbingUp = false;
+    }
+  }
+
+  void OnAnimatorIK() {
+    Animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, HandIKWeight);
+    Animator.SetIKPositionWeight(AvatarIKGoal.RightHand, HandIKWeight);
+    Animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, HandIKWeight);
+    Animator.SetIKRotationWeight(AvatarIKGoal.RightHand, HandIKWeight);
+    if (Hanging || ClimbingUp) {
+      var leftHand = AvatarAttacher.FindBoneTransform(Animator, AvatarBone.LeftHand);
+      var rightHand = AvatarAttacher.FindBoneTransform(Animator, AvatarBone.RightHand);
+      var leftHandTarget = Ledge.Pivot.position + transform.TransformVector(LeftHandHangOffset);
+      var rightHandTarget = Ledge.Pivot.position + transform.TransformVector(RightHandHangOffset);
+      var transitionInfo = Animator.GetAnimatorTransitionInfo(0);
+      Animator.SetIKPosition(AvatarIKGoal.LeftHand, leftHandTarget);
+      Animator.SetIKPosition(AvatarIKGoal.RightHand, rightHandTarget);
+      Animator.SetIKRotation(AvatarIKGoal.LeftHand, Quaternion.LookRotation(transform.forward));
+      Animator.SetIKRotation(AvatarIKGoal.RightHand, Quaternion.LookRotation(transform.forward));
+    }
+  }
+
+  void OnLedgeEnter(Ledge l) {
+    Ledge = l;
+    Hanging = true;
   }
 
   void OnHit(MeleeContact contact) {
@@ -133,9 +211,13 @@ public class LogicalTimeline : MonoBehaviour {
 
   void Jump() {
     InputManager.Consume(ButtonCode.South, ButtonPressType.JustDown);
-    Scope.Dispose();
-    Scope = new();
-    Scope.Start(Grounded.Value ? JumpAbility.Jump : DoubleJumpAbility.Jump);
+    if (Hanging) {
+      Scope.Start(ClimbUp);
+    } else {
+      Scope.Dispose();
+      Scope = new();
+      Scope.Start(Grounded.Value ? JumpAbility.Jump : DoubleJumpAbility.Jump);
+    }
   }
 
   TaskScope SprintScope = new();
