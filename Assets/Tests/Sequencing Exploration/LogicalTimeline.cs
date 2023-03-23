@@ -28,14 +28,16 @@ public class LogicalTimeline : MonoBehaviour {
 
   [Header("State")]
   [SerializeField] PersonalCamera PersonalCamera;
+  [SerializeField] LocalTime LocalTime;
   [SerializeField] SplitGravity Gravity;
   [SerializeField] MaxMovementSpeed MaxMovementSpeed;
+  [SerializeField] MaxFallSpeed MaxFallSpeed;
   [SerializeField] MovementSpeed MovementSpeed;
   [SerializeField] TurningSpeed TurningSpeed;
   [SerializeField] Acceleration Acceleration;
-  [SerializeField] LocalTime LocalTime;
   [SerializeField] Velocity Velocity;
   [SerializeField] Traditional.Grounded Grounded;
+  [SerializeField] Traditional.GroundDistance GroundDistance;
   [SerializeField] HitStop HitStop;
 
   public Ledge Ledge;
@@ -90,9 +92,6 @@ public class LogicalTimeline : MonoBehaviour {
       }
     }
 
-    // Steve - I'm moving this here before our physics calculations to see what effect
-    // it has on the way abilities can influence physics. Overall, I'd like physics calcs
-    // to happen "after" abilities run or in some sense "before" they run...
     // FIRE FIXED FRAME STUFF (REMOVE THIS)
     FixedFrame++;
     FixedTick.Fire();
@@ -126,6 +125,9 @@ public class LogicalTimeline : MonoBehaviour {
         planeVelocity = Mathf.Min(MaxMovementSpeed.Value, airSpeed) * airDirection;
         Velocity.Value.y += dt * Gravity.Value;
       }
+      if (Velocity.Value.y < 0) {
+        Velocity.Value.y = -Mathf.Min(Mathf.Abs(MaxFallSpeed.Value), Mathf.Abs(Velocity.Value.y));
+      }
       Velocity.Value.x = planeVelocity.x;
       Velocity.Value.z = planeVelocity.z;
       Controller.Move(dt * Velocity.Value);
@@ -134,7 +136,9 @@ public class LogicalTimeline : MonoBehaviour {
 
     // UPDATE THE ANIMATOR (MOVE TO SEPARATE SYSTEM)
     Animator.SetFloat("Speed", movementMagnitude * MovementSpeed.Value);
+    Animator.SetFloat("YSpeed", Velocity.Value.y);
     Animator.SetBool("Grounded", Grounded.Value);
+    Animator.SetFloat("GroundDistance", GroundDistance.Value);
     Animator.SetBool("Hanging", Hanging);
   }
 
@@ -150,7 +154,6 @@ public class LogicalTimeline : MonoBehaviour {
       var rightHand = AvatarAttacher.FindBoneTransform(Animator, AvatarBone.RightHand);
       var leftHandTarget = Ledge.Pivot.position + transform.TransformVector(LeftHandHangOffset);
       var rightHandTarget = Ledge.Pivot.position + transform.TransformVector(RightHandHangOffset);
-      var transitionInfo = Animator.GetAnimatorTransitionInfo(0);
       Animator.SetIKPosition(AvatarIKGoal.LeftHand, leftHandTarget);
       Animator.SetIKPosition(AvatarIKGoal.RightHand, rightHandTarget);
       Animator.SetIKRotation(AvatarIKGoal.LeftHand, Quaternion.LookRotation(transform.forward));
