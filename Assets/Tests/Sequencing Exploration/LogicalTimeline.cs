@@ -77,24 +77,84 @@ public class LogicalTimeline : MonoBehaviour {
     Graph.Destroy();
   }
 
+  /*
+  Broadly speaking, there seem to be a finite set of possible ways your character
+  might be moving during the game.
+
+  These ways do not seem to be mutually-exclusive per-se so it's important to write
+  them out and try to decide what the logical structure of the code and systems should be
+  such that writing "correct" code is simple.
+
+  There are a number of influences on character movement:
+
+    Players
+      Inputs
+        Varies based on character state
+    Mobs
+      AI
+    All
+      Physics
+        MaxSpeed
+        Velocity
+        Acceleration
+        Gravity
+        External forces?
+      Animation
+        Root Motion
+        Motion Warping
+      Scripts
+        Linked Motion
+        Grappling hook
+        Dash
+
+    Since we intend to build a game with tight interplay between Animation and
+    Physics, we want them to always run together. As such, it looks like our only
+    option afaict is to run our code before they run on each frame.
+
+    If we create our own AnimatorGraph component and use it to manually update
+    the graph associated with the character's animation in FixedUpdate then we have
+    only to contend with the following fixed order:
+
+      [FixedUpdate]
+      [PhysicsUpdate]
+      [PhysicsCallbacks]
+
+    This means we have control over how things are ordered in FixedUpdate.
+    There seem to be a few possible expectations:
+
+      [Early]
+        Systems that affect time run early
+          HitStop
+      [Default]
+        Systems that affect logic
+          Abilities
+          FixedGraph
+      [PreAnimation]
+        Systems that should run right before animation
+      [Animation]
+        Process Animation
+      [PostAnimation]
+        Systems that should run right after animation
+      [Physics]
+        Internal physics step runs here
+      [PhysicsCallbacks]
+        Physics callbacks fire here
+  */
+
   void FixedUpdate() {
     var movementMagnitude = 0;
     var worldSpaceDirection = InputManager.Axis(AxisCode.AxisLeft).XZFrom(PersonalCamera.Current);
+    // TODO: Should localtimescale affect basic inputs?
     if (Hanging) {
       transform.forward = Ledge.Pivot.forward;
       transform.position = Ledge.Pivot.position + transform.TransformVector(HangOffset);
     } else {
       if (worldSpaceDirection.sqrMagnitude > 0) {
         // TODO: Do we actually change orientation right away like this?
-        // TODO: Should localtimescale shit take priority over inputs?
         transform.rotation = Quaternion.LookRotation(worldSpaceDirection);
         movementMagnitude = 1;
       }
     }
-
-    // FIRE FIXED FRAME STUFF (REMOVE THIS)
-    FixedFrame++;
-    FixedTick.Fire();
 
     if (Hanging) {
       HandIKWeight = 1;
@@ -132,14 +192,17 @@ public class LogicalTimeline : MonoBehaviour {
       Velocity.Value.z = planeVelocity.z;
       Controller.Move(dt * Velocity.Value);
     }
-    Graph.Evaluate(dt);
-
     // UPDATE THE ANIMATOR (MOVE TO SEPARATE SYSTEM)
     Animator.SetFloat("Speed", movementMagnitude * MovementSpeed.Value);
     Animator.SetFloat("YSpeed", Velocity.Value.y);
     Animator.SetBool("Grounded", Grounded.Value);
     Animator.SetFloat("GroundDistance", GroundDistance.Value);
     Animator.SetBool("Hanging", Hanging);
+    Graph.Evaluate(dt);
+
+    // FIRE FIXED FRAME STUFF (REMOVE THIS)
+    FixedFrame++;
+    FixedTick.Fire();
   }
 
   float HandIKWeight;
