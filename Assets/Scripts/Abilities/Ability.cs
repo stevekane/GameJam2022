@@ -15,6 +15,7 @@ public class TriggerCondition {
 }
 
 [Serializable]
+[DefaultExecutionOrder(ScriptExecutionGroups.Ability)]
 public abstract class Ability : MonoBehaviour {
   public Character Character { get; set; }
   public AbilityManager AbilityManager => Character?.AbilityManager;

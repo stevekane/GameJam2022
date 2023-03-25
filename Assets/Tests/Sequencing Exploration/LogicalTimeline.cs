@@ -4,9 +4,6 @@ using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
 
 public class LogicalTimeline : MonoBehaviour {
-  public static int FixedFrame;
-  public static EventSource FixedTick = new();
-
   [Header("Input")]
   [SerializeField] InputManager InputManager;
 
@@ -199,10 +196,6 @@ public class LogicalTimeline : MonoBehaviour {
     Animator.SetFloat("GroundDistance", GroundDistance.Value);
     Animator.SetBool("Hanging", Hanging);
     Graph.Evaluate(dt);
-
-    // FIRE FIXED FRAME STUFF (REMOVE THIS)
-    FixedFrame++;
-    FixedTick.Fire();
   }
 
   float HandIKWeight;

@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[DefaultExecutionOrder(ScriptExecutionGroups.Early)]
 public class HitStop : MonoBehaviour {
   [SerializeField] LocalTime LocalTime;
 

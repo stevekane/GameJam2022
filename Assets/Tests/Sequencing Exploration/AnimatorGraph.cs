@@ -3,6 +3,7 @@ using UnityEngine.Playables;
 using UnityEngine.Animations;
 
 [ExecuteInEditMode]
+[DefaultExecutionOrder(ScriptExecutionGroups.Animation)]
 public class AnimatorGraph : MonoBehaviour {
   [SerializeField] RuntimeAnimatorController AnimatorController;
 
@@ -26,6 +27,7 @@ public class AnimatorGraph : MonoBehaviour {
   }
 
   void FixedUpdate() {
+    Debug.Log($"{FixedFrame.Instance.Tick}AnimatorGraph");
     Graph.Evaluate(Time.fixedDeltaTime);
   }
 

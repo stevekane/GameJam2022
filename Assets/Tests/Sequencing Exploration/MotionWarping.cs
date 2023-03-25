@@ -40,12 +40,12 @@ public class MotionWarping : MonoBehaviour {
     try {
       Animator.SetTrigger("Attack");
       for (var i = 0; i < 20; i++) {
-        await scope.ListenFor(LogicalTimeline.FixedTick);
+        await scope.ListenFor(FixedFrame.Instance.TickEvent);
       }
       frame = 0;
       total = 20;
       for (var i = 0; i < 20; i++) {
-        await scope.ListenFor(LogicalTimeline.FixedTick);
+        await scope.ListenFor(FixedFrame.Instance.TickEvent);
       }
     } finally {
       frame = total;

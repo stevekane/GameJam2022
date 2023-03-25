@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[DefaultExecutionOrder(-100)]
+[DefaultExecutionOrder(ScriptExecutionGroups.Time)]
 public class FixedFrame : MonoBehaviour {
   public static FixedFrame Instance;
 
