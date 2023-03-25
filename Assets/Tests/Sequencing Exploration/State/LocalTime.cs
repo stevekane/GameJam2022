@@ -13,7 +13,6 @@ public class LocalTime : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    Debug.Log($"{FixedFrame.Instance.Tick} LocalTime");
     FixedTime += FixedDeltaTime;
   }
 

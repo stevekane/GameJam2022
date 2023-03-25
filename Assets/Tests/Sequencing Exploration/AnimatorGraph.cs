@@ -27,7 +27,6 @@ public class AnimatorGraph : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    Debug.Log($"{FixedFrame.Instance.Tick}AnimatorGraph");
     Graph.Evaluate(Time.fixedDeltaTime);
   }
 
