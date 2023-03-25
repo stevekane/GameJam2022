@@ -12,6 +12,5 @@ public class FixedFrame : MonoBehaviour {
   void FixedUpdate() {
     Tick++;
     TickEvent.Fire();
-    Debug.Log($"{Tick}Fixed Tick");
   }
 }
