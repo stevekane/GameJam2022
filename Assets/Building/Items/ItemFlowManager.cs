@@ -275,8 +275,8 @@ public class ItemFlowManager : MonoBehaviour {
     MoveItems();
   }
 
-#if false
-  void Awake() { Test(); Test2(); Test3(); Test4(); Test5(); }
+#if true
+  void Awake() { Test6();  }
 
   void Test() {
     var solver = SolverContext.GetContext();
@@ -477,6 +477,67 @@ public class ItemFlowManager : MonoBehaviour {
 
     var solution = solver.Solve();
     Debug.Log($"Test5 ma = {mao} mb = {mbo} mc = {mci1}+{mci2}->{mco} sol={solution}");
+
+    solver.ClearModel();
+  }
+
+  async Task Test6() {
+    var solver = SolverContext.GetContext();
+    solver.ClearModel();
+    var model = solver.CreateModel();
+
+    Decision NewD() { var d = new Decision(Domain.Real, null); model.AddDecision(d); return d; }
+    var t = NewD();
+    model.AddGoal("Goal", GoalKind.Minimize, t);
+
+    (Decision, Decision) NewM() => (NewD(), NewD());
+    var ma = new (Decision, Decision)[] {
+      NewM(),
+      NewM(),
+      NewM(),
+      NewM(),
+    };
+    var mb = new (Decision, Decision)[] {
+      NewM(),
+      NewM(),
+    };
+    var mc = NewM();
+
+    var eab0 = new Decision[] { NewD(), NewD(), NewD() };
+    var eab1 = NewD();
+    var eb0c = NewD();
+    var eb1c = NewD();
+
+    var arange = new[] { 0, 1, 2, 3 };
+    var brange = new[] { 0, 1 };
+    model.AddConstraint(null, t >= 0);
+    // constraints: edges on outputs
+    model.AddConstraint(null, ma[0].Item2 == eab0[0]);
+    model.AddConstraint(null, ma[1].Item2 == eab0[1]);
+    model.AddConstraint(null, ma[2].Item2 == eab0[2]);
+    model.AddConstraint(null, ma[3].Item2 == eab1);
+    model.AddConstraint(null, mb[0].Item2 == eb0c);
+    model.AddConstraint(null, mb[1].Item2 == eb1c);
+    // constraints: edges on inputs
+    model.AddConstraint(null, mb[0].Item1 == eab0[0] + eab0[1] + eab0[2]);
+    model.AddConstraint(null, mb[1].Item1 == eab1);
+    model.AddConstraint(null, mc.Item1 == eb0c + eb1c);
+    // constraints: machine input and output rates
+    arange.ForEach(i => { model.AddConstraint(null, ma[i].Item2 <= 1 * t); });
+    brange.ForEach(i => { model.AddConstraint(null, mb[i].Item1 <= 3 * t); });
+    brange.ForEach(i => { model.AddConstraint(null, mb[i].Item2 <= 1 * t); });
+    model.AddConstraint(null, mc.Item1 <= 3 * t);
+    model.AddConstraint(null, mc.Item2 <= 1 * t);
+    // constraints: input/output rates match
+    arange.ForEach(i => { model.AddConstraint(null, ma[i].Item1 / 1 == ma[i].Item2 / 1); });
+    brange.ForEach(i => { model.AddConstraint(null, mb[i].Item1 / 3 == mb[i].Item2 / 1); });
+    model.AddConstraint(null, mc.Item1 / 3 == mc.Item2 / 1);
+
+    model.AddConstraint(null, ma[2].Item1 == 0);
+    model.AddConstraint(null, mc.Item2 >= 2);
+
+    var solution = solver.Solve();
+    Debug.Log($"Test6 t={t} ma = {ma[0].Item2}, {ma[1].Item2}, {ma[2].Item2} -> {mb[0].Item1}; ma4 = {ma[3].Item2} -> {mb[1].Item1}; mb = {mb[0].Item2} + {mb[1].Item2} = {mc.Item1}; mco = {mc.Item2}");
 
     solver.ClearModel();
   }
