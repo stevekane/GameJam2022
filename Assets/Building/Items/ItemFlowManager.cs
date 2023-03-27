@@ -76,18 +76,23 @@ public class ItemFlowManager : MonoBehaviour {
     solver.ClearModel();
     var model = solver.CreateModel();
 
+    int didx = 0;
+    string DecisionName(string name) => $"{name}{didx++}".Replace("(Clone)", "").Replace(' ', '_').Replace(',', '_').Replace('(', '_').Replace(')', '_');
+    Decision AddDecision(Domain domain, string name) {
+      var d = new Decision(domain, DecisionName(name));
+      model.AddDecision(d);
+      return d;
+    }
+
     // Main goal: minimize time spent crafting.
-    var t = new Decision(Domain.Real, "t");
-    model.AddDecision(t);
+    var t = AddDecision(Domain.Real, "t");
     model.AddGoal("Goal", GoalKind.Minimize, t);
     model.AddConstraint(null, t >= 0);
 
-    string DecisionName(object obj) => obj.ToString().Replace(' ', '_').Replace(',', '_').Replace('(', '_').Replace(')', '_');
     // Adds constraint on the maximum that can consumed/produced in the given time.
     Decision AddMaxAmountConstraint(Machine machine, Recipe.ItemAmount amount) {
-      var decidedAmount = new Decision(Domain.Real, $"max_{DecisionName(machine.name)}_{DecisionName(amount.Item.name)}");
+      var decidedAmount = AddDecision(Domain.IntegerNonnegative, $"max_{machine.name}_{amount.Item.name}");
       var rate = amount.Count / machine.Recipe.CraftTime;
-      model.AddDecision(decidedAmount);
       model.AddConstraint(null, decidedAmount <= rate * t);
       return decidedAmount;
     }
@@ -117,13 +122,12 @@ public class ItemFlowManager : MonoBehaviour {
 
     // Add decision variables for each edge.
     foreach (var edge in Edges) {
-      model.AddDecision(edgeAmounts[edge] = new Decision(Domain.Real, $"e_{DecisionName(edge)}"));
+      edgeAmounts[edge] = AddDecision(Domain.IntegerNonnegative, $"e_{edge}");
       outputEdges.GetOrAdd((edge.From, edge.OutputIdx), () => new()).Add(edge);
       inputEdges.GetOrAdd((edge.To, edge.InputIdx), () => new()).Add(edge);
     }
 
     // Set up the constraints for each machine's input and output, and collect the decided output amounts.
-    Dictionary<Machine, Decision[]> machineOutputDemands = new();
     foreach (var machine in Machines) {
       var inputAmounts = machine.Recipe.Inputs.Select(amount => AddMaxAmountConstraint(machine, amount)).ToArray();
       var outputAmounts = machine.Recipe.Outputs.Select(amount => AddMaxAmountConstraint(machine, amount)).ToArray();
@@ -141,7 +145,6 @@ public class ItemFlowManager : MonoBehaviour {
           model.AddConstraint(null, inputAmounts[0] >= inputsRequested);
         }
       }
-      machineOutputDemands[machine] = outputAmounts;
     }
 
     var solution = solver.Solve(new Directive() { TimeLimit = 5000 });
@@ -151,20 +154,12 @@ public class ItemFlowManager : MonoBehaviour {
     //}
     //Debug.Log($"Result time={t}");
 
-    // Figure out how many crafts each machine needs to execute.
-    foreach (var machine in Machines) {
-      var numCrafts = PlayerCraftRequests.GetValueOrDefault(machine, 0);
-      var outputDemands = machineOutputDemands[machine];
-      for (var i = 0; i < machine.Recipe.Outputs.Length; i++) {
-        //Debug.Log($"Machine {machine} outputs {outputDemands[i].ToDouble()} {machine.Recipe.Outputs[i].Item}");
-        if (outputDemands[i].ToDouble() > numCrafts)
-          numCrafts = Mathf.CeilToInt((float)(outputDemands[i].ToDouble() / machine.Recipe.Outputs[i].Count));
-      }
-      machine.TryStartCrafting();
-      //Debug.Log($"Machine crafts: {machine} crafts {numCrafts}");
-    }
     foreach (var edge in Edges) {
-      EdgeDemands[edge] = (int)edgeAmounts[edge].ToDouble();
+      var amount = (int)edgeAmounts[edge].ToDouble();
+      EdgeDemands[edge] = amount;
+      if (amount > 0)
+        edge.From.TryStartCrafting();
+      //Debug.Log($"Edge {edge} has demand {edgeAmounts[edge]}");
     }
   }
 
@@ -197,9 +192,11 @@ public class ItemFlowManager : MonoBehaviour {
     AdvanceOnPath(flow);
     Items.Add(flow);
 
-    if (--EdgeDemands[edge] <= 0)
+    if (--EdgeDemands[edge] > 0) {
+      edge.From.TryStartCrafting();
+    } else {
       EdgeDemands.Remove(edge);
-    edge.From.TryStartCrafting();
+    }
   }
 
   List<Vector2Int> ComputePath(Vector2Int startCell, Edge edge) {
