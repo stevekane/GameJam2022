@@ -12,5 +12,7 @@ public class FixedFrame : MonoBehaviour {
   void FixedUpdate() {
     Tick++;
     TickEvent.Fire();
+    Timeval.TickCount = Tick;
+    Timeval.TickEvent.Fire();
   }
 }

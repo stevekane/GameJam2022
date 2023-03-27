@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -61,6 +60,7 @@ public class InputManager : MonoBehaviour {
   bool InputEnabled = true;
   Dictionary<(ButtonCode, ButtonPressType), int> Buffer = new();
   Dictionary<(ButtonCode, ButtonPressType), EventSource> Buttons = new();
+  Dictionary<AxisCode, EventSource<AxisState>> Axes = new();
   AxisState AxisLeft = new();
   AxisState AxisRight = new();
   PlayerInputActions Controls;
@@ -68,6 +68,12 @@ public class InputManager : MonoBehaviour {
   public IEventSource ButtonEvent(ButtonCode code, ButtonPressType type) {
     if (!Buttons.TryGetValue((code, type), out EventSource evt))
       Buttons.Add((code, type), evt = new());
+    return evt;
+  }
+
+  public IEventSource<AxisState> AxisEvent(AxisCode code) {
+    if (!Axes.TryGetValue(code, out EventSource<AxisState> evt))
+      Axes.Add(code, evt = new());
     return evt;
   }
 
@@ -99,7 +105,7 @@ public class InputManager : MonoBehaviour {
   void OnEnable() => Controls.Enable();
   void OnDisable() => Controls.Disable();
 
-  void BroadcastEvent(ButtonCode code, ButtonPressType type, IEventSource evt) {
+  void BroadcastButtonEvent(ButtonCode code, ButtonPressType type, IEventSource evt) {
     if (code == ButtonCode.Unbound) return;
     var action = code switch {
       ButtonCode.L1 => Controls.Player.L1,
@@ -124,6 +130,11 @@ public class InputManager : MonoBehaviour {
     if (Buffer.TryGetValue((code, type), out int tickCount) && Timeval.TickCount - tickCount <= InputBufferTickLength)
       evt.Fire();
   }
+
+  void BroadcastAxisEvent(AxisCode code, EventSource<AxisState> evt) {
+    evt.Fire(code == AxisCode.AxisLeft ? AxisLeft : AxisRight);
+  }
+
   Vector2 GetAxisFromInput(InputAction action) {
     return action.ReadValue<Vector2>();
   }
@@ -131,20 +142,14 @@ public class InputManager : MonoBehaviour {
   void FixedUpdate() {
     if (!InputEnabled)
       return;
-    foreach (var it in Buttons) {
-      BroadcastEvent(it.Key.Item1, it.Key.Item2, it.Value);
-    }
+
     AxisLeft.Update(StickDeadZone, GetAxisFromInput(Controls.Player.Move));
     AxisRight.Update(StickDeadZone, GetAxisFromInput(Controls.Player.Look));
-
-    CheckSaveLoad();
-  }
-
-  // TODO: Remove this testing junk.
-  void CheckSaveLoad() {
-    if (Input.GetKeyDown(KeyCode.LeftBracket))
-      SaveData.SaveToFile();
-    if (Input.GetKeyDown(KeyCode.RightBracket))
-      SaveData.LoadFromFile();
+    foreach (var it in Axes) {
+      BroadcastAxisEvent(it.Key, it.Value);
+    }
+    foreach (var it in Buttons) {
+      BroadcastButtonEvent(it.Key.Item1, it.Key.Item2, it.Value);
+    }
   }
 }

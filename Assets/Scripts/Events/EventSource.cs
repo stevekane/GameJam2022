@@ -1,27 +1,41 @@
 using System;
 
 public interface IEventSource {
-  public void Listen(Action handler);
+  public int Priority { get; }
+  public void Listen(Action handler, int priority = 0);
   public void Unlisten(Action handler);
   public void Fire();
 }
 
 public interface IEventSource<T> {
-  public void Listen(Action<T> handler);
+  public int Priority { get; }
+  public void Listen(Action<T> handler, int priority = 0);
   public void Unlisten(Action<T> handler);
   public void Fire(T t);
 }
 
 public class EventSource : IEventSource {
   public Action Action;
-  public void Listen(Action handler) => Action += handler;
+  public int Priority { get; private set; }
+  public void Listen(Action handler, int priority = 0) {
+    if (priority >= Priority) {
+      Priority = priority;
+      Action = handler;
+    }
+  }
   public void Unlisten(Action handler) => Action -= handler;
   public void Fire() => Action?.Invoke();
 }
 
 public class EventSource<T> : IEventSource<T> {
   public Action<T> Action;
-  public void Listen(Action<T> handler) => Action += handler;
+  public int Priority { get; private set; }
+  public void Listen(Action<T> handler, int priority = 0) {
+    if (priority >= Priority) {
+      Priority = priority;
+      Action = handler;
+    }
+  }
   public void Unlisten(Action<T> handler) => Action -= handler;
   public void Fire(T t) => Action?.Invoke(t);
 }
