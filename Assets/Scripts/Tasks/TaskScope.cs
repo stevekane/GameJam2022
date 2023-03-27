@@ -12,6 +12,11 @@ public class TaskScope : IDisposable {
 
   public TaskScope() => Source = new();
   public TaskScope(TaskScope parent) => Source = parent.NewChildToken();
+  public static TaskScope StartNew(TaskFunc f) {
+    var scope = new TaskScope();
+    scope.Start(f);
+    return scope;
+  }
 
   public void Cancel() => Source.Cancel();
   public void Dispose() {
@@ -73,6 +78,7 @@ public class TaskScope : IDisposable {
     while (Timeval.TickCount < endTick)
       await Yield();
   }
+  public Task Seconds(float seconds) => Task.Delay((int)(seconds * 1000), Source.Token);
   public Task Millis(int ms) => Task.Delay(ms, Source.Token);
   public Task Forever() => Task.Delay(-1, Source.Token);
   public Task Delay(Timeval t) => Millis((int)t.Millis);

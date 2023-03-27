@@ -33,7 +33,7 @@ public class BuildGrid {
 
   public static GameObject GetCellContents(Vector3 worldPos) {
     if (Physics.Raycast(worldPos + Vector3.up*10f, Vector3.down, out var hit, 11f, Defaults.Instance.BuildingLayerMask, QueryTriggerInteraction.Collide))
-      return hit.transform.parent.gameObject;  // TODO: hack to get the BuildObject from the collider (currently child)
+      return hit.transform.GetComponentInParent<BuildObject>()?.gameObject;
     return null;
   }
 
