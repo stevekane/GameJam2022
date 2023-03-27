@@ -39,7 +39,6 @@ public class AxisState {
     var movementMagnitude = XY.magnitude;
     var worldSpaceDirection = camera.transform.TransformDirection(XY);
     worldSpaceDirection.y = 0;
-    worldSpaceDirection = worldSpaceDirection.normalized;
     return worldSpaceDirection;
   }
   public void Update(float deadZone, Vector2 raw) {
@@ -55,6 +54,7 @@ public class AxisState {
   }
 }
 
+[DefaultExecutionOrder(ScriptExecutionGroups.Input)]
 public class InputManager : MonoBehaviour {
   public int InputBufferTickLength = 10;
   public float StickDeadZone;
