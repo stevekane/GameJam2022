@@ -42,6 +42,7 @@ public static class HitHandler {
     List<Hurtbox> hits = new();
     int lastHit = 0;
     using var listener = new ScopedListener<Collider>(hitbox.OnTriggerStaySource, hit => {
+      Debug.Log($"Hit: {hit}");
       if (hit.TryGetComponent(out Parrybox pb) && pb.TryParry(hitParams))
         parried = pb;
       if (hit.TryGetComponent(out Hurtbox hurtbox) && !hits.Contains(hurtbox) && hurtbox.CanBeHurtBy(hitParams))

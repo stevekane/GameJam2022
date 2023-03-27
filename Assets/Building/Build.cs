@@ -80,7 +80,7 @@ public class Build : Ability {
         Debug.Log($"Placing {BuildPrefab} at {center} tr={GhostInstance.transform.position} bounds={bottomLeft}, {topRight}");
         var obj = Instantiate(BuildPrefab, GhostInstance.transform.position, GhostInstance.transform.rotation);
         obj.gameObject.SetActive(true);
-        FindObjectsOfType<Machine>().ForEach(m => m.UpdateOutputCells());
+        //FindObjectsOfType<Machine>().ForEach(m => m.UpdateOutputCells());
         if (!BuildPrefab.CanPlaceMultiple)
           break;
       }

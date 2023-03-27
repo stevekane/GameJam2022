@@ -10,14 +10,14 @@ public class Hurtbox : MonoBehaviour {
     Team = Team ?? Owner.GetComponent<Team>();
   }
 
-  public bool CanBeHurtBy(HitParams hitParams) {
+  public virtual bool CanBeHurtBy(HitParams hitParams) {
     if (!Team.CanBeHurtBy(hitParams.AttackerTeamID))
       return false;
     if (Owner.TryGetComponent(out Status status) && !status.IsHittable)
       return false;
     return true;
   }
-  public bool TryAttack(HitParams hitParams) {
+  public virtual bool TryAttack(HitParams hitParams) {
     if (!CanBeHurtBy(hitParams)) return false;
 
     hitParams.Defender = Owner;
