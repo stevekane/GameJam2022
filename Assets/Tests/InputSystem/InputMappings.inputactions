@@ -1,0 +1,108 @@
+{
+    "name": "InputSystemTester",
+    "maps": [
+        {
+            "name": "Grounded",
+            "id": "37dad415-d931-4693-9d93-aae0d0282f02",
+            "actions": [
+                {
+                    "name": "Move",
+                    "type": "Value",
+                    "id": "560f111a-57da-4d64-859c-ef0ce270baf9",
+                    "expectedControlType": "Stick",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Jump",
+                    "type": "Button",
+                    "id": "50a38003-cb1b-4205-981d-4b0e17d8ccbc",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Fly",
+                    "type": "Button",
+                    "id": "1f8e54b1-ac0c-4f8b-a508-0418442208eb",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "d1dd8bfc-bc3c-416e-a50f-936536c4cb5e",
+                    "path": "<Gamepad>/leftStick",
+                    "interactions": "",
+                    "processors": "StickDeadzone",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2d1d212b-bab2-4254-9c9a-60961bb505b1",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "52be6997-840a-47a3-b03a-4401261b9e88",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Fly",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Airborne",
+            "id": "4970ab41-17aa-4a5f-8b8b-868986da16d4",
+            "actions": [
+                {
+                    "name": "Move",
+                    "type": "Value",
+                    "id": "ecd61b08-4ef4-433f-baab-f34d01fd0310",
+                    "expectedControlType": "Stick",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "b0b6a9fa-4fbb-4431-9bc4-6ffb74e99438",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": [
+        {
+            "name": "Grounded",
+            "bindingGroup": "Grounded",
+            "devices": []
+        }
+    ]
+}
