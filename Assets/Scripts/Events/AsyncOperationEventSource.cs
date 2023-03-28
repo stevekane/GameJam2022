@@ -2,10 +2,11 @@ using System;
 using UnityEngine;
 
 public class AsyncOperationEventSource : IEventSource<AsyncOperation> {
-  public int Priority { get; }
   public AsyncOperation Operation;
   public AsyncOperationEventSource(AsyncOperation operation) => Operation = operation;
-  public void Listen(Action<AsyncOperation> handler, int priority = 0) => Operation.completed += handler;
+  public void Listen(Action<AsyncOperation> handler) => Operation.completed += handler;
+  public void Set(Action<AsyncOperation> handler) => throw new NotSupportedException("AsyncOperation set not supported");
   public void Unlisten(Action<AsyncOperation> handler) => Operation.completed -= handler;
+  public void Clear() => throw new NotSupportedException("AsyncOperation clear not supported");
   public void Fire(AsyncOperation op) {}
 }

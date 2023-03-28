@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GroundState : MonoBehaviour {
   [SerializeField] InputSystemTester SystemTester;
@@ -11,6 +12,12 @@ public class GroundState : MonoBehaviour {
 
   void OnDisable() {
     InputManager.ButtonEvent(FlyButtonCode, ButtonPressType.JustDown).Unlisten(Fly);
+  }
+
+  void FixedUpdate() {
+    var position = transform.position;
+    position.y = Mathf.MoveTowards(position.y, 0, Time.deltaTime);
+    transform.position = position;
   }
 
   void Fly() {

@@ -28,56 +28,16 @@ public partial class @InputMappings : IInputActionCollection2, IDisposable
             ""id"": ""37dad415-d931-4693-9d93-aae0d0282f02"",
             ""actions"": [
                 {
-                    ""name"": ""Move"",
-                    ""type"": ""Value"",
-                    ""id"": ""560f111a-57da-4d64-859c-ef0ce270baf9"",
-                    ""expectedControlType"": ""Stick"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                },
-                {
-                    ""name"": ""Jump"",
-                    ""type"": ""Button"",
-                    ""id"": ""50a38003-cb1b-4205-981d-4b0e17d8ccbc"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
                     ""name"": ""Fly"",
                     ""type"": ""Button"",
                     ""id"": ""1f8e54b1-ac0c-4f8b-a508-0418442208eb"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
-                {
-                    ""name"": """",
-                    ""id"": ""d1dd8bfc-bc3c-416e-a50f-936536c4cb5e"",
-                    ""path"": ""<Gamepad>/leftStick"",
-                    ""interactions"": """",
-                    ""processors"": ""StickDeadzone"",
-                    ""groups"": """",
-                    ""action"": ""Move"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""2d1d212b-bab2-4254-9c9a-60961bb505b1"",
-                    ""path"": ""<Gamepad>/buttonSouth"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Jump"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
                 {
                     ""name"": """",
                     ""id"": ""52be6997-840a-47a3-b03a-4401261b9e88"",
@@ -96,10 +56,19 @@ public partial class @InputMappings : IInputActionCollection2, IDisposable
             ""id"": ""4970ab41-17aa-4a5f-8b8b-868986da16d4"",
             ""actions"": [
                 {
-                    ""name"": ""Move"",
-                    ""type"": ""Value"",
+                    ""name"": ""Land"",
+                    ""type"": ""Button"",
                     ""id"": ""ecd61b08-4ef4-433f-baab-f34d01fd0310"",
-                    ""expectedControlType"": ""Stick"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Fire"",
+                    ""type"": ""Button"",
+                    ""id"": ""4856aa0f-2a07-4d5f-843a-29722d2ac4b2"",
+                    ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
@@ -109,11 +78,50 @@ public partial class @InputMappings : IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""b0b6a9fa-4fbb-4431-9bc4-6ffb74e99438"",
-                    ""path"": """",
+                    ""path"": ""<Gamepad>/buttonSouth"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Move"",
+                    ""action"": ""Land"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1c92ee47-d928-4f2a-94e6-64cf497e57b1"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Fire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""TripleShot"",
+            ""id"": ""9a5dc67d-0e53-4ffb-83fe-3996cf8b18f4"",
+            ""actions"": [
+                {
+                    ""name"": ""Fire"",
+                    ""type"": ""Button"",
+                    ""id"": ""7c68c2cc-7bc9-465b-9e82-c59b54546095"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""669dc8d8-e90a-4c8a-854f-43097119d5b6"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Fire"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -130,12 +138,14 @@ public partial class @InputMappings : IInputActionCollection2, IDisposable
 }");
         // Grounded
         m_Grounded = asset.FindActionMap("Grounded", throwIfNotFound: true);
-        m_Grounded_Move = m_Grounded.FindAction("Move", throwIfNotFound: true);
-        m_Grounded_Jump = m_Grounded.FindAction("Jump", throwIfNotFound: true);
         m_Grounded_Fly = m_Grounded.FindAction("Fly", throwIfNotFound: true);
         // Airborne
         m_Airborne = asset.FindActionMap("Airborne", throwIfNotFound: true);
-        m_Airborne_Move = m_Airborne.FindAction("Move", throwIfNotFound: true);
+        m_Airborne_Land = m_Airborne.FindAction("Land", throwIfNotFound: true);
+        m_Airborne_Fire = m_Airborne.FindAction("Fire", throwIfNotFound: true);
+        // TripleShot
+        m_TripleShot = asset.FindActionMap("TripleShot", throwIfNotFound: true);
+        m_TripleShot_Fire = m_TripleShot.FindAction("Fire", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -195,15 +205,11 @@ public partial class @InputMappings : IInputActionCollection2, IDisposable
     // Grounded
     private readonly InputActionMap m_Grounded;
     private IGroundedActions m_GroundedActionsCallbackInterface;
-    private readonly InputAction m_Grounded_Move;
-    private readonly InputAction m_Grounded_Jump;
     private readonly InputAction m_Grounded_Fly;
     public struct GroundedActions
     {
         private @InputMappings m_Wrapper;
         public GroundedActions(@InputMappings wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Move => m_Wrapper.m_Grounded_Move;
-        public InputAction @Jump => m_Wrapper.m_Grounded_Jump;
         public InputAction @Fly => m_Wrapper.m_Grounded_Fly;
         public InputActionMap Get() { return m_Wrapper.m_Grounded; }
         public void Enable() { Get().Enable(); }
@@ -214,12 +220,6 @@ public partial class @InputMappings : IInputActionCollection2, IDisposable
         {
             if (m_Wrapper.m_GroundedActionsCallbackInterface != null)
             {
-                @Move.started -= m_Wrapper.m_GroundedActionsCallbackInterface.OnMove;
-                @Move.performed -= m_Wrapper.m_GroundedActionsCallbackInterface.OnMove;
-                @Move.canceled -= m_Wrapper.m_GroundedActionsCallbackInterface.OnMove;
-                @Jump.started -= m_Wrapper.m_GroundedActionsCallbackInterface.OnJump;
-                @Jump.performed -= m_Wrapper.m_GroundedActionsCallbackInterface.OnJump;
-                @Jump.canceled -= m_Wrapper.m_GroundedActionsCallbackInterface.OnJump;
                 @Fly.started -= m_Wrapper.m_GroundedActionsCallbackInterface.OnFly;
                 @Fly.performed -= m_Wrapper.m_GroundedActionsCallbackInterface.OnFly;
                 @Fly.canceled -= m_Wrapper.m_GroundedActionsCallbackInterface.OnFly;
@@ -227,12 +227,6 @@ public partial class @InputMappings : IInputActionCollection2, IDisposable
             m_Wrapper.m_GroundedActionsCallbackInterface = instance;
             if (instance != null)
             {
-                @Move.started += instance.OnMove;
-                @Move.performed += instance.OnMove;
-                @Move.canceled += instance.OnMove;
-                @Jump.started += instance.OnJump;
-                @Jump.performed += instance.OnJump;
-                @Jump.canceled += instance.OnJump;
                 @Fly.started += instance.OnFly;
                 @Fly.performed += instance.OnFly;
                 @Fly.canceled += instance.OnFly;
@@ -244,12 +238,14 @@ public partial class @InputMappings : IInputActionCollection2, IDisposable
     // Airborne
     private readonly InputActionMap m_Airborne;
     private IAirborneActions m_AirborneActionsCallbackInterface;
-    private readonly InputAction m_Airborne_Move;
+    private readonly InputAction m_Airborne_Land;
+    private readonly InputAction m_Airborne_Fire;
     public struct AirborneActions
     {
         private @InputMappings m_Wrapper;
         public AirborneActions(@InputMappings wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Move => m_Wrapper.m_Airborne_Move;
+        public InputAction @Land => m_Wrapper.m_Airborne_Land;
+        public InputAction @Fire => m_Wrapper.m_Airborne_Fire;
         public InputActionMap Get() { return m_Wrapper.m_Airborne; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -259,20 +255,59 @@ public partial class @InputMappings : IInputActionCollection2, IDisposable
         {
             if (m_Wrapper.m_AirborneActionsCallbackInterface != null)
             {
-                @Move.started -= m_Wrapper.m_AirborneActionsCallbackInterface.OnMove;
-                @Move.performed -= m_Wrapper.m_AirborneActionsCallbackInterface.OnMove;
-                @Move.canceled -= m_Wrapper.m_AirborneActionsCallbackInterface.OnMove;
+                @Land.started -= m_Wrapper.m_AirborneActionsCallbackInterface.OnLand;
+                @Land.performed -= m_Wrapper.m_AirborneActionsCallbackInterface.OnLand;
+                @Land.canceled -= m_Wrapper.m_AirborneActionsCallbackInterface.OnLand;
+                @Fire.started -= m_Wrapper.m_AirborneActionsCallbackInterface.OnFire;
+                @Fire.performed -= m_Wrapper.m_AirborneActionsCallbackInterface.OnFire;
+                @Fire.canceled -= m_Wrapper.m_AirborneActionsCallbackInterface.OnFire;
             }
             m_Wrapper.m_AirborneActionsCallbackInterface = instance;
             if (instance != null)
             {
-                @Move.started += instance.OnMove;
-                @Move.performed += instance.OnMove;
-                @Move.canceled += instance.OnMove;
+                @Land.started += instance.OnLand;
+                @Land.performed += instance.OnLand;
+                @Land.canceled += instance.OnLand;
+                @Fire.started += instance.OnFire;
+                @Fire.performed += instance.OnFire;
+                @Fire.canceled += instance.OnFire;
             }
         }
     }
     public AirborneActions @Airborne => new AirborneActions(this);
+
+    // TripleShot
+    private readonly InputActionMap m_TripleShot;
+    private ITripleShotActions m_TripleShotActionsCallbackInterface;
+    private readonly InputAction m_TripleShot_Fire;
+    public struct TripleShotActions
+    {
+        private @InputMappings m_Wrapper;
+        public TripleShotActions(@InputMappings wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Fire => m_Wrapper.m_TripleShot_Fire;
+        public InputActionMap Get() { return m_Wrapper.m_TripleShot; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(TripleShotActions set) { return set.Get(); }
+        public void SetCallbacks(ITripleShotActions instance)
+        {
+            if (m_Wrapper.m_TripleShotActionsCallbackInterface != null)
+            {
+                @Fire.started -= m_Wrapper.m_TripleShotActionsCallbackInterface.OnFire;
+                @Fire.performed -= m_Wrapper.m_TripleShotActionsCallbackInterface.OnFire;
+                @Fire.canceled -= m_Wrapper.m_TripleShotActionsCallbackInterface.OnFire;
+            }
+            m_Wrapper.m_TripleShotActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @Fire.started += instance.OnFire;
+                @Fire.performed += instance.OnFire;
+                @Fire.canceled += instance.OnFire;
+            }
+        }
+    }
+    public TripleShotActions @TripleShot => new TripleShotActions(this);
     private int m_GroundedSchemeIndex = -1;
     public InputControlScheme GroundedScheme
     {
@@ -284,12 +319,15 @@ public partial class @InputMappings : IInputActionCollection2, IDisposable
     }
     public interface IGroundedActions
     {
-        void OnMove(InputAction.CallbackContext context);
-        void OnJump(InputAction.CallbackContext context);
         void OnFly(InputAction.CallbackContext context);
     }
     public interface IAirborneActions
     {
-        void OnMove(InputAction.CallbackContext context);
+        void OnLand(InputAction.CallbackContext context);
+        void OnFire(InputAction.CallbackContext context);
+    }
+    public interface ITripleShotActions
+    {
+        void OnFire(InputAction.CallbackContext context);
     }
 }

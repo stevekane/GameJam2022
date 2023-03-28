@@ -19,6 +19,12 @@ public class AirborneState : MonoBehaviour {
     InputManager.ButtonEvent(FireButtonCode, ButtonPressType.JustDown).Unlisten(Fire);
   }
 
+  void FixedUpdate() {
+    var position = transform.position;
+    position.y = Mathf.MoveTowards(position.y, 1, Time.deltaTime);
+    transform.position = position;
+  }
+
   void Land() {
     Debug.Log("Land");
     InputManager.Consume(LandButtonCode, ButtonPressType.JustDown);
