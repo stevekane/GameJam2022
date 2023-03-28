@@ -1,28 +1,10 @@
 {
-    "name": "InputSystemTester",
+    "name": "InputMappings",
     "maps": [
         {
             "name": "Grounded",
             "id": "37dad415-d931-4693-9d93-aae0d0282f02",
             "actions": [
-                {
-                    "name": "Move",
-                    "type": "Value",
-                    "id": "560f111a-57da-4d64-859c-ef0ce270baf9",
-                    "expectedControlType": "Stick",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
-                    "name": "Jump",
-                    "type": "Button",
-                    "id": "50a38003-cb1b-4205-981d-4b0e17d8ccbc",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
                 {
                     "name": "Fly",
                     "type": "Button",
@@ -30,32 +12,10 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
-                {
-                    "name": "",
-                    "id": "d1dd8bfc-bc3c-416e-a50f-936536c4cb5e",
-                    "path": "<Gamepad>/leftStick",
-                    "interactions": "",
-                    "processors": "StickDeadzone",
-                    "groups": "",
-                    "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "2d1d212b-bab2-4254-9c9a-60961bb505b1",
-                    "path": "<Gamepad>/buttonSouth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
                 {
                     "name": "",
                     "id": "52be6997-840a-47a3-b03a-4401261b9e88",
@@ -74,10 +34,19 @@
             "id": "4970ab41-17aa-4a5f-8b8b-868986da16d4",
             "actions": [
                 {
-                    "name": "Move",
-                    "type": "Value",
+                    "name": "Land",
+                    "type": "Button",
                     "id": "ecd61b08-4ef4-433f-baab-f34d01fd0310",
-                    "expectedControlType": "Stick",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Fire",
+                    "type": "Button",
+                    "id": "4856aa0f-2a07-4d5f-843a-29722d2ac4b2",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -87,11 +56,50 @@
                 {
                     "name": "",
                     "id": "b0b6a9fa-4fbb-4431-9bc4-6ffb74e99438",
-                    "path": "",
+                    "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "Land",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1c92ee47-d928-4f2a-94e6-64cf497e57b1",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Fire",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "TripleShot",
+            "id": "9a5dc67d-0e53-4ffb-83fe-3996cf8b18f4",
+            "actions": [
+                {
+                    "name": "Fire",
+                    "type": "Button",
+                    "id": "7c68c2cc-7bc9-465b-9e82-c59b54546095",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "669dc8d8-e90a-4c8a-854f-43097119d5b6",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Fire",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

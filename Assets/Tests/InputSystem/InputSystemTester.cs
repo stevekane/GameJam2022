@@ -3,9 +3,7 @@ using UnityEngine;
 
 [DefaultExecutionOrder(ScriptExecutionGroups.Input+1)]
 public class InputSystemTester : MonoBehaviour {
-  [SerializeField] InputManager InputManager;
-  [SerializeField] InputMappings InputMappings;
-
+  public InputMappings InputMappings;
   public GroundState GroundState;
   public AirborneState AirborneState;
   public MonoBehaviour ActiveState;
@@ -28,6 +26,10 @@ public class InputSystemTester : MonoBehaviour {
     ActiveState = state;
     ActiveState.enabled = true;
     return state;
+  }
+
+  void Awake() {
+    InputMappings = new InputMappings();
   }
 
   void Start() {
