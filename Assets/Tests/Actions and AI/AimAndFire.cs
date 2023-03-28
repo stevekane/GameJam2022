@@ -42,6 +42,7 @@ namespace ActionsAndAI {
     [SerializeField] Velocity Velocity;
     [SerializeField] FireAction FireAction;
     [SerializeField] AimAction AimAction;
+    [SerializeField] Timeval Duration = Timeval.FromSeconds(2);
     public override bool CanStart() => Controller.isGrounded && !Aiming.Value;
     // TODO: This bothersome setup is needed because tasks start asyncronously currently
     public override void OnStart() {
@@ -54,7 +55,7 @@ namespace ActionsAndAI {
       try {
         ActionManager.Actions.Add(FireAction);
         ActionManager.AxisActions.Add(AimAction);
-        await scope.Ticks(120);
+        await scope.Ticks(Duration.Ticks);
       } finally {
         Aiming.Value = false;
         ActionManager.Actions.Remove(FireAction);
