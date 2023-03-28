@@ -17,6 +17,15 @@ public class DebugUI : MonoBehaviour {
 
   bool Dirty = false;
   Dictionary<int, string> Logs = new();
+
+  void Awake() {
+    if (!Instance) {
+      Instance = this;
+    } else {
+      Destroy(this);
+    }
+  }
+
   void FixedUpdate() {
     if (!Dirty) return;
     Dirty = false;

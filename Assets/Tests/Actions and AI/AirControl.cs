@@ -1,17 +1,18 @@
 using UnityEngine;
 
 namespace ActionsAndAI {
-  public class AirControl : MonoBehaviour {
+  public class AirControl : AbstractAxisActionBehavior {
+    [field:SerializeField] public override string Name { get; set; } = "Air Control";
+    [field:SerializeField] public override AxisCode AxisCode { get; set; }
     [SerializeField] CharacterController Controller;
     [SerializeField] PersonalCamera PersonalCamera;
-    [SerializeField] MovementSpeed MovementSpeed;
-    [SerializeField] Velocity Velocity;
+    [SerializeField] Aiming Aiming;
 
-    public bool CanStart() => !Controller.isGrounded;
-    public void Move(AxisState axisState) {
-      var direction = MovementSpeed.Value * axisState.XZFrom(PersonalCamera.Current);
+    public override bool CanStart() => !Controller.isGrounded && !Aiming.Value;
+    public override void OnStart(AxisState axisState) {
+      var direction = axisState.XZFrom(PersonalCamera.Current);
       if (direction.magnitude > 0)
-        transform.forward = direction;
+        Controller.transform.forward = direction;
     }
   }
 }
