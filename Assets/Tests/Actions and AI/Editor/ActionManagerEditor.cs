@@ -13,6 +13,11 @@ namespace ActionsAndAI {
         text.text = $"{action.Name} {action.ButtonCode} {action.ButtonPressType} ({action.CanStart()})";
         container.Add(text);
       }
+      foreach (var action in actionManager.AxisActions) {
+        var text = new TextElement();
+        text.text = $"{action.Name} {action.AxisCode} ({action.CanStart()})";
+        container.Add(text);
+      }
       return container;
     }
   }

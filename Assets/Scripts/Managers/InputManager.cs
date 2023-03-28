@@ -101,6 +101,32 @@ public class InputManager : MonoBehaviour {
     Controls.devices = devices;
   }
 
+  public void ClearAllButtonEvents() {
+    ClearButtonEvents(ButtonCode.L1);
+    ClearButtonEvents(ButtonCode.L2);
+    ClearButtonEvents(ButtonCode.R1);
+    ClearButtonEvents(ButtonCode.R2);
+    ClearButtonEvents(ButtonCode.North);
+    ClearButtonEvents(ButtonCode.East);
+    ClearButtonEvents(ButtonCode.South);
+    ClearButtonEvents(ButtonCode.West);
+  }
+
+  public void ClearAllAxisEvents() {
+    ClearAxisEvents(AxisCode.AxisLeft);
+    ClearAxisEvents(AxisCode.AxisRight);
+  }
+
+  public void ClearButtonEvents(ButtonCode buttonCode) {
+    ButtonEvent(buttonCode, ButtonPressType.JustDown).Clear();
+    ButtonEvent(buttonCode, ButtonPressType.Down).Clear();
+    ButtonEvent(buttonCode, ButtonPressType.JustUp).Clear();
+  }
+
+  public void ClearAxisEvents(AxisCode axisCode) {
+    AxisEvent(axisCode).Clear();
+  }
+
   void Awake() => Controls = new();
   void OnEnable() => Controls.Enable();
   void OnDisable() => Controls.Disable();
