@@ -3,8 +3,6 @@ using UnityEngine;
 namespace ActionsAndAI {
   [DefaultExecutionOrder(ScriptExecutionGroups.Ability)]
   public class GroundControl : AbstractAxisActionBehavior {
-    [field:SerializeField] public override string Name { get; set; } = "Ground Control";
-    [field:SerializeField] public override AxisCode AxisCode { get; set; }
     [SerializeField] CharacterController Controller;
     [SerializeField] PersonalCamera PersonalCamera;
     [SerializeField] MovementSpeed MovementSpeed;

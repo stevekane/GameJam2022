@@ -10,16 +10,16 @@ namespace ActionsAndAI {
       InputManager.ClearAllAxisEvents();
       InputManager.ClearAllButtonEvents();
       foreach (var action in ActionManager.Actions) {
-        if (action.CanStart()) {
-          InputManager.ButtonEvent(action.ButtonCode, action.ButtonPressType).Set(delegate {
-            InputManager.Consume(action.ButtonCode, action.ButtonPressType);
+        if (action.CanStart() && action.TryGetComponent(out ActionInputMapping mapping)) {
+          InputManager.ButtonEvent(mapping.ButtonCode, mapping.ButtonPressType).Set(delegate {
+            InputManager.Consume(mapping.ButtonCode, mapping.ButtonPressType);
             action.OnStart();
           });
         }
       }
-      foreach (var axisAction in ActionManager.AxisActions) {
-        if (axisAction.CanStart()) {
-          InputManager.AxisEvent(axisAction.AxisCode).Set(axisAction.OnStart);
+      foreach (var action in ActionManager.AxisActions) {
+        if (action.CanStart() && action.TryGetComponent(out AxisActionInputMapping mapping)) {
+          InputManager.AxisEvent(mapping.AxisCode).Set(action.OnStart);
         }
       }
     }

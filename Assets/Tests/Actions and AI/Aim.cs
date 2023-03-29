@@ -1,11 +1,11 @@
 using UnityEngine;
 
 namespace ActionsAndAI {
-  public class AirControl : AbstractAxisActionBehavior {
-    [SerializeField] CharacterController Controller;
+  public class Aim : AbstractAxisActionBehavior {
     [SerializeField] PersonalCamera PersonalCamera;
-    [SerializeField] Aiming Aiming;
-    public override bool CanStart() => !Controller.isGrounded && !Aiming.Value;
+    [SerializeField] CharacterController Controller;
+    public bool IsActive;
+    public override bool CanStart() => IsActive;
     public override void OnStart(AxisState axisState) {
       var direction = axisState.XZFrom(PersonalCamera.Current);
       if (direction.magnitude > 0)
