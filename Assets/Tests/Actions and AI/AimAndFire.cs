@@ -17,13 +17,9 @@ namespace ActionsAndAI {
         Aiming.Value = true;
         Velocity.Value.x = 0;
         Velocity.Value.z = 0;
-        Fire.IsActive = true;
-        Aim.IsActive = true;
         await scope.Ticks(Duration.Ticks);
       } finally {
         Aiming.Value = false;
-        Fire.IsActive = false;
-        Aim.IsActive = false;
       }
     }
   }

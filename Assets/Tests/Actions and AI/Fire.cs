@@ -4,8 +4,8 @@ namespace ActionsAndAI {
   public class Fire : AbstractActionBehavior {
     [SerializeField] Transform Origin;
     [SerializeField] GameObject BulletPrefab;
-    public bool IsActive;
-    public override bool CanStart() => IsActive;
+    [SerializeField] Aiming Aiming;
+    public override bool CanStart() => Aiming.Value;
     public override void OnStart() {
       var bullet = GameObject.Instantiate(BulletPrefab, Origin.position, Origin.rotation);
       bullet.gameObject.SetActive(true);

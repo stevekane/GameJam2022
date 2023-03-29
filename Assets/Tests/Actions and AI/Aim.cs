@@ -4,8 +4,8 @@ namespace ActionsAndAI {
   public class Aim : AbstractAxisActionBehavior {
     [SerializeField] PersonalCamera PersonalCamera;
     [SerializeField] CharacterController Controller;
-    public bool IsActive;
-    public override bool CanStart() => IsActive;
+    [SerializeField] Aiming Aiming;
+    public override bool CanStart() => Aiming.Value;
     public override void OnStart(AxisState axisState) {
       var direction = axisState.XZFrom(PersonalCamera.Current);
       if (direction.magnitude > 0)
