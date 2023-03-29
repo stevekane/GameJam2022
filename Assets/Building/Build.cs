@@ -77,12 +77,14 @@ public class Build : Ability {
       if (IsBuildCellValid) {
         var center = BuildGrid.WorldToGrid(GhostInstance.transform.position);
         var (bottomLeft, topRight) = BuildGrid.GetBuildingBounds(BuildPrefab, center);
-        Debug.Log($"Placing {BuildPrefab} at {center} tr={GhostInstance.transform.position} bounds={bottomLeft}, {topRight}");
+        //Debug.Log($"Placing {BuildPrefab} at {center} tr={GhostInstance.transform.position} bounds={bottomLeft}, {topRight}");
         var obj = Instantiate(BuildPrefab, GhostInstance.transform.position, GhostInstance.transform.rotation);
         obj.gameObject.SetActive(true);
         //FindObjectsOfType<Machine>().ForEach(m => m.UpdateOutputCells());
         if (!BuildPrefab.CanPlaceMultiple)
           break;
+        Grid.RemoveCells(BuildPrefab, center);
+        IsBuildCellValid = false;
       }
     }
   }

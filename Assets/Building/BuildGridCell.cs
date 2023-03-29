@@ -74,22 +74,32 @@ public class BuildGrid {
 
   public bool IsValidBuildPos(BuildObject building, Vector2Int center) {
     var (bottomLeft, topRight) = GetBuildingBounds(building, center);
-    for (int x = bottomLeft.x; x <= topRight.x; x++) {
-      for (int y = bottomLeft.y; y <= topRight.y; y++) {
-        var pos = new Vector2Int(x, y);
-        if (!Cells.ContainsKey(pos)) return false;
-      }
+    foreach (var pos in CellsInSquare(bottomLeft, topRight)) {
+      if (!Cells.ContainsKey(pos)) return false;
     }
     return true;
   }
 
   public void UpdateCellState(BuildObject building, Vector2Int center, BuildGridCell.State state) {
     var (bottomLeft, topRight) = GetBuildingBounds(building, center);
-    for (int x = bottomLeft.x; x <= topRight.x; x++) {
-      for (int y = bottomLeft.y; y <= topRight.y; y++) {
-        var pos = new Vector2Int(x, y);
-        if (Cells.TryGetValue(pos, out var c))
-          c.SetState(state);
+    foreach (var pos in CellsInSquare(bottomLeft, topRight)) {
+      if (Cells.TryGetValue(pos, out var c))
+        c.SetState(state);
+    }
+  }
+
+  public void RemoveCells(BuildObject building, Vector2Int center) {
+    var (bottomLeft, topRight) = GetBuildingBounds(building, center);
+    foreach (var pos in CellsInSquare(bottomLeft, topRight)) {
+      Cells.Remove(pos);
+    }
+  }
+
+  IEnumerable<Vector2Int> CellsInSquare(Vector2Int bottomLeft, Vector2Int topRight) {
+    Vector2Int current = new();
+    for (current.x = bottomLeft.x; current.x <= topRight.x; current.x++) {
+      for (current.y = bottomLeft.y; current.y <= topRight.y; current.y++) {
+        yield return current;
       }
     }
   }
