@@ -272,7 +272,7 @@ public class ItemFlowManager : MonoBehaviour {
     MoveItems();
   }
 
-#if true
+#if false
   void Awake() { Test6();  }
 
   void Test() {
