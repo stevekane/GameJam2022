@@ -15,6 +15,7 @@ public class Build : Ability {
 
   public override bool CanStart(AbilityMethod func) => 0 switch {
     _ when func == AcceptAction => IsRunning,
+    _ when func == AcceptRelease => IsRunning,
     _ when func == CancelAction => IsRunning,
     _ when func == RotateAction => IsRunning,
     _ => true
@@ -73,8 +74,7 @@ public class Build : Ability {
 
   public async Task WaitForAccept(TaskScope scope) {
     while (true) {
-      await ListenFor(AcceptAction)(scope);
-      if (IsBuildCellValid) {
+      if (AcceptHeld && IsBuildCellValid) {
         var center = BuildGrid.WorldToGrid(GhostInstance.transform.position);
         var (bottomLeft, topRight) = BuildGrid.GetBuildingBounds(BuildPrefab, center);
         //Debug.Log($"Placing {BuildPrefab} at {center} tr={GhostInstance.transform.position} bounds={bottomLeft}, {topRight}");
@@ -86,10 +86,13 @@ public class Build : Ability {
         Grid.RemoveCells(BuildPrefab, center);
         IsBuildCellValid = false;
       }
+      await scope.Tick();
     }
   }
 
-  public Task AcceptAction(TaskScope scope) => null;
+  bool AcceptHeld = false;
+  public Task AcceptAction(TaskScope scope) { AcceptHeld = true; return null; }
+  public Task AcceptRelease(TaskScope scope) { AcceptHeld = false; return null; }
   public Task CancelAction(TaskScope scope) => null;
   public Task RotateAction(TaskScope scope) {
     GhostInstance.transform.rotation *= Quaternion.AngleAxis(90f, Vector3.up);
