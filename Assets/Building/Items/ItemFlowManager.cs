@@ -76,18 +76,23 @@ public class ItemFlowManager : MonoBehaviour {
     solver.ClearModel();
     var model = solver.CreateModel();
 
+    int didx = 0;
+    string DecisionName(string name) => $"{name}{didx++}".Replace("(Clone)", "").Replace(' ', '_').Replace(',', '_').Replace('(', '_').Replace(')', '_');
+    Decision AddDecision(Domain domain, string name) {
+      var d = new Decision(domain, DecisionName(name));
+      model.AddDecision(d);
+      return d;
+    }
+
     // Main goal: minimize time spent crafting.
-    var t = new Decision(Domain.Real, "t");
-    model.AddDecision(t);
+    var t = AddDecision(Domain.Real, "t");
     model.AddGoal("Goal", GoalKind.Minimize, t);
     model.AddConstraint(null, t >= 0);
 
-    string DecisionName(object obj) => obj.ToString().Replace(' ', '_').Replace(',', '_').Replace('(', '_').Replace(')', '_');
     // Adds constraint on the maximum that can consumed/produced in the given time.
     Decision AddMaxAmountConstraint(Machine machine, Recipe.ItemAmount amount) {
-      var decidedAmount = new Decision(Domain.Real, $"max_{DecisionName(machine.name)}_{DecisionName(amount.Item.name)}");
+      var decidedAmount = AddDecision(Domain.IntegerNonnegative, $"max_{machine.name}_{amount.Item.name}");
       var rate = amount.Count / machine.Recipe.CraftTime;
-      model.AddDecision(decidedAmount);
       model.AddConstraint(null, decidedAmount <= rate * t);
       return decidedAmount;
     }
@@ -117,13 +122,12 @@ public class ItemFlowManager : MonoBehaviour {
 
     // Add decision variables for each edge.
     foreach (var edge in Edges) {
-      model.AddDecision(edgeAmounts[edge] = new Decision(Domain.Real, $"e_{DecisionName(edge)}"));
+      edgeAmounts[edge] = AddDecision(Domain.IntegerNonnegative, $"e_{edge}");
       outputEdges.GetOrAdd((edge.From, edge.OutputIdx), () => new()).Add(edge);
       inputEdges.GetOrAdd((edge.To, edge.InputIdx), () => new()).Add(edge);
     }
 
     // Set up the constraints for each machine's input and output, and collect the decided output amounts.
-    Dictionary<Machine, Decision[]> machineOutputDemands = new();
     foreach (var machine in Machines) {
       var inputAmounts = machine.Recipe.Inputs.Select(amount => AddMaxAmountConstraint(machine, amount)).ToArray();
       var outputAmounts = machine.Recipe.Outputs.Select(amount => AddMaxAmountConstraint(machine, amount)).ToArray();
@@ -141,7 +145,6 @@ public class ItemFlowManager : MonoBehaviour {
           model.AddConstraint(null, inputAmounts[0] >= inputsRequested);
         }
       }
-      machineOutputDemands[machine] = outputAmounts;
     }
 
     var solution = solver.Solve(new Directive() { TimeLimit = 5000 });
@@ -151,20 +154,12 @@ public class ItemFlowManager : MonoBehaviour {
     //}
     //Debug.Log($"Result time={t}");
 
-    // Figure out how many crafts each machine needs to execute.
-    foreach (var machine in Machines) {
-      var numCrafts = PlayerCraftRequests.GetValueOrDefault(machine, 0);
-      var outputDemands = machineOutputDemands[machine];
-      for (var i = 0; i < machine.Recipe.Outputs.Length; i++) {
-        //Debug.Log($"Machine {machine} outputs {outputDemands[i].ToDouble()} {machine.Recipe.Outputs[i].Item}");
-        if (outputDemands[i].ToDouble() > numCrafts)
-          numCrafts = Mathf.CeilToInt((float)(outputDemands[i].ToDouble() / machine.Recipe.Outputs[i].Count));
-      }
-      machine.TryStartCrafting();
-      //Debug.Log($"Machine crafts: {machine} crafts {numCrafts}");
-    }
     foreach (var edge in Edges) {
-      EdgeDemands[edge] = (int)edgeAmounts[edge].ToDouble();
+      var amount = (int)edgeAmounts[edge].ToDouble();
+      EdgeDemands[edge] = amount;
+      if (amount > 0)
+        edge.From.TryStartCrafting();
+      //Debug.Log($"Edge {edge} has demand {edgeAmounts[edge]}");
     }
   }
 
@@ -197,9 +192,11 @@ public class ItemFlowManager : MonoBehaviour {
     AdvanceOnPath(flow);
     Items.Add(flow);
 
-    if (--EdgeDemands[edge] <= 0)
+    if (--EdgeDemands[edge] > 0) {
+      edge.From.TryStartCrafting();
+    } else {
       EdgeDemands.Remove(edge);
-    edge.From.TryStartCrafting();
+    }
   }
 
   List<Vector2Int> ComputePath(Vector2Int startCell, Edge edge) {
@@ -276,7 +273,7 @@ public class ItemFlowManager : MonoBehaviour {
   }
 
 #if false
-  void Awake() { Test(); Test2(); Test3(); Test4(); Test5(); }
+  void Awake() { Test6();  }
 
   void Test() {
     var solver = SolverContext.GetContext();
@@ -477,6 +474,67 @@ public class ItemFlowManager : MonoBehaviour {
 
     var solution = solver.Solve();
     Debug.Log($"Test5 ma = {mao} mb = {mbo} mc = {mci1}+{mci2}->{mco} sol={solution}");
+
+    solver.ClearModel();
+  }
+
+  async Task Test6() {
+    var solver = SolverContext.GetContext();
+    solver.ClearModel();
+    var model = solver.CreateModel();
+
+    Decision NewD() { var d = new Decision(Domain.Real, null); model.AddDecision(d); return d; }
+    var t = NewD();
+    model.AddGoal("Goal", GoalKind.Minimize, t);
+
+    (Decision, Decision) NewM() => (NewD(), NewD());
+    var ma = new (Decision, Decision)[] {
+      NewM(),
+      NewM(),
+      NewM(),
+      NewM(),
+    };
+    var mb = new (Decision, Decision)[] {
+      NewM(),
+      NewM(),
+    };
+    var mc = NewM();
+
+    var eab0 = new Decision[] { NewD(), NewD(), NewD() };
+    var eab1 = NewD();
+    var eb0c = NewD();
+    var eb1c = NewD();
+
+    var arange = new[] { 0, 1, 2, 3 };
+    var brange = new[] { 0, 1 };
+    model.AddConstraint(null, t >= 0);
+    // constraints: edges on outputs
+    model.AddConstraint(null, ma[0].Item2 == eab0[0]);
+    model.AddConstraint(null, ma[1].Item2 == eab0[1]);
+    model.AddConstraint(null, ma[2].Item2 == eab0[2]);
+    model.AddConstraint(null, ma[3].Item2 == eab1);
+    model.AddConstraint(null, mb[0].Item2 == eb0c);
+    model.AddConstraint(null, mb[1].Item2 == eb1c);
+    // constraints: edges on inputs
+    model.AddConstraint(null, mb[0].Item1 == eab0[0] + eab0[1] + eab0[2]);
+    model.AddConstraint(null, mb[1].Item1 == eab1);
+    model.AddConstraint(null, mc.Item1 == eb0c + eb1c);
+    // constraints: machine input and output rates
+    arange.ForEach(i => { model.AddConstraint(null, ma[i].Item2 <= 1 * t); });
+    brange.ForEach(i => { model.AddConstraint(null, mb[i].Item1 <= 3 * t); });
+    brange.ForEach(i => { model.AddConstraint(null, mb[i].Item2 <= 1 * t); });
+    model.AddConstraint(null, mc.Item1 <= 3 * t);
+    model.AddConstraint(null, mc.Item2 <= 1 * t);
+    // constraints: input/output rates match
+    arange.ForEach(i => { model.AddConstraint(null, ma[i].Item1 / 1 == ma[i].Item2 / 1); });
+    brange.ForEach(i => { model.AddConstraint(null, mb[i].Item1 / 3 == mb[i].Item2 / 1); });
+    model.AddConstraint(null, mc.Item1 / 3 == mc.Item2 / 1);
+
+    model.AddConstraint(null, ma[2].Item1 == 0);
+    model.AddConstraint(null, mc.Item2 >= 2);
+
+    var solution = solver.Solve();
+    Debug.Log($"Test6 t={t} ma = {ma[0].Item2}, {ma[1].Item2}, {ma[2].Item2} -> {mb[0].Item1}; ma4 = {ma[3].Item2} -> {mb[1].Item1}; mb = {mb[0].Item2} + {mb[1].Item2} = {mc.Item1}; mco = {mc.Item2}");
 
     solver.ClearModel();
   }
