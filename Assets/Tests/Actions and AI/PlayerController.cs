@@ -5,6 +5,7 @@ namespace ActionsAndAI {
   public class PlayerController : MonoBehaviour {
     [SerializeField] ActionManager ActionManager;
     [SerializeField] InputManager InputManager;
+    [SerializeField] PersonalCamera PersonalCamera;
 
     void FixedUpdate() {
       InputManager.ClearAllAxisEvents();
@@ -19,7 +20,7 @@ namespace ActionsAndAI {
       }
       foreach (var action in ActionManager.AxisActions) {
         if (action.CanStart() && action.TryGetComponent(out AxisActionInputMapping mapping)) {
-          InputManager.AxisEvent(mapping.AxisCode).Set(action.OnStart);
+          InputManager.AxisEvent(mapping.AxisCode).Set(axis => action.OnStart(axis.XZFrom(PersonalCamera.Current)));
         }
       }
     }

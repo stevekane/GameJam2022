@@ -5,7 +5,7 @@ using UnityEngine;
 namespace ActionsAndAI {
   public class ActionManager : MonoBehaviour {
     public List<AbstractActionBehavior> Actions = new();
-    public List<AbstractAxisActionBehavior> AxisActions = new();
+    public List<AbstractVectorActionBehavior> AxisActions = new();
     public TaskScope Scope = new();
 
     #if UNITY_EDITOR

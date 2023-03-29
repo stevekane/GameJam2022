@@ -14,9 +14,9 @@ namespace ActionsAndAI {
     }
   }
 
-  public abstract class AbstractAxisActionBehavior : MonoBehaviour {
+  public abstract class AbstractVectorActionBehavior : MonoBehaviour {
     public abstract bool CanStart();
-    public abstract void OnStart(AxisState axisState);
+    public abstract void OnStart(Vector3 v);
 
     void OnEnable() {
       gameObject.GetComponentInParent<ActionManager>()?.AxisActions.Add(this);
