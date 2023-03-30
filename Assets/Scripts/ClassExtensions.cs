@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.InputSystem;
 
 public static class AnimationExtensions {
   public static bool TryAddLayerMaskFromAvatarMask(
@@ -17,6 +18,15 @@ public static class AnimationExtensions {
       }
     }
 
+}
+
+public static class InputActionExtensions {
+  public static void SetEnabled(this InputAction inputAction, bool enabled) {
+    if (enabled && !inputAction.enabled)
+      inputAction.Enable();
+    else if (!enabled && inputAction.enabled)
+      inputAction.Disable();
+  }
 }
 
 public static class VectorExtensions {

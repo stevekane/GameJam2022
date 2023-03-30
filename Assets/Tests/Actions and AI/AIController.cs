@@ -41,7 +41,6 @@ namespace ActionsAndAI {
           float d when d < maxDistance => Mathf.InverseLerp(0, maxDistance, distance) * direction,
           _ => direction
         };
-        Debug.Log($"{input} {input.magnitude}");
         GroundControl.OnStart(input);
       }
     }

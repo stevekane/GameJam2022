@@ -22,5 +22,8 @@ namespace ActionsAndAI {
         Aiming.Value = false;
       }
     }
+    void Awake() {
+      enabled = false;
+    }
   }
 }
