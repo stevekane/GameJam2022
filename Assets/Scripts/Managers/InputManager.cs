@@ -55,7 +55,7 @@ public class AxisState {
 
 [DefaultExecutionOrder(ScriptExecutionGroups.Input)]
 public class InputManager : MonoBehaviour {
-  public int InputBufferTickLength = 10;
+  public Timeval BufferDuration = Timeval.FromAnimFrames(6,60);
   public float StickDeadZone;
   bool InputEnabled = true;
   Dictionary<(ButtonCode, ButtonPressType), int> Buffer = new();
@@ -153,7 +153,7 @@ public class InputManager : MonoBehaviour {
     if (func())
       Buffer[(code, type)] = Timeval.TickCount;
 
-    if (Buffer.TryGetValue((code, type), out int tickCount) && Timeval.TickCount - tickCount <= InputBufferTickLength)
+    if (Buffer.TryGetValue((code, type), out int tickCount) && Timeval.TickCount - tickCount <= BufferDuration.Ticks)
       evt.Fire();
   }
 

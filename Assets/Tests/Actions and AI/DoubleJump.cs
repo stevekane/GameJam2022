@@ -1,14 +1,14 @@
 using UnityEngine;
 
 namespace ActionsAndAI {
-  public class DoubleJump : MonoBehaviour {
-    [SerializeField] CharacterController Controller;
+  public class DoubleJump : SimpleAbility {
     [SerializeField] Velocity Velocity;
-    [SerializeField] JumpCount JumpCount;
     [SerializeField] float Strength = 35;
-    public void OnStart() {
-      JumpCount.Value--;
+
+    public override void OnRun() {
       Velocity.Value.y = Strength;
+      SimpleAbilityManager.Tags.ClearFlags(AbilityTag.CanJump);
+      SimpleAbilityManager.Stop(this);
     }
   }
 }

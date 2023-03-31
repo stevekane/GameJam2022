@@ -1,10 +1,13 @@
 using UnityEngine;
 
 namespace ActionsAndAI {
-  public class Jump : MonoBehaviour {
-    [SerializeField] CharacterController Controller;
+  public class Jump : SimpleAbility {
     [SerializeField] Velocity Velocity;
     [SerializeField] float Strength = 15;
-    public void OnStart() => Velocity.Value.y = Strength;
+
+    public override void OnRun() {
+      Velocity.Value.y = Strength;
+      SimpleAbilityManager.Stop(this);
+    }
   }
 }

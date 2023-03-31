@@ -132,8 +132,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 301672346}
-  - component: {fileID: 301672347}
   - component: {fileID: 301672348}
+  - component: {fileID: 301672347}
   m_Layer: 0
   m_Name: Double Jump
   m_TagString: Untagged
@@ -168,9 +168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95ac5473ad8814941a9470c79cd11e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Controller: {fileID: 775472273}
   Velocity: {fileID: 775472272}
-  JumpCount: {fileID: 775472279}
   Strength: 35
 --- !u!114 &301672348
 MonoBehaviour:
@@ -181,25 +179,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 301672345}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56c980e19729f0940aefb953bb34fbbc, type: 3}
+  m_Script: {fileID: 11500000, guid: 2e3df9f024dbfe146b5a586307be83ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Action:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 301672347}
-        m_TargetAssemblyTypeName: ActionsAndAI.DoubleJump, Assembly-CSharp
-        m_MethodName: OnStart
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  <IsAvailable>k__BackingField: 0
+  CancelAbilitiesWith: 0
+  BlockAbilitiesWith: 0
+  OwnerWhileActive: 0
+  OwnerActivationRequired: 1024
+  OwnerActivationBlocked: 64
+  Current: 0
 --- !u!1 &316844172
 GameObject:
   m_ObjectHideFlags: 0
@@ -299,7 +287,7 @@ MonoBehaviour:
   Muzzle: {fileID: 1746116694}
   Owner: {fileID: 775472267}
   BulletPrefab: {fileID: 7907818396571075275, guid: df454b30b2268a24196e9b0f447e26eb, type: 3}
-  Aiming: {fileID: 775472278}
+  Aiming: {fileID: 0}
   StartAimAction: {fileID: 602909869}
   StopAimAction: {fileID: 602909868}
   UpdateAimAction: {fileID: 602909867}
@@ -396,8 +384,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 687223901}
-  - component: {fileID: 687223902}
   - component: {fileID: 687223903}
+  - component: {fileID: 687223902}
   m_Layer: 0
   m_Name: Jump
   m_TagString: Untagged
@@ -432,7 +420,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10900db8736e9a64294a3ad42568a851, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Controller: {fileID: 775472273}
   Velocity: {fileID: 775472272}
   Strength: 20
 --- !u!114 &687223903
@@ -444,25 +431,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 687223900}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56c980e19729f0940aefb953bb34fbbc, type: 3}
+  m_Script: {fileID: 11500000, guid: 2e3df9f024dbfe146b5a586307be83ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Action:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 687223902}
-        m_TargetAssemblyTypeName: ActionsAndAI.Jump, Assembly-CSharp
-        m_MethodName: OnStart
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  <IsAvailable>k__BackingField: 0
+  CancelAbilitiesWith: 0
+  BlockAbilitiesWith: 0
+  OwnerWhileActive: 0
+  OwnerActivationRequired: 1088
+  OwnerActivationBlocked: 0
+  Current: 0
 --- !u!1 &758657262
 GameObject:
   m_ObjectHideFlags: 0
@@ -521,11 +498,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 775472267}
-  - component: {fileID: 775472277}
+  - component: {fileID: 775472280}
   - component: {fileID: 775472269}
   - component: {fileID: 775472276}
-  - component: {fileID: 775472278}
-  - component: {fileID: 775472279}
   - component: {fileID: 775472274}
   - component: {fileID: 775472272}
   - component: {fileID: 775472271}
@@ -568,7 +543,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa12d5ee94bcfd44dbe7e8a8507d46c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InputBufferTickLength: 10
+  BufferDuration:
+    Millis: 100
+    FramesPerSecond: 60
   StickDeadZone: 0.15
 --- !u!114 &775472271
 MonoBehaviour:
@@ -648,9 +625,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Controller: {fileID: 775472273}
+  SimpleAbilityManager: {fileID: 775472280}
   Gravity: {fileID: 775472271}
   Velocity: {fileID: 775472272}
-  JumpCount: {fileID: 775472279}
 --- !u!114 &775472276
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -664,7 +641,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Current: {fileID: 821619590}
---- !u!114 &775472277
+--- !u!114 &775472280
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -673,43 +650,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 775472266}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46bbce2f72f8d0f4e993da574da87279, type: 3}
+  m_Script: {fileID: 11500000, guid: dd480a89fe41dab4c9a92d327bb90a2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StartAimAction: {fileID: 602909869}
-  Jump: {fileID: 687223903}
-  DoubleJump: {fileID: 301672348}
-  GroundControl: {fileID: 1629427962}
-  AirControl: {fileID: 1439744520}
-  Aiming: {fileID: 775472278}
-  JumpCount: {fileID: 775472279}
-  Controller: {fileID: 775472273}
---- !u!114 &775472278
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 775472266}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f2e03942a0578924a9dd44185eec12d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Value: 0
---- !u!114 &775472279
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 775472266}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7167eea6febb444a9e9e99d6ba2b12d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Value: 0
+  Tags: 0
+  Abilities: []
 --- !u!1 &821619588
 GameObject:
   m_ObjectHideFlags: 0
@@ -1086,13 +1031,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1596575070}
-  - component: {fileID: 1596575072}
-  - component: {fileID: 1596575074}
-  - component: {fileID: 1596575073}
-  - component: {fileID: 1596575076}
-  - component: {fileID: 1596575077}
-  - component: {fileID: 1596575078}
-  - component: {fileID: 1596575079}
+  - component: {fileID: 1596575080}
+  - component: {fileID: 1596575081}
   m_Layer: 0
   m_Name: Inputs
   m_TagString: Untagged
@@ -1115,7 +1055,7 @@ Transform:
   m_Father: {fileID: 775472267}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1596575072
+--- !u!114 &1596575080
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1124,13 +1064,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1596575069}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b1a48e1718d493468139fa84ceda710, type: 3}
+  m_Script: {fileID: 11500000, guid: 8b2a227366f8b7f48baf692930af337c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AxisCode: 1
-  Action: {fileID: 602909867}
-  AxisProcessor: 4
---- !u!114 &1596575073
+  StartButtonCode: 6
+  StartButtonPressType: 0
+  StopButtonCode: 6
+  StopButtonPressType: 2
+  SimpleAbility: {fileID: 687223902}
+  ConsumeStartOnFire: 1
+  ConsumeStopOnFire: 1
+--- !u!114 &1596575081
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1139,91 +1083,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1596575069}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9bc102bdb5d9594a9b1a067de4fcf4a, type: 3}
+  m_Script: {fileID: 11500000, guid: 8b2a227366f8b7f48baf692930af337c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ButtonCode: 3
-  ButtonPressType: 2
-  Action: {fileID: 602909868}
-  ConsumeOnFire: 1
---- !u!114 &1596575074
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1596575069}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9bc102bdb5d9594a9b1a067de4fcf4a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ButtonCode: 3
-  ButtonPressType: 0
-  Action: {fileID: 602909869}
-  ConsumeOnFire: 0
---- !u!114 &1596575076
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1596575069}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9bc102bdb5d9594a9b1a067de4fcf4a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ButtonCode: 6
-  ButtonPressType: 0
-  Action: {fileID: 687223903}
-  ConsumeOnFire: 1
---- !u!114 &1596575077
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1596575069}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9bc102bdb5d9594a9b1a067de4fcf4a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ButtonCode: 6
-  ButtonPressType: 0
-  Action: {fileID: 301672348}
-  ConsumeOnFire: 0
---- !u!114 &1596575078
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1596575069}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b1a48e1718d493468139fa84ceda710, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  AxisCode: 0
-  Action: {fileID: 1629427962}
-  AxisProcessor: 4
---- !u!114 &1596575079
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1596575069}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b1a48e1718d493468139fa84ceda710, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  AxisCode: 0
-  Action: {fileID: 1439744520}
-  AxisProcessor: 4
+  StartButtonCode: 6
+  StartButtonPressType: 0
+  StopButtonCode: 6
+  StopButtonPressType: 2
+  SimpleAbility: {fileID: 301672347}
+  ConsumeStartOnFire: 1
+  ConsumeStopOnFire: 1
 --- !u!1 &1629427959
 GameObject:
   m_ObjectHideFlags: 0
