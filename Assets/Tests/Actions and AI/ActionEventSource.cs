@@ -1,19 +1,20 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 
-namespace ActionsAndAI {
-  [Serializable]
-  public class ActionEventSource : MonoBehaviour, IEventSource {
-    [field:SerializeField]
-    public bool IsAvailable { get; set; }
-    public Action Action;
-    public void Listen(Action handler) => Action += handler;
-    public void Set(Action handler) => Action = handler;
-    public void Unlisten(Action handler) => Action -= handler;
-    public void Clear() => Action = default;
-    public void Fire() {
-      if (IsAvailable)
-        Action?.Invoke();
+[Serializable]
+public class ActionEventSource : MonoBehaviour {
+  [SerializeField]
+  public UnityEvent Action;
+  [field:SerializeField]
+  public bool IsAvailable { get; set; }
+  public void Fire() {
+    if (IsAvailable) {
+      Action?.Invoke();
     }
+  }
+  public bool TryFire() {
+    Fire();
+    return IsAvailable;
   }
 }

@@ -13,25 +13,24 @@ namespace ActionsAndAI {
       Scope = new();
       Scope.Run(Brain);
     }
-    void OnDisable() => Scope.Dispose();
+
+    void OnDisable() {
+      Scope.Dispose();
+    }
 
     async Task Brain(TaskScope scope) {
       try {
         await scope.Repeat(async delegate {
-          if (StartAimAction.IsAvailable)
-            StartAimAction.Fire();
+          StartAimAction.TryFire();
           for (var i = 0; i < 20; i++) {
-            if (UpdateAimAction.IsAvailable)
-              UpdateAimAction.Fire(Random.onUnitSphere.XZ().normalized);
+            UpdateAimAction.TryFire(Random.onUnitSphere.XZ().normalized);
             await scope.Tick();
           }
-          if (StopAimAction.IsAvailable)
-            StopAimAction.Fire();
+          StopAimAction.TryFire();
           await scope.Ticks(40);
         });
       } finally {
-        if (StopAimAction.IsAvailable)
-          StopAimAction.Fire();
+        StopAimAction.TryFire();
       }
     }
   }

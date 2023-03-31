@@ -29,7 +29,7 @@ namespace ActionsAndAI {
     */
 
     void FixedUpdate() {
-      var target = FindObjectOfType<PlayerController>();
+      var target = FindObjectOfType<InputManager>();
       if (GroundControl.CanStart()) {
         var preferredPosition = target.transform.position + target.transform.forward * 10;
         var delta = (preferredPosition - transform.position).XZ();

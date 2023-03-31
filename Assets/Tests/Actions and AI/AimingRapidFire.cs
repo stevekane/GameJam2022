@@ -2,14 +2,17 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace ActionsAndAI {
+  [DefaultExecutionOrder(ScriptExecutionGroups.Ability)]
   public class AimingRapidFire : MonoBehaviour {
     [SerializeField] Timeval Cooldown = Timeval.FromSeconds(.25f);
     [SerializeField] Transform Muzzle;
     [SerializeField] Transform Owner;
     [SerializeField] GameObject BulletPrefab;
+    [SerializeField] Aiming Aiming;
     [SerializeField] ActionEventSource StartAimAction;
     [SerializeField] ActionEventSource StopAimAction;
     [SerializeField] ActionEventSourceVector3 UpdateAimAction;
+
     TaskScope Scope = new();
 
     void OnEnable() {
@@ -17,9 +20,6 @@ namespace ActionsAndAI {
       StartAimAction.IsAvailable = true;
       StopAimAction.IsAvailable = true;
       UpdateAimAction.IsAvailable = false;
-      StartAimAction.Set(StartAim);
-      StopAimAction.Set(StopAim);
-      UpdateAimAction.Set(UpdateAim);
     }
 
     void OnDisable() {
@@ -27,9 +27,6 @@ namespace ActionsAndAI {
       StartAimAction.IsAvailable = false;
       StopAimAction.IsAvailable = false;
       UpdateAimAction.IsAvailable = false;
-      StartAimAction.Clear();
-      StopAimAction.Clear();
-      UpdateAimAction.Clear();
     }
 
     async Task Fire(TaskScope scope) {
@@ -52,6 +49,11 @@ namespace ActionsAndAI {
       Scope.Dispose();
       Scope = new();
     }
-    public void UpdateAim(Vector3 v) => Owner.rotation = Quaternion.LookRotation(v.XZ().normalized, Vector3.up);
+
+    public void UpdateAim(Vector3 v) {
+      var xz = v.XZ();
+      if (xz.sqrMagnitude > 0)
+        Owner.rotation = Quaternion.LookRotation(xz.normalized, Vector3.up);
+    }
   }
 }

@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 namespace ActionsAndAI {
   public class SimpleActionTester : MonoBehaviour {
@@ -8,6 +10,7 @@ namespace ActionsAndAI {
     [SerializeField] ActionEventSource StartAimAction;
     [SerializeField] ActionEventSource StopAimAction;
     [SerializeField] ActionEventSourceVector3 UpdateAimAction;
+    [SerializeField] UnityEvent<Vector3> MyVec;
 
     void Awake() {
       Aim.started += ctx => StartAimAction.Fire();

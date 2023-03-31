@@ -43,6 +43,7 @@ class ScopedListener : IDisposable {
   }
   public void Dispose() => Event.Unlisten(Action);
 }
+
 class ScopedListener<T> : IDisposable {
   IEventSource<T> Event;
   Action<T> Action;

@@ -168,7 +168,6 @@ public class InputManager : MonoBehaviour {
   void FixedUpdate() {
     if (!InputEnabled)
       return;
-
     AxisLeft.Update(StickDeadZone, GetAxisFromInput(Controls.Player.Move));
     AxisRight.Update(StickDeadZone, GetAxisFromInput(Controls.Player.Look));
     foreach (var it in Axes) {
