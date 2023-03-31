@@ -30,11 +30,15 @@ public class SimpleAbilityManager : MonoBehaviour {
       }
     }
     Tags.AddFlags(ability.Tags.OwnerWhileActive);
+    ability.IsRunning = true;
     ability.OnRun();
   }
 
   public void Stop(SimpleAbility ability) {
     Tags.ClearFlags(ability.Tags.OwnerWhileActive);
-    ability.OnStop();
+    if (ability.IsRunning) {
+      ability.IsRunning = false;
+      ability.OnStop();
+    }
   }
 }

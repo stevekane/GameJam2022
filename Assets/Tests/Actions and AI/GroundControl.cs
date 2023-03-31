@@ -1,17 +1,18 @@
 using UnityEngine;
 
 namespace ActionsAndAI {
-  public class GroundControl : MonoBehaviour {
+  public class GroundControl : SimpleAbilityVector3 {
     [SerializeField] CharacterController Controller;
     [SerializeField] MovementSpeed MovementSpeed;
     [SerializeField] Velocity Velocity;
 
-    public void OnStart(Vector3 direction) {
-      var velocity = MovementSpeed.Value * direction;
+    public override void OnRun() {
+      var velocity = MovementSpeed.Value * Value;
       Velocity.Value.x = velocity.x;
       Velocity.Value.z = velocity.z;
       if (velocity.magnitude > 0)
         Controller.transform.forward = velocity;
+      Stop();
     }
   }
 }

@@ -12,6 +12,7 @@ public enum AbilityTag {
   Airborne = 1 << 7,              // This ability can only run in the air
 
   CanJump = 1 << 10,
+  Aiming = 1 << 11,
 
   AbilityHeavyEnabled = 1 << 28,
   AbilitySlamEnabled = 1 << 29,

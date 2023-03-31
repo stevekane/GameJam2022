@@ -1,13 +1,15 @@
 using UnityEngine;
 
-public class ButtonAbilityMapping : MonoBehaviour {
+public class AbilityMappingButton : MonoBehaviour {
+  [SerializeField] SimpleAbility SimpleAbility;
   [SerializeField] ButtonCode StartButtonCode;
   [SerializeField] ButtonPressType StartButtonPressType;
   [SerializeField] ButtonCode StopButtonCode;
   [SerializeField] ButtonPressType StopButtonPressType;
-  [SerializeField] SimpleAbility SimpleAbility;
   [SerializeField] bool ConsumeStartOnFire;
+  [SerializeField] bool ConsumeStartOnStop;
   [SerializeField] bool ConsumeStopOnFire;
+  [SerializeField] bool ConsumeStopOnStop;
 
   InputManager InputManager;
   SimpleAbilityManager SimpleAbilityManager;
@@ -18,13 +20,19 @@ public class ButtonAbilityMapping : MonoBehaviour {
   }
 
   void TryRun() {
-    if (SimpleAbilityManager.TryRun(SimpleAbility) && ConsumeStartOnFire)
-      InputManager.Consume(StartButtonCode, StartButtonPressType);
+    if (SimpleAbilityManager.TryRun(SimpleAbility)) {
+      if (ConsumeStartOnFire)
+        InputManager.Consume(StartButtonCode, StartButtonPressType);
+      if (ConsumeStopOnFire)
+        InputManager.Consume(StopButtonCode, StopButtonPressType);
+    }
   }
 
   void Stop() {
-    SimpleAbility.Stop();
-    if (ConsumeStopOnFire)
+    SimpleAbilityManager.Stop(SimpleAbility);
+    if (ConsumeStartOnStop)
+      InputManager.Consume(StartButtonCode, StartButtonPressType);
+    if (ConsumeStopOnStop)
       InputManager.Consume(StopButtonCode, StopButtonPressType);
   }
 
