@@ -1,24 +1,26 @@
-using System.Linq;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace ActionsAndAI {
+  [DefaultExecutionOrder(ScriptExecutionGroups.Late)]
   public class ActionManager : MonoBehaviour {
-    public List<AbstractActionBehavior> Actions = new();
-    public List<AbstractVectorActionBehavior> AxisActions = new();
-    public TaskScope Scope = new();
+    [Header("Actions")]
+    [SerializeField] ActionEventSource StartAimAction;
+    [SerializeField] ActionEventSource Jump;
+    [SerializeField] ActionEventSource DoubleJump;
+    [SerializeField] ActionEventSourceVector3 GroundControl;
+    [SerializeField] ActionEventSourceVector3 AirControl;
 
-    #if UNITY_EDITOR
+    [Header("State")]
+    [SerializeField] Aiming Aiming;
+    [SerializeField] JumpCount JumpCount;
+    [SerializeField] CharacterController Controller;
+
     void FixedUpdate() {
-      var log = "";
-      Actions
-        .Where(a => a.CanStart())
-        .ForEach(a => log += $"{a.name}\n");
-      AxisActions
-        .Where(a => a.CanStart())
-        .ForEach(a => log += $"{a.name}\n");
-      DebugUI.Log(this, log);
+      StartAimAction.IsAvailable = Controller.isGrounded && !Aiming.Value;
+      Jump.IsAvailable = Controller.isGrounded;
+      DoubleJump.IsAvailable = !Controller.isGrounded && JumpCount.Value > 0;
+      GroundControl.IsAvailable = Controller.isGrounded;
+      AirControl.IsAvailable = !Controller.isGrounded;
     }
-    #endif
   }
 }

@@ -4,14 +4,28 @@ public class ButtonInputMapping : MonoBehaviour {
   [SerializeField] ButtonCode ButtonCode;
   [SerializeField] ButtonPressType ButtonPressType;
   [SerializeField] ActionEventSource Action;
-  void OnEnable() {
-    GetComponentInParent<InputManager>()
-    .ButtonEvent(ButtonCode, ButtonPressType)
-    .Listen(Action.Fire);
+  [SerializeField] bool ConsumeOnFire;
+
+  InputManager InputManager;
+
+  void Fire() {
+    if (Action.TryFire() && ConsumeOnFire)
+      InputManager.Consume(ButtonCode, ButtonPressType);
   }
-  void OnDisable() {
-    GetComponentInParent<InputManager>()
+
+  void Awake() {
+    InputManager = GetComponentInParent<InputManager>();
+  }
+
+  void OnEnable() {
+    InputManager
     ?.ButtonEvent(ButtonCode, ButtonPressType)
-    .Unlisten(Action.Fire);
+    .Listen(Fire);
+  }
+
+  void OnDisable() {
+    InputManager
+    ?.ButtonEvent(ButtonCode, ButtonPressType)
+    .Unlisten(Fire);
   }
 }

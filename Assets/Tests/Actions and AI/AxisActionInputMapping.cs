@@ -12,7 +12,10 @@ public class AxisActionInputMapping : MonoBehaviour {
   [SerializeField] AxisCode AxisCode;
   [SerializeField] ActionEventSourceVector3 Action;
   [SerializeField] AxisProcessor AxisProcessor;
-  [SerializeField] PersonalCamera PersonalCamera;
+
+  PersonalCamera PersonalCamera;
+  InputManager InputManager;
+
   void Fire(AxisState axisState) {
     switch (AxisProcessor) {
       case AxisProcessor.XY:
@@ -32,13 +35,20 @@ public class AxisActionInputMapping : MonoBehaviour {
       break;
     }
   }
+
+  void Awake() {
+    InputManager = GetComponentInParent<InputManager>();
+    PersonalCamera = GetComponentInParent<PersonalCamera>();
+  }
+
   void OnEnable() {
-    GetComponentInParent<InputManager>()
-    .AxisEvent(AxisCode)
+    InputManager
+    ?.AxisEvent(AxisCode)
     .Listen(Fire);
   }
+
   void OnDisable() {
-    GetComponentInParent<InputManager>()
+    InputManager
     ?.AxisEvent(AxisCode)
     .Unlisten(Fire);
   }

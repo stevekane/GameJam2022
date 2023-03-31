@@ -1,14 +1,12 @@
 using UnityEngine;
 
 namespace ActionsAndAI {
-  public class DoubleJump : AbstractActionBehavior {
+  public class DoubleJump : MonoBehaviour {
     [SerializeField] CharacterController Controller;
-    [SerializeField] Aiming Aiming;
     [SerializeField] Velocity Velocity;
     [SerializeField] JumpCount JumpCount;
     [SerializeField] float Strength = 35;
-    public override bool CanStart() => !Controller.isGrounded && !Aiming.Value && JumpCount.Value > 0;
-    public override void OnStart() {
+    public void OnStart() {
       JumpCount.Value--;
       Velocity.Value.y = Strength;
     }
