@@ -26,13 +26,9 @@ namespace ActionsAndAI {
     }
 
     async Task Fire(TaskScope scope) {
-      try {
-        while (true) {
-          await scope.Ticks(Cooldown.Ticks);
-          Instantiate(BulletPrefab, Muzzle.position, Muzzle.rotation);
-        }
-      } finally {
-
+      while (true) {
+        await scope.Ticks(Cooldown.Ticks);
+        Instantiate(BulletPrefab, Muzzle.position, Muzzle.rotation);
       }
     }
   }
