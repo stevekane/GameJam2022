@@ -10,7 +10,6 @@ namespace ActionsAndAI {
     TaskScope Scope;
 
     public override void OnRun() {
-      Scope?.Dispose();
       Scope = new();
       Scope.Run(Fire);
       IsRunning = true;

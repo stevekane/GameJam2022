@@ -13,7 +13,6 @@ public class MeleeAttackAbility : SimpleAbility {
   TaskScope Scope;
 
   public override void OnRun() {
-    Scope?.Dispose();
     Scope = new();
     Scope.Run(Attack);
     IsRunning = true;
