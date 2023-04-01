@@ -2,27 +2,24 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace ActionsAndAI {
-  [DefaultExecutionOrder(ScriptExecutionGroups.Ability)]
   public class AimingRapidFire : SimpleAbility {
     [SerializeField] Timeval Cooldown = Timeval.FromSeconds(.25f);
     [SerializeField] Transform Muzzle;
     [SerializeField] GameObject BulletPrefab;
 
-    TaskScope Scope = new();
+    TaskScope Scope;
 
     public override void OnRun() {
-      if (Scope != null) {
-        Scope.Dispose();
-      }
+      Scope?.Dispose();
       Scope = new();
       Scope.Run(Fire);
+      IsRunning = true;
     }
 
     public override void OnStop() {
-      if (Scope != null) {
-        Scope.Dispose();
-      }
+      Scope.Dispose();
       Scope = null;
+      IsRunning = false;
     }
 
     async Task Fire(TaskScope scope) {

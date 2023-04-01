@@ -14,7 +14,7 @@ public class SimpleAbilityManager : MonoBehaviour {
     var conditionsSatisfied = ability.Conditions.All(c => c.Satisfied);
     var ownerAllowed = Tags.HasAllFlags(ability.Tags.OwnerActivationRequired);
     var ownerBlocked = Tags.HasAnyFlags(ability.Tags.OwnerActivationBlocked);
-    var abilityBlocked = Abilities.Any(a => a.IsRunning && a != ability && a.Tags.BlockAbilitiesWith.HasAnyFlags(ability.Tags.Current));
+    var abilityBlocked = Abilities.Any(a => a.IsRunning && a.Tags.BlockAbilitiesWith.HasAnyFlags(ability.Tags.Current));
     var shouldStart = conditionsSatisfied && ownerAllowed && !ownerBlocked && !abilityBlocked;
     return shouldStart;
   }
@@ -29,19 +29,17 @@ public class SimpleAbilityManager : MonoBehaviour {
 
   public void Run(SimpleAbility ability) {
     foreach (var otherAbility in Abilities) {
-      if (otherAbility.IsRunning && otherAbility != ability && otherAbility.Tags.Current.HasAnyFlags(ability.Tags.CancelAbilitiesWith)) {
+      if (otherAbility.IsRunning && otherAbility.Tags.Current.HasAnyFlags(ability.Tags.CancelAbilitiesWith)) {
         Stop(otherAbility);
       }
     }
     Tags.AddFlags(ability.Tags.OwnerWhileActive);
-    ability.IsRunning = true;
     ability.OnRun();
   }
 
   public void Stop(SimpleAbility ability) {
     Tags.ClearFlags(ability.Tags.OwnerWhileActive);
     if (ability.IsRunning) {
-      ability.IsRunning = false;
       ability.OnStop();
     }
   }

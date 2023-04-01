@@ -7,6 +7,7 @@ public class RootMotionTransfer : MonoBehaviour {
   [SerializeField] RootMotion RootMotion;
 
   void Awake() {
+    Debug.LogWarning("Consider changing RootMotionTransfer to general motion transfer");
     enabled = false;
   }
 

@@ -1,14 +1,14 @@
-using System.Threading.Tasks;
 using UnityEngine;
 
-public class DoubleJumpAbility : MonoBehaviour {
+public class DoubleJumpAbility : SimpleAbility {
   [SerializeField] AudioClip SFX;
-  [SerializeField] float JumpStrength;
   [SerializeField] Animator Animator;
   [SerializeField] Velocity Velocity;
   [SerializeField] AudioSource AudioSource;
+  [SerializeField] float JumpStrength;
 
-  public async Task Jump(TaskScope scope) {
+  public override void OnRun() {
+    SimpleAbilityManager.Tags.ClearFlags(AbilityTag.CanJump);
     Animator.SetTrigger("Jump");
     AudioSource.PlayOneShot(SFX);
     Velocity.Value.y = JumpStrength;

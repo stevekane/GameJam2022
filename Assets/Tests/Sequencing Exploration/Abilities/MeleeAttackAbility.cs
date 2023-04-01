@@ -6,13 +6,26 @@ using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEngine.Playables;
 
-public class MeleeAttackAbility : MonoBehaviour {
-  [Header("Configuration")]
+public class MeleeAttackAbility : SimpleAbility {
   [SerializeField] TimelineTaskConfig TimelineTaskConfig;
-  [Header("Components")]
   [SerializeField] LogicalTimeline LogicalTimeline;
 
-  public async Task Attack(TaskScope scope) {
+  TaskScope Scope;
+
+  public override void OnRun() {
+    Scope?.Dispose();
+    Scope = new();
+    Scope.Run(Attack);
+    IsRunning = true;
+  }
+
+  public override void OnStop() {
+    Scope.Dispose();
+    Scope = null;
+    IsRunning = false;
+  }
+
+  async Task Attack(TaskScope scope) {
     var graph = LogicalTimeline.Graph;
     var bindings = TimelineTaskConfig.Bindings;
     var tracks = bindings.Select(binding => binding.Track).Where(track => !track.muted);
@@ -38,6 +51,7 @@ public class MeleeAttackAbility : MonoBehaviour {
     } finally {
       outputs.ForEach(graph.DestroyOutput);
       graph.DestroySubgraph(timeline);
+      Stop();
     }
   }
 }

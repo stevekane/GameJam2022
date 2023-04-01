@@ -1,11 +1,12 @@
 using UnityEngine;
 
+[DefaultExecutionOrder(ScriptExecutionGroups.Ability)]
 public abstract class SimpleAbility : MonoBehaviour {
   public SimpleTags Tags { get; private set; }
   public Condition[] Conditions { get; private set; }
   public SimpleAbilityManager SimpleAbilityManager { get; private set; }
   [field:SerializeField]
-  public bool IsRunning { get; set; }
+  public virtual bool IsRunning { get; set; }
   public void Run() => SimpleAbilityManager.Run(this);
   public void Stop() => SimpleAbilityManager.Stop(this);
   public virtual void OnRun() {}
