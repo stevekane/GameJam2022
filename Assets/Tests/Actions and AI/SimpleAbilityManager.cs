@@ -6,6 +6,10 @@ public class SimpleAbilityManager : MonoBehaviour {
   public AbilityTag Tags;
   public List<SimpleAbility> Abilities;
 
+  void OnDestroy() {
+    Abilities.ForEach(Stop);
+  }
+
   public bool CanRun(SimpleAbility ability) {
     var conditionsSatisfied = ability.Conditions.All(c => c.Satisfied);
     var ownerAllowed = Tags.HasAllFlags(ability.Tags.OwnerActivationRequired);
