@@ -10,6 +10,7 @@ public class EnableBehavior : TaskBehavior {
   public override void Cleanup(Playable playable) {
     var mb = (MonoBehaviour)UserData;
     mb.enabled = false;
+    Debug.Log($"{FixedFrame.Instance.Tick} {mb.GetType()} EnableClip Cleanup");
   }
 }
 

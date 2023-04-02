@@ -19,6 +19,7 @@ public class MeleeAttackAbility : SimpleAbility {
   }
 
   public override void OnStop() {
+    Debug.Log($"{FixedFrame.Instance.Tick} Melee Attack OnStop");
     Scope.Dispose();
     Scope = null;
     IsRunning = false;
@@ -45,12 +46,12 @@ public class MeleeAttackAbility : SimpleAbility {
     }
     try {
       await scope.Until(() => timeline.IsDone());
+      Stop();
     } catch (Exception e) {
-      Debug.LogWarning($"MeleeAttackAbility caught {e.Message}");
     } finally {
+      Debug.LogWarning($"{FixedFrame.Instance.Tick} MeleeAttackAbility finally block");
       outputs.ForEach(graph.DestroyOutput);
       graph.DestroySubgraph(timeline);
-      Stop();
     }
   }
 }

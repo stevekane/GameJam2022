@@ -11,5 +11,6 @@ public class JumpAbility : SimpleAbility {
     Animator.SetTrigger("Jump");
     AudioSource.PlayOneShot(SFX);
     Velocity.Value.y = JumpStrength;
+    Debug.Log($"{FixedFrame.Instance.Tick} Jump");
   }
 }

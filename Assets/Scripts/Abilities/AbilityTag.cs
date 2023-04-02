@@ -14,6 +14,7 @@ public enum AbilityTag {
   CanJump = 1 << 10,
   Aiming = 1 << 11,
   Sprinting = 1 << 12,
+  MeleeAttacking = 1 << 13,
 
   AbilityHeavyEnabled = 1 << 28,
   AbilitySlamEnabled = 1 << 29,

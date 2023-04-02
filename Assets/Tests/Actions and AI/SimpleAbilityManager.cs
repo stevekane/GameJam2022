@@ -12,9 +12,10 @@ public class SimpleAbilityManager : MonoBehaviour {
 
   public bool CanRun(SimpleAbility ability) {
     var conditionsSatisfied = ability.Conditions.All(c => c.Satisfied);
-    var ownerAllowed = Tags.HasAllFlags(ability.Tags.OwnerActivationRequired);
-    var ownerBlocked = Tags.HasAnyFlags(ability.Tags.OwnerActivationBlocked);
-    var abilityBlocked = Abilities.Any(a => a.IsRunning && a.Tags.BlockAbilitiesWith.HasAnyFlags(ability.Tags.Current));
+    var ownerTagsAfterCancelations = RemoveTagsFromCancellable(ability, Tags);
+    var ownerAllowed = ownerTagsAfterCancelations.HasAllFlags(ability.Tags.OwnerActivationRequired);
+    var ownerBlocked = ownerTagsAfterCancelations.HasAnyFlags(ability.Tags.OwnerActivationBlocked);
+    var abilityBlocked = Abilities.Any(a => IsBlocked(ability, a));
     var shouldStart = conditionsSatisfied && ownerAllowed && !ownerBlocked && !abilityBlocked;
     return shouldStart;
   }
@@ -29,11 +30,11 @@ public class SimpleAbilityManager : MonoBehaviour {
 
   public void Run(SimpleAbility ability) {
     foreach (var otherAbility in Abilities) {
-      if (otherAbility.IsRunning && otherAbility.Tags.Current.HasAnyFlags(ability.Tags.CancelAbilitiesWith)) {
+      if (IsCancellable(ability, otherAbility))
         Stop(otherAbility);
-      }
     }
     Tags.AddFlags(ability.Tags.OwnerWhileActive);
+    ability.Tags.Current = ability.Tags.OnStart;
     ability.OnRun();
   }
 
@@ -42,5 +43,26 @@ public class SimpleAbilityManager : MonoBehaviour {
     if (ability.IsRunning) {
       ability.OnStop();
     }
+  }
+
+  AbilityTag RemoveTagsFromCancellable(SimpleAbility ability, AbilityTag tags) {
+    foreach (var otherAbility in Abilities) {
+      if (IsCancellable(ability, otherAbility))
+        tags.ClearFlags(otherAbility.Tags.OwnerWhileActive);
+    }
+    return tags;
+  }
+
+  // cancellable if running and incoming ability cancels you
+  bool IsCancellable(SimpleAbility incomingAbility, SimpleAbility currentAbility) {
+    return currentAbility.IsRunning
+        && currentAbility.Tags.Current.HasAnyFlags(incomingAbility.Tags.CancelAbilitiesWith);
+  }
+
+  // blocked if a running ability cannot be canceled and blocks you
+  bool IsBlocked(SimpleAbility incomingAbility, SimpleAbility currentAbility) {
+    return currentAbility.IsRunning
+        && currentAbility.Tags.Current.HasAnyFlags(incomingAbility.Tags.CancelAbilitiesWith)
+        && currentAbility.Tags.BlockAbilitiesWith.HasAnyFlags(incomingAbility.Tags.Current);
   }
 }

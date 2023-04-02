@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Playables;
 
+[DefaultExecutionOrder(ScriptExecutionGroups.Animation)]
 public class LogicalTimeline : MonoBehaviour {
   [Header("Input")]
   [SerializeField] InputManager InputManager;

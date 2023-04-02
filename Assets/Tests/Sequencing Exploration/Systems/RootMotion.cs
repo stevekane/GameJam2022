@@ -20,6 +20,7 @@ public class RootMotion : MonoBehaviour {
 
   // N.B. Fires during Late Execution Group
   void FixedUpdate() {
+    Debug.Log($"{FixedFrame.Instance.Tick} RootMotion FixedUpdate");
     Velocity.Value = DeltaPosition / Time.fixedDeltaTime;
     var rotation = DeltaRotation * transform.rotation;
     var euler = rotation.eulerAngles;
