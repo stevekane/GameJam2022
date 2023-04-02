@@ -10,6 +10,8 @@ public class SimpleAbilityManager : MonoBehaviour {
     Abilities.ForEach(Stop);
   }
 
+  // TODO: Should re-apply the tags from still-running abilities when building the ownerTagsAfterCancellation
+  // in case multiple abilities are writing to it
   public bool CanRun(SimpleAbility ability) {
     var conditionsSatisfied = ability.Conditions.All(c => c.Satisfied);
     var ownerTagsAfterCancelations = RemoveTagsFromCancellable(ability, Tags);

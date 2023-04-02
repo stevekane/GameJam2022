@@ -12,23 +12,14 @@ public class LogicalTimeline : MonoBehaviour {
   [Header("Components")]
   [SerializeField] Animator Animator;
   [SerializeField] Vibrator Vibrator;
-  [SerializeField] CharacterController Controller;
-  [SerializeField] ResidualImageRenderer ResidualImageRenderer;
   [SerializeField] MeleeAttackTargeting MeleeAttackTargeting;
 
   [Header("State")]
   [SerializeField] SimpleAbilityManager SimpleAbilityManager;
-  [SerializeField] RootMotion RootMotion;
-  [SerializeField] PersonalCamera PersonalCamera;
   [SerializeField] LocalTime LocalTime;
-  [SerializeField] SplitGravity Gravity;
-  [SerializeField] MaxMovementSpeed MaxMovementSpeed;
-  [SerializeField] MaxFallSpeed MaxFallSpeed;
-  [SerializeField] MovementSpeed MovementSpeed;
-  [SerializeField] TurningSpeed TurningSpeed;
-  [SerializeField] Acceleration Acceleration;
   [SerializeField] Velocity Velocity;
   [SerializeField] HitStop HitStop;
+  [SerializeField] GroundDistance GroundDistance;
 
   [Header("Hanging")]
   [Header("Configuration")]
@@ -43,18 +34,13 @@ public class LogicalTimeline : MonoBehaviour {
   // TODO: Should not be here
   public PlayableGraph Graph;
 
-  TaskScope Scope;
-
   void Start() {
-    Time.fixedDeltaTime = 1f / Timeval.FixedUpdatePerSecond;
-    Scope = new TaskScope();
     Graph = PlayableGraph.Create("Logical Timeline");
     Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
     Graph.Play();
   }
 
   void OnDestroy() {
-    Scope.Dispose();
     Graph.Destroy();
   }
 
@@ -77,10 +63,11 @@ public class LogicalTimeline : MonoBehaviour {
     // Steve - this rounding probably should be temporary and replaced / refactored with something
     // that is more robust. It exists to prevent the value being fed into the blend tree from stuttering
     // under floating-point imprecision which causes the animations to stutter awkwardly.
+    // Animator.SetBool("Hanging", Hanging);
     Animator.SetFloat("Speed", Mathf.RoundToInt(Velocity.Value.XZ().magnitude));
     Animator.SetFloat("YSpeed", Velocity.Value.y);
     Animator.SetBool("Grounded", SimpleAbilityManager.Tags.HasFlag(AbilityTag.Grounded));
-    // Animator.SetBool("Hanging", Hanging);
+    Animator.SetFloat("GroundDistance", GroundDistance.Value);
     Graph.Evaluate(LocalTime.FixedDeltaTime);
   }
 
