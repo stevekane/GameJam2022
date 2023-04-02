@@ -17,6 +17,7 @@ public class LogicalTimeline : MonoBehaviour {
   [SerializeField] MeleeAttackTargeting MeleeAttackTargeting;
 
   [Header("State")]
+  [SerializeField] SimpleAbilityManager SimpleAbilityManager;
   [SerializeField] RootMotion RootMotion;
   [SerializeField] PersonalCamera PersonalCamera;
   [SerializeField] LocalTime LocalTime;
@@ -27,8 +28,6 @@ public class LogicalTimeline : MonoBehaviour {
   [SerializeField] TurningSpeed TurningSpeed;
   [SerializeField] Acceleration Acceleration;
   [SerializeField] Velocity Velocity;
-  [SerializeField] Traditional.Grounded Grounded;
-  [SerializeField] Traditional.GroundDistance GroundDistance;
   [SerializeField] HitStop HitStop;
 
   [Header("Hanging")]
@@ -80,8 +79,7 @@ public class LogicalTimeline : MonoBehaviour {
     // under floating-point imprecision which causes the animations to stutter awkwardly.
     Animator.SetFloat("Speed", Mathf.RoundToInt(Velocity.Value.XZ().magnitude));
     Animator.SetFloat("YSpeed", Velocity.Value.y);
-    Animator.SetBool("Grounded", Grounded.Value);
-    Animator.SetFloat("GroundDistance", GroundDistance.Value);
+    Animator.SetBool("Grounded", SimpleAbilityManager.Tags.HasFlag(AbilityTag.Grounded));
     // Animator.SetBool("Hanging", Hanging);
     Graph.Evaluate(LocalTime.FixedDeltaTime);
   }
