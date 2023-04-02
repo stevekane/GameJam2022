@@ -3,18 +3,28 @@ using UnityEngine;
 [DefaultExecutionOrder(ScriptExecutionGroups.Physics)]
 public class SimpleMover : MonoBehaviour {
   [SerializeField] CharacterController Controller;
+  [SerializeField] SimpleAbilityManager SimpleAbilityManager;
+  [SerializeField] MaxFallSpeed MaxFallSpeed;
+  [SerializeField] LocalTime LocalTime;
   [SerializeField] Gravity Gravity;
   [SerializeField] Velocity Velocity;
-  [SerializeField] ActionsAndAI.JumpCount JumpCount;
+
+  void Awake() => Debug.LogWarning("Restore SimpleMover capping fall speed");
 
   void FixedUpdate() {
-    if (Controller.isGrounded && Velocity.Value.y < 0) {
-      Velocity.Value.y = Time.deltaTime * Gravity.Value;
-      // TODO: This could be a "land event"... not sure which is more robust?
-      JumpCount.Value = 1;
+    var isGrounded = SimpleAbilityManager.Tags.HasFlag(AbilityTag.Grounded);
+    if (isGrounded) {
+      SimpleAbilityManager.Tags.AddFlags(AbilityTag.CanJump);
+      SimpleAbilityManager.Tags.AddFlags(AbilityTag.Grounded);
     } else {
-      Velocity.Value.y += Time.deltaTime * Gravity.Value;
+      SimpleAbilityManager.Tags.ClearFlags(AbilityTag.Grounded);
     }
-    Controller.Move(Time.deltaTime * Velocity.Value);
+    if (isGrounded && Velocity.Value.y < 0) {
+      Velocity.Value.y = LocalTime.FixedDeltaTime * Gravity.Value;
+    } else {
+      Velocity.Value.y += LocalTime.FixedDeltaTime * Gravity.Value;
+    }
+    // Velocity.Value.y = -Mathf.Min(Mathf.Abs(MaxFallSpeed.Value), Mathf.Abs(Velocity.Value.y));
+    Controller.Move(LocalTime.FixedDeltaTime * Velocity.Value);
   }
 }

@@ -1,20 +1,17 @@
-using System.Threading.Tasks;
 using UnityEngine;
 
-public class JumpAbility : MonoBehaviour {
+public class JumpAbility : SimpleAbility {
   [SerializeField] AudioClip SFX;
-  [SerializeField] int StartupTicks;
-  [SerializeField] float JumpStrength;
-  [SerializeField] Velocity Velocity;
   [SerializeField] Animator Animator;
+  [SerializeField] Velocity Velocity;
   [SerializeField] AudioSource AudioSource;
+  [SerializeField] HitStop HitStop;
+  [SerializeField] float JumpStrength;
 
-  public async Task Jump(TaskScope scope) {
+  public override void OnRun() {
     Animator.SetTrigger("Jump");
     AudioSource.PlayOneShot(SFX);
-    for (var i = 0; i < StartupTicks; i++) {
-      await scope.ListenFor(FixedFrame.Instance.TickEvent);
-    }
     Velocity.Value.y = JumpStrength;
+    HitStop.TicksRemaining = 0;
   }
 }

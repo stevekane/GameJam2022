@@ -1,27 +1,21 @@
-using System.Threading.Tasks;
 using UnityEngine;
 
-public class SprintAbility : MonoBehaviour {
-  [SerializeField] float SprintMovementSpeed;
+public class SprintAbility : SimpleAbility {
   [SerializeField] BaseMovementSpeed BaseMovementSpeed;
   [SerializeField] MovementSpeed MovementSpeed;
   [SerializeField] MaxMovementSpeed MaxMovementSpeed;
   [SerializeField] InputManager InputManager;
-  [SerializeField] Sprinting Sprinting;
+  [SerializeField] float SprintMovementSpeed;
 
-  public ButtonCode ButtonCode;
+  public override void OnRun() {
+    IsRunning = true;
+    MovementSpeed.Value = SprintMovementSpeed;
+    MaxMovementSpeed.Value = SprintMovementSpeed;
+  }
 
-  public async Task Activate(TaskScope scope) {
-    try {
-      MovementSpeed.Value = SprintMovementSpeed;
-      MaxMovementSpeed.Value = SprintMovementSpeed;
-      Sprinting.IsActive = true;
-      await scope.ListenFor(InputManager.ButtonEvent(ButtonCode, ButtonPressType.JustUp));
-      InputManager.Consume(ButtonCode, ButtonPressType.JustUp);
-    } finally {
-      MovementSpeed.Value = BaseMovementSpeed.Value;
-      MaxMovementSpeed.Value = BaseMovementSpeed.Value;
-      Sprinting.IsActive = false;
-    }
+  public override void OnStop() {
+    IsRunning = false;
+    MovementSpeed.Value = BaseMovementSpeed.Value;
+    MaxMovementSpeed.Value = BaseMovementSpeed.Value;
   }
 }

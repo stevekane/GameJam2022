@@ -2,7 +2,7 @@ using UnityEngine;
 
 [DefaultExecutionOrder(ScriptExecutionGroups.Late+1)]
 public class RootMotion : MonoBehaviour {
-  [SerializeField] CharacterController Controller;
+  [SerializeField] Velocity Velocity;
   [SerializeField] Animator Animator;
 
   public Vector3 DeltaPosition;
@@ -20,10 +20,10 @@ public class RootMotion : MonoBehaviour {
 
   // N.B. Fires during Late Execution Group
   void FixedUpdate() {
+    Velocity.Value = DeltaPosition / Time.fixedDeltaTime;
     var rotation = DeltaRotation * transform.rotation;
     var euler = rotation.eulerAngles;
     rotation = Quaternion.Euler(0, euler.y, 0);
     transform.rotation = rotation;
-    Controller.Move(DeltaPosition);
   }
 }
