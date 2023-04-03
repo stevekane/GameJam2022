@@ -93,8 +93,8 @@ public class SimpleMob : MonoBehaviour {
         async s => {
           TaskFunc telegraph = TelegraphBehavior switch {
             TelegraphBehaviors.TelegraphThenAttack => async s => await Flash.RunStrobe(s, Color.red, Timeval.FromMillis(150), 3),
-            TelegraphBehaviors.TelegraphDuringAttack => async s => { _ = Flash.RunStrobe(s, Color.red, Timeval.FromMillis(150), 3); await scope.Yield(); },
-            TelegraphBehaviors.DontTelegraph => async s => await s.Yield(),
+            TelegraphBehaviors.TelegraphDuringAttack => async s => { _ = Flash.RunStrobe(s, Color.red, Timeval.FromMillis(150), 3); await scope.Tick(); },
+            TelegraphBehaviors.DontTelegraph => async s => await s.Tick(),
             _ => null,
           };
           await telegraph(s);

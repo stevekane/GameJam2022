@@ -79,7 +79,6 @@ public class MeleeAttackAbility : SimpleAbility {
     try {
       await scope.Until(() => timeline.IsDone());
       Stop();
-    } catch (Exception e) {
     } finally {
       outputs.ForEach(graph.DestroyOutput);
       graph.DestroySubgraph(timeline);
