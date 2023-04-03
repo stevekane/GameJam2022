@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class ItemFlowManager : MonoBehaviour {
@@ -68,6 +67,7 @@ public class ItemFlowManager : MonoBehaviour {
   // TODO: clean this up ffs
   void SolveForRequests() {
     var edgeAmounts = new Dictionary<Edge, Decision>();
+    var edgeTimes = new Dictionary<Edge, Decision>();
     var inputEdges = new Dictionary<(Machine, int), List<Edge>>();
     var outputEdges = new Dictionary<(Machine, int), List<Edge>>();
 
@@ -84,19 +84,17 @@ public class ItemFlowManager : MonoBehaviour {
     }
 
     // Main goal: minimize time spent crafting.
-    var t = AddDecision(Domain.Real, "t");
+    var t = AddDecision(Domain.RealNonnegative, "t");
     model.AddGoal("Goal", GoalKind.Minimize, t);
-    model.AddConstraint(null, t >= 0);
 
+    var empty = new List<Edge>();
     // Adds constraint on the maximum that can consumed/produced in the given time.
-    Decision AddMaxAmountConstraint(Machine machine, Recipe.ItemAmount amount) {
-      var decidedAmount = AddDecision(Domain.IntegerNonnegative, $"max_{machine.name}_{amount.Item.name}");
-      var rate = amount.Count / machine.Recipe.CraftTime;
-      model.AddConstraint(null, decidedAmount <= rate * t);
+    Decision AddMaxAmountDecision(Machine machine, Recipe.ItemAmount amount) {
+      var decidedAmount = AddDecision(Domain.IntegerNonnegative, $"m_{machine.name}_{amount.Item.name}");
       return decidedAmount;
     }
-    // Adds constraints on the recipe ratios by ensuring time to consume/produce each input/output is the same.
-    void AddRecipeRatioConstraints(Machine machine, Decision[] inputAmounts, Decision[] outputAmounts) {
+    // Adds constraints on the craft time of the machine and the total craft time to deliver each output (edgeTimes[e]).
+    void AddCraftTimeConstraints(Machine machine, Decision[] inputAmounts, Decision[] outputAmounts) {
       var recipe = machine.Recipe;
       Term TimeToCraft(int idx, Decision[] decidedAmounts, Recipe.ItemAmount[] amounts) =>
         decidedAmounts[idx] / (amounts[idx].Count / recipe.CraftTime);
@@ -107,8 +105,28 @@ public class ItemFlowManager : MonoBehaviour {
         model.AddConstraint(null, TimeToCraft(i, inputAmounts, recipe.Inputs) == referenceTime);
       for (var i = 0; i < outputAmounts.Length; i++)
         model.AddConstraint(null, TimeToCraft(i, outputAmounts, recipe.Outputs) == referenceTime);
+
+      // Edge craft times = total time from system start to satisfy the given edge's full demand.
+      // Note: this is not strictly correct. If a machine has 2 output edges, it might satisfy the first edge at time T,
+      // then the second at time T + T2. But this is a good enough approximation for our purposes - minimizing total
+      // craft time.
+      var totalCraftTime = AddDecision(Domain.RealNonnegative, $"mt_{machine.name}");
+      if (inputAmounts.Length == 0) {
+        model.AddConstraint(null, totalCraftTime == referenceTime);
+      } else {
+        // Adds constraint: totalCraftTime = max(inputEdgeTime) + machineCraftTime
+        foreach ((var inputEdge, var inputEdgeTime) in edgeTimes) {
+          if (inputEdge.To != machine) continue;
+          model.AddConstraint(null, totalCraftTime >= referenceTime + edgeTimes[inputEdge]);
+        }
+      }
+
+      foreach ((var outputEdge, var outputEdgeTime) in edgeTimes) {
+        if (outputEdge.From != machine) continue;
+        model.AddConstraint(null, outputEdgeTime == totalCraftTime);
+      }
+      model.AddConstraint(null, t >= totalCraftTime);
     }
-    var empty = new List<Edge>();
     // Adds constraint: sum(edges attached to machine slot N) = machine's slot_N decision.
     void AddEdgeToMachineConstraints(Machine machine, Dictionary<(Machine, int), List<Edge>> edgeMap, Recipe.ItemAmount[] slots, Decision[] decidedAmounts) {
       for (var i = 0; i < slots.Length; i++) {
@@ -122,15 +140,16 @@ public class ItemFlowManager : MonoBehaviour {
     // Add decision variables for each edge.
     foreach (var edge in Edges) {
       edgeAmounts[edge] = AddDecision(Domain.IntegerNonnegative, $"e_{edge}");
+      edgeTimes[edge] = AddDecision(Domain.RealNonnegative, $"et_{edge}");
       outputEdges.GetOrAdd((edge.From, edge.OutputIdx), () => new()).Add(edge);
       inputEdges.GetOrAdd((edge.To, edge.InputIdx), () => new()).Add(edge);
     }
 
     // Set up the constraints for each machine's input and output, and collect the decided output amounts.
     foreach (var machine in Machines) {
-      var inputAmounts = machine.Recipe.Inputs.Select(amount => AddMaxAmountConstraint(machine, amount)).ToArray();
-      var outputAmounts = machine.Recipe.Outputs.Select(amount => AddMaxAmountConstraint(machine, amount)).ToArray();
-      AddRecipeRatioConstraints(machine, inputAmounts, outputAmounts);
+      var inputAmounts = machine.Recipe.Inputs.Select(amount => AddMaxAmountDecision(machine, amount)).ToArray();
+      var outputAmounts = machine.Recipe.Outputs.Select(amount => AddMaxAmountDecision(machine, amount)).ToArray();
+      AddCraftTimeConstraints(machine, inputAmounts, outputAmounts);
       AddEdgeToMachineConstraints(machine, inputEdges, machine.Recipe.Inputs, inputAmounts);
       AddEdgeToMachineConstraints(machine, outputEdges, machine.Recipe.Outputs, outputAmounts);
 
@@ -148,18 +167,21 @@ public class ItemFlowManager : MonoBehaviour {
 
     var solution = solver.Solve(new Directive() { TimeLimit = 5000 });
 
-    //foreach (var c in model.Constraints) {
-    //  Debug.Log($"constraint: {c.Expression}");
-    //}
-    //Debug.Log($"Result time={t}");
+    foreach (var c in model.Constraints) {
+      Debug.Log($"constraint: {c.Expression}");
+    }
+    foreach (var d in model.Decisions) {
+      Debug.Log($"decision: {d.Name} == {d}");
+    }
 
     foreach (var edge in Edges) {
       var amount = (int)edgeAmounts[edge].ToDouble();
       EdgeDemands[edge] = amount;
       if (amount > 0)
         edge.From.TryStartCrafting();
-      Debug.Log($"Edge {edge} has demand {edgeAmounts[edge]}");
+      Debug.Log($"Edge {edge} has demand {edgeAmounts[edge]}, time {edgeTimes[edge]}");
     }
+    Debug.Log($"Total craft time {t}");
   }
 
   public void OnCraftFinished(Machine machine, int[] outputQueue) {
@@ -298,11 +320,15 @@ public class ItemFlowManager : MonoBehaviour {
   }
   [ContextMenu("Test flow")]
   void Test() {
+    if (!Application.isPlaying) {
+      Debug.Log("Enter play mode first, this depends on creating objects");
+      return;
+    }
     var itemIron = ScriptableObject.CreateInstance<ItemInfo>();
     var itemGear = ScriptableObject.CreateInstance<ItemInfo>();
     var itemBelt = ScriptableObject.CreateInstance<ItemInfo>();
     var recipeMiner = NewRecipe(1f, new Recipe.ItemAmount[0], NewIngred(itemIron, 1));
-    var recipeGear = NewRecipe(1f, new[] { NewIngred(itemIron, 2) }, NewIngred(itemGear, 1));
+    var recipeGear = NewRecipe(1f, new[] { NewIngred(itemIron, 3) }, NewIngred(itemGear, 1));
     var recipeBelt = NewRecipe(1f, new[] { NewIngred(itemGear, 1), NewIngred(itemIron, 1) }, NewIngred(itemBelt, 1));
     Machines = new() {
       NewMachine(recipeMiner, "ma"),
@@ -312,9 +338,9 @@ public class ItemFlowManager : MonoBehaviour {
     };
     Edges = new() {
       new() { From = Machines[0], OutputIdx = 0, To = Machines[2], InputIdx = 0 },
-      //new() { From = Machines[1], OutputIdx = 0, To = Machines[2], InputIdx = 0 },
+      new() { From = Machines[1], OutputIdx = 0, To = Machines[2], InputIdx = 0 },
       new() { From = Machines[0], OutputIdx = 0, To = Machines[3], InputIdx = 1 },
-      //new() { From = Machines[1], OutputIdx = 0, To = Machines[3], InputIdx = 1 },
+      new() { From = Machines[1], OutputIdx = 0, To = Machines[3], InputIdx = 1 },
       new() { From = Machines[2], OutputIdx = 0, To = Machines[3], InputIdx = 0 },
     };
     PlayerCraftRequests[Machines[3]] = 1;
@@ -322,7 +348,7 @@ public class ItemFlowManager : MonoBehaviour {
     SolveForRequests();
 
     Edges = new();
-    Machines.ForEach(m => DestroyImmediate(m.gameObject));
+    Machines.ForEach(m => Destroy(m.gameObject));
   }
 #endif
 
