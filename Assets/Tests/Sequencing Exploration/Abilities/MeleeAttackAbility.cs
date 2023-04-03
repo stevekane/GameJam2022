@@ -14,19 +14,19 @@ public class MeleeAttackAbility : SimpleAbility {
   TaskScope Scope;
 
   public override void OnRun() {
-    // Scope = new();
-    // Scope.Run(Attack);
+    Scope = new();
+    Scope.Run(Attack);
     IsRunning = true;
-    StartCoroutine(AttackEnumerator());
+    //StartCoroutine(AttackEnumerator());
   }
 
   public override void OnStop() {
-    // Scope.Dispose();
-    // Scope = null;
+    Scope.Dispose();
+    Scope = null;
     IsRunning = false;
-    Outputs.ForEach(LogicalTimeline.Graph.DestroyOutput);
-    LogicalTimeline.Graph.DestroySubgraph(Timeline);
-    StopAllCoroutines();
+    //Outputs.ForEach(LogicalTimeline.Graph.DestroyOutput);
+    //LogicalTimeline.Graph.DestroySubgraph(Timeline);
+    //StopAllCoroutines();
   }
 
   ScriptPlayable<TimelinePlayable> Timeline;

@@ -63,6 +63,7 @@ public class TaskScope : IDisposable {
   }
 
   // Basic control flow.
+  [Obsolete("You probably want to use Tick instead. This is unreliable for time-sensitive use cases.")]
   public async Task Yield() {
     ThrowIfCancelled();
     await Task.Yield();
@@ -70,13 +71,8 @@ public class TaskScope : IDisposable {
   }
   public Task Tick() => ListenFor(Timeval.TickEvent);
   public async Task Ticks(int ticks) {
-    // Maybe this should be Repeat(ticks, Tick()) ?
-    // Cons: more allocations that way.
-    // Pros: fewer yields, and it guarantees to finish *after* N calls to FixedUpdate, whereas this
-    // version will terminate at any point in the frame.
-    int endTick = Timeval.TickCount + ticks;
-    while (Timeval.TickCount < endTick)
-      await Yield();
+    for (int i = 0; i < ticks; i++)
+      await Tick();
   }
   public Task Seconds(float seconds) => Task.Delay((int)(seconds * 1000), Source.Token);
   public Task Millis(int ms) => Task.Delay(ms, Source.Token);
@@ -86,36 +82,36 @@ public class TaskScope : IDisposable {
   // Conditional control flow.
   public async Task While(Func<bool> pred) {
     while (pred())
-      await Yield();
+      await Tick();
   }
   public async Task Until(Func<bool> pred) {
     while (!pred())
-      await Yield();
+      await Tick();
   }
   public async Task Repeat(Action f) {
     while (true) {
       f();
-      await Yield();
+      await Tick();
     }
   }
   public async Task Repeat(int n, Action f) {
     for (int i = 0; i < n; i++) {
       f();
-      await Yield();
+      await Tick();
     }
   }
   public async Task Repeat(TaskFunc f) {
     while (true) {
       ThrowIfCancelled();
       await f(this);
-      await Yield();
+      await Tick();
     }
   }
   public async Task Repeat(int n, TaskFunc f) {
     for (int i = 0; i < n; i++) {
       ThrowIfCancelled();
       await f(this);
-      await Yield();
+      await Tick();
     }
   }
 

@@ -65,6 +65,42 @@ public class TaskScopeTests : MonoBehaviour {
     },
 
     new() {
+      Name = "cancelOther",
+      Test = async (TaskScope main) => {
+        var output = "";
+        Timeval.TickCount = 0;
+        await main.Any(
+          async (child) => {
+            try {
+              output += $"child1 {Timeval.TickCount};";
+              await child.Ticks(5);
+              output += "child1 notreached;";
+            } finally {
+              output += $"child1 finally {Timeval.TickCount};";
+            }
+          },
+          async (child) => {
+            try {
+              output += $"child2 start {Timeval.TickCount};";
+              await child.Ticks(1);
+              output += $"child2 cancelling {Timeval.TickCount};";
+              child.Cancel();
+              output += $"child2 awaiting {Timeval.TickCount};";
+              await child.Ticks(1);
+              output += $"child2 notreached;";
+            } finally {
+              output += $"child2 finally {Timeval.TickCount};";
+            }
+          }
+        );
+        await main.Tick();
+        output += $"end {Timeval.TickCount}";
+        return output;
+      },
+      ExpectedOutput = "child1 0;child2 start 0;child2 cancelling 1;child1 finally 1;child2 awaiting 1;child2 finally 1;end 2"
+    },
+
+    new() {
       Name = "any",
       Test = async (TaskScope main) => {
         var output = "";
