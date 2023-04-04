@@ -7,7 +7,8 @@ public class CrafterHurtbox : Hurtbox {
     return (hitParams.Attacker.GetComponent<Player>() != null);
   }
   public override bool TryAttack(HitParams hitParams) {
-    ItemFlowManager.Instance.AddCraftRequest(Machine);
+    // TODO: fixme
+    ItemFlowManager.Instance.AddCraftRequest(Machine.Recipes[0].Outputs[0].Item);
     return true;
   }
 }

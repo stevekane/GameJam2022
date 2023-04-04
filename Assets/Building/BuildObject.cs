@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -21,6 +22,14 @@ public class BuildObject : MonoBehaviour {
   }
 
 #if UNITY_EDITOR
+  private void Start() {
+    // Generate a unique name for debugging purposes.
+    var prefix = $"{Asset.editorAsset.name}_";
+    var existing = FindObjectsOfType<BuildObject>().Where(bo => bo.gameObject.name.StartsWith(prefix));
+    var id = existing.ToArray().Length + 1;
+    gameObject.name = $"{prefix}{id}";
+  }
+
   [ContextMenu("Update AssetReference for prefab")]
   void UpdateAssetReference() {
     var assetPath = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage()?.assetPath;

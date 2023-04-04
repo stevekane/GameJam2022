@@ -91,6 +91,7 @@ public class BuildGrid {
   public void RemoveCells(BuildObject building, Vector2Int center) {
     var (bottomLeft, topRight) = GetBuildingBounds(building, center);
     foreach (var pos in CellsInSquare(bottomLeft, topRight)) {
+      Cells[pos].gameObject.Destroy();
       Cells.Remove(pos);
     }
   }

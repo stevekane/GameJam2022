@@ -94,9 +94,9 @@ public class GameManager : MonoBehaviour {
     for (int i = 0; i < SaveLoadKeys.Length; i++) {
       if (Input.GetKey(SaveLoadKeys[i])) {
         if (Input.GetKey(KeyCode.LeftAlt)) {
-          SaveData.LoadFromFile(i);
-        } else {
           SaveData.SaveToFile(i);
+        } else {
+          SaveData.LoadFromFile(i);
         }
       }
     }

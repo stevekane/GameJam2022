@@ -23,6 +23,7 @@ public class BuildAbility : Ability {
   // TODO: better handling of distance (here and halfBuildSize)
   const float MaxBuildDist = 6f;
   public override async Task MainAction(TaskScope scope) {
+    AcceptHeld = false;
     var debugThing = Instantiate(VFXManager.Instance.DebugIndicatorPrefab);
     var realMoveAxis = AbilityManager.CaptureAxis(AxisTag.Move);
     var realAimAxis = AbilityManager.CaptureAxis(AxisTag.Aim);
@@ -75,7 +76,7 @@ public class BuildAbility : Ability {
     while (true) {
       if (AcceptHeld && IsBuildCellValid) {
         var center = BuildGrid.WorldToGrid(GhostInstance.transform.position);
-        var (bottomLeft, topRight) = BuildGrid.GetBuildingBounds(BuildPrefab, center);
+        //var (bottomLeft, topRight) = BuildGrid.GetBuildingBounds(BuildPrefab, center);
         //Debug.Log($"Placing {BuildPrefab} at {center} tr={GhostInstance.transform.position} bounds={bottomLeft}, {topRight}");
         var obj = Instantiate(BuildPrefab, GhostInstance.transform.position, GhostInstance.transform.rotation);
         obj.gameObject.SetActive(true);
