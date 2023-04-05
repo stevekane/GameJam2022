@@ -43,27 +43,28 @@ public class SaveData {
   public List<UpgradeData> Upgrades;
   public int Gold;
 
-  static string FilePath { get => System.IO.Path.Combine(Application.persistentDataPath, "save.json"); }
+  static string FilePath(int slot) => System.IO.Path.Combine(Application.persistentDataPath, $"save{slot}.json");
   static JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings() {
     Converters = new List<JsonConverter>() { new ScriptableObjectConverter(), new Vector3Converter(), new QuaternionConverter() },
     TypeNameHandling = TypeNameHandling.Auto,
   };
 
   // TODO: use async IO
-  public static void SaveToFile() {
+  public static void SaveToFile(int slot) {
     try {
       var json = SaveToJson();
       Debug.Log($"Save {json}");
-      File.WriteAllTextAsync(FilePath, json);
+      File.WriteAllTextAsync(FilePath(slot), json);
     } catch (Exception e) {
       Debug.Log($"Save failed: {e}");
     }
   }
-  public static void LoadFromFile() {
+  public static void LoadFromFile(int slot) {
     try {
-      if (!File.Exists(FilePath))
+      ResetLiveData();
+      if (!File.Exists(FilePath(slot)))
         return;
-      var json = File.ReadAllText(FilePath);
+      var json = File.ReadAllText(FilePath(slot));
       LoadFromJson(json);
     } catch (Exception e) {
       Debug.Log($"Load failed: {e}");
@@ -80,5 +81,8 @@ public class SaveData {
     var data = JsonConvert.DeserializeObject<SaveData>(json, JsonSerializerSettings);
     UnityEngine.Object.FindObjectOfType<Player>().GetComponent<Upgrades>().Load(data);
     data.Entities.ForEach(b => b.Load());
+  }
+  static void ResetLiveData() {
+    UnityEngine.Object.FindObjectsOfType<BuildObject>().ForEach(b => b.gameObject.Destroy());
   }
 }
