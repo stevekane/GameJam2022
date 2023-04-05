@@ -7,7 +7,7 @@ namespace ActionsAndAI {
 
     public override void OnRun() {
       Velocity.Value.y = Strength;
-      SimpleAbilityManager.Tags.ClearFlags(AbilityTag.CanJump);
+      SimpleAbilityManager.Tags.Current.ClearFlags(AbilityTag.CanJump);
       SimpleAbilityManager.Stop(this);
     }
   }

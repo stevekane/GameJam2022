@@ -2,7 +2,8 @@ using UnityEngine;
 
 [DefaultExecutionOrder(ScriptExecutionGroups.Ability)]
 public abstract class SimpleAbility : MonoBehaviour {
-  public SimpleTags Tags { get; private set; }
+  public SimpleTags SimpleTags { get; private set; }
+  public Tags Tags { get; private set; }
   public Condition[] Conditions { get; private set; }
   public SimpleAbilityManager SimpleAbilityManager { get; private set; }
   [field:SerializeField]
@@ -13,7 +14,8 @@ public abstract class SimpleAbility : MonoBehaviour {
   public virtual void OnStop() {}
 
   void OnEnable() {
-    Tags = GetComponent<SimpleTags>();
+    SimpleTags = GetComponent<SimpleTags>();
+    Tags = GetComponent<Tags>();
     Conditions = GetComponents<Condition>();
     SimpleAbilityManager = GetComponentInParent<SimpleAbilityManager>();
     SimpleAbilityManager.Abilities.Add(this);

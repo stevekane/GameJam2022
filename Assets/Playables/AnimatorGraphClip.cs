@@ -4,6 +4,10 @@ using UnityEngine.Timeline;
 
 public class AnimatorGraphClipBehavior : TaskBehavior {
   public AnimationClip Clip;
+
+  public override void Setup(Playable playable) {
+    base.Setup(playable);
+  }
 }
 
 public class AnimatorGraphClip : PlayableAsset, ITimelineClipAsset {

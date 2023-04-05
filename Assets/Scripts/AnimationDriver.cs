@@ -288,7 +288,7 @@ public class AnimationDriver : MonoBehaviour {
   AudioMixerPlayable AudioMixer;
   AnimationScriptPlayable SpineCorrector;
 
-  void Awake() {
+  void Start() {
 #if UNITY_EDITOR
     if (!Animator) {
       Debug.LogError($"AnimationDriver must have Animator reference to initialize", this);

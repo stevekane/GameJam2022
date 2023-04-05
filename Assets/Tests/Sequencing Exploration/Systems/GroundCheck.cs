@@ -26,7 +26,7 @@ public class GroundCheck : MonoBehaviour {
     var ray = new Ray(position, Vector3.down);
     var didHit = Physics.SphereCast(ray, CharacterController.radius, out Hit, MaxGroundCheckDistance, LayerMask);
     var isGrounded = didHit && Hit.distance <= GroundedDistanceThreshold;
-    var wasGrounded = SimpleAbilityManager.Tags.HasFlag(AbilityTag.Grounded);
+    var wasGrounded = SimpleAbilityManager.Tags.Current.HasFlag(AbilityTag.Grounded);
 
     if (isGrounded && !wasGrounded) {
       SendMessage(ON_LAND_EVENT_NAME, SendMessageOptions.DontRequireReceiver);
@@ -35,9 +35,9 @@ public class GroundCheck : MonoBehaviour {
       SendMessage(ON_TAKEOFF_EVENT_NAME, SendMessageOptions.DontRequireReceiver);
     }
     if (isGrounded) {
-      SimpleAbilityManager.Tags.AddFlags(AbilityTag.Grounded);
+      SimpleAbilityManager.Tags.Current.AddFlags(AbilityTag.Grounded);
     } else {
-      SimpleAbilityManager.Tags.ClearFlags(AbilityTag.Grounded);
+      SimpleAbilityManager.Tags.Current.ClearFlags(AbilityTag.Grounded);
     }
     GroundDistance.Value = didHit ? Hit.distance : float.MaxValue;
   }
