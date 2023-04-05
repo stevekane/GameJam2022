@@ -5,7 +5,7 @@ using UnityEngine;
 public class BuildMenu : Ability {
   // TODO: Not the best way to do this, but fine for now.
   [SerializeField] BuildObject[] Buildings;
-  Build BuildAbility;
+  BuildAbility BuildAbility;
 
   InlineEffect StopEffect => new(s => {
     s.CanRotate = false;

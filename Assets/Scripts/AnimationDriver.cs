@@ -88,7 +88,7 @@ public class AnimationTask : IPlayableTask {
   public async Task WaitPhase(TaskScope scope, int phase) {
     var time = GetPhaseEndTime(phase);
     while (IsRunning && Playable.GetTime() < time)
-      await scope.Yield();
+      await scope.Tick();
   }
   public TaskFunc PauseAfterPhase(int phase) => s => PauseAfterPhase(s, phase);
   public async Task PauseAfterPhase(TaskScope scope, int phase) {
@@ -99,12 +99,12 @@ public class AnimationTask : IPlayableTask {
   public TaskFunc WaitFrame(int frame) => s => WaitFrame(s, frame);
   public async Task WaitFrame(TaskScope scope, int frame) {
     while (CurrentFrame < frame && IsRunning)
-      await scope.Yield();
+      await scope.Tick();
   }
   public TaskFunc WaitDone() => s => WaitDone(s);
   public async Task WaitDone(TaskScope scope) {
     while (IsRunning)
-      await scope.Yield();
+      await scope.Tick();
   }
 
   // TDO: condense start/run?
@@ -147,7 +147,7 @@ public class AnimationTask : IPlayableTask {
         Playable.SetSpeed(DesiredSpeed * Config.Speed * Driver.Speed);
         if (Playable.IsDone())
           break;
-        await scope.Yield();
+        await scope.Tick();
       }
     } finally {
       // TODO: how to pause at end?
@@ -209,7 +209,7 @@ public class TimelineTask : IPlayableTask {
   public TaskFunc WaitDone() => s => WaitDone(s);
   public async Task WaitDone(TaskScope scope) {
     while (IsRunning)
-      await scope.Yield();
+      await scope.Tick();
   }
 
   public async Task Run(TaskScope scope) {
@@ -217,7 +217,7 @@ public class TimelineTask : IPlayableTask {
       while (IsRunning) {
         Driver.SetInputWeight(this, BlendWeight());
         Playable.SetSpeed(Driver.Speed);
-        await scope.Yield();
+        await scope.Tick();
       }
     } finally {
       Stop();

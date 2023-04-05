@@ -32,7 +32,7 @@ public class TaskScopeTests : MonoBehaviour {
     new() {
       Name = "basic",
       Test = async (TaskScope main) => {
-        await main.Yield();
+        await main.Tick();
         return "done";
       },
       ExpectedOutput = "done"
@@ -48,9 +48,9 @@ public class TaskScopeTests : MonoBehaviour {
             try {
               await main.Millis(16*1);
               main.Cancel();
-              output += "before yield;";
-              await main.Yield();
-              output += "after yield;";
+              output += "before Tick;";
+              await main.Tick();
+              output += "after Tick;";
             } catch {
               output += "exception;";
             } finally {
@@ -61,7 +61,7 @@ public class TaskScopeTests : MonoBehaviour {
         output += "end";
         return output;
       },
-      ExpectedOutput = "start;before yield;exception;finally;end"
+      ExpectedOutput = "start;before Tick;exception;finally;end"
     },
 
     new() {
@@ -118,7 +118,7 @@ public class TaskScopeTests : MonoBehaviour {
             }
           }
         );
-        await main.Yield();
+        await main.Tick();
         output += "end";
         return output;
       },
@@ -138,8 +138,8 @@ public class TaskScopeTests : MonoBehaviour {
             try {
               child.Cancel();
               output += "child2;";
-              await child.Yield();
-              output += "afterYield;";
+              await child.Tick();
+              output += "afterTick;";
             } catch {
               output += "child2 cancel;";
             }
@@ -161,7 +161,7 @@ public class TaskScopeTests : MonoBehaviour {
               await child.Millis(16*1);
               output += "child1;";
               main.Cancel();
-              await child.Yield();
+              await child.Tick();
               output += "child1 after;";
             }
           );
@@ -193,7 +193,7 @@ public class TaskScopeTests : MonoBehaviour {
             }
           }
         );
-        await main.Yield();
+        await main.Tick();
         output += $"index={index};";
         output += "end";
         return output;
@@ -244,7 +244,7 @@ public class TaskScopeTests : MonoBehaviour {
             output += "cancel;";
           }
         );
-        await main.Yield();
+        await main.Tick();
         output += "end";
         return output;
       },
@@ -391,7 +391,7 @@ public class TaskScopeTests : MonoBehaviour {
         var caught = false;
         var output = "";
         async Task Throw1(TaskScope scope) {
-          await scope.Yield();
+          await scope.Tick();
           throw new Exception("Throw1");
         }
         async Task Throw2(TaskScope scope) {
@@ -411,7 +411,7 @@ public class TaskScopeTests : MonoBehaviour {
         }
         main.Start(Behavior);
         while (!caught) {
-          await main.Yield();
+          await main.Tick();
         }
         output += "done";
         return output;
@@ -445,7 +445,7 @@ public class TaskScopeTests : MonoBehaviour {
         }
         main.Start(Behavior);
         while (!done) {
-          await main.Yield();
+          await main.Tick();
         }
         output += "done";
         return output;

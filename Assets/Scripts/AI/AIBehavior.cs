@@ -87,10 +87,10 @@ class AIBehavior {
   }
   async Task TryInvoke(TaskScope scope, AbilityMethod method) {
     Mob.AbilityManager.TryInvoke(method);
-    await scope.Yield();  // Need this for the ability's Task to Start.
+    await scope.Tick();  // Need this for the ability's Task to Start.
   }
   public async Task TelegraphThenAttack(TaskScope scope) => await Mob.Flash.RunStrobe(scope, Color.red, Timeval.FromMillis(150), 3);
-  public async Task TelegraphDuringAttack(TaskScope scope) { _ = TelegraphThenAttack(scope); await scope.Yield(); }
+  public async Task TelegraphDuringAttack(TaskScope scope) { _ = TelegraphThenAttack(scope); await scope.Tick(); }
 
   // If we can never invoke an ability given our state, just return true and let the invocation fail.
   public bool CanInvoke(Ability ability) => CanInvoke(ability.MainAction);

@@ -1,7 +1,7 @@
 using UnityEngine;
 
-public class MachineHurtbox : Hurtbox {
-  [SerializeField] Machine Machine;
+public class CrafterHurtbox : Hurtbox {
+  [SerializeField] Crafter Machine;
 
   public override bool CanBeHurtBy(HitParams hitParams) {
     return (hitParams.Attacker.GetComponent<Player>() != null);

@@ -30,7 +30,7 @@ public class TargetDummyController : MonoBehaviour {
   [SerializeField] ParticleSystem WallBounceDebris;
   [SerializeField] DecalProjector WallBounceDecal;
   [SerializeField] float KnockbackSmokeMinimumSpeed = 5;
-  [SerializeField, Range(0,1)] float HitStopSpeed = .1f;
+  //[SerializeField, Range(0,1)] float HitStopSpeed = .1f;
   [SerializeField, ColorUsage(true, true)] Color HurtFlashColor = Color.red;
   [SerializeField, ColorUsage(true, true)] Color ParryFlashColor = Color.blue;
   [SerializeField, ColorUsage(true, true)] Color BlockFlashColor = Color.white;

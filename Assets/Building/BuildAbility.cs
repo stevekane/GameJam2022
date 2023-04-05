@@ -1,8 +1,7 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class Build : Ability {
+public class BuildAbility : Ability {
   [SerializeField] BuildObject BuildPrefab;
   [SerializeField] BuildGridCell GridCellPrefab;
   [SerializeField] Material GhostMaterial;

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 [RequireComponent(typeof(BuildObject))]
-public class Machine : MonoBehaviour {
+public class Crafter : MonoBehaviour {
   public Recipe Recipe;
 
   // Arrays of input/output amounts held by this machine, in order of Recipe.Inputs/Outputs.
@@ -58,7 +58,7 @@ public class Machine : MonoBehaviour {
   }
 
 
-  public IEnumerable<(Machine, Vector2Int)> FindConnectedMachines() {
+  public IEnumerable<(Crafter, Vector2Int)> FindConnectedCrafters() {
     var center = BuildGrid.WorldToGrid(transform.position);
     var y = transform.position.y;
     var toVisit = new Queue<(Vector2Int, Vector2Int)>();
@@ -76,7 +76,7 @@ public class Machine : MonoBehaviour {
         toVisit.Enqueue((pos + Vector2Int.up, pos));
         toVisit.Enqueue((pos + Vector2Int.down, pos));
       }
-      if (obj != gameObject && obj.TryGetComponent(out Machine machine))
+      if (obj != gameObject && obj.TryGetComponent(out Crafter machine))
         yield return (machine, fromPos);
     }
   }

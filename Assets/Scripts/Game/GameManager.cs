@@ -71,23 +71,34 @@ public class GameManager : MonoBehaviour {
 
   async Task Run(TaskScope scope) {
     while (true) {
-      await scope.Any(WaitForInput, GameLoop);
+      await scope.Any(Waiter.Repeat(HandleSaveLoad), GameLoop);
       await scope.Tick();
     }
   }
 
   static KeyCode[] StartEncounterKeys = new[] { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3 };
-  async Task WaitForInput(TaskScope scope) {
-    while (true) {
-      if (Input.GetKeyDown(KeyCode.Backspace)) {
-        await ReloadScene(scope);
-        return;
-      } else if (Array.FindIndex(StartEncounterKeys, k => Input.GetKeyDown(k)) is var idx && idx >= 0) {
-        await ReloadScene(scope);
-        StartEncounter(idx);
-        return;
+  async Task HandleSceneLoad(TaskScope scope) {
+    if (Input.GetKeyDown(KeyCode.Backspace)) {
+      await ReloadScene(scope);
+      return;
+    } else if (Array.FindIndex(StartEncounterKeys, k => Input.GetKeyDown(k)) is var idx && idx >= 0) {
+      await ReloadScene(scope);
+      StartEncounter(idx);
+      return;
+    }
+  }
+
+  // Hacky save/load. Entirely the wrong approach, but good enough for now.
+  static KeyCode[] SaveLoadKeys = new[] { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5, KeyCode.Alpha6, KeyCode.Alpha7, KeyCode.Alpha8, KeyCode.Alpha9, };
+  void HandleSaveLoad() {
+    for (int i = 0; i < SaveLoadKeys.Length; i++) {
+      if (Input.GetKey(SaveLoadKeys[i])) {
+        if (Input.GetKey(KeyCode.LeftAlt)) {
+          SaveData.LoadFromFile(i);
+        } else {
+          SaveData.SaveToFile(i);
+        }
       }
-      await scope.Tick();
     }
   }
 
@@ -97,7 +108,7 @@ public class GameManager : MonoBehaviour {
     Player = Player ?? SpawnPlayer();
     if (!Player)  // No player prefab means don't run a game loop
       await scope.Forever();
-    SaveData.LoadFromFile();
+    SaveData.LoadFromFile(0);
     // Setup camera to target the player
     //PlayerVirtualCamera.Instance.Follow = Player.transform;
 
@@ -119,7 +130,7 @@ public class GameManager : MonoBehaviour {
       _ => "You lose"
     });
 
-    SaveData.SaveToFile();
+    SaveData.SaveToFile(0);
 
     Destroy(Player.gameObject);
     await scope.Millis(3000);
