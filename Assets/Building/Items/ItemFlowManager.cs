@@ -113,9 +113,8 @@ public class ItemFlowManager : MonoBehaviour {
   //   alternatively, time(e) == e.producer's craft time + max(time(inputEdge) foreach inputEdge connected to e.producer)
   public bool DebugModel = false;
   void SolveForRequests() {
+    var crafterActives = new Dictionary<Crafter, BoolExpr>();
     var edgeAmounts = new Dictionary<Edge, ArithExpr>();
-    var edgeTimes = new Dictionary<Edge, ArithExpr>();
-    var crafterTimes = new Dictionary<Crafter, ArithExpr>();
     var inputEdges = new Dictionary<Slot, List<Edge>>();
     var outputEdges = new Dictionary<Slot, List<Edge>>();
 
@@ -127,21 +126,12 @@ public class ItemFlowManager : MonoBehaviour {
     int didx = 0;
     string SymbolName(string name) =>
       Regex.Replace(Regex.Replace($"d{didx++}_{name}", "\\([^)]*\\)", ""), "  *", " ");
-    RealExpr AddReal(string name) {
-      var x = ctx.MkRealConst(SymbolName(name));
-      solver.Assert(x >= 0);
-      return x;
-    }
     IntExpr AddInt(string name) {
       var x = ctx.MkIntConst(SymbolName(name));
       solver.Assert(x >= 0);
       solver.Assert(x <= 10);
       return x;
     }
-
-    // Main goal: minimize time spent crafting.
-    var t = AddReal("t");
-    var tMin = solver.MkMinimize(t);
 
     var empty = new List<Edge>();
     // Adds constraint on the maximum that can consumed/produced in the given time.
@@ -163,24 +153,28 @@ public class ItemFlowManager : MonoBehaviour {
       for (var i = 0; i < outputSlotAmounts.Length; i++)
         solver.Assert(ctx.MkEq(TimeToCraft(i, outputSlotAmounts, recipe.Outputs), craftTime));
 
-      crafterTimes[crafter] = crafterTimes.GetValueOrDefault(crafter, ctx.MkInt(0)) + craftTime;
-    }
-    void AddCraftTimeConstraints2(Crafter crafter, ArithExpr crafterTime) {
-      // Edge craft times = total time from system start to satisfy the given edge's full demand.
-      // Note: this is not strictly correct. If a crafter has 2 output edges, it might satisfy the first edge at time T,
-      // then the second at time T + T2. But this is a good enough approximation for our purposes - minimizing total
-      // craft time.
-      var totalCraftTime = AddReal($"ct_{crafter.name}");
-      solver.Assert(totalCraftTime >= crafterTime);
-      foreach ((var edge, var edgeTime) in edgeTimes) {
-        // Input edge constraint: totalCraftTime >= sum(crafter's craft times) + max(totalTime(inputEdges)))
-        if (edge.ToCrafter == crafter)
-          solver.Assert(totalCraftTime >= crafterTime + edgeTimes[edge]);
-        // Output edge constraint: totalTime(outputEdge) = totalCraftTime
-        if (edge.FromCrafter == crafter)
-          solver.Assert(ctx.MkEq(edgeTime, totalCraftTime));
+      if (crafterActives.ContainsKey(crafter)) {
+        crafterActives[crafter] |= outputSlotAmounts[0] > 0;
+      } else {
+        crafterActives[crafter] = outputSlotAmounts[0] > 0;
       }
     }
+    //void AddCraftTimeConstraints2(Crafter crafter, ArithExpr crafterTime) {
+    //  // Edge craft times = total time from system start to satisfy the given edge's full demand.
+    //  // Note: this is not strictly correct. If a crafter has 2 output edges, it might satisfy the first edge at time T,
+    //  // then the second at time T + T2. But this is a good enough approximation for our purposes - minimizing total
+    //  // craft time.
+    //  var totalCraftTime = AddReal($"ct_{crafter.name}");
+    //  solver.Assert(totalCraftTime >= crafterTime);
+    //  foreach ((var edge, var edgeTime) in edgeTimes) {
+    //    // Input edge constraint: totalCraftTime >= sum(crafter's craft times) + max(totalTime(inputEdges)))
+    //    if (edge.ToCrafter == crafter)
+    //      solver.Assert(totalCraftTime >= crafterTime + edgeTimes[edge]);
+    //    // Output edge constraint: totalTime(outputEdge) = totalCraftTime
+    //    if (edge.FromCrafter == crafter)
+    //      solver.Assert(ctx.MkEq(edgeTime, totalCraftTime));
+    //  }
+    //}
     // Adds constraint: sum(edges attached to crafter slot N) = crafter's slot_N ArithExpr.
     void AddEdgeToCrafterConstraints(Crafter crafter, Recipe recipe, Dictionary<Slot, List<Edge>> edgeMap, ArithExpr[] decidedAmounts) {
       for (var i = 0; i < decidedAmounts.Length; i++) {
@@ -194,14 +188,12 @@ public class ItemFlowManager : MonoBehaviour {
     // Add decision variables for each edge.
     foreach (var edge in Edges) {
       edgeAmounts[edge] = AddInt($"e_{edge}");
-      edgeTimes[edge] = AddReal($"et_{edge}");
       outputEdges.GetOrAdd(edge.From, () => new()).Add(edge);
       inputEdges.GetOrAdd(edge.To, () => new()).Add(edge);
 
       // Add constraint for the edge producing a requested item.
       if (PlayerCraftRequests.TryGetValue(edge.OutputIngredient.Item, out var desiredAmount)) {
-        solver.Assert(edgeAmounts[edge] >= desiredAmount);
-        solver.Assert(t >= edgeTimes[edge]);
+        solver.Assert(ctx.MkEq(edgeAmounts[edge], ctx.MkInt(desiredAmount)));
       }
     }
 
@@ -214,9 +206,13 @@ public class ItemFlowManager : MonoBehaviour {
       AddEdgeToCrafterConstraints(crafter, recipe, inputEdges, inputSlotAmounts);
       AddEdgeToCrafterConstraints(crafter, recipe, outputEdges, outputSlotAmounts);
     }
-    foreach (var (crafter, crafterTime) in crafterTimes) {
-      AddCraftTimeConstraints2(crafter, crafterTime);
+    var totalActive = ctx.MkInt(0) + 0;
+    foreach (var (crafter, active) in crafterActives) {
+      totalActive += (ArithExpr)ctx.MkITE(active, ctx.MkInt(1), ctx.MkInt(0));
     }
+    //foreach (var (crafter, crafterTime) in crafterTimes) {
+    //  AddCraftTimeConstraints2(crafter, crafterTime);
+    //}
 
     Debug.Log($"Version {Microsoft.Z3.Version.FullVersion}");
     Debug.Log($"Numbers: edges={Edges.Count} crafterRecipes={CrafterRecipes.Count} constraints={solver.Assertions.Length}");
@@ -225,13 +221,14 @@ public class ItemFlowManager : MonoBehaviour {
         Debug.Log($"Constraint: {constraint}");
       }
     }
+    solver.MkMaximize(totalActive);
 
     Profiler.BeginSample("craftflow solveZ3");
     var solution = solver.Check();
     Profiler.EndSample();
 
     if (DebugModel) {
-      Debug.Log($"Model: t={t} {solver.Model}");
+      Debug.Log($"Model: {solver.Model}");
     }
 
     foreach (var edge in Edges) {
@@ -239,7 +236,8 @@ public class ItemFlowManager : MonoBehaviour {
       if (amount > 0)
         edge.FromCrafter.SetOutputRequest(edge.OutputIngredient.Item, amount);
       if (amount > 0)
-        Debug.Log($"Edge {edge} has demand {amount}, time {solver.Model.Double(edgeTimes[edge])}");
+        Debug.Log($"Edge {edge} has demand {amount}");
+        //Debug.Log($"Edge {edge} has demand {amount}, time {solver.Model.Double(edgeTimes[edge])}");
     }
     foreach (var edge in Edges) {
       if (EdgeDemands[edge] > 0)
