@@ -4,6 +4,7 @@ using UnityEngine;
 [DefaultExecutionOrder(ScriptExecutionGroups.Ability)]
 public class TestSystem1 : SampleAbility {
   [SerializeField] BooleanAttribute CanMove;
+  [SerializeField] SampleAction StartAction;
   [SerializeField] SampleAction ReleaseAction;
 
   TaskScope Scope;
@@ -25,13 +26,15 @@ public class TestSystem1 : SampleAbility {
       IsRunning = true;
       Debug.Log("System locking Motion");
       CanMove.Next.Set(false);
-      // TODO: Could create special version of listen
+      StartAction.Satisfied = false;
       ReleaseAction.Satisfied = true;
       await scope.ListenFor(ReleaseAction.EventSource);
       ReleaseAction.Satisfied = false;
       Debug.Log("Released!!!!!");
     } finally {
       Debug.Log("System stopped. freeing Motion");
+      StartAction.Satisfied = true;
+      ReleaseAction.Satisfied = false;
       IsRunning = false;
       CanMove.Next.Set(true);
     }
