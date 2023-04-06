@@ -7,5 +7,4 @@ public class SimpleTags : MonoBehaviour {
   public AbilityTag OwnerActivationRequired;
   public AbilityTag OwnerActivationBlocked;
   public AbilityTag OnStart;
-  public AbilityTag Current;
 }

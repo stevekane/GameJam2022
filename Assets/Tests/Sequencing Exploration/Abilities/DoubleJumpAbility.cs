@@ -8,7 +8,7 @@ public class DoubleJumpAbility : SimpleAbility {
   [SerializeField] float JumpStrength;
 
   public override void OnRun() {
-    SimpleAbilityManager.Tags.ClearFlags(AbilityTag.CanJump);
+    SimpleAbilityManager.Tags.Current.ClearFlags(AbilityTag.CanJump);
     Animator.SetTrigger("Jump");
     AudioSource.PlayOneShot(SFX);
     Velocity.Value.y = JumpStrength;

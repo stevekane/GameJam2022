@@ -12,12 +12,12 @@ public class SimpleMover : MonoBehaviour {
   void Awake() => Debug.LogWarning("Restore SimpleMover capping fall speed");
 
   void FixedUpdate() {
-    var isGrounded = SimpleAbilityManager.Tags.HasFlag(AbilityTag.Grounded);
+    var isGrounded = SimpleAbilityManager.Tags.Current.HasFlag(AbilityTag.Grounded);
     if (isGrounded) {
-      SimpleAbilityManager.Tags.AddFlags(AbilityTag.CanJump);
-      SimpleAbilityManager.Tags.AddFlags(AbilityTag.Grounded);
+      SimpleAbilityManager.Tags.Current.AddFlags(AbilityTag.CanJump);
+      SimpleAbilityManager.Tags.Current.AddFlags(AbilityTag.Grounded);
     } else {
-      SimpleAbilityManager.Tags.ClearFlags(AbilityTag.Grounded);
+      SimpleAbilityManager.Tags.Current.ClearFlags(AbilityTag.Grounded);
     }
     if (isGrounded && Velocity.Value.y < 0) {
       Velocity.Value.y = LocalTime.FixedDeltaTime * Gravity.Value;

@@ -3,9 +3,6 @@ using UnityEngine.Playables;
 
 [DefaultExecutionOrder(ScriptExecutionGroups.Animation)]
 public class LogicalTimeline : MonoBehaviour {
-  [Header("Input")]
-  [SerializeField] InputManager InputManager;
-
   [Header("Visual Effects")]
   [SerializeField] GameObject OnHitVFX;
 
@@ -66,7 +63,7 @@ public class LogicalTimeline : MonoBehaviour {
     // Animator.SetBool("Hanging", Hanging);
     Animator.SetFloat("Speed", Mathf.RoundToInt(Velocity.Value.XZ().magnitude));
     Animator.SetFloat("YSpeed", Velocity.Value.y);
-    Animator.SetBool("Grounded", SimpleAbilityManager.Tags.HasFlag(AbilityTag.Grounded));
+    Animator.SetBool("Grounded", SimpleAbilityManager.Tags.Current.HasFlag(AbilityTag.Grounded));
     Animator.SetFloat("GroundDistance", GroundDistance.Value);
     Graph.Evaluate(LocalTime.FixedDeltaTime);
   }
