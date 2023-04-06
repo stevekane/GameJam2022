@@ -22,6 +22,16 @@ public enum ButtonCode {
   Unbound // Dummy value to easily unbind buttons
 }
 
+[Serializable]
+public struct ButtonEvent {
+  public ButtonCode ButtonCode;
+  public ButtonPressType ButtonPressType;
+  public ButtonEvent(ButtonCode code, ButtonPressType pressType) {
+    ButtonCode = code;
+    ButtonPressType = pressType;
+  }
+}
+
 // TODO: Maybe don't need/want these? Maybe just use strings
 public enum AxisCode {
   AxisLeft,
@@ -90,6 +100,11 @@ public class InputManager : MonoBehaviour {
   public void Consume(ButtonCode code, ButtonPressType type) {
     Buffer.Remove((code, type));
   }
+
+  public void Consume(ButtonEvent buttonEvent) {
+    Buffer.Remove((buttonEvent.ButtonCode, buttonEvent.ButtonPressType));
+  }
+
 
   public void AssignDevices(InputDevice[] devices) {
     Controls.devices = devices;

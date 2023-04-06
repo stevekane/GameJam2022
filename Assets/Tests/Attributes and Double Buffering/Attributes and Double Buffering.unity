@@ -1538,6 +1538,7 @@ MonoBehaviour:
   Event:
     m_PersistentCalls:
       m_Calls: []
+  <Satisfied>k__BackingField: 0
 --- !u!114 &1750304099
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1579,6 +1580,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  <Satisfied>k__BackingField: 0
   Conditions:
   - {fileID: 1750304099}
 --- !u!114 &1750304101
@@ -1610,8 +1612,11 @@ GameObject:
   m_Component:
   - component: {fileID: 1764597349}
   - component: {fileID: 1764597351}
-  - component: {fileID: 1764597350}
   - component: {fileID: 1764597352}
+  - component: {fileID: 1764597355}
+  - component: {fileID: 1764597354}
+  - component: {fileID: 1764597357}
+  - component: {fileID: 1764597353}
   m_Layer: 0
   m_Name: My Classic Ability
   m_TagString: Untagged
@@ -1634,26 +1639,6 @@ Transform:
   m_Father: {fileID: 2114678065}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1764597350
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1764597348}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 337b21715280e6f429a6a87f4f9ffa99, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ButtonCode: 4
-  MethodBindings:
-  - Method:
-      Ability: {fileID: 1764597351}
-      MethodName: Squeak
-    ButtonCode: 2
-    ButtonPressType: 0
-    AlwaysConsume: 0
 --- !u!114 &1764597351
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1683,6 +1668,72 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ButtonCode: 4
+  MainAction: {fileID: 1764597355}
+  ReleaseAction: {fileID: 1764597354}
+--- !u!114 &1764597353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1764597348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08820b5b0758a274ba1464aca43da071, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Event:
+    m_PersistentCalls:
+      m_Calls: []
+  <Satisfied>k__BackingField: 0
+--- !u!114 &1764597354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1764597348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08820b5b0758a274ba1464aca43da071, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Event:
+    m_PersistentCalls:
+      m_Calls: []
+  <Satisfied>k__BackingField: 0
+--- !u!114 &1764597355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1764597348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08820b5b0758a274ba1464aca43da071, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Event:
+    m_PersistentCalls:
+      m_Calls: []
+  <Satisfied>k__BackingField: 0
+--- !u!114 &1764597357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1764597348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 337b21715280e6f429a6a87f4f9ffa99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ButtonCode: 2
+  ButtonPressType: 0
+  Action: {fileID: 1764597353}
+  MethodName: Squeak
 --- !u!1 &1884007259
 GameObject:
   m_ObjectHideFlags: 0
@@ -1819,6 +1870,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  <Satisfied>k__BackingField: 0
   Conditions:
   - {fileID: 1914781688}
 --- !u!1 &2114678064
