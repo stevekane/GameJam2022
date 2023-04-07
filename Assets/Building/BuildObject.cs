@@ -21,6 +21,14 @@ public class BuildObject : MonoBehaviour {
     return new Serialized { Asset = Asset, Position = transform.position, Rotation = transform.rotation };
   }
 
+  void Awake() {
+    BuildObjectManager.Instance.OnBuildObjectCreated(this);
+    ItemFlowManager.Instance.OnBuildingsChanged();
+  }
+  void OnDestroy() {
+    BuildObjectManager.Instance.OnBuildObjectDestroyed(this);
+    ItemFlowManager.Instance.OnBuildingsChanged();
+  }
 #if UNITY_EDITOR
   private void Start() {
     // Generate a unique name for debugging purposes.

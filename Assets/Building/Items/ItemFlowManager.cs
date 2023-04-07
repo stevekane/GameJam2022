@@ -1,7 +1,6 @@
 using Microsoft.Z3;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -10,113 +9,132 @@ using UnityEngine.Profiling;
 // Represents an input or output item slot on a crafter.
 using Slot = System.ValueTuple<Crafter, Recipe, int>;
 
-public class ItemFlowManager : MonoBehaviour {
-  public static ItemFlowManager Instance;
-
-  class ItemFlow {
-    public ItemObject Object;
-    public Vector3 NextWorldPos;
-    public Edge Edge;
-    public List<Vector2Int> Path;
-
-    public Vector2Int NextCell => BuildGrid.WorldToGrid(NextWorldPos);
+// Concepts:
+// CapillaryGroup: a connected set of capillaries, and which crafters are connected to it.
+// CrafterSlot (Slot): an input/output slot that consumes/produces a single item for a given recipe.
+// Edge: a (CapillaryGroup, Item) pair representing how much of an item is provided/consumed through this group.
+// Each CrafterSlot connects to a single Edge, which may be shared with other CrafterSlots. The solver uses
+// constraints to compute the crafting flow:
+//   amount(Edge) = sum(output CrafterSlots)
+//   amount(Edge) = sum(input CrafterSlots)
+// Recipe constraints enforce the recipes consumption and production of ingredients in the proper ratios:
+//   craftTime(CrafterSlot X) = craftTime(CrafterSlot Y), for each pair X,Y on a (Crafter,Recipe) pair.
+// The final constraint adds the requested items:
+//   amount(Edge X) = requestedAmount, where X is the output edge producing the item desired.
+public class CraftSolver {
+  class Edge {
+    public int Index;
+    public CapillaryGroup CapillaryGroup;
+    public ItemInfo Item;
+    public List<Slot> Producers = new();
+    public List<Slot> Consumers = new();
+    public override string ToString() => $"Edge:{Item.name}:{CapillaryGroup}";
   }
 
-  List<ItemFlow> Items = new();
-  Dictionary<ItemInfo, int> PlayerCraftRequests = new();
-  Dictionary<Edge, int> EdgeDemands = new();
+  public Dictionary<Slot, int> OutputSlotAmounts;
+  public Dictionary<Slot, int> InputSlotAmounts;
+  public Dictionary<Slot, int> CraftRequests = new();
 
-  public void AddCraftRequest(ItemInfo item) {
-    PlayerCraftRequests[item] = PlayerCraftRequests.GetValueOrDefault(item) + 1;
-    Profiler.BeginSample("craftflow buildgraph");
-    BuildGraph();
+  List<Edge> Edges;
+  List<(Crafter, Recipe)> CrafterRecipes;
+
+  public CapillaryGroup GetCapillaryGroupForInputSlot(Slot slot) {
+    var edge = Edges.First(e => e.Consumers.Contains(slot));
+    return edge.CapillaryGroup;
+  }
+
+  public Slot FindConsumerRequestingFromSlot(Slot producerSlot) {
+    var edge = Edges.First(e => e.Producers.Contains(producerSlot));
+    var result = InputSlotAmounts.FirstOrDefault(kv => kv.Value > 0 && edge.Consumers.Contains(kv.Key));
+    if (result.Value > 0 && --InputSlotAmounts[result.Key] == 0) {
+      InputSlotAmounts.Remove(result.Key);
+    }
+    return result.Key;  // can be null
+  }
+
+  public void OnBuildingsChanged() {
+    CraftRequests = new();
+  }
+
+  public void AddCraftRequest(Slot slot) {
+    CraftRequests[slot] = CraftRequests.GetValueOrDefault(slot) + 5;
+    Profiler.BeginSample("craftflow build graph");
+    CreateEdges();
     Profiler.EndSample();
-    Profiler.BeginSample("craftflow buildconstraints");
+    Profiler.BeginSample("craftflow constraints");
     SolveForRequests();
     Profiler.EndSample();
   }
 
-  struct Edge {
-    public Slot From;
-    public Slot To;
-
-    public Crafter FromCrafter => From.Item1;
-    public Recipe FromRecipe => From.Item2;
-    public int OutputIdx => From.Item3;
-    public Recipe.ItemAmount OutputIngredient => FromRecipe.Outputs[OutputIdx];
-    public Crafter ToCrafter => To.Item1;
-    public Recipe ToRecipe => To.Item2;
-    public int InputIdx => To.Item3;
-    public Recipe.ItemAmount InputIngredient => ToRecipe.Inputs[InputIdx];
-
-    public bool IsNull() => From.Item1 == null;
-
-    public override int GetHashCode() => AsTuple().GetHashCode();
-    public override bool Equals(object other) => other is Edge e && AsTuple().Equals(e.AsTuple());
-    public override string ToString() => $"[{From.Item1?.name}:{From.Item2?.name} => {To.Item1?.name}:{To.Item2?.name}]";
-    (Crafter, Recipe, int, Crafter, Recipe, int) AsTuple() => (From.Item1, From.Item2, From.Item3, To.Item1, To.Item2, To.Item3);
-  }
-  List<Edge> Edges;
-  List<Crafter> Crafters;
-  List<(Crafter, Recipe)> CrafterRecipes;
-  Dictionary<Edge, Vector2Int> EdgeOutputCells = new();
-  Dictionary<Crafter, List<(Crafter, Vector2Int)>> Connections = new();
-
-  void BuildGraph() {
+  void CreateEdges() {
+    BuildObjectManager.Instance.MaybeRefresh();
     Edges = new();
     CrafterRecipes = new();
-    Crafters = FindObjectsOfType<Crafter>().ToList();  // TODO: cache this
-    Connections = new();
-    foreach (var c in Crafters)
-      Connections[c] = c.FindConnectedCrafters().ToList();
-    var connected = Crafters.Select(c => (c, Vector2Int.zero));
-    foreach ((var item, int amount) in PlayerCraftRequests) {
-      BuildEdgesFromInputs((null, null, -1), connected, item);
+    foreach ((var slot, int amount) in CraftRequests) {
+      var (producer, producerRecipe, outputIdx) = slot;
+      var outItem = producerRecipe.Outputs[outputIdx].Item;
+      var outEdge = GetOrCreateEdge(producer.OutputCapillaryGroup, outItem, out var _);
+      BuildEdgesFromSlot(slot, outEdge);
     }
   }
 
-  void BuildEdgesFromInputs(Slot to, IEnumerable<(Crafter, Vector2Int)> producerCandidates, ItemInfo item) {
-    foreach ((var producer, var outputCell) in producerCandidates) {
-      if (producer.FindRecipeProducing(item) is var producerRecipe && !producerRecipe) continue;
-      int outputIdx = Array.FindIndex(producerRecipe.Outputs, output => output.Item == item);
-      var edge = new Edge { From = (producer, producerRecipe, outputIdx), To = to };
-      // TODO: is it ever possible to have this edge already?
-      if (!Edges.Contains(edge)) {
-        Edges.Add(edge);
-        EdgeOutputCells[edge] = outputCell;
+  void BuildEdgesFromSlot(Slot outSlot, Edge outEdge) {
+    // Add the crafter producing on this edge to its producers.
+    var (crafter, crafterRecipe, _) = outSlot;
+    if (outEdge.Producers.Contains(outSlot)) {
+      Debug.Log("TODO");
+      return; ///????
+    }
+    outEdge.Producers.Add(outSlot);
+    Debug.Assert(!CrafterRecipes.Contains((crafter, crafterRecipe)));
+    CrafterRecipes.Add((crafter, crafterRecipe));
+
+    // Add an edge for each of the crafter's inputs, adding it as a consumer to each edge.
+    var inGroup = crafter.InputCapillaryGroup;
+    for (var i = 0; i < crafterRecipe.Inputs.Length; i++) {
+      var inItem = crafterRecipe.Inputs[i].Item;
+      var inEdge = GetOrCreateEdge(inGroup, inItem, out var inExisted);
+      var inSlot = (crafter, crafterRecipe, i);
+      if (inEdge.Consumers.Contains(inSlot)) {
+        Debug.Log("TODO");
+        continue;  // ?????
       }
-      if (!CrafterRecipes.Contains((producer, producerRecipe))) {
-        CrafterRecipes.Add((producer, producerRecipe));
-      }
-      for (int i = 0; i < producerRecipe.Inputs.Length; i++) {
-        // TODO: cache connected
-        BuildEdgesFromInputs((producer, producerRecipe, i), Connections[producer], producerRecipe.Inputs[i].Item); 
+      inEdge.Consumers.Add((crafter, crafterRecipe, i));
+
+      // Recursively follow this edge to its CapillaryGroup's producers, adding the edge's producers
+      // and following their inputs in turn.
+      if (!inExisted) {
+        foreach (var producer in inGroup.Producers) {
+          if (producer.FindRecipeProducing(inItem) is var producerRecipe && !producerRecipe) continue;
+          int outputIdx = Array.FindIndex(producerRecipe.Outputs, output => output.Item == inItem);
+          BuildEdgesFromSlot((producer, producerRecipe, outputIdx), inEdge);
+        }
       }
     }
   }
 
-  // TODO: clean this up ffs
-  // This uses a constraint solver to compute how much of each item each crafter should attempt to produce, and what items it
-  // needs to consume to do so. The end goal is to minimize total crafting time in the system.
-  // The approach relies on two main concepts:
-  // - Slot: a single item input or output on a crafter (including which recipe it belongs to).
-  // - Edge: a path for a single item from a producing crafter's output slot to its consumer crafter's input slot.
-  //         alternatively, this is a pair of slots (producer, consumer) aka (from, to).
-  // We build constraints on the slots and edges and the link between them:
-  // RecipeRatio constraint:
-  //   time to produce/consume every item demanded at SlotX == time to produce/consume every item at SlotY,
-  //   foreach SlotX and SlotY on a given (crafter, recipe) pair
-  // EdgeToSlot constraint:
-  //   item amount demanded at SlotX == sum(edge amounts connected to SlotX)
-  // EdgeTime constraints:
-  //   time to satsify demand on Edge e == sum(machine craft times from start, to producer of item on edge e)
-  //   alternatively, time(e) == e.producer's craft time + max(time(inputEdge) foreach inputEdge connected to e.producer)
-  public bool DebugModel = false;
+  Edge GetEdge(CapillaryGroup group, ItemInfo item) => Edges.Find(e => e.CapillaryGroup == group && e.Item == item);
+  Edge GetOrCreateEdge(CapillaryGroup group, ItemInfo item, out bool alreadyExisted) {
+    if (GetEdge(group, item) is var edge && edge != null) {
+      alreadyExisted = true;
+      return edge;
+    }
+    alreadyExisted = false;
+    return CreateEdge(group, item);
+  }
+  Edge CreateEdge(CapillaryGroup group, ItemInfo item) {
+    var edge = new Edge { Index = Edges.Count, CapillaryGroup = group, Item = item };
+    Edges.Add(edge);
+    return edge;
+  }
+
+  public bool DebugModel = true;
   void SolveForRequests() {
-    var crafterActives = new Dictionary<Crafter, BoolExpr>();
+    var crafterTimes = new Dictionary<Crafter, ArithExpr>();
+    var edgeTimes = new Dictionary<Edge, ArithExpr>();
     var edgeAmounts = new Dictionary<Edge, ArithExpr>();
-    var inputEdges = new Dictionary<Slot, List<Edge>>();
-    var outputEdges = new Dictionary<Slot, List<Edge>>();
+    var inputSlotAmounts = new Dictionary<Slot, IntExpr>();
+    var outputSlotAmounts = new Dictionary<Slot, IntExpr>();
 
     Microsoft.Z3.Global.ToggleWarningMessages(true);
 
@@ -124,95 +142,99 @@ public class ItemFlowManager : MonoBehaviour {
     var solver = ctx.MkOptimize();
 
     int didx = 0;
-    string SymbolName(string name) =>
-      Regex.Replace(Regex.Replace($"d{didx++}_{name}", "\\([^)]*\\)", ""), "  *", " ");
+    string SymbolName(string name) => $"v{didx++}_{name}";
+      //Regex.Replace(Regex.Replace($"v{didx++}_{name}", "\\([^)]*\\)", ""), "  *", " ");
+
+    RealExpr AddReal(string name) {
+      var x = ctx.MkRealConst(SymbolName(name));
+      solver.Assert(x >= 0);
+      //solver.Assert(x <= 10);
+      return x;
+    }
+
     IntExpr AddInt(string name) {
       var x = ctx.MkIntConst(SymbolName(name));
       solver.Assert(x >= 0);
-      solver.Assert(x <= 10);
       return x;
     }
 
     var empty = new List<Edge>();
-    // Adds constraint on the maximum that can consumed/produced in the given time.
-    IntExpr AddSlotAmountVar(Crafter crafter, Recipe.ItemAmount amount) {
-      var decidedAmount = AddInt($"c_{crafter.name}_{amount.Item.name}");
-      return decidedAmount;
+    // Adds variables for the amount of an item consumed/produced at each crafter Slot.
+    void AddSlotAmountVars(Crafter crafter, Recipe recipe, Recipe.ItemAmount[] slots, Dictionary<Slot, IntExpr> slotAmounts, string name) {
+      for (var i = 0; i < slots.Length; i++)
+        slotAmounts[(crafter, recipe, i)] = AddInt($"slot{name}:{crafter.name}:{recipe.name}:{i}");
     }
-    // Adds constraints on the craft time of the crafter and the total craft time to deliver each output (edgeTimes[e]).
-    void AddCraftTimeConstraints(Crafter crafter, Recipe recipe, IntExpr[] inputSlotAmounts, IntExpr[] outputSlotAmounts) {
-      ArithExpr TimeToCraft(int idx, IntExpr[] decidedAmounts, Recipe.ItemAmount[] amounts) =>
-        ctx.MkInt2Real(decidedAmounts[idx]) / (amounts[idx].Count / recipe.CraftTime);
-      var craftTime =
-        inputSlotAmounts.Length > 0 ? TimeToCraft(0, inputSlotAmounts, recipe.Inputs) :
-        outputSlotAmounts.Length > 0 ? TimeToCraft(0, outputSlotAmounts, recipe.Outputs) : null;
+    // Adds constraints ensuring that recipe ratios are honored (e.g. consumes 2 iron for every 1 gear produced).
+    void AddRecipeRatioConstraints(Crafter crafter, Recipe recipe) {
+      ArithExpr TimeToCraft(int idx, Recipe.ItemAmount[] amounts, Dictionary<Slot, IntExpr> slotAmounts) =>
+        ctx.MkInt2Real(slotAmounts[(crafter, recipe, idx)]) / (amounts[idx].Count / recipe.CraftTime);
 
       // Recipe ratios: time spent on each slot is the same.
-      for (var i = 0; i < inputSlotAmounts.Length; i++)
-        solver.Assert(ctx.MkEq(TimeToCraft(i, inputSlotAmounts, recipe.Inputs), craftTime));
-      for (var i = 0; i < outputSlotAmounts.Length; i++)
-        solver.Assert(ctx.MkEq(TimeToCraft(i, outputSlotAmounts, recipe.Outputs), craftTime));
+      var craftTime =
+        recipe.Inputs.Length > 0 ? TimeToCraft(0, recipe.Inputs, inputSlotAmounts) :
+        recipe.Outputs.Length > 0 ? TimeToCraft(0, recipe.Outputs, outputSlotAmounts) : null;
+      for (var i = 0; i < recipe.Inputs.Length; i++)
+        solver.Assert(ctx.MkEq(TimeToCraft(i, recipe.Inputs, inputSlotAmounts), craftTime));
+      for (var i = 0; i < recipe.Outputs.Length; i++)
+        solver.Assert(ctx.MkEq(TimeToCraft(i, recipe.Outputs, outputSlotAmounts), craftTime));
 
-      if (crafterActives.ContainsKey(crafter)) {
-        crafterActives[crafter] |= outputSlotAmounts[0] > 0;
+      if (crafterTimes.ContainsKey(crafter)) {
+        crafterTimes[crafter] += craftTime;
       } else {
-        crafterActives[crafter] = outputSlotAmounts[0] > 0;
+        crafterTimes[crafter] = craftTime;
       }
     }
-    //void AddCraftTimeConstraints2(Crafter crafter, ArithExpr crafterTime) {
-    //  // Edge craft times = total time from system start to satisfy the given edge's full demand.
-    //  // Note: this is not strictly correct. If a crafter has 2 output edges, it might satisfy the first edge at time T,
-    //  // then the second at time T + T2. But this is a good enough approximation for our purposes - minimizing total
-    //  // craft time.
-    //  var totalCraftTime = AddReal($"ct_{crafter.name}");
-    //  solver.Assert(totalCraftTime >= crafterTime);
-    //  foreach ((var edge, var edgeTime) in edgeTimes) {
-    //    // Input edge constraint: totalCraftTime >= sum(crafter's craft times) + max(totalTime(inputEdges)))
-    //    if (edge.ToCrafter == crafter)
-    //      solver.Assert(totalCraftTime >= crafterTime + edgeTimes[edge]);
-    //    // Output edge constraint: totalTime(outputEdge) = totalCraftTime
-    //    if (edge.FromCrafter == crafter)
-    //      solver.Assert(ctx.MkEq(edgeTime, totalCraftTime));
-    //  }
-    //}
-    // Adds constraint: sum(edges attached to crafter slot N) = crafter's slot_N ArithExpr.
-    void AddEdgeToCrafterConstraints(Crafter crafter, Recipe recipe, Dictionary<Slot, List<Edge>> edgeMap, ArithExpr[] decidedAmounts) {
-      for (var i = 0; i < decidedAmounts.Length; i++) {
-        var edges = edgeMap.GetValueOrDefault((crafter, recipe, i), empty);
-        if (edges.Count == 0) continue; // TODO: figure out what to do about a disconnected input, and output
-        var edgeSum = edges.Aggregate((ArithExpr)ctx.MkInt(0), (term, e) => term + edgeAmounts[e]);
-        solver.Assert(ctx.MkEq(edgeSum, decidedAmounts[i]));
+    void AddCraftTimeConstraints(Crafter crafter, ArithExpr crafterTime) {
+      // Cumulative craft times = total time from system start for this crafter to finish crafting.
+      var cumCraftTime = AddReal($"ct_{crafter.name}");
+      var inEdgeTime = edgeTimes.Where(kv => kv.Key.CapillaryGroup == crafter.InputCapillaryGroup)
+        .Aggregate((ArithExpr)ctx.MkReal(0),
+          (term, kv) => (ArithExpr)ctx.MkITE(term > kv.Value, term, kv.Value));
+      solver.Assert(ctx.MkEq(cumCraftTime, crafterTime + inEdgeTime));
+      foreach ((var edge, var edgeTime) in edgeTimes) {
+        var prod = edge.Producers.FirstOrDefault(slot => CraftRequests.ContainsKey(slot));
+        if (prod.Item1 == crafter)
+          solver.MkMinimize(cumCraftTime);
       }
     }
 
-    // Add decision variables for each edge.
-    foreach (var edge in Edges) {
-      edgeAmounts[edge] = AddInt($"e_{edge}");
-      outputEdges.GetOrAdd(edge.From, () => new()).Add(edge);
-      inputEdges.GetOrAdd(edge.To, () => new()).Add(edge);
-
-      // Add constraint for the edge producing a requested item.
-      if (PlayerCraftRequests.TryGetValue(edge.OutputIngredient.Item, out var desiredAmount)) {
-        solver.Assert(ctx.MkEq(edgeAmounts[edge], ctx.MkInt(desiredAmount)));
-      }
-    }
-
-    // Set up the constraints for each crafter's input and output, and collect the decided output amounts.
+    // Add the constraints for each crafter's input and output.
     foreach (var (crafter, recipe) in CrafterRecipes) {
-      var inputSlotAmounts = recipe.Inputs.Select(amount => AddSlotAmountVar(crafter, amount)).ToArray();
-      var outputSlotAmounts = recipe.Outputs.Select(amount => AddSlotAmountVar(crafter, amount)).ToArray();
-      //AddCraftTimeConstraints(crafter, recipe, inputSlotAmounts.Select(i => ctx.MkInt2Real(i)).ToArray(), outputSlotAmounts.Select(i => ctx.MkInt2Real(i)).ToArray());
-      AddCraftTimeConstraints(crafter, recipe, inputSlotAmounts, outputSlotAmounts);
-      AddEdgeToCrafterConstraints(crafter, recipe, inputEdges, inputSlotAmounts);
-      AddEdgeToCrafterConstraints(crafter, recipe, outputEdges, outputSlotAmounts);
+      AddSlotAmountVars(crafter, recipe, recipe.Inputs, inputSlotAmounts, "in");
+      AddSlotAmountVars(crafter, recipe, recipe.Outputs, outputSlotAmounts, "out");
+      AddRecipeRatioConstraints(crafter, recipe);
     }
-    var totalActive = ctx.MkInt(0) + 0;
-    foreach (var (crafter, active) in crafterActives) {
-      totalActive += (ArithExpr)ctx.MkITE(active, ctx.MkInt(1), ctx.MkInt(0));
+
+    // Add constraints that the number of items on each edge is equal to both the number produced by crafters onto the edge
+    // and the number consumed by crafters from the edge.
+    foreach (var edge in Edges) {
+      var amount = edgeAmounts[edge] = AddInt($"{edge}");
+      var producerSum = edge.Producers.Aggregate((ArithExpr)ctx.MkInt(0), (term, c) => term + outputSlotAmounts[c]);
+      solver.Assert(ctx.MkEq(amount, producerSum));
+      if (edge.Consumers.Count > 0) {
+        var consumerSum = edge.Consumers.Aggregate((ArithExpr)ctx.MkInt(0), (term, c) => term + inputSlotAmounts[c]);
+        solver.Assert(ctx.MkEq(amount, consumerSum));
+      }
     }
-    //foreach (var (crafter, crafterTime) in crafterTimes) {
-    //  AddCraftTimeConstraints2(crafter, crafterTime);
-    //}
+
+    // Add constraints that the amount output on the requested slots is the requested amount.
+    foreach (var (slot, amount) in CraftRequests) {
+      solver.Assert(ctx.MkEq(outputSlotAmounts[slot], ctx.MkInt(amount)));
+    }
+
+    // Add craft time constraints to minimize total time spent crafting.
+    // Confusion1: constraining edges before crafters seems to be faster for some reason?
+    // Confusion2: really the edges should be using cumulative crafterTime, but using only the immediate producers crafterTime
+    // seems to work as well, and is way faster.
+    foreach (var edge in Edges) {
+      var edgeTime = edgeTimes[edge] = AddReal($"t{edge}");
+      var maxCrafterTime = edge.Producers.Aggregate((ArithExpr)ctx.MkReal(0),
+        (term, c) => (ArithExpr)ctx.MkITE(term > crafterTimes[c.Item1], term, crafterTimes[c.Item1]));
+      solver.Assert(ctx.MkEq(edgeTime, maxCrafterTime));
+    }
+    foreach (var (crafter, crafterTime) in crafterTimes) {
+      AddCraftTimeConstraints(crafter, crafterTime);
+    }
 
     Debug.Log($"Version {Microsoft.Z3.Version.FullVersion}");
     Debug.Log($"Numbers: edges={Edges.Count} crafterRecipes={CrafterRecipes.Count} constraints={solver.Assertions.Length}");
@@ -221,7 +243,6 @@ public class ItemFlowManager : MonoBehaviour {
         Debug.Log($"Constraint: {constraint}");
       }
     }
-    solver.MkMaximize(totalActive);
 
     Profiler.BeginSample("craftflow solveZ3");
     var solution = solver.Check();
@@ -231,83 +252,125 @@ public class ItemFlowManager : MonoBehaviour {
       Debug.Log($"Model: {solver.Model}");
     }
 
-    foreach (var edge in Edges) {
-      var amount = EdgeDemands[edge] = (int)solver.Model.Double(edgeAmounts[edge]);
-      if (amount > 0)
-        edge.FromCrafter.SetOutputRequest(edge.OutputIngredient.Item, amount);
-      if (amount > 0)
-        Debug.Log($"Edge {edge} has demand {amount}");
-        //Debug.Log($"Edge {edge} has demand {amount}, time {solver.Model.Double(edgeTimes[edge])}");
+    OutputSlotAmounts = new();
+    foreach ((var slot, var amountVar) in outputSlotAmounts) {
+      var amount = (int)solver.Model.Double(amountVar);
+      if (amount > 0) {
+        OutputSlotAmounts[slot] = amount;
+        Debug.Log($"Crafter {slot.Item1.name} outputs {amount} {slot.Item2.Outputs[slot.Item3].Item.name}");
+      }
     }
-    foreach (var edge in Edges) {
-      if (EdgeDemands[edge] > 0)
-        edge.FromCrafter.CheckRequestSatisfied();
+    InputSlotAmounts = new();
+    foreach ((var slot, var amountVar) in inputSlotAmounts) {
+      var amount = (int)solver.Model.Double(amountVar);
+      if (amount > 0) {
+        InputSlotAmounts[slot] = amount;
+        Debug.Log($"Crafter {slot.Item1.name} inputs {amount} {slot.Item2.Inputs[slot.Item3].Item.name}");
+      }
+    }
+  }
+}
+
+public class ItemFlowManager : MonoBehaviour {
+  public static ItemFlowManager Instance;
+
+  class ItemFlow {
+    public ItemObject Object;
+    public Vector3 NextWorldPos;
+    public List<Vector2Int> Path;
+    public Slot ConsumerSlot;
+
+    public Vector2Int NextCell => BuildGrid.WorldToGrid(NextWorldPos);
+  }
+
+  List<ItemFlow> Items = new();
+  CraftSolver CraftSolver = new();
+
+  public void OnBuildingsChanged() {
+    CraftSolver.OnBuildingsChanged();
+    Items = new();
+  }
+  public void AddCraftRequest(Crafter crafter) {
+    var slot = (crafter, crafter.Recipes[0], 0);
+    CraftSolver.AddCraftRequest(slot);
+    StartCrafting();
+  }
+
+  void StartCrafting() {
+    // Inform all crafters of the requested amounts first, then have them start outputting. Crafters may have
+    // multiple recipes to craft and will be able to prioritize with the full request information.
+    foreach (((var crafter, var recipe, var outputIdx), var amount) in CraftSolver.OutputSlotAmounts) {
+      crafter.SetOutputRequest(recipe.Outputs[outputIdx].Item, amount);
+    }
+    foreach (((var crafter, var recipe, var outputIdx), var amount) in CraftSolver.OutputSlotAmounts) {
+      crafter.CheckRequestSatisfied();
     }
   }
 
-  // TODO clean this shit up, move to Crafter?
-  public void OnOutputReady(Crafter crafter, ItemInfo item) {
-    var edgeDemand = EdgeDemands.FirstOrDefault(e => e.Key.FromCrafter == crafter && e.Key.OutputIngredient.Item == item && e.Value > 0);
-    Debug.Assert(!edgeDemand.Key.IsNull() && edgeDemand.Value > 0);
-    if (!edgeDemand.Key.IsNull())
-      SpawnOutput(edgeDemand.Key);
+  public void OnOutputReady(Crafter crafter, Recipe recipe, ItemInfo item) {
+    int outputIdx = Array.FindIndex(recipe.Outputs, i => i.Item == item);
+    SpawnOutput((crafter, recipe, outputIdx), item);
   }
 
-  void SpawnOutput(Edge edge) {
-    var outputCell = EdgeOutputCells[edge];
-    var item = edge.OutputIngredient.Item;
-    Debug.Assert(!IsCellOccupied(outputCell, item), "Figure out how to handle this case");
-    edge.FromCrafter.ExtractOutput(item);
-    if (PlayerCraftRequests.GetValueOrDefault(item) > 0)
-      PlayerCraftRequests[item]--;
+  void SpawnOutput(Slot slot, ItemInfo item) {
+    if (!CraftSolver.OutputSlotAmounts.ContainsKey(slot)) {
+      Debug.Log("what");
+    }
+    CraftSolver.OutputSlotAmounts[slot]--;
+    if (CraftSolver.CraftRequests.GetValueOrDefault(slot) > 0)
+      CraftSolver.CraftRequests[slot]--;
 
-    var instance = item.Spawn(edge.FromCrafter.transform.position);
+    var producer = slot.Item1;
+    var outputCell = producer.OutputPortCell;
+    //Debug.Assert(!IsCellOccupied(outputCell, item), "Figure out how to handle this case");
+    producer.ExtractOutput(item);
+
+    var instance = item.Spawn(producer.transform.position);
+    var consumerSlot = CraftSolver.FindConsumerRequestingFromSlot(slot);
     var flow = new ItemFlow {
       Object = instance,
-      Path = ComputePath(outputCell, edge),
-      Edge = edge,
+      Path = ComputePath(outputCell, consumerSlot),
+      ConsumerSlot = consumerSlot,
     };
     AdvanceOnPath(flow);
     Items.Add(flow);
 
-    edge.FromCrafter.CheckRequestSatisfied();
-    if (--EdgeDemands[edge] == 0)
-      EdgeDemands.Remove(edge);
+    producer.CheckRequestSatisfied();
   }
 
-  List<Vector2Int> ComputePath(Vector2Int startCell, Edge edge) {
-    var destCell = startCell;
-    var y = edge.FromCrafter.transform.position.y;
+  List<Vector2Int> ComputePath(Vector2Int startCell, Slot consumerSlot) {
+    var consumer = consumerSlot.Item1;
+    if (!consumer)
+      return new() { startCell };
+
+    var destCell = consumer.InputPortCell;
+    var cells = CraftSolver.GetCapillaryGroupForInputSlot(consumerSlot).Cells;
     var toVisit = new Queue<Vector2Int>();
     var distance = new Dictionary<Vector2Int, int>();
     var prev = new Dictionary<Vector2Int, Vector2Int>();
     toVisit.Enqueue(startCell);
     distance[startCell] = 0;
     while (toVisit.TryDequeue(out var pos)) {
-      var obj = BuildGrid.GetCellContents(pos, y);
-      if (obj == null) continue;
-      if (obj == gameObject || obj.TryGetComponent(out Capillary _)) {
-        void Check(Vector2Int neighbor) {
-          var alt = distance[pos] + 1;
-          if (alt < distance.GetValueOrDefault(neighbor, int.MaxValue)) {
-            distance[neighbor] = distance[pos] + 1;
-            prev[neighbor] = pos;
-            toVisit.Enqueue(neighbor);
-          }
+      if (!cells.Contains(pos)) continue;
+      void Check(Vector2Int neighbor) {
+        var alt = distance[pos] + 1;
+        if (alt < distance.GetValueOrDefault(neighbor, int.MaxValue)) {
+          distance[neighbor] = distance[pos] + 1;
+          prev[neighbor] = pos;
+          toVisit.Enqueue(neighbor);
         }
-        Check(pos + Vector2Int.left);
-        Check(pos + Vector2Int.right);
-        Check(pos + Vector2Int.up);
-        Check(pos + Vector2Int.down);
       }
-      if (obj != gameObject && obj.TryGetComponent(out Crafter crafter) && crafter == edge.ToCrafter)
-        destCell = pos;
+      Check(pos + Vector2Int.left);
+      Check(pos + Vector2Int.right);
+      Check(pos + Vector2Int.up);
+      Check(pos + Vector2Int.down);
     }
     List<Vector2Int> path = new();
     for (var pos = destCell; pos != startCell; pos = prev[pos])
       path.Add(pos);
     path.Add(startCell);
     path.Reverse();
+    path.Add(BuildGrid.WorldToGrid(consumer.transform.position));
     return path;
   }
 
@@ -331,17 +394,18 @@ public class ItemFlowManager : MonoBehaviour {
         item.Object.transform.position += delta.normalized * distance;
       }
     }
-    foreach (var item in toConsume) {
-      if (item.Edge.ToCrafter)
-        item.Edge.ToCrafter.InsertInput(item.Edge.InputIngredient.Item);
-      item.Object.gameObject.Destroy();
+    foreach (var flow in toConsume) {
+      (var consumer, var recipe, var inputIdx) = flow.ConsumerSlot;
+      if (consumer)
+        consumer.InsertInput(recipe.Inputs[inputIdx].Item);
+      flow.Object.gameObject.Destroy();
     }
     toConsume.ForEach(f => Items.Remove(f));
   }
 
   void AdvanceOnPath(ItemFlow item) {
     if (IsCellOccupied(item.Path[0], item.Object.Info)) return;
-    item.NextWorldPos = BuildGrid.GridToWorld(item.Path[0], item.Edge.FromCrafter.transform.position.y);
+    item.NextWorldPos = BuildGrid.GridToWorld(item.Path[0], item.Object.transform.position.y);
     item.Path.RemoveAt(0);
   }
 
@@ -349,7 +413,7 @@ public class ItemFlowManager : MonoBehaviour {
     MoveItems();
   }
 
-#if true
+#if false
   Crafter NewCrafter(Recipe recipe, string name) => NewCrafter(new[] { recipe }, name);
   Crafter NewCrafter(Recipe[] recipes, string name) {
     var go = new GameObject(name);

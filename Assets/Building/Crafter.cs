@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +7,9 @@ using UnityEngine;
 public class Crafter : MonoBehaviour {
   public Recipe[] Recipes;
 
+  public CapillaryGroup InputCapillaryGroup { get; set; }
+  public CapillaryGroup OutputCapillaryGroup { get; set; }
+
   // Arrays of input/output amounts held by this machine, in order of Recipe.Inputs/Outputs.
   Dictionary<ItemInfo, int> InputQueue = new();
   Dictionary<ItemInfo, int> OutputQueue = new();
@@ -15,9 +17,15 @@ public class Crafter : MonoBehaviour {
   TaskScope CraftTask;
   ItemObject CraftDisplayObject;
   Animator Animator;
+  BuildObject BuildObject;
 
   // Note: We assume there is only 1 recipe that can produce a given output.
   public Recipe FindRecipeProducing(ItemInfo item) => Recipes.FirstOrDefault(r => r.Outputs.Any(o => o.Item == item));
+
+  public Vector2Int InputPortCell =>
+    BuildGrid.WorldToGrid(transform.position - transform.rotation*new Vector3(0f, 0f, BuildGrid.GetBottomLeftOffset(BuildObject).y + 1f));
+  public Vector2Int OutputPortCell =>
+    BuildGrid.WorldToGrid(transform.position + transform.rotation*new Vector3(0f, 0f, BuildGrid.GetBottomLeftOffset(BuildObject).y + 1f));
 
   public void SetOutputRequest(ItemInfo item, int amount) {
     OutputRequests[item] = amount;
@@ -79,7 +87,7 @@ public class Crafter : MonoBehaviour {
       CraftDisplayObject?.gameObject.Destroy();
       CraftTask = null;
       if (finished)
-        ItemFlowManager.Instance.OnOutputReady(this, item);
+        ItemFlowManager.Instance.OnOutputReady(this, recipe, item);
     }
   }
 
@@ -108,6 +116,7 @@ public class Crafter : MonoBehaviour {
 
   void Awake() {
     this.InitComponentFromChildren(out Animator);
+    this.InitComponent(out BuildObject);
   }
 
   void OnDestroy() => CraftTask?.Dispose();
@@ -124,10 +133,10 @@ public class Crafter : MonoBehaviour {
       }
     }
     string[] ToArray(Dictionary<ItemInfo, int> queue) => ToList(queue).ToArray();
-    string ToString(Dictionary<ItemInfo, int> queue) => string.Join(",", ToList(queue));
     DebugInputs = ToArray(InputQueue);
     DebugOutputs = ToArray(OutputQueue);
     DebugRequests = ToArray(OutputRequests);
+    //string ToString(Dictionary<ItemInfo, int> queue) => string.Join(",", ToList(queue));
     //DebugUI.Log(this, $"{name}: in={ToString(InputQueue)}, out={ToString(OutputQueue)}, requested={ToString(OutputRequests)}");
   }
 #endif

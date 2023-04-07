@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour {
       this.InitComponentFromChildren(out NavMeshUtil.Instance);
       this.InitComponentFromChildren(out PlayerManager.Instance);
       this.InitComponentFromChildren(out ItemFlowManager.Instance);
+      this.InitComponentFromChildren(out BuildObjectManager.Instance);
       DontDestroyOnLoad(Instance.gameObject);
     }
   }
@@ -71,7 +72,7 @@ public class GameManager : MonoBehaviour {
 
   async Task Run(TaskScope scope) {
     while (true) {
-      await scope.Any(Waiter.Repeat(HandleSaveLoad), GameLoop);
+      await GameLoop(scope);
       await scope.Tick();
     }
   }
@@ -92,7 +93,7 @@ public class GameManager : MonoBehaviour {
   static KeyCode[] SaveLoadKeys = new[] { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5, KeyCode.Alpha6, KeyCode.Alpha7, KeyCode.Alpha8, KeyCode.Alpha9, };
   void HandleSaveLoad() {
     for (int i = 0; i < SaveLoadKeys.Length; i++) {
-      if (Input.GetKey(SaveLoadKeys[i])) {
+      if (Input.GetKeyDown(SaveLoadKeys[i])) {
         if (Input.GetKey(KeyCode.LeftAlt)) {
           SaveData.SaveToFile(i);
         } else {
@@ -100,6 +101,10 @@ public class GameManager : MonoBehaviour {
         }
       }
     }
+  }
+
+  void Update() {
+    HandleSaveLoad();
   }
 
   async Task GameLoop(TaskScope scope) {

@@ -30,6 +30,9 @@ public static class HitHandler {
         }
         await scope.Tick();
       }
+    } catch (OperationCanceledException) {
+    } catch (Exception ex) {
+      Debug.Log($"Caught {ex}");
     } finally {
       //GameObject.Destroy(dbg);
       hitbox.EnableCollision = false;
