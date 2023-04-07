@@ -39,14 +39,19 @@ public class BuildGrid {
 
   public static GameObject GetCellContents(Vector2Int pos, float y) => GetCellContents(GridToWorld(pos, y));
 
+  static public Vector2Int GetBottomLeftOffset(BuildObject building) => (building.Size) / 2;
+  static public Vector2Int GetTopRightOffset(BuildObject building) => (building.Size - Vector2Int.one) / 2;
   static public (Vector2Int, Vector2Int) GetBuildingBounds(BuildObject building, Vector2Int center) {
     var offsetBottomLeft = (building.Size) / 2;
     var offsetTopRight = (building.Size - Vector2Int.one) / 2;
-    return (center - offsetBottomLeft, center + offsetTopRight);
+    return (center - GetBottomLeftOffset(building), center + GetTopRightOffset(building));
   }
 
   // TODO: creating cells dynamically is slow. Cache this?
+  GameObject GridRoot;
   public void CreateGridCells(BuildGridCell prefab, Vector2Int center, float y) {
+    GridRoot?.Destroy();
+    GridRoot = new GameObject("BuildGridCells");
     var toVisit = new Queue<Vector2Int>();
     toVisit.Enqueue(center);
     var invalidCells = new HashSet<Vector2Int>();
@@ -58,7 +63,7 @@ public class BuildGrid {
         invalidCells.Add(pos);
         continue;
       }
-      var indicator = GameObject.Instantiate(prefab, worldPos, Quaternion.identity);
+      var indicator = GameObject.Instantiate(prefab, worldPos, Quaternion.identity, GridRoot.transform);
       Cells.Add(pos, indicator);
       toVisit.Enqueue(pos + Vector2Int.left);
       toVisit.Enqueue(pos + Vector2Int.right);
@@ -68,7 +73,8 @@ public class BuildGrid {
   }
 
   public void Clear() {
-    Cells.ForEach(c => c.Value.gameObject.Destroy());
+    GridRoot?.Destroy();
+    GridRoot = null;
     Cells.Clear();
   }
 
@@ -91,6 +97,7 @@ public class BuildGrid {
   public void RemoveCells(BuildObject building, Vector2Int center) {
     var (bottomLeft, topRight) = GetBuildingBounds(building, center);
     foreach (var pos in CellsInSquare(bottomLeft, topRight)) {
+      Cells[pos].gameObject.Destroy();
       Cells.Remove(pos);
     }
   }
