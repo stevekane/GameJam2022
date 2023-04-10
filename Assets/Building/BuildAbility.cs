@@ -21,7 +21,8 @@ public class BuildAbility : Ability {
   };
 
   // TODO: better handling of distance (here and halfBuildSize)
-  const float MaxBuildDist = 6f;
+  const float MaxBuildDistInner = 6f;
+  const float MaxBuildDistOuter = 7f;
   public override async Task MainAction(TaskScope scope) {
     AcceptHeld = false;
     var debugThing = Instantiate(VFXManager.Instance.DebugIndicatorPrefab);
@@ -43,12 +44,13 @@ public class BuildAbility : Ability {
         WaitForAccept,
         ListenFor(CancelAction),
         Waiter.Repeat(async s => {
-          buildTarget += realMoveAxis.XZ * Mover.WalkSpeed * Time.fixedDeltaTime;
           var buildDelta = buildTarget - Character.transform.position;
-          var moveAxis = new Vector3(
-            Mathf.Abs(buildDelta.x) < MaxBuildDist ? 0 : realMoveAxis.XZ.x,
-            0f,
-            Mathf.Abs(buildDelta.z) < MaxBuildDist ? 0 : realMoveAxis.XZ.z);
+          var movingAway = Vector3.Dot(realMoveAxis.XZ, buildDelta) >= 0f;
+          var maxDist = movingAway ? MaxBuildDistOuter : MaxBuildDistInner;
+          bool TooFar(float maxDist) => buildDelta.sqrMagnitude > maxDist.Sqr();
+          var speed = Mover.WalkSpeed * (TooFar(MaxBuildDistOuter) && movingAway ? 1f : 2f);
+          var moveAxis = TooFar(MaxBuildDistInner) && movingAway ? realMoveAxis.XZ : Vector3.zero;
+          buildTarget += realMoveAxis.XZ * speed * Time.fixedDeltaTime;
           Mover.SetMoveAim(moveAxis, moveAxis);
           buildCell = BuildGrid.WorldToGrid(buildTarget);
           if (lastBuildCell != buildCell) {
