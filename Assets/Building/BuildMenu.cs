@@ -5,6 +5,7 @@ using UnityEngine;
 public class BuildMenu : Ability {
   // TODO: Not the best way to do this, but fine for now.
   [SerializeField] BuildObject[] Buildings;
+  string[] Choices;
   BuildAbility BuildAbility;
 
   InlineEffect StopEffect => new(s => {
@@ -15,7 +16,7 @@ public class BuildMenu : Ability {
   public override async Task MainAction(TaskScope scope) {
     try {
       using var stopped = Status.Add(StopEffect);
-      Menu.Show(Buildings);
+      Menu.Show(Choices);
       var which = await scope.Any(
         ListenFor(MainRelease),
         Waiter.Repeat(async s => {
@@ -26,7 +27,10 @@ public class BuildMenu : Ability {
       Stop();
       Menu.Hide();
       var selected = GetSelected();
-      if (selected >= 0) {
+      if (selected == Buildings.Length) {
+        BuildAbility.SetDeleteMode();
+        AbilityManager.TryInvoke(BuildAbility.MainAction);
+      } else if (selected >= 0) {
         BuildAbility.SetBuildPrefab(Buildings[selected]);
         AbilityManager.TryInvoke(BuildAbility.MainAction);
       }
@@ -40,7 +44,7 @@ public class BuildMenu : Ability {
       return -1;
     var angle = Vector3.SignedAngle(Vector3.forward, dir, Vector3.up);
     var frac = (1f + angle/360f) % 1f;
-    var idx = (int)(frac * Buildings.Length);
+    var idx = (int)(frac * Choices.Length);
     return idx;
     //return Abilities[idx];
   }
@@ -49,5 +53,8 @@ public class BuildMenu : Ability {
   void Start() {
     Character.InitComponentFromChildren(out BuildAbility);
     this.InitComponentFromChildren(out Menu);
+    Choices = new string[Buildings.Length+1];
+    Buildings.ForEach((b, i) => Choices[i] = b.name );
+    Choices[Buildings.Length] = "Delete";
   }
 }

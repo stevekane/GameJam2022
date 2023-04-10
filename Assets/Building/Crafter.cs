@@ -23,9 +23,9 @@ public class Crafter : MonoBehaviour {
   public Recipe FindRecipeProducing(ItemInfo item) => Recipes.FirstOrDefault(r => r.Outputs.Any(o => o.Item == item));
 
   public Vector2Int InputPortCell =>
-    BuildGrid.WorldToGrid(transform.position - transform.rotation*new Vector3(0f, 0f, BuildGrid.GetBottomLeftOffset(BuildObject).y + 1f));
+    BuildGrid.WorldToGrid(transform.position - transform.rotation*new Vector3(0f, 0f, BuildGrid.GetBottomLeftOffset(BuildObject.Size).y + 1f));
   public Vector2Int OutputPortCell =>
-    BuildGrid.WorldToGrid(transform.position + transform.rotation*new Vector3(0f, 0f, BuildGrid.GetBottomLeftOffset(BuildObject).y + 1f));
+    BuildGrid.WorldToGrid(transform.position + transform.rotation*new Vector3(0f, 0f, BuildGrid.GetBottomLeftOffset(BuildObject.Size).y + 1f));
 
   public void SetOutputRequest(ItemInfo item, int amount) {
     OutputRequests[item] = amount;

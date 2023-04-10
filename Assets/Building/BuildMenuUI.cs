@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -11,14 +12,14 @@ public class BuildMenuUI : MonoBehaviour {
     Canvas.SetActive(false);
   }
 
-  public void Show(BuildObject[] choices) {
+  public void Show(string[] choices) {
     //RectTransform rectTransform = GetComponent<RectTransform>(); 
     foreach (Transform child in Canvas.transform)
       Destroy(child.gameObject);
     for (int i = 0; i < choices.Length; i++) {
       var angle = 2f*Mathf.PI * i / choices.Length;
       var card = Instantiate(CardPrefab, Canvas.transform);
-      card.Init($"{choices[i].Name}");
+      card.Init($"{choices[i]}");
       var rect = card.GetComponent<RectTransform>();
       rect.anchoredPosition = new(Radius*Mathf.Sin(angle), Radius*Mathf.Cos(angle));
     }
