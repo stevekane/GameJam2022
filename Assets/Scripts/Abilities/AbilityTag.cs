@@ -16,6 +16,8 @@ public enum AbilityTag {
   Sprinting = 1 << 12,
   MeleeAttacking = 1 << 13,
 
+  Interact = 1 << 20,             // If the player has this tag, he can only use abilities with this tag
+
   AbilityHeavyEnabled = 1 << 28,
   AbilitySlamEnabled = 1 << 29,
   AbilityMorphEnabled = 1 << 30,

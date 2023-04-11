@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-public class BuildMenuItemUI : MonoBehaviour {
+public class RadialMenuUIItem : MonoBehaviour {
   public TextMeshProUGUI Title;
 
   public void Init(string title) {

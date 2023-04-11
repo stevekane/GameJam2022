@@ -79,6 +79,7 @@ public class AbilityManager : MonoBehaviour {
       _ when !ability.CanStart(method) => 1,
       _ when !Status.CanAttack => 2,
       _ when !ability.Status.Tags.HasAllFlags(trigger.RequiredOwnerTags) => 3,
+      _ when ability.Status.Tags.HasAllFlags(AbilityTag.Interact) && !trigger.Tags.HasAllFlags(AbilityTag.Interact) => 3.5,
       //_ when trigger.Tags.HasAllFlags(AbilityTag.OnlyOne) && Running.Any(a => !CanCancel(a)) => 4,
       _ when trigger.Tags.HasAllFlags(AbilityTag.OnlyOne) && Running.Any(a => a.ActiveTags.HasAllFlags(AbilityTag.OnlyOne) && !CanCancel(a)) => 4,
       _ when trigger.Tags.HasAllFlags(AbilityTag.BlockIfRunning) && ability.IsRunning => 5,

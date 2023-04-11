@@ -67,7 +67,8 @@ public abstract class Ability : MonoBehaviour {
   public virtual Task MainAction(TaskScope scope) => null;
   public virtual Task MainRelease(TaskScope scope) => null;
   public void SetCancellable() => Tags.AddFlags(AbilityTag.Cancellable);
-  public TriggerCondition GetTriggerCondition(AbilityMethod method) =>
+  // TODO(HACK): InteractAbility needs to override this to provide the Release action with the Interact tag.
+  public virtual TriggerCondition GetTriggerCondition(AbilityMethod method) =>
       method == MainAction ? TriggerCondition : TriggerCondition.Empty;
   public void Stop() {
     Tags = 0;

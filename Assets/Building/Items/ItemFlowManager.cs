@@ -295,6 +295,11 @@ public class ItemFlowManager : MonoBehaviour {
     CraftSolver.AddCraftRequest(slot);
     StartCrafting();
   }
+  public void AddCraftRequest(Crafter crafter, Recipe recipe) {
+    var slot = (crafter, recipe, 0);
+    CraftSolver.AddCraftRequest(slot);
+    StartCrafting();
+  }
 
   void StartCrafting() {
     // Inform all crafters of the requested amounts first, then have them start outputting. Crafters may have

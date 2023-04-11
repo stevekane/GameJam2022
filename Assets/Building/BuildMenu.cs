@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -46,13 +45,12 @@ public class BuildMenu : Ability {
     var frac = (1f + angle/360f) % 1f;
     var idx = (int)(frac * Choices.Length);
     return idx;
-    //return Abilities[idx];
   }
 
-  BuildMenuUI Menu;
+  RadialMenuUI Menu;
   void Start() {
     Character.InitComponentFromChildren(out BuildAbility);
-    this.InitComponentFromChildren(out Menu);
+    Character.InitComponentFromChildren(out Menu);
     Choices = new string[Buildings.Length+1];
     Buildings.ForEach((b, i) => Choices[i] = b.name );
     Choices[Buildings.Length] = "Delete";

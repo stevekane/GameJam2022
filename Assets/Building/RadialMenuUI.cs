@@ -1,10 +1,9 @@
-using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class BuildMenuUI : MonoBehaviour {
+public class RadialMenuUI : MonoBehaviour {
   public GameObject Canvas;
-  public BuildMenuItemUI CardPrefab;
+  public RadialMenuUIItem CardPrefab;
   public bool IsShowing { get; private set; }
   public float Radius = 100f;
 
@@ -31,7 +30,7 @@ public class BuildMenuUI : MonoBehaviour {
     if (choice == -1) {
       EventSystem.current.SetSelectedGameObject(null);
     } else {
-      var items = GetComponentsInChildren<BuildMenuItemUI>();
+      var items = GetComponentsInChildren<RadialMenuUIItem>();
       EventSystem.current.SetSelectedGameObject(items[choice].gameObject);
     }
   }
