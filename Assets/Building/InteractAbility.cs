@@ -54,6 +54,7 @@ public class InteractAbility : Ability {
     if (dir == Vector3.zero)
       return -1;
     var angle = Vector3.SignedAngle(Vector3.forward, dir, Vector3.up);
+    angle += 90f / Choices.Length;  // Offset the start region for the choices by the width of the region
     var frac = (1f + angle/360f) % 1f;
     var idx = (int)(frac * Choices.Length);
     return idx;
