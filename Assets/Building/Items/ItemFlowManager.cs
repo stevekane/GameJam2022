@@ -57,7 +57,7 @@ public class CraftSolver {
   }
 
   public void AddCraftRequest(Slot slot) {
-    CraftRequests[slot] = CraftRequests.GetValueOrDefault(slot) + 5;
+    CraftRequests[slot] = CraftRequests.GetValueOrDefault(slot) + 1;
     Profiler.BeginSample("craftflow build graph");
     CreateEdges();
     Profiler.EndSample();
@@ -322,8 +322,10 @@ public class ItemFlowManager : MonoBehaviour {
       Debug.Log("what");
     }
     CraftSolver.OutputSlotAmounts[slot]--;
-    if (CraftSolver.CraftRequests.GetValueOrDefault(slot) > 0)
-      CraftSolver.CraftRequests[slot]--;
+    if (CraftSolver.CraftRequests.GetValueOrDefault(slot) > 0) {
+      if (--CraftSolver.CraftRequests[slot] == 0)
+        CraftSolver.CraftRequests.Remove(slot);
+    }
 
     var producer = slot.Item1;
     var outputCell = producer.OutputPortCell;
