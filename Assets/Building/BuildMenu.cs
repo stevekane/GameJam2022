@@ -37,16 +37,7 @@ public class BuildMenu : Ability {
     }
   }
 
-  int GetSelected() {
-    var dir = AbilityManager.GetAxis(AxisTag.Move).XZ;
-    if (dir == Vector3.zero)
-      return -1;
-    var angle = Vector3.SignedAngle(Vector3.forward, dir, Vector3.up);
-    angle += 90f / Choices.Length;  // Offset the start region for the choices by the width of the region
-    var frac = (1f + angle/360f) % 1f;
-    var idx = (int)(frac * Choices.Length);
-    return idx;
-  }
+  int GetSelected() => Menu.GetSelectedFromAim(AbilityManager.GetAxis(AxisTag.Move).XZ, Choices.Length);
 
   RadialMenuUI Menu;
   void Start() {
