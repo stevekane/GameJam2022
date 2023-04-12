@@ -16,9 +16,9 @@ public class BuildGrid {
     return new(gridPos.x*GridSize + GridSize*.5f, yOffset, gridPos.y*GridSize + GridSize*.5f);
   }
 
-  public static Vector3 GridToWorld(BuildObject building, Vector2Int gridPos, float yOffset = 0f) {
+  public static Vector3 GridToWorld(Vector2Int buildingSize, Vector2Int gridPos, float yOffset = 0f) {
     // Bleh.. offset the building center by .5 for even sized buildings.
-    var buildOffset = new Vector3((building.Size.x+1) % 2, 0f, (building.Size.y+1) % 2) * .5f;
+    var buildOffset = new Vector3((buildingSize.x+1) % 2, 0f, (buildingSize.y+1) % 2) * .5f;
     return new Vector3(gridPos.x*GridSize + GridSize*.5f, yOffset, gridPos.y*GridSize + GridSize*.5f) - buildOffset;
   }
 
@@ -39,14 +39,17 @@ public class BuildGrid {
 
   public static GameObject GetCellContents(Vector2Int pos, float y) => GetCellContents(GridToWorld(pos, y));
 
-  static public (Vector2Int, Vector2Int) GetBuildingBounds(BuildObject building, Vector2Int center) {
-    var offsetBottomLeft = (building.Size) / 2;
-    var offsetTopRight = (building.Size - Vector2Int.one) / 2;
-    return (center - offsetBottomLeft, center + offsetTopRight);
+  static public Vector2Int GetBottomLeftOffset(Vector2Int region) => (region) / 2;
+  static public Vector2Int GetTopRightOffset(Vector2Int region) => (region - Vector2Int.one) / 2;
+  static public (Vector2Int, Vector2Int) GetBuildingBounds(Vector2Int region, Vector2Int center) {
+    return (center - GetBottomLeftOffset(region), center + GetTopRightOffset(region));
   }
 
   // TODO: creating cells dynamically is slow. Cache this?
+  GameObject GridRoot;
   public void CreateGridCells(BuildGridCell prefab, Vector2Int center, float y) {
+    GridRoot?.Destroy();
+    GridRoot = new GameObject("BuildGridCells");
     var toVisit = new Queue<Vector2Int>();
     toVisit.Enqueue(center);
     var invalidCells = new HashSet<Vector2Int>();
@@ -58,7 +61,7 @@ public class BuildGrid {
         invalidCells.Add(pos);
         continue;
       }
-      var indicator = GameObject.Instantiate(prefab, worldPos, Quaternion.identity);
+      var indicator = GameObject.Instantiate(prefab, worldPos, Quaternion.identity, GridRoot.transform);
       Cells.Add(pos, indicator);
       toVisit.Enqueue(pos + Vector2Int.left);
       toVisit.Enqueue(pos + Vector2Int.right);
@@ -68,29 +71,31 @@ public class BuildGrid {
   }
 
   public void Clear() {
-    Cells.ForEach(c => c.Value.gameObject.Destroy());
+    GridRoot?.Destroy();
+    GridRoot = null;
     Cells.Clear();
   }
 
-  public bool IsValidBuildPos(BuildObject building, Vector2Int center) {
-    var (bottomLeft, topRight) = GetBuildingBounds(building, center);
+  public bool IsValidBuildPos(Vector2Int region, Vector2Int center) {
+    var (bottomLeft, topRight) = GetBuildingBounds(region, center);
     foreach (var pos in CellsInSquare(bottomLeft, topRight)) {
       if (!Cells.ContainsKey(pos)) return false;
     }
     return true;
   }
 
-  public void UpdateCellState(BuildObject building, Vector2Int center, BuildGridCell.State state) {
-    var (bottomLeft, topRight) = GetBuildingBounds(building, center);
+  public void UpdateCellState(Vector2Int region, Vector2Int center, BuildGridCell.State state) {
+    var (bottomLeft, topRight) = GetBuildingBounds(region, center);
     foreach (var pos in CellsInSquare(bottomLeft, topRight)) {
       if (Cells.TryGetValue(pos, out var c))
         c.SetState(state);
     }
   }
 
-  public void RemoveCells(BuildObject building, Vector2Int center) {
-    var (bottomLeft, topRight) = GetBuildingBounds(building, center);
+  public void RemoveCells(Vector2Int region, Vector2Int center) {
+    var (bottomLeft, topRight) = GetBuildingBounds(region, center);
     foreach (var pos in CellsInSquare(bottomLeft, topRight)) {
+      Cells[pos].gameObject.Destroy();
       Cells.Remove(pos);
     }
   }
