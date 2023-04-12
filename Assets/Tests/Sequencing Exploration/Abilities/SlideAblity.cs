@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -6,23 +5,24 @@ using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEngine.Playables;
 
-public class MeleeAttackAbility : SimpleAbility {
+public class SlideAblity : SimpleAbility {
   [SerializeField] TimelineTaskConfig TimelineTaskConfig;
+  [SerializeField] DirectMotion DirectMotion;
+  [SerializeField] float Distance = 10;
   [SerializeField] LogicalTimeline LogicalTimeline;
 
   TaskScope Scope;
 
   public override void OnRun() {
     Scope = new();
-    Scope.Run(Attack);
+    Scope.Run(Slide);
   }
 
   public override void OnStop() {
     Scope.Dispose();
-    Scope = null;
   }
 
-  async Task Attack(TaskScope scope) {
+  async Task Slide(TaskScope scope) {
     var graph = LogicalTimeline.Graph;
     var bindings = TimelineTaskConfig.Bindings;
     var tracks = bindings.Select(binding => binding.Track).Where(track => !track.muted);
@@ -32,7 +32,6 @@ public class MeleeAttackAbility : SimpleAbility {
     timeline.SetDuration(duration);
     timeline.SetTime(0);
     timeline.SetOutputCount(timeline.GetInputCount());
-    IsRunning = true;
     foreach (var (track, port) in tracks.WithIndex()) {
       var trackMixer = timeline.GetInput(port);
       var binding = bindings[port];
@@ -42,9 +41,14 @@ public class MeleeAttackAbility : SimpleAbility {
       output.SetSourcePlayable(timeline, port);
       outputs.Add(output);
     }
+    IsRunning = true;
+    var velocity = (Distance / (float)timeline.GetDuration()) * transform.forward;
     try {
-      await scope.Until(() => timeline.IsDone());
-      Stop();
+      while (!timeline.IsDone()) {
+        DirectMotion.IsActive(true, 1);
+        DirectMotion.Override(Time.deltaTime * velocity, 1);
+        await scope.Tick();
+      }
     } finally {
       IsRunning = false;
       outputs.ForEach(graph.DestroyOutput);

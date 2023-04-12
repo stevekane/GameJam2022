@@ -3,7 +3,7 @@ using UnityEngine;
 public class JumpAbility : SimpleAbility {
   [SerializeField] AudioClip SFX;
   [SerializeField] Animator Animator;
-  [SerializeField] Velocity Velocity;
+  [SerializeField] PhysicsMotion PhysicsMotion;
   [SerializeField] AudioSource AudioSource;
   [SerializeField] HitStop HitStop;
   [SerializeField] float JumpStrength;
@@ -11,7 +11,7 @@ public class JumpAbility : SimpleAbility {
   public override void OnRun() {
     Animator.SetTrigger("Jump");
     AudioSource.PlayOneShot(SFX);
-    Velocity.Value.y = JumpStrength;
+    PhysicsMotion.OverrideVelocityY(JumpStrength, 1);
     HitStop.TicksRemaining = 0;
   }
 }

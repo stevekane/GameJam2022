@@ -8,12 +8,16 @@ public class GroundCheck : MonoBehaviour {
   const string ON_LAND_EVENT_NAME = "OnLand";
   const string ON_TAKEOFF_EVENT_NAME = "OnTakeoff";
 
+  [Header("Reads From")]
   [SerializeField] LayerMask LayerMask;
   [SerializeField] CharacterController CharacterController;
-  [SerializeField] SimpleAbilityManager SimpleAbilityManager;
-  [SerializeField] GroundDistance GroundDistance;
   [SerializeField] float MaxGroundCheckDistance = 1f;
   [SerializeField] float GroundedDistanceThreshold = .2f;
+  [Header("Writes To")]
+  [SerializeField] SimpleAbilityManager SimpleAbilityManager;
+  [SerializeField] Animator Animator;
+  public bool IsGrounded { get; private set; }
+  public float GroundDistance { get; private set; }
 
   RaycastHit Hit = new();
 
@@ -35,11 +39,15 @@ public class GroundCheck : MonoBehaviour {
       SendMessage(ON_TAKEOFF_EVENT_NAME, SendMessageOptions.DontRequireReceiver);
     }
     if (isGrounded) {
+      SimpleAbilityManager.Tags.Current.AddFlags(AbilityTag.CanJump);
       SimpleAbilityManager.Tags.Current.AddFlags(AbilityTag.Grounded);
     } else {
       SimpleAbilityManager.Tags.Current.ClearFlags(AbilityTag.Grounded);
     }
-    GroundDistance.Value = didHit ? Hit.distance : float.MaxValue;
+    IsGrounded = isGrounded;
+    GroundDistance = didHit ? Hit.distance : float.MaxValue;
+    Animator.SetBool("Grounded", IsGrounded);
+    Animator.SetFloat("GroundDistance", GroundDistance);
   }
 
   void OnDrawGizmos() {

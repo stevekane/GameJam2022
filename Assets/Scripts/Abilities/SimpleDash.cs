@@ -63,7 +63,7 @@ public class SimpleDash : Ability {
 
   async Task SpawnResidualImage(TaskScope scope) {
     if (Status.TryGetComponent(out ResidualImageRenderer renderer)) {
-      renderer.Render();
+      renderer.RenderImage();
     }
     await scope.Delay(ResidualImagePeriod);
   }

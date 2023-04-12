@@ -9,7 +9,7 @@ public class ResidualImageRenderer : MonoBehaviour {
   public Color Color = Color.black;
   public float LifeTime = 1;
 
-  public void Render() {
+  public void RenderImage() {
     var mesh = new Mesh();
     var image = new GameObject("Residual Image");
     var meshRenderer = image.AddComponent<MeshRenderer>();

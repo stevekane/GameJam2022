@@ -2,29 +2,16 @@ using UnityEngine;
 
 [DefaultExecutionOrder(ScriptExecutionGroups.Physics)]
 public class SimpleMover : MonoBehaviour {
-  [SerializeField] CharacterController Controller;
-  [SerializeField] SimpleAbilityManager SimpleAbilityManager;
-  [SerializeField] MaxFallSpeed MaxFallSpeed;
+  [Header("Reads From")]
   [SerializeField] LocalTime LocalTime;
-  [SerializeField] Gravity Gravity;
+  [Header("Writes To")]
+  [SerializeField] CharacterController Controller;
   [SerializeField] Velocity Velocity;
-
-  void Awake() => Debug.LogWarning("Restore SimpleMover capping fall speed");
+  [SerializeField] Animator Animator;
 
   void FixedUpdate() {
-    var isGrounded = SimpleAbilityManager.Tags.Current.HasFlag(AbilityTag.Grounded);
-    if (isGrounded) {
-      SimpleAbilityManager.Tags.Current.AddFlags(AbilityTag.CanJump);
-      SimpleAbilityManager.Tags.Current.AddFlags(AbilityTag.Grounded);
-    } else {
-      SimpleAbilityManager.Tags.Current.ClearFlags(AbilityTag.Grounded);
-    }
-    if (isGrounded && Velocity.Value.y < 0) {
-      Velocity.Value.y = LocalTime.FixedDeltaTime * Gravity.Value;
-    } else {
-      Velocity.Value.y += LocalTime.FixedDeltaTime * Gravity.Value;
-    }
-    // Velocity.Value.y = -Mathf.Min(Mathf.Abs(MaxFallSpeed.Value), Mathf.Abs(Velocity.Value.y));
     Controller.Move(LocalTime.FixedDeltaTime * Velocity.Value);
+    Animator.SetFloat("YSpeed", Velocity.Value.y);
+    Velocity.Value = Vector3.zero;
   }
 }
