@@ -27,6 +27,12 @@ public static class InputActionExtensions {
     else if (!enabled && inputAction.enabled)
       inputAction.Disable();
   }
+  public static void SetEnabled(this InputActionMap inputActionMap, bool enabled) {
+    if (enabled && !inputActionMap.enabled)
+      inputActionMap.Enable();
+    else if (!enabled && inputActionMap.enabled)
+      inputActionMap.Disable();
+  }
 }
 
 public static class VectorExtensions {
