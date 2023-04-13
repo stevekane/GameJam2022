@@ -45,7 +45,6 @@ public class TargetDummyController : MonoBehaviour {
   [SerializeField] AudioSource AudioSource;
   [SerializeField] Vibrator Vibrator;
   [SerializeField] SimpleFlash SimpleFlash;
-  [SerializeField] RootMotion RootMotion;
 
   [Header("State")]
   [SerializeField] LocalTime LocalTime;

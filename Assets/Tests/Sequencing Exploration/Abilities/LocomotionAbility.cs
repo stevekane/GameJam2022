@@ -1,15 +1,20 @@
 using UnityEngine;
 
 public class LocomotionAbility : SimpleAbilityVector3 {
-  [SerializeField] Velocity Velocity;
+  [Header("Reads From")]
   [SerializeField] MovementSpeed MovementSpeed;
+  [Header("Writes To")]
+  [SerializeField] DirectMotion DirectMotion;
+  [SerializeField] Animator Animator;
 
   public override void OnRun() {
     if (Value.sqrMagnitude > 0) {
       SimpleAbilityManager.transform.rotation = Quaternion.LookRotation(Value);
     }
-    var velocityXZ = MovementSpeed.Value * Value.normalized;
-    Velocity.Value.x = velocityXZ.x;
-    Velocity.Value.z = velocityXZ.z;
+    var velocity = MovementSpeed.Value * Value.normalized;
+    var motion = Time.deltaTime * velocity;
+    DirectMotion.IsActive(true, 0);
+    DirectMotion.AddMotion(motion);
+    Animator.SetFloat("Speed", Mathf.Round(velocity.magnitude));
   }
 }

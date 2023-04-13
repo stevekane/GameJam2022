@@ -42,15 +42,16 @@ public class SimpleAbilityManager : MonoBehaviour {
 
   public void Stop(SimpleAbility ability) {
     if (ability.IsRunning) {
-      Tags.Current = default;
+      Tags.Current.ClearFlags(ability.SimpleTags.OwnerWhileActive);
       ability.OnStop();
     }
   }
 
   AbilityTag RemoveTagsFromCancellable(SimpleAbility ability, AbilityTag tags) {
     foreach (var otherAbility in Abilities) {
-      if (IsCancellable(ability, otherAbility))
+      if (IsCancellable(ability, otherAbility)) {
         tags.ClearFlags(otherAbility.SimpleTags.OwnerWhileActive);
+      }
     }
     return tags;
   }

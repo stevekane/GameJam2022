@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using UnityEngine;
 
-[DefaultExecutionOrder(ScriptExecutionGroups.Ability)]
 public class TestSystem1 : SampleAbility {
   [SerializeField] BooleanAttribute CanMove;
   [SerializeField] SampleAction StartAction;
@@ -20,6 +19,25 @@ public class TestSystem1 : SampleAbility {
     Scope.Dispose();
     Scope = null;
   }
+
+  /*
+  If you want to apply a persistent effect which can be a convenient means
+  of describing something that should happen and then be reversed later on,
+  you must know that the applied effect you are intending to reverse was actually
+  applied.
+
+  There are generally two possible ways to do this:
+
+    1. Get a handle to the modification you have applied
+       Remove the modification by this handle.
+    2. Design your code such that you only apply
+       cleanup when you have actually applied a modification.
+
+  The first approach will
+
+  The second approach will have faster execution as you do not
+  need to find the modification by handle.
+  */
 
   async Task Run(TaskScope scope) {
     try {
