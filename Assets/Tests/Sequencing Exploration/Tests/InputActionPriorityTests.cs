@@ -80,6 +80,64 @@ public class InputActionPriorityTests : MonoBehaviour {
     !Dead &&
     !Stunned;
 
+  /*
+  Matt mentiond that there is a convention in the existing AbilityManager
+  which allows an ability to be started when it would normally be blocked from starting
+  if the blocking ability is cancelled by this new ability starting.
+
+  First, a delineation of the of the key concepts:
+
+    Can Take Action
+    Condition prevents taking an Action
+    Cancel existing action
+    Check conditions for starting the new action
+    If new conditions allow the action, then allow the action
+
+  A way this could be done:
+
+    Speculatively take the action
+    Determine if the action is blocked
+    If the action is blocked revert the action
+    If the action is not blocked then allow it
+
+  This is pretty tough to do in general.
+  You would need universal undo on all actions in order to attempt a transaction
+  and then be able to revert it if it is not allowed.
+
+  Let's look at an example:
+
+    CanMove: !Attacking
+    OnMove: CancelAttack && Move
+
+    OnMove()
+    if (CanMove(State))
+      Commit
+    else
+      Revert
+
+  This would require that all the behaviors in OnMove were reversible or wrote to a provided
+  state variable which could either be applied to the real state or discarded. This does not
+  seem practical as it would constrain the entire system for a fairly niche use-case.
+
+  Instead, handling conditions like these may require you to specifically model more conditions
+  that would allow an ability to be started or not.
+
+    Attacking blocks movement
+    Movement cancels a cancellable Attack
+
+    CanMove: !Attacking || AttackIsCancellable
+    OnMove: CancelAttack && Move
+
+  Here, you have created additional state in the model that explicitly allow the coordination
+  desired. Specifically, AttackIsCancellable is now a part of the state and thus can be included
+  in the predicate determining whether movement is allowed. Finally, cancelling that attack is
+  an action taken when Move is performed.
+
+  The result of this setup is that the following requirement is satisfied:
+
+    Move when performing a cancellable attack should move and cancel that attack.
+  */
+
   void Start() {
     JumpInputAction = InputActions.FindActionMap("Basics").FindAction("Jump");
     FireInputAction = InputActions.FindActionMap("RemoteMissile").FindAction("Fire");
@@ -88,6 +146,13 @@ public class InputActionPriorityTests : MonoBehaviour {
     ConfirmInputAction = InputActions.FindActionMap("Interactions").FindAction("Confirm");
     CancelInputAction = InputActions.FindActionMap("Interactions").FindAction("Cancel");
     OnDeathEvent.Action += OnDeath;
+    JumpAbility.JumpAction.Action += OnJump;
+  }
+
+  // stuff that happens when you initiate a jump
+  void OnJump() {
+    // cancel some stuff
+    // cancel running melee ability
   }
 
   void FixedUpdate() {

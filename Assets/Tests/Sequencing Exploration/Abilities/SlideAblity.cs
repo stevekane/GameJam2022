@@ -1,17 +1,14 @@
-using System.Linq;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Timeline;
-using UnityEngine.Playables;
 
 public class SlideAblity : SimpleAbility {
+  [SerializeField] LogicalTimeline LogicalTimeline;
   [SerializeField] TimelineTaskConfig TimelineTaskConfig;
   [SerializeField] DirectMotion DirectMotion;
   [SerializeField] float Distance = 10;
-  [SerializeField] LogicalTimeline LogicalTimeline;
 
   TaskScope Scope;
+  float Duration;
 
   public override void OnRun() {
     Scope = new();
@@ -20,39 +17,25 @@ public class SlideAblity : SimpleAbility {
 
   public override void OnStop() {
     Scope.Dispose();
+    Scope = null;
+  }
+
+  void FixedUpdate() {
+    if (!IsRunning)
+      return;
+    var velocity = (Distance / Duration) * transform.forward;
+    DirectMotion.IsActive(true, 1);
+    DirectMotion.Override(velocity, 1);
   }
 
   async Task Slide(TaskScope scope) {
-    var graph = LogicalTimeline.Graph;
-    var bindings = TimelineTaskConfig.Bindings;
-    var tracks = bindings.Select(binding => binding.Track).Where(track => !track.muted);
-    var timeline = TimelinePlayable.Create(graph, tracks, gameObject, false, false);
-    var outputs = new List<PlayableOutput>(bindings.Length);
-    var duration = TimelineTaskConfig.Asset.duration;
-    timeline.SetDuration(duration);
-    timeline.SetTime(0);
-    timeline.SetOutputCount(timeline.GetInputCount());
-    foreach (var (track, port) in tracks.WithIndex()) {
-      var trackMixer = timeline.GetInput(port);
-      var binding = bindings[port];
-      var output = ScriptPlayableOutput.Create(graph, track.name);
-      trackMixer.SetDuration(duration);
-      output.SetUserData(binding.Binding);
-      output.SetSourcePlayable(timeline, port);
-      outputs.Add(output);
-    }
-    IsRunning = true;
-    var velocity = (Distance / (float)timeline.GetDuration()) * transform.forward;
     try {
-      while (!timeline.IsDone()) {
-        DirectMotion.IsActive(true, 1);
-        DirectMotion.Override(Time.deltaTime * velocity, 1);
-        await scope.Tick();
-      }
+      IsRunning = true;
+      Duration = (float)(TimelineTaskConfig.Asset.TickDuration(Timeval.FixedUpdatePerSecond)+1);
+      await LogicalTimeline.Play(scope, TimelineTaskConfig);
+      Stop();
     } finally {
       IsRunning = false;
-      outputs.ForEach(graph.DestroyOutput);
-      graph.DestroySubgraph(timeline);
     }
   }
 }
