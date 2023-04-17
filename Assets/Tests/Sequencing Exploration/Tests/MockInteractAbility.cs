@@ -57,7 +57,7 @@ public class MockInteractAbility : SampleAbility {
   bool CanConfirm() => IsRunning;
   bool CanCancel() => IsRunning;
 
-  public void Interact() {
+  void Interact() {
     Debug.Log("Interact");
     IsRunning = true;
   }

@@ -88,6 +88,10 @@ public class InputActionPriorityTests : MonoBehaviour {
     ConfirmInputAction = InputActions.FindActionMap("Interactions").FindAction("Confirm");
     CancelInputAction = InputActions.FindActionMap("Interactions").FindAction("Cancel");
     OnDeathEvent.Action += OnDeath;
+    JumpAbility.JumpAction.Action += OnJump;
+  }
+
+  void OnJump() {
   }
 
   void FixedUpdate() {

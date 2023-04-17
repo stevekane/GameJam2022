@@ -13,6 +13,7 @@ public class PhysicsMotion : MonoBehaviour {
   Vector3 NextVelocity;
   [field:SerializeField]
   public Vector3 PhysicsVelocity { get; private set; }
+  public Vector3 ReferenceFrameVelocity { get; set; }
 
   [Header("Writes To")]
   [SerializeField] Velocity Velocity;
@@ -32,6 +33,14 @@ public class PhysicsMotion : MonoBehaviour {
     NextVelocity = velocity;
   }
 
+  public void OverrideVelocityXZ(float x, float z, int priority) {
+    if (priority <= VelocityPriority)
+      return;
+    VelocityPriority = priority;
+    NextVelocity.x = x;
+    NextVelocity.z = z;
+  }
+
   public void OverrideVelocityY(float y, int priority) {
     if (priority <= VelocityPriority)
       return;
@@ -48,7 +57,7 @@ public class PhysicsMotion : MonoBehaviour {
 
   void FixedUpdate() {
     if (NextActive) {
-      Velocity.Value += NextVelocity;
+      Velocity.Value += ReferenceFrameVelocity + NextVelocity;
     }
     VelocityPriority = 0;
     PhysicsVelocity = NextVelocity;
