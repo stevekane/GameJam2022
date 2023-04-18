@@ -6,6 +6,7 @@ public class ResidualImageRenderer : MonoBehaviour {
   [SerializeField] Material Material;
   [Range(0,1)]
   public float Opacity = 1;
+  [ColorUsage(true, true)]
   public Color Color = Color.black;
   public float LifeTime = 1;
 
