@@ -35,10 +35,10 @@ public class InputActionManager : MonoBehaviour {
     #region GROUND
     Inputs.Grounded.Run.SetEnabled(AbilityManager.CanRun(Locomotion.Move));
     Inputs.Grounded.Jump.SetEnabled(AbilityManager.CanRun(Jump.Jump));
-    Inputs.Grounded.Slide.SetEnabled(AbilityManager.CanRun(Slide.Slide));
+    Inputs.Grounded.Slide.SetEnabled(AbilityManager.CanRun(Slide.Main));
     Inputs.Grounded.Sprint.SetEnabled(AbilityManager.CanRun(Sprint.Sprint));
-    Inputs.Grounded.LightAttack.SetEnabled(AbilityManager.CanRun(LightAttack.Attack));
-    Inputs.Grounded.HeavyAttack.SetEnabled(AbilityManager.CanRun(HeavyAttack.Attack));
+    Inputs.Grounded.LightAttack.SetEnabled(AbilityManager.CanRun(LightAttack.Main));
+    Inputs.Grounded.HeavyAttack.SetEnabled(AbilityManager.CanRun(HeavyAttack.Main));
     #endregion
 
     #region AIR
@@ -56,15 +56,15 @@ public class InputActionManager : MonoBehaviour {
     if (Inputs.Grounded.Jump.WasPerformedThisFrame())
       AbilityManager.Run(Jump.Jump);
     if (Inputs.Grounded.Slide.WasPerformedThisFrame())
-      AbilityManager.Run(Slide.Slide);
+      AbilityManager.Run(Slide.Main);
 
     if (Inputs.Grounded.Sprint.IsInProgress())
       AbilityManager.Run(Sprint.Sprint);
 
     if (Inputs.Grounded.LightAttack.WasPerformedThisFrame())
-      AbilityManager.Run(LightAttack.Attack);
+      AbilityManager.Run(LightAttack.Main);
     if (Inputs.Grounded.HeavyAttack.WasPerformedThisFrame())
-      AbilityManager.Run(HeavyAttack.Attack);
+      AbilityManager.Run(HeavyAttack.Main);
     #endregion
 
     #region AIR

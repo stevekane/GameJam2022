@@ -1,32 +1,13 @@
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class SlideAblity : SimpleAbility {
-  public AbilityAction Slide;
-
+public class SlideAblity : ClassicAbility {
   [SerializeField] LogicalTimeline LogicalTimeline;
   [SerializeField] TimelineTaskConfig TimelineTaskConfig;
   [SerializeField] DirectMotion DirectMotion;
   [SerializeField] float Distance = 10;
 
-  void Awake() {
-    Slide.Ability = this;
-    Slide.CanRun = true;
-    Slide.Source.Listen(Main);
-  }
-
-  TaskScope Scope;
   float Duration;
-
-  void Main() {
-    Scope = new();
-    Scope.Run(SlideTask);
-  }
-
-  public override void Stop() {
-    Scope.Dispose();
-    Scope = null;
-  }
 
   void FixedUpdate() {
     if (!IsRunning)
@@ -36,14 +17,8 @@ public class SlideAblity : SimpleAbility {
     DirectMotion.Override(velocity, 1);
   }
 
-  async Task SlideTask(TaskScope scope) {
-    try {
-      IsRunning = true;
-      Duration = (float)(TimelineTaskConfig.Asset.TickDuration(Timeval.FixedUpdatePerSecond)+1);
-      await LogicalTimeline.Play(scope, TimelineTaskConfig);
-      Stop();
-    } finally {
-      IsRunning = false;
-    }
+  public override async Task MainAction(TaskScope scope) {
+    Duration = (float)(TimelineTaskConfig.Asset.TickDuration(Timeval.FixedUpdatePerSecond)+1);
+    await LogicalTimeline.Play(scope, TimelineTaskConfig);
   }
 }

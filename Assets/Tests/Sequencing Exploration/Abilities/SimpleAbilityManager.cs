@@ -5,22 +5,27 @@ using UnityEngine;
 
 [DefaultExecutionOrder(ScriptExecutionGroups.Late)]
 public class SimpleAbilityManager : MonoBehaviour {
-  AbilityTag NextTags;
+  AbilityTag NextSystemTags;
+  AbilityTag SystemTags;
   [field:SerializeField]
   public AbilityTag Tags { get; private set; }
   public List<SimpleAbility> Abilities;
 
   void OnDestroy() {
-    Abilities.ForEach(Stop);
+    Abilities.ForEach(a => a.Stop());
   }
 
   void FixedUpdate() {
-    Tags = NextTags | TagsWhere(a => a.IsRunning);
-    NextTags = default;
+    SystemTags = NextSystemTags;
+    Tags = SystemTags | AbilityOwnerTagsWhere(a => a.IsRunning);
   }
 
   public void AddTag(AbilityTag tag) {
-    NextTags |= tag;
+    NextSystemTags |= tag;
+  }
+
+  public void RemoveTag(AbilityTag tag) {
+    NextSystemTags.ClearFlags(tag);
   }
 
   public bool TryRun(AbilityAction action) {
@@ -32,7 +37,7 @@ public class SimpleAbilityManager : MonoBehaviour {
 
   public bool CanRun(AbilityAction action) {
     var predicateSatisfied = action.CanRun;
-    var ownerTagsAfterCancelations = TagsWhere(a => a.IsRunning && IsCancellable(action, a));
+    var ownerTagsAfterCancelations = SystemTags | AbilityOwnerTagsWhere(a => a.IsRunning && !IsCancellable(action, a));
     var ownerAllowed = ownerTagsAfterCancelations.HasAllFlags(action.OwnerActivationRequired);
     var ownerBlocked = ownerTagsAfterCancelations.HasAnyFlags(action.OwnerActivationBlocked);
     var abilityBlocked = Abilities.Any(a => a.IsRunning && !IsCancellable(action, a) && IsBlocked(action, a));
@@ -42,17 +47,9 @@ public class SimpleAbilityManager : MonoBehaviour {
   public void Run(AbilityAction action) {
     foreach (var ability in Abilities) {
       if (ability.IsRunning && IsCancellable(action, ability))
-        Stop(ability);
+        ability.Stop();
     }
-    action.Ability.Tags.AddFlags(action.AddToAbility);
-    action.Source.Fire();
-  }
-
-  public void Stop(SimpleAbility ability) {
-    if (ability.IsRunning) {
-      ability.Tags = default;
-      ability.Stop();
-    }
+    action.Fire();
   }
 
   bool IsCancellable(AbilityAction action, SimpleAbility ability) {
@@ -63,13 +60,11 @@ public class SimpleAbilityManager : MonoBehaviour {
     return ability.BlockActionsWith.HasAnyFlags(action.Tags);
   }
 
-  AbilityTag TagsWhere(Predicate<SimpleAbility> predicate) {
+  AbilityTag AbilityOwnerTagsWhere(Predicate<SimpleAbility> predicate) {
     AbilityTag tag = default;
-    foreach (var ability in Abilities) {
+    foreach (var ability in Abilities)
       if (predicate(ability))
-        continue;
-      tag |= ability.AddedToOwner;
-    }
+        tag |= ability.AddedToOwner;
     return tag;
   }
 }

@@ -7,9 +7,7 @@ public class SprintAbility : SimpleAbility {
   [SerializeField] float MoveSpeedBonus = 6;
 
   void Awake() {
-    Sprint.Ability = this;
-    Sprint.CanRun = true;
-    Sprint.Source.Listen(Main);
+    Sprint.Listen(Main);
   }
 
   void Main() {

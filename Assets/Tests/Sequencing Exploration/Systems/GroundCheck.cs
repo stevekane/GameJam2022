@@ -41,6 +41,8 @@ public class GroundCheck : MonoBehaviour {
     if (isGrounded) {
       SimpleAbilityManager.AddTag(AbilityTag.CanJump);
       SimpleAbilityManager.AddTag(AbilityTag.Grounded);
+    } else {
+      SimpleAbilityManager.RemoveTag(AbilityTag.Grounded);
     }
     IsGrounded = isGrounded;
     GroundDistance = didHit ? Hit.distance : float.MaxValue;

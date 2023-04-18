@@ -11,9 +11,7 @@ public class JumpAbility : SimpleAbility {
   [SerializeField] float JumpStrength;
 
   void Awake() {
-    Jump.Ability = this;
-    Jump.CanRun = true;
-    Jump.Source.Listen(Main);
+    Jump.Listen(Main);
   }
 
   void Main() {

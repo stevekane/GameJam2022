@@ -12,14 +12,11 @@ public class DoubleJumpAbility : SimpleAbility {
   [SerializeField] Animator Animator;
 
   void Awake() {
-    Jump.Ability = this;
-    Jump.CanRun = true;
-    Jump.Source.Listen(Main);
+    Jump.Listen(Main);
   }
 
   void Main() {
-    Debug.LogWarning("Double jump previously clears AbilityTag.CanJump");
-    // SimpleAbilityManager.Tags.Current.ClearFlags(AbilityTag.CanJump);
+    SimpleAbilityManager.RemoveTag(AbilityTag.CanJump);
     Animator.SetTrigger("Jump");
     AudioSource.PlayOneShot(SFX);
     PhysicsMotion.OverrideVelocityY(JumpStrength, 1);

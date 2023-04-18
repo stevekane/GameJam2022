@@ -11,9 +11,7 @@ public class LocomotionAbility : SimpleAbilityVector3 {
   public AbilityAction Move;
 
   void Awake() {
-    Move.Ability = this;
-    Move.CanRun = true;
-    Move.Source.Listen(Main);
+    Move.Listen(Main);
   }
 
   void Main() {
