@@ -3,7 +3,7 @@ using System;
 [Serializable]
 public class AbilityMethodBinding {
   public AbilityMethodReference Method;
-  public AbilityManager AbilityManager;
+  public SimpleAbilityManager AbilityManager;
   public SampleAction Action;
   public void Update() {
     Action.Satisfied = AbilityManager.CanInvoke(Method.GetMethod());

@@ -198,6 +198,94 @@ public partial class @CharacterInputActions : IInputActionCollection2, IDisposab
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Interaction"",
+            ""id"": ""e904f185-15c5-4b15-af0d-05663cb3124b"",
+            ""actions"": [
+                {
+                    ""name"": ""Interact"",
+                    ""type"": ""Button"",
+                    ""id"": ""fa786301-a28b-4c28-9e67-09d58f3e0ec8"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Rotate"",
+                    ""type"": ""Button"",
+                    ""id"": ""c9e0a1d0-3dda-44a9-998c-ddd142030999"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Cancel"",
+                    ""type"": ""Button"",
+                    ""id"": ""92f1caad-b7a7-41df-8d82-e2891bca4c94"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Confirm"",
+                    ""type"": ""Button"",
+                    ""id"": ""c0379cf5-e091-4544-84b2-0b847111b7aa"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""0db82c5f-de52-4ab6-8a6a-a82ce11f357f"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1cf2e1fc-ff31-47df-b605-5a96b059670e"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Rotate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2761bc02-26bd-4a78-afb4-f0c4b57cb850"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Cancel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""39096aa0-36a4-46c2-9d3e-87dd7cabeb46"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Confirm"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -214,6 +302,12 @@ public partial class @CharacterInputActions : IInputActionCollection2, IDisposab
         m_Air = asset.FindActionMap("Air", throwIfNotFound: true);
         m_Air_Steer = m_Air.FindAction("Steer", throwIfNotFound: true);
         m_Air_Jump = m_Air.FindAction("Jump", throwIfNotFound: true);
+        // Interaction
+        m_Interaction = asset.FindActionMap("Interaction", throwIfNotFound: true);
+        m_Interaction_Interact = m_Interaction.FindAction("Interact", throwIfNotFound: true);
+        m_Interaction_Rotate = m_Interaction.FindAction("Rotate", throwIfNotFound: true);
+        m_Interaction_Cancel = m_Interaction.FindAction("Cancel", throwIfNotFound: true);
+        m_Interaction_Confirm = m_Interaction.FindAction("Confirm", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -383,6 +477,63 @@ public partial class @CharacterInputActions : IInputActionCollection2, IDisposab
         }
     }
     public AirActions @Air => new AirActions(this);
+
+    // Interaction
+    private readonly InputActionMap m_Interaction;
+    private IInteractionActions m_InteractionActionsCallbackInterface;
+    private readonly InputAction m_Interaction_Interact;
+    private readonly InputAction m_Interaction_Rotate;
+    private readonly InputAction m_Interaction_Cancel;
+    private readonly InputAction m_Interaction_Confirm;
+    public struct InteractionActions
+    {
+        private @CharacterInputActions m_Wrapper;
+        public InteractionActions(@CharacterInputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Interact => m_Wrapper.m_Interaction_Interact;
+        public InputAction @Rotate => m_Wrapper.m_Interaction_Rotate;
+        public InputAction @Cancel => m_Wrapper.m_Interaction_Cancel;
+        public InputAction @Confirm => m_Wrapper.m_Interaction_Confirm;
+        public InputActionMap Get() { return m_Wrapper.m_Interaction; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(InteractionActions set) { return set.Get(); }
+        public void SetCallbacks(IInteractionActions instance)
+        {
+            if (m_Wrapper.m_InteractionActionsCallbackInterface != null)
+            {
+                @Interact.started -= m_Wrapper.m_InteractionActionsCallbackInterface.OnInteract;
+                @Interact.performed -= m_Wrapper.m_InteractionActionsCallbackInterface.OnInteract;
+                @Interact.canceled -= m_Wrapper.m_InteractionActionsCallbackInterface.OnInteract;
+                @Rotate.started -= m_Wrapper.m_InteractionActionsCallbackInterface.OnRotate;
+                @Rotate.performed -= m_Wrapper.m_InteractionActionsCallbackInterface.OnRotate;
+                @Rotate.canceled -= m_Wrapper.m_InteractionActionsCallbackInterface.OnRotate;
+                @Cancel.started -= m_Wrapper.m_InteractionActionsCallbackInterface.OnCancel;
+                @Cancel.performed -= m_Wrapper.m_InteractionActionsCallbackInterface.OnCancel;
+                @Cancel.canceled -= m_Wrapper.m_InteractionActionsCallbackInterface.OnCancel;
+                @Confirm.started -= m_Wrapper.m_InteractionActionsCallbackInterface.OnConfirm;
+                @Confirm.performed -= m_Wrapper.m_InteractionActionsCallbackInterface.OnConfirm;
+                @Confirm.canceled -= m_Wrapper.m_InteractionActionsCallbackInterface.OnConfirm;
+            }
+            m_Wrapper.m_InteractionActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @Interact.started += instance.OnInteract;
+                @Interact.performed += instance.OnInteract;
+                @Interact.canceled += instance.OnInteract;
+                @Rotate.started += instance.OnRotate;
+                @Rotate.performed += instance.OnRotate;
+                @Rotate.canceled += instance.OnRotate;
+                @Cancel.started += instance.OnCancel;
+                @Cancel.performed += instance.OnCancel;
+                @Cancel.canceled += instance.OnCancel;
+                @Confirm.started += instance.OnConfirm;
+                @Confirm.performed += instance.OnConfirm;
+                @Confirm.canceled += instance.OnConfirm;
+            }
+        }
+    }
+    public InteractionActions @Interaction => new InteractionActions(this);
     public interface IGroundedActions
     {
         void OnRun(InputAction.CallbackContext context);
@@ -396,5 +547,12 @@ public partial class @CharacterInputActions : IInputActionCollection2, IDisposab
     {
         void OnSteer(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
+    }
+    public interface IInteractionActions
+    {
+        void OnInteract(InputAction.CallbackContext context);
+        void OnRotate(InputAction.CallbackContext context);
+        void OnCancel(InputAction.CallbackContext context);
+        void OnConfirm(InputAction.CallbackContext context);
     }
 }

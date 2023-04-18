@@ -8,7 +8,7 @@ public class AblityMethodActionBinding : MonoBehaviour {
 
   void Start() {
     AbilityMethodBinding = new() {
-      AbilityManager = GetComponentInParent<AbilityManager>(),
+      AbilityManager = GetComponentInParent<SimpleAbilityManager>(),
       Action = Action,
       Method = Method,
     };

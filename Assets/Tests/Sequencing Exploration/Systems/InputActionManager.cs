@@ -12,6 +12,7 @@ public class InputActionManager : MonoBehaviour {
   [SerializeField] SprintAbility Sprint;
   [SerializeField] MeleeAttackAbility LightAttack;
   [SerializeField] MeleeAttackAbility HeavyAttack;
+  [SerializeField] SimpleInteractAbility Interact;
 
   [Header("Airborne")]
   [SerializeField] DoubleJumpAbility DoubleJump;
@@ -39,6 +40,10 @@ public class InputActionManager : MonoBehaviour {
     Inputs.Grounded.LightAttack.SetEnabled(AbilityManager.CanRun(LightAttack.Main));
     Inputs.Grounded.HeavyAttack.SetEnabled(AbilityManager.CanRun(HeavyAttack.Main));
     Inputs.Air.Jump.SetEnabled(AbilityManager.CanRun(DoubleJump.Jump));
+    Inputs.Interaction.Interact.SetEnabled(AbilityManager.CanRun(Interact.Main));
+    Inputs.Interaction.Rotate.SetEnabled(AbilityManager.CanRun(Interact.Rotate));
+    Inputs.Interaction.Confirm.SetEnabled(AbilityManager.CanRun(Interact.Confirm));
+    Inputs.Interaction.Cancel.SetEnabled(AbilityManager.CanRun(Interact.Cancel));
     if (Inputs.Grounded.Run.enabled) {
       Locomotion.Value = PersonalCamera.CameraScreenToWorldXZ(Inputs.Grounded.Run.ReadValue<Vector2>());
       AbilityManager.Run(Locomotion.Move);
@@ -58,5 +63,13 @@ public class InputActionManager : MonoBehaviour {
       AbilityManager.Run(HeavyAttack.Main);
     if (Inputs.Air.Jump.WasPerformedThisFrame())
       AbilityManager.Run(DoubleJump.Jump);
+    if (Inputs.Interaction.Interact.WasPerformedThisFrame())
+      AbilityManager.Run(Interact.Main);
+    if (Inputs.Interaction.Rotate.WasPerformedThisFrame())
+      AbilityManager.Run(Interact.Rotate);
+    if (Inputs.Interaction.Confirm.WasPerformedThisFrame())
+      AbilityManager.Run(Interact.Confirm);
+    if (Inputs.Interaction.Cancel.WasPerformedThisFrame())
+      AbilityManager.Run(Interact.Cancel);
   }
 }

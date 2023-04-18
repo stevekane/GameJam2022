@@ -9,7 +9,7 @@ public class DefaultAbilityMethodActionBindings : MonoBehaviour {
 
   void Start() {
     var ability = GetComponent<Ability>();
-    var abilityManager = GetComponentInParent<AbilityManager>();
+    var abilityManager = GetComponentInParent<SimpleAbilityManager>();
     var inputManager = GetComponentInParent<InputManager>();
     MainMethodBinding = new();
     MainMethodBinding.AbilityManager = abilityManager;
