@@ -16,11 +16,11 @@ public abstract class SimpleAbility : MonoBehaviour {
 
   void OnEnable() {
     SimpleAbilityManager = GetComponentInParent<SimpleAbilityManager>();
-    SimpleAbilityManager.Abilities.Add(this);
+    SimpleAbilityManager.AddAbility(this);
   }
 
   void OnDisable() {
-    SimpleAbilityManager.Abilities.Remove(this);
+    SimpleAbilityManager.RemoveAbility(this);
   }
 }
 
