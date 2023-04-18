@@ -2,21 +2,15 @@ using UnityEngine;
 
 [DefaultExecutionOrder(ScriptExecutionGroups.Ability)]
 public abstract class SimpleAbility : MonoBehaviour {
-  public SimpleTags SimpleTags { get; private set; }
-  public Tags Tags { get; private set; }
-  public Condition[] Conditions { get; private set; }
+  public AbilityTag Tags;
+  public AbilityTag BlockActionsWith;
+  public AbilityTag AddedToOwner;
   public SimpleAbilityManager SimpleAbilityManager { get; private set; }
   [field:SerializeField]
   public virtual bool IsRunning { get; set; }
-  public void Run() => SimpleAbilityManager.Run(this);
-  public void Stop() => SimpleAbilityManager.Stop(this);
-  public virtual void OnRun() {}
-  public virtual void OnStop() {}
+  public virtual void Stop() {}
 
   void OnEnable() {
-    SimpleTags = GetComponent<SimpleTags>();
-    Tags = GetComponent<Tags>();
-    Conditions = GetComponents<Condition>();
     SimpleAbilityManager = GetComponentInParent<SimpleAbilityManager>();
     SimpleAbilityManager.Abilities.Add(this);
   }
