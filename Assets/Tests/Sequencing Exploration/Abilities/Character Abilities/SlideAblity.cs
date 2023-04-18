@@ -7,18 +7,14 @@ public class SlideAblity : ClassicAbility {
   [SerializeField] DirectMotion DirectMotion;
   [SerializeField] float Distance = 10;
 
-  float Duration;
-
-  void FixedUpdate() {
-    if (!IsRunning)
-      return;
-    var velocity = (Distance / Duration) * transform.forward;
-    DirectMotion.IsActive(true, 1);
-    DirectMotion.Override(velocity, 1);
-  }
-
   public override async Task MainAction(TaskScope scope) {
-    Duration = (float)(TimelineTaskConfig.Asset.TickDuration(Timeval.FixedUpdatePerSecond)+1);
-    await LogicalTimeline.Play(scope, TimelineTaskConfig);
+    var duration = (float)(TimelineTaskConfig.Asset.TickDuration(Timeval.FixedUpdatePerSecond)+1);
+    var velocity = (Distance / duration) * transform.forward;
+    await scope.Any(
+      s => LogicalTimeline.Play(s, TimelineTaskConfig),
+      Waiter.Repeat(delegate {
+        DirectMotion.IsActive(true, 1);
+        DirectMotion.Override(velocity, 1);
+      }));
   }
 }
