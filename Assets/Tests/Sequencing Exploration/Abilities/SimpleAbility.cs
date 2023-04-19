@@ -15,14 +15,15 @@ public abstract class SimpleAbility : MonoBehaviour {
 
   protected SimpleAbilityManager AbilityManager;
 
-  void Start() {
+  void OnEnable() {
     AbilityManager = GetComponentInParent<SimpleAbilityManager>();
     AbilityManager.AddAbility(this);
   }
 
-  void OnDestroy() {
+  void OnDisable() {
     AbilityManager = GetComponentInParent<SimpleAbilityManager>();
-    AbilityManager.RemoveAbility(this);
+    if (AbilityManager)
+      AbilityManager.RemoveAbility(this);
   }
 }
 

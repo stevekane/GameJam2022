@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [DefaultExecutionOrder(ScriptExecutionGroups.Input)]
 public class InputActionManager : MonoBehaviour {
@@ -34,16 +37,16 @@ public class InputActionManager : MonoBehaviour {
 
   void FixedUpdate() {
     Inputs.Grounded.Run.SetEnabled(AbilityManager.CanRun(Locomotion.Move));
-    Inputs.Grounded.Jump.SetEnabled(AbilityManager.CanRun(Jump.Jump));
-    Inputs.Grounded.Slide.SetEnabled(AbilityManager.CanRun(Slide.Main));
-    Inputs.Grounded.Sprint.SetEnabled(AbilityManager.CanRun(Sprint.Sprint));
-    Inputs.Grounded.LightAttack.SetEnabled(AbilityManager.CanRun(LightAttack.Main));
-    Inputs.Grounded.HeavyAttack.SetEnabled(AbilityManager.CanRun(HeavyAttack.Main));
-    Inputs.Air.Jump.SetEnabled(AbilityManager.CanRun(DoubleJump.Jump));
-    Inputs.Interaction.Interact.SetEnabled(AbilityManager.CanRun(Interact.Main));
-    Inputs.Interaction.Rotate.SetEnabled(AbilityManager.CanRun(Interact.Rotate));
-    Inputs.Interaction.Confirm.SetEnabled(AbilityManager.CanRun(Interact.Confirm));
-    Inputs.Interaction.Cancel.SetEnabled(AbilityManager.CanRun(Interact.Cancel));
+    // Inputs.Grounded.Jump.SetEnabled(AbilityManager.CanRun(Jump.Jump) && !AbilityManager.CanRun(Interact.Confirm));
+    // Inputs.Grounded.Slide.SetEnabled(AbilityManager.CanRun(Slide.Main));
+    // Inputs.Grounded.Sprint.SetEnabled(AbilityManager.CanRun(Sprint.Sprint));
+    // Inputs.Grounded.LightAttack.SetEnabled(AbilityManager.CanRun(LightAttack.Main) && !AbilityManager.CanRun(Interact.Rotate));
+    // Inputs.Grounded.HeavyAttack.SetEnabled(AbilityManager.CanRun(HeavyAttack.Main) && !AbilityManager.CanRun(Interact.Main));
+    // Inputs.Air.Jump.SetEnabled(AbilityManager.CanRun(DoubleJump.Jump));
+    // Inputs.Interaction.Interact.SetEnabled(AbilityManager.CanRun(Interact.Main));
+    // Inputs.Interaction.Rotate.SetEnabled(AbilityManager.CanRun(Interact.Rotate));
+    // Inputs.Interaction.Confirm.SetEnabled(AbilityManager.CanRun(Interact.Confirm));
+    // Inputs.Interaction.Cancel.SetEnabled(AbilityManager.CanRun(Interact.Cancel));
     if (Inputs.Grounded.Run.enabled) {
       Locomotion.Value = PersonalCamera.CameraScreenToWorldXZ(Inputs.Grounded.Run.ReadValue<Vector2>());
       AbilityManager.Run(Locomotion.Move);
