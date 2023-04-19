@@ -16,7 +16,7 @@ public class DoubleJumpAbility : SimpleAbility {
   }
 
   void Main() {
-    SimpleAbilityManager.RemoveTag(AbilityTag.CanJump);
+    AbilityManager.RemoveTag(AbilityTag.CanJump);
     Animator.SetTrigger("Jump");
     AudioSource.PlayOneShot(SFX);
     PhysicsMotion.OverrideVelocityY(JumpStrength, 1);

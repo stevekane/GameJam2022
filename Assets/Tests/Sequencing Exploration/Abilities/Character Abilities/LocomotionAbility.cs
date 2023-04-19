@@ -16,7 +16,7 @@ public class LocomotionAbility : SimpleAbilityVector3 {
 
   void Main() {
     if (Value.sqrMagnitude > 0) {
-      SimpleAbilityManager.transform.rotation = Quaternion.LookRotation(Value);
+      AbilityManager.transform.rotation = Quaternion.LookRotation(Value);
     }
     var currentVelocity = PhysicsMotion.PhysicsVelocity.XZ();
     var desiredVelocity = MovementSpeed.Value * Value.normalized;

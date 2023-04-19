@@ -5,7 +5,6 @@ public abstract class SimpleAbility : MonoBehaviour {
   public AbilityTag BlockActionsWith;
   public AbilityTag Tags;
   public AbilityTag AddedToOwner;
-  public SimpleAbilityManager SimpleAbilityManager { get; private set; }
   [field:SerializeField]
   public virtual bool IsRunning { get; set; }
   public virtual void Stop() {
@@ -14,13 +13,17 @@ public abstract class SimpleAbility : MonoBehaviour {
     IsRunning = false;
   }
 
+  protected SimpleAbilityManager AbilityManager;
+
   void OnEnable() {
-    SimpleAbilityManager = GetComponentInParent<SimpleAbilityManager>();
-    SimpleAbilityManager.AddAbility(this);
+    AbilityManager = GetComponentInParent<SimpleAbilityManager>();
+    AbilityManager.AddAbility(this);
   }
 
   void OnDisable() {
-    SimpleAbilityManager.RemoveAbility(this);
+    AbilityManager = GetComponentInParent<SimpleAbilityManager>();
+    if (AbilityManager)
+      AbilityManager.RemoveAbility(this);
   }
 }
 

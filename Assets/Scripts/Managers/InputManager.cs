@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 public enum ButtonPressType {
   JustDown,
   Down,
-  JustUp
+  JustUp,
 }
 
 // TODO: Maybe don't need/want these? Maybe just use strings

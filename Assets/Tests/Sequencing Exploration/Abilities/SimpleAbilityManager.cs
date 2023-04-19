@@ -7,7 +7,7 @@ using UnityEngine;
 public class SimpleAbilityManager : MonoBehaviour {
   AbilityTag NextSystemTags;
   AbilityTag SystemTags;
-  List<SimpleAbility> Abilities;
+  List<SimpleAbility> Abilities = new();
 
   [field:SerializeField]
   public AbilityTag Tags { get; private set; }
@@ -16,7 +16,10 @@ public class SimpleAbilityManager : MonoBehaviour {
   public void RemoveTag(AbilityTag tag) => NextSystemTags.ClearFlags(tag);
 
   public void AddAbility(SimpleAbility ability) => Abilities.Add(ability);
-  public void RemoveAbility(SimpleAbility ability) => Abilities.Remove(ability);
+  public void RemoveAbility(SimpleAbility ability) {
+    ability.Stop();
+    Abilities.Remove(ability);
+  }
 
   public bool CanRun(AbilityAction action) {
     var predicateSatisfied = action.CanRun;
