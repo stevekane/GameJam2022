@@ -27,9 +27,10 @@ public class Crafter : MonoBehaviour {
   public Vector2Int OutputPortCell =>
     BuildGrid.WorldToGrid(transform.position + transform.rotation*new Vector3(0f, 0f, BuildGrid.GetBottomLeftOffset(BuildObject.Size).y + 1f));
 
-  public void SetOutputRequest(ItemInfo item, int amount) {
-    OutputRequests[item] = amount;
-  }
+  public int GetInputQueue(ItemInfo item) => InputQueue.GetValueOrDefault(item);
+  public int GetOutputQueue(ItemInfo item) => OutputQueue.GetValueOrDefault(item);
+  public int GetOutputRequests(ItemInfo item) => OutputRequests.GetValueOrDefault(item);
+  public void SetOutputRequest(ItemInfo item, int amount) => OutputRequests[item] = amount;
 
   // Adds an item to the input queue, which could possibly trigger a craft.
   public void InsertInput(ItemInfo item) {
@@ -73,18 +74,18 @@ public class Crafter : MonoBehaviour {
       if (OutputQueue.GetValueOrDefault(item) == 0) {
         Animator.SetBool("Crafting", true);
         CraftDisplayObject = recipe.Outputs[0].Item.Spawn(transform.position + 3f*Vector3.up);
+        await scope.Seconds(recipe.CraftTime);
         foreach (var input in recipe.Inputs) {
           Debug.Assert(InputQueue[input.Item] > 0);
           InputQueue[input.Item] -= input.Count;
         }
-        await scope.Seconds(recipe.CraftTime);
         foreach (var output in recipe.Outputs)
           OutputQueue[output.Item] = OutputQueue.GetValueOrDefault(output.Item) + output.Count;
       }
       finished = true;
     } finally {
-      Animator.SetBool("Crafting", false);
       CraftDisplayObject?.gameObject.Destroy();
+      Animator?.SetBool("Crafting", false);
       CraftTask = null;
       if (finished)
         ItemFlowManager.Instance.OnOutputReady(this, recipe, item);

@@ -35,6 +35,18 @@ public class RadialMenuUI : MonoBehaviour {
     }
   }
 
+  public int GetSelectedFromAim(Vector3 dir, int numChoices) {
+    if (dir == Vector3.zero)
+      return -1;
+    var angle = Vector3.SignedAngle(Vector3.forward, dir, Vector3.up);
+    if (numChoices > 1)
+      angle += 90f / (numChoices-1);  // Offset the start region for the choices by the width of the region
+    var frac = (1f + angle/360f) % 1f;
+    var idx = (int)(frac * numChoices);
+    return idx;
+  }
+
+
   public void Hide() {
     Canvas.SetActive(false);
     IsShowing = false;
