@@ -20,9 +20,12 @@ public class ItemFlowManager : MonoBehaviour {
 
   List<ItemFlow> Items = new();
   CraftSolver CraftSolver = new();
+  bool Dirty = true;
 
   public void OnBuildingsChanged() {
+    Dirty = true;
     CraftSolver.OnBuildingsChanged();
+    // TODO: need to update Items to take into account the new graph structure.
     Items.ForEach(i => i.Object.gameObject.Destroy());
     Items = new();
   }
@@ -149,6 +152,13 @@ public class ItemFlowManager : MonoBehaviour {
   }
 
   void FixedUpdate() {
+    if (Dirty) {
+      Dirty = false;
+      var plots = FindObjectsOfType<BuildPlot>();
+      foreach (var plot in plots) {
+        plot.TryConstruct();
+      }
+    }
     MoveItems();
   }
 

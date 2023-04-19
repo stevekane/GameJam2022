@@ -7,6 +7,8 @@ public class BuildObject : MonoBehaviour {
   public string Name;
   public Vector2Int Size;
   public bool CanPlaceMultiple = false;
+  public BuildPlot BuildPlot;
+  public Recipe BuildRecipe;
   public AssetReference Asset;
 
   class Serialized : ISerializeableAsset {
@@ -19,6 +21,15 @@ public class BuildObject : MonoBehaviour {
   }
   public ISerializeableAsset Save() {
     return new Serialized { Asset = Asset, Position = transform.position, Rotation = transform.rotation };
+  }
+
+  public BuildObject Construct(Vector3 position, Quaternion rotation) {
+    if (BuildPlot && BuildRecipe) {
+      var plot = Instantiate(BuildPlot, position, rotation);
+      plot.BuildRecipe = BuildRecipe;
+      return plot.GetComponent<BuildObject>();
+    }
+    return Instantiate(this, position, rotation);
   }
 
   void Awake() {

@@ -88,8 +88,17 @@ public class Crafter : MonoBehaviour {
       Animator?.SetBool("Crafting", false);
       CraftTask = null;
       if (finished)
-        ItemFlowManager.Instance.OnOutputReady(this, recipe, item);
+        OnCraftFinished(recipe, item);
     }
+  }
+
+  void OnCraftFinished(Recipe recipe, ItemInfo item) {
+    if (GetComponent<BuildPlot>() != null) {
+      item.Spawn(transform.position, transform.rotation);
+      gameObject.Destroy();
+      return;
+    }
+    ItemFlowManager.Instance.OnOutputReady(this, recipe, item);
   }
 
   public IEnumerable<(Crafter, Vector2Int)> FindConnectedCrafters() {

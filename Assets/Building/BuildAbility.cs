@@ -43,9 +43,11 @@ public class BuildAbility : Ability {
         IndicatorInstance = debugThing;
       } else {
         IndicatorInstance = Instantiate(BuildPrefab, buildTarget, Quaternion.identity).gameObject;
+        IndicatorInstance.GetComponent<BuildObject>().enabled = false;
+        if (IndicatorInstance.TryGetComponent(out Crafter crafter))
+          crafter.enabled = false;
         ApplyGhostMaterial(IndicatorInstance);
       }
-      IndicatorInstance.SetActive(true);
       Vector2Int? lastBuildCell = null;
       var which = await scope.Any(
         WaitForAccept,
@@ -95,10 +97,8 @@ public class BuildAbility : Ability {
         } else {
           //var (bottomLeft, topRight) = BuildGrid.GetBuildingBounds(BuildPrefab, center);
           //Debug.Log($"Placing {BuildPrefab} at {center} tr={GhostInstance.transform.position} bounds={bottomLeft}, {topRight}");
-          var obj = Instantiate(BuildPrefab, IndicatorInstance.transform.position, IndicatorInstance.transform.rotation);
-          obj.gameObject.SetActive(true);
+          BuildPrefab.Construct(IndicatorInstance.transform.position, IndicatorInstance.transform.rotation);
         }
-        //FindObjectsOfType<Machine>().ForEach(m => m.UpdateOutputCells());
         if (!CanPlaceMultiple)
           break;
         if (IsDeleteMode) {
