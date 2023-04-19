@@ -1,5 +1,4 @@
 using UnityEngine;
-using static UnityEditor.Progress;
 
 [CreateAssetMenu(fileName = "Item", menuName = "Crafting/Item")]
 public class ItemInfo : ScriptableObject {
