@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
+public class AbilityActionFieldReference : FieldReference<SimpleAbility, AbilityAction> {}
+
+[Serializable]
 public struct ButtonEventActionMap {
   public bool Block;
-  public FieldReference<SimpleAbility, AbilityAction> ActionReference;
+  public AbilityActionFieldReference ActionReference;
   public ButtonCode ButtonCode;
   public ButtonPressType ButtonPressType;
 }
