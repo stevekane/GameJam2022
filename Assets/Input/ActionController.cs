@@ -2,12 +2,17 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum ButtonEventFlowBehavior {
+  Pass,
+  Block
+}
+
 [Serializable]
 public class AbilityActionFieldReference : FieldReference<SimpleAbility, AbilityAction> {}
 
 [Serializable]
 public struct ButtonEventActionMap {
-  public bool Block;
+  public ButtonEventFlowBehavior FlowBehavior;
   public AbilityActionFieldReference ActionReference;
   public ButtonCode ButtonCode;
   public ButtonPressType ButtonPressType;
@@ -29,7 +34,7 @@ public class ActionController : MonoBehaviour {
             if (SimpleAbilityManager.CanRun(action)) {
               SimpleAbilityManager.Run(action);
               InputManager.Consume(buttonCode, buttonPressType);
-              if (map.Block)
+              if (map.FlowBehavior.Equals(ButtonEventFlowBehavior.Block))
                 break;
             }
           }

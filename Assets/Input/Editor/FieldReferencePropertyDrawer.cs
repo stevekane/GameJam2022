@@ -11,10 +11,12 @@ public class FieldReferencePropertyDrawer : PropertyDrawer {
     var targetProp = property.FindPropertyRelative("Target");
     var target = targetProp.objectReferenceValue;
     var dropDownText = fieldProp.stringValue == "" ? "Select method" : fieldProp.stringValue;
-    var p1 = new Rect(position); p1.width /= 2;
+    var partWidth = position.width / 2;
+    var p1 = new Rect(position.x, position.y, partWidth, position.height);
+    var p2 = new Rect(position.x + partWidth, position.y, partWidth, position.height);
     var fieldType = property.boxedValue.GetType().GetProperty("Value", BindingFlags.Instance | BindingFlags.Public).PropertyType;
+
     EditorGUI.ObjectField(p1, targetProp, GUIContent.none);
-    var p2 = new Rect(position); p2.width /= 2; p2.x += p2.width;
     if (target && EditorGUI.DropdownButton(p2, new GUIContent(dropDownText), FocusType.Keyboard)) {
       var menu = new GenericMenu();
       var fields = target.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);
@@ -28,7 +30,7 @@ public class FieldReferencePropertyDrawer : PropertyDrawer {
         }
       }
       if (menu.GetItemCount() == 0) {
-        menu.AddDisabledItem(new GUIContent("No valid methods found."), false);
+        menu.AddDisabledItem(new GUIContent("No valid fields found."), false);
       }
       menu.ShowAsContext();
     }
