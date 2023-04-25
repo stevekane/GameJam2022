@@ -1,5 +1,16 @@
 using UnityEngine;
 
+/*
+Describe several ways a character might move:
+
+When on the ground, the character can control its direct motion with the control stick.
+If it stops controlling its direct motion that should be treated as a force affecting
+its current velocity.
+
+How would you describe the total velocity of a character?
+
+*/
+
 public class LocomotionAbility : SimpleAbility {
   [Header("Reads From")]
   [SerializeField] MovementSpeed MovementSpeed;
@@ -18,18 +29,18 @@ public class LocomotionAbility : SimpleAbility {
     if (value.sqrMagnitude > 0) {
       AbilityManager.transform.rotation = Quaternion.LookRotation(value);
     }
-    var currentVelocity = PhysicsMotion.PhysicsVelocity.XZ();
-    var desiredVelocity = MovementSpeed.Value * value.normalized;
-    var deltaVelocity = desiredVelocity - currentVelocity;
-    var requiredForce = deltaVelocity / Time.fixedDeltaTime;
-    var maxForceMagnitude = 2 * MovementSpeed.Value / Time.fixedDeltaTime;
-    var steeringForce = Mathf.Min(maxForceMagnitude, requiredForce.magnitude) * requiredForce.normalized;
-    var velocity = currentVelocity + Time.fixedDeltaTime * steeringForce;
-    // var velocity = MovementSpeed.Value * Value.normalized;
-    // var motion = Time.deltaTime * velocity;
-    // DirectMotion.IsActive(true, 0);
-    // DirectMotion.AddMotion(motion);
-    PhysicsMotion.AddVelocity(Time.fixedDeltaTime * steeringForce);
+    // var currentVelocity = PhysicsMotion.PhysicsVelocity.XZ();
+    // var desiredVelocity = MovementSpeed.Value * value.normalized;
+    // var deltaVelocity = desiredVelocity - currentVelocity;
+    // var requiredForce = deltaVelocity / Time.fixedDeltaTime;
+    // var maxForceMagnitude = 2 * MovementSpeed.Value / Time.fixedDeltaTime;
+    // var steeringForce = Mathf.Min(maxForceMagnitude, requiredForce.magnitude) * requiredForce.normalized;
+    // var velocity = currentVelocity + Time.fixedDeltaTime * steeringForce;
+    // PhysicsMotion.AddVelocity(Time.fixedDeltaTime * steeringForce);
+    var velocity = MovementSpeed.Value * value.normalized;
+    var motion = Time.deltaTime * velocity;
+    DirectMotion.IsActive(true, 0);
+    DirectMotion.AddMotion(motion);
     Animator.SetFloat("Speed", Mathf.Round(velocity.magnitude));
   }
 }
