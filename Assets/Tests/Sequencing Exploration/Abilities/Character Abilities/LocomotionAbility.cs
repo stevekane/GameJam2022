@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class LocomotionAbility : SimpleAbilityVector3 {
+public class LocomotionAbility : SimpleAbility {
   [Header("Reads From")]
   [SerializeField] MovementSpeed MovementSpeed;
   [Header("Writes To")]
@@ -8,18 +8,18 @@ public class LocomotionAbility : SimpleAbilityVector3 {
   [SerializeField] PhysicsMotion PhysicsMotion;
   [SerializeField] Animator Animator;
 
-  public AbilityAction Move;
+  public AbilityAction<Vector3> Move;
 
   void Awake() {
     Move.Listen(Main);
   }
 
-  void Main() {
-    if (Value.sqrMagnitude > 0) {
-      AbilityManager.transform.rotation = Quaternion.LookRotation(Value);
+  void Main(Vector3 value) {
+    if (value.sqrMagnitude > 0) {
+      AbilityManager.transform.rotation = Quaternion.LookRotation(value);
     }
     var currentVelocity = PhysicsMotion.PhysicsVelocity.XZ();
-    var desiredVelocity = MovementSpeed.Value * Value.normalized;
+    var desiredVelocity = MovementSpeed.Value * value.normalized;
     var deltaVelocity = desiredVelocity - currentVelocity;
     var requiredForce = deltaVelocity / Time.fixedDeltaTime;
     var maxForceMagnitude = 2 * MovementSpeed.Value / Time.fixedDeltaTime;

@@ -3,12 +3,12 @@ using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 
-[CustomPropertyDrawer(typeof(ButtonEventActionMap))]
-public class ButtonEventActionMapPropertyDrawer : PropertyDrawer {
+[CustomPropertyDrawer(typeof(AxisEventActionMap))]
+public class AxisEventActionMapPropertyDrawer : PropertyDrawer {
   public override VisualElement CreatePropertyGUI(SerializedProperty property) {
     var container = new VisualElement();
-    var code = new PropertyField(property.FindPropertyRelative("ButtonCode"), "");
-    var type = new PropertyField(property.FindPropertyRelative("ButtonPressType"), "");
+    var code = new PropertyField(property.FindPropertyRelative("AxisCode"), "");
+    var processor = new PropertyField(property.FindPropertyRelative("AxisProcessor"), "");
     var reference = new PropertyField(property.FindPropertyRelative("ActionReference"), "");
     var flow = new PropertyField(property.FindPropertyRelative("FlowBehavior"), "");
 
@@ -24,20 +24,20 @@ public class ButtonEventActionMapPropertyDrawer : PropertyDrawer {
     code.style.flexGrow = 1;
     code.style.flexShrink = 1;
 
-    type.style.flexBasis = 0;
-    type.style.flexGrow = 1;
-    type.style.flexShrink = 1;
-
-    reference.style.flexBasis = 0;
-    reference.style.flexGrow = 2;
-    reference.style.flexShrink = 2;
+    processor.style.flexBasis = 0;
+    processor.style.flexGrow = 1;
+    processor.style.flexShrink = 1;
 
     flow.style.flexBasis = 0;
     flow.style.flexGrow = 1;
     flow.style.flexShrink = 1;
 
+    reference.style.flexBasis = 0;
+    reference.style.flexGrow = 2;
+    reference.style.flexShrink = 2;
+
     container.Add(code);
-    container.Add(type);
+    container.Add(processor);
     container.Add(reference);
     container.Add(flow);
 

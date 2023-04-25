@@ -14,7 +14,8 @@ public class FieldReferencePropertyDrawer : PropertyDrawer {
     var partWidth = position.width / 2;
     var p1 = new Rect(position.x, position.y, partWidth, position.height);
     var p2 = new Rect(position.x + partWidth, position.y, partWidth, position.height);
-    var fieldType = property.boxedValue.GetType().GetProperty("Value", BindingFlags.Instance | BindingFlags.Public).PropertyType;
+    var flags = BindingFlags.Instance | BindingFlags.Public;
+    var fieldType = property.boxedValue.GetType().GetProperty("Value", flags).PropertyType;
 
     EditorGUI.ObjectField(p1, targetProp, GUIContent.none);
     if (target && EditorGUI.DropdownButton(p2, new GUIContent(dropDownText), FocusType.Keyboard)) {

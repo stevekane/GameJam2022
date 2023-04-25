@@ -30,11 +30,27 @@ public class SimpleAbilityManager : MonoBehaviour {
     return predicateSatisfied && ownerAllowed && !ownerBlocked && !abilityBlocked;
   }
 
+  public bool CanRun<T>(AbilityAction<T> action) {
+    var predicateSatisfied = action.CanRun;
+    var ownerTagsAfterCancelations = AbilityOwnerTagsWhere(a => a.IsRunning && !IsCancellable(action, a), SystemTags);
+    var ownerAllowed = ownerTagsAfterCancelations.HasAllFlags(action.OwnerActivationRequired);
+    var ownerBlocked = ownerTagsAfterCancelations.HasAnyFlags(action.OwnerActivationBlocked);
+    var abilityBlocked = Abilities.Any(a => a.IsRunning && !IsCancellable(action, a) && IsBlocked(action, a));
+    return predicateSatisfied && ownerAllowed && !ownerBlocked && !abilityBlocked;
+  }
+
   public void Run(AbilityAction action) {
     foreach (var ability in Abilities)
       if (ability.IsRunning && IsCancellable(action, ability))
         ability.Stop();
     action.Fire();
+  }
+
+  public void Run<T>(AbilityAction<T> action, T t) {
+    foreach (var ability in Abilities)
+      if (ability.IsRunning && IsCancellable(action, ability))
+        ability.Stop();
+    action.Fire(t);
   }
 
   void OnDestroy() => Abilities.ForEach(a => a.Stop());
@@ -48,7 +64,15 @@ public class SimpleAbilityManager : MonoBehaviour {
     return ability.Tags.HasAnyFlags(action.CancelAbilitiesWith);
   }
 
+  bool IsCancellable<T>(AbilityAction<T> action, SimpleAbility ability) {
+    return ability.Tags.HasAnyFlags(action.CancelAbilitiesWith);
+  }
+
   bool IsBlocked(AbilityAction action, SimpleAbility ability) {
+    return ability.BlockActionsWith.HasAnyFlags(action.Tags);
+  }
+
+  bool IsBlocked<T>(AbilityAction<T> action, SimpleAbility ability) {
     return ability.BlockActionsWith.HasAnyFlags(action.Tags);
   }
 
