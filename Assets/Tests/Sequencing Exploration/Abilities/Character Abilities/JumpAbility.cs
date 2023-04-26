@@ -3,12 +3,15 @@ using UnityEngine;
 public class JumpAbility : SimpleAbility {
   public AbilityAction Jump;
 
+  [Header("Reads From")]
+  [SerializeField] Gravity Gravity;
   [SerializeField] AudioClip SFX;
-  [SerializeField] Animator Animator;
-  [SerializeField] PhysicsMotion PhysicsMotion;
+  [SerializeField] float JumpHeight;
+  [Header("Writes To")]
+  [SerializeField] SimpleCharacterController CharacterController;
   [SerializeField] AudioSource AudioSource;
+  [SerializeField] Animator Animator;
   [SerializeField] HitStop HitStop;
-  [SerializeField] float JumpStrength;
 
   void Awake() {
     Jump.Listen(Main);
@@ -17,7 +20,7 @@ public class JumpAbility : SimpleAbility {
   void Main() {
     Animator.SetTrigger("Jump");
     AudioSource.PlayOneShot(SFX);
-    PhysicsMotion.OverrideVelocityY(JumpStrength, 1);
+    CharacterController.PhysicsVelocity.y = Mathf.Sqrt(2 * Mathf.Abs(Gravity.RisingStrength) * JumpHeight);
     HitStop.TicksRemaining = 0;
   }
 }

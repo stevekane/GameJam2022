@@ -4,7 +4,7 @@ using UnityEngine;
 public class SlideAblity : ClassicAbility {
   [SerializeField] LogicalTimeline LogicalTimeline;
   [SerializeField] TimelineTaskConfig TimelineTaskConfig;
-  [SerializeField] DirectMotion DirectMotion;
+  [SerializeField] SimpleCharacterController CharacterController;
   [SerializeField] float Distance = 10;
 
   public override async Task MainAction(TaskScope scope) {
@@ -13,8 +13,7 @@ public class SlideAblity : ClassicAbility {
     await scope.Any(
       s => LogicalTimeline.Play(s, TimelineTaskConfig),
       Waiter.Repeat(delegate {
-        DirectMotion.IsActive(true, 1);
-        DirectMotion.Override(velocity, 1);
+        CharacterController.Move(velocity);
       }));
   }
 }

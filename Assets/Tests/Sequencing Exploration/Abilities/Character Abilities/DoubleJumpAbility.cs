@@ -4,10 +4,11 @@ public class DoubleJumpAbility : SimpleAbility {
   public AbilityAction Jump;
 
   [Header("Reads From")]
+  [SerializeField] Gravity Gravity;
   [SerializeField] AudioClip SFX;
-  [SerializeField] float JumpStrength;
+  [SerializeField] float JumpHeight;
   [Header("Writes To")]
-  [SerializeField] PhysicsMotion PhysicsMotion;
+  [SerializeField] SimpleCharacterController CharacterController;
   [SerializeField] AudioSource AudioSource;
   [SerializeField] Animator Animator;
 
@@ -19,6 +20,6 @@ public class DoubleJumpAbility : SimpleAbility {
     AbilityManager.RemoveTag(AbilityTag.CanJump);
     Animator.SetTrigger("Jump");
     AudioSource.PlayOneShot(SFX);
-    PhysicsMotion.OverrideVelocityY(JumpStrength, 1);
+    CharacterController.PhysicsVelocity.y = Mathf.Sqrt(2 * Mathf.Abs(Gravity.RisingStrength) * JumpHeight);
   }
 }

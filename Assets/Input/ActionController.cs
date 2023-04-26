@@ -14,6 +14,7 @@ public enum AxisProcessor {
 
 [Serializable]
 public class AbilityActionFieldReference : FieldReference<SimpleAbility, AbilityAction> {}
+
 [Serializable]
 public class AbilityActionVector3FieldReference : FieldReference<SimpleAbility, AbilityAction<Vector3>> {}
 

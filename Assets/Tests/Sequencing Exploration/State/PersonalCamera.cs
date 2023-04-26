@@ -11,6 +11,6 @@ public class PersonalCamera : MonoBehaviour {
     var length = v.magnitude;
     var xzWorld = Current.transform.TransformDirection(v);
     xzWorld.y = 0;
-    return length * xzWorld;
+    return length * xzWorld.normalized;
   }
 }
