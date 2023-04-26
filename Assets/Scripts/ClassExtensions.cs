@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.InputSystem;
@@ -17,7 +16,6 @@ public static class AnimationExtensions {
         return false;
       }
     }
-
 }
 
 public static class InputActionExtensions {
@@ -274,5 +272,27 @@ public static class DictionaryExtensions {
     if (!dictionary.TryGetValue(key, out TValue value))
       dictionary.Add(key, value = createFunc());
     return value;
+  }
+}
+
+public static class CameraExtensions {
+  public static Vector2 WorldToGUIPoint(this Camera cam, Vector3 worldPos) {
+    var pos = cam.WorldToScreenPoint(worldPos);
+    return new(pos.x, cam.pixelHeight - pos.y);
+  }
+}
+
+public static class GUIExtensions {
+  public static void DrawLine(Vector2 start, Vector2 end, int width) {
+    Vector2 d = end - start;
+    float a = Mathf.Rad2Deg * Mathf.Atan(d.y / d.x);
+    if (d.x < 0)
+      a += 180;
+
+    int width2 = (int)Mathf.Ceil(width / 2);
+
+    GUIUtility.RotateAroundPivot(a, start);
+    GUI.DrawTexture(new Rect(start.x, start.y - width2, d.magnitude, width), Texture2D.whiteTexture);
+    GUIUtility.RotateAroundPivot(-a, start);
   }
 }

@@ -162,6 +162,26 @@ public class ItemFlowManager : MonoBehaviour {
     MoveItems();
   }
 
+#if UNITY_EDITOR
+  public bool DebugDraw = false;
+  void OnGUI() {
+    if (!DebugDraw)
+      return;
+
+    Vector2 PathPointToGUI(ItemFlow item, int pathIdx) {
+      var worldPos = BuildGrid.GridToWorld(item.Path[pathIdx], item.Object.transform.position.y);
+      return Camera.main.WorldToGUIPoint(worldPos);
+    }
+    foreach (var item in Items) {
+      for (int i = 0; i < item.Path.Count-1; i++) {
+        var startPos = PathPointToGUI(item, i);
+        var endPos = PathPointToGUI(item, i+1);
+        GUIExtensions.DrawLine(startPos, endPos, 3);
+      }
+    }
+  }
+#endif
+
 #if false
   Crafter NewCrafter(Recipe recipe, string name) => NewCrafter(new[] { recipe }, name);
   Crafter NewCrafter(Recipe[] recipes, string name) {
