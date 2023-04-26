@@ -8,7 +8,7 @@ public class MotionWarpingClipEditor : ClipEditor {
     var motionWarpingClip = (MotionWarpingClip)clip.asset;
     var seconds = clip.duration;
     var ticks = Mathf.RoundToInt((float)(Timeval.FixedUpdatePerSecond * seconds));
-    clip.displayName = ticks.ToString();
+    clip.displayName = $"Motion Warp {ticks}";
     motionWarpingClip.Ticks = ticks;
     base.OnClipChanged(clip);
   }

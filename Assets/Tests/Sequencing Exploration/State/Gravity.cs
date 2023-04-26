@@ -5,19 +5,20 @@ public class Gravity : MonoBehaviour {
   [Header("Reads From")]
   [SerializeField] LocalTime LocalTime;
   [SerializeField] GroundCheck GroundCheck;
-  [SerializeField] float RisingStrength;
-  [SerializeField] float FallingStrength;
+
+  public float RisingStrength;
+  public float FallingStrength;
 
   [Header("Writes To")]
-  [SerializeField] PhysicsMotion PhysicsMotion;
+  [SerializeField] SimpleCharacterController CharacterController;
 
   void FixedUpdate() {
-    var strength = PhysicsMotion.PhysicsVelocity.y <= 0 ? FallingStrength : RisingStrength;
+    var strength = CharacterController.PhysicsVelocity.y <= 0 ? FallingStrength : RisingStrength;
     var yVelocity = LocalTime.FixedDeltaTime * strength;
-    if (GroundCheck.IsGrounded) {
-      PhysicsMotion.OverrideVelocityY(yVelocity, 0);
+    if (GroundCheck.IsGrounded && CharacterController.PhysicsVelocity.y < 0) {
+      CharacterController.PhysicsVelocity.y = 0;
     } else {
-      PhysicsMotion.AddVelocity(yVelocity * Vector3.up);
+      CharacterController.ApplyExternalForce(strength * Vector3.up);
     }
   }
 }
