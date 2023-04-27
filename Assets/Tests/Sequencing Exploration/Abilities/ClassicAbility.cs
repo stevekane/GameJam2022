@@ -29,8 +29,9 @@ public abstract class ClassicAbility : SimpleAbility {
       await f(scope);
     } finally {
       RunningTaskCount--;
-      if (RunningTaskCount == 0)
+      if (RunningTaskCount == 0) {
         Stop();
+      }
     }
   };
 

@@ -61,11 +61,11 @@ public class SimpleAbilityManager : MonoBehaviour {
   }
 
   bool IsCancellable(AbilityAction action, SimpleAbility ability) {
-    return ability.Tags.HasAnyFlags(action.CancelAbilitiesWith);
+    return action.CancelAbilitiesWith != default && ability.Tags.HasAllFlags(action.CancelAbilitiesWith);
   }
 
   bool IsCancellable<T>(AbilityAction<T> action, SimpleAbility ability) {
-    return ability.Tags.HasAnyFlags(action.CancelAbilitiesWith);
+    return action.CancelAbilitiesWith != default && ability.Tags.HasAllFlags(action.CancelAbilitiesWith);
   }
 
   bool IsBlocked(AbilityAction action, SimpleAbility ability) {
