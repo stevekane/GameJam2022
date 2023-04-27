@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -68,8 +69,10 @@ public class Crafter : MonoBehaviour {
       CraftTask = TaskScope.StartNew(s => Craft(s, recipeToCraft, itemToOutput));
   }
 
+  // TODO: this is no good for save/load
   async Task Craft(TaskScope scope, Recipe recipe, ItemInfo item) {
     bool finished = false;
+    var isBuildPlot = GetComponent<BuildPlot>();
     try {
       using var disposeTask = CraftTask;
       if (OutputQueue.GetValueOrDefault(item) == 0) {
@@ -83,6 +86,8 @@ public class Crafter : MonoBehaviour {
         foreach (var output in recipe.Outputs)
           OutputQueue[output.Item] = OutputQueue.GetValueOrDefault(output.Item) + output.Count;
       }
+      if (!isBuildPlot)
+        await scope.Until(() => ItemFlowManager.Instance.CanSpawnOutput(item, OutputPortCell));
       finished = true;
     } finally {
       CraftDisplayObject?.gameObject.Destroy();

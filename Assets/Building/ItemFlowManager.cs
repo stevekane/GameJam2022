@@ -76,6 +76,10 @@ public class ItemFlowManager : MonoBehaviour {
     }
   }
 
+  public bool CanSpawnOutput(ItemInfo item, Vector2Int outputCell) {
+    return !IsCellOccupied(outputCell, item);
+  }
+
   public void OnOutputReady(Crafter crafter, Recipe recipe, ItemInfo item) {
     int outputIdx = Array.FindIndex(recipe.Outputs, i => i.Item == item);
     SpawnOutput((crafter, recipe, outputIdx), item);
@@ -93,7 +97,6 @@ public class ItemFlowManager : MonoBehaviour {
 
     var producer = slot.Item1;
     var outputCell = producer.OutputPortCell;
-    //Debug.Assert(!IsCellOccupied(outputCell, item), "Figure out how to handle this case");
     producer.ExtractOutput(item);
 
     var instance = item.Spawn(producer.transform.position);
