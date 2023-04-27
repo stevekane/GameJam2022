@@ -32,7 +32,8 @@ public class BuildObject : MonoBehaviour {
     return Instantiate(this, position, rotation);
   }
 
-  void Awake() {
+  void Start() {
+    SetName();
     BuildObjectManager.Instance.OnBuildObjectCreated(this);
     ItemFlowManager.Instance.OnBuildingsChanged();
   }
@@ -41,7 +42,7 @@ public class BuildObject : MonoBehaviour {
     ItemFlowManager.Instance.OnBuildingsChanged();
   }
 #if UNITY_EDITOR
-  private void Start() {
+  void SetName() {
     // Generate a unique name for debugging purposes.
     var prefix = $"{Asset.editorAsset.name}_";
     var existing = FindObjectsOfType<BuildObject>().Where(bo => bo.gameObject.name.StartsWith(prefix));
@@ -60,5 +61,7 @@ public class BuildObject : MonoBehaviour {
       }
     }
   }
+#else
+  void SetName() { }
 #endif
 }
