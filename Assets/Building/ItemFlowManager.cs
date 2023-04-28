@@ -12,31 +12,60 @@ public class ItemFlowManager : MonoBehaviour {
   class ItemFlow {
     public ItemObject Object;
     public Vector3 NextWorldPos;
+    public CapillaryGroup CapillaryGroup;
     public List<Vector2Int> Path;
     public Slot ConsumerSlot;
 
+    public Vector2Int PrevCell;
     public Vector2Int NextCell => BuildGrid.WorldToGrid(NextWorldPos);
   }
 
   List<ItemFlow> Items = new();
   CraftSolver CraftSolver = new();
-  bool Dirty = true;
+  bool NeedsRebuild = true;
+  bool NeedsSolve = false;
 
-  public void OnBuildingsChanged() {
-    Dirty = true;
-    CraftSolver.OnBuildingsChanged();
-    // TODO: need to update Items to take into account the new graph structure.
-    Items.ForEach(i => i.Object.gameObject.Destroy());
-    Items = new();
-  }
   public void AddCraftRequest(Crafter crafter, Recipe recipe) {
     var slot = (crafter, recipe, 0);
     CraftSolver.AddCraftRequest(slot);
-    CraftSolver.SolveForRequests(Items.Select(i => i.ConsumerSlot));
-    StartCrafting();
+    NeedsSolve = true;
+    Debug.Log($"Add craft: {crafter}, {recipe}");
+  }
+
+  public void OnBuildingsChanged() {
+    Debug.Log($"Buildings Changed");
+    NeedsRebuild = true;
+    NeedsSolve = true;
+  }
+
+  void RebuildGraph() {
+    CraftSolver.OnBuildingsChanged();
+    BuildObjectManager.Instance.MaybeRefresh();
+    List<ItemFlow> ToRemove = new();
+    foreach (var item in Items) {
+      var startCell = item.PrevCell;
+      item.CapillaryGroup =
+        BuildObjectManager.Instance.GetCapillaryGroup(startCell = item.PrevCell) ??
+        BuildObjectManager.Instance.GetCapillaryGroup(startCell = item.NextCell);
+      if (item.CapillaryGroup == null) {
+        Debug.Log($"Item not on cap group anymore: {item.Object.Info.name}");
+        ToRemove.Add(item);
+      } else {
+        if (item.ConsumerSlot.Item1 == null) {
+          // Target consumer was destroyed (or we never had one).
+          item.ConsumerSlot = CraftSolver.FindConsumerRequestingItem(item.CapillaryGroup, item.Object.Info);
+        }
+        item.Path = ComputePath(item.CapillaryGroup, startCell, item.ConsumerSlot);
+        item.NextWorldPos = item.Object.transform.position;
+        AdvanceOnPath(item);
+      }
+    }
+    ToRemove.ForEach(i => { i.Object.gameObject.Destroy(); Items.Remove(i); });
   }
 
   void StartCrafting() {
+    CraftSolver.SolveForRequests(Items.Select(i => i.ConsumerSlot));
+
     // Inform all crafters of the requested amounts first, then have them start outputting. Crafters may have
     // multiple recipes to craft and will be able to prioritize with the full request information.
     foreach (((var crafter, var recipe, var outputIdx), var amount) in CraftSolver.OutputSlotAmounts) {
@@ -45,6 +74,10 @@ public class ItemFlowManager : MonoBehaviour {
     foreach (((var crafter, var recipe, var outputIdx), var amount) in CraftSolver.OutputSlotAmounts) {
       crafter.CheckRequestSatisfied();
     }
+  }
+
+  public bool CanSpawnOutput(ItemInfo item, Vector2Int outputCell) {
+    return !IsCellOccupied(outputCell, item);
   }
 
   public void OnOutputReady(Crafter crafter, Recipe recipe, ItemInfo item) {
@@ -64,15 +97,17 @@ public class ItemFlowManager : MonoBehaviour {
 
     var producer = slot.Item1;
     var outputCell = producer.OutputPortCell;
-    //Debug.Assert(!IsCellOccupied(outputCell, item), "Figure out how to handle this case");
     producer.ExtractOutput(item);
 
     var instance = item.Spawn(producer.transform.position);
     var consumerSlot = CraftSolver.FindConsumerRequestingFromSlot(slot);
+    var capillaryGroup = consumerSlot.Item1 ? CraftSolver.GetCapillaryGroupForInputSlot(consumerSlot) : null;
     var flow = new ItemFlow {
       Object = instance,
-      Path = ComputePath(outputCell, consumerSlot),
+      Path = ComputePath(capillaryGroup, outputCell, consumerSlot),
+      NextWorldPos = instance.transform.position,
       ConsumerSlot = consumerSlot,
+      CapillaryGroup = capillaryGroup,
     };
     AdvanceOnPath(flow);
     Items.Add(flow);
@@ -80,13 +115,15 @@ public class ItemFlowManager : MonoBehaviour {
     producer.CheckRequestSatisfied();
   }
 
-  List<Vector2Int> ComputePath(Vector2Int startCell, Slot consumerSlot) {
-    var consumer = consumerSlot.Item1;
-    if (!consumer)
+  List<Vector2Int> ComputePath(CapillaryGroup capillaryGroup, Vector2Int startCell, Slot consumerSlot) {
+    if (capillaryGroup == null)
       return new() { startCell };
 
+    var consumer = consumerSlot.Item1;
     var destCell = consumer.InputPortCell;
-    var cells = CraftSolver.GetCapillaryGroupForInputSlot(consumerSlot).Cells;
+    var cells = capillaryGroup.Cells;
+    if (!cells.Contains(destCell))
+      return new() { startCell };
     var toVisit = new Queue<Vector2Int>();
     var distance = new Dictionary<Vector2Int, int>();
     var prev = new Dictionary<Vector2Int, Vector2Int>();
@@ -147,20 +184,42 @@ public class ItemFlowManager : MonoBehaviour {
 
   void AdvanceOnPath(ItemFlow item) {
     if (IsCellOccupied(item.Path[0], item.Object.Info)) return;
+    item.PrevCell = item.NextCell;
     item.NextWorldPos = BuildGrid.GridToWorld(item.Path[0], item.Object.transform.position.y);
     item.Path.RemoveAt(0);
   }
 
   void FixedUpdate() {
-    if (Dirty) {
-      Dirty = false;
-      var plots = FindObjectsOfType<BuildPlot>();
-      foreach (var plot in plots) {
-        plot.TryConstruct();
-      }
+    if (NeedsRebuild) {
+      NeedsRebuild = false;
+      RebuildGraph();
+    }
+    if (NeedsSolve) {
+      NeedsSolve = false;
+      StartCrafting();
     }
     MoveItems();
   }
+
+#if UNITY_EDITOR
+  public bool DebugDraw = false;
+  void OnGUI() {
+    if (!DebugDraw)
+      return;
+
+    Vector2 PathPointToGUI(ItemFlow item, int pathIdx) {
+      var worldPos = BuildGrid.GridToWorld(item.Path[pathIdx], item.Object.transform.position.y);
+      return Camera.main.WorldToGUIPoint(worldPos);
+    }
+    foreach (var item in Items) {
+      for (int i = 0; i < item.Path.Count-1; i++) {
+        var startPos = PathPointToGUI(item, i);
+        var endPos = PathPointToGUI(item, i+1);
+        GUIExtensions.DrawLine(startPos, endPos, 3);
+      }
+    }
+  }
+#endif
 
 #if false
   Crafter NewCrafter(Recipe recipe, string name) => NewCrafter(new[] { recipe }, name);

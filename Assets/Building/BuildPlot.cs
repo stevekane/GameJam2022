@@ -7,9 +7,9 @@ using UnityEngine;
 public class BuildPlot : MonoBehaviour {
   // TODO: This doesn't work after loading. Need to store the recipe somewhere.
   public Recipe BuildRecipe { get; set; }
-  public void TryConstruct() {
+  void Start() {
     var crafter = GetComponent<Crafter>();
-    Debug.Assert(crafter.Recipes.Contains(BuildRecipe));
+    Debug.Assert(BuildRecipe && crafter.Recipes.Contains(BuildRecipe));
     ItemFlowManager.Instance.AddCraftRequest(crafter, BuildRecipe);
   }
 }

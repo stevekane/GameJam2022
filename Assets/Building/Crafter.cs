@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UnityEditor;
 using UnityEngine;
 
 [RequireComponent(typeof(BuildObject))]
@@ -22,10 +24,10 @@ public class Crafter : MonoBehaviour {
   // Note: We assume there is only 1 recipe that can produce a given output.
   public Recipe FindRecipeProducing(ItemInfo item) => Recipes.FirstOrDefault(r => r.Outputs.Any(o => o.Item == item));
 
-  public Vector2Int InputPortCell =>
-    BuildGrid.WorldToGrid(transform.position - transform.rotation*new Vector3(0f, 0f, BuildGrid.GetBottomLeftOffset(BuildObject.Size).y + 1f));
-  public Vector2Int OutputPortCell =>
-    BuildGrid.WorldToGrid(transform.position + transform.rotation*new Vector3(0f, 0f, BuildGrid.GetBottomLeftOffset(BuildObject.Size).y + 1f));
+  public Vector2Int InputPortCell => BuildGrid.WorldToGrid(InputPortPos);
+  public Vector2Int OutputPortCell => BuildGrid.WorldToGrid(OutputPortPos);
+  Vector3 InputPortPos => transform.position - transform.rotation*new Vector3(0f, 0f, BuildGrid.GetBottomLeftOffset(BuildObject.Size).y + 1f);
+  Vector3 OutputPortPos => transform.position + transform.rotation*new Vector3(0f, 0f, BuildGrid.GetTopRightOffset(BuildObject.Size).y + 1f);
 
   public int GetInputQueue(ItemInfo item) => InputQueue.GetValueOrDefault(item);
   public int GetOutputQueue(ItemInfo item) => OutputQueue.GetValueOrDefault(item);
@@ -67,8 +69,10 @@ public class Crafter : MonoBehaviour {
       CraftTask = TaskScope.StartNew(s => Craft(s, recipeToCraft, itemToOutput));
   }
 
+  // TODO: this is no good for save/load
   async Task Craft(TaskScope scope, Recipe recipe, ItemInfo item) {
     bool finished = false;
+    var isBuildPlot = GetComponent<BuildPlot>();
     try {
       using var disposeTask = CraftTask;
       if (OutputQueue.GetValueOrDefault(item) == 0) {
@@ -82,6 +86,8 @@ public class Crafter : MonoBehaviour {
         foreach (var output in recipe.Outputs)
           OutputQueue[output.Item] = OutputQueue.GetValueOrDefault(output.Item) + output.Count;
       }
+      if (!isBuildPlot)
+        await scope.Until(() => ItemFlowManager.Instance.CanSpawnOutput(item, OutputPortCell));
       finished = true;
     } finally {
       CraftDisplayObject?.gameObject.Destroy();
@@ -139,7 +145,7 @@ public class Crafter : MonoBehaviour {
     IEnumerable<string> ToList(Dictionary<ItemInfo, int> queue) {
       foreach ((var item, int amount) in queue) {
         if (amount > 0)
-          yield return $"{item}:{amount}";
+          yield return $"{item.name}:{amount}";
       }
     }
     string[] ToArray(Dictionary<ItemInfo, int> queue) => ToList(queue).ToArray();
@@ -148,6 +154,20 @@ public class Crafter : MonoBehaviour {
     DebugRequests = ToArray(OutputRequests);
     //string ToString(Dictionary<ItemInfo, int> queue) => string.Join(",", ToList(queue));
     //DebugUI.Log(this, $"{name}: in={ToString(InputQueue)}, out={ToString(OutputQueue)}, requested={ToString(OutputRequests)}");
+  }
+
+  void OnGUI() {
+    if (!ItemFlowManager.Instance.DebugDraw)
+      return;
+    var style = new GUIStyle() { fontSize = 48 };
+    style.normal.textColor = Color.white;
+    string ToString(string[] list) => string.Join("\n", list);
+    void DrawLabel(Vector3 worldPos, string label) {
+      var pos = Camera.main.WorldToGUIPoint(worldPos);
+      GUI.Label(new Rect(pos.x, pos.y, 100, 100), label, style);
+    }
+    DrawLabel(InputPortPos, ToString(DebugInputs));
+    DrawLabel(OutputPortPos - transform.forward, ToString(DebugRequests));
   }
 #endif
 }

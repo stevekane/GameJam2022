@@ -59,19 +59,41 @@ public class CraftSolver {
     return result.Key;  // can be null
   }
 
+  public Slot FindConsumerRequestingItem(CapillaryGroup group, ItemInfo item) {
+    var result = InputSlotAmounts.FirstOrDefault(
+      kv => kv.Value > 0 &&
+      kv.Key.ItemAsInput() == item &&
+      Edges.Any(e => e.CapillaryGroup == group && e.Item == item && e.Consumers.Contains(kv.Key)));
+    if (result.Value > 0 && --InputSlotAmounts[result.Key] == 0) {
+      InputSlotAmounts.Remove(result.Key);
+    }
+    return result.Key;  // can be null
+  }
+
+
   public void OnBuildingsChanged() {
-    CraftRequests = new();
+    //bool Check(Dictionary<Slot, int> amounts) => amounts?.Any(kvp => kvp.Key.Item1 == null) ?? false;
+    //Check(OutputSlotAmounts);
+    //Check(InputSlotAmounts);
+    //Check(CraftRequests);
+    while (CraftRequests.FirstOrDefault(kvp => kvp.Key.Item1 == null) is var staleRequest && staleRequest.Value > 0) {
+      CraftRequests.Remove(staleRequest.Key);
+    }
+    CreateEdges();
   }
 
   public void AddCraftRequest(Slot slot) {
     CraftRequests[slot] = CraftRequests.GetValueOrDefault(slot) + 1;
-    Profiler.BeginSample("craftflow build graph");
-    CreateEdges();
-    Profiler.EndSample();
+    Edges = null;
   }
 
   public void SolveForRequests(IEnumerable<Slot> itemsInTransit) {
-    Debug.Log($"------------- Version {Microsoft.Z3.Version.FullVersion}");
+    if (Edges == null) {
+      Profiler.BeginSample("craftflow build graph");
+      CreateEdges();
+      Profiler.EndSample();
+    }
+
     ItemsInTransit = new();
     itemsInTransit.ForEach(s => ItemsInTransit[s] = ItemsInTransit.GetValueOrDefault(s) + 1);
     //foreach ((var slot, var amount) in ItemsInTransit) {
@@ -268,7 +290,7 @@ public class CraftSolver {
       AddCraftTimeConstraints(crafter, crafterTime);
     }
 
-    Debug.Log($"Numbers: edges={Edges.Count} crafterRecipes={CrafterRecipes.Count} constraints={solver.Assertions.Length}");
+    //Debug.Log($"Numbers: edges={Edges.Count} crafterRecipes={CrafterRecipes.Count} constraints={solver.Assertions.Length}");
     //foreach (var constraint in solver.Assertions) {
     //  Debug.Log($"Constraint: {constraint}");
     //}
@@ -277,14 +299,14 @@ public class CraftSolver {
     var solution = solver.Check();
     Profiler.EndSample();
 
-    Debug.Log($"Model: {solver.Model}");
+    //Debug.Log($"Model: {solver.Model}");
 
     OutputSlotAmounts = new();
     foreach ((var slot, var amountVar) in outputSlotAmounts) {
       var amount = (int)solver.Model.Double(amountVar);
       if (amount > 0) {
         OutputSlotAmounts[slot] = amount;
-        Debug.Log($"Crafter {slot.Item1.name} outputs {amount} {slot.ItemAsOutput().name}");
+        //Debug.Log($"Crafter {slot.Item1.name} outputs {amount} {slot.ItemAsOutput().name}");
       }
     }
     InputSlotAmounts = new();
@@ -293,7 +315,7 @@ public class CraftSolver {
       if (amount > 0) {
         var inTransit = ItemsInTransit.GetValueOrDefault(slot);
         InputSlotAmounts[slot] = amount - inTransit;
-        Debug.Log($"Crafter {slot.Item1.name} inputs {amount} {slot.ItemAsInput().name} ({inTransit} en route)");
+        //Debug.Log($"Crafter {slot.Item1.name} inputs {amount} {slot.ItemAsInput().name} ({inTransit} en route)");
       }
     }
   }
