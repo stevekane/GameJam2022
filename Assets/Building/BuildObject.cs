@@ -11,18 +11,6 @@ public class BuildObject : MonoBehaviour {
   public Recipe BuildRecipe;
   public AssetReference Asset;
 
-  class Serialized : ISerializeableAsset {
-    public AssetReference Asset;
-    public Vector3 Position;
-    public Quaternion Rotation;
-    public void Load() {
-      Asset.InstantiateAsync(Position, Rotation);
-    }
-  }
-  public ISerializeableAsset Save() {
-    return new Serialized { Asset = Asset, Position = transform.position, Rotation = transform.rotation };
-  }
-
   public BuildObject Construct(Vector3 position, Quaternion rotation) {
     if (BuildPlot && BuildRecipe) {
       var plot = Instantiate(BuildPlot, position, rotation);

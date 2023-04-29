@@ -67,6 +67,7 @@ GameObject:
   - component: {fileID: 7640369293247503218}
   - component: {fileID: 7640369293247503221}
   - component: {fileID: 8586958007301181477}
+  - component: {fileID: 1150819093959931649}
   m_Layer: 23
   m_Name: BaseCrafter
   m_TagString: Untagged
@@ -105,6 +106,8 @@ MonoBehaviour:
   Name: BaseCrafter
   Size: {x: 3, y: 3}
   CanPlaceMultiple: 0
+  BuildPlot: {fileID: 0}
+  BuildRecipe: {fileID: 0}
   Asset:
     m_AssetGUID: ab513cd221c10a647864480ece17f2f6
     m_SubObjectName: 
@@ -138,6 +141,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 142b4b1077bd30c4eb581d26cf6a899d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1150819093959931649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7640369293247503216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cee76fba6253dd45adecff9cc3ba57b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Asset:
+    m_AssetGUID: ab513cd221c10a647864480ece17f2f6
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
 --- !u!1 &7640369293899099168
 GameObject:
   m_ObjectHideFlags: 0

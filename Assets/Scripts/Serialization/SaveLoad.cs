@@ -33,13 +33,17 @@ public class ScriptableObjectConverter : JsonConverter {
   }
 }
 
-public interface ISerializeableAsset {
+public interface ISaveableObject {
+  public ILoadableObject Save();
+}
+
+public interface ILoadableObject {
   public void Load();
 }
 
 // Represents all the save data we read/write to the save file.
 public class SaveData {
-  public List<ISerializeableAsset> Entities;
+  public List<ILoadableObject> Entities;
   public List<UpgradeData> Upgrades;
   public int Gold;
 
@@ -74,7 +78,7 @@ public class SaveData {
   static string SaveToJson() {
     SaveData data = new();
     UnityEngine.Object.FindObjectOfType<Player>().GetComponent<Upgrades>().Save(data);
-    data.Entities = UnityEngine.Object.FindObjectsOfType<BuildObject>().Select(b => b.Save()).ToList();
+    data.Entities = UnityEngine.Object.FindObjectsOfType<SaveObject>().Select(b => b.Save()).ToList();
     return JsonConvert.SerializeObject(data, Formatting.Indented, JsonSerializerSettings);
   }
   static void LoadFromJson(string json) {
@@ -83,6 +87,6 @@ public class SaveData {
     data.Entities.ForEach(b => b.Load());
   }
   static void ResetLiveData() {
-    UnityEngine.Object.FindObjectsOfType<BuildObject>().ForEach(b => b.gameObject.Destroy());
+    UnityEngine.Object.FindObjectsOfType<SaveObject>().ForEach(b => b.gameObject.Destroy());
   }
 }
