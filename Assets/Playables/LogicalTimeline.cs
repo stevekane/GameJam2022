@@ -28,6 +28,7 @@ public class LogicalTimeline : MonoBehaviour {
   // TODO: Possibly avoid allocation of outputs list somehow?
   // An internal pool perhaps or maybe some way of not needing
   // to create that list at all?
+
   public async Task Play(TaskScope scope, TimelineTaskConfig config) {
     var bindings = config.Bindings;
     var tracks = bindings.Select(binding => binding.Track).Where(track => !track.muted);
