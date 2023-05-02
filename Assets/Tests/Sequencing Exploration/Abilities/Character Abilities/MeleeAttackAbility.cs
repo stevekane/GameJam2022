@@ -1,12 +1,17 @@
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Playables;
 
 public class MeleeAttackAbility : ClassicAbility {
-  [SerializeField] TimelineTaskConfig TimelineTaskConfig;
-  [SerializeField] LogicalTimeline LogicalTimeline;
-  [SerializeField] SimpleCharacterController CharacterController;
+  [SerializeField] PlayableDirector PlayableDirector;
 
   public override async Task MainAction(TaskScope scope) {
-    await LogicalTimeline.Play(scope, TimelineTaskConfig);
+    PlayableDirector.RebuildGraph();
+    PlayableDirector.RebindPlayableGraphOutputs();
+    PlayableDirector.timeUpdateMode = DirectorUpdateMode.Manual;
+    PlayableDirector.time = 0;
+    Debug.Log(PlayableDirector.state);
+    await scope.Tick();
+    // await LogicalTimeline.Play(scope, TimelineTaskConfig);
   }
 }
