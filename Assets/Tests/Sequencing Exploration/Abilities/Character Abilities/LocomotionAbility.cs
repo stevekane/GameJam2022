@@ -17,7 +17,7 @@ public class LocomotionAbility : SimpleAbility {
     if (value.sqrMagnitude > 0) {
       AbilityManager.transform.rotation = Quaternion.LookRotation(value);
     }
-    var velocity = MovementSpeed.Value * value;
+    var velocity = MovementSpeed.Value * value.normalized;
     CharacterController.Move(Time.fixedDeltaTime * velocity);
     Animator.SetFloat("Speed", Mathf.Round(velocity.magnitude));
   }

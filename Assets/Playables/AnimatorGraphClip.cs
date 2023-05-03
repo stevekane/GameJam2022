@@ -10,7 +10,7 @@ public class AnimatorGraphClipBehavior : TaskBehavior {
   }
 }
 
-public class AnimatorGraphClip : PlayableAsset, ITimelineClipAsset {
+public class AnimatorGraphClip : PlayableAsset, ITimelineClipAsset, IPropertyPreview {
   public AnimationClip Clip;
   public float Speed = 1;
   public override Playable CreatePlayable(PlayableGraph graph, GameObject owner) {
@@ -23,4 +23,8 @@ public class AnimatorGraphClip : PlayableAsset, ITimelineClipAsset {
   public override double duration => Clip ? Clip.length : base.duration;
 
   public ClipCaps clipCaps => ClipCaps.SpeedMultiplier| ClipCaps.Blending;
+
+  public void GatherProperties(PlayableDirector director, IPropertyCollector driver) {
+    driver.AddFromClip(Clip);
+  }
 }
