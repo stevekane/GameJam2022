@@ -12,8 +12,6 @@ public class SlideAblity : ClassicAbility {
     var velocity = (Distance / duration) * transform.forward;
     await scope.Any(
       s => LogicalTimeline.Play(s, TimelineTaskConfig),
-      Waiter.Repeat(delegate {
-        CharacterController.Move(velocity);
-      }));
+      Waiter.Repeat(() => CharacterController.Move(velocity)));
   }
 }

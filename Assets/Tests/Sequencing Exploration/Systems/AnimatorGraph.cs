@@ -51,8 +51,10 @@ public class AnimatorGraph : MonoBehaviour {
   }
 
   public void Disconnect() {
-    Graph.DestroySubgraph(CurrentPlayable);
-    CurrentPlayable = AnimationClipPlayable.Create(Graph, null);
+    if (Graph.IsValid()) {
+      Graph.DestroySubgraph(CurrentPlayable);
+      CurrentPlayable = AnimationClipPlayable.Create(Graph, null);
+    }
     LayerMixer.SetInputWeight(1, 0);
   }
 
