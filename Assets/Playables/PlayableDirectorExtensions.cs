@@ -7,6 +7,8 @@ public static class PlayableDirectorExtensions {
   public static async Task PlayTask(this PlayableDirector director, TaskScope scope, LocalTime localTime) {
     try {
       director.RebuildGraph();
+      director.timeUpdateMode = DirectorUpdateMode.Manual;
+      director.extrapolationMode = DirectorWrapMode.None;
       director.time = 0;
       director.Evaluate();
       do {

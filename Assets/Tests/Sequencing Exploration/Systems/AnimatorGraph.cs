@@ -54,8 +54,8 @@ public class AnimatorGraph : MonoBehaviour {
     if (Graph.IsValid()) {
       Graph.DestroySubgraph(CurrentPlayable);
       CurrentPlayable = AnimationClipPlayable.Create(Graph, null);
+      LayerMixer.SetInputWeight(1, 0);
     }
-    LayerMixer.SetInputWeight(1, 0);
   }
 
   public void Evaluate(AnimationClip clip, double time, double duration, float weight) {
