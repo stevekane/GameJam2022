@@ -33,12 +33,21 @@ public class AnimatorGraphTrack : TrackAsset {
       Debug.LogWarning($"No animator found as peer of AnimatorGraph");
       return;
     }
+    if (animator.isHuman) {
+      void AddTransformComponentProperties(Transform t) {
+        driver.AddFromComponent(t.gameObject, t);
+        var childCount = t.childCount;
+        for (var i = 0; i < childCount; i++) {
+          AddTransformComponentProperties(t.GetChild(i));
+        }
+      }
+      AddTransformComponentProperties(animator.avatarRoot);
+    } else {
       foreach (var timelineClip in GetClips()) {
         var clip = timelineClip.asset as AnimatorGraphClip;
-        Debug.Log($"Added from non-humanoid clip {clip.Clip.name}");
-        driver.PushActiveGameObject(animator.gameObject);
-        driver.AddFromClip(clip.Clip);
+        driver.AddFromClip(animator.gameObject, clip.Clip);
       }
+    }
     #endif
   }
 }
