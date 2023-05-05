@@ -6,7 +6,8 @@ using UnityEngine.Playables;
 public class WeaponTrailTrackAsset : TrackAsset {
   public override void GatherProperties(PlayableDirector director, IPropertyCollector driver) {
     var weaponTrail = (WeaponTrail)director.GetGenericBinding(this);
+    if (!weaponTrail)
+      return;
     driver.AddFromName<WeaponTrail>(weaponTrail.gameObject, "Emitting");
-    base.GatherProperties(director, driver);
   }
 }

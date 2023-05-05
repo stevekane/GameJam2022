@@ -6,11 +6,15 @@ public class ModifyFlagsBehavior : TaskBehavior {
 
   public override void Setup(Playable playable) {
     var ability = (SimpleAbility)UserData;
+    if (!ability)
+      return;
     ability.Tags.AddFlags(Add);
   }
 
   public override void Cleanup(Playable playable) {
     var ability = (SimpleAbility)UserData;
+    if (!ability)
+      return;
     ability.Tags.ClearFlags(Add);
   }
 }

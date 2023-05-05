@@ -7,6 +7,8 @@ public class MotionWarpingPlayable : TaskBehavior {
 
   public override void Setup(Playable playable) {
     var controller = (SimpleCharacterController)UserData;
+    if (!controller)
+      return;
     controller.Total = Ticks;
     controller.Frame = 0;
   }
@@ -14,6 +16,8 @@ public class MotionWarpingPlayable : TaskBehavior {
   public override void ProcessFrame(Playable playable, FrameData info, object playerData) {
     base.ProcessFrame(playable, info, playerData);
     var controller = (SimpleCharacterController)UserData;
+    if (!controller)
+      return;
     controller.MotionWarpingActive = RootMotionProvider.Active(controller.gameObject);
     if (controller.MotionWarpingActive) {
       controller.TargetPosition = RootMotionProvider.Position(controller.gameObject);
@@ -23,6 +27,8 @@ public class MotionWarpingPlayable : TaskBehavior {
 
   public override void Cleanup(Playable playable) {
     var controller = (SimpleCharacterController)UserData;
+    if (!controller)
+      return;
     controller.MotionWarpingActive = false;
     controller.Total = Ticks;
     controller.Frame = Ticks;

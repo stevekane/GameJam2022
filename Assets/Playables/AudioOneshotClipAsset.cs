@@ -6,6 +6,8 @@ public class AudioOneshotClipBehavior : TaskBehavior {
 
   public override void Setup(Playable playable) {
     var audioSource = (AudioSource)UserData;
+    if (audioSource)
+      return;
     audioSource.PlayOneShot(Clip);
   }
 }
