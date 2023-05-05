@@ -138,11 +138,11 @@ public class TargetDummyController : MonoBehaviour {
     var forward = toAttacker.XZ().normalized.TryGetDirection() ?? transform.forward;
     transform.rotation = Quaternion.LookRotation(forward, transform.up);
     CameraShaker.Instance.Shake(hitbox.HitboxParams.CameraShakeIntensity);
-    HitStop.TicksRemaining = hitbox.HitboxParams.HitStopDuration.Ticks;
+    HitStop.TicksRemaining = hitbox.HitboxParams.HitStopTicks;
     SimpleFlash.FlashColor = HurtFlashColor;
     SimpleFlash.TicksRemaining = 20;
     Destroy(DirectionalVFX(transform, OnHurtVFX, hitbox.HitboxParams.HitDirection), 3);
-    Vibrator.VibrateOnHurt(HitDirectionVector(transform, hitbox.HitboxParams.HitDirection), hitbox.HitboxParams.HitStopDuration.Ticks);
+    Vibrator.VibrateOnHurt(HitDirectionVector(transform, hitbox.HitboxParams.HitDirection), hitbox.HitboxParams.HitStopTicks);
     Animator.SetTrigger(hitbox.HitboxParams.HitDirection switch {
       HitDirection.Left => "HurtLeft",
       HitDirection.Right => "HurtRight",
@@ -173,11 +173,11 @@ public class TargetDummyController : MonoBehaviour {
     var forward = toAttacker.XZ().normalized.TryGetDirection() ?? transform.forward;
     transform.rotation = Quaternion.LookRotation(forward, transform.up);
     CameraShaker.Instance.Shake(hitParams.CameraShakeIntensity);
-    HitStop.TicksRemaining = hitParams.HitStopDuration.Ticks * 2;
+    HitStop.TicksRemaining = hitParams.HitStopTicks * 2;
     SimpleFlash.FlashColor = ParryFlashColor;
     SimpleFlash.TicksRemaining = 20;
     Destroy(DirectionalVFX(transform, OnParryVFX, hitParams.HitDirection), 3);
-    Vibrator.VibrateOnHurt(HitDirectionVector(transform, hitParams.HitDirection), hitParams.HitStopDuration.Ticks);
+    Vibrator.VibrateOnHurt(HitDirectionVector(transform, hitParams.HitDirection), hitParams.HitStopTicks);
     // Animator.SetTrigger("Parry");
     AudioSource.PlayOneShot(ParrySFX);
   }
@@ -188,11 +188,11 @@ public class TargetDummyController : MonoBehaviour {
     var forward = toAttacker.XZ().normalized.TryGetDirection() ?? transform.forward;
     transform.rotation = Quaternion.LookRotation(forward, transform.up);
     CameraShaker.Instance.Shake(hitbox.HitboxParams.CameraShakeIntensity / 2);
-    HitStop.TicksRemaining = hitbox.HitboxParams.HitStopDuration.Ticks / 2;
+    HitStop.TicksRemaining = hitbox.HitboxParams.HitStopTicks / 2;
     SimpleFlash.FlashColor = BlockFlashColor;
     SimpleFlash.TicksRemaining = 20;
     Destroy(DirectionalVFX(transform, OnBlockVFX, hitbox.HitboxParams.HitDirection), 3);
-    Vibrator.VibrateOnHurt(HitDirectionVector(transform, hitbox.HitboxParams.HitDirection), hitbox.HitboxParams.HitStopDuration.Ticks);
+    Vibrator.VibrateOnHurt(HitDirectionVector(transform, hitbox.HitboxParams.HitDirection), hitbox.HitboxParams.HitStopTicks);
     Animator.SetTrigger("Block");
     AudioSource.PlayOneShot(BlockSFX);
   }

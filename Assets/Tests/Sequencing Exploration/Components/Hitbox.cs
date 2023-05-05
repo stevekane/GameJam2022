@@ -11,7 +11,7 @@ public enum HitDirection {
 [Serializable]
 public struct HitboxParams {
   public HitDirection HitDirection;
-  public Timeval HitStopDuration;
+  public int HitStopTicks; // Steve - int because value-type. plays better with timeline serialization
   public float KnockbackStrength;
   public float CameraShakeIntensity;
   public float Damage;
