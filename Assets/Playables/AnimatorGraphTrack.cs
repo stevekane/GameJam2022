@@ -3,18 +3,7 @@ using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEngine.Playables;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
-public class AnimatorGraphTrackBehavior : TaskBehavior {
-  // TODO: Is this correct? Should the track be responsible for this?
-  // Maybe clips should individually do this?
-  public override void Cleanup(Playable playable) {
-    var animatorGraph = (AnimatorGraph)UserData;
-    animatorGraph.Disconnect();
-  }
-}
+public class AnimatorGraphTrackBehavior : TaskBehavior {}
 
 [TrackBindingType(typeof(AnimatorGraph))]
 [TrackClipType(typeof(AnimatorGraphClip))]

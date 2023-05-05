@@ -12,6 +12,11 @@ public class AnimatorGraphClipBehavior : TaskBehavior {
     // how much weight we are being played with to pass that along to AnimatorGraph
     animatorGraph.Evaluate(Clip, playable.GetTime(), playable.GetDuration(), 1);
   }
+
+  public override void Cleanup(Playable playable) {
+    var animatorGraph = (AnimatorGraph)UserData;
+    animatorGraph.Disconnect();
+  }
 }
 
 public class AnimatorGraphClip : PlayableAsset, ITimelineClipAsset {
