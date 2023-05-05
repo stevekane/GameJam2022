@@ -5,7 +5,14 @@ public class SpawnClipBehavior : TaskBehavior {
   public GameObject Prefab;
   public override void Setup(Playable playable) {
     var referenceObject = (GameObject)UserData;
-    GameObject.Instantiate(Prefab, referenceObject.transform.position, referenceObject.transform.rotation);
+    if (!Application.isPlaying)
+      return;
+    if (!Prefab)
+      return;
+    if (referenceObject)
+      GameObject.Instantiate(Prefab, referenceObject.transform.position, referenceObject.transform.rotation);
+    else
+      GameObject.Instantiate(Prefab);
   }
 }
 

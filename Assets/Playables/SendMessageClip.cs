@@ -7,6 +7,10 @@ public class SendMessageBehavior : TaskBehavior {
 
   public override void Setup(Playable playable) {
     var go = (GameObject)UserData;
+    if (!Application.isPlaying)
+      return;
+    if (!go)
+      return;
     go.SendMessage(Message, SendMessageOptions);
   }
 }
