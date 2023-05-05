@@ -1,17 +1,18 @@
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Playables;
 
 public class SlideAblity : ClassicAbility {
-  [SerializeField] LogicalTimeline LogicalTimeline;
-  [SerializeField] TimelineTaskConfig TimelineTaskConfig;
   [SerializeField] SimpleCharacterController CharacterController;
+  [SerializeField] LocalTime LocalTime;
+  [SerializeField] PlayableDirector PlayableDirector;
   [SerializeField] float Distance = 10;
 
   public override async Task MainAction(TaskScope scope) {
-    var duration = (float)(TimelineTaskConfig.Asset.TickDuration(Timeval.FixedUpdatePerSecond)+1);
+    var duration = (float)PlayableDirector.playableAsset.duration;
     var velocity = (Distance / duration) * transform.forward;
     await scope.Any(
-      s => LogicalTimeline.Play(s, TimelineTaskConfig),
-      Waiter.Repeat(() => CharacterController.Move(velocity)));
+      PlayableDirector.PlayTask(LocalTime),
+      Waiter.Repeat(() => CharacterController.Move(LocalTime.FixedDeltaTime * velocity)));
   }
 }

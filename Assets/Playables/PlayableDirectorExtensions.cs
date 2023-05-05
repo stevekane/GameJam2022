@@ -22,4 +22,8 @@ public static class PlayableDirectorExtensions {
       director.RebuildGraph();
     }
   }
+
+  public static TaskFunc PlayTask(this PlayableDirector director, LocalTime localTime) => scope => {
+    return PlayTask(director, scope, localTime);
+  };
 }

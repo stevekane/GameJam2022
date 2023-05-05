@@ -1,9 +1,7 @@
 using System;
 using System.Linq;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using static SaveObject;
-using UnityEngine.AddressableAssets;
 
 [RequireComponent(typeof(Crafter))]
 [RequireComponent(typeof(BuildObject))]

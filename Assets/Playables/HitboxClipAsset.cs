@@ -8,13 +8,15 @@ public class HitboxClipBehavior : TaskBehavior {
     var hitbox = (Hitbox)UserData;
     hitbox.HitboxParams = HitboxParams;
     hitbox.Collider.enabled = true;
-    hitbox.Targets.Clear();
+    if (Application.isPlaying)
+      hitbox.Targets.Clear();
   }
 
   public override void Cleanup(Playable playable) {
     var hitbox = (Hitbox)UserData;
     hitbox.Collider.enabled = false;
-    hitbox.Targets.Clear();
+    if (Application.isPlaying)
+      hitbox.Targets.Clear();
   }
 }
 
