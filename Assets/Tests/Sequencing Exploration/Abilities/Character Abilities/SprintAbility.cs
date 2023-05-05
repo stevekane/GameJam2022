@@ -1,16 +1,24 @@
 using UnityEngine;
 
 public class SprintAbility : SimpleAbility {
-  public AbilityAction Sprint;
+  public AbilityAction StartSprinting;
+  public AbilityAction StopSprinting;
 
   [SerializeField] MovementSpeed MovementSpeed;
   [SerializeField] float MoveSpeedBonus = 6;
 
   void Awake() {
-    Sprint.Listen(Main);
+    StartSprinting.Listen(StartSprint);
+    StopSprinting.Listen(Stop);
   }
 
-  void Main() {
-    MovementSpeed.Add(MoveSpeedBonus);
+  void StartSprint() {
+    IsRunning = true;
+  }
+
+  void FixedUpdate() {
+    if (IsRunning) {
+      MovementSpeed.Add(MoveSpeedBonus);
+    }
   }
 }

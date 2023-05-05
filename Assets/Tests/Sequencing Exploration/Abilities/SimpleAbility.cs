@@ -25,7 +25,3 @@ public abstract class SimpleAbility : MonoBehaviour {
       AbilityManager.RemoveAbility(this);
   }
 }
-
-public abstract class SimpleAbilityVector3 : SimpleAbility {
-  public Vector3 Value { get; set; }
-}

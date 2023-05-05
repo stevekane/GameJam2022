@@ -15,6 +15,7 @@ public enum AbilityTag {
   Aiming = 1 << 11,
   MeleeAttacking = 1 << 13,
   Dashing = 1 << 14,
+  Sprinting = 1 << 15,
 
   Interact = 1 << 20,             // If the player has this tag, he can only use abilities with this tag
 
