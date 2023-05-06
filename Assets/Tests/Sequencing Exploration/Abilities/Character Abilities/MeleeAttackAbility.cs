@@ -7,6 +7,6 @@ public class MeleeAttackAbility : ClassicAbility {
   [SerializeField] PlayableDirector PlayableDirector;
 
   public override Task MainAction(TaskScope scope) {
-    return PlayableDirector.PlayTask(scope, LocalTime);
+    return PlayableDirector.PlayTask(LocalTime)(scope);
   }
 }
