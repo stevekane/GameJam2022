@@ -10,6 +10,8 @@ public class SimpleCharacterControllerTrack : TrackAsset {
     var controller = (SimpleCharacterController)director.GetGenericBinding(this);
     if (!controller)
       return;
+    // Transform for root motion
+    driver.AddFromComponent(controller.gameObject, controller.transform);
     driver.PushActiveGameObject(controller.gameObject);
     // Character behavior stuff
     driver.AddFromName<SimpleCharacterController>("AllowRootMotion");

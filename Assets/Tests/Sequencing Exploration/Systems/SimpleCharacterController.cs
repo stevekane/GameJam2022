@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[ExecuteInEditMode]
 [DefaultExecutionOrder(ScriptExecutionGroups.Physics)]
 public class SimpleCharacterController : MonoBehaviour {
   [SerializeField] CharacterController Controller;
