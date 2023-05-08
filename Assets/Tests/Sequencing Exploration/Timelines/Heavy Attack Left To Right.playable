@@ -118,6 +118,20 @@ MonoBehaviour:
     m_DisplayName: Cancel
   m_Markers:
     m_Objects: []
+--- !u!114 &-2760026698325866315
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea2d63e10b23fbb4987e6fedfaa7510d, type: 3}
+  m_Name: Audio One Shot Marker
+  m_EditorClassIdentifier: 
+  m_Time: 0.35
+  Clip: {fileID: 8300000, guid: 92280f8f42fc11a42bd44b28b1cd578a, type: 3}
 --- !u!114 &-2032862494193690744
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -265,7 +279,6 @@ MonoBehaviour:
   m_Tracks:
   - {fileID: 4935068233070531795}
   - {fileID: -913993611563280496}
-  - {fileID: 6501016762788579180}
   - {fileID: 3320922046272012163}
   - {fileID: 3361744406757411815}
   - {fileID: 7244559723255108732}
@@ -496,20 +509,8 @@ MonoBehaviour:
   m_Children: []
   m_Clips: []
   m_Markers:
-    m_Objects: []
---- !u!114 &4196627412817552616
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 151bdb87dd574844c880a9ad3415bf07, type: 3}
-  m_Name: AudioOneshotClipAsset
-  m_EditorClassIdentifier: 
-  Clip: {fileID: 8300000, guid: 92280f8f42fc11a42bd44b28b1cd578a, type: 3}
+    m_Objects:
+    - {fileID: 6084781276869992011}
 --- !u!114 &4935068233070531795
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -602,7 +603,7 @@ MonoBehaviour:
     m_DisplayName: HitboxClipAsset
   m_Markers:
     m_Objects: []
---- !u!114 &6501016762788579180
+--- !u!114 &6084781276869992011
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -611,89 +612,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 543693d805a0b404ea61b580e686272f, type: 3}
-  m_Name: Audio Oneshot Track Asset
+  m_Script: {fileID: 11500000, guid: ea2d63e10b23fbb4987e6fedfaa7510d, type: 3}
+  m_Name: Audio One Shot Marker
   m_EditorClassIdentifier: 
-  m_Version: 3
-  m_AnimClip: {fileID: 0}
-  m_Locked: 0
-  m_Muted: 0
-  m_CustomPlayableFullTypename: 
-  m_Curves: {fileID: 0}
-  m_Parent: {fileID: 11400000}
-  m_Children: []
-  m_Clips:
-  - m_Version: 1
-    m_Start: 0.35
-    m_ClipIn: 0
-    m_Asset: {fileID: 4196627412817552616}
-    m_Duration: 0.016666666666666666
-    m_TimeScale: 1
-    m_ParentTrack: {fileID: 6501016762788579180}
-    m_EaseInDuration: 0
-    m_EaseOutDuration: 0
-    m_BlendInDuration: -1
-    m_BlendOutDuration: -1
-    m_MixInCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_MixOutCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_BlendInCurveMode: 0
-    m_BlendOutCurveMode: 0
-    m_ExposedParameterNames: []
-    m_AnimationCurves: {fileID: 0}
-    m_Recordable: 0
-    m_PostExtrapolationMode: 0
-    m_PreExtrapolationMode: 0
-    m_PostExtrapolationTime: 0
-    m_PreExtrapolationTime: 0
-    m_DisplayName: AudioOneshotClipAsset
-  m_Markers:
-    m_Objects: []
+  m_Time: 0.35
+  Clip: {fileID: 8300000, guid: 92280f8f42fc11a42bd44b28b1cd578a, type: 3}
 --- !u!114 &6718093586965040120
 MonoBehaviour:
   m_ObjectHideFlags: 1
