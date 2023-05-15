@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7099279732708566833}
-  - component: {fileID: 7099279732708566836}
   - component: {fileID: 7099279732708566835}
   - component: {fileID: 7099279732708566834}
+  - component: {fileID: 697350019288047446}
   m_Layer: 16
   m_Name: Hurtbox
   m_TagString: Untagged
@@ -34,19 +34,6 @@ Transform:
   m_Father: {fileID: 7099279732817842499}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7099279732708566836
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7099279732708566832}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ce0c9e24a5611d40b8628b31748e2d6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Owner: {fileID: 7099279732817842510}
 --- !u!54 &7099279732708566835
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -54,10 +41,21 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7099279732708566832}
-  serializedVersion: 2
+  serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
   m_UseGravity: 0
   m_IsKinematic: 1
   m_Interpolate: 0
@@ -71,11 +69,32 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7099279732708566832}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Size: {x: 0.5, y: 2, z: 0.5}
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &697350019288047446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7099279732708566832}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fffd6ab5983c739408a9d009e4186648, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Owner: {fileID: 7099279732817842510}
 --- !u!1 &7099279732817842510
 GameObject:
   m_ObjectHideFlags: 0
@@ -88,7 +107,6 @@ GameObject:
   - component: {fileID: 7099279732817842520}
   - component: {fileID: 7099279732817842511}
   - component: {fileID: 7099279732817842496}
-  - component: {fileID: 910028226816469415}
   m_Layer: 16
   m_Name: Elevator Switch
   m_TagString: Untagged
@@ -111,7 +129,7 @@ Transform:
   - {fileID: 7099279732708566833}
   - {fileID: 7099279733034412651}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7099279732817842520
 MonoBehaviour:
@@ -160,30 +178,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f970a829f86019441a549e1a5005231c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  RendererRoot: {fileID: 7099279733034412650}
+  ColorName: _EmissionColor
   Duration:
     Millis: 500
     FramesPerSecond: 30
-  ColorName: _EmissionColor
   FlashColor: {r: 4, g: 4, b: 4, a: 1}
-  Renderers:
-  - {fileID: 7099279733034412652}
---- !u!114 &910028226816469415
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7099279732817842510}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12696007f0177044dbd28057089e4be9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  VFXOffset: {x: 0, y: 0.5, z: 0}
-  OnHurtVFX: {fileID: 1995403933065894, guid: bf3228cec72bf65469800c0e55477fbd, type: 3}
-  OnHurtSFX: {fileID: 8300000, guid: ffb650e702f24544587dc358727c7d80, type: 3}
-  OnHitVFX: {fileID: 0}
-  OnHitSFX: {fileID: 0}
 --- !u!1 &7099279733034412650
 GameObject:
   m_ObjectHideFlags: 0

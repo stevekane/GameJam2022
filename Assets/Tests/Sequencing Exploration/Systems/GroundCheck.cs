@@ -18,6 +18,7 @@ public class GroundCheck : MonoBehaviour {
   [SerializeField] Animator Animator;
   public bool IsGrounded { get; private set; }
   public float GroundDistance { get; private set; }
+  public Collider Ground { get; private set; }
 
   RaycastHit Hit = new();
 
@@ -31,6 +32,14 @@ public class GroundCheck : MonoBehaviour {
     var didHit = Physics.SphereCast(ray, CharacterController.radius, out Hit, MaxGroundCheckDistance, LayerMask);
     var isGrounded = didHit && Hit.distance <= GroundedDistanceThreshold;
     var wasGrounded = SimpleAbilityManager.Tags.HasFlag(AbilityTag.Grounded);
+
+    if (didHit) {
+      Debug.DrawLine(position, Hit.point, Color.green);
+      Debug.Log(Hit.distance);
+    } else {
+      Debug.DrawLine(position, position + MaxGroundCheckDistance*Vector3.down, Color.red);
+      Debug.Log("No hit");
+    }
 
     if (isGrounded && !wasGrounded) {
       SendMessage(ON_LAND_EVENT_NAME, SendMessageOptions.DontRequireReceiver);
@@ -46,6 +55,7 @@ public class GroundCheck : MonoBehaviour {
     }
     IsGrounded = isGrounded;
     GroundDistance = didHit ? Hit.distance : float.MaxValue;
+    Ground = isGrounded ? Hit.collider : null;
     Animator.SetBool("Grounded", IsGrounded);
     Animator.SetFloat("GroundDistance", GroundDistance);
   }

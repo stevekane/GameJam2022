@@ -4,7 +4,6 @@ using UnityEngine;
 public class RootMotionTransfer : MonoBehaviour {
   [SerializeField] Animator Animator;
   [SerializeField] MeleeAttackTargeting MeleeAttackTargeting;
-  [SerializeField] RootMotion RootMotion;
 
   /*
   N.B. I HAVE SORT OF HACKED THIS UP.

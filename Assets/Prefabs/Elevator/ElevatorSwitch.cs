@@ -4,7 +4,7 @@ public class ElevatorSwitch : MonoBehaviour {
   [SerializeField] Transform Target;
   [SerializeField] Elevator Elevator;
 
-  void OnHurt(HitParams hitParams) {
+  void OnContact(MeleeContact contact) {
     Elevator.SetTarget.Fire(Target);
   }
 }
