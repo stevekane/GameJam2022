@@ -1,7 +1,6 @@
 using UnityEngine;
 using KinematicCharacterController;
 
-[ExecuteInEditMode]
 [DefaultExecutionOrder(ScriptExecutionGroups.Physics)]
 public class SimpleCharacterController : MonoBehaviour, ICharacterController {
   [SerializeField] SimpleAbilityManager SimpleAbilityManager;
