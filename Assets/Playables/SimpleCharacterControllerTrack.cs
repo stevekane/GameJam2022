@@ -18,7 +18,7 @@ public class SimpleCharacterControllerTrack : TrackAsset {
     driver.AddFromName<SimpleCharacterController>("AllowRootRotation");
     driver.AddFromName<SimpleCharacterController>("AllowWarping");
     driver.AddFromName<SimpleCharacterController>("AllowMoving");
-    driver.AddFromName<SimpleCharacterController>("AllowReferenceFrameMotion");
+    driver.AddFromName<SimpleCharacterController>("AllowRotating");
     driver.AddFromName<SimpleCharacterController>("AllowExternalForces");
     driver.AddFromName<SimpleCharacterController>("AllowPhysics");
     // Motion-warping stuff

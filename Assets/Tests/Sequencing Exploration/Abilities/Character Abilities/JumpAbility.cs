@@ -1,4 +1,5 @@
 using UnityEngine;
+using KinematicCharacterController;
 
 public class JumpAbility : SimpleAbility {
   public AbilityAction Jump;
@@ -20,6 +21,10 @@ public class JumpAbility : SimpleAbility {
   void Main() {
     Animator.SetTrigger("Jump");
     AudioSource.PlayOneShot(SFX);
+    var platform = CharacterController.KinematicCharacterMotor.GroundingStatus.GroundCollider?.GetComponent<PhysicsMover>();
+    if (platform) {
+      CharacterController.SetPhysicsVelocity(CharacterController.PhysicsVelocity + platform.Velocity);
+    }
     CharacterController.KinematicCharacterMotor.ForceUnground();
     var v = CharacterController.PhysicsVelocity;
     v.y = Mathf.Sqrt(2 * Mathf.Abs(Gravity.RisingStrength) * JumpHeight);
