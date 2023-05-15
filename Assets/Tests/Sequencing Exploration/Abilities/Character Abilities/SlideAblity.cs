@@ -13,6 +13,6 @@ public class SlideAblity : ClassicAbility {
     var velocity = (Distance / duration) * transform.forward;
     await scope.Any(
       PlayableDirector.PlayTask(LocalTime),
-      Waiter.Repeat(() => CharacterController.Move(LocalTime.FixedDeltaTime * velocity)));
+      Waiter.Repeat(() => CharacterController.Move(velocity)));
   }
 }

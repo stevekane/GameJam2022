@@ -20,6 +20,8 @@ public class DoubleJumpAbility : SimpleAbility {
     AbilityManager.RemoveTag(AbilityTag.CanJump);
     Animator.SetTrigger("Jump");
     AudioSource.PlayOneShot(SFX);
-    CharacterController.PhysicsVelocity.y = Mathf.Sqrt(2 * Mathf.Abs(Gravity.RisingStrength) * JumpHeight);
+    var v = CharacterController.PhysicsVelocity;
+    v.y = Mathf.Sqrt(2 * Mathf.Abs(Gravity.RisingStrength) * JumpHeight);
+    CharacterController.SetPhysicsVelocity(v);
   }
 }

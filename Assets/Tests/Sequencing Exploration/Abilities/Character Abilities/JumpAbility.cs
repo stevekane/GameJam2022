@@ -20,7 +20,10 @@ public class JumpAbility : SimpleAbility {
   void Main() {
     Animator.SetTrigger("Jump");
     AudioSource.PlayOneShot(SFX);
-    CharacterController.PhysicsVelocity.y = Mathf.Sqrt(2 * Mathf.Abs(Gravity.RisingStrength) * JumpHeight);
+    CharacterController.KinematicCharacterMotor.ForceUnground();
+    var v = CharacterController.PhysicsVelocity;
+    v.y = Mathf.Sqrt(2 * Mathf.Abs(Gravity.RisingStrength) * JumpHeight);
+    CharacterController.SetPhysicsVelocity(v);
     HitStop.TicksRemaining = 0;
   }
 }
