@@ -1,7 +1,7 @@
 using UnityEngine;
 using KinematicCharacterController;
 
-// [DefaultExecutionOrder(ScriptExecutionGroups.Physics)]
+[DefaultExecutionOrder(ScriptExecutionGroups.Physics)]
 public class SimpleCharacterController : MonoBehaviour, ICharacterController {
   [SerializeField] SimpleAbilityManager SimpleAbilityManager;
   [SerializeField] Animator Animator;
@@ -25,6 +25,9 @@ public class SimpleCharacterController : MonoBehaviour, ICharacterController {
   public bool AllowExternalForces = true;
   public bool AllowPhysics = true;
 
+  public Collider WallCollider;
+  public Vector3 WallNormal;
+  public PhysicsMover GroundPhysicsMover => KinematicCharacterMotor.GroundingStatus.GroundCollider?.GetComponent<PhysicsMover>();
   public Vector3 PhysicsVelocity { get; private set; }
 
   Vector3 AnimationVelocity;
@@ -97,19 +100,29 @@ public class SimpleCharacterController : MonoBehaviour, ICharacterController {
 
   // Only place you set rotation
   public void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
-    currentRotation = DirectRotation;
-    currentRotation *= AnimationRotation;
-    DirectRotation = currentRotation;
+    if (AllowRootRotation) {
+      currentRotation = AnimationRotation * currentRotation;
+    } else if (AllowRotating) {
+      currentRotation = DirectRotation;
+    }
   }
 
   // Only place you set velocity
   public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
-    var totalVelocity = DirectVelocity + AnimationVelocity + PhysicsVelocity;
-    currentVelocity = totalVelocity;
+    if (AllowRootMotion) {
+      currentVelocity = AnimationVelocity;
+    } else if (AllowMoving) {
+      currentVelocity = DirectVelocity;
+    } else {
+      currentVelocity = PhysicsVelocity;
+    }
   }
 
   // Run code prior to update
   public void BeforeCharacterUpdate(float deltaTime) {
+    WallCollider = null;
+    WallNormal = Vector3.zero;
+    SimpleAbilityManager.RemoveTag(AbilityTag.OnWall);
   }
 
   // Run code after grounding check (regardless of outcome)
@@ -142,13 +155,19 @@ public class SimpleCharacterController : MonoBehaviour, ICharacterController {
 
   // Callback for contact from the sides or top
   public void OnMovementHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport) {
+    // if we hit a wall then record that we hit the wall for this frame
+    if (!KinematicCharacterMotor.GroundingStatus.IsStableOnGround && !hitStabilityReport.IsStable) {
+      WallCollider = hitCollider;
+      WallNormal = hitNormal;
+      SimpleAbilityManager.AddTag(AbilityTag.OnWall);
+    }
+  }
+
+  // Fired on discrete collision. Happens when some collider overlaps you w/o some "contact" moment
+  public void OnDiscreteCollisionDetected(Collider hitCollider) {
   }
 
   // Not sure yet. Something to do with a chance to modify the stability report
   public void ProcessHitStabilityReport(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, Vector3 atCharacterPosition, Quaternion atCharacterRotation, ref HitStabilityReport hitStabilityReport) {
-  }
-
-  // Fired on discrete collision. Not sure about details yet
-  public void OnDiscreteCollisionDetected(Collider hitCollider) {
   }
 }

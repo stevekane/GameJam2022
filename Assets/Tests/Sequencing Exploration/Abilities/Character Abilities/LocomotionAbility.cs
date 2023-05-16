@@ -18,12 +18,12 @@ public class LocomotionAbility : SimpleAbility {
       CharacterController.Rotate(Quaternion.LookRotation(value));
     }
     var velocity = MovementSpeed.Value * value.normalized;
-    var steeringVector = velocity - CharacterController.KinematicCharacterMotor.BaseVelocity.XZ();
+    var steeringVector = velocity - CharacterController.PhysicsVelocity.XZ();
     var steeringForce = steeringVector / Time.fixedDeltaTime;
     var steeringDirection = steeringForce.normalized;
     var steeringMagnitude = steeringForce.magnitude;
     // how much grip i gots?
-    var grounded = CharacterController.KinematicCharacterMotor.GroundingStatus.IsStableOnGround;
+    var grounded = CharacterController.KinematicCharacterMotor.GroundingStatus.FoundAnyGround;
     var maxSteeringMagnitude = (grounded ? 2 : .025f) * MovementSpeed.Value / Time.fixedDeltaTime;
     var boundedSteeringForce = Mathf.Min(steeringMagnitude, maxSteeringMagnitude) * steeringDirection.XZ();
     CharacterController.ApplyExternalForce(boundedSteeringForce);

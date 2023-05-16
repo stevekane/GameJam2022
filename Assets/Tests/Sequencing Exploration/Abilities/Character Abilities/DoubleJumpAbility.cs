@@ -11,6 +11,7 @@ public class DoubleJumpAbility : SimpleAbility {
   [SerializeField] SimpleCharacterController CharacterController;
   [SerializeField] AudioSource AudioSource;
   [SerializeField] Animator Animator;
+  [SerializeField] HitStop HitStop;
 
   void Awake() {
     Jump.Listen(Main);
@@ -18,10 +19,11 @@ public class DoubleJumpAbility : SimpleAbility {
 
   void Main() {
     AbilityManager.RemoveTag(AbilityTag.CanJump);
-    Animator.SetTrigger("Jump");
-    AudioSource.PlayOneShot(SFX);
     var v = CharacterController.PhysicsVelocity;
     v.y = Mathf.Sqrt(2 * Mathf.Abs(Gravity.RisingStrength) * JumpHeight);
     CharacterController.SetPhysicsVelocity(v);
+    HitStop.TicksRemaining = 0;
+    Animator.SetTrigger("Jump");
+    AudioSource.PlayOneShot(SFX);
   }
 }

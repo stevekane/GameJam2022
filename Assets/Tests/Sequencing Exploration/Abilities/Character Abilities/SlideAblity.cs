@@ -11,8 +11,15 @@ public class SlideAblity : ClassicAbility {
   public override async Task MainAction(TaskScope scope) {
     var duration = (float)PlayableDirector.playableAsset.duration;
     var velocity = (Distance / duration) * transform.forward;
-    await scope.Any(
-      PlayableDirector.PlayTask(LocalTime),
-      Waiter.Repeat(() => CharacterController.Move(velocity)));
+    try {
+      CharacterController.AllowMoving = true;
+      CharacterController.AllowRotating = false;
+      await scope.Any(
+        PlayableDirector.PlayTask(LocalTime),
+        Waiter.Repeat(() => CharacterController.Move(velocity)));
+    } finally {
+      CharacterController.AllowMoving = false;
+      CharacterController.AllowRotating = true;
+    }
   }
 }

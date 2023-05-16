@@ -1,12 +1,13 @@
 using UnityEngine;
 
-public class JumpAbility : SimpleAbility {
+public class WallJumpAbility : SimpleAbility {
   public AbilityAction Jump;
 
   [Header("Reads From")]
   [SerializeField] Gravity Gravity;
   [SerializeField] AudioClip SFX;
   [SerializeField] float JumpHeight;
+  [SerializeField] float PushOffStrength;
   [Header("Writes To")]
   [SerializeField] SimpleCharacterController CharacterController;
   [SerializeField] AudioSource AudioSource;
@@ -18,12 +19,8 @@ public class JumpAbility : SimpleAbility {
   }
 
   void Main() {
-    var platform = CharacterController.GroundPhysicsMover;
-    if (platform) {
-      CharacterController.SetPhysicsVelocity(CharacterController.PhysicsVelocity + platform.Velocity);
-    }
-    CharacterController.KinematicCharacterMotor.ForceUnground();
-    var v = CharacterController.PhysicsVelocity;
+    var v = CharacterController.WallNormal;
+    v *= PushOffStrength;
     v.y = Mathf.Sqrt(2 * Mathf.Abs(Gravity.RisingStrength) * JumpHeight);
     CharacterController.SetPhysicsVelocity(v);
     HitStop.TicksRemaining = 0;
