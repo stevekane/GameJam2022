@@ -1,10 +1,13 @@
-using System.Linq;
 using System.Threading.Tasks;
-using UnityEditor;
-using UnityEngine;
+
+public interface IInteractable {
+  string[] Choices { get; }
+  void Choose(Character interacter, int choiceIdx);
+  void Rotate(float degrees);
+}
 
 public class InteractAbility : Ability {
-  Crafter InteractTarget;
+  IInteractable InteractTarget;
   string[] Choices;
 
   InlineEffect InteractEffect = new(s => {
@@ -15,7 +18,7 @@ public class InteractAbility : Ability {
     s.CanMove = false;
   }, "Build menu");
 
-  public override bool CanStart(AbilityMethod func) => InteractTarget && 0 switch {
+  public override bool CanStart(AbilityMethod func) => InteractTarget != null && 0 switch {
     _ when func == MainRelease => IsRunning,
     _ => !IsRunning,
   };
@@ -26,7 +29,7 @@ public class InteractAbility : Ability {
   public override async Task MainAction(TaskScope scope) {
     try {
       using var stopped = Status.Add(StopEffect);
-      Choices = InteractTarget.Recipes.Select(r => r.name).ToArray();
+      Choices = InteractTarget.Choices;
       Menu.Show(Choices);
       var which = await scope.Any(
         ListenFor(MainRelease),
@@ -39,13 +42,13 @@ public class InteractAbility : Ability {
       Menu.Hide();
       var selected = GetSelected();
       if (selected >= 0) {
-        ItemFlowManager.Instance.AddCraftRequest(InteractTarget, InteractTarget.Recipes[selected]);
+        InteractTarget.Choose(Character, selected);
       }
     } finally {
     }
   }
   public Task RotateAction(TaskScope scope) {
-    InteractTarget.transform.rotation *= Quaternion.AngleAxis(90f, Vector3.up);
+    InteractTarget.Rotate(90f);
     return null;
   }
 
@@ -56,9 +59,11 @@ public class InteractAbility : Ability {
     var obj = BuildGrid.GetCellContents(Character.transform.position + Character.transform.forward*InteractDist);
     var couldInteract = InteractTarget != null;
     InteractTarget = obj?.GetComponent<Crafter>();
-    if (InteractTarget && !couldInteract) {
+    if (InteractTarget == null)
+      InteractTarget = obj?.GetComponent<Container>();
+    if (InteractTarget != null && !couldInteract) {
       Status.Add(InteractEffect);
-    } else if (!InteractTarget && couldInteract) {
+    } else if (InteractTarget == null && couldInteract) {
       Status.Remove(InteractEffect);
     }
   }

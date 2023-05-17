@@ -1,7 +1,5 @@
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 
 public class BuildObject : MonoBehaviour {
   public string Name;
@@ -9,7 +7,6 @@ public class BuildObject : MonoBehaviour {
   public bool CanPlaceMultiple = false;
   public BuildPlot BuildPlot;
   public Recipe BuildRecipe;
-  public AssetReference Asset;
 
   public BuildObject Construct(Vector3 position, Quaternion rotation) {
     if (BuildPlot && BuildRecipe) {
@@ -29,27 +26,13 @@ public class BuildObject : MonoBehaviour {
     BuildObjectManager.Instance.OnBuildObjectDestroyed(this);
     ItemFlowManager.Instance.OnBuildingsChanged();
   }
-#if UNITY_EDITOR
   void SetName() {
+#if UNITY_EDITOR
     // Generate a unique name for debugging purposes.
-    var prefix = $"{Asset.editorAsset.name}_";
+    var prefix = $"{GetComponent<SaveObject>().Asset.editorAsset.name}_";
     var existing = FindObjectsOfType<BuildObject>().Where(bo => bo.gameObject.name.StartsWith(prefix));
     var id = existing.ToArray().Length + 1;
     gameObject.name = $"{prefix}{id}";
-  }
-
-  [ContextMenu("Update AssetReference for prefab")]
-  void UpdateAssetReference() {
-    var assetPath = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage()?.assetPath;
-    if (assetPath != null && assetPath.Length > 0) {
-      var guid = AssetDatabase.AssetPathToGUID(assetPath);
-      if (Asset.AssetGUID != guid) {
-        Debug.Log($"Updating Asset path to {assetPath}");
-        Asset = new(guid);
-      }
-    }
-  }
-#else
-  void SetName() { }
 #endif
+  }
 }

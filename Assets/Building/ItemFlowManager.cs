@@ -33,7 +33,6 @@ public class ItemFlowManager : MonoBehaviour {
   }
 
   public void OnBuildingsChanged() {
-    Debug.Log($"Buildings Changed");
     NeedsRebuild = true;
     NeedsSolve = true;
   }
@@ -60,7 +59,8 @@ public class ItemFlowManager : MonoBehaviour {
         AdvanceOnPath(item);
       }
     }
-    ToRemove.ForEach(i => { i.Object.gameObject.Destroy(); Items.Remove(i); });
+    ToRemove.ForEach(i => { i.Object.MakePickupable(); Items.Remove(i); });
+    //ToRemove.ForEach(i => { i.Object.gameObject.Destroy(); Items.Remove(i); });
   }
 
   void StartCrafting() {

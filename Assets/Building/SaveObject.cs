@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -37,4 +38,18 @@ public class SaveObject : MonoBehaviour, ISaveableObject {
   public void RegisterSaveable(ISaveableComponent component) {
     Saveables.Add(component);
   }
+
+#if UNITY_EDITOR
+  [ContextMenu("Update AssetReference for prefab")]
+  void UpdateAssetReference() {
+    var assetPath = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage()?.assetPath;
+    if (assetPath != null && assetPath.Length > 0) {
+      var guid = AssetDatabase.AssetPathToGUID(assetPath);
+      if (Asset.AssetGUID != guid) {
+        Debug.Log($"Updating Asset path to {assetPath}");
+        Asset = new(guid);
+      }
+    }
+  }
+#endif
 }

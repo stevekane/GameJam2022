@@ -1,12 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using UnityEditor;
 using UnityEngine;
 
 [RequireComponent(typeof(BuildObject))]
-public class Crafter : MonoBehaviour {
+public class Crafter : MonoBehaviour, IInteractable {
   public Recipe[] Recipes;
 
   public CapillaryGroup InputCapillaryGroup { get; set; }
@@ -20,6 +18,15 @@ public class Crafter : MonoBehaviour {
   ItemObject CraftDisplayObject;
   Animator Animator;
   BuildObject BuildObject;
+
+  // IInteractable
+  public string[] Choices => Recipes.Select(r => r.name).ToArray();
+  public void Choose(Character interacter, int choiceIdx) {
+    ItemFlowManager.Instance.AddCraftRequest(this, Recipes[choiceIdx]);
+  }
+  public void Rotate(float degrees) {
+    transform.rotation *= Quaternion.AngleAxis(90f, Vector3.up);
+  }
 
   // Note: We assume there is only 1 recipe that can produce a given output.
   public Recipe FindRecipeProducing(ItemInfo item) => Recipes.FirstOrDefault(r => r.Outputs.Any(o => o.Item == item));
