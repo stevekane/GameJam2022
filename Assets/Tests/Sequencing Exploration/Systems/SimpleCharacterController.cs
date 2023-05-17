@@ -123,6 +123,7 @@ public class SimpleCharacterController : MonoBehaviour, ICharacterController {
     WallCollider = null;
     WallNormal = Vector3.zero;
     SimpleAbilityManager.RemoveTag(AbilityTag.OnWall);
+    Animator.SetBool("WallSlide", false);
   }
 
   // Run code after grounding check (regardless of outcome)
@@ -157,6 +158,7 @@ public class SimpleCharacterController : MonoBehaviour, ICharacterController {
   public void OnMovementHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport) {
     // if we hit a wall then record that we hit the wall for this frame
     if (!KinematicCharacterMotor.GroundingStatus.IsStableOnGround && !hitStabilityReport.IsStable) {
+      Animator.SetBool("WallSlide", true);
       WallCollider = hitCollider;
       WallNormal = hitNormal;
       SimpleAbilityManager.AddTag(AbilityTag.OnWall);
