@@ -19,8 +19,7 @@ public class WallJumpAbility : SimpleAbility {
   }
 
   void Main() {
-    var v = CharacterController.WallNormal;
-    v *= PushOffStrength;
+    var v = PushOffStrength * CharacterController.WallNormal;
     v.y = Mathf.Sqrt(2 * Mathf.Abs(Gravity.RisingStrength) * JumpHeight);
     CharacterController.SetPhysicsVelocity(v);
     HitStop.TicksRemaining = 0;
