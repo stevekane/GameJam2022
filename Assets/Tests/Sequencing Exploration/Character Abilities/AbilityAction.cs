@@ -1,11 +1,14 @@
 using System;
 using System.Threading.Tasks;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class AbilityAction : IEventSource {
   EventSource Source = new();
   public AbilityTag Tags;
-  public AbilityTag CancelAbilitiesWith;
+  [FormerlySerializedAs("CancelAbilitiesWith")]
+  public AbilityTag CancelAbilitiesWithAll;
+  public AbilityTag CancelAbilitiesWithAny;
   public AbilityTag AddToOwner;
   public AbilityTag AddToAbility;
   public AbilityTag OwnerActivationRequired;
@@ -35,7 +38,9 @@ public class AbilityAction : IEventSource {
 public class AbilityAction<T> : IEventSource<T> {
   EventSource<T> Source = new();
   public AbilityTag Tags;
-  public AbilityTag CancelAbilitiesWith;
+  [FormerlySerializedAs("CancelAbilitiesWith")]
+  public AbilityTag CancelAbilitiesWithAll;
+  public AbilityTag CancelAbilitiesWithAny;
   public AbilityTag AddToOwner;
   public AbilityTag AddToAbility;
   public AbilityTag OwnerActivationRequired;

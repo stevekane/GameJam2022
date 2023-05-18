@@ -1064,6 +1064,111 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0.1, z: 0.25}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &140189846
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 140189847}
+  - component: {fileID: 140189849}
+  - component: {fileID: 140189848}
+  - component: {fileID: 140189850}
+  m_Layer: 10
+  m_Name: KnockDown
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &140189847
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 140189846}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1214664406}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!320 &140189848
+PlayableDirector:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 140189846}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_PlayableAsset: {fileID: 11400000, guid: 2df7875924e056c4a81a0c4f6220d3f3, type: 2}
+  m_InitialState: 0
+  m_WrapMode: 2
+  m_DirectorUpdateMode: 1
+  m_InitialTime: 0
+  m_SceneBindings:
+  - key: {fileID: -6270183932174821520, guid: 986af18a6b8bcca449162d0fe43ffdd2, type: 2}
+    value: {fileID: 1205142576}
+  - key: {fileID: -6270183932174821520, guid: 2df7875924e056c4a81a0c4f6220d3f3, type: 2}
+    value: {fileID: 1205142576}
+  - key: {fileID: 6149505056864003983, guid: 986af18a6b8bcca449162d0fe43ffdd2, type: 2}
+    value: {fileID: 1205142617}
+  - key: {fileID: -8169347719327423022, guid: 2df7875924e056c4a81a0c4f6220d3f3, type: 2}
+    value: {fileID: 1205142617}
+  m_ExposedReferences:
+    m_References: []
+--- !u!114 &140189849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 140189846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 570e0b393732a1e489871d6f3579a43a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BlockActionsWith: 0
+  Tags: 0
+  AddedToOwner: 0
+  Main:
+    Tags: 0
+    CancelAbilitiesWithAll: 0
+    CancelAbilitiesWithAny: 1073152
+    AddToOwner: 256
+    AddToAbility: 256
+    OwnerActivationRequired: 0
+    OwnerActivationBlocked: 256
+    CanRun: 1
+    Ability: {fileID: 140189849}
+  PlayableDirector: {fileID: 140189848}
+  LocalTime: {fileID: 1205142581}
+  KnockdownTimeline: {fileID: 11400000, guid: 986af18a6b8bcca449162d0fe43ffdd2, type: 2}
+  GroundedLoopClip: {fileID: 0}
+  GetupTimeline: {fileID: 11400000, guid: 2df7875924e056c4a81a0c4f6220d3f3, type: 2}
+  Duration:
+    Millis: 1000
+    FramesPerSecond: 60
+--- !u!114 &140189850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 140189846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3de63b31de9a7944fa767c7db2e12990, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AudioSource: {fileID: 794871982}
 --- !u!1 &144147442
 GameObject:
   m_ObjectHideFlags: 0
@@ -1115,11 +1220,12 @@ MonoBehaviour:
   AddedToOwner: 0
   Main:
     Tags: 0
-    CancelAbilitiesWith: 8208
+    CancelAbilitiesWithAll: 8208
+    CancelAbilitiesWithAny: 0
     AddToOwner: 8192
     AddToAbility: 8192
     OwnerActivationRequired: 64
-    OwnerActivationBlocked: 24576
+    OwnerActivationBlocked: 24832
     CanRun: 0
     Ability: {fileID: 144147444}
   LocalTime: {fileID: 1205142581}
@@ -1748,11 +1854,12 @@ MonoBehaviour:
   AddedToOwner: 0
   Main:
     Tags: 0
-    CancelAbilitiesWith: 8192
+    CancelAbilitiesWithAll: 8192
+    CancelAbilitiesWithAny: 0
     AddToOwner: 16384
     AddToAbility: 16384
     OwnerActivationRequired: 64
-    OwnerActivationBlocked: 16384
+    OwnerActivationBlocked: 16640
     CanRun: 0
     Ability: {fileID: 327652195}
   CharacterController: {fileID: 1205142617}
@@ -2363,11 +2470,12 @@ MonoBehaviour:
   AddedToOwner: 0
   Jump:
     Tags: 0
-    CancelAbilitiesWith: 8192
+    CancelAbilitiesWithAll: 8192
+    CancelAbilitiesWithAny: 0
     AddToOwner: 0
     AddToAbility: 0
     OwnerActivationRequired: 1088
-    OwnerActivationBlocked: 0
+    OwnerActivationBlocked: 256
     CanRun: 1
     Ability: {fileID: 472617276}
   Gravity: {fileID: 1205142606}
@@ -4390,7 +4498,8 @@ MonoBehaviour:
   AddedToOwner: 0
   StartSprinting:
     Tags: 0
-    CancelAbilitiesWith: 0
+    CancelAbilitiesWithAll: 0
+    CancelAbilitiesWithAny: 0
     AddToOwner: 32768
     AddToAbility: 0
     OwnerActivationRequired: 0
@@ -4399,7 +4508,8 @@ MonoBehaviour:
     Ability: {fileID: 910649704}
   StopSprinting:
     Tags: 0
-    CancelAbilitiesWith: 0
+    CancelAbilitiesWithAll: 0
+    CancelAbilitiesWithAny: 0
     AddToOwner: 0
     AddToAbility: 0
     OwnerActivationRequired: 32768
@@ -4804,7 +4914,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_NoiseProfile: {fileID: 11400000, guid: 69ce8388f6785dd4c8c39915efece2f4, type: 2}
   m_PivotOffset: {x: 0, y: 0, z: 0}
-  m_AmplitudeGain: 0.000002541954
+  m_AmplitudeGain: 1.7e-44
   m_FrequencyGain: 1
   mNoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!1 &988004716
@@ -4974,38 +5084,42 @@ MonoBehaviour:
   AddedToOwner: 0
   Main:
     Tags: 0
-    CancelAbilitiesWith: 0
+    CancelAbilitiesWithAll: 0
+    CancelAbilitiesWithAny: 0
     AddToOwner: 0
     AddToAbility: 0
     OwnerActivationRequired: 1048576
-    OwnerActivationBlocked: 0
+    OwnerActivationBlocked: 256
     CanRun: 1
     Ability: {fileID: 1026014070}
   Rotate:
     Tags: 0
-    CancelAbilitiesWith: 0
+    CancelAbilitiesWithAll: 0
+    CancelAbilitiesWithAny: 0
     AddToOwner: 0
     AddToAbility: 0
     OwnerActivationRequired: 0
-    OwnerActivationBlocked: 0
+    OwnerActivationBlocked: 256
     CanRun: 0
     Ability: {fileID: 1026014070}
   Cancel:
     Tags: 0
-    CancelAbilitiesWith: 0
+    CancelAbilitiesWithAll: 0
+    CancelAbilitiesWithAny: 0
     AddToOwner: 0
     AddToAbility: 0
     OwnerActivationRequired: 0
-    OwnerActivationBlocked: 0
+    OwnerActivationBlocked: 256
     CanRun: 0
     Ability: {fileID: 1026014070}
   Confirm:
     Tags: 0
-    CancelAbilitiesWith: 0
+    CancelAbilitiesWithAll: 0
+    CancelAbilitiesWithAny: 0
     AddToOwner: 0
     AddToAbility: 0
     OwnerActivationRequired: 0
-    OwnerActivationBlocked: 0
+    OwnerActivationBlocked: 256
     CanRun: 0
     Ability: {fileID: 1026014070}
 --- !u!54 &1026014071
@@ -5769,6 +5883,12 @@ MonoBehaviour:
       Target: {fileID: 910649704}
       FieldName: StopSprinting
     FlowBehavior: 0
+  - ButtonCode: 0
+    ButtonPressType: 0
+    ActionReference:
+      Target: {fileID: 140189849}
+      FieldName: Main
+    FlowBehavior: 0
   AxisEventActions:
   - AxisCode: 0
     AxisProcessor: 1
@@ -5795,8 +5915,8 @@ MonoBehaviour:
   State: {fileID: 1553312572}
   KinematicCharacterMotor: {fileID: 1205142619}
   MotionWarpingActive: 0
-  Frame: 15
-  Total: 15
+  Frame: 21
+  Total: 21
   TargetPosition: {x: 0, y: 0, z: 0}
   TargetRotation: {x: 0, y: 0, z: 0, w: 0}
   AllowRootMotion: 0
@@ -5920,6 +6040,7 @@ Transform:
   - {fileID: 1915817567}
   - {fileID: 144147443}
   - {fileID: 1320985814}
+  - {fileID: 140189847}
   m_Father: {fileID: 1205142568}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6120,7 +6241,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1296779155}
-  m_Mesh: {fileID: 1747618061}
+  m_Mesh: {fileID: 1359445193}
 --- !u!1 &1320985813
 GameObject:
   m_ObjectHideFlags: 0
@@ -6172,11 +6293,12 @@ MonoBehaviour:
   AddedToOwner: 0
   Main:
     Tags: 0
-    CancelAbilitiesWith: 8208
+    CancelAbilitiesWithAll: 8208
+    CancelAbilitiesWithAny: 0
     AddToOwner: 8192
     AddToAbility: 8192
     OwnerActivationRequired: 64
-    OwnerActivationBlocked: 24576
+    OwnerActivationBlocked: 24832
     CanRun: 0
     Ability: {fileID: 1320985815}
   LocalTime: {fileID: 1205142581}
@@ -6437,11 +6559,12 @@ MonoBehaviour:
   AddedToOwner: 0
   Jump:
     Tags: 0
-    CancelAbilitiesWith: 0
+    CancelAbilitiesWithAll: 0
+    CancelAbilitiesWithAny: 0
     AddToOwner: 0
     AddToAbility: 0
     OwnerActivationRequired: 65536
-    OwnerActivationBlocked: 64
+    OwnerActivationBlocked: 320
     CanRun: 1
     Ability: {fileID: 1346375675}
   Gravity: {fileID: 1205142606}
@@ -6452,6 +6575,171 @@ MonoBehaviour:
   AudioSource: {fileID: 794871982}
   Animator: {fileID: 1205142566}
   HitStop: {fileID: 1205142598}
+--- !u!43 &1359445193
+Mesh:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  serializedVersion: 11
+  m_SubMeshes:
+  - serializedVersion: 2
+    firstByte: 0
+    indexCount: 0
+    topology: 0
+    baseVertex: 0
+    firstVertex: 0
+    vertexCount: 0
+    localAABB:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+  m_Shapes:
+    vertices: []
+    shapes: []
+    channels: []
+    fullWeights: []
+  m_BindPose: []
+  m_BoneNameHashes: 
+  m_RootBoneNameHash: 0
+  m_BonesAABB: []
+  m_VariableBoneCountWeights:
+    m_Data: 
+  m_MeshCompression: 0
+  m_IsReadable: 1
+  m_KeepVertices: 1
+  m_KeepIndices: 1
+  m_IndexFormat: 0
+  m_IndexBuffer: 
+  m_VertexData:
+    serializedVersion: 3
+    m_VertexCount: 2
+    m_Channels:
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 3
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 12
+      format: 0
+      dimension: 4
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    m_DataSize: 56
+    _typelessdata: 3e3a1c340d022bbef82a073d0000000000000000000000000000803fcb7c903439b4a8bf80ef273d0000000000000000000000000000803f
+  m_CompressedMesh:
+    m_Vertices:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_UV:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Normals:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Tangents:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Weights:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_NormalSigns:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_TangentSigns:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_FloatColors:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_BoneIndices:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Triangles:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_UVInfo: 0
+  m_LocalAABB:
+    m_Center: {x: 0.00000020731355, y: -0.7425, z: 0.036999926}
+    m_Extent: {x: 0.00000006181534, y: 0.57549995, z: 0.0039999634}
+  m_MeshUsageFlags: 0
+  m_CookingOptions: 30
+  m_BakedConvexCollisionMesh: 
+  m_BakedTriangleCollisionMesh: 
+  m_MeshMetrics[0]: 1
+  m_MeshMetrics[1]: 1
+  m_MeshOptimizationFlags: 1
+  m_StreamData:
+    serializedVersion: 2
+    offset: 0
+    size: 0
+    path: 
 --- !u!1 &1379517354
 GameObject:
   m_ObjectHideFlags: 0
@@ -6501,11 +6789,12 @@ MonoBehaviour:
   AddedToOwner: 0
   Jump:
     Tags: 0
-    CancelAbilitiesWith: 8192
+    CancelAbilitiesWithAll: 8192
+    CancelAbilitiesWithAny: 0
     AddToOwner: 0
     AddToAbility: 0
     OwnerActivationRequired: 1024
-    OwnerActivationBlocked: 64
+    OwnerActivationBlocked: 320
     CanRun: 1
     Ability: {fileID: 1379517356}
   Gravity: {fileID: 1205142606}
@@ -6567,11 +6856,12 @@ MonoBehaviour:
   Animator: {fileID: 1205142566}
   Move:
     Tags: 0
-    CancelAbilitiesWith: 0
+    CancelAbilitiesWithAll: 0
+    CancelAbilitiesWithAny: 0
     AddToOwner: 0
     AddToAbility: 0
     OwnerActivationRequired: 0
-    OwnerActivationBlocked: 24576
+    OwnerActivationBlocked: 24832
     CanRun: 1
     Ability: {fileID: 1386752987}
 --- !u!1 &1443608672
@@ -8441,171 +8731,6 @@ Transform:
   m_Father: {fileID: 871733279}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!43 &1747618061
-Mesh:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  serializedVersion: 11
-  m_SubMeshes:
-  - serializedVersion: 2
-    firstByte: 0
-    indexCount: 0
-    topology: 0
-    baseVertex: 0
-    firstVertex: 0
-    vertexCount: 0
-    localAABB:
-      m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 0, y: 0, z: 0}
-  m_Shapes:
-    vertices: []
-    shapes: []
-    channels: []
-    fullWeights: []
-  m_BindPose: []
-  m_BoneNameHashes: 
-  m_RootBoneNameHash: 0
-  m_BonesAABB: []
-  m_VariableBoneCountWeights:
-    m_Data: 
-  m_MeshCompression: 0
-  m_IsReadable: 1
-  m_KeepVertices: 1
-  m_KeepIndices: 1
-  m_IndexFormat: 0
-  m_IndexBuffer: 
-  m_VertexData:
-    serializedVersion: 3
-    m_VertexCount: 2
-    m_Channels:
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 3
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 12
-      format: 0
-      dimension: 4
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    m_DataSize: 56
-    _typelessdata: 3e3a1c340d022bbef82a073d0000000000000000000000000000803fcb7c903439b4a8bf80ef273d0000000000000000000000000000803f
-  m_CompressedMesh:
-    m_Vertices:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_UV:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Normals:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Tangents:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Weights:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_NormalSigns:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_TangentSigns:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_FloatColors:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_BoneIndices:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Triangles:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_UVInfo: 0
-  m_LocalAABB:
-    m_Center: {x: 0.00000020731355, y: -0.7425, z: 0.036999926}
-    m_Extent: {x: 0.00000006181534, y: 0.57549995, z: 0.0039999634}
-  m_MeshUsageFlags: 0
-  m_CookingOptions: 30
-  m_BakedConvexCollisionMesh: 
-  m_BakedTriangleCollisionMesh: 
-  m_MeshMetrics[0]: 1
-  m_MeshMetrics[1]: 1
-  m_MeshOptimizationFlags: 1
-  m_StreamData:
-    serializedVersion: 2
-    offset: 0
-    size: 0
-    path: 
 --- !u!1 &1753115720
 GameObject:
   m_ObjectHideFlags: 0
@@ -9072,11 +9197,12 @@ MonoBehaviour:
   AddedToOwner: 0
   Main:
     Tags: 0
-    CancelAbilitiesWith: 8208
+    CancelAbilitiesWithAll: 8208
+    CancelAbilitiesWithAny: 0
     AddToOwner: 8192
     AddToAbility: 8192
     OwnerActivationRequired: 64
-    OwnerActivationBlocked: 24576
+    OwnerActivationBlocked: 24832
     CanRun: 0
     Ability: {fileID: 1915817568}
   LocalTime: {fileID: 1205142581}

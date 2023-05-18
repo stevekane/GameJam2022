@@ -67,7 +67,7 @@ public static class PlayableDirectorExtensions {
       } while (director.time < director.duration);
     } catch (OperationCanceledException) {
     } catch (Exception e) {
-      Debug.LogError(e.Message);
+      Debug.LogError($"Execption:{e.GetType()} {e.Message}");
     } finally {
       director.playableGraph.Destroy();
     }
