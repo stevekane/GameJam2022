@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Animations;
@@ -5,13 +7,19 @@ using UnityEngine.Animations;
 [ExecuteInEditMode]
 [DefaultExecutionOrder(ScriptExecutionGroups.Animation)]
 public class AnimatorGraph : MonoBehaviour {
-  [SerializeField] RuntimeAnimatorController AnimatorController;
-
   AnimationPlayableOutput Output;
-  PlayableGraph Graph;
   AnimationClipPlayable CurrentPlayable;
-  AnimationLayerMixerPlayable LayerMixer;
-  AnimatorControllerPlayable AnimatorControllerPlayable;
+
+  int MixerIndex;
+  int LastMixerIndex;
+  float LastMixerWeight;
+  float MixerDuration;
+  float MixerRemaining;
+
+  public PlayableGraph Graph;
+  public AnimationLayerMixerPlayable LayerMixer;
+  public Playable Mixer;
+  public List<CharacterState> CharacterStates = new();
 
   void OnEnable() {
     RebuildGraph();
@@ -27,7 +35,30 @@ public class AnimatorGraph : MonoBehaviour {
   }
 
   void FixedUpdate() {
+    var count = Mixer.GetInputCount();
+    var fractionOn = Mathf.InverseLerp(0, MixerDuration, MixerDuration-MixerRemaining);
+    var fractionOff = 1-fractionOn;
+    for (var i = 0; i < count; i++) {
+      if (i == MixerIndex) {
+        Mixer.SetInputWeight(i, MixerDuration > 0 ? fractionOn : 1);
+      } else if (i == LastMixerIndex) {
+        Mixer.SetInputWeight(i, MixerDuration > 0 ? LastMixerWeight * fractionOff : 0);
+      } else {
+        Mixer.SetInputWeight(i, 0);
+      }
+    }
+    MixerRemaining = Mathf.Max(0, MixerRemaining-Time.fixedDeltaTime);
     Graph.Evaluate(Time.fixedDeltaTime);
+  }
+
+  public void CrossFade(int index, float duration = .2f) {
+    var input = Mixer.GetInput(index);
+    input.SetTime(0);
+    LastMixerIndex = MixerIndex;
+    LastMixerWeight = Mixer.GetInputWeight(MixerIndex);
+    MixerIndex = index;
+    MixerDuration = duration;
+    MixerRemaining = duration;
   }
 
   public void RebuildGraph() {
@@ -37,10 +68,13 @@ public class AnimatorGraph : MonoBehaviour {
     Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
     Graph.Play();
     CurrentPlayable = AnimationClipPlayable.Create(Graph, null);
-    AnimatorControllerPlayable = AnimatorControllerPlayable.Create(Graph, AnimatorController);
+    Mixer = AnimationMixerPlayable.Create(Graph);
+    foreach (var characterState in CharacterStates) {
+      Mixer.AddInput(characterState.CreatePlayable(Graph, characterState.gameObject), 0, 0);
+    }
     LayerMixer = AnimationLayerMixerPlayable.Create(Graph);
     LayerMixer.SetInputCount(2);
-    LayerMixer.ConnectInput(0, AnimatorControllerPlayable, 0, 1);
+    LayerMixer.ConnectInput(0, Mixer, 0, 1);
     LayerMixer.ConnectInput(1, CurrentPlayable, 0, 0);
     Output = AnimationPlayableOutput.Create(Graph, name, GetComponent<Animator>());
     Output.SetSourcePlayable(LayerMixer);

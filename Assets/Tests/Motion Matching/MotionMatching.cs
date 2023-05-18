@@ -40,6 +40,7 @@ public class BlendTreeBehaviour : PlayableBehaviour {
   public override void OnPlayableCreate(Playable playable) {
     Mixer = AnimationMixerPlayable.Create(playable.GetGraph(), 0);
     Playable = playable;
+    Playable.DisconnectInput(0);
     Playable.ConnectInput(0, Mixer, 0);
   }
 

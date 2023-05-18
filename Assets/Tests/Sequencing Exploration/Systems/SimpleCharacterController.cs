@@ -4,7 +4,12 @@ using KinematicCharacterController;
 [DefaultExecutionOrder(ScriptExecutionGroups.Physics)]
 public class SimpleCharacterController : MonoBehaviour, ICharacterController {
   [SerializeField] SimpleAbilityManager SimpleAbilityManager;
+  [SerializeField] AnimatorGraph AnimatorGraph;
   [SerializeField] Animator Animator;
+  [SerializeField] CharacterState InitialState;
+
+  [Header("States")]
+  public CharacterState State;
 
   [Header("Motor")]
   public KinematicCharacterMotor KinematicCharacterMotor;
@@ -30,39 +35,27 @@ public class SimpleCharacterController : MonoBehaviour, ICharacterController {
   public PhysicsMover GroundPhysicsMover => KinematicCharacterMotor.GroundingStatus.GroundCollider?.GetComponent<PhysicsMover>();
   public Vector3 PhysicsVelocity { get; private set; }
 
-  Vector3 AnimationVelocity;
-  Quaternion AnimationRotation;
-  Vector3 DirectVelocity;
-  Quaternion DirectRotation;
+  public Vector3 AnimationVelocity;
+  public Quaternion AnimationRotation;
+  public Vector3 DirectVelocity;
+  public Quaternion DirectRotation;
 
   void Start() {
     KinematicCharacterMotor.CharacterController = this;
+    ChangeState(InitialState);
   }
 
-  /*
-  NOTE: One thing that won't work anymore is using this to cause root motion to be applied
-  during Timeline preview (by having UpdateInEditMode and having this component update the
-  position and rotation of the character directly) .
-
-  If we want to support Animation in this way we probably need to do something else tbd.
-  */
-  void OnAnimatorMove() {
-    if (AllowRootMotion) {
-      if (MotionWarpingActive) {
-        AnimationVelocity += WarpMotion(transform.position, TargetPosition, Animator.deltaPosition, Frame, Total) / Time.fixedDeltaTime;
-      } else {
-        AnimationVelocity += Animator.deltaPosition / Time.fixedDeltaTime;
-      }
+  // TODO: Should this happen right away?
+  // Maybe should happen at the start of the next update or something?
+  public void ChangeState(CharacterState nextState) {
+    if (State) {
+      SimpleAbilityManager.RemoveTag(State.ActiveTags);
+      State.OnExit();
     }
-
-    if (AllowRootRotation) {
-      if (MotionWarpingActive) {
-        AnimationRotation = WarpRotation(transform.rotation, TargetRotation, Animator.deltaRotation, Frame, Total);
-      } else {
-        AnimationRotation = Animator.deltaRotation;
-      }
-    }
-    Frame = Mathf.Min(Total, Frame+1);
+    State = nextState;
+    AnimatorGraph.CrossFade(AnimatorGraph.CharacterStates.IndexOf(State), .1f);
+    SimpleAbilityManager.AddTag(State.ActiveTags);
+    State.OnEnter();
   }
 
   public void Move(Vector3 v) {
@@ -84,6 +77,80 @@ public class SimpleCharacterController : MonoBehaviour, ICharacterController {
       PhysicsVelocity += a * Time.fixedDeltaTime;
   }
 
+  public void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
+    State.UpdateRotation(ref currentRotation, deltaTime);
+  }
+
+  public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
+    State.UpdateVelocity(ref currentVelocity, deltaTime);
+  }
+
+  public void BeforeCharacterUpdate(float deltaTime) {
+    // WallCollider = null;
+    // WallNormal = Vector3.zero;
+    // SimpleAbilityManager.RemoveTag(AbilityTag.OnWall);
+    // Animator.SetBool("WallSlide", false);
+    State.BeforeCharacterUpdate(deltaTime);
+  }
+
+  public void PostGroundingUpdate(float deltaTime) {
+    State.PostGroundingUpdate(deltaTime);
+  }
+
+  public void AfterCharacterUpdate(float deltaTime) {
+    DirectVelocity = Vector3.zero;
+    AnimationVelocity = Vector3.zero;
+    AnimationRotation = Quaternion.identity;
+    State.AfterCharacterUpdate(deltaTime);
+  }
+
+  public bool IsColliderValidForCollisions(Collider coll) {
+    return State.IsColliderValidForCollisions(coll);
+  }
+
+  public void OnGroundHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport) {
+    State.OnGroundHit(hitCollider, hitNormal, hitPoint, ref hitStabilityReport);
+  }
+
+  public void OnMovementHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport) {
+    State.OnMovementHit(hitCollider, hitNormal, hitPoint, ref hitStabilityReport);
+  }
+
+  public void ProcessHitStabilityReport(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, Vector3 atCharacterPosition, Quaternion atCharacterRotation, ref HitStabilityReport hitStabilityReport) {
+    State.ProcessHitStabilityReport(hitCollider, hitNormal, hitPoint, atCharacterPosition, atCharacterRotation, ref hitStabilityReport);
+  }
+
+  public void OnDiscreteCollisionDetected(Collider hitCollider) {
+    State.OnDiscreteCollisionDetected(hitCollider);
+  }
+
+  /*
+  NOTE: One thing that won't work anymore is using this to cause root motion to be applied
+  during Timeline preview (by having UpdateInEditMode and having this component update the
+  position and rotation of the character directly) .
+
+  If we want to support Animation in this way we probably need to do something else tbd.
+  */
+
+  void OnAnimatorMove() {
+    if (AllowRootMotion) {
+      if (MotionWarpingActive) {
+        AnimationVelocity += WarpMotion(transform.position, TargetPosition, Animator.deltaPosition, Frame, Total) / Time.fixedDeltaTime;
+      } else {
+        AnimationVelocity += Animator.deltaPosition / Time.fixedDeltaTime;
+      }
+    }
+
+    if (AllowRootRotation) {
+      if (MotionWarpingActive) {
+        AnimationRotation = WarpRotation(transform.rotation, TargetRotation, Animator.deltaRotation, Frame, Total);
+      } else {
+        AnimationRotation = Animator.deltaRotation;
+      }
+    }
+    Frame = Mathf.Min(Total, Frame+1);
+  }
+
   Vector3 WarpMotion(Vector3 position, Vector3 target, Vector3 deltaPosition, int frame, int total) {
     var fraction = (float)frame/(float)total;
     var warpDelta = (target-position) / (total-frame);
@@ -98,60 +165,13 @@ public class SimpleCharacterController : MonoBehaviour, ICharacterController {
     return Quaternion.Euler(0, xyzEuler.y, 0);
   }
 
-  // Only place you set rotation
-  public void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
-    if (AllowRootRotation) {
-      currentRotation = AnimationRotation * currentRotation;
-    } else if (AllowRotating) {
-      currentRotation = DirectRotation;
-    }
-  }
-
-  // Only place you set velocity
-  public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
-    if (AllowRootMotion) {
-      currentVelocity = AnimationVelocity;
-    } else if (AllowMoving) {
-      currentVelocity = DirectVelocity;
-    } else {
-      currentVelocity = PhysicsVelocity;
-    }
-  }
-
+  /*
   // Run code prior to update
   public void BeforeCharacterUpdate(float deltaTime) {
     WallCollider = null;
     WallNormal = Vector3.zero;
     SimpleAbilityManager.RemoveTag(AbilityTag.OnWall);
     Animator.SetBool("WallSlide", false);
-  }
-
-  // Run code after grounding check (regardless of outcome)
-  public void PostGroundingUpdate(float deltaTime) {
-    // TODO: Where to put "take off and land events" if anywhere?
-    if (KinematicCharacterMotor.GroundingStatus.IsStableOnGround) {
-      SimpleAbilityManager.AddTag(AbilityTag.CanJump);
-      SimpleAbilityManager.AddTag(AbilityTag.Grounded);
-    } else {
-      SimpleAbilityManager.RemoveTag(AbilityTag.Grounded);
-    }
-    Animator.SetBool("Grounded", KinematicCharacterMotor.GroundingStatus.IsStableOnGround);
-  }
-
-  // Run code after update
-  public void AfterCharacterUpdate(float deltaTime) {
-    DirectVelocity = Vector3.zero;
-    AnimationVelocity = Vector3.zero;
-    AnimationRotation = Quaternion.identity;
-  }
-
-  // Evaluate colliders to determine if collision should happen
-  public bool IsColliderValidForCollisions(Collider coll) {
-    return true;
-  }
-
-  // Callback for contacting the ground
-  public void OnGroundHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport) {
   }
 
   // Callback for contact from the sides or top
@@ -164,12 +184,5 @@ public class SimpleCharacterController : MonoBehaviour, ICharacterController {
       SimpleAbilityManager.AddTag(AbilityTag.OnWall);
     }
   }
-
-  // Fired on discrete collision. Happens when some collider overlaps you w/o some "contact" moment
-  public void OnDiscreteCollisionDetected(Collider hitCollider) {
-  }
-
-  // Not sure yet. Something to do with a chance to modify the stability report
-  public void ProcessHitStabilityReport(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, Vector3 atCharacterPosition, Quaternion atCharacterRotation, ref HitStabilityReport hitStabilityReport) {
-  }
+  */
 }
