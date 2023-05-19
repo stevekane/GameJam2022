@@ -205,7 +205,7 @@ public class MotionMatching : MonoBehaviour {
     BlendTreePlayable = ScriptPlayable<BlendTreeBehaviour>.Create(Graph, 1);
     BlendTree = BlendTreePlayable.GetBehaviour();
     BlendTree.BlendCurve = BlendCurve;
-    BlendTree.Value = TorsoTwist;
+    BlendTree.Set(TorsoTwist);
     Debug.LogWarning("Start of MotionMatching no longer sets nodes on blendtree because API changed.");
     // BlendTree.SetNodes(LowerBodyNodes);
     UpperBodyPlayable = AnimationClipPlayable.Create(Graph, UpperBodyClip);
@@ -257,7 +257,7 @@ public class MotionMatching : MonoBehaviour {
   void Update() {
     var samplerData = Sampler.GetJobData<SampleJob>();
     TorsoTwist = samplerData.Angle;
-    BlendTree.Value = samplerData.Angle;
+    BlendTree.Set(samplerData.Angle);
     BlendTree.BlendCurve = BlendCurve;
   }
 }

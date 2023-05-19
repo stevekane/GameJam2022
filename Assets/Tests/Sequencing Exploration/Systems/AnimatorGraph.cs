@@ -42,7 +42,7 @@ public class AnimatorGraph : MonoBehaviour {
     var velocity = Motor.BaseVelocity;
     var speed = Mathf.RoundToInt(velocity.magnitude);
     LocomotionStateSelect.GetBehaviour().CrossFade(isGrounded ? 0 : 1);
-    GroundBlendTree.GetBehaviour().Value = speed;
+    GroundBlendTree.GetBehaviour().Set(speed);
     AirborneSelect.GetBehaviour().CrossFade(isHurt ? 1 : 0);
     Graph.Evaluate(Time.fixedDeltaTime);
   }

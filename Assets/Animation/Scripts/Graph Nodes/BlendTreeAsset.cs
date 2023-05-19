@@ -32,12 +32,21 @@ public struct BlendTreeNode : IComparable<BlendTreeNode> {
 }
 
 public class BlendTreeBehaviour : PlayableBehaviour {
-  public AnimationCurve BlendCurve = AnimationCurve.Linear(0,0,1,1);
-  public float Value = 0;
+  const float DEFAULT_SPEED = 40;
 
   Playable Playable;
   AnimationMixerPlayable Mixer;
   List<float> Values = new();
+  float TargetValue = 0;
+  float Value = 0;
+  float Speed = DEFAULT_SPEED;
+
+  public AnimationCurve BlendCurve = AnimationCurve.Linear(0,0,1,1);
+
+  public void Set(float value, float speed = DEFAULT_SPEED) {
+    TargetValue = value;
+    Speed = speed;
+  }
 
   public void Add(Playable playable, float value) {
     Values.Add(value);
@@ -56,6 +65,7 @@ public class BlendTreeBehaviour : PlayableBehaviour {
   }
 
   public override void PrepareFrame(Playable playable, FrameData info) {
+    Value = Mathf.MoveTowards(Value, TargetValue, info.deltaTime * Speed);
     var count = Mixer.GetInputCount();
     for (var i = 0; i < count; i++) {
       var weight = Weight(i, Value, Values);

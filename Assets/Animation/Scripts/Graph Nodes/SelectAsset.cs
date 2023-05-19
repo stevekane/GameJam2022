@@ -17,13 +17,14 @@ public class SelectAsset : PlayableAsset {
 }
 
 public class SelectBehavior : PlayableBehaviour {
-  public float Speed = .1f;
-  public int Index;
+  const float DEFAULT_SPEED = 4;
 
   Playable Playable;
   AnimationMixerPlayable Mixer;
+  float Speed = DEFAULT_SPEED;
+  int Index;
 
-  public void CrossFade(int index, float speed = .1f) {
+  public void CrossFade(int index, float speed = DEFAULT_SPEED) {
     if (Index != index) {
       var input = Mixer.GetInput(index);
       input.SetTime(0);
@@ -53,11 +54,12 @@ public class SelectBehavior : PlayableBehaviour {
       var target = i == Index ? 1 : 0;
       var weight = Mixer.GetInputWeight(i);
       var input = Mixer.GetInput(i);
-      weight = Mathf.MoveTowards(weight, target, Speed);
+      weight = Mathf.MoveTowards(weight, target, info.deltaTime * Speed);
       Mixer.SetInputWeight(i, weight);
-      if (weight == 0) {
+      if (weight == 0 && input.GetPlayState().Equals(PlayState.Playing)) {
         input.Pause();
-        input.SetTime(0);
+      } else if (weight != 0 && input.GetPlayState().Equals(PlayState.Paused)) {
+        input.Play();
       }
     }
   }
