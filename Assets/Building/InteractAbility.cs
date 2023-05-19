@@ -1,4 +1,6 @@
+using System.Linq;
 using System.Threading.Tasks;
+using UnityEngine;
 
 public interface IInteractable {
   string[] Choices { get; }
@@ -8,6 +10,7 @@ public interface IInteractable {
 
 public class InteractAbility : Ability {
   IInteractable InteractTarget;
+  GameObject InteractIndicator;
   string[] Choices;
 
   InlineEffect InteractEffect = new(s => {
@@ -18,10 +21,12 @@ public class InteractAbility : Ability {
     s.CanMove = false;
   }, "Build menu");
 
-  public override bool CanStart(AbilityMethod func) => InteractTarget != null && 0 switch {
-    _ when func == MainRelease => IsRunning,
-    _ => !IsRunning,
-  };
+  public override bool CanStart(AbilityMethod func) =>
+    InteractTarget != null &&
+    0 switch {
+      _ when func == MainRelease => IsRunning,
+      _ => !IsRunning,
+    };
   // TODO(HACK): All press+release events share the trigger condition. This is needed because we don't have
   // a way to specify Release trigger conditions.
   public override TriggerCondition GetTriggerCondition(AbilityMethod method) => TriggerCondition;
@@ -56,14 +61,21 @@ public class InteractAbility : Ability {
 
   float InteractDist = 1f;
   void FixedUpdate() {
-    var obj = BuildGrid.GetCellContents(Character.transform.position + Character.transform.forward*InteractDist);
     var couldInteract = InteractTarget != null;
-    InteractTarget = obj?.GetComponent<Crafter>();
-    if (InteractTarget == null)
-      InteractTarget = obj?.GetComponent<Container>();
+    var obj = BuildGrid.GetCellContents(Character.transform.position + Character.transform.forward*InteractDist);
+    if (AbilityManager.Running.Any(a => a != this && a.ActiveTags.HasAllFlags(AbilityTag.OnlyOne))) {
+      // TODO(HACK): We don't want to interact when there's another ability running.
+      InteractTarget = null;
+    } else {
+      InteractTarget = obj?.GetComponent<Crafter>();
+      if (InteractTarget == null)
+        InteractTarget = obj?.GetComponent<Container>();
+    }
     if (InteractTarget != null && !couldInteract) {
+      InteractIndicator = Instantiate(VFXManager.Instance.DebugIndicatorPrefab, obj.transform.position + 3f*Vector3.up, Quaternion.identity);
       Status.Add(InteractEffect);
     } else if (InteractTarget == null && couldInteract) {
+      InteractIndicator?.Destroy();
       Status.Remove(InteractEffect);
     }
   }
