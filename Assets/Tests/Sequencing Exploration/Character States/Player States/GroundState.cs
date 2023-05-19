@@ -1,20 +1,5 @@
-using System;
 using UnityEngine;
 using UnityEngine.Playables;
-
-[Serializable]
-public class BlendTreeAsset {
-  public BlendTreeNode[] Nodes;
-  public AnimationCurve BlendCurve = AnimationCurve.Linear(0,0,1,1);
-  public ScriptPlayable<BlendTreeBehaviour> CreatePlayable(PlayableGraph graph) {
-    var playable = ScriptPlayable<BlendTreeBehaviour>.Create(graph, 1);
-    var blendTree = playable.GetBehaviour();
-    blendTree.CycleSpeed = .5f;
-    blendTree.BlendCurve = BlendCurve;
-    blendTree.SetNodes(Nodes);
-    return playable;
-  }
-}
 
 public class GroundState : CharacterState {
   [SerializeField] CharacterState AirborneState;
@@ -22,7 +7,7 @@ public class GroundState : CharacterState {
   [SerializeField] float RateOfSpeedChange = 10;
 
   public override Playable CreatePlayable(PlayableGraph graph, GameObject owner) {
-    return BlendTree.CreatePlayable(graph);
+    return BlendTree.CreatePlayable(graph, owner);
   }
 
   public override void PostGroundingUpdate(float deltaTime) {

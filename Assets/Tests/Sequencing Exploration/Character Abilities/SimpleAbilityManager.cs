@@ -14,6 +14,7 @@ public class SimpleAbilityManager : MonoBehaviour {
 
   public void AddTag(AbilityTag tag) => NextSystemTags |= tag;
   public void RemoveTag(AbilityTag tag) => NextSystemTags.ClearFlags(tag);
+  public bool HasFlag(AbilityTag tag) => (NextSystemTags & tag) != 0;
 
   public void AddAbility(SimpleAbility ability) => Abilities.Add(ability);
   public void RemoveAbility(SimpleAbility ability) {
