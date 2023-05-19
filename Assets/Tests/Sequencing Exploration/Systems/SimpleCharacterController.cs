@@ -53,7 +53,7 @@ public class SimpleCharacterController : MonoBehaviour, ICharacterController {
       State.OnExit();
     }
     State = nextState;
-    AnimatorGraph.CrossFade(AnimatorGraph.CharacterStates.IndexOf(State), .1f);
+    // AnimatorGraph.CrossFade(AnimatorGraph.CharacterStates.IndexOf(State), .1f);
     SimpleAbilityManager.AddTag(State.ActiveTags);
     State.OnEnter();
   }

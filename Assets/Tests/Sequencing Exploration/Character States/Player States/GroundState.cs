@@ -1,14 +1,7 @@
 using UnityEngine;
-using UnityEngine.Playables;
 
 public class GroundState : CharacterState {
   [SerializeField] CharacterState AirborneState;
-  [SerializeField] BlendTreeAsset BlendTree;
-  [SerializeField] float RateOfSpeedChange = 10;
-
-  public override Playable CreatePlayable(PlayableGraph graph, GameObject owner) {
-    return BlendTree.CreatePlayable(graph, owner);
-  }
 
   public override void PostGroundingUpdate(float deltaTime) {
     if (!Motor.GroundingStatus.FoundAnyGround) {
@@ -32,13 +25,5 @@ public class GroundState : CharacterState {
     } else {
       currentVelocity = Controller.PhysicsVelocity;
     }
-  }
-
-  public override void AfterCharacterUpdate(float deltaTime) {
-    // Let's attempt a very hacky way of accessing our own playable
-    var playable = AnimatorGraph.Mixer.GetInput(AnimatorGraph.CharacterStates.IndexOf(this));
-    var blendTreePlayable = (ScriptPlayable<BlendTreeBehaviour>)playable;
-    var blendTree = blendTreePlayable.GetBehaviour();
-    blendTree.Value = Mathf.MoveTowards(blendTree.Value, Mathf.RoundToInt(Motor.BaseVelocity.magnitude), RateOfSpeedChange * deltaTime);
   }
 }

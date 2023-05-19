@@ -1,38 +1,13 @@
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Playables;
 using KinematicCharacterController;
 
-public abstract class CharacterState : MonoBehaviour, ICharacterController, IPlayableAsset {
+public abstract class CharacterState : MonoBehaviour, ICharacterController {
   public AbilityTag ActiveTags;
   public AnimatorGraph AnimatorGraph;
   public SimpleAbilityManager AbilityManager;
   public SimpleCharacterController Controller;
   public KinematicCharacterMotor Motor;
 
-  void OnEnable() {
-    if (!AnimatorGraph.CharacterStates.Contains(this)) {
-      AnimatorGraph.CharacterStates.Add(this);
-      AnimatorGraph.RebuildGraph();
-    }
-  }
-
-  void OnDisable() {
-    if (AnimatorGraph.CharacterStates.Contains(this)) {
-      AnimatorGraph.CharacterStates.Remove(this);
-      AnimatorGraph.RebuildGraph();
-    }
-  }
-
-  void OnValidate() {
-    if (!AnimatorGraph.CharacterStates.Contains(this))
-      AnimatorGraph.CharacterStates.Add(this);
-    AnimatorGraph.RebuildGraph();
-  }
-
-  public virtual double duration => double.PositiveInfinity;
-  public virtual IEnumerable<PlayableBinding> outputs => null;
-  public virtual Playable CreatePlayable(PlayableGraph graph, GameObject owner) => Playable.Null;
   public virtual void OnEnter() {}
   public virtual void OnExit() {}
   public virtual void OnAnimatorMove() {}
