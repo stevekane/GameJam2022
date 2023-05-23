@@ -23,6 +23,6 @@ public class BuildPlot : MonoBehaviour, ISaveableComponent {
 
     var crafter = GetComponent<Crafter>();
     Debug.Assert(BuildRecipe && crafter.Recipes.Contains(BuildRecipe));
-    ItemFlowManager.Instance.AddCraftRequest(crafter, BuildRecipe);
+    crafter.RequestCraft();
   }
 }

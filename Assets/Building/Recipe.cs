@@ -3,14 +3,14 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
+[Serializable]
+public class ItemAmount {
+  public ItemInfo Item;
+  public int Count = 1;
+}
+
 [CreateAssetMenu(fileName = "Recipe", menuName = "Crafting/Recipe")]
 public class Recipe : ScriptableObject {
-  [Serializable]
-  public class ItemAmount {
-    public ItemInfo Item;
-    public int Count = 1;
-  }
-
   [FormerlySerializedAs("Time")]
   public float CraftTime;
   public ItemAmount[] Inputs;

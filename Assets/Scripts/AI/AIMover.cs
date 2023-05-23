@@ -24,18 +24,17 @@ public class AIMover : MonoBehaviour {
   bool TraversingLink = false;
   bool WasGrounded = true;
   public bool UseDesiredVelocity = false;
-  Vector3 OffMeshVelocity;
-  public void SetMoveFromNavMeshAgent() {
-    if (NavMeshAgent.isOnOffMeshLink) {
-      Mover.SetMove(OffMeshVelocity);
-      return;
-    }
-    if (UseDesiredVelocity) {
-      Mover.SetMove(NavMeshAgent.desiredVelocity.normalized);
-    } else {
-      Mover.SetMove(NavMeshAgent.velocity.normalized);
-    }
-  }
+  Vector3 OffMeshMoveDir;
+  Vector3 AgentMoveDir =>
+    NavMeshAgent.isOnOffMeshLink ? OffMeshMoveDir :
+    UseDesiredVelocity ? NavMeshAgent.desiredVelocity.normalized :
+    NavMeshAgent.velocity.normalized;
+
+  public void SetMoveFromNavMeshAgent() => Mover.SetMove(AgentMoveDir);
+  public void SetAimFromNavMeshAgent() => Mover.SetAim(AgentMoveDir);
+  public void SetMove(Vector3 dir) => Mover.SetMove(dir);
+  public void SetAim(Vector3 dir) => Mover.SetAim(dir);
+  public void SetDestination(Vector3 pos) => NavMeshAgent.SetDestination(pos);
 
   void FixedUpdate() {
     // Hacks to update navmesh agent state to behave correctly.
@@ -76,13 +75,13 @@ public class AIMover : MonoBehaviour {
   }
 
   async Task FallOffLink(TaskScope scope, Vector3 dest) {
-    var dir = transform.position.TryGetDirection(dest) ?? OffMeshVelocity;
-    OffMeshVelocity = dir.XZ().normalized;
+    var dir = transform.position.TryGetDirection(dest) ?? OffMeshMoveDir;
+    OffMeshMoveDir = dir.XZ().normalized;
     await scope.Until(() => Status.IsGrounded);
   }
 
   async Task JumpOffLink(TaskScope scope, Vector3 dest) {
-    OffMeshVelocity = Vector3.zero;
+    OffMeshMoveDir = Vector3.zero;
     await scope.Any(
       async s => {
         await AbilityManager.TryRun(s, Jump.MainAction);
@@ -90,13 +89,13 @@ public class AIMover : MonoBehaviour {
         await s.Until(() => Status.IsGrounded);
       },
       Waiter.Repeat(() => {
-        var dir = transform.position.TryGetDirection(dest) ?? OffMeshVelocity;
-        OffMeshVelocity = dir.XZ().normalized;
+        var dir = transform.position.TryGetDirection(dest) ?? OffMeshMoveDir;
+        OffMeshMoveDir = dir.XZ().normalized;
       }));
   }
 
   async Task TeleportOffLink(TaskScope scope, Vector3 dest) {
-    OffMeshVelocity = Vector3.zero;
+    OffMeshMoveDir = Vector3.zero;
     Teleport.Destination = dest;
     await scope.Until(() => AbilityManager.CanInvoke(Teleport.MainAction));
     await AbilityManager.TryRun(scope, Teleport.MainAction);

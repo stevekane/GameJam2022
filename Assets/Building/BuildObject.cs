@@ -19,12 +19,6 @@ public class BuildObject : MonoBehaviour {
 
   void Start() {
     SetName();
-    BuildObjectManager.Instance.OnBuildObjectCreated(this);
-    ItemFlowManager.Instance.OnBuildingsChanged();
-  }
-  void OnDestroy() {
-    BuildObjectManager.Instance.OnBuildObjectDestroyed(this);
-    ItemFlowManager.Instance.OnBuildingsChanged();
   }
   void SetName() {
 #if UNITY_EDITOR
