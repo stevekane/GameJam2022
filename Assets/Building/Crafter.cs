@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 [RequireComponent(typeof(BuildObject))]
-public class Crafter : MonoBehaviour, IInteractable {
+public class Crafter : MonoBehaviour, IContainer, IInteractable {
   public Recipe[] Recipes;
 
   // Arrays of input/output amounts held by this machine, in order of Recipe.Inputs/Outputs.
@@ -43,18 +43,26 @@ public class Crafter : MonoBehaviour, IInteractable {
   public int GetInputQueue(ItemInfo item) => InputQueue.GetValueOrDefault(item);
   public int GetOutputQueue(ItemInfo item) => OutputQueue.GetValueOrDefault(item);
 
+  // IContainer
+  public Transform Transform => transform;
+
   // Adds an item to the input queue, which could possibly trigger a craft.
-  public void InsertInput(ItemInfo item, int count) {
+  public bool InsertItem(ItemInfo item, int count) {
     InputQueue[item] = InputQueue.GetValueOrDefault(item) + count;
     CheckRequestSatisfied();
+    return true;
   }
 
   // Removes an item from the output queue.
-  public void ExtractOutput(ItemInfo item, int count) {
-    Debug.Assert(OutputQueue.GetValueOrDefault(item) >= count);
-    OutputQueue[item] -= count;
-    RequestCraft();
+  public bool ExtractItem(ItemInfo item, int count) {
+    if (GetExtractCount(item) >= count is var enough && enough) {
+      OutputQueue[item] -= count;
+      RequestCraft();
+    }
+    return enough;
   }
+
+  public int GetExtractCount(ItemInfo item) => GetOutputQueue(item);
 
   public bool CanCraft(Inventory inventory) {
     if (!CurrentRecipe) return false;
@@ -129,7 +137,7 @@ public class Crafter : MonoBehaviour, IInteractable {
     }
     var hub = FindObjectOfType<Container>();
     foreach (var output in CurrentRecipe.Outputs) {
-      WorkerManager.Instance.AddHarvestJob(this, hub, output);
+      WorkerManager.Instance.AddDeliveryJob(this, hub, output);
     }
     RequestCraft();
   }

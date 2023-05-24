@@ -28,12 +28,7 @@ public class WorkerManager : MonoBehaviour {
     AssignJobs();
   }
 
-  public void AddHarvestJob(Crafter from, Container to, ItemAmount request) {
-    JobQueue.Add(new Worker.HarvestJob { From = from, To = to, Request = request });
-    AssignJobs();
-  }
-
-  public void AddDeliveryJob(Container from, Crafter to, ItemAmount request) {
+  public void AddDeliveryJob(IContainer from, IContainer to, ItemAmount request) {
     JobQueue.Add(new Worker.DeliveryJob { From = from, To = to, Request = request });
     AssignJobs();
   }

@@ -2,8 +2,16 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+// Common interface for Containers, Crafters. Things that items can be put in/out of.
+public interface IContainer {
+  Transform Transform { get; }
+  bool InsertItem(ItemInfo item, int count = 1);
+  bool ExtractItem(ItemInfo item, int count = 1);
+  int GetExtractCount(ItemInfo item);
+}
+
 [RequireComponent(typeof(Inventory))]
-public class Container : MonoBehaviour, IInteractable {
+public class Container : MonoBehaviour, IContainer, IInteractable {
   public Inventory Inventory;
 
   // IInteractable
@@ -16,13 +24,19 @@ public class Container : MonoBehaviour, IInteractable {
     transform.rotation *= Quaternion.AngleAxis(90f, Vector3.up);
   }
 
-  public void Add(ItemInfo item, int count = 1) {
+  // IContainer
+  public Transform Transform => transform;
+  public bool InsertItem(ItemInfo item, int count = 1) {
     Inventory.Add(item, count);
     WorkerManager.Instance.OnContainerChanged(this);
+    return true;
   }
-  public void Remove(ItemInfo item, int count = 1) {
-    Inventory.Remove(item, count);
+  public bool ExtractItem(ItemInfo item, int count = 1) {
+    if (GetExtractCount(item) >= count is var enough && enough)
+      Inventory.Remove(item, count);
+    return enough;
   }
+  public int GetExtractCount(ItemInfo item) => Inventory.Count(item);
 
   void Awake() {
     this.InitComponent(out Inventory);

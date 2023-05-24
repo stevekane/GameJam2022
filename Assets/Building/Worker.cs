@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Worker : MonoBehaviour {
@@ -11,51 +10,27 @@ public class Worker : MonoBehaviour {
     public abstract TaskFunc Run(Worker worker);
   }
 
-  // TODO: unify these?
   public class DeliveryJob : Job {
-    public Container From;
-    public Crafter To;
+    public IContainer From;
+    public IContainer To;
     public ItemAmount Request;
 
-    public override bool CanStart() => From.Inventory.Contents.GetValueOrDefault(Request.Item) >= Request.Count;
+    public override bool CanStart() => From.GetExtractCount(Request.Item) >= Request.Count;
     public override TaskFunc Run(Worker worker) => async scope => {
 #if UNITY_EDITOR
       worker.DebugCarry = new ItemAmount { Item = Request.Item, Count = -Request.Count };
 #endif
       var dist = 5f;
-      worker.Mover.SetDestination(From.transform.position);
-      await scope.Until(() => (worker.transform.position - From.transform.position).sqrMagnitude < dist.Sqr());
-      From.Remove(Request.Item, Request.Count);
+      worker.Mover.SetDestination(From.Transform.position);
+      await scope.Until(() => (worker.transform.position - From.Transform.position).sqrMagnitude < dist.Sqr());
+      if (!From.ExtractItem(Request.Item, Request.Count))
+        return;
 #if UNITY_EDITOR
       worker.DebugCarry = Request;
 #endif
-      worker.Mover.SetDestination(To.transform.position);
-      await scope.Until(() => (worker.transform.position - To.transform.position).sqrMagnitude < dist.Sqr());
-      To.InsertInput(Request.Item, Request.Count);
-      worker.OnJobDone(this);
-    };
-  }
-
-  public class HarvestJob : Job {
-    public Crafter From;
-    public Container To;
-    public ItemAmount Request;
-
-    public override bool CanStart() => From.GetOutputQueue(Request.Item) >= Request.Count;
-    public override TaskFunc Run(Worker worker) => async scope => {
-#if UNITY_EDITOR
-      worker.DebugCarry = new ItemAmount { Item = Request.Item, Count = -Request.Count };
-#endif
-      var dist = 5f;
-      worker.Mover.SetDestination(From.transform.position);
-      await scope.Until(() => (worker.transform.position - From.transform.position).sqrMagnitude < dist.Sqr());
-      From.ExtractOutput(Request.Item, Request.Count);
-#if UNITY_EDITOR
-      worker.DebugCarry = Request;
-#endif
-      worker.Mover.SetDestination(To.transform.position);
-      await scope.Until(() => (worker.transform.position - To.transform.position).sqrMagnitude < dist.Sqr());
-      To.Add(Request.Item, Request.Count);
+      worker.Mover.SetDestination(To.Transform.position);
+      await scope.Until(() => (worker.transform.position - To.Transform.position).sqrMagnitude < dist.Sqr());
+      To.InsertItem(Request.Item, Request.Count);
       worker.OnJobDone(this);
     };
   }
