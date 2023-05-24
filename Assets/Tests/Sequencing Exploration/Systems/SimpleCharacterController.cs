@@ -86,10 +86,6 @@ public class SimpleCharacterController : MonoBehaviour, ICharacterController {
   }
 
   public void BeforeCharacterUpdate(float deltaTime) {
-    // WallCollider = null;
-    // WallNormal = Vector3.zero;
-    // SimpleAbilityManager.RemoveTag(AbilityTag.OnWall);
-    // Animator.SetBool("WallSlide", false);
     State.BeforeCharacterUpdate(deltaTime);
   }
 

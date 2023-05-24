@@ -5,12 +5,13 @@ public class DoubleJumpAbility : SimpleAbility {
 
   [Header("Reads From")]
   [SerializeField] Gravity Gravity;
+  [SerializeField] AnimationClip AnimationClip;
   [SerializeField] AudioClip SFX;
   [SerializeField] float JumpHeight;
   [Header("Writes To")]
   [SerializeField] SimpleCharacterController CharacterController;
   [SerializeField] AudioSource AudioSource;
-  [SerializeField] Animator Animator;
+  [SerializeField] AnimatorGraph AnimatorGraph;
   [SerializeField] HitStop HitStop;
 
   void Awake() {
@@ -23,7 +24,7 @@ public class DoubleJumpAbility : SimpleAbility {
     v.y = Mathf.Sqrt(2 * Mathf.Abs(Gravity.RisingStrength) * JumpHeight);
     CharacterController.SetPhysicsVelocity(v);
     HitStop.TicksRemaining = 0;
-    Animator.SetTrigger("Jump");
+    AnimatorGraph.Play(AnimationClip);
     AudioSource.PlayOneShot(SFX);
   }
 }

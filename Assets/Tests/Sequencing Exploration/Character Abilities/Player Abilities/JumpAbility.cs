@@ -10,7 +10,6 @@ public class JumpAbility : SimpleAbility {
   [Header("Writes To")]
   [SerializeField] SimpleCharacterController CharacterController;
   [SerializeField] AudioSource AudioSource;
-  [SerializeField] Animator Animator;
   [SerializeField] HitStop HitStop;
 
   void Awake() {
@@ -27,7 +26,6 @@ public class JumpAbility : SimpleAbility {
     v.y = Mathf.Sqrt(2 * Mathf.Abs(Gravity.RisingStrength) * JumpHeight);
     CharacterController.SetPhysicsVelocity(v);
     HitStop.TicksRemaining = 0;
-    Animator.SetTrigger("Jump");
     AudioSource.PlayOneShot(SFX);
   }
 }
