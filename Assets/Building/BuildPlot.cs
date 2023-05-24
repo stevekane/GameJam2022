@@ -1,30 +1,11 @@
-using System;
-using System.Linq;
 using UnityEngine;
-using static SaveObject;
 
-// TODO: This class is redundant now that Crafter has a CurrentRecipe.
 [RequireComponent(typeof(Crafter))]
 [RequireComponent(typeof(BuildObject))]
-public class BuildPlot : MonoBehaviour, ISaveableComponent {
-  public Recipe BuildRecipe { get; set; }
-
-  SaveObject SaveObject;
-  public ILoadableComponent Save() => new Serialized { BuildRecipe = BuildRecipe };
-  class Serialized : ILoadableComponent {
-    public Recipe BuildRecipe;
-    public void Load(GameObject go) {
-      go.GetComponent<BuildPlot>().BuildRecipe = BuildRecipe;
-    }
-  }
-
-  void Start() {
-    this.InitComponent(out SaveObject);
-    SaveObject.RegisterSaveable(this);
-
+public class BuildPlot : MonoBehaviour {
+  public void Craft(Recipe buildRecipe) {
     var crafter = GetComponent<Crafter>();
-    Debug.Assert(BuildRecipe && crafter.Recipes.Contains(BuildRecipe));
-    crafter.CurrentRecipe = BuildRecipe;
+    crafter.CurrentRecipe = buildRecipe;
     crafter.RequestCraft();
   }
 }

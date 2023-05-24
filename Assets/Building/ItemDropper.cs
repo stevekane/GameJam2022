@@ -7,7 +7,7 @@ public class ItemDropper : MonoBehaviour {
   [Serializable]
   public class DropChance {
     public float Chance;
-    public ItemInfo Item;
+    public ItemProto Item;
   }
 
   public List<DropChance> Drops;

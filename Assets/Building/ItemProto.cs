@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Item", menuName = "Crafting/ItemProto")]
-public class ItemInfo : ScriptableObject {
+public class ItemProto : ScriptableObject {
   [SerializeField] ItemObject ObjectPrefab;
 
   public ItemObject Spawn(Vector3 position) => Spawn(position, Quaternion.identity);

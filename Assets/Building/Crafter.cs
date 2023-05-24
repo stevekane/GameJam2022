@@ -2,19 +2,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using static SaveObject;
 
 [RequireComponent(typeof(BuildObject))]
-public class Crafter : MonoBehaviour, IContainer, IInteractable {
+public class Crafter : MonoBehaviour, IContainer, IInteractable, ISaveableComponent {
   public Recipe[] Recipes;
+  public Recipe CurrentRecipe;
 
   // Arrays of input/output amounts held by this machine, in order of Recipe.Inputs/Outputs.
-  Dictionary<ItemInfo, int> InputQueue = new();
-  Dictionary<ItemInfo, int> OutputQueue = new();
+  Dictionary<ItemProto, int> InputQueue = new();
+  Dictionary<ItemProto, int> OutputQueue = new();
   TaskScope CraftTask;
   ItemObject CraftDisplayObject;
   Animator Animator;
   BuildObject BuildObject;
-  public Recipe CurrentRecipe;
 
   // IInteractable
   public string[] Choices => Recipes.Select(r => r.name).ToArray();
@@ -37,24 +38,24 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
 
   //public Vector2Int InputPortCell => BuildGrid.WorldToGrid(InputPortPos);
   //public Vector2Int OutputPortCell => BuildGrid.WorldToGrid(OutputPortPos);
-  Vector3 InputPortPos => transform.position - transform.rotation*new Vector3(0f, 0f, BuildGrid.GetBottomLeftOffset(BuildObject.Size).y + 1f);
-  Vector3 OutputPortPos => transform.position + transform.rotation*new Vector3(0f, 0f, BuildGrid.GetTopRightOffset(BuildObject.Size).y + 1f);
+  public Vector3 InputPortPos => transform.position - transform.rotation*new Vector3(0f, 0f, BuildGrid.GetBottomLeftOffset(BuildObject.Size).y + 1f);
+  public Vector3 OutputPortPos => transform.position + transform.rotation*new Vector3(0f, 0f, BuildGrid.GetTopRightOffset(BuildObject.Size).y + 1f);
 
-  public int GetInputQueue(ItemInfo item) => InputQueue.GetValueOrDefault(item);
-  public int GetOutputQueue(ItemInfo item) => OutputQueue.GetValueOrDefault(item);
+  public int GetInputQueue(ItemProto item) => InputQueue.GetValueOrDefault(item);
+  public int GetOutputQueue(ItemProto item) => OutputQueue.GetValueOrDefault(item);
 
   // IContainer
   public Transform Transform => transform;
 
   // Adds an item to the input queue, which could possibly trigger a craft.
-  public bool InsertItem(ItemInfo item, int count) {
+  public bool InsertItem(ItemProto item, int count) {
     InputQueue[item] = InputQueue.GetValueOrDefault(item) + count;
-    CheckRequestSatisfied();
+    CraftIfSatisfied();
     return true;
   }
 
   // Removes an item from the output queue.
-  public bool ExtractItem(ItemInfo item, int count) {
+  public bool ExtractItem(ItemProto item, int count) {
     if (GetExtractCount(item) >= count is var enough && enough) {
       OutputQueue[item] -= count;
       RequestCraft();
@@ -62,7 +63,7 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
     return enough;
   }
 
-  public int GetExtractCount(ItemInfo item) => GetOutputQueue(item);
+  public int GetExtractCount(ItemProto item) => GetOutputQueue(item);
 
   public bool CanCraft(Inventory inventory) {
     if (!CurrentRecipe) return false;
@@ -80,11 +81,11 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
       // TODO: queue not needed?
       InputQueue[input.Item] = InputQueue.GetValueOrDefault(input.Item) + input.Count;
     }
-    CheckRequestSatisfied();
+    CraftIfSatisfied();
   }
 
   // See if we can output an item or begin a craft that has been requested, and do it if so.
-  public void CheckRequestSatisfied() {
+  public void CraftIfSatisfied() {
     if (CraftTask != null) return;
     var satisfied = CurrentRecipe.Inputs.All(i => InputQueue.GetValueOrDefault(i.Item) >= i.Count);
     if (satisfied)
@@ -92,7 +93,7 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
   }
 
   public void RequestCraft() {
-    CheckRequestSatisfied();
+    CraftIfSatisfied();
     if (CraftTask != null) return;
 
     var hub = FindObjectOfType<Container>();
@@ -140,9 +141,24 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
       output.Item.OnCrafted(this);
   }
 
+  SaveObject SaveObject;
+  public ILoadableComponent Save() => new Serialized {
+    CurrentRecipe = CurrentRecipe,
+    // TODO: input/output queue. (Serializable)Dictionary does not work with ItemInfo?
+    // TODO: crafting progress
+  };
+  class Serialized : ILoadableComponent {
+    public Recipe CurrentRecipe;
+    public void Load(GameObject go) {
+      go.GetComponent<Crafter>().CurrentRecipe = CurrentRecipe;
+    }
+  }
+
   void Awake() {
     this.InitComponentFromChildren(out Animator);
     this.InitComponent(out BuildObject);
+    this.InitComponent(out SaveObject);
+    SaveObject.RegisterSaveable(this);
   }
 
   void OnDestroy() => CraftTask?.Dispose();
@@ -151,13 +167,13 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
   public string[] DebugInputs;
   public string[] DebugOutputs;
   void FixedUpdate() {
-    IEnumerable<string> ToList(Dictionary<ItemInfo, int> queue) {
+    IEnumerable<string> ToList(Dictionary<ItemProto, int> queue) {
       foreach ((var item, int amount) in queue) {
         if (amount > 0)
           yield return $"{item.name}:{amount}";
       }
     }
-    string[] ToArray(Dictionary<ItemInfo, int> queue) => ToList(queue).ToArray();
+    string[] ToArray(Dictionary<ItemProto, int> queue) => ToList(queue).ToArray();
     DebugInputs = ToArray(InputQueue);
     DebugOutputs = ToArray(OutputQueue);
   }

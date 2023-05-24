@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 
 [Serializable]
 public class ItemAmount {
-  public ItemInfo Item;
+  public ItemProto Item;
   public int Count = 1;
 }
 
@@ -16,5 +16,5 @@ public class Recipe : ScriptableObject {
   public ItemAmount[] Inputs;
   public ItemAmount[] Outputs;
 
-  public bool Produces(ItemInfo item) => Outputs.Any(a => a.Item == item);
+  public bool Produces(ItemProto item) => Outputs.Any(a => a.Item == item);
 }

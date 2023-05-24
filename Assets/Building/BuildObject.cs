@@ -10,7 +10,7 @@ public class BuildObject : MonoBehaviour {
   public BuildObject Construct(Vector3 position, Quaternion rotation) {
     if (BuildPlot && BuildRecipe) {
       var plot = Instantiate(BuildPlot, position, rotation);
-      plot.BuildRecipe = BuildRecipe;
+      plot.Craft(BuildRecipe);
       return plot.GetComponent<BuildObject>();
     }
     return Instantiate(this, position, rotation);

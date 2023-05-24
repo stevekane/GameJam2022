@@ -21,7 +21,7 @@ public class ScriptableObjectConverter : JsonConverter {
 
   public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
     var wrapper = JsonUtility.FromJson<FuckingUnityScriptableObjectWrapper>((string)reader.Value);
-    return wrapper.Object;
+    return wrapper?.Object;
   }
 
   public override bool CanRead {

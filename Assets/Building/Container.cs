@@ -5,9 +5,9 @@ using UnityEngine;
 // Common interface for Containers, Crafters. Things that items can be put in/out of.
 public interface IContainer {
   Transform Transform { get; }
-  bool InsertItem(ItemInfo item, int count = 1);
-  bool ExtractItem(ItemInfo item, int count = 1);
-  int GetExtractCount(ItemInfo item);
+  bool InsertItem(ItemProto item, int count = 1);
+  bool ExtractItem(ItemProto item, int count = 1);
+  int GetExtractCount(ItemProto item);
 }
 
 [RequireComponent(typeof(Inventory))]
@@ -26,17 +26,17 @@ public class Container : MonoBehaviour, IContainer, IInteractable {
 
   // IContainer
   public Transform Transform => transform;
-  public bool InsertItem(ItemInfo item, int count = 1) {
+  public bool InsertItem(ItemProto item, int count = 1) {
     Inventory.Add(item, count);
     WorkerManager.Instance.OnContainerChanged(this);
     return true;
   }
-  public bool ExtractItem(ItemInfo item, int count = 1) {
+  public bool ExtractItem(ItemProto item, int count = 1) {
     if (GetExtractCount(item) >= count is var enough && enough)
       Inventory.Remove(item, count);
     return enough;
   }
-  public int GetExtractCount(ItemInfo item) => Inventory.Count(item);
+  public int GetExtractCount(ItemProto item) => Inventory.Count(item);
 
   void Awake() {
     this.InitComponent(out Inventory);
@@ -45,7 +45,7 @@ public class Container : MonoBehaviour, IContainer, IInteractable {
 #if UNITY_EDITOR
   public string[] DebugContents;
   void FixedUpdate() {
-    IEnumerable<string> ToList(Dictionary<ItemInfo, int> queue) {
+    IEnumerable<string> ToList(Dictionary<ItemProto, int> queue) {
       foreach ((var item, int amount) in queue) {
         if (amount > 0)
           yield return $"{item.name}:{amount}";
