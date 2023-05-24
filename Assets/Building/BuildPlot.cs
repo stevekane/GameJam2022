@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using static SaveObject;
 
+// TODO: This class is redundant now that Crafter has a CurrentRecipe.
 [RequireComponent(typeof(Crafter))]
 [RequireComponent(typeof(BuildObject))]
 public class BuildPlot : MonoBehaviour, ISaveableComponent {
@@ -23,6 +24,7 @@ public class BuildPlot : MonoBehaviour, ISaveableComponent {
 
     var crafter = GetComponent<Crafter>();
     Debug.Assert(BuildRecipe && crafter.Recipes.Contains(BuildRecipe));
+    crafter.CurrentRecipe = BuildRecipe;
     crafter.RequestCraft();
   }
 }

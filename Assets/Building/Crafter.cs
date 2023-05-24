@@ -14,7 +14,7 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
   ItemObject CraftDisplayObject;
   Animator Animator;
   BuildObject BuildObject;
-  Recipe CurrentRecipe;
+  public Recipe CurrentRecipe;
 
   // IInteractable
   public string[] Choices => Recipes.Select(r => r.name).ToArray();
@@ -100,6 +100,13 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
       WorkerManager.Instance.AddDeliveryJob(hub, this, input);
   }
 
+  public void RequestHarvestOutput() {
+    var hub = FindObjectOfType<Container>();  // TODO: atm I'm assuming one container
+    foreach (var output in CurrentRecipe.Outputs) {
+      WorkerManager.Instance.AddDeliveryJob(this, hub, output);
+    }
+  }
+
   // TODO: this is no good for save/load
   async Task Craft(TaskScope scope, Recipe recipe) {
     bool finished = false;
@@ -129,17 +136,8 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
   }
 
   void OnCraftFinished(Recipe recipe) {
-    if (GetComponent<BuildPlot>() != null) {
-      Debug.Assert(recipe.Outputs.Length == 1);
-      recipe.Outputs[0].Item.Spawn(transform.position, transform.rotation);
-      gameObject.Destroy();
-      return;
-    }
-    var hub = FindObjectOfType<Container>();
-    foreach (var output in CurrentRecipe.Outputs) {
-      WorkerManager.Instance.AddDeliveryJob(this, hub, output);
-    }
-    RequestCraft();
+    foreach (var output in recipe.Outputs)
+      output.Item.OnCrafted(this);
   }
 
   void Awake() {
