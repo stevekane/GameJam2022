@@ -1,7 +1,50 @@
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.Animations;
+using Unity.Burst;
+using Unity.Mathematics;
 
+[BurstCompile]
+public struct FocusTrackingJob : IAnimationJob {
+  public NativeArray<Vector3> CurrentLinkPositions;
+  public NativeArray<float> LinkLengths;
+  public NativeArray<TransformStreamHandle> Bones;
+  public Vector3 GoalPosition;
+  public Quaternion GoalRotation;
+  public float Tolerance;
+  public float Reach;
+  public int Iterations;
+  public int ReferenceStreamIndex; // 0
+  public int AnimationStreamIndex; // 1
+
+  public void ProcessRootMotion(AnimationStream stream) {}
+  public void ProcessAnimation(AnimationStream stream) {
+    AnimationRuntimeUtils.SolveFABRIK(ref CurrentLinkPositions, ref LinkLengths, GoalPosition, Tolerance, Reach, Iterations);
+    var referenceStream = stream.GetInputStream(ReferenceStreamIndex);
+    var animationStream = stream.GetInputStream(AnimationStreamIndex);
+    var referenceRotation = Bones[0].GetRotation(referenceStream);
+    var animationLocalRotation = Bones[0].GetLocalRotation(animationStream);
+    var refDir = referenceRotation * new float3(0,0,1); // world space reference direction
+    var newDir = (CurrentLinkPositions[1] - CurrentLinkPositions[0]).normalized; // world space new direction
+    var IKRotation = Quaternion.FromToRotation(refDir, newDir); // TODO: degenerae when vectors co-linear
+    Bones[0].SetLocalRotation(stream, animationLocalRotation * IKRotation);
+    Debug.DrawRay(CurrentLinkPositions[0], newDir * LinkLengths[0], Color.white);
+
+    for (int i = 1; i < Bones.Length; i++) {
+      animationLocalRotation = Bones[i].GetLocalRotation(animationStream);
+      refDir = (CurrentLinkPositions[i] - CurrentLinkPositions[i - 1]).normalized;
+      newDir = (i < Bones.Length - 1)
+        ? (CurrentLinkPositions[i + 1] - CurrentLinkPositions[i]).normalized
+        : GoalRotation * new Vector3(0,0,1);
+      IKRotation = Quaternion.FromToRotation(refDir, newDir); // TODO: degenerate when vectors co-linear
+      Bones[i].SetLocalRotation(stream, animationLocalRotation * IKRotation);
+      Debug.DrawRay(CurrentLinkPositions[i], newDir * LinkLengths[i], Color.white);
+    }
+  }
+}
+
+[DefaultExecutionOrder(1)]
 public class FocusTracking : MonoBehaviour {
   [SerializeField] Transform[] Bones;
   [SerializeField] Transform[] ReferenceBones;
@@ -28,39 +71,41 @@ public class FocusTracking : MonoBehaviour {
       ReferencePose[i] = ReferenceBones[i].localRotation;
       ReferencePositions[i] = Bones[0].position + i * .5f * Vector3.forward; // bones in reference pose
       LinkLengths[i] = .5f; // TODO: hardcoded because lazy but correct for example
+      CurrentLinkPositions[i] = ReferenceBones[i].position; // TODO: This produces what looks correct. Not 100% sure it's logical?
     }
     // Final LinkLength is always 0 since that last bone in some sense has zero length... very stupid
     LinkLengths[LinkLengths.Length-1] = 0;
   }
 
-  /*
-  For each bone, compute the local rotation by comparing it to
-  its parents forward vector.
-
-  For the zeroeth bone, use the identity.
-
-  THIS IS WHERE TO PICK UP. The TESTROTATIONS are obtained by logging the angular values
-  then plugging themback into this setup to verify that the result matches what I would expect
-  intuitively. This is the case, so what remains then is to use the previous bones forward,
-  your forward, to build a localRotation for each bone.
-  */
   void FixedUpdate() {
-    CurrentLinkPositions.CopyFrom(ReferencePositions);
-    float[] TESTROTATIONS = new float[5] { 30.8f, 8, 12, 9, 30 };
+    // CurrentLinkPositions.CopyFrom(ReferencePositions);
     AnimationRuntimeUtils.SolveFABRIK(ref CurrentLinkPositions, ref LinkLengths, Goal.position, Tolerance, Reach, Iterations);
-    for(int i = 0; i < Bones.Length; i++) {
-      var refDir = Vector3.forward; // Not sure but this would be world space forward
-      var newDir = (i < Bones.Length - 1)
+    var refDir = ReferenceBones[0].forward;
+    var newDir = (CurrentLinkPositions[1] - CurrentLinkPositions[0]).normalized;
+    Quaternion rotation;
+    if (Mathf.Approximately(Vector3.Dot(refDir, newDir), -1)) {
+      rotation = Quaternion.AngleAxis(180f, ReferenceBones[0].up);
+    } else {
+      rotation = Quaternion.FromToRotation(refDir, newDir);
+    }
+    Bones[0].localRotation = AnimationPose[0] * rotation;
+    Debug.DrawRay(CurrentLinkPositions[0], newDir * LinkLengths[0], Color.white);
+    for (int i = 1; i < Bones.Length; i++) {
+      refDir = (CurrentLinkPositions[i] - CurrentLinkPositions[i - 1]).normalized;
+      newDir = (i < Bones.Length - 1)
         ? (CurrentLinkPositions[i + 1] - CurrentLinkPositions[i]).normalized
         : Goal.forward;
-      var refDirLocal = ReferenceBones[i].InverseTransformDirection(refDir);
-      var newDirLocal = ReferenceBones[i].InverseTransformDirection(newDir);
-
-      Debug.Log($"{Vector3.Angle(refDir, newDir)}");
       Debug.DrawRay(CurrentLinkPositions[i], newDir * LinkLengths[i], Color.white);
-      // var rotation = Quaternion.FromToRotation(refDirLocal, newDirLocal);
-      var rotation = Quaternion.Euler(0, TESTROTATIONS[i], 0);
-      Bones[i].localRotation = rotation * AnimationPose[i];
+      // TODO: This case probably also needs to solve the degenerate case though it is way less obvious
+      // how to obtain a rotation axis... This sort of highlights why the full version of
+      // this system might need to do parallel-transport to build proper continuous
+      // local reference frames for all the bones
+      if (Mathf.Approximately(Vector3.Dot(refDir, newDir), -1)) {  // almost opposite
+        rotation = Quaternion.AngleAxis(180f, Vector3.Cross(refDir, Vector3.up));
+      } else {
+        rotation = Quaternion.FromToRotation(refDir, newDir);
+      }
+      Bones[i].localRotation = AnimationPose[i] * rotation;
     }
   }
 
