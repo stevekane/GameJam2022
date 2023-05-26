@@ -19,19 +19,26 @@ public class Worker : MonoBehaviour {
     public override TaskFunc Run(Worker worker) => async scope => {
 #if UNITY_EDITOR
       worker.DebugCarry = new ItemAmount { Item = Request.Item, Count = -Request.Count };
+      worker.DebugState = $"Pickup {From}->{To} {Request.Item}:{Request.Count}";
 #endif
       var dist = 5f;
       worker.Mover.SetDestination(From.Transform.position);
       await scope.Until(() => (worker.transform.position - From.Transform.position).sqrMagnitude < dist.Sqr());
-      if (!From.ExtractItem(Request.Item, Request.Count))
+      worker.DebugState = $"Arrived {From}->{To} {Request.Item}:{Request.Count}";
+      if (!From.ExtractItem(Request.Item, Request.Count)) {
+        worker.DebugState = $"Notenough {From}->{To} {Request.Item}:{Request.Count}";
         return;
+      }
 #if UNITY_EDITOR
+      worker.DebugState = $"Dropoff {From}->{To} {Request.Item}:{Request.Count}";
       worker.DebugCarry = Request;
 #endif
       worker.Mover.SetDestination(To.Transform.position);
       await scope.Until(() => (worker.transform.position - To.Transform.position).sqrMagnitude < dist.Sqr());
+      worker.DebugState = $"Insert {From}->{To} {Request.Item}:{Request.Count}";
       To.InsertItem(Request.Item, Request.Count);
       worker.OnJobDone(this);
+      worker.DebugState = $"Inserted {From}->{To} {Request.Item}:{Request.Count}";
     };
   }
 
@@ -69,6 +76,7 @@ public class Worker : MonoBehaviour {
 
 #if UNITY_EDITOR
   public ItemAmount DebugCarry;
+  public string DebugState = "";
   void OnGUI() {
     if (!WorkerManager.Instance.DebugDraw)
       return;
@@ -78,5 +86,7 @@ public class Worker : MonoBehaviour {
       GUIExtensions.DrawLabel(transform.position, ToString(DebugCarry));
     }
   }
+#else
+  public string DebugState { set { } }
 #endif
 }

@@ -6,6 +6,7 @@ public class CharacterProto : ItemProto {
   public override void OnCrafted(Crafter crafter) {
     Instantiate(CharacterPrefab, crafter.OutputPortPos, Quaternion.identity);
     crafter.ExtractItem(this, 1);
-    crafter.RequestCraft();
+    if (WorkerManager.Instance.NumWorkers < 4) // TODO(hack): hardcoded
+      crafter.RequestCraft();
   }
 }

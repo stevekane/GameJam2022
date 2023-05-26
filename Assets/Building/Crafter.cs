@@ -56,10 +56,8 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable, ISaveableCompon
 
   // Removes an item from the output queue.
   public bool ExtractItem(ItemProto item, int count) {
-    if (GetExtractCount(item) >= count is var enough && enough) {
+    if (GetExtractCount(item) >= count is var enough && enough)
       OutputQueue[item] -= count;
-      RequestCraft();
-    }
     return enough;
   }
 
