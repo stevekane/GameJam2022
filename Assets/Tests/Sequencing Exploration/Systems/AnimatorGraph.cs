@@ -18,6 +18,7 @@ public class AnimatorGraph : MonoBehaviour {
   [Header("Graph parts")]
   [SerializeField] BlendTreeAsset GroundedBlendTreeAsset;
   [SerializeField] SelectAsset AirborneSelectAsset;
+  [SerializeField] TwistChain SpineTwistChain;
 
   [Header("Lean Animation")]
   [SerializeField] Transform HipTransform;
@@ -38,6 +39,7 @@ public class AnimatorGraph : MonoBehaviour {
   ScriptPlayable<BlendTreeBehaviour> GroundBlendTree;
   ScriptPlayable<SelectBehavior> AirborneSelect;
   AnimationScriptPlayable GroundLean;
+  AnimationScriptPlayable SpineTwistChainPlayable;
   AnimationPlayableOutput Output;
 
   Vector3 Forward;
@@ -80,14 +82,6 @@ public class AnimatorGraph : MonoBehaviour {
         ForwardSpeed = ForwardSpeed + LocalTime.FixedDeltaTime * ForwardAcceleration;
         ForwardAcceleration = ForwardElasticity * forwardAcceleration;
       }
-      // TODO: Optional additional step could imnplement. This smooths out forward acceleration giving a less jerky transition
-      // when the change is large
-      //   var deltaA = Acceleration-Jerk;
-      //   if (deltaA.magnitude < SnapThreshold) {
-      //     Jerk = Acceleration;
-      //   } else {
-      //     Jerk = Jerk + LocalTime.FixedDeltaTime*JerkCoefficient*deltaA;
-      //   }
       var forwardLeanAngle = Mathf.Lerp(-MaxForwardLean, MaxForwardLean, Mathf.InverseLerp(-MaxForwardAcceleration, MaxForwardAcceleration, ForwardAcceleration));
       var sidewaysLeanAngle = Mathf.Lerp(-MaxSidewaysLean, MaxSidewaysLean, Mathf.InverseLerp(-MaxTurnAngle, MaxTurnAngle, TurnAngle));
       GroundLean.SetJobData(LeanJob.From(Animator, RootTransform, HipTransform, Mathf.Deg2Rad * forwardLeanAngle, Mathf.Deg2Rad * sidewaysLeanAngle));
@@ -131,10 +125,11 @@ public class AnimatorGraph : MonoBehaviour {
     LayerMixer = AnimationLayerMixerPlayable.Create(Graph);
     LayerMixer.AddInput(LocomotionStateSelect, 0, 1);
     LayerMixer.AddInput(FullBodySlot, 0, 1);
+    SpineTwistChainPlayable = SpineTwistChain.CreatePlayable(Graph, Animator);
+    SpineTwistChainPlayable.ConnectInput(0, LayerMixer, 0, 1);
     Output = AnimationPlayableOutput.Create(Graph, name, Animator);
-    Output.SetSourcePlayable(LayerMixer);
+    Output.SetSourcePlayable(SpineTwistChainPlayable);
   }
-
 
   public void Disconnect(AnimationClip clip) {
     if (Graph.IsValid()) {
