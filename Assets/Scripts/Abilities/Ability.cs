@@ -59,7 +59,7 @@ public abstract class Ability : MonoBehaviour {
     } catch (Exception ex) {
       // TODO: Figure out how to make it so these exceptions aren't swallowed. Run() drops the Task on the floor, but I
       // don't know how to pull the exception out.
-      Debug.Log($"Exception in ability {this}: {ex}");
+      Debug.LogException(ex, this);
       throw ex;
     } finally {
       ActiveTasks.Remove(func);
