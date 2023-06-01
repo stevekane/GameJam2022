@@ -1639,7 +1639,7 @@ MonoBehaviour:
   HitStop: {fileID: 1205142598}
   LocalTime: {fileID: 1205142581}
   PlayableDirector: {fileID: 327652196}
-  Distance: 15
+  Distance: 7
 --- !u!320 &327652196
 PlayableDirector:
   m_ObjectHideFlags: 0
@@ -1659,8 +1659,6 @@ PlayableDirector:
     value: {fileID: 1205142576}
   - key: {fileID: 7063039472081364106, guid: 2702c34e4bdffab40b9ada8976936cfb, type: 2}
     value: {fileID: 327652194}
-  - key: {fileID: -1983787677826722701, guid: 2702c34e4bdffab40b9ada8976936cfb, type: 2}
-    value: {fileID: 327652191}
   m_ExposedReferences:
     m_References: []
 --- !u!114 &327652197
@@ -1706,38 +1704,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AudioSource: {fileID: 794871982}
---- !u!1 &355816748
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 355816749}
-  m_Layer: 0
-  m_Name: Tip
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &355816749
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 355816748}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.318, z: 0.041}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 835758180}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!43 &398720092
+--- !u!43 &350722270
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1902,6 +1869,37 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &355816748
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 355816749}
+  m_Layer: 0
+  m_Name: Tip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &355816749
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 355816748}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -1.318, z: 0.041}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 835758180}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &405963045
 GameObject:
   m_ObjectHideFlags: 0
@@ -6109,7 +6107,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1296779155}
-  m_Mesh: {fileID: 398720092}
+  m_Mesh: {fileID: 350722270}
 --- !u!1 &1306781645
 GameObject:
   m_ObjectHideFlags: 0
@@ -6772,12 +6770,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01b654ee852bfba429a1728fa0056fd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RendererRoot: {fileID: 1595590380}
+  RendererRoot: {fileID: 2070691777}
   ColorName: _EmissionColor
-  FlashColor: {r: 8, g: 0, b: 0, a: 1}
+  FlashColor: {r: 128, g: 0, b: 0, a: 1}
   TicksRemaining: 0
-  OnTicks: 10
-  OffTicks: 10
+  OnTicks: 45
+  OffTicks: 0
 --- !u!114 &1443608677
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7848,18 +7846,13 @@ PrefabInstance:
     - target: {fileID: 6148737315974723067, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: ab1e501408f784696a373918622592b2, type: 2}
+      objectReference: {fileID: 2100000, guid: edc6106c915984de2b613a68e4945671, type: 2}
     m_RemovedComponents:
     - {fileID: 5866666021909216657, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
---- !u!1 &1595590380 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7882376022164389543, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
-  m_PrefabInstance: {fileID: 1595590379}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1595590381 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
@@ -9662,6 +9655,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Pivot: {fileID: 239123921}
+--- !u!1 &2070691777 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
+  m_PrefabInstance: {fileID: 1595590379}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2098892539
 GameObject:
   m_ObjectHideFlags: 0
