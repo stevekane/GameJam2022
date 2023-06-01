@@ -57,8 +57,9 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable, ISaveableCompon
   // Removes an item from the output queue.
   public bool ExtractItem(ItemProto item, int count) {
     if (GetExtractCount(item) >= count is var enough && enough) {
-      OutputQueue[item] -= count;
-      RequestCraft();
+      var remaining = OutputQueue[item] -= count;
+      if (remaining == 0)
+        OutputQueue.Remove(item);
     }
     return enough;
   }
@@ -103,9 +104,8 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable, ISaveableCompon
 
   public void RequestHarvestOutput() {
     var hub = FindObjectOfType<Container>();  // TODO: atm I'm assuming one container
-    foreach (var output in CurrentRecipe.Outputs) {
-      WorkerManager.Instance.AddDeliveryJob(this, hub, output);
-    }
+    foreach (var output in OutputQueue)
+      WorkerManager.Instance.AddDeliveryJob(this, hub, new() { Item = output.Key, Count = output.Value });
   }
 
   // TODO: this is no good for save/load
@@ -144,29 +144,49 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable, ISaveableCompon
   SaveObject SaveObject;
   public ILoadableComponent Save() => new Serialized {
     CurrentRecipe = CurrentRecipe,
-    // TODO: input/output queue. (Serializable)Dictionary does not work with ItemInfo?
+    InputQueue = InputQueue,
+    OutputQueue = OutputQueue,
     // TODO: crafting progress
   };
   class Serialized : ILoadableComponent {
     public Recipe CurrentRecipe;
+    public Dictionary<ItemProto, int> InputQueue;
+    public Dictionary<ItemProto, int> OutputQueue;
     public void Load(GameObject go) {
-      go.GetComponent<Crafter>().CurrentRecipe = CurrentRecipe;
+      var crafter = go.GetComponent<Crafter>();
+      crafter.CurrentRecipe = CurrentRecipe;
+      if (InputQueue != null)
+        crafter.InputQueue = InputQueue;
+      if (OutputQueue != null)
+        crafter.OutputQueue = OutputQueue;
+      crafter.JustLoaded = true;
     }
   }
 
   void Awake() {
-    this.InitComponentFromChildren(out Animator);
-    this.InitComponent(out BuildObject);
-    this.InitComponent(out SaveObject);
+    this.InitComponentFromChildren(out Animator, true);
+    this.InitComponent(out BuildObject, true);
+    this.InitComponent(out SaveObject, true);
     SaveObject.RegisterSaveable(this);
   }
 
   void OnDestroy() => CraftTask?.Dispose();
 
+  bool JustLoaded = false;
+  void FixedUpdate() {
+    DebugUpdate();
+    if (JustLoaded) {
+      JustLoaded = false;
+      RequestHarvestOutput();
+      if (CurrentRecipe)
+        RequestCraft();
+    }
+  }
+
 #if UNITY_EDITOR
   public string[] DebugInputs;
   public string[] DebugOutputs;
-  void FixedUpdate() {
+  void DebugUpdate() {
     IEnumerable<string> ToList(Dictionary<ItemProto, int> queue) {
       foreach ((var item, int amount) in queue) {
         if (amount > 0)
@@ -185,5 +205,7 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable, ISaveableCompon
     GUIExtensions.DrawLabel(InputPortPos, ToString(DebugInputs));
     GUIExtensions.DrawLabel(OutputPortPos - transform.forward, ToString(DebugOutputs));
   }
+#else
+  void DebugUpdate() {}
 #endif
 }

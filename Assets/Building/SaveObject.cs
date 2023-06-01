@@ -1,3 +1,5 @@
+using ES3Types;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -14,23 +16,28 @@ public class SaveObject : MonoBehaviour, ISaveableObject {
   public interface ILoadableComponent {
     public void Load(GameObject obj);
   }
-
   public ILoadableObject Save() {
+    if (Asset.Asset == null) {
+      Asset.LoadAssetAsync<GameObject>().WaitForCompletion();
+    }
     return new Serialized {
-      Asset = Asset,
+      AssetGUID = Asset.AssetGUID,
       Position = transform.position,
       Rotation = transform.rotation,
+      //Components = Saveables.ToArray()
       Components = Saveables.Select(c => c.Save()).ToArray()
     };
   }
   class Serialized : ILoadableObject {
-    public AssetReference Asset;
+    public string AssetGUID;
     public Vector3 Position;
     public Quaternion Rotation;
     public ILoadableComponent[] Components;
     public void Load() {
+      var asset = new AssetReference(AssetGUID);
+      asset.LoadAssetAsync<GameObject>().WaitForCompletion();
       //var go = await Asset.InstantiateAsync(Position, Rotation).Task;
-      var go = Asset.InstantiateAsync(Position, Rotation).WaitForCompletion();
+      var go = asset.InstantiateAsync(Position, Rotation).WaitForCompletion();
       Components.ForEach(o => o.Load(go));
     }
   }

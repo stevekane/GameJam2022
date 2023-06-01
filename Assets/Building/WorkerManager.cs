@@ -10,6 +10,8 @@ public class WorkerManager : MonoBehaviour {
   List<Worker> IdleWorkers = new();
   List<Worker.Job> JobQueue = new();
 
+  public int NumWorkers => Workers.Count;
+
   public void OnWorkerCreated(Worker worker) {
     Workers.Add(worker);
     IdleWorkers.Add(worker);

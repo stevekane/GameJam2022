@@ -69,6 +69,7 @@ GameObject:
   - component: {fileID: 7640369293247503221}
   - component: {fileID: 8586958007301181477}
   - component: {fileID: 1150819093959931649}
+  - component: {fileID: -2983500537838029850}
   m_Layer: 23
   m_Name: BaseCrafter
   m_TagString: Untagged
@@ -104,7 +105,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8954349dd2d41b4998ecbbfc7c363c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Name: BaseCrafter
   Size: {x: 3, y: 3}
   CanPlaceMultiple: 0
   BuildPlot: {fileID: 0}
@@ -122,9 +122,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Recipes: []
+  CurrentRecipe: {fileID: 0}
   DebugInputs: []
   DebugOutputs: []
-  DebugRequests: []
 --- !u!114 &8586958007301181477
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -154,6 +154,25 @@ MonoBehaviour:
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
+--- !u!114 &-2983500537838029850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7640369293247503216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 0
+  m_Area: 0
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 0
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &7640369293899099168
 GameObject:
   m_ObjectHideFlags: 0

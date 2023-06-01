@@ -1,4 +1,5 @@
 using System.Linq;
+using Unity.AI.Navigation;
 using UnityEngine;
 
 public class BuildObject : MonoBehaviour {
@@ -18,6 +19,7 @@ public class BuildObject : MonoBehaviour {
 
   void Start() {
     SetName();
+    FindObjectOfType<NavMeshSurface>().BuildNavMesh();
   }
   void SetName() {
 #if UNITY_EDITOR

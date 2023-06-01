@@ -32,7 +32,7 @@ public static class HitHandler {
       }
     } catch (OperationCanceledException) {
     } catch (Exception ex) {
-      Debug.Log($"Caught {ex}");
+      Debug.LogException(ex);
     } finally {
       //GameObject.Destroy(dbg);
       hitbox.EnableCollision = false;
