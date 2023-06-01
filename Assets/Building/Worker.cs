@@ -9,8 +9,16 @@ public class Worker : MonoBehaviour {
   public abstract class Job {
     public abstract bool CanStart();
     public abstract TaskFunc Run(Worker worker);
+    public virtual void OnGUI() { }
   }
-
+  bool TargetInRange(Transform target, float range) {
+    var delta = (target.position - transform.position);
+    return delta.y < range && delta.XZ().sqrMagnitude < range.Sqr();
+  }
+  Vector3 ChaseTarget(Transform target, float desiredDist) {
+    var delta = target.position.XZ() - transform.position.XZ();
+    return transform.position + delta - (desiredDist - Mover.stoppingDistance) * delta.normalized;
+  }
   public class DeliveryJob : Job {
     public IContainer From;
     public IContainer To;
@@ -22,9 +30,9 @@ public class Worker : MonoBehaviour {
       worker.DebugCarry = new ItemAmount { Item = Request.Item, Count = -Request.Count };
       worker.DebugState = $"Pickup {From}->{To} {Request.Item}:{Request.Count}";
 #endif
-      var dist = 5f;
-      worker.Mover.SetDestination(From.Transform.position);
-      await scope.Until(() => (worker.transform.position - From.Transform.position).sqrMagnitude < dist.Sqr());
+      var dist = 3f;
+      worker.Mover.SetDestination(worker.ChaseTarget(From.Transform, dist));
+      await scope.Until(() => (worker.TargetInRange(From.Transform, dist)));
       worker.DebugState = $"Arrived {From}->{To} {Request.Item}:{Request.Count}";
       if (!From.ExtractItem(Request.Item, Request.Count)) {
         worker.DebugState = $"Notenough {From}->{To} {Request.Item}:{Request.Count}";
@@ -35,13 +43,20 @@ public class Worker : MonoBehaviour {
       worker.DebugState = $"Dropoff {From}->{To} {Request.Item}:{Request.Count}";
       worker.DebugCarry = Request;
 #endif
-      worker.Mover.SetDestination(To.Transform.position);
-      await scope.Until(() => (worker.transform.position - To.Transform.position).sqrMagnitude < dist.Sqr());
+      worker.Mover.SetDestination(worker.ChaseTarget(To.Transform, dist));
+      await scope.Until(() => (worker.TargetInRange(To.Transform, dist)));
       worker.DebugState = $"Insert {From}->{To} {Request.Item}:{Request.Count}";
       To.InsertItem(Request.Item, Request.Count);
       worker.OnJobDone(this);
       worker.DebugState = $"Inserted {From}->{To} {Request.Item}:{Request.Count}";
     };
+    public override void OnGUI() {
+      string ToString(ItemAmount a) => $"{a.Item.name}:{a.Count}";
+      var delta = To.Transform.position - From.Transform.position;
+      var pos = From.Transform.position + delta*.2f;
+      GUIExtensions.DrawLine(From.Transform.position, To.Transform.position, 2);
+      GUIExtensions.DrawLabel(pos, ToString(Request));
+    }
   }
 
   public void AssignJob(Job job) {

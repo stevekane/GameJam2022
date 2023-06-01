@@ -35,6 +35,7 @@ public class AIMover : MonoBehaviour {
   public void SetMove(Vector3 dir) => Mover.SetMove(dir);
   public void SetAim(Vector3 dir) => Mover.SetAim(dir);
   public void SetDestination(Vector3 pos) => NavMeshAgent.SetDestination(pos);
+  public float stoppingDistance => NavMeshAgent.stoppingDistance;
 
   void FixedUpdate() {
     // Hacks to update navmesh agent state to behave correctly.
@@ -101,18 +102,18 @@ public class AIMover : MonoBehaviour {
     await AbilityManager.TryRun(scope, Teleport.MainAction);
   }
 
-  //void OnDrawGizmos() {
-  //  if (NavMeshAgent != null) {
-  //    Gizmos.color = Color.yellow;
-  //    var p = NavMeshAgent.path.corners;
-  //    for (int i = 0; i+1 < p.Length; i++) {
-  //      Gizmos.DrawLine(p[i] + 1 * Vector3.up, p[i+1] + 1 * Vector3.up);
-  //    }
-  //    Gizmos.color = NavMeshAgent.isOnOffMeshLink ? Color.green : Color.red;
-  //    Gizmos.DrawRay(transform.position + 4 * Vector3.up, 4 * Vector3.down);
-  //    Gizmos.DrawRay(transform.position + 3 * Vector3.up, NavMeshAgent.desiredVelocity);
-  //    Gizmos.color = Color.blue;
-  //    Gizmos.DrawRay(transform.position + 4 * Vector3.up, NavMeshAgent.velocity);
-  //  }
-  //}
+  void OnDrawGizmos() {
+    if (NavMeshAgent != null) {
+      Gizmos.color = Color.yellow;
+      var p = NavMeshAgent.path.corners;
+      for (int i = 0; i+1 < p.Length; i++) {
+        Gizmos.DrawLine(p[i] + 1 * Vector3.up, p[i+1] + 1 * Vector3.up);
+      }
+      //Gizmos.color = NavMeshAgent.isOnOffMeshLink ? Color.green : Color.red;
+      //Gizmos.DrawRay(transform.position + 4 * Vector3.up, 4 * Vector3.down);
+      //Gizmos.DrawRay(transform.position + 3 * Vector3.up, NavMeshAgent.desiredVelocity);
+      //Gizmos.color = Color.blue;
+      //Gizmos.DrawRay(transform.position + 4 * Vector3.up, NavMeshAgent.velocity);
+    }
+  }
 }

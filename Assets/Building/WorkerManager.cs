@@ -48,4 +48,11 @@ public class WorkerManager : MonoBehaviour {
     if (job != null) JobQueue.Remove(job);
     return job;
   }
+
+  void OnGUI() {
+    if (!DebugDraw)
+      return;
+    foreach (var job in JobQueue)
+      job.OnGUI();
+  }
 }
