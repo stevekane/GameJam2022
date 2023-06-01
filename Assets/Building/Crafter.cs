@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,8 +11,8 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable, ISaveableCompon
   public Recipe CurrentRecipe;
 
   // Arrays of input/output amounts held by this machine, in order of Recipe.Inputs/Outputs.
-  Dictionary<ItemProto, int> InputQueue = new();
-  Dictionary<ItemProto, int> OutputQueue = new();
+  [ShowInInspector] Dictionary<ItemProto, int> InputQueue = new();
+  [ShowInInspector] Dictionary<ItemProto, int> OutputQueue = new();
   TaskScope CraftTask;
   ItemObject CraftDisplayObject;
   Animator Animator;
@@ -174,7 +175,6 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable, ISaveableCompon
 
   bool JustLoaded = false;
   void FixedUpdate() {
-    DebugUpdate();
     if (JustLoaded) {
       JustLoaded = false;
       RequestHarvestOutput();
@@ -184,28 +184,12 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable, ISaveableCompon
   }
 
 #if UNITY_EDITOR
-  public string[] DebugInputs;
-  public string[] DebugOutputs;
-  void DebugUpdate() {
-    IEnumerable<string> ToList(Dictionary<ItemProto, int> queue) {
-      foreach ((var item, int amount) in queue) {
-        if (amount > 0)
-          yield return $"{item.name}:{amount}";
-      }
-    }
-    string[] ToArray(Dictionary<ItemProto, int> queue) => ToList(queue).ToArray();
-    DebugInputs = ToArray(InputQueue);
-    DebugOutputs = ToArray(OutputQueue);
-  }
-
   void OnGUI() {
     if (!WorkerManager.Instance.DebugDraw)
       return;
-    string ToString(string[] list) => string.Join("\n", list);
-    GUIExtensions.DrawLabel(InputPortPos, ToString(DebugInputs));
-    GUIExtensions.DrawLabel(OutputPortPos - transform.forward, ToString(DebugOutputs));
+    string ToString(Dictionary<ItemProto, int> queue) => string.Join("\n", queue.Select(kvp => $"{kvp.Key.name}:{kvp.Value}"));
+    GUIExtensions.DrawLabel(InputPortPos, ToString(InputQueue));
+    GUIExtensions.DrawLabel(OutputPortPos - transform.forward, ToString(OutputQueue));
   }
-#else
-  void DebugUpdate() {}
 #endif
 }

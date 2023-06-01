@@ -1,8 +1,9 @@
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public class Worker : MonoBehaviour {
   AIMover Mover;
-  Job CurrentJob;
+  [ShowInInspector] Job CurrentJob;
   TaskScope Scope = new();
 
   public abstract class Job {

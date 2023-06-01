@@ -43,22 +43,11 @@ public class Container : MonoBehaviour, IContainer, IInteractable {
   }
 
 #if UNITY_EDITOR
-  public string[] DebugContents;
-  void FixedUpdate() {
-    IEnumerable<string> ToList(Dictionary<ItemProto, int> queue) {
-      foreach ((var item, int amount) in queue) {
-        if (amount > 0)
-          yield return $"{item.name}:{amount}";
-      }
-    }
-    DebugContents = ToList(Inventory.Contents).ToArray();
-  }
-
   void OnGUI() {
     if (!WorkerManager.Instance.DebugDraw)
       return;
-    string ToString(string[] list) => string.Join("\n", list);
-    GUIExtensions.DrawLabel(transform.position, ToString(DebugContents));
+    string ToString(Dictionary<ItemProto, int> queue) => string.Join("\n", queue.Select(kvp => $"{kvp.Key.name}:{kvp.Value}"));
+    GUIExtensions.DrawLabel(transform.position, ToString(Inventory.Contents));
   }
 #endif
 }
