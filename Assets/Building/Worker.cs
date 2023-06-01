@@ -30,7 +30,7 @@ public class Worker : MonoBehaviour {
       worker.DebugCarry = new ItemAmount { Item = Request.Item, Count = -Request.Count };
       worker.DebugState = $"Pickup {From}->{To} {Request.Item}:{Request.Count}";
 #endif
-      var dist = 3f;
+      var dist = 3.5f;
       worker.Mover.SetDestination(worker.ChaseTarget(From.Transform, dist));
       await scope.Until(() => (worker.TargetInRange(From.Transform, dist)));
       worker.DebugState = $"Arrived {From}->{To} {Request.Item}:{Request.Count}";

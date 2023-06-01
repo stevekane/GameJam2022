@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static SaveObject;
 
-public class Inventory : MonoBehaviour {
+public class Inventory : MonoBehaviour, ISaveableComponent {
   [Serializable] public class ItemDictionary : SerializableDictionary<ItemProto, int> { }
   [SerializeField] ItemDictionary Items = new();
 
@@ -15,5 +16,20 @@ public class Inventory : MonoBehaviour {
     foreach (var kv in Items)
       other.Add(kv.Key, kv.Value);
     Items.Clear();
+  }
+
+  public ILoadableComponent Save() => new Serialized {
+    Items = Items,
+  };
+  class Serialized : ILoadableComponent {
+    public ItemDictionary Items;
+    public void Load(GameObject go) {
+      go.GetComponent<Inventory>().Items = Items;
+    }
+  }
+
+  void Awake() {
+    if (TryGetComponent(out SaveObject save))
+      save.RegisterSaveable(this);
   }
 }
