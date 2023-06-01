@@ -40,14 +40,11 @@ public class WorkerManager : MonoBehaviour {
       var worker = IdleWorkers[0];
       IdleWorkers.RemoveAt(0);
       worker.AssignJob(job);
+      JobQueue.Remove(job);
     }
   }
 
-  Worker.Job StartableJob() {
-    var job = JobQueue.FirstOrDefault(j => j.CanStart());
-    if (job != null) JobQueue.Remove(job);
-    return job;
-  }
+  Worker.Job StartableJob() => JobQueue.FirstOrDefault(j => j.CanStart());
 
   void OnGUI() {
     if (!DebugDraw)
