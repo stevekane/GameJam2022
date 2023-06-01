@@ -28,6 +28,7 @@ public class Worker : MonoBehaviour {
       worker.DebugState = $"Arrived {From}->{To} {Request.Item}:{Request.Count}";
       if (!From.ExtractItem(Request.Item, Request.Count)) {
         worker.DebugState = $"Notenough {From}->{To} {Request.Item}:{Request.Count}";
+        worker.OnJobDone(this);
         return;
       }
 #if UNITY_EDITOR

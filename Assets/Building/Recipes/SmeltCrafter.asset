@@ -10,10 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 75f2696ea7abd704e85ecd1a83997f20, type: 3}
-  m_Name: Blue
+  m_Name: SmeltCrafter
   m_EditorClassIdentifier: 
-  Inputs: []
+  CraftTime: 2
+  Inputs:
+  - Item: {fileID: 11400000, guid: e5dcb2bc93e512443a67a56360ddaf71, type: 2}
+    Count: 5
   Outputs:
-  - Item: {fileID: 11400000, guid: edc6f0fd575b28a468f1f3424816ba00, type: 2}
+  - Item: {fileID: 11400000, guid: e35e22450bf2ceb49b8dc3f2d0183528, type: 2}
     Count: 1
-  Time: 1
