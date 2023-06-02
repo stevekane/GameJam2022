@@ -66,6 +66,69 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
 
   public int GetExtractCount(ItemProto item) => GetOutputQueue(item);
 
+  public class RequestJob : Worker.Job {
+    public Container From;
+    public Crafter To;
+    public ItemAmount Request;
+
+    public override bool CanStart() => From.GetExtractCount(Request.Item) >= Request.Count;
+    public override TaskFunc<Worker.Job> Run(Worker worker) => async scope => {
+      await worker.MoveTo(scope, From.transform);
+      if (!From.ExtractItem(Request.Item, Request.Count))
+        return null;
+      try {
+        worker.Inventory.Add(Request.Item, Request.Count);
+        return new DepositJob { Target = To };
+      } catch {
+        // If we fail to finish the dropoff, return it whence it came.
+        return new DepositJob() { Target = From };
+      } finally {
+      }
+    };
+    public override void OnGUI() {
+      GUIExtensions.DrawLabel(To.transform.position, $"Request:{Request.Item}:{Request.Count}");
+    }
+  }
+  public class HarvestJob : Worker.Job {
+    public Crafter Target;
+    public ItemProto Item;
+
+    public override bool CanStart() => true;
+    public override TaskFunc<Worker.Job> Run(Worker worker) => async scope => {
+      await worker.MoveTo(scope, Target.transform);
+      int count = Target.GetOutputQueue(Item);
+      if (count == 0 || !Target.ExtractItem(Item, count))
+        return null;
+      worker.Inventory.Add(Item, count);
+      var hub = FindObjectOfType<Container>();
+      return new DepositJob { Target = FindObjectOfType<Container>() }; // TODO
+    };
+    public override void OnGUI() {
+      //var delta = To.Transform.position - From.Transform.position;
+      //var pos = From.Transform.position + delta*.2f;
+      //GUIExtensions.DrawLine(From.Transform.position, To.Transform.position, 2);
+      GUIExtensions.DrawLabel(Target.transform.position, $"Harvest:{Item.name}");
+    }
+  }
+  public class DepositJob : Worker.Job {
+    public IContainer Target;
+    Inventory DebugInventory = null;
+
+    public override bool CanStart() => true;
+    public override TaskFunc<Worker.Job> Run(Worker worker) => async scope => {
+      DebugInventory = worker.Inventory;
+      await worker.MoveTo(scope, Target.Transform);
+      foreach (var kvp in worker.Inventory.Contents)
+        Target.InsertItem(kvp.Key, kvp.Value);
+      worker.Inventory.Contents.Clear();
+      return null;
+    };
+    public override void OnGUI() {
+      string ToString(Dictionary<ItemProto, int> queue) => string.Join("\n", queue.Select(kvp => $"{kvp.Key.name}:{kvp.Value}"));
+      GUIExtensions.DrawLabel(Target.Transform.position, $"Deposit:{ToString(DebugInventory.Contents)}");
+    }
+  }
+
   public bool CanCraft(Inventory inventory) {
     if (!CurrentRecipe) return false;
     foreach (var input in CurrentRecipe.Inputs) {
@@ -99,13 +162,14 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
 
     var hub = FindObjectOfType<Container>();
     foreach (var input in CurrentRecipe.Inputs)
-      WorkerManager.Instance.AddDeliveryJob(hub, this, input);
+      WorkerManager.Instance.AddJob(new RequestJob { From = hub, To = this, Request = input });
   }
 
   public void RequestHarvestOutput() {
-    var hub = FindObjectOfType<Container>();  // TODO: atm I'm assuming one container
-    foreach (var output in OutputQueue)
-      WorkerManager.Instance.AddDeliveryJob(this, hub, new() { Item = output.Key, Count = output.Value });
+    foreach (var output in OutputQueue) {
+      if (!WorkerManager.Instance.GetAllJobs().Any(j => j is HarvestJob h && h.Target == this && h.Item == output.Key))
+        WorkerManager.Instance.AddJob(new HarvestJob { Target = this, Item = output.Key });
+    }
   }
 
   // TODO: this is no good for save/load

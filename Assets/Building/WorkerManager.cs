@@ -1,3 +1,5 @@
+using Sirenix.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,7 +10,8 @@ public class WorkerManager : MonoBehaviour {
 
   List<Worker> Workers = new();
   List<Worker> IdleWorkers = new();
-  List<Worker.Job> JobQueue = new();
+  List<Worker.Job> PendingJobs = new();
+  List<Worker.Job> AssignedJobs = new();
 
   public int NumWorkers => Workers.Count;
 
@@ -25,31 +28,36 @@ public class WorkerManager : MonoBehaviour {
     Workers.Remove(worker);
     IdleWorkers.Remove(worker);
   }
+  public void OnWorkerJobDone(Worker.Job job) {
+    AssignedJobs.Remove(job);
+  }
 
   public void OnContainerChanged(Container container) {
     AssignJobs();
   }
 
-  public void AddDeliveryJob(IContainer from, IContainer to, ItemAmount request) {
-    JobQueue.Add(new Worker.DeliveryJob { From = from, To = to, Request = request });
+  public void AddJob(Worker.Job job) {
+    PendingJobs.Add(job);
     AssignJobs();
   }
+  public IEnumerable<Worker.Job> GetAllJobs() => PendingJobs.Concat(AssignedJobs);
 
   void AssignJobs() {
     while (IdleWorkers.Count != 0 && StartableJob() is var job && job != null) {
       var worker = IdleWorkers[0];
       IdleWorkers.RemoveAt(0);
+      PendingJobs.Remove(job);
+      AssignedJobs.Add(job);
       worker.AssignJob(job);
-      JobQueue.Remove(job);
     }
   }
 
-  Worker.Job StartableJob() => JobQueue.FirstOrDefault(j => j.CanStart());
+  Worker.Job StartableJob() => PendingJobs.FirstOrDefault(j => j.CanStart());
 
   void OnGUI() {
     if (!DebugDraw)
       return;
-    foreach (var job in JobQueue)
+    foreach (var job in GetAllJobs())
       job.OnGUI();
   }
 }
