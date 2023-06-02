@@ -16,4 +16,8 @@ public class Inventory : MonoBehaviour {
       other.Add(kv.Key, kv.Value);
     Items.Clear();
   }
+
+  void Awake() {
+    GetComponent<SaveObject>()?.RegisterSaveable(this);
+  }
 }

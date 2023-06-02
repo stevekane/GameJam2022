@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-using static SaveObject;
 
 [RequireComponent(typeof(BuildObject))]
-public class Crafter : MonoBehaviour, IContainer, IInteractable, ISaveableComponent {
-  public Recipe[] Recipes;
+public class Crafter : MonoBehaviour, IContainer, IInteractable {
+  [ES3NonSerializable] public Recipe[] Recipes;
   public Recipe CurrentRecipe;
 
   // Arrays of input/output amounts held by this machine, in order of Recipe.Inputs/Outputs.
-  [ShowInInspector] Dictionary<ItemProto, int> InputQueue = new();
-  [ShowInInspector] Dictionary<ItemProto, int> OutputQueue = new();
+  [ShowInInspector, ES3Serializable] Dictionary<ItemProto, int> InputQueue = new();
+  [ShowInInspector, ES3Serializable] Dictionary<ItemProto, int> OutputQueue = new();
   TaskScope CraftTask;
   ItemObject CraftDisplayObject;
   Animator Animator;
@@ -142,33 +141,10 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable, ISaveableCompon
       output.Item.OnCrafted(this);
   }
 
-  SaveObject SaveObject;
-  public ILoadableComponent Save() => new Serialized {
-    CurrentRecipe = CurrentRecipe,
-    InputQueue = InputQueue,
-    OutputQueue = OutputQueue,
-    // TODO: crafting progress
-  };
-  class Serialized : ILoadableComponent {
-    public Recipe CurrentRecipe;
-    public Dictionary<ItemProto, int> InputQueue;
-    public Dictionary<ItemProto, int> OutputQueue;
-    public void Load(GameObject go) {
-      var crafter = go.GetComponent<Crafter>();
-      crafter.CurrentRecipe = CurrentRecipe;
-      if (InputQueue != null)
-        crafter.InputQueue = InputQueue;
-      if (OutputQueue != null)
-        crafter.OutputQueue = OutputQueue;
-      crafter.JustLoaded = true;
-    }
-  }
-
   void Awake() {
     this.InitComponentFromChildren(out Animator, true);
     this.InitComponent(out BuildObject, true);
-    this.InitComponent(out SaveObject, true);
-    SaveObject.RegisterSaveable(this);
+    GetComponent<SaveObject>().RegisterSaveable(this);
   }
 
   void OnDestroy() => CraftTask?.Dispose();

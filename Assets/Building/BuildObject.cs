@@ -1,4 +1,6 @@
+using ES3Internal;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Unity.AI.Navigation;
 using UnityEngine;
 
@@ -17,17 +19,20 @@ public class BuildObject : MonoBehaviour {
     return Instantiate(this, position, rotation);
   }
 
-  void Start() {
+  void Awake() {
     SetName();
+  }
+  void Start() {
     FindObjectOfType<NavMeshSurface>().BuildNavMesh();
   }
   void SetName() {
 #if UNITY_EDITOR
     // Generate a unique name for debugging purposes.
-    var prefix = $"{GetComponent<SaveObject>().Asset.editorAsset.name}_";
+    var prefix = Regex.Replace(name, "\\([^)]*\\)", "");
+    prefix = prefix.TrimEnd(' ');
     var existing = FindObjectsOfType<BuildObject>().Where(bo => bo.gameObject.name.StartsWith(prefix));
     var id = existing.ToArray().Length + 1;
-    gameObject.name = $"{prefix}{id}";
+    gameObject.name = $"{prefix}_{id}";
 #endif
   }
 }
