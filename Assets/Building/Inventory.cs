@@ -32,4 +32,8 @@ public class Inventory : MonoBehaviour, ISaveableComponent {
     if (TryGetComponent(out SaveObject save))
       save.RegisterSaveable(this);
   }
+
+  void Awake() {
+    GetComponent<SaveObject>()?.RegisterSaveable(this);
+  }
 }
