@@ -43,6 +43,7 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
       // Cancel worker jobs trying to fetch crafter outputs.
       WorkerManager.Instance.GetAllJobs()
         .Where(j => j is CollectJob h && h.Target == this && h.Item == outputItem)
+        .ToArray()
         .ForEach(j => j.Cancel());
       inventory.Add(outputItem, count);
     }
@@ -59,6 +60,7 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
       WorkerManager.Instance.GetAllJobs()
         .Where(j => j is RequestJob r && r.To == this && r.Request.Item == input.Item ||
                j is DepositJob d && d.Target == (IContainer)this)
+        .ToArray()
         .ForEach(j => j.Cancel());
       inventory.Remove(input.Item, input.Count);
       InputQueue[input.Item] = InputQueue.GetValueOrDefault(input.Item) + input.Count;
@@ -115,6 +117,7 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
         worker.Inventory.Add(Request.Item, Request.Count);
         return new DepositJob { Target = To };
       } catch {
+        Debug.Log($"Crafter: Request job was cancelled.");
         // If we fail to finish the dropoff, return it whence it came.
         return new DepositJob() { Target = From };
       } finally {
@@ -163,8 +166,11 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
         return null;
       } catch {
         // If we fail to finish the dropoff, return it to a container.
-        Debug.Assert(Target is Crafter); // should not fail/cancel when depositing items in a container.
-        return new DepositJob { Target = FindObjectOfType<Container>() }; // TODO
+        if (Target is Crafter && FindObjectOfType<Container>() is var container && container != null) { // TODO: container
+          Debug.Log($"Crafter: Deposit job cancelled, returning to container");
+          return new DepositJob { Target = container };
+        }
+        return null;
       } finally {
       }
     };

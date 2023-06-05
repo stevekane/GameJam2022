@@ -35,6 +35,7 @@ public class TaskScope : IDisposable {
     var scope = childScope;
     return CheckTask(f(scope));
   }
+  public Task RunChild(TaskFunc f) => RunChild(out var _, f);
   T CheckTask<T>(T task) where T : Task {
     ThrowIfCancelled();
     return task;

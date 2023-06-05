@@ -26,10 +26,13 @@ public class WorkerManager : MonoBehaviour {
     Workers.Remove(worker);
     IdleWorkers.Remove(worker);
   }
+  public void OnWorkerJobStarted(Worker.Job job) {
+    PendingJobs.Remove(job);
+    AssignedJobs.Add(job);
+  }
   public void OnWorkerJobDone(Worker.Job job) {
     AssignedJobs.Remove(job);
   }
-
   public void OnWorkerJobCancelled(Worker.Job job) {
     // Might be pending or in progress.
     PendingJobs.Remove(job);
@@ -50,8 +53,6 @@ public class WorkerManager : MonoBehaviour {
     while (IdleWorkers.Count != 0 && StartableJob() is var job && job != null) {
       var worker = IdleWorkers[0];
       IdleWorkers.RemoveAt(0);
-      PendingJobs.Remove(job);
-      AssignedJobs.Add(job);
       worker.AssignJob(job);
     }
   }

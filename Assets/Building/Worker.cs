@@ -17,7 +17,7 @@ public class Worker : MonoBehaviour {
     public abstract TaskFunc<Job> Run(Worker worker);
     public virtual void OnGUI() { }
     public void Cancel() {
-      RunScope.Cancel();
+      RunScope?.Cancel();
       WorkerManager.Instance.OnWorkerJobCancelled(this);
     }
     internal TaskScope RunScope;  // only valid once it is started.
@@ -44,11 +44,15 @@ public class Worker : MonoBehaviour {
   async Task RunCurrentJob(TaskScope scope) {
     while (CurrentJob != null) {
       try {
-        CurrentJob.RunScope = scope;
-        var nextJob = await CurrentJob.Run(this)(scope);
-        WorkerManager.Instance.OnWorkerJobDone(CurrentJob);
-        CurrentJob = nextJob;
-      } finally {
+        WorkerManager.Instance.OnWorkerJobStarted(CurrentJob);
+        await scope.RunChild(async s => {
+          CurrentJob.RunScope = s;
+          var nextJob = await CurrentJob.Run(this)(s);
+          WorkerManager.Instance.OnWorkerJobDone(CurrentJob);
+          CurrentJob = nextJob;
+        });
+      } catch {
+        Debug.Log($"Worker: Running job was cancelled.");
         CurrentJob = null;
       }
     }
