@@ -23,7 +23,7 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
     // TODO: cancel pending jobs
     CurrentRecipe = Recipes[choiceIdx];
     var inventory = interacter.GetComponent<Inventory>();
-    if (CanCraft(inventory)) {
+    if (HasRequiredInputs(inventory)) {
       TransferItems(inventory);
     } else {
       RequestCraft();
@@ -31,6 +31,39 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
   }
   public void Rotate(float degrees) {
     transform.rotation *= Quaternion.AngleAxis(90f, Vector3.up);
+  }
+  public void Deposit(Character interacter) {
+    var inventory = interacter.GetComponent<Inventory>();
+    if (HasRequiredInputs(inventory))
+      TransferItems(inventory);
+  }
+  public void Collect(Character interacter) {
+    var inventory = interacter.GetComponent<Inventory>();
+    foreach ((var outputItem, var count) in OutputQueue) {
+      // Cancel worker jobs trying to fetch crafter outputs.
+      WorkerManager.Instance.GetAllJobs()
+        .Where(j => j is CollectJob h && h.Target == this && h.Item == outputItem)
+        .ForEach(j => j.Cancel());
+      inventory.Add(outputItem, count);
+    }
+    OutputQueue.Clear();
+  }
+
+  public bool HasRequiredInputs(Inventory inventory) {
+    return CurrentRecipe != null && CurrentRecipe.Inputs.All(input => inventory.Count(input.Item) >= input.Count);
+  }
+
+  public void TransferItems(Inventory inventory) {
+    foreach (var input in CurrentRecipe.Inputs) {
+      // Cancel worker jobs trying to give this crafter items.
+      WorkerManager.Instance.GetAllJobs()
+        .Where(j => j is RequestJob r && r.To == this && r.Request.Item == input.Item ||
+               j is DepositJob d && d.Target == (IContainer)this)
+        .ForEach(j => j.Cancel());
+      inventory.Remove(input.Item, input.Count);
+      InputQueue[input.Item] = InputQueue.GetValueOrDefault(input.Item) + input.Count;
+    }
+    CraftIfSatisfied();
   }
 
   // Note: We assume there is only 1 recipe that can produce a given output.
@@ -66,6 +99,8 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
 
   public int GetExtractCount(ItemProto item) => GetOutputQueue(item);
 
+  // Job telling a worker to fetch an input item from a container. Once the worker has the item,
+  // a new DepositJob continues to deliver the item to us.
   public class RequestJob : Worker.Job {
     public Container From;
     public Crafter To;
@@ -89,7 +124,9 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
       GUIExtensions.DrawLabel(To.transform.position, $"Request:{Request.Item}:{Request.Count}");
     }
   }
-  public class HarvestJob : Worker.Job {
+  // Job telling a worker to collect items from our output queue. Once the worker has the items,
+  // a new DepositJob continues to drop the item off in a container.
+  public class CollectJob : Worker.Job {
     public Crafter Target;
     public ItemProto Item;
 
@@ -110,42 +147,31 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
       GUIExtensions.DrawLabel(Target.transform.position, $"Harvest:{Item.name}");
     }
   }
+  // Job telling the worker to deposit his items in a target (container or our crafter).
   public class DepositJob : Worker.Job {
     public IContainer Target;
     Inventory DebugInventory = null;
 
     public override bool CanStart() => true;
     public override TaskFunc<Worker.Job> Run(Worker worker) => async scope => {
-      DebugInventory = worker.Inventory;
-      await worker.MoveTo(scope, Target.Transform);
-      foreach (var kvp in worker.Inventory.Contents)
-        Target.InsertItem(kvp.Key, kvp.Value);
-      worker.Inventory.Contents.Clear();
-      return null;
+      try {
+        DebugInventory = worker.Inventory;
+        await worker.MoveTo(scope, Target.Transform);
+        foreach (var kvp in worker.Inventory.Contents)
+          Target.InsertItem(kvp.Key, kvp.Value);
+        worker.Inventory.Contents.Clear();
+        return null;
+      } catch {
+        // If we fail to finish the dropoff, return it to a container.
+        Debug.Assert(Target is Crafter); // should not fail/cancel when depositing items in a container.
+        return new DepositJob { Target = FindObjectOfType<Container>() }; // TODO
+      } finally {
+      }
     };
     public override void OnGUI() {
       string ToString(Dictionary<ItemProto, int> queue) => string.Join("\n", queue.Select(kvp => $"{kvp.Key.name}:{kvp.Value}"));
       GUIExtensions.DrawLabel(Target.Transform.position, $"Deposit:{ToString(DebugInventory.Contents)}");
     }
-  }
-
-  public bool CanCraft(Inventory inventory) {
-    if (!CurrentRecipe) return false;
-    foreach (var input in CurrentRecipe.Inputs) {
-      if (inventory.Count(input.Item) < input.Count)
-        return false;
-    }
-    return true;
-  }
-
-  public void TransferItems(Inventory inventory) {
-    Debug.Log($"Transferring items from {inventory.gameObject.name} to {name} for {CurrentRecipe}");
-    foreach (var input in CurrentRecipe.Inputs) {
-      inventory.Remove(input.Item, input.Count);
-      // TODO: queue not needed?
-      InputQueue[input.Item] = InputQueue.GetValueOrDefault(input.Item) + input.Count;
-    }
-    CraftIfSatisfied();
   }
 
   // See if we can output an item or begin a craft that has been requested, and do it if so.
@@ -167,8 +193,8 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
 
   public void RequestHarvestOutput() {
     foreach (var output in OutputQueue) {
-      if (!WorkerManager.Instance.GetAllJobs().Any(j => j is HarvestJob h && h.Target == this && h.Item == output.Key))
-        WorkerManager.Instance.AddJob(new HarvestJob { Target = this, Item = output.Key });
+      if (!WorkerManager.Instance.GetAllJobs().Any(j => j is CollectJob h && h.Target == this && h.Item == output.Key))
+        WorkerManager.Instance.AddJob(new CollectJob { Target = this, Item = output.Key });
     }
   }
 

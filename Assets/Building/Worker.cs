@@ -16,6 +16,11 @@ public class Worker : MonoBehaviour {
     public abstract bool CanStart();
     public abstract TaskFunc<Job> Run(Worker worker);
     public virtual void OnGUI() { }
+    public void Cancel() {
+      RunScope.Cancel();
+      WorkerManager.Instance.OnWorkerJobCancelled(this);
+    }
+    internal TaskScope RunScope;  // only valid once it is started.
   }
   bool TargetInRange(Transform target, float range) {
     var delta = (target.position - transform.position);
@@ -38,9 +43,14 @@ public class Worker : MonoBehaviour {
   }
   async Task RunCurrentJob(TaskScope scope) {
     while (CurrentJob != null) {
-      var nextJob = await CurrentJob.Run(this)(scope);
-      WorkerManager.Instance.OnWorkerJobDone(CurrentJob);
-      CurrentJob = nextJob;
+      try {
+        CurrentJob.RunScope = scope;
+        var nextJob = await CurrentJob.Run(this)(scope);
+        WorkerManager.Instance.OnWorkerJobDone(CurrentJob);
+        CurrentJob = nextJob;
+      } finally {
+        CurrentJob = null;
+      }
     }
     WorkerManager.Instance.OnWorkerIdle(this);
   }

@@ -1,5 +1,3 @@
-using Sirenix.Utilities;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -29,6 +27,12 @@ public class WorkerManager : MonoBehaviour {
     IdleWorkers.Remove(worker);
   }
   public void OnWorkerJobDone(Worker.Job job) {
+    AssignedJobs.Remove(job);
+  }
+
+  public void OnWorkerJobCancelled(Worker.Job job) {
+    // Might be pending or in progress.
+    PendingJobs.Remove(job);
     AssignedJobs.Remove(job);
   }
 

@@ -17,11 +17,16 @@ public class Container : MonoBehaviour, IContainer, IInteractable {
   // IInteractable
   public string[] Choices => new[] { "Deposit" };
   public void Choose(Character interacter, int choiceIdx) {
-    var charInventory = interacter.GetComponent<Inventory>();
-    charInventory.MoveTo(Inventory);
+    Deposit(interacter);
   }
   public void Rotate(float degrees) {
     transform.rotation *= Quaternion.AngleAxis(90f, Vector3.up);
+  }
+  public void Deposit(Character interacter) {
+    interacter.GetComponent<Inventory>().MoveTo(Inventory);
+  }
+  public void Collect(Character interacter) {
+    Inventory.MoveTo(interacter.GetComponent<Inventory>());
   }
 
   // IContainer

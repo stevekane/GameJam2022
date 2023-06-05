@@ -6,6 +6,8 @@ public interface IInteractable {
   string[] Choices { get; }
   void Choose(Character interacter, int choiceIdx);
   void Rotate(float degrees);
+  void Deposit(Character interacter);
+  void Collect(Character interacter);
 }
 
 public class InteractAbility : Ability {
@@ -54,6 +56,21 @@ public class InteractAbility : Ability {
   }
   public Task RotateAction(TaskScope scope) {
     InteractTarget.Rotate(90f);
+    return null;
+  }
+
+  string ToString(Inventory inv) {
+    return string.Join(",", inv.Contents.Select(kvp => $"{kvp.Key}:{kvp.Value}"));
+  }
+  public Task DepositAction(TaskScope scope) {
+    InteractTarget.Deposit(Character);
+    Debug.Log($"Deposited! Inventory now: {ToString(Character.GetComponent<Inventory>())}");
+    return null;
+  }
+
+  public Task CollectAction(TaskScope scope) {
+    InteractTarget.Collect(Character);
+    Debug.Log($"Collected! Inventory now: {ToString(Character.GetComponent<Inventory>())}");
     return null;
   }
 
