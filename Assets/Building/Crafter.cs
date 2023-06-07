@@ -10,24 +10,18 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
   public Recipe CurrentRecipe;
 
   // Arrays of input/output amounts held by this machine, in order of Recipe.Inputs/Outputs.
+  // TODO: maybe reuse Inventory?
   [ShowInInspector, ES3Serializable] Dictionary<ItemProto, int> InputQueue = new();
   [ShowInInspector, ES3Serializable] Dictionary<ItemProto, int> OutputQueue = new();
   TaskScope CraftTask;
-  ItemObject CraftDisplayObject;
+  ItemObject RecipeIndicator;
   Animator Animator;
   BuildObject BuildObject;
 
   // IInteractable
   public string[] Choices => Recipes.Select(r => r.name).ToArray();
   public void Choose(Character interacter, int choiceIdx) {
-    // TODO: cancel pending jobs
-    CurrentRecipe = Recipes[choiceIdx];
-    var inventory = interacter.GetComponent<Inventory>();
-    if (HasRequiredInputs(inventory)) {
-      TransferItems(inventory);
-    } else {
-      RequestCraft();
-    }
+    SetRecipe(Recipes[choiceIdx]);
   }
   public void Rotate(float degrees) {
     transform.rotation *= Quaternion.AngleAxis(90f, Vector3.up);
@@ -55,17 +49,23 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
   }
 
   public void TransferItems(Inventory inventory) {
+    CancelRequestJobs();
     foreach (var input in CurrentRecipe.Inputs) {
-      // Cancel worker jobs trying to give this crafter items.
-      WorkerManager.Instance.GetAllJobs()
-        .Where(j => j is RequestJob r && r.To == this && r.Request.Item == input.Item ||
-               j is DepositJob d && d.Target == (IContainer)this)
-        .ToArray()
-        .ForEach(j => j.Cancel());
       inventory.Remove(input.Item, input.Count);
       InputQueue[input.Item] = InputQueue.GetValueOrDefault(input.Item) + input.Count;
     }
     CraftIfSatisfied();
+  }
+
+  void SetRecipe(Recipe recipe) {
+    CancelRequestJobs();
+    CurrentRecipe = recipe;
+    RecipeIndicator?.gameObject?.Destroy();
+    if (CurrentRecipe) {
+      if (CurrentRecipe.Outputs.Length > 0)
+        RecipeIndicator = CurrentRecipe.Outputs[0].Item.Spawn(transform.position + 3f*Vector3.up);
+      RequestCraft();
+    }
   }
 
   // Note: We assume there is only 1 recipe that can produce a given output.
@@ -100,6 +100,108 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
   }
 
   public int GetExtractCount(ItemProto item) => GetOutputQueue(item);
+
+  // See if we can output an item or begin a craft that has been requested, and do it if so.
+  public void CraftIfSatisfied() {
+    if (CraftTask != null) return;
+    var satisfied = CurrentRecipe.Inputs.All(i => InputQueue.GetValueOrDefault(i.Item) >= i.Count);
+    if (satisfied)
+      CraftTask = TaskScope.StartNew(s => Craft(s, CurrentRecipe));
+  }
+
+  public void RequestCraft() {
+    CraftIfSatisfied();
+    if (CraftTask != null) return;
+
+    var hub = FindObjectOfType<Container>();
+    foreach (var input in CurrentRecipe.Inputs)
+      WorkerManager.Instance.AddJob(new RequestJob { From = hub, To = this, Request = input });
+  }
+
+  public void RequestCollectOutput() {
+    foreach (var output in OutputQueue) {
+      if (!WorkerManager.Instance.GetAllJobs().Any(j => j is CollectJob h && h.Target == this && h.Item == output.Key))
+        WorkerManager.Instance.AddJob(new CollectJob { Target = this, Item = output.Key });
+    }
+  }
+
+  // Cancel worker jobs trying to give this crafter items.
+  void CancelRequestJobs() {
+    if (CurrentRecipe == null) return;
+    foreach (var input in CurrentRecipe.Inputs) {
+      WorkerManager.Instance.GetAllJobs()
+        .Where(j => j is RequestJob r && r.To == this && r.Request.Item == input.Item ||
+               j is DepositJob d && d.Target == (IContainer)this)
+        .ToArray()
+        .ForEach(j => j.Cancel());
+    }
+  }
+
+  // TODO: this is no good for save/load
+  async Task Craft(TaskScope scope, Recipe recipe) {
+    bool finished = false;
+    var isBuildPlot = GetComponent<BuildPlot>();
+    try {
+      using var disposeTask = CraftTask;
+      await scope.Until(() => OutputQueue.Sum(kvp => kvp.Value) <= 1);
+      Animator.SetBool("Crafting", true);
+      await scope.Seconds(recipe.CraftTime);
+      foreach (var input in recipe.Inputs) {
+        Debug.Assert(InputQueue[input.Item] > 0);
+        InputQueue[input.Item] -= input.Count;
+      }
+      foreach (var output in recipe.Outputs)
+        OutputQueue[output.Item] = OutputQueue.GetValueOrDefault(output.Item) + output.Count;
+      //if (!isBuildPlot)
+      //  await scope.Until(() => ItemFlowManager.Instance.CanSpawnOutput(item, OutputPortCell));
+      finished = true;
+    } finally {
+      Animator?.SetBool("Crafting", false);
+      CraftTask = null;
+      if (finished)
+        OnCraftFinished(recipe);
+    }
+  }
+
+  void OnCraftFinished(Recipe recipe) {
+    foreach (var output in recipe.Outputs)
+      output.Item.OnCrafted(this);
+  }
+
+  void Awake() {
+    this.InitComponentFromChildren(out Animator, true);
+    this.InitComponent(out BuildObject, true);
+    GetComponent<SaveObject>().RegisterSaveable(this);
+  }
+
+  void Start() {
+    SetRecipe(CurrentRecipe);
+  }
+
+  void OnDestroy() {
+    CraftTask?.Dispose();
+    RecipeIndicator?.gameObject?.Destroy();
+  }
+
+  bool JustLoaded = false;
+  void FixedUpdate() {
+    if (JustLoaded) {
+      JustLoaded = false;
+      RequestCollectOutput();
+      if (CurrentRecipe)
+        RequestCraft();
+    }
+  }
+
+#if UNITY_EDITOR
+  void OnGUI() {
+    if (!WorkerManager.Instance.DebugDraw)
+      return;
+    string ToString(Dictionary<ItemProto, int> queue) => string.Join("\n", queue.Select(kvp => $"{kvp.Key.name}:{kvp.Value}"));
+    GUIExtensions.DrawLabel(InputPortPos, ToString(InputQueue));
+    GUIExtensions.DrawLabel(OutputPortPos - transform.forward, ToString(OutputQueue));
+  }
+#endif
 
   // Job telling a worker to fetch an input item from a container. Once the worker has the item,
   // a new DepositJob continues to deliver the item to us.
@@ -179,89 +281,4 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
       GUIExtensions.DrawLabel(Target.Transform.position, $"Deposit:{ToString(DebugInventory.Contents)}");
     }
   }
-
-  // See if we can output an item or begin a craft that has been requested, and do it if so.
-  public void CraftIfSatisfied() {
-    if (CraftTask != null) return;
-    var satisfied = CurrentRecipe.Inputs.All(i => InputQueue.GetValueOrDefault(i.Item) >= i.Count);
-    if (satisfied)
-      CraftTask = TaskScope.StartNew(s => Craft(s, CurrentRecipe));
-  }
-
-  public void RequestCraft() {
-    CraftIfSatisfied();
-    if (CraftTask != null) return;
-
-    var hub = FindObjectOfType<Container>();
-    foreach (var input in CurrentRecipe.Inputs)
-      WorkerManager.Instance.AddJob(new RequestJob { From = hub, To = this, Request = input });
-  }
-
-  public void RequestHarvestOutput() {
-    foreach (var output in OutputQueue) {
-      if (!WorkerManager.Instance.GetAllJobs().Any(j => j is CollectJob h && h.Target == this && h.Item == output.Key))
-        WorkerManager.Instance.AddJob(new CollectJob { Target = this, Item = output.Key });
-    }
-  }
-
-  // TODO: this is no good for save/load
-  async Task Craft(TaskScope scope, Recipe recipe) {
-    bool finished = false;
-    var isBuildPlot = GetComponent<BuildPlot>();
-    try {
-      using var disposeTask = CraftTask;
-      await scope.Until(() => OutputQueue.Sum(kvp => kvp.Value) <= 1);
-      Animator.SetBool("Crafting", true);
-      CraftDisplayObject = recipe.Outputs[0].Item.Spawn(transform.position + 3f*Vector3.up);
-      await scope.Seconds(recipe.CraftTime);
-      foreach (var input in recipe.Inputs) {
-        Debug.Assert(InputQueue[input.Item] > 0);
-        InputQueue[input.Item] -= input.Count;
-      }
-      foreach (var output in recipe.Outputs)
-        OutputQueue[output.Item] = OutputQueue.GetValueOrDefault(output.Item) + output.Count;
-      //if (!isBuildPlot)
-      //  await scope.Until(() => ItemFlowManager.Instance.CanSpawnOutput(item, OutputPortCell));
-      finished = true;
-    } finally {
-      CraftDisplayObject?.gameObject.Destroy();
-      Animator?.SetBool("Crafting", false);
-      CraftTask = null;
-      if (finished)
-        OnCraftFinished(recipe);
-    }
-  }
-
-  void OnCraftFinished(Recipe recipe) {
-    foreach (var output in recipe.Outputs)
-      output.Item.OnCrafted(this);
-  }
-
-  void Awake() {
-    this.InitComponentFromChildren(out Animator, true);
-    this.InitComponent(out BuildObject, true);
-    GetComponent<SaveObject>().RegisterSaveable(this);
-  }
-
-  void OnDestroy() => CraftTask?.Dispose();
-
-  bool JustLoaded = false;
-  void FixedUpdate() {
-    if (JustLoaded) {
-      JustLoaded = false;
-      RequestHarvestOutput();
-      if (CurrentRecipe)
-        RequestCraft();
-    }
-  }
-
-#if UNITY_EDITOR
-  void OnGUI() {
-    if (!WorkerManager.Instance.DebugDraw)
-      return;
-    string ToString(Dictionary<ItemProto, int> queue) => string.Join("\n", queue.Select(kvp => $"{kvp.Key.name}:{kvp.Value}"));
-    GUIExtensions.DrawLabel(InputPortPos, ToString(InputQueue));
-    GUIExtensions.DrawLabel(OutputPortPos - transform.forward, ToString(OutputQueue));
-  }
-#endif
 }

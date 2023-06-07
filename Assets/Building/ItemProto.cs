@@ -16,6 +16,6 @@ public class ItemProto : ScriptableObject {
   public virtual void OnCrafted(Crafter crafter) {
     // By default, crafters request the next craft and put the output up for harvesting.
     crafter.RequestCraft();
-    crafter.RequestHarvestOutput();
+    crafter.RequestCollectOutput();
   }
 }
