@@ -32,8 +32,12 @@ public class Worker : MonoBehaviour {
   }
   public async Task MoveTo(TaskScope scope, Transform target) {
     const float desiredDist = 3.5f;
-    Mover.SetDestination(ChaseTarget(target, desiredDist));
-    await scope.Until(() => TargetInRange(target, desiredDist));
+    await scope.Any(
+      Waiter.Until(() => TargetInRange(target, desiredDist)),
+      Waiter.Repeat(async s => {
+        Mover.SetDestination(ChaseTarget(target, desiredDist));
+        await s.Millis(200);
+      }));
   }
 
   public void AssignJob(Job job) {

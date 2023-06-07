@@ -309,10 +309,11 @@ public static class GUIExtensions {
     GUI.DrawTexture(new Rect(start.x, start.y - width2, d.magnitude, width), Texture2D.whiteTexture);
     GUIUtility.RotateAroundPivot(-a, start);
   }
-  public static void DrawLabel(Vector3 worldPos, string label) {
+  public static void DrawLabel(Vector3 worldPos, string label) => DrawLabel(worldPos, label, Color.white);
+  public static void DrawLabel(Vector3 worldPos, string label, Color color) {
     var pos = Camera.main.WorldToGUIPoint(worldPos);
-    var style = new GUIStyle() { fontSize = 48 };
-    style.normal.textColor = Color.white;
+    var style = new GUIStyle() { fontSize = 32 };
+    style.normal.textColor = color;
     GUI.Label(new Rect(pos.x, pos.y, 100, 100), label, style);
   }
 }

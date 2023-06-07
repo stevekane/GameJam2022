@@ -66,8 +66,8 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
 
   //public Vector2Int InputPortCell => BuildGrid.WorldToGrid(InputPortPos);
   //public Vector2Int OutputPortCell => BuildGrid.WorldToGrid(OutputPortPos);
-  public Vector3 InputPortPos => transform.position - transform.rotation*new Vector3(0f, 0f, BuildGrid.GetBottomLeftOffset(BuildObject.Size).y + 1f);
-  public Vector3 OutputPortPos => transform.position + transform.rotation*new Vector3(0f, 0f, BuildGrid.GetTopRightOffset(BuildObject.Size).y + 1f);
+  public Vector3 InputPortPos => transform.position - transform.rotation*new Vector3(BuildGrid.GetBottomLeftOffset(BuildObject.Size).y + 1f, 0f, 0f);
+  public Vector3 OutputPortPos => transform.position + transform.rotation*new Vector3(BuildGrid.GetTopRightOffset(BuildObject.Size).y + 1f, 0f, 0f);
 
   // IContainer
   public Transform Transform => transform;
@@ -176,8 +176,10 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
     }
   }
 
+  int guiIdx = 0;
 #if UNITY_EDITOR
   void OnGUI() {
+    guiIdx = 0;
     if (!WorkerManager.Instance.DebugDraw)
       return;
     string ToString(IEnumerable<KeyValuePair<ItemProto, int>> queue) =>
@@ -210,7 +212,9 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
       }
     };
     public override void OnGUI() {
-      GUIExtensions.DrawLabel(To.transform.position, $"Request:{Request.Item}:{Request.Count}");
+      var newlines = string.Concat(Enumerable.Repeat("\n", To.guiIdx++));
+      var blue = new Color(.3f, .3f, 1, 1);
+      GUIExtensions.DrawLabel(To.transform.position, $"{newlines}r:{Request.Item.name}:{Request.Count}", blue);
     }
   }
   // Job telling a worker to collect items from our output queue. Once the worker has the items,
@@ -233,7 +237,9 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
       //var delta = To.Transform.position - From.Transform.position;
       //var pos = From.Transform.position + delta*.2f;
       //GUIExtensions.DrawLine(From.Transform.position, To.Transform.position, 2);
-      GUIExtensions.DrawLabel(Target.transform.position, $"Harvest:{Item.name}");
+      var newlines = string.Concat(Enumerable.Repeat("\n", Target.guiIdx++));
+      var red = new Color(1, .3f, .3f, 1);
+      GUIExtensions.DrawLabel(Target.transform.position, $"{newlines}c:{Item.name}", red);
     }
   }
   // Job telling the worker to deposit his items in a target (container or our crafter).
@@ -262,7 +268,7 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
     };
     public override void OnGUI() {
       string ToString(Dictionary<ItemProto, int> queue) => string.Join("\n", queue.Select(kvp => $"{kvp.Key.name}:{kvp.Value}"));
-      GUIExtensions.DrawLabel(Target.Transform.position, $"Deposit:{ToString(DebugInventory.Contents)}");
+      GUIExtensions.DrawLabel(Target.Transform.position, $"d:{ToString(DebugInventory.Contents)}");
     }
   }
 }
