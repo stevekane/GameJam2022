@@ -273,6 +273,18 @@ public static class DictionaryExtensions {
       dictionary.Add(key, value = createFunc());
     return value;
   }
+  // Special case for "counting" dictionaries, where a 0 indicates "key not present".
+  public static int Increment<TKey>(this IDictionary<TKey, int> dictionary, TKey key, int amount = 1) {
+    var current = dictionary.TryGetValue(key, out var value) ? value : 0;
+    return dictionary[key] = current + amount;
+  }
+  public static int Decrement<TKey>(this IDictionary<TKey, int> dictionary, TKey key, int amount = 1) {
+    var current = dictionary.TryGetValue(key, out var value) ? value : 0;
+    var remaining = dictionary[key] = current - amount;
+    if (remaining == 0)
+      dictionary.Remove(key);
+    return remaining;
+  }
 }
 
 public static class CameraExtensions {

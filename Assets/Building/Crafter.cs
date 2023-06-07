@@ -9,14 +9,18 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
   [ES3NonSerializable] public Recipe[] Recipes;
   public Recipe CurrentRecipe;
 
-  // Arrays of input/output amounts held by this machine, in order of Recipe.Inputs/Outputs.
-  // TODO: maybe reuse Inventory?
-  [ShowInInspector, ES3Serializable] Dictionary<ItemProto, int> InputQueue = new();
-  [ShowInInspector, ES3Serializable] Dictionary<ItemProto, int> OutputQueue = new();
+  Inventory Inventory;
   TaskScope CraftTask;
   ItemObject RecipeIndicator;
   Animator Animator;
   BuildObject BuildObject;
+
+  // Inputs and Outputs are held in the inventory. Inputs are those in CurrentRecipe.Inputs, outputs are everything
+  // else (and include extra items left over after switching recipes).
+  IEnumerable<KeyValuePair<ItemProto, int>> InputQueue =>
+    Inventory.Contents.Where(i => CurrentRecipe?.Inputs.Any(ia => ia.Item == i.Key) ?? false);
+  IEnumerable<KeyValuePair<ItemProto, int>> OutputQueue =>
+    Inventory.Contents.Where(i => !CurrentRecipe?.Inputs.Any(ia => ia.Item == i.Key) ?? true);
 
   // IInteractable
   public string[] Choices => Recipes.Select(r => r.name).ToArray();
@@ -27,34 +31,23 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
     transform.rotation *= Quaternion.AngleAxis(90f, Vector3.up);
   }
   public void Deposit(Character interacter) {
-    var inventory = interacter.GetComponent<Inventory>();
-    if (HasRequiredInputs(inventory))
-      TransferItems(inventory);
+    var characterInventory = interacter.GetComponent<Inventory>();
+    var hasAllInputs = CurrentRecipe != null && CurrentRecipe.Inputs.All(input => characterInventory.Count(input.Item) >= input.Count);
+    if (!hasAllInputs) return;
+    CancelRequestJobs();
+    foreach (var input in CurrentRecipe.Inputs)
+      characterInventory.MoveTo(Inventory, input.Item, input.Count);
+    CraftIfSatisfied();
   }
   public void Collect(Character interacter) {
-    var inventory = interacter.GetComponent<Inventory>();
-    foreach ((var outputItem, var count) in OutputQueue) {
-      // Cancel worker jobs trying to fetch crafter outputs.
-      WorkerManager.Instance.GetAllJobs()
-        .Where(j => j is CollectJob h && h.Target == this && h.Item == outputItem)
-        .ToArray()
-        .ForEach(j => j.Cancel());
-      inventory.Add(outputItem, count);
-    }
-    OutputQueue.Clear();
-  }
-
-  public bool HasRequiredInputs(Inventory inventory) {
-    return CurrentRecipe != null && CurrentRecipe.Inputs.All(input => inventory.Count(input.Item) >= input.Count);
-  }
-
-  public void TransferItems(Inventory inventory) {
-    CancelRequestJobs();
-    foreach (var input in CurrentRecipe.Inputs) {
-      inventory.Remove(input.Item, input.Count);
-      InputQueue[input.Item] = InputQueue.GetValueOrDefault(input.Item) + input.Count;
-    }
-    CraftIfSatisfied();
+    // Cancel worker jobs trying to fetch crafter outputs.
+    WorkerManager.Instance.GetAllJobs()
+      .Where(j => j is CollectJob h && h.Target == this)
+      .ToArray()
+      .ForEach(j => j.Cancel());
+    var characterInventory = interacter.GetComponent<Inventory>();
+    foreach ((var outputItem, var count) in OutputQueue.ToArray())
+      Inventory.MoveTo(characterInventory, outputItem, count);
   }
 
   void SetRecipe(Recipe recipe) {
@@ -76,35 +69,29 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
   public Vector3 InputPortPos => transform.position - transform.rotation*new Vector3(0f, 0f, BuildGrid.GetBottomLeftOffset(BuildObject.Size).y + 1f);
   public Vector3 OutputPortPos => transform.position + transform.rotation*new Vector3(0f, 0f, BuildGrid.GetTopRightOffset(BuildObject.Size).y + 1f);
 
-  public int GetInputQueue(ItemProto item) => InputQueue.GetValueOrDefault(item);
-  public int GetOutputQueue(ItemProto item) => OutputQueue.GetValueOrDefault(item);
-
   // IContainer
   public Transform Transform => transform;
 
   // Adds an item to the input queue, which could possibly trigger a craft.
   public bool InsertItem(ItemProto item, int count) {
-    InputQueue[item] = InputQueue.GetValueOrDefault(item) + count;
+    Inventory.Add(item, count);
     CraftIfSatisfied();
     return true;
   }
 
   // Removes an item from the output queue.
   public bool ExtractItem(ItemProto item, int count) {
-    if (GetExtractCount(item) >= count is var enough && enough) {
-      var remaining = OutputQueue[item] -= count;
-      if (remaining == 0)
-        OutputQueue.Remove(item);
-    }
+    if (Inventory.Count(item) >= count is var enough && enough)
+      Inventory.Remove(item, count);
     return enough;
   }
 
-  public int GetExtractCount(ItemProto item) => GetOutputQueue(item);
+  public int GetExtractCount(ItemProto item) => Inventory.Count(item);
 
   // See if we can output an item or begin a craft that has been requested, and do it if so.
   public void CraftIfSatisfied() {
     if (CraftTask != null) return;
-    var satisfied = CurrentRecipe.Inputs.All(i => InputQueue.GetValueOrDefault(i.Item) >= i.Count);
+    var satisfied = CurrentRecipe.Inputs.All(i => Inventory.Count(i.Item) >= i.Count);
     if (satisfied)
       CraftTask = TaskScope.StartNew(s => Craft(s, CurrentRecipe));
   }
@@ -127,14 +114,11 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
 
   // Cancel worker jobs trying to give this crafter items.
   void CancelRequestJobs() {
-    if (CurrentRecipe == null) return;
-    foreach (var input in CurrentRecipe.Inputs) {
-      WorkerManager.Instance.GetAllJobs()
-        .Where(j => j is RequestJob r && r.To == this && r.Request.Item == input.Item ||
-               j is DepositJob d && d.Target == (IContainer)this)
-        .ToArray()
-        .ForEach(j => j.Cancel());
-    }
+    WorkerManager.Instance.GetAllJobs()
+      .Where(j => j is RequestJob r && r.To == this ||
+              j is DepositJob d && d.Target == (IContainer)this)
+      .ToArray()
+      .ForEach(j => j.Cancel());
   }
 
   // TODO: this is no good for save/load
@@ -143,15 +127,13 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
     var isBuildPlot = GetComponent<BuildPlot>();
     try {
       using var disposeTask = CraftTask;
-      await scope.Until(() => OutputQueue.Sum(kvp => kvp.Value) <= 1);
+      await scope.Until(() => OutputQueue.Sum(kvp => kvp.Value) < 10);
       Animator.SetBool("Crafting", true);
       await scope.Seconds(recipe.CraftTime);
-      foreach (var input in recipe.Inputs) {
-        Debug.Assert(InputQueue[input.Item] > 0);
-        InputQueue[input.Item] -= input.Count;
-      }
+      foreach (var input in recipe.Inputs)
+        Inventory.Remove(input.Item, input.Count);
       foreach (var output in recipe.Outputs)
-        OutputQueue[output.Item] = OutputQueue.GetValueOrDefault(output.Item) + output.Count;
+        Inventory.Add(output.Item, output.Count);
       //if (!isBuildPlot)
       //  await scope.Until(() => ItemFlowManager.Instance.CanSpawnOutput(item, OutputPortCell));
       finished = true;
@@ -169,6 +151,7 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
   }
 
   void Awake() {
+    this.InitComponentFromChildren(out Inventory);
     this.InitComponentFromChildren(out Animator, true);
     this.InitComponent(out BuildObject, true);
     GetComponent<SaveObject>().RegisterSaveable(this);
@@ -197,8 +180,9 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
   void OnGUI() {
     if (!WorkerManager.Instance.DebugDraw)
       return;
-    string ToString(Dictionary<ItemProto, int> queue) => string.Join("\n", queue.Select(kvp => $"{kvp.Key.name}:{kvp.Value}"));
-    GUIExtensions.DrawLabel(InputPortPos, ToString(InputQueue));
+    string ToString(IEnumerable<KeyValuePair<ItemProto, int>> queue) =>
+      string.Join("\n", queue.Select(kvp => $"{kvp.Key.name}:{kvp.Value}"));
+    GUIExtensions.DrawLabel(transform.position, ToString(InputQueue));
     GUIExtensions.DrawLabel(OutputPortPos - transform.forward, ToString(OutputQueue));
   }
 #endif
@@ -238,7 +222,7 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
     public override bool CanStart() => true;
     public override TaskFunc<Worker.Job> Run(Worker worker) => async scope => {
       await worker.MoveTo(scope, Target.transform);
-      int count = Target.GetOutputQueue(Item);
+      int count = Target.GetExtractCount(Item);
       if (count == 0 || !Target.ExtractItem(Item, count))
         return null;
       worker.Inventory.Add(Item, count);
