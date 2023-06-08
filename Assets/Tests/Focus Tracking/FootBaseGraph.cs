@@ -34,9 +34,10 @@ public class FootBaseGraph : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    var normalizedTime = (float)FrameIndex/Asset.LeftFootDirections.Length;
-    FootbasePlayable.SetTime(normalizedTime * FootbasePlayable.GetAnimationClip().length);
-    Graph.Evaluate(Time.fixedDeltaTime);
+    var totalFrames = Asset.LeftFootPositions.Length;
+    var time = Mathf.Lerp(0, Asset.AnimationClip.length, Mathf.InverseLerp(0, totalFrames-1, FrameIndex%totalFrames));
+    FootbasePlayable.SetTime(time);
+    Graph.Evaluate();
   }
 
   void OnDrawGizmos() {
@@ -66,21 +67,21 @@ public class FootBaseGraph : MonoBehaviour {
     }
 
     if (ShowHeelToe) {
-      // var lheel = transform.TransformPoint(Asset.LeftHeelPositions[index]);
-      // var ltoe = transform.TransformPoint(Asset.LeftToePositions[index]);
-      var lheel = Asset.LeftHeelPositions[index];
-      var ltoe = Asset.LeftToePositions[index];
+      var lheel = transform.TransformPoint(Asset.LeftHeelPositions[index]);
+      var ltoe = transform.TransformPoint(Asset.LeftToePositions[index]);
+      // var lheel = Asset.LeftHeelPositions[index];
+      // var ltoe = Asset.LeftToePositions[index];
       Gizmos.color = Color.blue;
-      // Gizmos.DrawLine(lheel, ltoe);
-      Gizmos.DrawRay(lheel, Vector3.up);
+      Gizmos.DrawLine(lheel, ltoe);
+      // Gizmos.DrawRay(lheel, Vector3.up);
 
-      // var rheel = transform.TransformPoint(Asset.RightHeelPositions[index]);
-      // var rtoe = transform.TransformPoint(Asset.RightToePositions[index]);
-      var rheel = Asset.RightHeelPositions[index];
-      var rtoe = Asset.RightToePositions[index];
+      var rheel = transform.TransformPoint(Asset.RightHeelPositions[index]);
+      var rtoe = transform.TransformPoint(Asset.RightToePositions[index]);
+      // var rheel = Asset.RightHeelPositions[index];
+      // var rtoe = Asset.RightToePositions[index];
       Gizmos.color = Color.green;
-      // Gizmos.DrawLine(rheel, rtoe);
-      Gizmos.DrawRay(rheel, Vector3.up);
+      Gizmos.DrawLine(rheel, rtoe);
+      // Gizmos.DrawRay(rheel, Vector3.up);
     }
   }
 }

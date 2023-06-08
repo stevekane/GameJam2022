@@ -3,6 +3,8 @@ using System;
 using UnityEditor;
 #endif
 using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.Animations;
 
 [CreateAssetMenu(menuName = "AnimationGraph/FootBase")]
 public class FootBaseAsset : ScriptableObject {
@@ -88,6 +90,7 @@ public class FootBaseAsset : ScriptableObject {
         motionAxis,
         α,
         β);
+      Debug.Log($"{i} ⇒ {cost}");
       if (cost <= lowestCost) {
         lowestCost = cost;
         index = i;
@@ -108,7 +111,7 @@ public class FootBaseAsset : ScriptableObject {
   float footLength,
   float α = 80) {
     const float π = Mathf.PI;
-    return Mathf.Atan((heelHeight-toeHeight)*α/footLength)/π + .5f;
+    return 1-(Mathf.Atan((heelHeight-toeHeight)*α/footLength)/π + .5f);
   }
 
   public static Vector3 FootBase(
@@ -152,17 +155,18 @@ public class FootBaseAsset : ScriptableObject {
 
   [ContextMenu("Sample")]
   public void Sample() {
-    var model = (GameObject)null;
+    var graph = PlayableGraph.Create("FootBaseSampler");
+    var model = (GameObject)PrefabUtility.InstantiatePrefab(ModelPrefab);
     try {
-      model = (GameObject)PrefabUtility.InstantiatePrefab(ModelPrefab);
-      Debug.Log(model.transform.position);
       var animator = model.GetComponent<Animator>();
+      animator.applyRootMotion = false;
+      animator.updateMode = AnimatorUpdateMode.AnimatePhysics;
+      animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
       var totalFrames = Mathf.RoundToInt(AnimationClip.length * FrameRate);
       var leftHeel = animator.GetBoneTransform(HumanBodyBones.LeftFoot);
       var leftToe = animator.GetBoneTransform(HumanBodyBones.LeftToes);
       var rightHeel = animator.GetBoneTransform(HumanBodyBones.RightFoot);
       var rightToe = animator.GetBoneTransform(HumanBodyBones.RightToes);
-      animator.applyRootMotion = true;
       LeftHeelPositions = new Vector3[totalFrames];
       LeftToePositions = new Vector3[totalFrames];
       LeftFootPositions = new Vector3[totalFrames];
@@ -192,17 +196,21 @@ public class FootBaseAsset : ScriptableObject {
       LeftFootLength = Vector3.Distance(leftHeelWorldPosition, leftToeWorldPosition);
       RightFootLength = Vector3.Distance(rightHeelWorldPosition, rightToeWorldPosition);
 
+      var playable = AnimationClipPlayable.Create(graph, AnimationClip);
+      var output = AnimationPlayableOutput.Create(graph, "Output", animator);
+      playable.SetDuration(AnimationClip.length);
+      playable.Play();
+      output.SetSourcePlayable(playable);
+      graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
+      graph.Play();
+
       // sample animation clip recording heel, toe, and foot positions
       for (var i = 0; i < totalFrames; i++) {
-        var normalizedTime = (float)i/totalFrames;
-        AnimationClip.SampleAnimation(model, normalizedTime*AnimationClip.length);
-
-        // LeftHeelPositions[i] = leftHeel.TransformPoint(leftHeelLocalPosition);
-        // LeftToePositions[i] = leftToe.TransformPoint(leftToeLocalPosition);
-        // LeftHeelPositions[i] = model.transform.InverseTransformPoint(leftHeel.position);
-        // LeftToePositions[i] = model.transform.InverseTransformPoint(leftToe.position);
-        LeftHeelPositions[i] = leftHeel.position;
-        LeftToePositions[i] = leftToe.position;
+        var time = Mathf.Lerp(0, AnimationClip.length, Mathf.InverseLerp(0, totalFrames-1, i));
+        playable.SetTime(time);
+        graph.Evaluate();
+        LeftHeelPositions[i] = leftHeel.TransformPoint(leftHeelLocalPosition);
+        LeftToePositions[i] = leftToe.TransformPoint(leftToeLocalPosition);
         LeftFootPositions[i] = (leftToe.position + leftHeel.position) / 2f;
         LeftFootDirections[i] = FootDirection(LeftToePositions[i], LeftHeelPositions[i], LeftFootLength);
         LeftFootGroundPositions[i] = LeftFootPositions[i];
@@ -210,12 +218,8 @@ public class FootBaseAsset : ScriptableObject {
         LeftFootBalances[i] = Balance(LeftHeelPositions[i].y, LeftToePositions[i].y, LeftFootLength);
         LeftFootBases[i] = FootBase(LeftHeelPositions[i], LeftToePositions[i], LeftFootDirections[i], LeftFootBalances[i]);
 
-        // RightHeelPositions[i] = rightHeel.TransformPoint(rightHeelLocalPosition);
-        // RightToePositions[i] = rightToe.TransformPoint(rightToeLocalPosition);
-        // RightHeelPositions[i] = model.transform.InverseTransformPoint(rightHeel.position);
-        // RightToePositions[i] = model.transform.InverseTransformPoint(rightToe.position);
-        RightHeelPositions[i] = rightHeel.position;
-        RightToePositions[i] = rightToe.position;
+        RightHeelPositions[i] = rightHeel.TransformPoint(rightHeelLocalPosition);
+        RightToePositions[i] = rightToe.TransformPoint(rightToeLocalPosition);
         RightFootPositions[i] = (rightToe.position + rightHeel.position) / 2f;
         RightFootDirections[i] = FootDirection(RightToePositions[i], RightHeelPositions[i], RightFootLength);
         RightFootGroundPositions[i] = RightFootPositions[i];
@@ -246,6 +250,7 @@ public class FootBaseAsset : ScriptableObject {
         RightAverage,
         RightAxis);
     } finally {
+      graph.Destroy();
       DestroyImmediate(model);
     }
   }
