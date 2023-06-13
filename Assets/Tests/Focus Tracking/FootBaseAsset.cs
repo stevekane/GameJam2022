@@ -6,8 +6,61 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Animations;
 
+[Serializable]
+public struct StrideFrames {
+  public int FootStrike;
+  public int FootLand;
+  public int Stance;
+  public int FootLift;
+  public int FootOff;
+}
+
+[Serializable]
+public struct FootBase {
+  public Vector3 TranslationOffset;
+  public Quaternion RotationOffset;
+  public float Progression;
+}
+
+[Serializable]
+public struct Stride {
+  public Vector3 StancePosition;
+  public Vector3 StanceRotation;
+  public float StanceDirection;
+  public float StanceCycleTime;
+  public float FootLiftStrideTime;
+  public float FootOffStrideTime;
+  public float FootStrikeStrideTime;
+  public float FootLandStrideTime;
+}
+
+[Serializable]
+public struct Foot {
+  public StrideFrames StrideFrames;
+  public Stride Stride;
+  public FootBase[] FootBase;
+}
+
+[Serializable]
+public struct Cycle {
+  public float Distance;
+  public float Duration;
+  public float Speed;
+  public Vector3 Direction;
+}
+
 [CreateAssetMenu(menuName = "AnimationGraph/FootBase")]
 public class FootBaseAsset : ScriptableObject {
+  public static float Normalize(float n) {
+    var a = n % 1;
+    return a < 0 ? 1+a : a;
+  }
+
+  public static float StrideNormalizedTime(int stanceFrame, int eventFrame, int totalFrames) {
+    var delta = (float)(eventFrame-stanceFrame);
+    return Normalize(delta/totalFrames);
+  }
+
   public static Vector3 Average(Vector3[] xs) {
     var v = Vector3.zero;
     for (var i = 0; i < xs.Length; i++)
@@ -77,8 +130,8 @@ public class FootBaseAsset : ScriptableObject {
   Vector3[] footPositions,
   Vector3 averageGroundPosition,
   Vector3 motionAxis) {
-    var α = calculateα(heelPositions, toePositions);
-    var β = calculateβ(motionAxis);
+    var α = calculateα(heelPositions, toePositions) / GroundedImportance;
+    var β = calculateβ(motionAxis) / CenteredImportance;
     var index = 0;
     var lowestCost = float.MaxValue;
     for (var i = 0; i < footPositions.Length; i++) {
@@ -90,7 +143,6 @@ public class FootBaseAsset : ScriptableObject {
         motionAxis,
         α,
         β);
-      Debug.Log($"{i} ⇒ {cost}");
       if (cost <= lowestCost) {
         lowestCost = cost;
         index = i;
@@ -99,7 +151,12 @@ public class FootBaseAsset : ScriptableObject {
     return index;
   }
 
-  public static Vector3 FootDirection(Vector3 toePosition, Vector3 heelPosition, float footLength) {
+  // TODO: Include functions for analyzing motion to determine all foot keytimes
+
+  public static Vector3 FootDirection(
+  Vector3 toePosition,
+  Vector3 heelPosition,
+  float footLength) {
     var d = toePosition - heelPosition;
     d.y = 0;
     return d.normalized * footLength;
@@ -109,8 +166,9 @@ public class FootBaseAsset : ScriptableObject {
   float heelHeight,
   float toeHeight,
   float footLength,
-  float α = 80) {
+  float α = 40) {
     const float π = Mathf.PI;
+    // steve: reference paper is not 1-... but the logic they explain seems wrong
     return 1-(Mathf.Atan((heelHeight-toeHeight)*α/footLength)/π + .5f);
   }
 
@@ -124,8 +182,15 @@ public class FootBaseAsset : ScriptableObject {
 
   [SerializeField] GameObject ModelPrefab;
   [SerializeField] int FrameRate = 30;
+  [SerializeField] float GroundedImportance = 1;
+  [SerializeField] float CenteredImportance = 1;
 
   public AnimationClip AnimationClip;
+  public int FrameCount;
+  public Cycle Cycle;
+  public Foot LeftFoot;
+  public Foot RightFoot;
+
   public Vector3[] LeftHeelPositions;
   public Vector3[] LeftToePositions;
   public Vector3[] LeftFootPositions;
@@ -133,6 +198,10 @@ public class FootBaseAsset : ScriptableObject {
   public Vector3[] LeftFootDirections;
   public Vector3[] LeftFootBases;
   public float[] LeftFootBalances;
+  public Vector3 LeftStrideVector;
+  public Vector3 LeftCycleDirectionEstimate;
+  public float LeftCycleDistanceEstimate;
+
   public Vector3[] RightHeelPositions;
   public Vector3[] RightToePositions;
   public Vector3[] RightFootPositions;
@@ -140,18 +209,21 @@ public class FootBaseAsset : ScriptableObject {
   public Vector3[] RightFootDirections;
   public Vector3[] RightFootBases;
   public float[] RightFootBalances;
+  public Vector3 RightStrideVector;
+  public Vector3 RightCycleDirectionEstimate;
+  public float RightCycleDistanceEstimate;
+
   public float LeftFootLength;
   public Vector3 LeftAverage;
   public Vector3 LeftExtent1;
   public Vector3 LeftExtent2;
   public Vector3 LeftAxis;
-  public int LeftStanceTimeIndex;
+
   public float RightFootLength;
   public Vector3 RightAverage;
   public Vector3 RightExtent1;
   public Vector3 RightExtent2;
   public Vector3 RightAxis;
-  public int RightStanceTimeIndex;
 
   [ContextMenu("Sample")]
   public void Sample() {
@@ -162,25 +234,25 @@ public class FootBaseAsset : ScriptableObject {
       animator.applyRootMotion = false;
       animator.updateMode = AnimatorUpdateMode.AnimatePhysics;
       animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
-      var totalFrames = Mathf.RoundToInt(AnimationClip.length * FrameRate);
       var leftHeel = animator.GetBoneTransform(HumanBodyBones.LeftFoot);
       var leftToe = animator.GetBoneTransform(HumanBodyBones.LeftToes);
       var rightHeel = animator.GetBoneTransform(HumanBodyBones.RightFoot);
       var rightToe = animator.GetBoneTransform(HumanBodyBones.RightToes);
-      LeftHeelPositions = new Vector3[totalFrames];
-      LeftToePositions = new Vector3[totalFrames];
-      LeftFootPositions = new Vector3[totalFrames];
-      LeftFootGroundPositions = new Vector3[totalFrames];
-      LeftFootDirections = new Vector3[totalFrames];
-      LeftFootBases = new Vector3[totalFrames];
-      LeftFootBalances = new float[totalFrames];
-      RightHeelPositions = new Vector3[totalFrames];
-      RightToePositions = new Vector3[totalFrames];
-      RightFootPositions = new Vector3[totalFrames];
-      RightFootGroundPositions = new Vector3[totalFrames];
-      RightFootDirections = new Vector3[totalFrames];
-      RightFootBases = new Vector3[totalFrames];
-      RightFootBalances = new float[totalFrames];
+      FrameCount = Mathf.RoundToInt(AnimationClip.length * FrameRate);
+      LeftHeelPositions = new Vector3[FrameCount];
+      LeftToePositions = new Vector3[FrameCount];
+      LeftFootPositions = new Vector3[FrameCount];
+      LeftFootGroundPositions = new Vector3[FrameCount];
+      LeftFootDirections = new Vector3[FrameCount];
+      LeftFootBases = new Vector3[FrameCount];
+      LeftFootBalances = new float[FrameCount];
+      RightHeelPositions = new Vector3[FrameCount];
+      RightToePositions = new Vector3[FrameCount];
+      RightFootPositions = new Vector3[FrameCount];
+      RightFootGroundPositions = new Vector3[FrameCount];
+      RightFootDirections = new Vector3[FrameCount];
+      RightFootBases = new Vector3[FrameCount];
+      RightFootBalances = new float[FrameCount];
 
       // Assume heel straight down from the ankle to the ground
       // Assume ball straight down from toe to the ground
@@ -205,8 +277,8 @@ public class FootBaseAsset : ScriptableObject {
       graph.Play();
 
       // sample animation clip recording heel, toe, and foot positions
-      for (var i = 0; i < totalFrames; i++) {
-        var time = Mathf.Lerp(0, AnimationClip.length, Mathf.InverseLerp(0, totalFrames-1, i));
+      for (var i = 0; i < FrameCount; i++) {
+        var time = Mathf.Lerp(0, AnimationClip.length, Mathf.InverseLerp(0, FrameCount-1, i));
         playable.SetTime(time);
         graph.Evaluate();
         LeftHeelPositions[i] = leftHeel.TransformPoint(leftHeelLocalPosition);
@@ -232,23 +304,72 @@ public class FootBaseAsset : ScriptableObject {
       LeftExtent1 = FurthestFrom(LeftFootGroundPositions, LeftAverage);
       LeftExtent2 = FurthestFrom(LeftFootGroundPositions, LeftExtent1);
       LeftAxis = LeftExtent1 - LeftExtent2;
-      LeftStanceTimeIndex = StanceTimeIndex(
-        LeftHeelPositions,
-        LeftToePositions,
-        LeftFootPositions,
-        LeftAverage,
-        LeftAxis);
+      // Analysis approach to heuristically find StanceTime
+      // LeftStanceTimeIndex = StanceTimeIndex(
+      //   LeftHeelPositions,
+      //   LeftToePositions,
+      //   LeftFootPositions,
+      //   LeftAverage,
+      //   LeftAxis);
 
       RightAverage = Average(RightFootGroundPositions);
       RightExtent1 = FurthestFrom(RightFootGroundPositions, RightAverage);
       RightExtent2 = FurthestFrom(RightFootGroundPositions, RightExtent1);
       RightAxis = RightExtent1 - RightExtent2;
-      RightStanceTimeIndex = StanceTimeIndex(
-        RightHeelPositions,
-        RightToePositions,
-        RightFootPositions,
-        RightAverage,
-        RightAxis);
+      // Analysis approach to heuristically find StanceTime
+      // RightStanceTimeIndex = StanceTimeIndex(
+      //   RightHeelPositions,
+      //   RightToePositions,
+      //   RightFootPositions,
+      //   RightAverage,
+      //   RightAxis);
+
+      LeftFoot.Stride.StancePosition = LeftFootBases[LeftFoot.StrideFrames.Stance];
+      LeftFoot.Stride.StanceRotation = LeftFootDirections[LeftFoot.StrideFrames.Stance];
+      LeftFoot.Stride.StanceCycleTime = (float)LeftFoot.StrideFrames.Stance/FrameCount;
+      LeftFoot.Stride.FootStrikeStrideTime = StrideNormalizedTime(LeftFoot.StrideFrames.Stance, LeftFoot.StrideFrames.FootStrike, FrameCount);
+      LeftFoot.Stride.FootLandStrideTime = StrideNormalizedTime(LeftFoot.StrideFrames.Stance, LeftFoot.StrideFrames.FootLand, FrameCount);
+      LeftFoot.Stride.FootLiftStrideTime = StrideNormalizedTime(LeftFoot.StrideFrames.Stance, LeftFoot.StrideFrames.FootLift, FrameCount);
+      LeftFoot.Stride.FootOffStrideTime = StrideNormalizedTime(LeftFoot.StrideFrames.Stance, LeftFoot.StrideFrames.FootOff, FrameCount);
+      LeftStrideVector = LeftFootBases[LeftFoot.StrideFrames.FootOff]-LeftFootBases[LeftFoot.StrideFrames.FootStrike];
+      LeftCycleDirectionEstimate = -LeftStrideVector.normalized;
+      LeftCycleDistanceEstimate = LeftStrideVector.magnitude / Normalize(LeftFoot.Stride.FootOffStrideTime-LeftFoot.Stride.FootStrikeStrideTime);
+
+      RightFoot.Stride.StancePosition = RightFootBases[RightFoot.StrideFrames.Stance];
+      RightFoot.Stride.StanceRotation = RightFootDirections[RightFoot.StrideFrames.Stance];
+      RightFoot.Stride.StanceCycleTime = (float)RightFoot.StrideFrames.Stance/FrameCount;
+      RightFoot.Stride.FootStrikeStrideTime = StrideNormalizedTime(RightFoot.StrideFrames.Stance, RightFoot.StrideFrames.FootStrike, FrameCount);
+      RightFoot.Stride.FootLandStrideTime = StrideNormalizedTime(RightFoot.StrideFrames.Stance, RightFoot.StrideFrames.FootLand, FrameCount);
+      RightFoot.Stride.FootLiftStrideTime = StrideNormalizedTime(RightFoot.StrideFrames.Stance, RightFoot.StrideFrames.FootLift, FrameCount);
+      RightFoot.Stride.FootOffStrideTime = StrideNormalizedTime(RightFoot.StrideFrames.Stance, RightFoot.StrideFrames.FootOff, FrameCount);
+      RightStrideVector = RightFootBases[RightFoot.StrideFrames.FootOff]-RightFootBases[RightFoot.StrideFrames.FootStrike];
+      RightCycleDirectionEstimate = -RightStrideVector.normalized;
+      RightCycleDistanceEstimate = RightStrideVector.magnitude / Normalize(RightFoot.Stride.FootOffStrideTime-RightFoot.Stride.FootStrikeStrideTime);
+
+      Cycle.Duration = AnimationClip.length;
+      Cycle.Distance = (LeftCycleDistanceEstimate + RightCycleDistanceEstimate) / 2;
+      Cycle.Direction = (LeftCycleDirectionEstimate + RightCycleDirectionEstimate) / 2;
+      Cycle.Speed = Cycle.Distance / Cycle.Duration;
+
+      var Q = Quaternion.FromToRotation(Cycle.Direction, Vector3.forward);
+      LeftFoot.FootBase = new FootBase[FrameCount];
+      for (var i = 0; i < FrameCount; i++) {
+        var cycleTime = (float)i/FrameCount;
+        var fbc = LeftFootBases[i];
+        var fbw = fbc + cycleTime * Cycle.Distance * Cycle.Direction;
+        fbw = Q * fbw;
+        fbw.z /= Cycle.Distance;
+        LeftFoot.FootBase[i].TranslationOffset = fbw;
+      }
+      RightFoot.FootBase = new FootBase[FrameCount];
+      for (var i = 0; i < FrameCount; i++) {
+        var cycleTime = (float)i/FrameCount;
+        var fbc = RightFootBases[i];
+        var fbw = fbc + cycleTime * Cycle.Distance * Cycle.Direction;
+        fbw = Q * fbw;
+        fbw.z /= Cycle.Distance;
+        RightFoot.FootBase[i].TranslationOffset = fbw;
+      }
     } finally {
       graph.Destroy();
       DestroyImmediate(model);
