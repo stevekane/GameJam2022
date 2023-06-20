@@ -1,4 +1,3 @@
-using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,9 +7,11 @@ using UnityEngine;
 public class Crafter : MonoBehaviour, IContainer, IInteractable {
   [ES3NonSerializable] public Recipe[] Recipes;
   public Recipe CurrentRecipe;
+  [ES3Serializable] int CraftTicksRemaining = -1;
 
   Inventory Inventory;
   TaskScope CraftTask;
+  TaskTimer CraftTimer;
   ItemObject RecipeIndicator;
   Animator Animator;
   BuildObject BuildObject;
@@ -58,9 +59,6 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
     }
   }
 
-  // Note: We assume there is only 1 recipe that can produce a given output.
-  //public Recipe FindRecipeProducing(ItemInfo item) => Recipes.FirstOrDefault(r => r.Outputs.Any(o => o.Item == item));
-
   //public Vector2Int InputPortCell => BuildGrid.WorldToGrid(InputPortPos);
   //public Vector2Int OutputPortCell => BuildGrid.WorldToGrid(OutputPortPos);
   public Vector3 InputPortPos => transform.position - transform.rotation*new Vector3(BuildGrid.GetBottomLeftOffset(BuildObject.Size).y + 1f, 0f, 0f);
@@ -89,8 +87,11 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
   public void CraftIfSatisfied() {
     if (CraftTask != null) return;
     var satisfied = CurrentRecipe.Inputs.All(i => Inventory.Count(i.Item) >= i.Count);
-    if (satisfied)
-      CraftTask = TaskScope.StartNew(s => Craft(s, CurrentRecipe));
+    if (satisfied) {
+      var craftTime = CraftTicksRemaining >= 0 ? Timeval.FromTicks(CraftTicksRemaining) : Timeval.FromSeconds(CurrentRecipe.CraftTime);
+      CraftTicksRemaining = -1;
+      CraftTask = TaskScope.StartNew(s => Craft(s, CurrentRecipe, craftTime));
+    }
   }
 
   public void RequestCraft() {
@@ -124,24 +125,24 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
   }
 
   // TODO: this is no good for save/load
-  async Task Craft(TaskScope scope, Recipe recipe) {
+  async Task Craft(TaskScope scope, Recipe recipe, Timeval craftTime) {
     bool finished = false;
     var isBuildPlot = GetComponent<BuildPlot>();
     try {
       using var disposeTask = CraftTask;
       await scope.Until(() => OutputQueue.Sum(kvp => kvp.Value) < 10);
       Animator.SetBool("Crafting", true);
-      await scope.Seconds(recipe.CraftTime);
+      CraftTimer = new(craftTime);
+      await CraftTimer.WaitDone(scope);
       foreach (var input in recipe.Inputs)
         Inventory.Remove(input.Item, input.Count);
       foreach (var output in recipe.Outputs)
         Inventory.Add(output.Item, output.Count);
-      //if (!isBuildPlot)
-      //  await scope.Until(() => ItemFlowManager.Instance.CanSpawnOutput(item, OutputPortCell));
       finished = true;
     } finally {
       Animator?.SetBool("Crafting", false);
       CraftTask = null;
+      CraftTimer = null;
       if (finished)
         OnCraftFinished(recipe);
     }
@@ -150,6 +151,10 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
   void OnCraftFinished(Recipe recipe) {
     foreach (var output in recipe.Outputs)
       output.Item.OnCrafted(this);
+  }
+
+  void OnBeforeSave() {
+    CraftTicksRemaining = CraftTimer != null ? CraftTimer.TicksRemaining : -1;
   }
 
   void Awake() {
@@ -189,6 +194,7 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
       string.Join("\n", queue.Select(kvp => $"{kvp.Key.name}:{kvp.Value}"));
     GUIExtensions.DrawLabel(transform.position, ToString(InputQueue));
     GUIExtensions.DrawLabel(OutputPortPos - transform.forward, ToString(OutputQueue));
+    GUIExtensions.DrawLabel(transform.position + 2*Vector3.up, CraftTimer != null ? $"remaining={CraftTimer.TicksRemaining}" : "");
   }
 #endif
 
@@ -237,9 +243,6 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
       return new DepositJob { Target = FindObjectOfType<Container>() }; // TODO
     };
     public override void OnGUI() {
-      //var delta = To.Transform.position - From.Transform.position;
-      //var pos = From.Transform.position + delta*.2f;
-      //GUIExtensions.DrawLine(From.Transform.position, To.Transform.position, 2);
       var newlines = string.Concat(Enumerable.Repeat("\n", Target.guiIdx++));
       var red = new Color(1, .3f, .3f, 1);
       GUIExtensions.DrawLabel(Target.transform.position, $"{newlines}c:{Item.name}", red);

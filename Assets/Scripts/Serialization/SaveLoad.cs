@@ -34,8 +34,9 @@ public class SaveData {
   static void Save3(string key) {
     SaveData data = new();
     UnityEngine.Object.FindObjectOfType<Player>().GetComponent<Upgrades>().Save(data);
-    var objs = UnityEngine.Object.FindObjectsOfType<SaveObject>().Select(b => b.gameObject).ToList();
+    var objs = UnityEngine.Object.FindObjectsOfType<SaveObject>().Select(so => so.gameObject).ToList();
     var settings = new ES3Settings { memberReferenceMode = ES3.ReferenceMode.ByRef };
+    UnityEngine.Object.FindObjectsOfType<SaveObject>().ForEach(so => so.DispatchOnBeforeSave());
     ES3.Save(key, data, settings);
     ES3.Save(key + "objects", objs, settings);
   }

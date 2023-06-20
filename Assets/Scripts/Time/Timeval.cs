@@ -19,6 +19,10 @@ public class Timeval {
   public static Timeval FromAnimFrames(int frames, int fps) {
     return new Timeval { Millis = (float)frames * 1000f / fps, FramesPerSecond = fps };
   }
+  public static Timeval FromTicks(int ticks) {
+    return FromAnimFrames(ticks, FixedUpdatePerSecond);
+  }
+
   public int Ticks {
     set { Millis = value * 1000f / FixedUpdatePerSecond; }
     get { return Mathf.RoundToInt(Millis * FixedUpdatePerSecond / 1000f); }

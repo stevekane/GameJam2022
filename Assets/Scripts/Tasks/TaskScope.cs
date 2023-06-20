@@ -247,3 +247,14 @@ public static class Waiter {
     }
   };
 }
+
+class TaskTimer {
+  Timeval Delay;
+  int CompletionTick;
+  public int TicksRemaining => CompletionTick - Timeval.TickCount;
+  public TaskTimer(Timeval delay) => Delay = delay;
+  public async Task WaitDone(TaskScope s) {
+    CompletionTick = Timeval.TickCount + Delay.Ticks;
+    await s.Delay(Delay);
+  }
+}
