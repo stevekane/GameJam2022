@@ -17,8 +17,11 @@ public class Worker : MonoBehaviour {
     public abstract TaskFunc<Job> Run(Worker worker);
     public virtual void OnGUI() { }
     public void Cancel() {
-      RunScope?.Cancel();
-      WorkerManager.Instance.OnWorkerJobCancelled(this);
+      if (RunScope != null) {
+        RunScope.Cancel();  // Will notify WorkerManager in RunCurrentJob
+      } else {
+        WorkerManager.Instance.OnWorkerJobCancelled(this);
+      }
     }
     internal TaskScope RunScope;  // only valid once it is started.
   }
@@ -57,6 +60,7 @@ public class Worker : MonoBehaviour {
         });
       } catch {
         Debug.Log($"Worker: Running job was cancelled.");
+        WorkerManager.Instance.OnWorkerJobCancelled(CurrentJob);
         CurrentJob = null;
       }
     }

@@ -41,10 +41,7 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
   }
   public void Collect(Character interacter) {
     // Cancel worker jobs trying to fetch crafter outputs.
-    WorkerManager.Instance.GetAllJobs()
-      .Where(j => j is CollectJob h && h.Target == this)
-      .ToArray()
-      .ForEach(j => j.Cancel());
+    WorkerManager.Instance.CancelJobsIf(j => j is CollectJob h && h.Target == this);
     var characterInventory = interacter.GetComponent<Inventory>();
     foreach ((var outputItem, var count) in OutputQueue.ToArray())
       Inventory.MoveTo(characterInventory, outputItem, count);
@@ -114,11 +111,16 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
 
   // Cancel worker jobs trying to give this crafter items.
   void CancelRequestJobs() {
-    WorkerManager.Instance.GetAllJobs()
-      .Where(j => j is RequestJob r && r.To == this ||
-              j is DepositJob d && d.Target == (IContainer)this)
-      .ToArray()
-      .ForEach(j => j.Cancel());
+    WorkerManager.Instance.CancelJobsIf(j =>
+      j is RequestJob r && r.To == this ||
+      j is DepositJob d && d.Target == (IContainer)this);
+  }
+
+  void CancelCrafterJobs() {
+    WorkerManager.Instance.CancelJobsIf(j =>
+      j is RequestJob r && r.To == this ||
+      j is DepositJob d && d.Target == (IContainer)this ||
+      j is CollectJob c && c.Target == this);
   }
 
   // TODO: this is no good for save/load
@@ -162,6 +164,7 @@ public class Crafter : MonoBehaviour, IContainer, IInteractable {
   }
 
   void OnDestroy() {
+    CancelCrafterJobs();
     CraftTask?.Dispose();
     RecipeIndicator?.gameObject?.Destroy();
   }

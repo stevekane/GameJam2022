@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -48,6 +49,8 @@ public class WorkerManager : MonoBehaviour {
     AssignJobs();
   }
   public IEnumerable<Worker.Job> GetAllJobs() => PendingJobs.Concat(AssignedJobs);
+  public IEnumerable<Worker.Job> GetJobsIf(Func<Worker.Job, bool> pred) => GetAllJobs().Where(pred);
+  public void CancelJobsIf(Func<Worker.Job, bool> pred) => GetJobsIf(pred).ToArray().ForEach(j => j.Cancel());
 
   void AssignJobs() {
     while (IdleWorkers.Count != 0 && StartableJob() is var job && job != null) {
