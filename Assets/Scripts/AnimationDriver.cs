@@ -394,6 +394,7 @@ public class AnimationDriver : MonoBehaviour {
         } else {
           var playableOutput = 0 switch {
             _ when track is HitboxTrackAsset => ObjectPlayableOutput(Graph, track, task.Config),
+            _ when track is ClassicHitboxTrackAsset => ObjectPlayableOutput(Graph, track, task.Config),
             _ when track is WeaponTrailTrackAsset => ObjectPlayableOutput(Graph, track, task.Config),
             _ when track is AbilityTrackAsset => ObjectPlayableOutput(Graph, track, task.Config),
             _ when track is AudioOneshotTrackAsset => ObjectPlayableOutputObj(Graph, track, SFXManager.Instance.AudioSource),
