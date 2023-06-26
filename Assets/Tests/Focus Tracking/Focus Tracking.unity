@@ -884,20 +884,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &886930225
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1916665198}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 87b384bb07c910f40b09e5af7d2eb174, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Owner: {fileID: 1759603253}
-  Animator: {fileID: 1916665197}
 --- !u!1 &899656180
 GameObject:
   m_ObjectHideFlags: 0
@@ -1460,7 +1446,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1759603249}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b2d8418b0b9634b1892b0268dd9c2743, type: 3}
   m_Name: 
@@ -1511,6 +1497,10 @@ MonoBehaviour:
   ShowCyclePositions: 1
   ShowStridePath: 1
   ShowFootBase: 1
+  PositionWeight: 1
+  RotationWeight: 0
+  AnkleHeight: 0.3
+  Speed: 0.25
 --- !u!114 &1759603255
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1518,7 +1508,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1759603249}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b2d8418b0b9634b1892b0268dd9c2743, type: 3}
   m_Name: 
@@ -1796,7 +1786,7 @@ PrefabInstance:
       addedObject: {fileID: 1916665200}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 886930225}
+      addedObject: {fileID: 1916665201}
   m_SourcePrefab: {fileID: 100100000, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}
 --- !u!95 &1916665197 stripped
 Animator:
@@ -1825,6 +1815,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 072d2a7076ed6124ab6450d607d4c004, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1916665201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1916665198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4dd5909348fc9043baae18eb263af84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 1916665197}
 --- !u!4 &1916665206 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -2072040086291044643, guid: d0b38c9858aefb8449e064a434b9dacc, type: 3}

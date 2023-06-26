@@ -51,14 +51,14 @@ public struct Cycle {
 
 [CreateAssetMenu(menuName = "AnimationGraph/FootBase")]
 public class FootBaseAsset : ScriptableObject {
-  public static float Normalize(float n) {
-    var a = n % 1;
-    return a < 0 ? 1+a : a;
+  // From the paper. Takes -Infinity->Infinity to 0-1
+  public static float Cyclic(float n) {
+    return n - Mathf.Floor(n);
   }
 
   public static float StrideNormalizedTime(int stanceFrame, int eventFrame, int totalFrames) {
     var delta = (float)(eventFrame-stanceFrame);
-    return Normalize(delta/totalFrames);
+    return Cyclic(delta/totalFrames);
   }
 
   public static Vector3 Average(Vector3[] xs) {
@@ -101,6 +101,8 @@ public class FootBaseAsset : ScriptableObject {
     return v;
   }
 
+  // BEGIN Heuristic analysis
+  // These are analytical techniques from the paper used to derive key times from the animation
   public static float Cost(
   float heelHeight,
   float toeHeight,
@@ -150,8 +152,7 @@ public class FootBaseAsset : ScriptableObject {
     }
     return index;
   }
-
-  // TODO: Include functions for analyzing motion to determine all foot keytimes
+  // END Heuristic analysis
 
   public static Vector3 FootDirection(
   Vector3 toePosition,
@@ -168,8 +169,7 @@ public class FootBaseAsset : ScriptableObject {
   float footLength,
   float α = 40) {
     const float π = Mathf.PI;
-    // steve: reference paper is not 1-... but the logic they explain seems wrong
-    return 1-(Mathf.Atan((heelHeight-toeHeight)*α/footLength)/π + .5f);
+    return Mathf.Atan((heelHeight-toeHeight)*α/footLength)/π + .5f;
   }
 
   public static Vector3 FootBase(
@@ -177,7 +177,7 @@ public class FootBaseAsset : ScriptableObject {
   Vector3 toePosition,
   Vector3 footDirection,
   float balance) {
-    return heelPosition*balance + (toePosition-footDirection)*(1-balance);
+    return heelPosition*(1-balance) + (toePosition-footDirection)*balance;
   }
 
   [SerializeField] GameObject ModelPrefab;
@@ -225,6 +225,11 @@ public class FootBaseAsset : ScriptableObject {
   public Vector3 RightExtent2;
   public Vector3 RightAxis;
 
+  public Vector3 leftHeelLocalPosition;
+  public Vector3 leftToeLocalPosition;
+  public Vector3 rightHeelLocalPosition;
+  public Vector3 rightToeLocalPosition;
+
   [ContextMenu("Sample")]
   public void Sample() {
     var graph = PlayableGraph.Create("FootBaseSampler");
@@ -257,13 +262,13 @@ public class FootBaseAsset : ScriptableObject {
       // Assume heel straight down from the ankle to the ground
       // Assume ball straight down from toe to the ground
       var leftHeelWorldPosition = leftHeel.position + leftHeel.position.y*Vector3.down;
-      var leftHeelLocalPosition = leftHeel.InverseTransformPoint(leftHeelWorldPosition);
+      leftHeelLocalPosition = leftHeel.InverseTransformPoint(leftHeelWorldPosition);
       var leftToeWorldPosition = leftToe.position + leftToe.position.y*Vector3.down;
-      var leftToeLocalPosition = leftToe.InverseTransformPoint(leftToeWorldPosition);
+      leftToeLocalPosition = leftToe.InverseTransformPoint(leftToeWorldPosition);
       var rightHeelWorldPosition = rightHeel.position + rightHeel.position.y*Vector3.down;
-      var rightHeelLocalPosition = rightHeel.InverseTransformPoint(rightHeelWorldPosition);
+      rightHeelLocalPosition = rightHeel.InverseTransformPoint(rightHeelWorldPosition);
       var rightToeWorldPosition = rightToe.position + rightToe.position.y*Vector3.down;
-      var rightToeLocalPosition = rightToe.InverseTransformPoint(rightToeWorldPosition);
+      rightToeLocalPosition = rightToe.InverseTransformPoint(rightToeWorldPosition);
 
       LeftFootLength = Vector3.Distance(leftHeelWorldPosition, leftToeWorldPosition);
       RightFootLength = Vector3.Distance(rightHeelWorldPosition, rightToeWorldPosition);
@@ -333,7 +338,7 @@ public class FootBaseAsset : ScriptableObject {
       LeftFoot.Stride.FootOffStrideTime = StrideNormalizedTime(LeftFoot.StrideFrames.Stance, LeftFoot.StrideFrames.FootOff, FrameCount);
       LeftStrideVector = LeftFootBases[LeftFoot.StrideFrames.FootOff]-LeftFootBases[LeftFoot.StrideFrames.FootStrike];
       LeftCycleDirectionEstimate = -LeftStrideVector.normalized;
-      LeftCycleDistanceEstimate = LeftStrideVector.magnitude / Normalize(LeftFoot.Stride.FootOffStrideTime-LeftFoot.Stride.FootStrikeStrideTime);
+      LeftCycleDistanceEstimate = LeftStrideVector.magnitude / Cyclic(LeftFoot.Stride.FootOffStrideTime-LeftFoot.Stride.FootStrikeStrideTime);
 
       RightFoot.Stride.StancePosition = RightFootBases[RightFoot.StrideFrames.Stance];
       RightFoot.Stride.StanceRotation = RightFootDirections[RightFoot.StrideFrames.Stance];
@@ -344,7 +349,7 @@ public class FootBaseAsset : ScriptableObject {
       RightFoot.Stride.FootOffStrideTime = StrideNormalizedTime(RightFoot.StrideFrames.Stance, RightFoot.StrideFrames.FootOff, FrameCount);
       RightStrideVector = RightFootBases[RightFoot.StrideFrames.FootOff]-RightFootBases[RightFoot.StrideFrames.FootStrike];
       RightCycleDirectionEstimate = -RightStrideVector.normalized;
-      RightCycleDistanceEstimate = RightStrideVector.magnitude / Normalize(RightFoot.Stride.FootOffStrideTime-RightFoot.Stride.FootStrikeStrideTime);
+      RightCycleDistanceEstimate = RightStrideVector.magnitude / Cyclic(RightFoot.Stride.FootOffStrideTime-RightFoot.Stride.FootStrikeStrideTime);
 
       Cycle.Duration = AnimationClip.length;
       Cycle.Distance = (LeftCycleDistanceEstimate + RightCycleDistanceEstimate) / 2;
