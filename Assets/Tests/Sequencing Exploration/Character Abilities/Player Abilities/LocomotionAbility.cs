@@ -27,6 +27,7 @@ public class LocomotionAbility : SimpleAbility {
     var maxSteeringMagnitude = (grounded ? 2 : .025f) * MovementSpeed.Value / Time.fixedDeltaTime;
     var boundedSteeringForce = Mathf.Min(steeringMagnitude, maxSteeringMagnitude) * steeringDirection.XZ();
     CharacterController.ApplyExternalForce(boundedSteeringForce);
-    Animator.SetFloat("Speed", Mathf.Round(velocity.magnitude));
+    if (Animator)
+      Animator.SetFloat("Speed", Mathf.Round(velocity.magnitude));
   }
 }
