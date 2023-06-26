@@ -7,7 +7,9 @@ using UnityEngine;
 public class SimpleAbilityManager : MonoBehaviour {
   AbilityTag NextSystemTags;
   AbilityTag SystemTags;
-  List<SimpleAbility> Abilities = new();
+
+  [HideInInspector, NonSerialized]
+  public List<SimpleAbility> Abilities = new();
 
   [field:SerializeField]
   public AbilityTag Tags { get; private set; }
