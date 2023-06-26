@@ -1,4 +1,3 @@
-using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +5,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public class Worker : MonoBehaviour {
-  [ShowInInspector] Job CurrentJob;
+  //[ShowInInspector] Job CurrentJob;  // -- removed ODIN
+  public Job CurrentJob;
   TaskScope Scope = new();
 
   AIMover Mover;
