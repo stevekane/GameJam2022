@@ -6,6 +6,7 @@ public class AnimatorGraphClipEditor : ClipEditor {
   public override void OnClipChanged(TimelineClip clip) {
     var animatorGraphClip = (AnimatorGraphClip)clip.asset;
     clip.displayName = animatorGraphClip.Clip?.name;
+    animatorGraphClip.Speed = clip.timeScale;
     base.OnClipChanged(clip);
   }
 

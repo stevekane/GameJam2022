@@ -19,78 +19,6 @@ Construct playable graph.
 + Use data from attack animation stream to blend between running cycles.
 + Blend result of blended running cycles with attack.
 */
-[Serializable]
-public struct BlendTreeNode : IComparable<BlendTreeNode> {
-  public AnimationClip Clip;
-  public float Value;
-  public int CompareTo(BlendTreeNode b) => Value.CompareTo(b.Value);
-}
-
-public class BlendTreeBehaviour : PlayableBehaviour {
-  public AnimationCurve BlendCurve;
-  public Transform Transform;
-  public float CycleSpeed = 1;
-  public float Value = 0;
-
-  Playable Playable;
-  AnimationMixerPlayable Mixer;
-  AnimationClipPlayable[] ClipPlayables;
-  BlendTreeNode[] Nodes;
-
-  public override void OnPlayableCreate(Playable playable) {
-    Mixer = AnimationMixerPlayable.Create(playable.GetGraph(), 0);
-    Playable = playable;
-    Playable.ConnectInput(0, Mixer, 0);
-  }
-
-  public override void OnPlayableDestroy(Playable playable) {
-    Mixer.Destroy();
-    foreach (var clipPlayable in ClipPlayables) {
-      clipPlayable.Destroy();
-    }
-  }
-
-  public override void PrepareFrame(Playable playable, FrameData info) {
-    for (var i = 0; i < Nodes.Length; i++) {
-      var weight = Weight(i, Value, Nodes);
-      Mixer.SetInputWeight(i, weight);
-      ClipPlayables[i].SetSpeed(Nodes[i].Clip.length / CycleSpeed);
-    }
-  }
-
-  public void SetNodes(BlendTreeNode[] nodes) {
-    Nodes = nodes.SortedCopy();
-    ClipPlayables = new AnimationClipPlayable[Nodes.Length];
-    Mixer.SetInputCount(Nodes.Length);
-    for (var i = 0; i < Nodes.Length; i++) {
-      var node = Nodes[i];
-      var playable = AnimationClipPlayable.Create(Playable.GetGraph(), node.Clip);
-      playable.SetSpeed(node.Clip.length / CycleSpeed);
-      Mixer.ConnectInput(i, playable, 0, 0);
-      ClipPlayables[i] = playable;
-    }
-  }
-
-  float Weight(int index, float value, BlendTreeNode[] nodes) {
-    var minIndex = 0;
-    var maxIndex = nodes.Length-1;
-    if (index < minIndex || index > maxIndex) {
-      return 0;
-    } else if (maxIndex == 0) {
-      return 1;
-    } else if (index == minIndex && value < nodes[minIndex].Value) {
-      return 1;
-    } else if (index == maxIndex && value > nodes[maxIndex].Value) {
-      return 1;
-    } else if (index > minIndex && value >= nodes[index-1].Value && value <= nodes[index].Value) {
-      return BlendCurve.Evaluate(Mathf.InverseLerp(nodes[index-1].Value, nodes[index].Value, value));
-    } else if (index < maxIndex && value >= nodes[index].Value && value <= nodes[index+1].Value) {
-      return 1-BlendCurve.Evaluate(Mathf.InverseLerp(nodes[index].Value, nodes[index+1].Value, value));
-    } else {
-      return 0;
-    }
-  }
-}
 
 public struct SampleJob : IAnimationJob {
   public float Angle;
@@ -272,34 +200,14 @@ public class MotionMatching : MonoBehaviour {
   public AnimationScriptPlayable Sampler;
   public BlendTreeBehaviour BlendTree;
 
-/*
-Character has four states currently:
-
-  Grounded stationary
-    Fullbody
-  Grounded moving
-    Upperbody
-
-  Airborne
-    Full body
-  Grounded stunned
-    Full body
-  Airborne stunned
-    Full body
-
-In states that have driven upper body motion
-The lower body should have a blend tree that uses the hip rotation
-*/
-
   void Start() {
     Graph = PlayableGraph.Create("Motion Matching");
     BlendTreePlayable = ScriptPlayable<BlendTreeBehaviour>.Create(Graph, 1);
     BlendTree = BlendTreePlayable.GetBehaviour();
     BlendTree.BlendCurve = BlendCurve;
-    BlendTree.CycleSpeed = CycleSpeed;
-    BlendTree.Value = TorsoTwist;
-    BlendTree.Transform = transform;
-    BlendTree.SetNodes(LowerBodyNodes);
+    BlendTree.Set(TorsoTwist);
+    Debug.LogWarning("Start of MotionMatching no longer sets nodes on blendtree because API changed.");
+    // BlendTree.SetNodes(LowerBodyNodes);
     UpperBodyPlayable = AnimationClipPlayable.Create(Graph, UpperBodyClip);
     Output = AnimationPlayableOutput.Create(Graph, "Motion Matching", Animator);
 
@@ -349,8 +257,7 @@ The lower body should have a blend tree that uses the hip rotation
   void Update() {
     var samplerData = Sampler.GetJobData<SampleJob>();
     TorsoTwist = samplerData.Angle;
-    BlendTree.Value = samplerData.Angle;
-    BlendTree.CycleSpeed = CycleSpeed;
+    BlendTree.Set(samplerData.Angle);
     BlendTree.BlendCurve = BlendCurve;
   }
 }
