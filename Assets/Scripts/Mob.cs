@@ -14,11 +14,11 @@ public class Mob : MonoBehaviour {
     Destroy(gameObject, .01f);
   }
 
-  void Awake() {
-    MobManager.Instance.Mobs.Add(this);
+  void Start() {
+    MobManager.Instance?.Mobs.Add(this);
   }
 
   void OnDestroy() {
-    MobManager.Instance.Mobs.Remove(this);
+    MobManager.Instance?.Mobs.Remove(this);
   }
 }

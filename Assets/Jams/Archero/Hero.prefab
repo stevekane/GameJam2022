@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2097471542423530351}
   - component: {fileID: 2282307819230839900}
+  - component: {fileID: 8607025741770465254}
   m_Layer: 0
   m_Name: Fire
   m_TagString: Untagged
@@ -47,28 +48,6 @@ MonoBehaviour:
   BlockActionsWith: 0
   Tags: 0
   AddedToOwner: 0
-  ProjectilePrefab: {fileID: 339482186798935924, guid: 53a95549b1dcc1d4fb718f56241c5517, type: 3}
-  ShootOffset: {x: 0, y: 1, z: 0}
-  HitConfig:
-    Damage:
-      Base: 0
-      Mult: 1
-    Knockback:
-      Base: 0
-      Mult: 1
-    KnockbackType: 0
-    KnockbackAngle: 0
-    RecoilStrength: 0
-    CameraShakeStrength: 0
-    HitStopDuration:
-      Millis: 1
-      FramesPerSecond: 60
-    StunDuration:
-      Millis: 500
-      FramesPerSecond: 60
-    SlowFallDuration:
-      Millis: 0
-      FramesPerSecond: 60
   Main:
     Tags: 0
     CancelAbilitiesWithAll: 0
@@ -79,7 +58,50 @@ MonoBehaviour:
     OwnerActivationBlocked: 16384
     CanRun: 1
     Ability: {fileID: 2282307819230839900}
+  Targeting: {fileID: 8607025741770465254}
+  ProjectilePrefab: {fileID: 339482186798935924, guid: 53a95549b1dcc1d4fb718f56241c5517, type: 3}
+  ShootOffset: {x: 0, y: 1, z: 0}
+  HitConfig:
+    Damage:
+      Base: 3
+      Mult: 0
+    Knockback:
+      Base: 0
+      Mult: 1
+    KnockbackType: 0
+    KnockbackAngle: 0
+    RecoilStrength: 0
+    CameraShakeStrength: 3
+    HitStopDuration:
+      Millis: 1
+      FramesPerSecond: 60
+    StunDuration:
+      Millis: 500
+      FramesPerSecond: 60
+    SlowFallDuration:
+      Millis: 0
+      FramesPerSecond: 60
   CooldownTicks: 0
+--- !u!114 &8607025741770465254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3065696498156848038}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f062b9cf8b6e4ce49a55577621a28d34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxDistance: 20
+  MaxAngle: 90
+  DistanceWeight: 1
+  AngleWeight: 1
+  LineOfSightWeight: 10
+  WallAndMobLayerMask:
+    serializedVersion: 2
+    m_Bits: 16385
 --- !u!1 &4691442712406987086
 GameObject:
   m_ObjectHideFlags: 0
@@ -387,13 +409,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1744445807933971131, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
+      propertyPath: Health
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: BaseAttributes.Array.size
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: BaseAttributes.Array.data[0].Modifier.Base
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: BaseAttributes.Array.data[0].Modifier.Mult
