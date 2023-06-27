@@ -63,15 +63,15 @@ MonoBehaviour:
   ShootOffset: {x: 0, y: 1, z: 0}
   HitConfig:
     Damage:
-      Base: 0
-      Mult: 1
+      Base: 3
+      Mult: 0
     Knockback:
       Base: 0
       Mult: 1
     KnockbackType: 0
     KnockbackAngle: 0
     RecoilStrength: 0
-    CameraShakeStrength: 0
+    CameraShakeStrength: 3
     HitStopDuration:
       Millis: 1
       FramesPerSecond: 60
@@ -409,13 +409,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1744445807933971131, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
+      propertyPath: Health
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: BaseAttributes.Array.size
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: BaseAttributes.Array.data[0].Modifier.Base
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: BaseAttributes.Array.data[0].Modifier.Mult
