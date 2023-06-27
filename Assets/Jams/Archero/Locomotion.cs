@@ -20,11 +20,7 @@ namespace Archero {
 
     public override void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
       currentVelocity = Attributes.GetValue(AttributeTag.MoveSpeed, 0) * V.normalized;
-      if (currentVelocity.magnitude > 0) {
-        AbilityManager.AddTag(AbilityTag.Dashing);
-      } else {
-        AbilityManager.RemoveTag(AbilityTag.Dashing);
-      }
+      AbilityManager.SetTag(AbilityTag.Dashing, currentVelocity.magnitude > 0);
     }
 
     public override void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
