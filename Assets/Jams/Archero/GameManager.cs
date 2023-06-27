@@ -46,6 +46,8 @@ namespace Archero {
 
     public void OnMobsCleared() {
       GlobalScope.Start(async s => {
+        FindObjectOfType<Door>().Open();
+        await s.Seconds(.5f);
         var coins = FindObjectsOfType<Coin>();
         var tasks = coins.Select(c => c.Collect(s));
         await s.AllTask(tasks.ToArray());

@@ -11,8 +11,9 @@ namespace Archero {
       Health = Mathf.Max(0, Health - (int)hitParams.Damage);
       OnDamage?.Invoke();
       if (Health <= 0) {
-        Destroy(gameObject);
         OnDeath?.Invoke();
+        SendMessage("OnDeath", SendMessageOptions.DontRequireReceiver);
+        Destroy(gameObject);
       }
     }
   }
