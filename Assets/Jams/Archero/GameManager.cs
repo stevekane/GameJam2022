@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 namespace Archero {
   public class GameManager : MonoBehaviour {
     public static GameManager Instance;
-    
+
     public List<SceneAsset> Scenes;
     public int CurrentLevel => Scenes.FindIndex(s => s.name == SceneManager.GetActiveScene().name);
 
@@ -20,6 +20,11 @@ namespace Archero {
         //this.InitComponentFromChildren(out NavMeshUtil.Instance);
         DontDestroyOnLoad(Instance.gameObject);
       }
+    }
+
+    void FixedUpdate() {
+      Timeval.TickCount++;
+      Timeval.TickEvent.Fire();
     }
 
     public void OnLevelComplete() {

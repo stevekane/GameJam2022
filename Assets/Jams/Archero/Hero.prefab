@@ -81,7 +81,16 @@ MonoBehaviour:
     SlowFallDuration:
       Millis: 0
       FramesPerSecond: 60
+  VolleyPeriod:
+    Millis: 50
+    FramesPerSecond: 60
   CooldownTicks: 0
+  DefaultVolleyCount: 1
+  DefaultForwardArrowCount: 1
+  DefaultDiagonalArrowCount: 0
+  DefaultSidewaysArrowCount: 0
+  DefaultRearArrowCount: 0
+  SpreadDistance: 0.05
 --- !u!114 &8607025741770465254
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -415,7 +424,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: BaseAttributes.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: BaseAttributes.Array.data[0].Modifier.Base
@@ -427,10 +436,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: BaseAttributes.Array.data[1].Modifier.Base
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: BaseAttributes.Array.data[1].Modifier.Mult
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
+      propertyPath: BaseAttributes.Array.data[2].Modifier.Base
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
+      propertyPath: BaseAttributes.Array.data[2].Modifier.Mult
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
@@ -442,12 +459,20 @@ PrefabInstance:
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
+      propertyPath: BaseAttributes.Array.data[2].Attribute.Value
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: BaseAttributes.Array.data[0].Attribute.String
       value: MoveSpeed
       objectReference: {fileID: 0}
     - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: BaseAttributes.Array.data[1].Attribute.String
       value: AttackSpeed
+      objectReference: {fileID: 0}
+    - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
+      propertyPath: BaseAttributes.Array.data[2].Attribute.String
+      value: FrontArrow
       objectReference: {fileID: 0}
     - target: {fileID: 6692932924000704826, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: m_Name
