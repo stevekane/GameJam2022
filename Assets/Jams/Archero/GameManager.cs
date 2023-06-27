@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -11,15 +13,26 @@ namespace Archero {
     public List<SceneAsset> Scenes;
     public int CurrentLevel => Scenes.FindIndex(s => s.name == SceneManager.GetActiveScene().name);
 
+    public List<Upgrade> Upgrades;
+
+    public Coin CoinPrefab;
+
+    TaskScope GlobalScope = new();
+
     void Awake() {
       Time.fixedDeltaTime = 1f / Timeval.FixedUpdatePerSecond;
       if (Instance) {
         Destroy(gameObject);
       } else {
         Instance = this;
-        //this.InitComponentFromChildren(out NavMeshUtil.Instance);
+        this.InitComponentFromChildren(out UpgradeUI.Instance);
         DontDestroyOnLoad(Instance.gameObject);
       }
+    }
+
+    void FixedUpdate() {
+      Timeval.TickCount++;
+      Timeval.TickEvent.Fire();
     }
 
     public void OnLevelComplete() {
@@ -29,6 +42,22 @@ namespace Archero {
       } else {
         Debug.Log($"Victory!");
       }
+    }
+
+    public void OnMobsCleared() {
+      GlobalScope.Start(async s => {
+        var coins = FindObjectsOfType<Coin>();
+        var tasks = coins.Select(c => c.Collect(s));
+        await s.AllTask(tasks.ToArray());
+        Debug.Log($"Got em all");
+      });
+    }
+
+    [ContextMenu("Spawn coins")]
+    void SpawnCoins() {
+      var xz = UnityEngine.Random.insideUnitCircle * 3;
+      Coin.SpawnCoins(new(xz.x, 0f, xz.y), 100);
+      Invoke("OnMobsCleared", 2f);
     }
   }
 }
