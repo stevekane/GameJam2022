@@ -24,7 +24,7 @@ namespace Archero {
       if (Owner.TryGetComponent(out Attributes defenderAttributes))
         hitParams.DefenderAttributes = defenderAttributes;
 
-      Debug.Log($"{Owner} got hit by {hitParams.Source} for {hitParams.Damage}");
+      //Debug.Log($"{Owner} got hit by {hitParams.Source} for {hitParams.Damage}");
       //hitParams.Defender.SendMessage("OnHurt", hitParams, SendMessageOptions.DontRequireReceiver);
       //hitParams.Source.SendMessage("OnHit", hitParams, SendMessageOptions.DontRequireReceiver);
       //OnHurt.Fire(hitParams);
