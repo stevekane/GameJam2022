@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using UnityEngine;
 
 public delegate Task TaskFunc(TaskScope scope);
 public delegate Task<T> TaskFunc<T>(TaskScope scope);
@@ -70,7 +71,10 @@ public class TaskScope : IDisposable {
     await Task.Yield();
     ThrowIfCancelled();
   }
+  // TODO: This is apparently very slow. Somehow, even sharing a CancellationToken for the next tick across
+  // all TaskScopes does not fix it. Task.Delay(x, token) is slow if one `token` is created each frame...
   public Task Tick() => ListenFor(Timeval.TickEvent);
+  public Task TickTime() => Seconds(Time.fixedDeltaTime);
   public async Task Ticks(int ticks) {
     for (int i = 0; i < ticks; i++)
       await Tick();

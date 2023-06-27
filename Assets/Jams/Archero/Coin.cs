@@ -46,8 +46,7 @@ namespace Archero {
         var delta = player.transform.position - transform.position;
         var dist = Mathf.Min(Time.fixedDeltaTime * CollectSpeed, delta.magnitude);
         transform.position += dist * delta.normalized;
-        await scope.Tick();
-        //await scope.Yield();
+        await scope.TickTime();
       }
     }
     IEnumerator CollectRoutine() {
