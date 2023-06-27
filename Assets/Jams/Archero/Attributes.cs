@@ -48,17 +48,16 @@ namespace Archero {
     public static AttributeModifier Times(float n) => new() { Mult = n };
 
     public float Base = 0;
-    public float Mult = 1;
-    public float Apply(float baseValue) => (baseValue + Base) * Mult;
+    public float Mult = 0;
+    public float Apply(float baseValue) => (baseValue + Base) * (1 + Mult);
     public AttributeModifier Merge(AttributeModifier other) {
       Base += other.Base;
-      Mult *= other.Mult;
+      Mult += other.Mult;
       return this;
     }
     public AttributeModifier Remove(AttributeModifier other) {
-      Debug.Assert(other.Mult != 0f, "Cannot remove a x0 modifier");
       Base -= other.Base;
-      Mult /= other.Mult;
+      Mult -= other.Mult;
       return this;
     }
     public static void Add(Dictionary<AttributeTag, AttributeModifier> dict, AttributeTag attrib, AttributeModifier modifier) {
