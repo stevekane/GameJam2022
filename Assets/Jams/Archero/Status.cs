@@ -83,7 +83,7 @@ namespace Archero {
       DamagePerFrame = dps / Timeval.FixedUpdatePerSecond;
     }
     public override void ApplyTimed(Status status) {
-      status.Damage?.Value.AddPoints(DamagePerFrame);
+      status.Damage.AddPoints(DamagePerFrame);
     }
   }
 
@@ -178,40 +178,6 @@ namespace Archero {
     }
   }
 
-  // Some forward-translation juice for melee hits to convey momentum.
-  public class HitFollowthroughEffect : TimedEffect {
-    Vector3 Velocity;
-    List<Status> Defenders = new();
-    public HitFollowthroughEffect(Vector3 velocity, Timeval duration, GameObject defender) : base(duration.Ticks) {
-      Velocity = velocity;
-      MaybeAddDefender(defender);
-    }
-    public override bool Merge(StatusEffect e) {
-      ((HitFollowthroughEffect)e).Defenders.ForEach(d => MaybeAddDefender(d.gameObject));
-      return true;
-    }
-    void MaybeAddDefender(GameObject defender) {
-      if (defender && defender.TryGetComponent(out Status status) && status.IsHittable && status.IsInterruptible)
-        Defenders.Add(status);
-    }
-    public override void ApplyTimed(Status status) {
-      if (Defenders.Count == 0)
-        return;
-      var remaining = Defenders.Where(d => d != null);
-      var delta = Velocity*Time.fixedDeltaTime;
-      if (CanMove(status, delta) && remaining.Any(s => CanMove(s, delta))) {
-        Move(status, delta);
-      }
-      remaining.ForEach(s => { if (CanMove(s, delta)) Move(s, delta); });
-    }
-    public bool CanMove(Status target, Vector3 delta) => !target.IsGrounded || target.IsOverGround(delta);
-    public void Move(Status target, Vector3 delta) {
-      target.Mover.Move(delta);
-      target.CanMove = false;
-      target.CanRotate = false;
-    }
-  }
-
   public class FallenEffect : StatusEffect {
     AnimationJobConfig RecoveryAnimation;
     public FallenEffect(AnimationJobConfig recover) => RecoveryAnimation = recover;
@@ -246,7 +212,7 @@ namespace Archero {
     internal Upgrades Upgrades;
     internal CharacterController CharacterController;
     internal Mover Mover;
-    internal Optional<Damage> Damage;
+    internal Damage Damage;
     Dictionary<AttributeTag, AttributeModifier> Modifiers = new();
 
     public bool IsGrounded { get; private set; }
@@ -316,35 +282,11 @@ namespace Archero {
       Damage = GetComponent<Damage>();
     }
 
-    internal bool IsOverGround(Vector3 delta) {
-      const float GROUND_DISTANCE = .2f;
-      var cylinderHeight = Mathf.Max(0, CharacterController.height - 2*CharacterController.radius);
-      var offsetDistance = cylinderHeight / 2;
-      var offset = offsetDistance*Vector3.up;
-      var skinOffset = CharacterController.skinWidth*Vector3.up;
-      var position = transform.TransformPoint(CharacterController.center + skinOffset - offset) + delta;
-      var ray = new Ray(position, Vector3.down);
-      var hit = new RaycastHit();
-      var didHit = Physics.SphereCast(ray, CharacterController.radius, out hit, GROUND_DISTANCE, Defaults.Instance.EnvironmentLayerMask, QueryTriggerInteraction.Ignore);
-      return didHit && hit.collider.CompareTag(Defaults.Instance.GroundTag);
-    }
-
     private void FixedUpdate() {
       Modifiers.Clear();
 
-      var wasGrounded = IsGrounded;
-      IsGrounded = IsOverGround(Vector3.zero);
-      JustGrounded = !wasGrounded && IsGrounded;
-      JustTookOff = wasGrounded && !IsGrounded;
-      IsWallSliding = !IsGrounded && Mover.Velocity.y < 0f && CharacterController.collisionFlags.HasFlag(CollisionFlags.CollidedSides);
       IsHurt = false;
       IsFallen = false;
-      if (JustGrounded) {
-        gameObject.SendMessage("OnLand", SendMessageOptions.DontRequireReceiver);
-      }
-      if (JustTookOff) {
-        gameObject.SendMessage("OnTakeoff", SendMessageOptions.DontRequireReceiver);
-      }
 
       //Tags = Upgrades.AbilityTags;
 
@@ -371,14 +313,6 @@ namespace Archero {
 
 #if UNITY_EDITOR
     public List<string> DebugEffects = new();
-    void OnDrawGizmos() {
-      var controller = CharacterController != null ? CharacterController : GetComponent<CharacterController>();
-      var cylinderHeight = Mathf.Max(0, controller.height - 2*controller.radius);
-      var offsetDistance = cylinderHeight / 2;
-      var offset = offsetDistance*Vector3.up;
-      var position = transform.TransformPoint(controller.center-offset);
-      Gizmos.DrawWireSphere(position, controller.radius);
-    }
 #endif
   }
 }

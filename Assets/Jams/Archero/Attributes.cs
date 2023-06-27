@@ -22,15 +22,19 @@ namespace Archero {
     IsHurt,
     IsInterruptible,
 
+    Multishot,
+    Ricochet,
+    FrontArrow,
+    Pierce,
+    BouncyWall,
+    DiagonalArrow,
+    SideArrow,
+    RearArrow,
+
     GoldGain,
 
     FreezingHits,
     BurningHits,
-
-    // Abilities
-    AbilityStart = 1000,
-    AbilityHeavyActive,
-    AbilitySlamActive,
 
     // States
     LocalTimeScale

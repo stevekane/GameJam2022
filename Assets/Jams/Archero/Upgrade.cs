@@ -2,8 +2,9 @@ using UnityEngine;
 
 namespace Archero {
   public class Upgrade : ScriptableObject {
-    // Returns the gold cost for the next level of this upgrade.
-    public virtual int GetCost(Upgrades us) => 0;
+    public int MaxLevel = 18;
+    // Adds the upgrade to the acquired or increases its level.
+    public virtual UpgradeData Add(Upgrades us) => null;
     // Applies the effect of the current level of this upgrade.
     public virtual void Apply(Upgrades us) { }
     //// Returns description data used for the UI.

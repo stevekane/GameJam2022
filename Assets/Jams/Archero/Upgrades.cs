@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Xml.XPath;
 using UnityEngine;
 
 namespace Archero {
@@ -27,11 +26,8 @@ namespace Archero {
     }
     public void AddUpgrade(Upgrade upgrade) {
       Dirty = true;
-      if (GetUpgradeData(upgrade) is UpgradeData data) {
-        data.CurrentLevel++;
-      } else {
-        Added.Add(new() { Upgrade = upgrade, CurrentLevel = 0 });
-      }
+      if (upgrade.Add(this) is UpgradeData data)
+        Added.Add(data);
     }
     public void CollectGold(int gold) {
       XP += gold;
