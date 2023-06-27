@@ -29,9 +29,89 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7572476005031051833}
+  - {fileID: 5046079436214481256}
   m_Father: {fileID: 7502077783201813007}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4834269040944377385
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5046079436214481256}
+  - component: {fileID: 6843625312093327830}
+  m_Layer: 0
+  m_Name: ShootButton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5046079436214481256
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4834269040944377385}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1734143714636766854}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6843625312093327830
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4834269040944377385}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a08dfc20cc4527a41b5f8936d2440c83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BlockActionsWith: 0
+  Tags: 0
+  AddedToOwner: 0
+  ProjectilePrefab: {fileID: 339482186798935924, guid: 53a95549b1dcc1d4fb718f56241c5517, type: 3}
+  ShootOffset: {x: 0, y: 1, z: 0}
+  HitConfig:
+    Damage:
+      Base: 5
+      Mult: 1
+    Knockback:
+      Base: 0
+      Mult: 1
+    KnockbackType: 0
+    KnockbackAngle: 0
+    RecoilStrength: 0
+    CameraShakeStrength: 0
+    HitStopDuration:
+      Millis: 1
+      FramesPerSecond: 60
+    StunDuration:
+      Millis: 500
+      FramesPerSecond: 60
+    SlowFallDuration:
+      Millis: 0
+      FramesPerSecond: 60
+  Main:
+    Tags: 0
+    CancelAbilitiesWithAll: 0
+    CancelAbilitiesWithAny: 0
+    AddToOwner: 0
+    AddToAbility: 0
+    OwnerActivationRequired: 0
+    OwnerActivationBlocked: 0
+    CanRun: 1
+    Ability: {fileID: 6843625312093327830}
 --- !u!1 &5479974746974176019
 GameObject:
   m_ObjectHideFlags: 0
@@ -285,7 +365,13 @@ MonoBehaviour:
   SimpleAbilityManager: {fileID: 8699607654073364690}
   InputManager: {fileID: -8503290537206015001}
   PersonalCamera: {fileID: -3852056992930453506}
-  ButtonEventActions: []
+  ButtonEventActions:
+  - ButtonCode: 6
+    ButtonPressType: 0
+    ActionReference:
+      Target: {fileID: 6843625312093327830}
+      FieldName: Main
+    FlowBehavior: 0
   AxisEventActions:
   - AxisCode: 0
     AxisProcessor: 1
