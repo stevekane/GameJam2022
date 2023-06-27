@@ -87,9 +87,9 @@ public class AnimatorGraph : MonoBehaviour {
       GroundLean.SetJobData(LeanJob.From(Animator, RootTransform, HipTransform, Mathf.Deg2Rad * forwardLeanAngle, Mathf.Deg2Rad * sidewaysLeanAngle));
     }
 
-    var isGrounded = AbilityManager.HasFlag(AbilityTag.Grounded);
-    var isAirborne = AbilityManager.HasFlag(AbilityTag.Airborne);
-    var isHurt = AbilityManager.HasFlag(AbilityTag.Hurt);
+    var isGrounded = AbilityManager.HasTag(AbilityTag.Grounded);
+    var isAirborne = AbilityManager.HasTag(AbilityTag.Airborne);
+    var isHurt = AbilityManager.HasTag(AbilityTag.Hurt);
     var velocity = Motor.BaseVelocity;
     var speed = Mathf.RoundToInt(velocity.magnitude);
     LocomotionStateSelect.GetBehaviour().CrossFade(isGrounded ? 0 : 1);

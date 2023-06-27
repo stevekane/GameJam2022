@@ -14,9 +14,13 @@ public class SimpleAbilityManager : MonoBehaviour {
   [field:SerializeField]
   public AbilityTag Tags { get; private set; }
 
+  public bool HasTag(AbilityTag tag) => (NextSystemTags & tag) != 0;
   public void AddTag(AbilityTag tag) => NextSystemTags |= tag;
   public void RemoveTag(AbilityTag tag) => NextSystemTags.ClearFlags(tag);
-  public bool HasFlag(AbilityTag tag) => (NextSystemTags & tag) != 0;
+  public void SetTag(AbilityTag tag, bool active) {
+    if (active) AddTag(tag);
+    else        RemoveTag(tag);
+  }
 
   public void AddAbility(SimpleAbility ability) => Abilities.Add(ability);
   public void RemoveAbility(SimpleAbility ability) {

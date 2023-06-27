@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Archero {
   public class Locomotion : SimpleAbility {
-    [SerializeField] MovementSpeed MovementSpeed;
+    [SerializeField] Attributes Attributes;
     [SerializeField] CharacterController CharacterController;
 
     public AbilityAction<Vector3> Move;
@@ -19,7 +19,8 @@ namespace Archero {
     }
 
     public override void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
-      currentVelocity = MovementSpeed.Value * V.normalized;
+      currentVelocity = Attributes.GetValue(AttributeTag.MoveSpeed, 0) * V.normalized;
+      AbilityManager.SetTag(AbilityTag.Dashing, currentVelocity.magnitude > 0);
     }
 
     public override void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
