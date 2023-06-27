@@ -40,6 +40,7 @@ namespace Archero {
       var selected = GetComponentInChildren<Button>();
       EventSystem.current.SetSelectedGameObject(selected.gameObject);
 
+      // Need to change InputSystem's update mode while paused or it won't update.
       InputSystem.settings.updateMode = InputSettings.UpdateMode.ProcessEventsInDynamicUpdate;
       Time.timeScale = 0f;
     }
