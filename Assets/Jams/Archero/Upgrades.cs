@@ -16,6 +16,8 @@ namespace Archero {
     Dictionary<AttributeTag, AttributeModifier> Modifiers = new();
     bool Dirty = false;
     public int XP = 0;
+    public int CurrentLevel = 1;
+    int XPToNextLevel => 100 + 50*CurrentLevel;
     public AttributeModifier GetModifier(AttributeTag attrib) => Modifiers.GetValueOrDefault(attrib, null);
     public void AddAttributeModifier(AttributeTag attrib, AttributeModifier modifier) => AttributeModifier.Add(Modifiers, attrib, modifier);
     public void RemoveAttributeModifier(AttributeTag attrib, AttributeModifier modifier) => AttributeModifier.Remove(Modifiers, attrib, modifier);

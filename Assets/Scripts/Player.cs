@@ -9,10 +9,10 @@ public class Player : MonoBehaviour {
   }
 
   void Awake() {
-    PlayerManager.Instance.RegisterPlayer(this);
+    PlayerManager.Instance?.RegisterPlayer(this);
   }
 
   void OnDestroy() {
-    PlayerManager.Instance.UnregisterPlayer(this);
+    PlayerManager.Instance?.UnregisterPlayer(this);
   }
 }
