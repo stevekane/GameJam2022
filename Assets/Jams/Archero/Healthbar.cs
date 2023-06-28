@@ -3,15 +3,17 @@ using UnityEngine.UI;
 
 namespace Archero {
   public class Healthbar : MonoBehaviour {
-    [SerializeField] Damageable Damageable;
+    [SerializeField] PersonalCamera PersonalCamera;
     [SerializeField] Attributes Attributes;
     [SerializeField] Slider Slider;
-    [SerializeField] PersonalCamera PersonalCamera;
     [SerializeField] Vector3 Offset;
 
-    public void OnDamage(DamageEvent damageEvent) {
-      Debug.Log("Fired");
-      Slider.value = (float)damageEvent.NewHealth / Attributes.GetValue(AttributeTag.Health, 0);
+    void OnDamage(DamageEvent damageEvent) {
+      Slider.value = (float)damageEvent.Health / Attributes.GetValue(AttributeTag.Health, 0);
+    }
+
+    void OnDeath() {
+      Slider.gameObject.SetActive(false);
     }
 
     void LateUpdate() {

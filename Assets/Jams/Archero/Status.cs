@@ -77,23 +77,46 @@ namespace Archero {
     }
   }
 
-  public class BurningEffect : TimedEffect {
-    float DamagePerFrame = 1f;
-    public BurningEffect(float dps) : base(Timeval.FromSeconds(3f).Ticks) {
-      DamagePerFrame = dps / Timeval.FixedUpdatePerSecond;
+  public class FlameEffect : TimedEffect {
+    float Damage = 1f;
+    static int DelayTicks = 60/4;  // .25s
+    int TicksRemaining;
+    public FlameEffect(float baseDamage) : base(Timeval.FromSeconds(2f).Ticks) {
+      Damage = baseDamage * .18f;
+      TicksRemaining = DelayTicks;
     }
     public override void ApplyTimed(Status status) {
-      status.Damage.AddPoints(DamagePerFrame);
+      if (--TicksRemaining < 0) {
+        status.Damage.TakeDamage(Damage, false);
+        TicksRemaining = DelayTicks;
+      }
     }
   }
 
-  public class FreezingEffect : TimedEffect {
-    public FreezingEffect(int ticks) : base(ticks) { }
+  public class FreezeEffect : TimedEffect {
+    public FreezeEffect() : base(Timeval.FromSeconds(2f).Ticks) { }
     public override void ApplyTimed(Status status) {
       status.CanMove = false;
       status.CanRotate = false;
       status.CanAttack = false;
       status.AddAttributeModifier(AttributeTag.LocalTimeScale, AttributeModifier.TimesZero);
+    }
+  }
+
+  public class PoisonEffect : StatusEffect {
+    float Damage;
+    static int DelayTicks = 60;  // 1s
+    int TicksRemaining;
+    public PoisonEffect(float baseDamage) {
+      Damage = baseDamage * .35f;
+      TicksRemaining = DelayTicks;
+    }
+    public override bool Merge(StatusEffect e) => false;
+    public override void Apply(Status status) {
+      if (--TicksRemaining < 0) {
+        status.Damage.TakeDamage(Damage, false);
+        TicksRemaining = DelayTicks;
+      }
     }
   }
 
@@ -212,7 +235,7 @@ namespace Archero {
     internal Upgrades Upgrades;
     internal CharacterController CharacterController;
     internal Mover Mover;
-    internal Damage Damage;
+    internal Damageable Damage;
     Dictionary<AttributeTag, AttributeModifier> Modifiers = new();
 
     public bool IsGrounded { get; private set; }
@@ -279,7 +302,7 @@ namespace Archero {
       CharacterController = GetComponent<CharacterController>();
       Mover = GetComponent<Mover>();
       AnimationDriver = GetComponent<AnimationDriver>();
-      Damage = GetComponent<Damage>();
+      this.InitComponent(out Damage);
     }
 
     private void FixedUpdate() {
@@ -309,6 +332,19 @@ namespace Archero {
       DebugEffects.Clear();
       Active.ForEach(e => DebugEffects.Add($"{e}"));
 #endif
+    }
+
+    void OnHurt(HitParams hitParams) {
+      Remove(Get<FreezeEffect>());
+      if (hitParams.AttackerAttributes.GetValue(AttributeTag.Blaze, 0) > 0) {
+        Add(new FlameEffect(hitParams.ElemDamage));
+      }
+      if (hitParams.AttackerAttributes.GetValue(AttributeTag.Freeze, 0) > 0) {
+        Add(new FreezeEffect());
+      }
+      if (hitParams.AttackerAttributes.GetValue(AttributeTag.Poison, 0) > 0) {
+        Add(new PoisonEffect(hitParams.ElemDamage));
+      }
     }
 
 #if UNITY_EDITOR

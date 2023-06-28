@@ -136,6 +136,7 @@ Transform:
   m_Children:
   - {fileID: 1151444186777784401}
   - {fileID: 2353201615000997685}
+  - {fileID: 5104031550283412937}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -277,6 +278,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5553f3f315ec13540a9e67365a36f2da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Active: []
+  Modifiers:
+    KeyList: 
+    ValueList: []
   XP: 0
   CurrentLevel: 1
 --- !u!114 &7270848277881640408
@@ -307,19 +312,7 @@ MonoBehaviour:
   Health: 0
   OnDamage:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 930353500575523091}
-        m_TargetAssemblyTypeName: Archero.Healthbar, Assembly-CSharp
-        m_MethodName: OnDamage
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -336,6 +329,50 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Current: {fileID: 0}
+--- !u!1 &8209241461576161196
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5104031550283412937}
+  - component: {fileID: 3072612938206837368}
+  m_Layer: 10
+  m_Name: Damage Number Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5104031550283412937
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8209241461576161196}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1122499520473116429}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3072612938206837368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8209241461576161196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: beac4ba9a05a1cf469f508e52c512eed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &4330073789954398440
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -450,11 +487,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8503810811469106285, guid: 9607694db3168b144873f69d8d055fb8, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.05
+      value: 0.02
       objectReference: {fileID: 0}
     - target: {fileID: 8503810811469106285, guid: 9607694db3168b144873f69d8d055fb8, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.05
+      value: 0.02
       objectReference: {fileID: 0}
     - target: {fileID: 8755212310119584359, guid: 9607694db3168b144873f69d8d055fb8, type: 3}
       propertyPath: m_AnchorMax.x
@@ -470,24 +507,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9110861769930584736, guid: 9607694db3168b144873f69d8d055fb8, type: 3}
       propertyPath: m_Name
-      value: Health Bar Canvas
+      value: Health Bar
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9607694db3168b144873f69d8d055fb8, type: 3}
---- !u!114 &930353500575523091 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3530475485881334267, guid: 9607694db3168b144873f69d8d055fb8, type: 3}
-  m_PrefabInstance: {fileID: 4330073789954398440}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93c64976a8f2b2848aeb3bc86f8069b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &2353201615000997685 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2071589090141444061, guid: 9607694db3168b144873f69d8d055fb8, type: 3}

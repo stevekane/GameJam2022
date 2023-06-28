@@ -6,8 +6,13 @@ namespace Archero {
   [Serializable]
   public struct DamageEvent {
     public int Delta;
-    public int OldHealth;
-    public int NewHealth;
+    public int Health;
+    public bool IsCrit;
+    public DamageEvent(int delta, int health, bool isCrit = false) {
+      Delta = delta;
+      Health = health;
+      IsCrit = isCrit;
+    }
   }
 
   public class Damageable : MonoBehaviour {
@@ -16,24 +21,21 @@ namespace Archero {
     [SerializeField] UnityEvent OnDeath;
 
     void OnHurt(HitParams hitParams) {
-      var newHealth = Mathf.Max(0, Health - (int)hitParams.Damage);
-      var damageEvent = new DamageEvent {
-        Delta = (int)hitParams.Damage,
-        OldHealth = Health,
-        NewHealth = newHealth
-      };
-      Health = newHealth;
-      OnDamage.Invoke(damageEvent);
-      // TODO: Move damage text to separate system that subs to OnDamage
-      var damageText = $"-{hitParams.Damage}";
-      var damageTextPosition = transform.position+2*Vector3.up;
-      var damageMessage = WorldSpaceMessageManager.Instance.SpawnMessage(damageText, damageTextPosition);
-      damageMessage.LocalScale = Vector3.one;
-      Destroy(damageMessage.gameObject, 2);
+      var didCrit = hitParams.CritRoll;
+      var damage = (int)hitParams.GetDamage(didCrit);
+      TakeDamage(damage, didCrit);
+    }
+
+    public void TakeDamage(float damage, bool didCrit) {
+      Health = Mathf.Max(0, Health - (int)damage);
       if (Health <= 0) {
         OnDeath.Invoke();
-        SendMessage("OnDeath", SendMessageOptions.DontRequireReceiver);
+        BroadcastMessage("OnDeath", SendMessageOptions.DontRequireReceiver);
         Destroy(gameObject);
+      } else {
+        var damageEvent = new DamageEvent((int)damage, Health, didCrit);
+        OnDamage.Invoke(damageEvent);
+        BroadcastMessage("OnDamage", damageEvent, SendMessageOptions.DontRequireReceiver);
       }
     }
   }

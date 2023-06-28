@@ -8,9 +8,13 @@ namespace Archero {
     public float Gravity = -200f;
     public float CollectSpeed = 40f;
 
+    static GameObject _Parent;
+    static GameObject Parent => _Parent = _Parent ? _Parent : new GameObject("Coins"); 
+
     public static void SpawnCoins(Vector3 position, int amount) {
       for (int i = 0; i < amount; i++) {
-        Instantiate(GameManager.Instance.CoinPrefab, position, Quaternion.identity);
+        var c = Instantiate(GameManager.Instance.CoinPrefab, position, Quaternion.identity);
+        c.transform.SetParent(Parent.transform, true);
       }
     }
 
@@ -66,13 +70,6 @@ namespace Archero {
       if (other.GetComponent<Player>() && other.TryGetComponent(out Upgrades us)) {
         us.CollectGold(1);
         Destroy(gameObject);
-      }
-    }
-
-    void OnDestroy() {
-      var remaining = FindObjectsOfType<Coin>();
-      if (remaining.Length == 0) {
-        Debug.Log($"Got em");
       }
     }
   }
