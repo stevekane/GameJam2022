@@ -72,12 +72,5 @@ namespace Archero {
         Destroy(gameObject);
       }
     }
-
-    void OnDestroy() {
-      var remaining = FindObjectsOfType<Coin>();
-      if (remaining.Length == 0) {
-        Debug.Log($"Got em");
-      }
-    }
   }
 }

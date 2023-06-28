@@ -36,23 +36,28 @@ namespace Archero {
     }
 
     public void OnLevelComplete() {
-      if (CurrentLevel+1 < Scenes.Count) {
-        var next = Scenes[CurrentLevel+1];
-        SceneManager.LoadSceneAsync(next.name);
-      } else {
-        Debug.Log($"Victory!");
-      }
+      GlobalScope.Start(async s => {
+        await s.While(() => CollectingCoins);
+        if (CurrentLevel+1 < Scenes.Count) {
+          var next = Scenes[CurrentLevel+1];
+          SceneManager.LoadSceneAsync(next.name);
+        } else {
+          Debug.Log($"Victory!");
+        }
+      });
     }
 
+    bool CollectingCoins = false;
     public void OnMobsCleared() {
       GlobalScope.Start(async s => {
+        CollectingCoins = true;
         FindObjectOfType<Door>().Open();
         await s.Seconds(.5f);
         var coins = FindObjectsOfType<Coin>();
         var tasks = coins.Select(c => c.Collect(s));
         await s.AllTask(tasks.ToArray());
         Player.Get().GetComponent<Upgrades>().MaybeLevelUp();
-        Debug.Log($"Got em all");
+        CollectingCoins = false;
       });
     }
 
