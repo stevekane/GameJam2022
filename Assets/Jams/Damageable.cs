@@ -8,7 +8,10 @@ namespace Archero {
     [SerializeField] UnityEvent OnDeath;
 
     void OnHurt(HitParams hitParams) {
-      Health = Mathf.Max(0, Health - (int)hitParams.Damage);
+      var didCrit = hitParams.CritRoll;
+      var damage = hitParams.GetDamage(didCrit);
+      //Debug.Log($"Hit {name} for {damage} {(didCrit ? "CRIT" : "")}");
+      Health = Mathf.Max(0, Health - (int)damage);
       OnDamage?.Invoke();
       if (Health <= 0) {
         OnDeath?.Invoke();
