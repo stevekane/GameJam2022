@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace Archero {
@@ -12,54 +13,48 @@ namespace Archero {
     public UpgradeCardUI CardPrefab;
     public TextMeshProUGUI LevelText;
     public bool IsShowing { get; private set; }
-    Upgrade[] UpgradeChoices;
 
     void Start() {
-      Archero.UpgradeUI.Instance = this;
       Canvas.SetActive(false);
     }
 
-    public void Show(Upgrade[] choices) {
-      UpgradeChoices = choices;
-
-      var level = 42;
-      LevelText.text = $"Level {level} in this adventure!";
+    public void Show(Upgrades us, Upgrade[] choices) {
+      LevelText.text = $"Level {us.CurrentLevel} in this adventure!";
       foreach (Transform child in ChoicesFrame.transform)
         Destroy(child.gameObject);
-      Button selected = GetComponentInChildren<Button>();
-      var playerUs = Player.Get().GetComponent<Upgrades>();
       choices.ForEach(u => {
         var card = Instantiate(CardPrefab, ChoicesFrame.transform);
-        var descr = u.GetDescription(playerUs);
+        var descr = u.GetDescription(us);
         card.Init(descr);
         var b = card.GetComponent<Button>();
-        b.onClick.AddListener(() => OnChooseCard(u));
+        b.onClick.AddListener(() => OnChooseCard(us, u));
       });
       Canvas.SetActive(true);
-      Player.Get().GetComponent<InputManager>().SetInputEnabled(false);
-      Time.timeScale = 0f;
-      if (selected != null)
-        EventSystem.current.SetSelectedGameObject(selected.gameObject);
+      Invoke("FuckYouUnityYouMonumentalHeapOfFuckingGarbage", 0f);
 
       IsShowing = true;
     }
 
+    // Setting focus *sometimes* doesn't work unless we do it in this deferred function? WTF??
+    void FuckYouUnityYouMonumentalHeapOfFuckingGarbage() {
+      var selected = GetComponentInChildren<Button>();
+      EventSystem.current.SetSelectedGameObject(selected.gameObject);
+
+      // Need to change InputSystem's update mode while paused or it won't update.
+      InputSystem.settings.updateMode = InputSettings.UpdateMode.ProcessEventsInDynamicUpdate;
+      Time.timeScale = 0f;
+    }
+
     public void Hide() {
+      EventSystem.current.SetSelectedGameObject(null);
       Canvas.SetActive(false);
       Time.timeScale = 1f;
-      // TODO: This is a dumb hack so the button onRelease doesn't register as a player input.
-      // Should probably have a close-shop animation anyway.
-      Invoke("EnableInput", .1f);
+      InputSystem.settings.updateMode = InputSettings.UpdateMode.ProcessEventsInFixedUpdate;
     }
 
-    void EnableInput() {
-      //Player.Get().GetComponent<InputManager>().SetInputEnabled(true);
-      IsShowing = false;
-    }
-
-    public void OnChooseCard(Upgrade which) {
-      //Player.Get().GetComponent<Upgrades>().BuyUpgrade(which);
-      Show(UpgradeChoices);
+    public void OnChooseCard(Upgrades us, Upgrade which) {
+      us.BuyUpgrade(which);
+      Hide();
     }
     public void OnExit() {
       Hide();

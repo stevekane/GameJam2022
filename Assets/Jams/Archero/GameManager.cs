@@ -51,6 +51,7 @@ namespace Archero {
         var coins = FindObjectsOfType<Coin>();
         var tasks = coins.Select(c => c.Collect(s));
         await s.AllTask(tasks.ToArray());
+        Player.Get().GetComponent<Upgrades>().MaybeLevelUp();
         Debug.Log($"Got em all");
       });
     }
@@ -60,6 +61,13 @@ namespace Archero {
       var xz = UnityEngine.Random.insideUnitCircle * 3;
       Coin.SpawnCoins(new(xz.x, 0f, xz.y), 100);
       Invoke("OnMobsCleared", 2f);
+    }
+
+    [ContextMenu("LevelUp")]
+    void LevelUp() {
+      var ups = Player.Get().GetComponent<Upgrades>();
+      ups.XP += ups.XPToNextLevel;
+      ups.MaybeLevelUp();
     }
   }
 }
