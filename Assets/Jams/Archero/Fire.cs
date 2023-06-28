@@ -10,11 +10,6 @@ namespace Archero {
     public HitConfig HitConfig;
     public Timeval VolleyPeriod = Timeval.FromMillis(100);
     public int CooldownTicks;
-    public int DefaultVolleyCount = 1;
-    public int DefaultForwardArrowCount = 1;
-    public int DefaultDiagonalArrowCount = 0;
-    public int DefaultSidewaysArrowCount = 0;
-    public int DefaultRearArrowCount = 0;
     public float SpreadDistance = .15f;
 
     Attributes Attributes => AbilityManager.GetComponent<Attributes>();
@@ -42,7 +37,7 @@ namespace Archero {
       var secondsPerAttack = 1f/attacksPerSecond;
       CooldownTicks = Mathf.RoundToInt(secondsPerAttack*Timeval.FixedUpdatePerSecond);
       var target = Targeting.BestTarget;
-      var volleys = Attributes.GetValue(AttributeTag.Multishot, DefaultVolleyCount);
+      var volleys = Attributes.GetValue(AttributeTag.Multishot, 1);
       try {
         if (target && volleys > 0) {
           var toTarget = target.transform.position-transform.position;
@@ -51,10 +46,10 @@ namespace Archero {
           var toRightDiagonal = (toTarget + toRightSide).normalized;
           var toLeftDiagonal = (toTarget + toLeftSide).normalized;
           var toRear = -toTarget;
-          var frontArrowCount = (int)Attributes.GetValue(AttributeTag.FrontArrow, DefaultForwardArrowCount);
-          var sideArrowCount = (int)Attributes.GetValue(AttributeTag.SideArrow, DefaultSidewaysArrowCount);
-          var diagonalArrowCount = (int)Attributes.GetValue(AttributeTag.DiagonalArrow, DefaultDiagonalArrowCount);
-          var rearArrowCount = (int)Attributes.GetValue(AttributeTag.RearArrow, DefaultRearArrowCount);
+          var frontArrowCount = (int)Attributes.GetValue(AttributeTag.FrontArrow, 1);
+          var sideArrowCount = (int)Attributes.GetValue(AttributeTag.SideArrow, 0);
+          var diagonalArrowCount = (int)Attributes.GetValue(AttributeTag.DiagonalArrow, 0);
+          var rearArrowCount = (int)Attributes.GetValue(AttributeTag.RearArrow, 0);
           for (var i = 0; i < volleys; i++) {
             await scope.Ticks(VolleyPeriod.Ticks);
             FireArrowVolley(toTarget, frontArrowCount);
