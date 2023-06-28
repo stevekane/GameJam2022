@@ -18,8 +18,8 @@ namespace Archero {
   }
 
   public class Damageable : MonoBehaviour {
-    [SerializeField] Attributes Attributes;
     [SerializeField] int Health;
+    [SerializeField] Attributes Attributes;
     [SerializeField] UnityEvent<DamageEvent> OnDamage;
     [SerializeField] UnityEvent OnDeath;
 
