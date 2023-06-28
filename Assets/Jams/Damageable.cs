@@ -10,9 +10,14 @@ namespace Archero {
     void OnHurt(HitParams hitParams) {
       var didCrit = hitParams.CritRoll;
       var damage = hitParams.GetDamage(didCrit);
-      //Debug.Log($"Hit {name} for {damage} {(didCrit ? "CRIT" : "")}");
+      OnDamage?.Invoke();  // Guessing this is meant as an on-hit callback?
+      TakeDamage(damage, didCrit);
+    }
+
+    // Things like DoTs go through here.
+    public void TakeDamage(float damage, bool didCrit) {
+      Debug.Log($"Hit {name} for {damage} {(didCrit ? "CRIT" : "")}");
       Health = Mathf.Max(0, Health - (int)damage);
-      OnDamage?.Invoke();
       if (Health <= 0) {
         OnDeath?.Invoke();
         SendMessage("OnDeath", SendMessageOptions.DontRequireReceiver);

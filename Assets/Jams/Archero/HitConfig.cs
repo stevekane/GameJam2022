@@ -49,8 +49,9 @@ namespace Archero {
     public IAttributes DefenderAttributes;
     // TODO: cache this value? It gets called at least 4x per hit.
     public Vector3 KnockbackVector => HitConfig.KnockbackType.KnockbackVector(HitConfig.KnockbackAngle, Source.transform, Defender.transform);
-    public float GetDamage(bool didCrit) => HitConfig.Damage.Apply(AttackerAttributes.GetValue(AttributeTag.Damage, 0)) * (didCrit ? CritDamageMult : 1) * DefenderAttributes.GetValue(AttributeTag.DamageTaken, 1);
-    public float BaseDamage => HitConfig.Damage.Apply(AttackerAttributes.GetValue(AttributeTag.Damage, 0));
+    public float GetDamage(bool didCrit) => AttackerAttributes.GetValue(AttributeTag.Damage, BaseDamage) * (didCrit ? CritDamageMult : 1) * DefenderAttributes.GetValue(AttributeTag.DamageTaken, 1);
+    public float BaseDamage => HitConfig.Damage.Apply(0);
+    public float ElemDamage => AttackerAttributes.GetValue(AttributeTag.ElementDamage, BaseDamage);
     public float CritDamageMult => AttackerAttributes.GetValue(AttributeTag.CritDamage, 1) + 1f;
     public bool CritRoll => AttackerAttributes.GetValue(AttributeTag.CritChance, 0) >= UnityEngine.Random.Range(0f, 1f);
     public int DefenderTeamID => Defender.GetComponent<Team>().ID;
