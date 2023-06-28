@@ -12,9 +12,10 @@ namespace Archero {
   }
 
   public class Upgrades : MonoBehaviour {
-    List<UpgradeData> Active = new();
+    public List<UpgradeData> Active = new();
     List<UpgradeData> Added = new();
-    Dictionary<AttributeTag, AttributeModifier> Modifiers = new();
+    [Serializable] public class AttributeDictionary : SerializableDictionary<AttributeTag, AttributeModifier> { }
+    public AttributeDictionary Modifiers = new ();
     bool Dirty = false;
     public int XP = 0;
     public int CurrentLevel = 1;
@@ -34,7 +35,7 @@ namespace Archero {
     public void AddUpgrade(Upgrade upgrade) {
       Dirty = true;
 
-      if (GetUpgradeData(upgrade) is var data) {
+      if (GetUpgradeData(upgrade) is var data && data != null) {
         data.CurrentLevel++;
       } else {
         data = new() { Upgrade = upgrade, CurrentLevel = 1 };
