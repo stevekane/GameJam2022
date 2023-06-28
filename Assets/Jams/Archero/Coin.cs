@@ -9,7 +9,7 @@ namespace Archero {
     public float CollectSpeed = 40f;
 
     static GameObject _Parent;
-    static GameObject Parent => _Parent = _Parent ? _Parent : new GameObject("Coins"); 
+    static GameObject Parent => _Parent = _Parent ? _Parent : new GameObject("Coins");
 
     public static void SpawnCoins(Vector3 position, int amount) {
       for (int i = 0; i < amount; i++) {
@@ -43,7 +43,7 @@ namespace Archero {
     }
     public async Task Collect(TaskScope scope) {
       GetComponent<Collider>().enabled = true;
-      var player = Player.Get();
+      var player = Player.Instance;
       var accel = 60f;
       while (player && this) {
         CollectSpeed += Time.fixedDeltaTime * accel;
@@ -55,7 +55,7 @@ namespace Archero {
     }
     IEnumerator CollectRoutine() {
       GetComponent<Collider>().enabled = true;
-      var player = Player.Get();
+      var player = Player.Instance;
       var accel = 60f;
       while (player && this) {
         CollectSpeed += Time.fixedDeltaTime * accel;

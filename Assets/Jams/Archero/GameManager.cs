@@ -54,7 +54,7 @@ namespace Archero {
         var coins = FindObjectsOfType<Coin>();
         var tasks = coins.Select(c => c.Collect(s));
         await s.AllTask(tasks.ToArray());
-        Player.Get().GetComponent<Upgrades>().MaybeLevelUp();
+        Player.Instance.GetComponent<Upgrades>().MaybeLevelUp();
         CollectingCoins = false;
       });
     }
@@ -68,7 +68,7 @@ namespace Archero {
 
     [ContextMenu("LevelUp")]
     void LevelUp() {
-      var ups = Player.Get().GetComponent<Upgrades>();
+      var ups = Player.Instance.GetComponent<Upgrades>();
       ups.XP += ups.XPToNextLevel;
       ups.MaybeLevelUp();
     }

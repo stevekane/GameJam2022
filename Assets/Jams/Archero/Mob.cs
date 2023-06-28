@@ -5,7 +5,7 @@ namespace Archero {
     int Coins => 50 + 5*GameManager.Instance.CurrentLevel;
 
     public void DropCoins() {
-      var amount = (int)(Player.Get().GetComponent<Attributes>().GetValue(AttributeTag.GoldGain, Coins * Random.Range(.75f, 1.5f)));
+      var amount = (int)(Player.Instance.GetComponent<Attributes>().GetValue(AttributeTag.GoldGain, Coins * Random.Range(.75f, 1.5f)));
       Coin.SpawnCoins(transform.position.XZ(), amount);
     }
 
