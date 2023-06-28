@@ -6,15 +6,6 @@ namespace Archero {
   public class UpgradeAttribute : Upgrade {
     public SerializableEnum<AttributeTag> Attribute;
     public AttributeModifier Modifier;
-    public override UpgradeData Add(Upgrades us) {
-      if (GetData(us) is UpgradeData data) {
-        Debug.Assert(data.CurrentLevel < MaxLevel);
-        data.CurrentLevel++;
-        return null;
-      } else {
-        return new() { Upgrade = this, CurrentLevel = 1 };
-      }
-    }
     public override void Apply(Upgrades us) => us.AddAttributeModifier(Attribute, CalcModifier(GetData(us).CurrentLevel));
     public AttributeModifier CalcModifier(int level) {
       var total = new AttributeModifier();
@@ -22,6 +13,5 @@ namespace Archero {
         total.Merge(Modifier);
       return total;
     }
-    UpgradeData GetData(Upgrades us) => us.GetUpgradeData(this);
   }
 }

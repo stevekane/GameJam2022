@@ -7,6 +7,7 @@ namespace Archero {
   public enum AttributeTag {
     Damage,
     Health,
+    ExtraLives,  // 0 means no revives
     Knockback,
     Weight,
     MoveSpeed,
@@ -31,10 +32,41 @@ namespace Archero {
     SideArrow,
     RearArrow,
 
-    GoldGain,
+    CritChance,
+    CritDamage,
 
-    FreezingHits,
-    BurningHits,
+    Bolt,
+    Freeze,
+    Poison,
+    Blaze,
+    ElementDamage,
+    ElementBurst,
+    DarkTouch,
+    DeathBomb,
+    DeathNova,
+    HolyTouch,
+
+    FireCircle,
+    IceCircle,
+    PoisonCircle,
+    BoltCircle,
+    ObsidianCircle,
+
+    SpeedAura,
+    CritAura,
+    InvincibleStar,
+    ShieldGuard,
+
+    StrongHeart,  // +40% heal power and heart drops
+    Bloodthirst,  // 1.5% base HP on kill
+    Rage,         // +1.2% damage per missing 1% HP
+    Headshot,     // 12.5% chance to instagib
+    DamageTaken,
+    Inspire,      // Attack speed +25% on enemy death
+    WaterWalk,
+    WallWalk,
+
+    GoldGain,
 
     // States
     LocalTimeScale

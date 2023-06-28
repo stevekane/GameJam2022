@@ -33,8 +33,21 @@ namespace Archero {
     }
     public void AddUpgrade(Upgrade upgrade) {
       Dirty = true;
-      if (upgrade.Add(this) is UpgradeData data)
+
+      if (GetUpgradeData(upgrade) is var data) {
+        data.CurrentLevel++;
+      } else {
+        data = new() { Upgrade = upgrade, CurrentLevel = 1 };
         Added.Add(data);
+      }
+      upgrade.OnAdded(this, data.CurrentLevel);
+    }
+    public void RemoveUpgrade(Upgrade upgrade) {
+      Dirty = true;
+      if (GetUpgradeData(upgrade) is var data) {
+        Added.Remove(data);
+        Active.Remove(data);
+      }
     }
     public void CollectGold(int gold) {
       XP += gold;
