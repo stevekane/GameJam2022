@@ -46,12 +46,6 @@ namespace Archero {
     DeathNova,
     HolyTouch,
 
-    FireCircle,
-    IceCircle,
-    PoisonCircle,
-    BoltCircle,
-    ObsidianCircle,
-
     SpeedAura,
     CritAura,
     InvincibleStar,
@@ -151,6 +145,7 @@ namespace Archero {
           Attributes.Add(a, attributes.GetModifier(a));
       }
       public float GetValue(AttributeTag attrib, float baseValue = 0f) => GetModifier(attrib).Apply(baseValue);
+      public void AddModifier(AttributeTag attrib, AttributeModifier modifier) { Attributes[attrib].Merge(modifier); }
 
       // Don't use this!
       public static Serialized EmptyDontUse = new();

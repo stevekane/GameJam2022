@@ -15,6 +15,8 @@ namespace Archero {
 
     public Coin CoinPrefab;
 
+    public Circle CirclePrefab;
+
     TaskScope GlobalScope = new();
 
     void Awake() {
