@@ -93,8 +93,9 @@ namespace Archero {
 
     public void MaybeLevelUp() {
       if (XP >= XPToNextLevel) {
+        var newXP = XP - XPToNextLevel;
         ChangeLevel(CurrentLevel+1);
-        ChangeExperience(0);
+        ChangeExperience(newXP);
         UpgradeUI.Instance.Show(this, PickUpgrades());
       }
     }
