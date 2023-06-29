@@ -17,14 +17,16 @@ namespace Archero {
     }
 
     void OnEnable() {
-      CollectionTrigger.enabled = false;
+      var impulse = Vector3.Scale(BurstForce, Random.onUnitSphere);
+      impulse.y = Mathf.Abs(impulse.y);
+      Rigidbody.AddForce(impulse, ForceMode.Impulse);
       Rigidbody.isKinematic = false;
-      Rigidbody.AddForce(Vector3.Scale(BurstForce, Random.onUnitSphere), ForceMode.Impulse);
+      CollectionTrigger.enabled = false;
     }
 
     void OnDisable() {
-      CollectionTrigger.enabled = true;
       Rigidbody.isKinematic = false;
+      CollectionTrigger.enabled = true;
     }
 
     public void Collect() {

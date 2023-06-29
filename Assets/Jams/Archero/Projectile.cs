@@ -3,6 +3,7 @@ using UnityEngine;
 namespace Archero {
   [RequireComponent(typeof(Rigidbody))]
   public class Projectile : MonoBehaviour {
+    const float RicochetDist = 10f;
     public HitParams HitParams;
     public float InitialSpeed = 10;
     int Bounces = 0;
@@ -53,7 +54,6 @@ namespace Archero {
     }
 
     Transform GetNearestMob() {
-      const float MaxDist = 10f;
       var bestDist = Mathf.Infinity;
       Mob bestMob = null;
       foreach (var mob in MobManager.Instance.Mobs) {
@@ -61,7 +61,7 @@ namespace Archero {
         if (mob.gameObject != HitParams.Defender && distSqr < bestDist)
           (bestDist, bestMob) = (distSqr, mob);
       }
-      return bestDist < MaxDist.Sqr() ? bestMob.transform : null;
+      return bestDist < RicochetDist.Sqr() ? bestMob.transform : null;
     }
   }
 }

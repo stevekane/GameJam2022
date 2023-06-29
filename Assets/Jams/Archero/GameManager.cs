@@ -14,8 +14,8 @@ namespace Archero {
     public List<Upgrade> Upgrades;
 
     public Coin CoinPrefab;
-
     public Circle CirclePrefab;
+    public Bolt BoltPrefab;
 
     TaskScope GlobalScope = new();
 

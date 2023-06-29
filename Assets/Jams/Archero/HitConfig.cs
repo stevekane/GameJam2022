@@ -103,5 +103,11 @@ namespace Archero {
       Source = source;
       AttackerTeamID = attacker.GetComponent<Team>().ID;
     }
+
+    public HitParams AddMult(float mult) {
+      var hp = Clone();
+      hp.HitConfig = hp.HitConfig.AddMult(mult);
+      return hp;
+    }
   }
 }
