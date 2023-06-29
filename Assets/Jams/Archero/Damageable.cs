@@ -9,19 +9,24 @@ namespace Archero {
     public int Health;
     public int MaxHealth;
     public bool IsCrit;
-    public DamageEvent(int delta, int health, int maxHealth, bool isCrit = false) {
+    public bool IsHeadshot;
+    public DamageEvent(int delta, int health, int maxHealth, bool isCrit = false, bool isHeadshot = false) {
       Delta = delta;
       Health = health;
       MaxHealth = maxHealth;
       IsCrit = isCrit;
+      IsHeadshot = isHeadshot;
     }
   }
 
   public class Damageable : MonoBehaviour {
-    [SerializeField] int Health;
+    [SerializeField] public int Health;
     [SerializeField] Attributes Attributes;
     [SerializeField] UnityEvent<DamageEvent> OnDamage;
     [SerializeField] UnityEvent OnDeath;
+
+    // Range [0,1].
+    public float HealthPct => Health / Attributes.GetValue(AttributeTag.Health, 0);
 
     void Start() {
       var maxHealth = (int)Attributes.GetValue(AttributeTag.Health, 0);
@@ -29,22 +34,24 @@ namespace Archero {
     }
 
     void OnHurt(HitParams hitParams) {
+      var headshot = hitParams.HeadshotRoll;
       var didCrit = hitParams.CritRoll;
-      var damage = (int)hitParams.GetDamage(didCrit);
-      TakeDamage(damage, didCrit);
+      var damage = headshot ? Health : (int)hitParams.GetDamage(didCrit);
+      TakeDamage(damage, didCrit, headshot);
     }
 
-    public void TakeDamage(float damage, bool didCrit) {
+    public void TakeDamage(float damage, bool didCrit = false, bool headshot = false) {
       Health = Mathf.Max(0, Health - (int)damage);
+
+      var maxHealth = (int)Attributes.GetValue(AttributeTag.Health, 0);
+      var damageEvent = new DamageEvent((int)damage, Health, maxHealth, didCrit, headshot);
+      OnDamage.Invoke(damageEvent);
+      BroadcastMessage("OnDamage", damageEvent, SendMessageOptions.DontRequireReceiver);
+
       if (Health <= 0) {
         OnDeath.Invoke();
         BroadcastMessage("OnDeath", SendMessageOptions.DontRequireReceiver);
         Destroy(gameObject);
-      } else {
-        var maxHealth = (int)Attributes.GetValue(AttributeTag.Health, 0);
-        var damageEvent = new DamageEvent((int)damage, Health, maxHealth, didCrit);
-        OnDamage.Invoke(damageEvent);
-        BroadcastMessage("OnDamage", damageEvent, SendMessageOptions.DontRequireReceiver);
       }
     }
   }
