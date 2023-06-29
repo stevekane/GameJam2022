@@ -9,18 +9,22 @@ namespace Archero {
     [SerializeField] Vector3 BurstForce = new Vector3(10, 1, 10);
     [SerializeField] float CollectSpeed = 40f;
 
-    static GameObject _Parent;
-    static GameObject Parent => _Parent = _Parent ? _Parent : new GameObject("Coins");
-
     public static void SpawnCoins(Vector3 position, int amount) {
       for (int i = 0; i < amount; i++) {
-        var c = Instantiate(GameManager.Instance.CoinPrefab, position, Quaternion.identity);
-        c.transform.SetParent(Parent.transform, true);
+        var c = CoinManager.Instance.CoinPool.Get();
+        c.transform.SetPositionAndRotation(position, Quaternion.identity);
       }
     }
 
-    void Start() {
+    void OnEnable() {
+      CollectionTrigger.enabled = false;
+      Rigidbody.isKinematic = false;
       Rigidbody.AddForce(Vector3.Scale(BurstForce, Random.onUnitSphere), ForceMode.Impulse);
+    }
+
+    void OnDisable() {
+      CollectionTrigger.enabled = true;
+      Rigidbody.isKinematic = false;
     }
 
     public void Collect() {
@@ -28,10 +32,11 @@ namespace Archero {
     }
 
     public async Task Collect(TaskScope scope) {
+      Rigidbody.isKinematic = true;
       CollectionTrigger.enabled = true;
       var player = Player.Instance;
       var accel = 60f;
-      while (player && this) {
+      while (player && isActiveAndEnabled) {
         CollectSpeed += Time.fixedDeltaTime * accel;
         var delta = player.transform.position - transform.position;
         var dist = Mathf.Min(Time.fixedDeltaTime * CollectSpeed, delta.magnitude);
@@ -45,7 +50,7 @@ namespace Archero {
       CollectionTrigger.enabled = true;
       var player = Player.Instance;
       var accel = 60f;
-      while (player && this) {
+      while (player && isActiveAndEnabled) {
         CollectSpeed += Time.fixedDeltaTime * accel;
         var delta = player.transform.position - transform.position;
         var dist = Mathf.Min(Time.fixedDeltaTime * CollectSpeed, delta.magnitude);
@@ -57,7 +62,7 @@ namespace Archero {
     void OnTriggerEnter(Collider other) {
       if (other.GetComponent<Player>() && other.TryGetComponent(out Upgrades us)) {
         us.CollectGold(1);
-        Destroy(gameObject);
+        CoinManager.Instance.CoinPool.Release(this);
       }
     }
   }

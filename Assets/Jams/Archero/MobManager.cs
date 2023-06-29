@@ -6,5 +6,13 @@ namespace Archero {
     public static MobManager Instance;
 
     public List<Mob> Mobs;
+
+    void Awake() {
+      Instance = this;
+    }
+
+    void OnDestroy() {
+      Instance = null;
+    }
   }
 }

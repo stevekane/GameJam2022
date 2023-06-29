@@ -2,9 +2,7 @@ using UnityEngine;
 
 namespace Archero {
   public class Targeting : MonoBehaviour {
-    [Header("Scoring Config")]
     [SerializeField] float MaxDistance = 20;
-    [Header("Scoring Weights")]
     [SerializeField] float DistanceWeight = 1;
     [SerializeField] float LineOfSightWeight = 1;
     [SerializeField] LayerMask WallAndMobLayerMask;
