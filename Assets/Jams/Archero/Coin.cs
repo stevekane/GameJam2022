@@ -4,9 +4,10 @@ using UnityEngine;
 
 namespace Archero {
   public class Coin : MonoBehaviour {
-    public float BurstForce = 10f;
-    public float Gravity = -200f;
-    public float CollectSpeed = 40f;
+    [SerializeField] Rigidbody Rigidbody;
+    [SerializeField] Collider CollectionTrigger;
+    [SerializeField] Vector3 BurstForce = new Vector3(10, 1, 10);
+    [SerializeField] float CollectSpeed = 40f;
 
     static GameObject _Parent;
     static GameObject Parent => _Parent = _Parent ? _Parent : new GameObject("Coins");
@@ -19,30 +20,15 @@ namespace Archero {
     }
 
     void Start() {
-      StartCoroutine(Burst());
-    }
-
-    IEnumerator Burst() {
-      var rb = GetComponent<Rigidbody>();
-      var xz = UnityEngine.Random.onUnitSphere;
-      var impulse = new Vector3(xz.x, 3f, xz.z).normalized * BurstForce;
-      rb.AddForce(impulse, ForceMode.Impulse);
-      yield return new WaitForFixedUpdate();
-      var velocity = rb.velocity;
-      // Why do I have to manually simulate gravity? AddForce does not work right
-      while (velocity.y > 0f || transform.position.y > .01f) {
-        velocity.y += Time.fixedDeltaTime * Gravity;
-        rb.MovePosition(transform.position + Time.fixedDeltaTime * velocity);
-        yield return new WaitForFixedUpdate();
-      }
-      rb.isKinematic = true;
+      Rigidbody.AddForce(Vector3.Scale(BurstForce, Random.onUnitSphere), ForceMode.Impulse);
     }
 
     public void Collect() {
       StartCoroutine(CollectRoutine());
     }
+
     public async Task Collect(TaskScope scope) {
-      GetComponent<Collider>().enabled = true;
+      CollectionTrigger.enabled = true;
       var player = Player.Instance;
       var accel = 60f;
       while (player && this) {
@@ -53,8 +39,10 @@ namespace Archero {
         await scope.TickTime();
       }
     }
+
     IEnumerator CollectRoutine() {
-      GetComponent<Collider>().enabled = true;
+      Rigidbody.isKinematic = true;
+      CollectionTrigger.enabled = true;
       var player = Player.Instance;
       var accel = 60f;
       while (player && this) {

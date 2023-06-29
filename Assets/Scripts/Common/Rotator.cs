@@ -5,6 +5,6 @@ public class Rotator : MonoBehaviour {
   public float DegreesPerSecond;
 
   void FixedUpdate() {
-    transform.RotateAround(transform.position, transform.TransformVector(Axis), DegreesPerSecond*Time.deltaTime);
+    transform.RotateAround(transform.position, Axis, DegreesPerSecond*Time.deltaTime);
   }
 }
