@@ -20,7 +20,9 @@ namespace Archero {
     }
 
     void Start() {
-      Rigidbody.AddForce(Vector3.Scale(BurstForce, Random.onUnitSphere), ForceMode.Impulse);
+      var impulse = Vector3.Scale(BurstForce, Random.onUnitSphere);
+      impulse.y = Mathf.Abs(impulse.y);
+      Rigidbody.AddForce(impulse, ForceMode.Impulse);
     }
 
     public void Collect() {
