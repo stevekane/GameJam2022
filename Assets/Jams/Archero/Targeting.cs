@@ -4,10 +4,8 @@ namespace Archero {
   public class Targeting : MonoBehaviour {
     [Header("Scoring Config")]
     [SerializeField] float MaxDistance = 20;
-    [SerializeField] float MaxAngle = 90;
     [Header("Scoring Weights")]
     [SerializeField] float DistanceWeight = 1;
-    [SerializeField] float AngleWeight = 1;
     [SerializeField] float LineOfSightWeight = 1;
     [SerializeField] LayerMask WallAndMobLayerMask;
 
@@ -31,11 +29,9 @@ namespace Archero {
 
     float Score(Mob mob) {
       var distance = Vector3.Distance(mob.transform.position, transform.position);
-      var angle = Vector3.Angle(transform.forward, mob.transform.position-transform.position);
       var los = IsVisible(mob);
       var distanceScore = 1-Mathf.InverseLerp(0, MaxDistance, Mathf.Min(distance, MaxDistance));
-      var angleScore = 1-Mathf.InverseLerp(0, MaxAngle, Mathf.Min(angle, MaxAngle));
-      return DistanceWeight * distanceScore + AngleWeight * angleScore + (los ? LineOfSightWeight : 0);
+      return DistanceWeight * distanceScore + (los ? LineOfSightWeight : 0);
     }
 
     public Mob BestTarget {
