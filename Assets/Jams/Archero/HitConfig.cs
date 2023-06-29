@@ -18,22 +18,22 @@ namespace Archero {
     public Timeval StunDuration = Timeval.FromMillis(500);
     public Timeval SlowFallDuration = Timeval.FromSeconds(0);
 
-    public HitConfig Scale(float scale) {
+    public HitConfig AddMult(float mult) {
       return new() {
         Damage = new() {
-          Base = Damage.Base*scale,
-          Mult = Damage.Mult
+          Base = Damage.Base,
+          Mult = Damage.Mult + mult
         },
         Knockback = new() {
-          Base = Knockback.Base*scale,
-          Mult = Knockback.Mult
+          Base = Knockback.Base,
+          Mult = Knockback.Mult + mult
         },
         KnockbackType = KnockbackType,
         KnockbackAngle = KnockbackAngle,
         RecoilStrength = RecoilStrength,
         CameraShakeStrength = CameraShakeStrength,
         HitStopDuration = HitStopDuration,
-        StunDuration = new Timeval() { Ticks = (int)(StunDuration.Ticks*scale) },
+        StunDuration = new Timeval() { Ticks = (int)(StunDuration.Ticks) },
         SlowFallDuration = SlowFallDuration,
       };
     }
@@ -94,7 +94,7 @@ namespace Archero {
     void Init(HitConfig hitConfig, Attributes.Serialized attackerAttributes, GameObject attacker, GameObject source) {
       if (attackerAttributes.GetValue(AttributeTag.Rage, 0) > 0) {
         // +1.2% damage per missing 1% HP.
-        HitConfig = hitConfig.Scale(1f + 1.2f * (1f - attacker.GetComponent<Damageable>().HealthPct));
+        HitConfig = hitConfig.AddMult(1.2f * (1f - attacker.GetComponent<Damageable>().HealthPct));
       } else {
         HitConfig = hitConfig;
       }
