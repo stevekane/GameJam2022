@@ -567,9 +567,6 @@ PrefabInstance:
       addedObject: {fileID: -8503290537206015001}
     - targetCorrespondingSourceObject: {fileID: 6692932924000704826, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       insertIndex: -1
-      addedObject: {fileID: -3852056992930453506}
-    - targetCorrespondingSourceObject: {fileID: 6692932924000704826, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 8707488475694945269}
   m_SourcePrefab: {fileID: 100100000, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
 --- !u!114 &2854940354230430395 stripped
@@ -613,7 +610,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SimpleAbilityManager: {fileID: 8699607654073364690}
   InputManager: {fileID: -8503290537206015001}
-  PersonalCamera: {fileID: -3852056992930453506}
+  PersonalCamera: {fileID: 8046624740859461746}
   ButtonEventActions:
   - ButtonCode: 6
     ButtonPressType: 0
@@ -644,19 +641,6 @@ MonoBehaviour:
     Millis: 100
     FramesPerSecond: 60
   StickDeadZone: 0.15
---- !u!114 &-3852056992930453506
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4282153220200244280}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1b01e1dd38631b044a7fba45096f2415, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Current: {fileID: 0}
 --- !u!114 &8707488475694945269
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -674,6 +658,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1122499520473116429, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
   m_PrefabInstance: {fileID: 7462271767969578242}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8046624740859461746 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 586605067714231664, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
+  m_PrefabInstance: {fileID: 7462271767969578242}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4282153220200244280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b01e1dd38631b044a7fba45096f2415, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &8699607654073364690 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2248536134492573136, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}

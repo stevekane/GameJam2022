@@ -12,7 +12,6 @@ namespace Archero {
     }
 
     void OnTriggerEnter(Collider other) {
-      Debug.Log($"Door {other.gameObject} in level {GameManager.Instance.CurrentLevel}");
       GameManager.Instance.OnLevelComplete();
     }
 

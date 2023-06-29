@@ -1,5 +1,6 @@
 using UnityEngine;
 using KinematicCharacterController;
+using System;
 
 namespace Archero {
   public class CharacterController : MonoBehaviour, ICharacterController {
@@ -90,6 +91,10 @@ namespace Archero {
       foreach (var ability in AbilityManager.Abilities)
         if (ability.IsRunning)
           ability.UpdateVelocity(ref currentVelocity, deltaTime);
+    }
+
+    public void Warp(Vector3 position, Quaternion rotation) {
+      Motor.SetPositionAndRotation(position, rotation, true);
     }
   }
 }

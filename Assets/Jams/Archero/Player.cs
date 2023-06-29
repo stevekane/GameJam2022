@@ -5,11 +5,18 @@ namespace Archero {
     public static Player Instance;
 
     void Awake() {
-      Instance = this;
+      if (Instance) {
+        Instance.OnNewRoom(this);
+        Destroy(gameObject);
+      } else {
+        Instance = this;
+        DontDestroyOnLoad(Instance.gameObject);
+      }
     }
 
-    void OnDestroy() {
-      Instance = null;
+    void OnNewRoom(Player scenePlayer) {
+      GetComponent<CharacterController>().Warp(scenePlayer.transform.position, scenePlayer.transform.rotation);
+      GetComponent<PersonalCamera>().Current = Camera.main;
     }
   }
 }
