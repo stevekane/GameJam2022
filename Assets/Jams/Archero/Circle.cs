@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 namespace Archero {
@@ -9,7 +10,18 @@ namespace Archero {
     AttributeTag EffectType;
 
     static public Circle Attach(Circle prefab, Attributes owner, AttributeTag type, Material material) {
-      var circle = Instantiate(prefab, owner.transform.position, Quaternion.identity);
+      var otherCircles = FindObjectsOfType<Circle>().Where(c => c.Owner == owner).ToArray();
+      var numCircles = otherCircles.Length;
+      var offsetY = numCircles switch {
+        0 => 0f,
+        1 => 90f,
+        2 => 45f,
+        3 => -90f,
+        _ => 0f,  // 4 is possible but unlikely so fuck it
+      };
+      if (numCircles > 0) offsetY += otherCircles[0].transform.rotation.eulerAngles.y;  // 0 seems to be the most recent one?
+      Debug.Log($"Circle: {numCircles} existing, angleY={offsetY}");
+      var circle = Instantiate(prefab, owner.transform.position, Quaternion.Euler(0, offsetY, 0));
       circle.Owner = owner;
       circle.EffectType = type;
       circle.gameObject.GetComponentsInChildren<MeshRenderer>().ForEach(m => m.material = material);
