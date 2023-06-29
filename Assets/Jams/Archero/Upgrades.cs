@@ -12,6 +12,8 @@ namespace Archero {
   }
 
   public class Upgrades : MonoBehaviour {
+    public Upgrade DebugAddUpgrade;
+
     public List<UpgradeData> Active = new();
     List<UpgradeData> Added = new();
     [Serializable] public class AttributeDictionary : SerializableDictionary<AttributeTag, AttributeModifier> { }
@@ -68,6 +70,10 @@ namespace Archero {
     }
 
     void FixedUpdate() {
+      if (DebugAddUpgrade != null) {
+        AddUpgrade(DebugAddUpgrade);
+        DebugAddUpgrade = null;
+      }
       if (Added.Count > 0 || Dirty) {
         Dirty = false;
         Added.ForEach(e => Active.Add(e));

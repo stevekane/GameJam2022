@@ -18,7 +18,6 @@ namespace Archero {
 
     void OnTriggerEnter(Collider other) {
       if (other.gameObject.TryGetComponent(out Hurtbox hb)) {
-        Debug.Log($"Ball hit {hb.Owner.name}");
         var hitParams = new HitParams(HitConfig, Owner.SerializedCopy, Owner.gameObject, gameObject);
         hitParams.AttackerAttributes.AddModifier(EffectType, new() { Base = 1 });
         hb.TryAttack(hitParams);
