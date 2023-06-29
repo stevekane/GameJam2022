@@ -46,8 +46,6 @@ namespace Archero {
     DeathNova,
     HolyTouch,
 
-    SpeedAura,
-    CritAura,
     InvincibleStar,
     ShieldGuard,
 

@@ -16,8 +16,9 @@ namespace Archero {
     public Coin CoinPrefab;
     public Circle CirclePrefab;
     public Bolt BoltPrefab;
+    public GameObject AuraPrefab;
 
-    TaskScope GlobalScope = new();
+    public TaskScope GlobalScope = new();
 
     void Awake() {
       Time.fixedDeltaTime = 1f / Timeval.FixedUpdatePerSecond;
