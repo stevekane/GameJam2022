@@ -1,14 +1,13 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Archero {
   public class Door : MonoBehaviour {
-    public GameObject DoorObject;
-    public TriggerEvent DoorTrigger;
+    [SerializeField] Animator Animator;
+    [SerializeField] TriggerEvent DoorTrigger;
 
     [ContextMenu("Open")]
     public void Open() {
-      DoorObject.Destroy();
+      Animator.SetTrigger("Open");
     }
 
     void OnTriggerEnter(Collider other) {
