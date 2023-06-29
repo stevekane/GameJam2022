@@ -18,22 +18,22 @@ namespace Archero {
     public Timeval StunDuration = Timeval.FromMillis(500);
     public Timeval SlowFallDuration = Timeval.FromSeconds(0);
 
-    public HitConfig Scale(float scale) {
+    public HitConfig AddMult(float mult) {
       return new() {
         Damage = new() {
-          Base = Damage.Base*scale,
-          Mult = Damage.Mult
+          Base = Damage.Base,
+          Mult = Damage.Mult + mult
         },
         Knockback = new() {
-          Base = Knockback.Base*scale,
-          Mult = Knockback.Mult
+          Base = Knockback.Base,
+          Mult = Knockback.Mult + mult
         },
         KnockbackType = KnockbackType,
         KnockbackAngle = KnockbackAngle,
         RecoilStrength = RecoilStrength,
         CameraShakeStrength = CameraShakeStrength,
         HitStopDuration = HitStopDuration,
-        StunDuration = new Timeval() { Ticks = (int)(StunDuration.Ticks*scale) },
+        StunDuration = new Timeval() { Ticks = (int)(StunDuration.Ticks) },
         SlowFallDuration = SlowFallDuration,
       };
     }
@@ -54,6 +54,7 @@ namespace Archero {
     public float ElemDamage => AttackerAttributes.GetValue(AttributeTag.ElementDamage, BaseDamage);
     public float CritDamageMult => AttackerAttributes.GetValue(AttributeTag.CritDamage, 1) + 1f;
     public bool CritRoll => AttackerAttributes.GetValue(AttributeTag.CritChance, 0) >= UnityEngine.Random.Range(0f, 1f);
+    public bool HeadshotRoll => AttackerAttributes.GetValue(AttributeTag.Headshot, 0) >= UnityEngine.Random.Range(0f, 1f);
     public int DefenderTeamID => Defender.GetComponent<Team>().ID;
 
     public float GetKnockbackStrength(float defenderDamage) {
@@ -91,7 +92,12 @@ namespace Archero {
        => Init(hitConfig, attributes.SerializedCopy, attributes.gameObject, attributes.gameObject);
 
     void Init(HitConfig hitConfig, Attributes.Serialized attackerAttributes, GameObject attacker, GameObject source) {
-      HitConfig = hitConfig;
+      if (attackerAttributes.GetValue(AttributeTag.Rage, 0) > 0) {
+        // +1.2% damage per missing 1% HP.
+        HitConfig = hitConfig.AddMult(1.2f * (1f - attacker.GetComponent<Damageable>().HealthPct));
+      } else {
+        HitConfig = hitConfig;
+      }
       AttackerAttributes = attackerAttributes;
       Attacker = attacker;
       Source = source;

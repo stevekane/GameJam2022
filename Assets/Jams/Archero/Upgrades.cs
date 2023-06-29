@@ -119,5 +119,22 @@ namespace Archero {
         Active.ForEach(ud => ud.Upgrade.Apply(this));
       }
     }
+
+    bool TookDamageThisRoom = false;
+    void OnDamage(DamageEvent damageEvent) {
+      TookDamageThisRoom = true;
+    }
+
+    public void OnNewRoom() {
+      var challenges = Active.Where(ud => ud.Upgrade is UpgradeChallenge).ToArray();
+      if (!TookDamageThisRoom) {
+        Debug.Log($"Entered room, challenges complete: {challenges.Length}");
+        challenges.ForEach(c => ((UpgradeChallenge)c.Upgrade).OnSuccess(this));
+      } else {
+        Debug.Log($"Entered room, challenges failed: {challenges.Length}");
+        challenges.ForEach(c => RemoveUpgrade(c.Upgrade));
+      }
+      TookDamageThisRoom = false;
+    }
   }
  }

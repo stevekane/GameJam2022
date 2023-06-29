@@ -38,6 +38,7 @@ namespace Archero {
 
     void Start() {
       Hitboxes.ForEach(hb => hb.OnTriggerEnterSource.Listen(OnTriggerEnter));
+      DontDestroyOnLoad(gameObject);
     }
     void FixedUpdate() {
       transform.position = Owner.transform.position;

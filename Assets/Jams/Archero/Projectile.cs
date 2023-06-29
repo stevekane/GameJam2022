@@ -26,23 +26,23 @@ namespace Archero {
           rb.velocity = dir * rb.velocity.magnitude;
           transform.forward = dir;
           Ricochets++;
-          HitParams.HitConfig = HitParams.HitConfig.Scale(.7f);
+          HitParams.HitConfig = HitParams.HitConfig.AddMult(-.3f);
         } else if (Ricochets == 0 && HitParams.AttackerAttributes.GetValue(AttributeTag.Pierce, 0) > 0) {
-          HitParams.HitConfig = HitParams.HitConfig.Scale(2f/3f);
+          HitParams.HitConfig = HitParams.HitConfig.AddMult(-1f/3f);
         } else {
           Destroy(this.gameObject);
         }
       }
     }
     void OnCollisionEnter(Collision collision) {
-      if (Bounces < 1 && HitParams.AttackerAttributes.GetValue(AttributeTag.BouncyWall, 0) > 0) {
+      if (Bounces < 2 && HitParams.AttackerAttributes.GetValue(AttributeTag.BouncyWall, 0) > 0) {
         var rb = GetComponent<Rigidbody>();
         var contact = collision.contacts[0];  // Just pick a contact.
         rb.velocity = Vector3.Reflect(-collision.relativeVelocity, contact.normal);
         transform.position += rb.velocity * Time.fixedDeltaTime;
         transform.forward = rb.velocity.normalized;
         if (Bounces == 0)
-          HitParams.HitConfig = HitParams.HitConfig.Scale(.5f); // 50% damage after bounce
+          HitParams.HitConfig = HitParams.HitConfig.AddMult(-.5f); // 50% damage after bounce
         Bounces++;
       } else {
         Destroy(this.gameObject);
