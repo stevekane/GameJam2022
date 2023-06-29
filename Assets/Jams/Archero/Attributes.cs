@@ -146,6 +146,7 @@ namespace Archero {
       }
       public float GetValue(AttributeTag attrib, float baseValue = 0f) => GetModifier(attrib).Apply(baseValue);
       public void AddModifier(AttributeTag attrib, AttributeModifier modifier) { Attributes[attrib].Merge(modifier); }
+      public void ClearModifier(AttributeTag attrib) { Attributes[attrib] = new(); }
 
       // Don't use this!
       public static Serialized EmptyDontUse = new();

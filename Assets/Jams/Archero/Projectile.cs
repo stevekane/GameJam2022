@@ -1,11 +1,8 @@
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Archero {
   [RequireComponent(typeof(Rigidbody))]
   public class Projectile : MonoBehaviour {
-    const float BoltDist = 10f;
     const float RicochetDist = 10f;
     public HitParams HitParams;
     public float InitialSpeed = 10;
@@ -24,13 +21,6 @@ namespace Archero {
     void OnTriggerEnter(Collider other) { // MP: This seems to be called for child objects too?
       if (other.gameObject.TryGetComponent(out Hurtbox hb) && hb.TryAttack(HitParams)) {
         // Hit something.
-        if (HitParams.AttackerAttributes.GetValue(AttributeTag.Bolt, 0) > 0) {
-          var mobs = GetMobsWithin(BoltDist);
-          foreach (var mob in mobs) {
-            Bolt.Create(GameManager.Instance.BoltPrefab, HitParams.Defender.transform, mob);
-            mob.GetComponentInChildren<Hurtbox>().TryAttack(HitParams.AddMult(-.75f));
-          }
-        }
         if (Ricochets < 3 && HitParams.AttackerAttributes.GetValue(AttributeTag.Ricochet, 0) > 0 && GetNearestMob() is var target && target != null) {
           var rb = GetComponent<Rigidbody>();
           var dir = (target.transform.position - transform.position).normalized;
@@ -72,11 +62,6 @@ namespace Archero {
           (bestDist, bestMob) = (distSqr, mob);
       }
       return bestDist < RicochetDist.Sqr() ? bestMob.transform : null;
-    }
-    IEnumerable<Mob> GetMobsWithin(float distance) {
-      return MobManager.Instance.Mobs.Where(mob =>
-        mob.gameObject != HitParams.Defender &&
-        (mob.transform.position - transform.position).sqrMagnitude < distance.Sqr());
     }
   }
 }
