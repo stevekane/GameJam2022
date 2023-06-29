@@ -15,6 +15,7 @@ namespace Archero {
     }
 
     void OnNewRoom(Player scenePlayer) {
+      GetComponent<Upgrades>().OnNewRoom();
       GetComponent<CharacterController>().Warp(scenePlayer.transform.position, scenePlayer.transform.rotation);
       GetComponent<PersonalCamera>().Current = Camera.main;
     }

@@ -87,7 +87,7 @@ namespace Archero {
     }
     public override void ApplyTimed(Status status) {
       if (--TicksRemaining < 0) {
-        status.Damage.TakeDamage(Damage, false);
+        status.Damage.TakeDamage((int)Damage, false);
         TicksRemaining = DelayTicks;
       }
     }
@@ -114,7 +114,7 @@ namespace Archero {
     public override bool Merge(StatusEffect e) => false;
     public override void Apply(Status status) {
       if (--TicksRemaining < 0) {
-        status.Damage.TakeDamage(Damage, false);
+        status.Damage.TakeDamage((int)Damage, false);
         TicksRemaining = DelayTicks;
       }
     }

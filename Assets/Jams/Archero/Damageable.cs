@@ -40,11 +40,12 @@ namespace Archero {
       TakeDamage(damage, didCrit, headshot);
     }
 
-    public void TakeDamage(float damage, bool didCrit = false, bool headshot = false) {
-      Health = Mathf.Max(0, Health - (int)damage);
+    public void TakeDamage(int damage, bool didCrit = false, bool headshot = false) {
+      if (damage == 0) return;
+      Health = Mathf.Max(0, Health - damage);
 
       var maxHealth = (int)Attributes.GetValue(AttributeTag.Health, 0);
-      var damageEvent = new DamageEvent((int)damage, Health, maxHealth, didCrit, headshot);
+      var damageEvent = new DamageEvent(damage, Health, maxHealth, didCrit, headshot);
       OnDamage.Invoke(damageEvent);
       BroadcastMessage("OnDamage", damageEvent, SendMessageOptions.DontRequireReceiver);
 
