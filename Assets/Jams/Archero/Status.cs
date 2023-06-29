@@ -77,6 +77,15 @@ namespace Archero {
     }
   }
 
+  // +25% attack speed after killing mob.
+  public class InspireEffect : TimedEffect {
+    public AttributeModifier Modifier = new() { Mult = .25f };
+    public InspireEffect() : base(Timeval.FromSeconds(2f).Ticks) { }
+    public override void ApplyTimed(Status status) {
+      status.AddAttributeModifier(AttributeTag.AttackSpeed, Modifier);
+    }
+  }
+
   public class FlameEffect : TimedEffect {
     float Damage = 1f;
     static int DelayTicks = 60/4;  // .25s

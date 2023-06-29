@@ -54,9 +54,10 @@ namespace Archero {
         OnDeath.Invoke();
         BroadcastMessage("OnDeath", SendMessageOptions.DontRequireReceiver);
 
-        if (LastAttacker != null && LastAttacker.GetComponent<Attributes>().GetValue(AttributeTag.Bloodthirst, 0) > 0) {
+        if (LastAttacker != null && LastAttacker.GetComponent<Attributes>().GetValue(AttributeTag.Bloodthirst, 0) > 0)
           LastAttacker.GetComponent<Damageable>().Heal((int)(.015 * MaxHealth));
-        }
+        if (LastAttacker != null && LastAttacker.GetComponent<Attributes>().GetValue(AttributeTag.Inspire, 0) > 0)
+          LastAttacker.GetComponent<Status>().Add(new InspireEffect());
         Destroy(gameObject);
       }
     }
