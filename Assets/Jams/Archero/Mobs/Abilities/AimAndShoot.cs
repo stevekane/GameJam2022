@@ -7,6 +7,7 @@ namespace Archero {
     public LineRenderer AimLine;
     public Projectile ArrowPrefab;
     public HitConfig HitConfig;
+    public int WindupSeconds = 1;
 
     Attributes Attributes => AbilityManager.GetComponent<Attributes>();
     Transform Target => Player.Instance.transform;
@@ -17,7 +18,7 @@ namespace Archero {
       try {
         AimLine.gameObject.SetActive(true);
         await scope.Any(
-          Waiter.Delay(Timeval.FromSeconds(2f)),
+          Waiter.Delay(Timeval.FromSeconds(WindupSeconds)),
           Waiter.Repeat(Aim));
       } finally {
         AimLine.gameObject.SetActive(false);
