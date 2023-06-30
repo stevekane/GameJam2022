@@ -36,7 +36,7 @@ namespace Archero {
       }
     }
     void OnCollisionEnter(Collision collision) {
-      if (Bounces < 2 && HitParams.AttackerAttributes.GetValue(AttributeTag.BouncyWall, 0) > 0) {
+      if (Bounces < HitParams.AttackerAttributes.GetValue(AttributeTag.BouncyWall, 0)) {
         var rb = GetComponent<Rigidbody>();
         var contact = collision.contacts[0];  // Just pick a contact.
         rb.velocity = Vector3.Reflect(-collision.relativeVelocity, contact.normal);
