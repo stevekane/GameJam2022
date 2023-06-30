@@ -31,10 +31,10 @@ namespace Archero {
     public AttributeDictionary Modifiers = new ();
     bool Dirty = false;
     public int XP = 0;
-    public int CurrentLevel = 1;
+    public int CurrentLevel = 0;
     public UnityEvent<ExperienceEvent> OnExperience;
     public UnityEvent<int> OnLevel;
-    public int XPToNextLevel => 100 + 50*(CurrentLevel-1);
+    public int XPToNextLevel => 50 + 10*(CurrentLevel-1);
     public AttributeModifier GetModifier(AttributeTag attrib) => Modifiers.GetValueOrDefault(attrib, null);
     public void AddAttributeModifier(AttributeTag attrib, AttributeModifier modifier) => AttributeModifier.Add(Modifiers, attrib, modifier);
     public void RemoveAttributeModifier(AttributeTag attrib, AttributeModifier modifier) => AttributeModifier.Remove(Modifiers, attrib, modifier);
@@ -92,7 +92,7 @@ namespace Archero {
     }
 
     public void MaybeLevelUp() {
-      if (XP >= XPToNextLevel) {
+      if (CurrentLevel == 0 || XP >= XPToNextLevel) {
         var newXP = XP - XPToNextLevel;
         ChangeLevel(CurrentLevel+1);
         ChangeExperience(newXP);

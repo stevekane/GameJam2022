@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -28,7 +30,14 @@ namespace Archero {
         Instance = this;
         this.InitComponentFromChildren(out UpgradeUI.Instance);
         DontDestroyOnLoad(Instance.gameObject);
+
+        GlobalScope.Start(GameMain);
       }
+    }
+
+    async Task GameMain(TaskScope scope) {
+      await scope.Ticks(2);  // ensure player and upgradeUI have initted
+      Player.Instance.GetComponent<Upgrades>().MaybeLevelUp();
     }
 
     void FixedUpdate() {

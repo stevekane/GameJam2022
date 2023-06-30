@@ -17,7 +17,7 @@ namespace Archero {
     }
 
     void OnEnable() {
-      var impulse = Vector3.Scale(BurstForce, Random.onUnitSphere);
+      var impulse = Vector3.Scale(BurstForce, Random.onUnitSphere) * Random.Range(.5f, 1f);
       impulse.y = Mathf.Abs(impulse.y);
       Rigidbody.AddForce(impulse, ForceMode.Impulse);
       Rigidbody.isKinematic = false;
