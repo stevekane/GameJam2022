@@ -81,8 +81,8 @@ namespace Archero {
 
     public override void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
       base.UpdateRotation(ref currentRotation, deltaTime);
-      if (Velocity.sqrMagnitude > 0) {
-        currentRotation = Quaternion.LookRotation(Velocity);
+      if (Velocity.XZ().sqrMagnitude > 0) {
+        currentRotation = Quaternion.LookRotation(Velocity.XZ());
       }
     }
 

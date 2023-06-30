@@ -26,11 +26,11 @@ namespace Archero {
     [SerializeField] UnityEvent OnDeath;
     GameObject LastAttacker;
 
-    // Range [0,1].
     public int MaxHealth => (int)Attributes.GetValue(AttributeTag.Health, 0);
-    public float HealthPct => Health / (float)MaxHealth;
+    public float HealthPct => Health / (float)MaxHealth;  // Range [0,1]
 
     void Start() {
+      Health = MaxHealth;
       BroadcastMessage("OnSpawn", new DamageEvent(0, Health, MaxHealth, false), SendMessageOptions.DontRequireReceiver);
     }
 
