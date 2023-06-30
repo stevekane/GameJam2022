@@ -8,7 +8,7 @@ namespace Archero {
 
     Attributes Attributes => AbilityManager.GetComponent<Attributes>();
     Transform Target => Player.Instance.transform;
-    Vector3 Origin => transform.position + .5f*Vector3.up;
+    Vector3 Origin => AbilityManager.transform.position + .5f*Vector3.up;
 
     public override async Task MainAction(TaskScope scope) {
       await scope.Seconds(.5f); // windup anim
