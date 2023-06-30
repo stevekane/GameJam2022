@@ -35,7 +35,6 @@ namespace Archero {
       } finally {
         AI.Velocity = Vector3.zero;
       }
-      await scope.Seconds(.5f);
     }
   }
 }
