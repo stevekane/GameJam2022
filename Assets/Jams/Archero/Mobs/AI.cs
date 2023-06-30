@@ -79,6 +79,11 @@ namespace Archero {
       }
     }
 
+    public override void BeforeCharacterUpdate(float deltaTime) {
+      base.BeforeCharacterUpdate(deltaTime);
+      NavMeshAgent.nextPosition = transform.position;
+    }
+
     public override void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
       base.UpdateRotation(ref currentRotation, deltaTime);
       if (Velocity.XZ().sqrMagnitude > 0) {
