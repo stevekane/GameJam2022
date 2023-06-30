@@ -38,10 +38,11 @@ namespace Archero {
           }
           await scope.Tick();
         }
+        Velocity = Vector3.zero;
+        PathMove.IsRunning = false;
         if (AbilityActionRef.Target && AbilityManager.CanRun(AbilityActionRef.Value)) {
           AbilityManager.Run(AbilityActionRef.Value);
-        } else {
-          // Debug.Log("No Attack Ability Found");
+          await scope.Until(() => !AbilityActionRef.Target.IsRunning);
         }
         await scope.Tick();
       }
