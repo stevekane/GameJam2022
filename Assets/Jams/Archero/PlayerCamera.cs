@@ -9,10 +9,7 @@ namespace Archero {
       if (!Camera.main.GetComponent<CinemachineBrain>()) {
         Camera.main.gameObject.AddComponent<CinemachineBrain>();
       }
-    }
-
-    void LateUpdate() {
-      VirtualCamera.Follow = Player.Instance?.transform;
+      VirtualCamera.GetComponent<ZAxisCameraFollow>().Target = Player.Instance?.transform;
     }
   }
 }
