@@ -3,6 +3,7 @@ using UnityEngine.AI;
 
 namespace Archero {
   public class PathMove : SimpleAbility {
+    [SerializeField] AI AI;
     [SerializeField] NavMeshAgent NavMeshAgent;
 
     public AbilityAction<Vector3> Move;
@@ -12,17 +13,12 @@ namespace Archero {
     }
 
     void OnMove(Vector3 v) {
-      NavMeshAgent.SetDestination(v);
-    }
-
-    public override void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
-      if (NavMeshAgent.desiredVelocity.sqrMagnitude > 0) {
-        currentRotation = Quaternion.LookRotation(NavMeshAgent.desiredVelocity.XZ().normalized);
+      if (NavMeshAgent) {
+        NavMeshAgent.SetDestination(v);
+        AI.Velocity = NavMeshAgent.desiredVelocity;
+      } else {
+        AI.Velocity = Vector3.zero;
       }
-    }
-
-    public override void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
-      currentVelocity = NavMeshAgent.desiredVelocity;
     }
   }
 }

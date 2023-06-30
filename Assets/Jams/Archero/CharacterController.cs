@@ -1,29 +1,28 @@
 using UnityEngine;
 using KinematicCharacterController;
-using System;
 
 namespace Archero {
   public class CharacterController : MonoBehaviour, ICharacterController {
-    [SerializeField] KinematicCharacterMotor Motor;
-    [SerializeField] SimpleAbilityManager AbilityManager;
+    public KinematicCharacterMotor Motor;
+    public SimpleAbilityManager AbilityManager;
 
-    void Start() {
+    public virtual void Start() {
       Motor.CharacterController = this;
     }
 
-    public void AfterCharacterUpdate(float deltaTime) {
+    public virtual void AfterCharacterUpdate(float deltaTime) {
       foreach (var ability in AbilityManager.Abilities)
         if (ability.IsRunning)
           ability.AfterCharacterUpdate(deltaTime);
     }
 
-    public void BeforeCharacterUpdate(float deltaTime) {
+    public virtual void BeforeCharacterUpdate(float deltaTime) {
       foreach (var ability in AbilityManager.Abilities)
         if (ability.IsRunning)
           ability.BeforeCharacterUpdate(deltaTime);
     }
 
-    public bool IsColliderValidForCollisions(Collider coll) {
+    public virtual bool IsColliderValidForCollisions(Collider coll) {
       var valid = true;
       foreach (var ability in AbilityManager.Abilities)
         if (ability.IsRunning)
@@ -31,13 +30,13 @@ namespace Archero {
       return valid;
     }
 
-    public void OnDiscreteCollisionDetected(Collider hitCollider) {
+    public virtual void OnDiscreteCollisionDetected(Collider hitCollider) {
       foreach (var ability in AbilityManager.Abilities)
         if (ability.IsRunning)
           ability.OnDiscreteCollisionDetected(hitCollider);
     }
 
-    public void OnGroundHit(
+    public virtual void OnGroundHit(
     Collider hitCollider,
     Vector3 hitNormal,
     Vector3 hitPoint,
@@ -47,7 +46,7 @@ namespace Archero {
           ability.OnGroundHit(hitCollider, hitNormal, hitPoint, ref hitStabilityReport);
     }
 
-    public void OnMovementHit(
+    public virtual void OnMovementHit(
     Collider hitCollider,
     Vector3 hitNormal,
     Vector3 hitPoint,
@@ -57,13 +56,13 @@ namespace Archero {
           ability.OnMovementHit(hitCollider, hitNormal, hitPoint, ref hitStabilityReport);
     }
 
-    public void PostGroundingUpdate(float deltaTime) {
+    public virtual void PostGroundingUpdate(float deltaTime) {
       foreach (var ability in AbilityManager.Abilities)
         if (ability.IsRunning)
           ability.PostGroundingUpdate(deltaTime);
     }
 
-    public void ProcessHitStabilityReport(
+    public virtual void ProcessHitStabilityReport(
     Collider hitCollider,
     Vector3 hitNormal,
     Vector3 hitPoint,
@@ -81,13 +80,13 @@ namespace Archero {
             ref hitStabilityReport);
     }
 
-    public void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
+    public virtual void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
       foreach (var ability in AbilityManager.Abilities)
         if (ability.IsRunning)
           ability.UpdateRotation(ref currentRotation, deltaTime);
     }
 
-    public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
+    public virtual void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
       foreach (var ability in AbilityManager.Abilities)
         if (ability.IsRunning)
           ability.UpdateVelocity(ref currentVelocity, deltaTime);

@@ -1,5 +1,64 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &17928974949849251
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7412827582398671555}
+  - component: {fileID: 1846453234600395878}
+  m_Layer: 0
+  m_Name: Path Move
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7412827582398671555
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 17928974949849251}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3218949450758086773}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1846453234600395878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 17928974949849251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81927cb7bd49111408fdd7cb9868ef3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BlockActionsWith: 0
+  Tags: 0
+  AddedToOwner: 0
+  AI: {fileID: 8010524832022494981}
+  NavMeshAgent: {fileID: 869097254503722863}
+  Move:
+    Tags: 0
+    CancelAbilitiesWithAll: 0
+    CancelAbilitiesWithAny: 0
+    AddToOwner: 0
+    AddToAbility: 0
+    OwnerActivationRequired: 0
+    OwnerActivationBlocked: 0
+    CanRun: 1
+    Ability: {fileID: 1846453234600395878}
 --- !u!1001 &2509407211103102572
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -68,6 +127,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5035075096598959472, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
+      propertyPath: m_Size.y
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6692932924000704826, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: m_Name
       value: Mob Base
@@ -94,7 +157,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 1044612911886321177, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7412827582398671555}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 6692932924000704826, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       insertIndex: -1
@@ -102,7 +168,37 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6692932924000704826, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 869097254503722863}
+    - targetCorrespondingSourceObject: {fileID: 6692932924000704826, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8010524832022494981}
   m_SourcePrefab: {fileID: 100100000, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
+--- !u!114 &325484106905795439 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2762798402025364739, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
+  m_PrefabInstance: {fileID: 2509407211103102572}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9093092658675367766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd480a89fe41dab4c9a92d327bb90a2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &3218949450758086773 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1044612911886321177, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
+  m_PrefabInstance: {fileID: 2509407211103102572}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7192742483840020086 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4684576758823880730, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
+  m_PrefabInstance: {fileID: 2509407211103102572}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9093092658675367766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d1bc5515e3ab954e80599c538834774, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &9093092658675367766 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6692932924000704826, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
@@ -142,3 +238,28 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &8010524832022494981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9093092658675367766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f750d68a928c6c94e81ca7d8d4984e03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Motor: {fileID: 7192742483840020086}
+  AbilityManager: {fileID: 325484106905795439}
+  NavMeshAgent: {fileID: 869097254503722863}
+  AbilityManager: {fileID: 325484106905795439}
+  PathMove: {fileID: 1846453234600395878}
+  AbilityActionRef:
+    Target: {fileID: 0}
+    FieldName: 
+  MoveDuration:
+    Millis: 1
+    FramesPerSecond: 60
+  AreaName: Walkable
+  Velocity: {x: 0, y: 0, z: 0}
