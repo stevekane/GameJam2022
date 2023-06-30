@@ -8,6 +8,9 @@ namespace Archero {
 
     public GameObject Owner;
     public Team Team;
+    public float InvulnPeriod = 0f;
+
+    int InvulnTicksRemaining = 0;
 
     void Awake() {
       Owner = Owner ?? transform.parent.gameObject;
@@ -18,6 +21,8 @@ namespace Archero {
       if (!Team.CanBeHurtBy(hitParams.AttackerTeamID))
         return false;
       if (Owner.TryGetComponent(out Status status) && !status.IsHittable)
+        return false;
+      if (InvulnTicksRemaining > 0)
         return false;
       return true;
     }
@@ -36,11 +41,13 @@ namespace Archero {
         }
       }
 
+      InvulnTicksRemaining = Timeval.FromSeconds(InvulnPeriod).Ticks;
       hitParams.Defender = Owner;
       if (Owner.TryGetComponent(out Attributes defenderAttributes))
         hitParams.DefenderAttributes = defenderAttributes;
       hitParams.Defender?.SendMessage("OnHurt", hitParams, SendMessageOptions.DontRequireReceiver);
       hitParams.Source?.SendMessage("OnHit", hitParams, SendMessageOptions.DontRequireReceiver);
+
       return true;
     }
 
@@ -48,6 +55,11 @@ namespace Archero {
       return MobManager.Instance.Mobs.Where(mob =>
         mob.gameObject != Owner &&
         (mob.transform.position - transform.position).sqrMagnitude < distance.Sqr()).ToArray();
+    }
+
+    void FixedUpdate() {
+      if (InvulnTicksRemaining > 0)
+        InvulnTicksRemaining--;
     }
   }
 }

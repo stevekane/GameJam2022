@@ -233,6 +233,7 @@ public static class Waiter {
   public static TaskFunc Millis(int ms) => s => s.Millis(ms);
   public static TaskFunc Forever() => s => s.Forever();
   public static TaskFunc Delay(Timeval t) => s => s.Delay(t);
+  public static TaskFunc Seconds(float seconds) => s => s.Seconds(seconds);
   public static TaskFunc While(Func<bool> pred) => s => s.While(pred);
   public static TaskFunc Until(Func<bool> pred) => s => s.Until(pred);
   public static TaskFunc Repeat(Action f) => s => s.Repeat(f);
