@@ -39,7 +39,7 @@ namespace Archero {
       CollectionTrigger.enabled = true;
       var player = Player.Instance;
       var accel = 60f;
-      while (player && isActiveAndEnabled) {
+      while (player && this) {
         CollectSpeed += Time.fixedDeltaTime * accel;
         var delta = player.transform.position - transform.position;
         var dist = Mathf.Min(Time.fixedDeltaTime * CollectSpeed, delta.magnitude);
@@ -53,6 +53,7 @@ namespace Archero {
         var frac = d.GetComponent<Attributes>().GetValue(AttributeTag.StrongHeart, HealFraction);
         Debug.Log($"Would heal for {frac}");
         d.Heal(Mathf.RoundToInt(frac * d.MaxHealth));
+        Destroy(gameObject);
       }
     }
 
