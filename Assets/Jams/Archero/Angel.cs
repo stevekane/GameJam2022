@@ -10,7 +10,7 @@ namespace Archero {
 
     void OnTriggerEnter(Collider other) {
       if (other.TryGetComponent(out Player p)) {
-
+        Hitbox.OnTriggerEnterSource.Unlisten(OnTriggerEnter);
         var us = p.GetComponent<Upgrades>();
         UpgradeUI.Instance.Show(us, "You've met an angel!", "Choose a blessing",
           us.PickUpgrades(Upgrades, 1).Append(Heal));

@@ -9,8 +9,8 @@ namespace Archero {
   public class UpgradeUI : MonoBehaviour {
     public static UpgradeUI Instance;
 
-    public EventSource<(Upgrades, Upgrade)> OnChoose;
-    public EventSource OnReject;
+    public EventSource<(Upgrades, Upgrade)> OnChoose = new();
+    public EventSource OnReject = new();
 
     public GameObject Canvas;
     public TextMeshProUGUI Heading;

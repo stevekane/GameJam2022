@@ -36,6 +36,7 @@ namespace Archero {
         GlobalScope.Start(GameMain);
       }
     }
+    void OnDestroy() => GlobalScope.Dispose();
 
     async Task GameMain(TaskScope scope) {
       await scope.Ticks(2);  // ensure player and upgradeUI have initted

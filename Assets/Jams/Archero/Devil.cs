@@ -9,10 +9,12 @@ namespace Archero {
 
     void OnTriggerEnter(Collider other) {
       if (other.TryGetComponent(out Player p)) {
+        Hitbox.OnTriggerEnterSource.Unlisten(OnTriggerEnter);
+        UpgradeUI.Instance.OnChoose.Listen(OnAccept);
         var amount = p.GetComponent<Attributes>().GetValue(AttributeTag.Health, 0) * .2f;
         var us = p.GetComponent<Upgrades>();
         UpgradeUI.Instance.Show(us, "You've met a devil!", $"Accept the devil's offer?\nLose {amount} Max HP",
-          us.PickUpgrades(Upgrades, 1));
+          us.PickUpgrades(Upgrades, 1), true);
       }
     }
 
@@ -25,7 +27,6 @@ namespace Archero {
     void Awake() {
       this.InitComponentFromChildren(out Hitbox);
       Hitbox.OnTriggerEnterSource.Listen(OnTriggerEnter);
-      UpgradeUI.Instance.OnChoose.Listen(OnAccept);
     }
     void OnDestroy() {
       UpgradeUI.Instance.OnChoose.Unlisten(OnAccept);

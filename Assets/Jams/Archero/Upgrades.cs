@@ -126,6 +126,7 @@ namespace Archero {
         Added.Clear();
         Modifiers.Clear();
         Active.ForEach(ud => ud.Upgrade.Apply(this));
+        GetComponent<Damageable>().Heal(0);  // Update health bar with potentially new max HP.
       }
     }
 
