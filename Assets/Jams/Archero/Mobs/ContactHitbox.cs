@@ -14,7 +14,7 @@ namespace Archero {
     }
 
     void OnTriggerStay(Collider other) {
-      if (other.gameObject.TryGetComponent(out Hurtbox hb)) {
+      if (other.gameObject.TryGetComponent(out Hurtbox hb) && hb.Team.ID != Team.ID) {
         var hitConfig = Mode == Modes.Passive ? HitConfig.AddMult(-.9f) : HitConfig;
         hb.TryAttack(new(hitConfig, Owner.SerializedCopy, Owner.gameObject, Owner.gameObject));
       }

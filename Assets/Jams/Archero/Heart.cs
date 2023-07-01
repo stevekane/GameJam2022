@@ -3,17 +3,22 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Archero {
-  public class Coin : MonoBehaviour {
-    [SerializeField] Rigidbody Rigidbody;
+  public class Heart : MonoBehaviour {
     [SerializeField] Collider CollectionTrigger;
-    [SerializeField] Vector3 BurstForce = new Vector3(10, 1, 10);
+    [SerializeField] Vector3 BurstForce = new Vector3(5, 5, 5);
+    [SerializeField] float DropRate = .02f;
+    [SerializeField] float HealFraction = .02f;
     [SerializeField] float CollectSpeed = 40f;
 
-    public static void SpawnCoins(Vector3 position, int amount) {
-      for (int i = 0; i < amount; i++) {
-        var c = CoinManager.Instance.CoinPool.Get();
-        c.transform.SetPositionAndRotation(position, Quaternion.identity);
-      }
+    Rigidbody Rigidbody;
+
+    public static void MaybeSpawn(Vector3 position) {
+      var playerAt = Player.Instance.GetComponent<Attributes>();
+      var dropRate = playerAt.GetValue(AttributeTag.StrongHeart, GameManager.Instance.HeartPrefab.DropRate);
+      var roll = dropRate > Random.Range(0, 1f);
+      Debug.Log($"Drop rate {dropRate} => {roll}");
+      if (roll)
+        Instantiate(GameManager.Instance.HeartPrefab, position, Quaternion.identity);
     }
 
     void OnEnable() {
@@ -44,10 +49,15 @@ namespace Archero {
     }
 
     void OnTriggerEnter(Collider other) {
-      if (other.GetComponent<Player>() && other.TryGetComponent(out Upgrades us)) {
-        us.CollectGold(1);
-        CoinManager.Instance.CoinPool.Release(this);
+      if (other.GetComponent<Player>() && other.TryGetComponent(out Damageable d)) {
+        var frac = d.GetComponent<Attributes>().GetValue(AttributeTag.StrongHeart, HealFraction);
+        Debug.Log($"Would heal for {frac}");
+        d.Heal(Mathf.RoundToInt(frac * d.MaxHealth));
       }
+    }
+
+    void Awake() {
+      this.InitComponent(out Rigidbody);
     }
   }
 }
