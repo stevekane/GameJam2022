@@ -34,7 +34,7 @@ namespace Archero {
     public int CurrentLevel = 1;
     public UnityEvent<ExperienceEvent> OnExperience;
     public UnityEvent<int> OnLevel;
-    public int XPToNextLevel => 100 + 50*(CurrentLevel-1);
+    public int XPToNextLevel => 40 + 10*(CurrentLevel-1);
     public AttributeModifier GetModifier(AttributeTag attrib) => Modifiers.GetValueOrDefault(attrib, null);
     public void AddAttributeModifier(AttributeTag attrib, AttributeModifier modifier) => AttributeModifier.Add(Modifiers, attrib, modifier);
     public void RemoveAttributeModifier(AttributeTag attrib, AttributeModifier modifier) => AttributeModifier.Remove(Modifiers, attrib, modifier);
@@ -88,16 +88,22 @@ namespace Archero {
     }
 
     public void CollectGold(int gold) {
+      if (XP < XPToNextLevel && XP+gold >= XPToNextLevel)
+        WorldSpaceMessageManager.Instance.SpawnMessage($"Level Up!", transform.position + 2*Vector3.up, 2f);
       ChangeExperience(XP+gold);
     }
 
     public void MaybeLevelUp() {
-      if (XP >= XPToNextLevel) {
+      if (CurrentLevel == 0 || XP >= XPToNextLevel) {
         var newXP = XP - XPToNextLevel;
         ChangeLevel(CurrentLevel+1);
         ChangeExperience(newXP);
         UpgradeUI.Instance.Show(this, PickUpgrades());
       }
+    }
+
+    public void ChooseFirstUpgrade() {
+      UpgradeUI.Instance.Show(this, PickUpgrades());
     }
 
     Upgrade[] PickUpgrades() {

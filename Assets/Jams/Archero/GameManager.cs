@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -28,7 +30,14 @@ namespace Archero {
         Instance = this;
         this.InitComponentFromChildren(out UpgradeUI.Instance);
         DontDestroyOnLoad(Instance.gameObject);
+
+        GlobalScope.Start(GameMain);
       }
+    }
+
+    async Task GameMain(TaskScope scope) {
+      await scope.Ticks(2);  // ensure player and upgradeUI have initted
+      Player.Instance.GetComponent<Upgrades>().ChooseFirstUpgrade();
     }
 
     void FixedUpdate() {
@@ -50,14 +59,18 @@ namespace Archero {
 
     bool CollectingCoins = false;
     public void OnMobsCleared() {
-      GlobalScope.Start(async s => {
+      GlobalScope.Start(async scope => {
         CollectingCoins = true;
         FindObjectOfType<Door>().Open();
-        await s.Seconds(.5f);
+        await scope.Seconds(.5f);
         var coins = FindObjectsOfType<Coin>();
-        var tasks = coins.Select(c => c.Collect(s));
-        await s.AllTask(tasks.ToArray());
-        Player.Instance.GetComponent<Upgrades>().MaybeLevelUp();
+        var tasks = coins.Select(c => c.Collect(scope));
+        await scope.AllTask(tasks.ToArray());
+        await scope.Seconds(.5f);
+        do {
+          await scope.While(() => UpgradeUI.Instance.IsShowing);
+          Player.Instance.GetComponent<Upgrades>().MaybeLevelUp();
+        } while (UpgradeUI.Instance.IsShowing);
         CollectingCoins = false;
       });
     }

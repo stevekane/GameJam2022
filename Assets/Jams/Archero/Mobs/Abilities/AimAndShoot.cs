@@ -16,6 +16,7 @@ namespace Archero {
 
     public override async Task MainAction(TaskScope scope) {
       try {
+        AimLine.positionCount = (int)Attributes.GetValue(AttributeTag.BouncyWall, 0) + 2;
         AimLine.gameObject.SetActive(true);
         await scope.Any(
           Waiter.Delay(Timeval.FromSeconds(WindupSeconds)),
