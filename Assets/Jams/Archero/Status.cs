@@ -297,6 +297,15 @@ namespace Archero {
         Removed.Add(effect);
     }
 
+    public void Remove(Predicate<StatusEffect> predicate) {
+      foreach (var effect in Active)
+        if (predicate(effect))
+          Removed.Add(effect);
+      foreach (var effect in Added)
+        if (predicate(effect))
+          Removed.Add(effect);
+    }
+
     public T Get<T>() where T : StatusEffect {
       return Active.FirstOrDefault(e => e is T) as T;
     }
