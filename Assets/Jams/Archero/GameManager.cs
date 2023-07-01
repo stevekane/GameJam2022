@@ -61,24 +61,29 @@ namespace Archero {
     bool CollectingDrops = false;
     void OnMobsCleared() {
       GlobalScope.Start(async scope => {
+        Debug.Log("Start of Mobs Cleared");
         CollectingDrops = true;
         FindObjectOfType<Door>().Open();
+        Debug.Log("After door open of Mobs Cleared");
         await scope.Seconds(.5f);
         var tasks =
             FindObjectsOfType<Coin>().Select(c => c.Collect(scope))
             .Concat(FindObjectsOfType<Heart>().Select(h => h.Collect(scope)));
         await scope.AllTask(tasks.ToArray());
+        Debug.Log("After collection of Mobs Cleared");
         await scope.Seconds(.5f);
         do {
           await scope.While(() => UpgradeUI.Instance.IsShowing);
           Player.Instance.GetComponent<Upgrades>().MaybeLevelUp();
         } while (UpgradeUI.Instance.IsShowing);
         CollectingDrops = false;
+        Debug.Log("End of Mobs Cleared");
       });
     }
 
     public void OnRoomExited() {
       GlobalScope.Start(async scope => {
+        Debug.Log("Start of Room Exited");
         await scope.While(() => CollectingDrops);
         if (CurrentRoom+1 < Scenes.Count) {
           var next = Scenes[CurrentRoom+1];
@@ -98,6 +103,7 @@ namespace Archero {
           await scope.While(() => MessageUI.Instance.IsShowing);
           RestartGame();
         }
+        Debug.Log("End of Room Exited");
       });
     }
 
