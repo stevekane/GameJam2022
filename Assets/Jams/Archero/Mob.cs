@@ -11,6 +11,9 @@ namespace Archero {
 
     void OnDeath() {
       DropCoins();
+      MobManager.Instance?.Mobs.Remove(this);
+      if (MobManager.Instance?.Mobs.Count == 0)
+        GameManager.Instance.OnMobsCleared();
     }
 
     void Start() {
@@ -19,8 +22,6 @@ namespace Archero {
 
     void OnDestroy() {
       MobManager.Instance?.Mobs.Remove(this);
-      if (MobManager.Instance?.Mobs.Count == 0)
-        GameManager.Instance.OnMobsCleared();
     }
   }
 }
