@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -58,7 +59,7 @@ namespace Archero {
     }
 
     bool CollectingDrops = false;
-    public void OnMobsCleared() {
+    void OnMobsCleared() {
       GlobalScope.Start(async scope => {
         CollectingDrops = true;
         FindObjectOfType<Door>().Open();
@@ -107,6 +108,15 @@ namespace Archero {
         await scope.While(() => MessageUI.Instance.IsShowing);
         RestartGame();
       });
+    }
+
+    public void OnMobDied() {
+      Invoke("CheckMobsCleared", .05f);  // Gives a chance for DeathSplit mobs to spawn.
+    }
+
+    void CheckMobsCleared() {
+      if (MobManager.Instance.Mobs.Count == 0)
+        OnMobsCleared();
     }
 
     [ContextMenu("Spawn coins")]
