@@ -66,9 +66,9 @@ MonoBehaviour:
       Base: 0
       Mult: 0
     Knockback:
-      Base: 0
-      Mult: 1
-    KnockbackType: 0
+      Base: 8
+      Mult: 0
+    KnockbackType: 1
     KnockbackAngle: 0
     RecoilStrength: 0
     CameraShakeStrength: 3
@@ -335,7 +335,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1122499520473116429, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 1122499520473116429, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -439,11 +439,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: BaseAttributes.Array.data[0].Attribute.Value
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: BaseAttributes.Array.data[1].Attribute.Value
-      value: 7
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 4616639879333648313, guid: c1622936cd05a4e49b03ac3f396c239a, type: 3}
       propertyPath: BaseAttributes.Array.data[2].Attribute.Value
@@ -634,6 +634,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1a85cdb389a3e64fb1708c7934cf1aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Deaths: 0
 --- !u!114 &1451915198251472733
 MonoBehaviour:
   m_ObjectHideFlags: 0
