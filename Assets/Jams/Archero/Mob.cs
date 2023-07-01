@@ -17,7 +17,7 @@ namespace Archero {
         GameManager.Instance.OnMobsCleared();
     }
 
-    void Start() {
+    void Awake() {
       MobManager.Instance?.Mobs.Add(this);
     }
 

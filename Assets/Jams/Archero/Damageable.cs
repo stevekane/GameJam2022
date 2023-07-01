@@ -68,5 +68,10 @@ namespace Archero {
       OnDamage.Invoke(damageEvent);
       BroadcastMessage("OnDamage", damageEvent, SendMessageOptions.DontRequireReceiver);
     }
+
+    [ContextMenu("Kill")]
+    void Kill() {
+      TakeDamage(MaxHealth, false, true);
+    }
   }
 }
