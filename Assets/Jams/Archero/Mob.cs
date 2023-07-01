@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Archero {
   public class Mob : MonoBehaviour {
-    int Coins => 10 + 2*GameManager.Instance.CurrentLevel;
+    int Coins => 10 + 2*GameManager.Instance.CurrentRoom;
 
     public void DropCoins() {
       var amount = (int)(Player.Instance.GetComponent<Attributes>().GetValue(AttributeTag.GoldGain, Coins * Random.Range(.75f, 1.5f)));

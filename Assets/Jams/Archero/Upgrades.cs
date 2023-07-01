@@ -107,6 +107,7 @@ namespace Archero {
     }
 
     Upgrade[] PickUpgrades() {
+      UnityEngine.Random.InitState((int)DateTime.Now.Ticks);  // Why do I need to call this EXACTLY HERE?
       var availableUpgrades = GameManager.Instance.Upgrades.Where(u => CanBuyUpgrade(u)).ToList();
       availableUpgrades.Shuffle();
       return availableUpgrades.Take(3).ToArray();
