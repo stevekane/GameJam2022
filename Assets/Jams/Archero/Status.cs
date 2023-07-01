@@ -131,20 +131,14 @@ namespace Archero {
 
   // The flying state that happens to a defender when they get hit by a strong attack.
   public class KnockbackEffect : StatusEffect {
-    const float DRAG = 5;
-    const float AIRBORNE_SPEED = 100f;
-    const float DONE_SPEED = 5f;
+    const float DONE_SPEED = 1f;
 
-    // Returns the speed needed to cover the given distance with exponential decay due to drag.
-    public static float GetSpeedToTravelDistance(float distance) => DRAG*distance;
-
+    AI AI;
     public float Drag;
     public Vector3 Velocity;
-    public Vector3? WallbounceTarget;  // TODO: Obsolete for now. Remove at some point.
-    public bool IsAirborne = false;
-    public KnockbackEffect(Vector3 velocity, Vector3? wallbounceTarget = null, float drag = 5f) {
+    public KnockbackEffect(AI ai, Vector3 velocity, float drag = 5f) {
+      AI = ai;
       Velocity = velocity;
-      WallbounceTarget = wallbounceTarget;
       Drag = drag;
     }
     public override bool Merge(StatusEffect e) {
@@ -153,15 +147,11 @@ namespace Archero {
     }
     public override void Apply(Status status) {
       Velocity = Velocity * Mathf.Exp(-Time.fixedDeltaTime * Drag);
-      status.Mover.Move(Velocity*Time.fixedDeltaTime);
-      IsAirborne = Velocity.sqrMagnitude >= AIRBORNE_SPEED.Sqr();
-      if (IsAirborne) {
-        status.CanMove = false;
-        status.CanRotate = false;
-        status.CanAttack = false;
-      }
-      if (Velocity.sqrMagnitude < DONE_SPEED.Sqr())
+      AI.ScriptedVelocity = Velocity;
+      if (Velocity.sqrMagnitude < DONE_SPEED.Sqr()) {
+        Debug.Log("KB done");
         status.Remove(this);
+      }
     }
   }
 

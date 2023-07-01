@@ -47,7 +47,6 @@ namespace Archero {
     public int AttackerTeamID;
     public Attributes.Serialized AttackerAttributes;
     public IAttributes DefenderAttributes;
-    // TODO: cache this value? It gets called at least 4x per hit.
     public Vector3 KnockbackVector => HitConfig.KnockbackType.KnockbackVector(HitConfig.KnockbackAngle, Source.transform, Defender.transform);
     public float GetDamage(bool didCrit) => BaseDamage * (didCrit ? CritDamageMult : 1) * DefenderAttributes.GetValue(AttributeTag.DamageTaken, 1);
     public float BaseDamage => HitConfig.Damage.Apply(AttackerAttributes.GetValue(AttributeTag.Damage, 0));
@@ -57,13 +56,7 @@ namespace Archero {
     public bool HeadshotRoll => AttackerAttributes.GetValue(AttributeTag.Headshot, 0) >= UnityEngine.Random.Range(0f, 1f);
     public int DefenderTeamID => Defender.GetComponent<Team>().ID;
 
-    public float GetKnockbackStrength(float defenderDamage) {
-      //var defenderWeightFactor = 2f / (1f + DefenderAttributes.GetValue(AttributeTag.Weight));
-      var defenderWeightFactor = 1f / DefenderAttributes.GetValue(AttributeTag.Weight);
-      var baseKnockback = (defenderDamage/10f + (defenderDamage * BaseDamage)/20f) * defenderWeightFactor * 1.4f + 18f;
-      // TODO HACK: This is a different attribute formula.. maybe this is what we want in general?
-      return HitConfig.Knockback.Base + HitConfig.Knockback.Mult * baseKnockback;
-    }
+    public float GetKnockbackStrength() => DefenderAttributes.GetValue(AttributeTag.KnockbackTaken, HitConfig.Knockback.Apply(0));
 
     // Scale hitstop and hurtstun duration based on damage.
     static AnimationCurve StunScaling = AnimationCurve.Linear(0, 1f, 1, 3f); // 1-3x duration

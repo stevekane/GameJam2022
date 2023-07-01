@@ -9,6 +9,7 @@ namespace Archero {
     Health,
     ExtraLives,  // 0 means no revives
     Knockback,
+    KnockbackTaken,  // like Weight I guess but easier to reason about
     Weight,
     MoveSpeed,
     TurnSpeed,
