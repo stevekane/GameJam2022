@@ -14,6 +14,7 @@ namespace Archero {
       DropCoins();
       MobManager.Instance?.Mobs.Remove(this);
       GameManager.Instance.OnMobDied();
+      Destroy(gameObject, .01f);
     }
 
     void Awake() {

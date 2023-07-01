@@ -19,10 +19,10 @@ namespace Archero {
       HealthText.text = damageEvent.Health.ToString();
     }
 
-    void OnDeath() {
-      Slider.gameObject.SetActive(false);
-      HealthText.gameObject.SetActive(false);
-    }
+    //void OnDeath() {
+    //  Slider.gameObject.SetActive(false);
+    //  HealthText.gameObject.SetActive(false);
+    //}
 
     void LateUpdate() {
       transform.rotation = PersonalCamera.Current.transform.rotation;

@@ -44,6 +44,7 @@ namespace Archero {
 
     public void TakeDamage(int damage, bool didCrit = false, bool headshot = false) {
       if (damage == 0) return;
+      if (Health == 0) return; // we're already dead
       Health = Mathf.Max(0, Health - damage);
 
       var damageEvent = new DamageEvent(-damage, Health, MaxHealth, didCrit, headshot);
@@ -58,7 +59,6 @@ namespace Archero {
           LastAttacker.GetComponent<Damageable>().Heal((int)(.015 * MaxHealth));
         if (LastAttacker != null && LastAttacker.GetComponent<Attributes>().GetValue(AttributeTag.Inspire, 0) > 0)
           LastAttacker.GetComponent<Status>().Add(new InspireEffect());
-        Destroy(gameObject);
       }
     }
 

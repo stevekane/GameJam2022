@@ -3,6 +3,7 @@ using UnityEngine;
 namespace Archero {
   public class Player : MonoBehaviour {
     public static Player Instance;
+    public int Deaths = 0;
 
     void Awake() {
       if (Instance) {
@@ -22,7 +23,15 @@ namespace Archero {
     }
 
     void OnDeath() {
-      GameManager.Instance.OnPlayerDied();
+      Deaths++;
+      if (Deaths <= (int)GetComponent<Attributes>().GetValue(AttributeTag.ExtraLives, 0)) {
+        var d = GetComponent<Damageable>();
+        d.Heal(d.MaxHealth);
+        WorldSpaceMessageManager.Instance.SpawnMessage($"Extra Life", transform.position + 2*Vector3.up, 2f);
+      } else {
+        GameManager.Instance.OnPlayerDied();
+        Destroy(gameObject);
+      }
     }
   }
 }
