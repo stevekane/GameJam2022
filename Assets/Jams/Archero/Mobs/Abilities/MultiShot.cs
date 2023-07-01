@@ -32,7 +32,7 @@ namespace Archero {
 
     Vector3 SpreadDirection(Vector3 direction) {
       return SpreadStyle switch {
-        SpreadStyle.Centered => Quaternion.Euler(0, -ShotAngleSpacing*(ShotCount-1)/2,0) * direction,
+        SpreadStyle.Centered => Quaternion.Euler(0, -ShotAngleSpacing*(ShotCount-1)/2f,0) * direction,
         _ => direction
       };
     }
