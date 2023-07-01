@@ -98,19 +98,21 @@ namespace Archero {
         var newXP = XP - XPToNextLevel;
         ChangeLevel(CurrentLevel+1);
         ChangeExperience(newXP);
-        UpgradeUI.Instance.Show(this, PickUpgrades());
+        UpgradeUI.Instance.Show(this, $"Level {CurrentLevel} in this adventure!", "Select a new ability",
+          PickUpgrades(GameManager.Instance.Upgrades, 3));
       }
     }
 
     public void ChooseFirstUpgrade() {
-      UpgradeUI.Instance.Show(this, PickUpgrades());
+      UpgradeUI.Instance.Show(this, $"New game", "Choose your first ability",
+        PickUpgrades(GameManager.Instance.Upgrades, 3));
     }
 
-    Upgrade[] PickUpgrades() {
+    public IEnumerable<Upgrade> PickUpgrades(List<Upgrade> choices, int n) {
       UnityEngine.Random.InitState((int)DateTime.Now.Ticks);  // Why do I need to call this EXACTLY HERE?
-      var availableUpgrades = GameManager.Instance.Upgrades.Where(u => CanBuyUpgrade(u)).ToList();
+      var availableUpgrades = choices.Where(u => CanBuyUpgrade(u)).ToList();
       availableUpgrades.Shuffle();
-      return availableUpgrades.Take(3).ToArray();
+      return availableUpgrades.Take(n);
     }
 
     void FixedUpdate() {

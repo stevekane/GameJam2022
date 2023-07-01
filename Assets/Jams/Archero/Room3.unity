@@ -10943,9 +10943,29 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 202562036340341930, guid: c70b6e63199195645a9d65eac5fb2fec, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1649975271}
+    - target: {fileID: 202562036340341930, guid: c70b6e63199195645a9d65eac5fb2fec, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnExit
+      objectReference: {fileID: 0}
+    - target: {fileID: 202562036340341930, guid: c70b6e63199195645a9d65eac5fb2fec, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Archero.UpgradeUI, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 222287811378824595, guid: c70b6e63199195645a9d65eac5fb2fec, type: 3}
+      propertyPath: m_Name
+      value: Heading
+      objectReference: {fileID: 0}
     - target: {fileID: 948568889533844393, guid: c70b6e63199195645a9d65eac5fb2fec, type: 3}
       propertyPath: m_Name
       value: GameManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 7696980452933851117, guid: c70b6e63199195645a9d65eac5fb2fec, type: 3}
+      propertyPath: m_Name
+      value: Choose
       objectReference: {fileID: 0}
     - target: {fileID: 7707345710710891757, guid: c70b6e63199195645a9d65eac5fb2fec, type: 3}
       propertyPath: m_RootOrder
@@ -10991,18 +11011,63 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8722128079350463035, guid: c70b6e63199195645a9d65eac5fb2fec, type: 3}
+      propertyPath: m_text
+      value: Reject Offer
+      objectReference: {fileID: 0}
+    - target: {fileID: 8849066714506539637, guid: c70b6e63199195645a9d65eac5fb2fec, type: 3}
+      propertyPath: Heading
+      value: 
+      objectReference: {fileID: 1649975270}
+    - target: {fileID: 8849066714506539637, guid: c70b6e63199195645a9d65eac5fb2fec, type: 3}
+      propertyPath: ChooseMessage
+      value: 
+      objectReference: {fileID: 1649975269}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c70b6e63199195645a9d65eac5fb2fec, type: 3}
+--- !u!114 &1649975269 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5751889424468827132, guid: c70b6e63199195645a9d65eac5fb2fec, type: 3}
+  m_PrefabInstance: {fileID: 1649975268}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1649975270 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8679286878824818572, guid: c70b6e63199195645a9d65eac5fb2fec, type: 3}
+  m_PrefabInstance: {fileID: 1649975268}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1649975271 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8849066714506539637, guid: c70b6e63199195645a9d65eac5fb2fec, type: 3}
+  m_PrefabInstance: {fileID: 1649975268}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e4dea2e9bab3b54c97968c95d98c2ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!43 &1682694842
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh34788
+  m_Name: pb_Mesh158968
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
