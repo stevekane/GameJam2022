@@ -16,13 +16,13 @@ namespace Archero {
 
     public override async Task MainAction(TaskScope scope) {
       try {
+        AimLine.enabled = true;
         AimLine.positionCount = (int)Attributes.GetValue(AttributeTag.BouncyWall, 0) + 2;
-        AimLine.gameObject.SetActive(true);
         await scope.Any(
           Waiter.Delay(Timeval.FromSeconds(WindupSeconds)),
           Waiter.Repeat(Aim));
       } finally {
-        AimLine.gameObject.SetActive(false);
+        AimLine.enabled = false;
       }
       Projectile.Fire(ArrowPrefab, Origin, Quaternion.LookRotation(Dir), Attributes, HitConfig);
     }
