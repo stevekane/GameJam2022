@@ -32,6 +32,7 @@ Transform:
   - {fileID: 6802492643323741933}
   - {fileID: 3037124563474827286}
   - {fileID: 6769708352955108075}
+  - {fileID: 5467929192965488505}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -51,7 +52,9 @@ MonoBehaviour:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 5.5, y: 0, z: 10.5}
   Scenes:
-  - {fileID: 102900000, guid: 8254bf5db1716ec498826d6424711728, type: 3}
+  - {fileID: 102900000, guid: ceaaa8201b4f2de4892f630137b7f7b9, type: 3}
+  - {fileID: 102900000, guid: ceaaa8201b4f2de4892f630137b7f7b9, type: 3}
+  - {fileID: 102900000, guid: ceaaa8201b4f2de4892f630137b7f7b9, type: 3}
   Upgrades:
   - {fileID: 11400000, guid: 515149271a4838b41a533923f2110c6a, type: 2}
   - {fileID: 11400000, guid: 5e2e02c23a196704fbd1a447e58937c1, type: 2}
@@ -100,6 +103,54 @@ MonoBehaviour:
   CirclePrefab: {fileID: 4086417409265781655, guid: e264576ad6adaca4f99fe513d20e5511, type: 3}
   BoltPrefab: {fileID: 5999384653325019395, guid: f585e18764bd2c243b51777adc8287fe, type: 3}
   AuraPrefab: {fileID: 6898308082709039787, guid: e1c8e25c23a08fe4e93a88a1c84f9770, type: 3}
+--- !u!1 &5617784131037926331
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5467929192965488505}
+  - component: {fileID: 225801226371801729}
+  m_Layer: 0
+  m_Name: Coin Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5467929192965488505
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5617784131037926331}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 100, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7707345710710891757}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &225801226371801729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5617784131037926331}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15475d4bae8c04e4caae99b54638d1f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CoinPrefab: {fileID: 4986400933148887714, guid: 441d1ef37e0ae6c4aaf6cbec7784854b, type: 3}
+  CheckPoolSize: 0
+  InitialPoolSize: 500
+  MaxPoolSize: 1000
 --- !u!1 &6582021101053168486
 GameObject:
   m_ObjectHideFlags: 0

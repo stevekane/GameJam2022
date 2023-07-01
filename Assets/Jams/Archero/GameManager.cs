@@ -31,6 +31,7 @@ namespace Archero {
         Instance = this;
         this.InitComponentFromChildren(out UpgradeUI.Instance);
         this.InitComponentFromChildren(out MessageUI.Instance);
+        transform.SetParent(null);
         DontDestroyOnLoad(Instance.gameObject);
 
         GlobalScope.Start(GameMain);

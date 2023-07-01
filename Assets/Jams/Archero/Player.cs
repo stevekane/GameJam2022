@@ -10,6 +10,7 @@ namespace Archero {
         Destroy(gameObject);
       } else {
         Instance = this;
+        transform.SetParent(null);
         DontDestroyOnLoad(Instance.gameObject);
       }
     }

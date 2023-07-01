@@ -33,13 +33,19 @@ namespace Archero {
     void OnDestroyCoin(Coin coin) => Destroy(coin.gameObject);
 
     void Awake() {
-      Instance = this;
-      CoinPool = new ObjectPool<Coin>(CreateCoin, OnGetCoin, OnReleaseCoin, OnDestroyCoin, CheckPoolSize, InitialPoolSize, MaxPoolSize);
-      CoinPool.Drain(CoinPool.Fill(InitialPoolSize));
+      if (Instance) {
+        Destroy(gameObject);
+      } else {
+        Instance = this;
+        CoinPool = new ObjectPool<Coin>(CreateCoin, OnGetCoin, OnReleaseCoin, OnDestroyCoin, CheckPoolSize, InitialPoolSize, MaxPoolSize);
+        CoinPool.Drain(CoinPool.Fill(InitialPoolSize));
+        transform.SetParent(null);
+        DontDestroyOnLoad(Instance.gameObject);
+      }
     }
+
     void OnDestroy() {
-      Instance = null;
-      CoinPool.Dispose();
+      CoinPool?.Dispose();
     }
   }
 }
