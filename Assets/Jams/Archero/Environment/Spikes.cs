@@ -22,6 +22,7 @@ namespace Archero {
   }
 
   public class Spikes : MonoBehaviour {
+    [SerializeField] Team Team;
     [SerializeField] float DamagePeriod = 1;
     [SerializeField] int EnterDamage = 80;
     [SerializeField] int PeriodicDamage = 1;
@@ -29,7 +30,10 @@ namespace Archero {
     bool IsEffectFromThis(StatusEffect e) => (e as SpikeEffect)?.Spikes == this;
 
     void OnTriggerEnter(Collider c) {
-      if (c.TryGetComponent(out Hurtbox hurtbox) && hurtbox.Owner.TryGetComponent(out Status status)) {
+      if (c.TryGetComponent(out Hurtbox hurtbox) &&
+          hurtbox.Owner.TryGetComponent(out Team team) &&
+          team.CanBeHurtBy(Team) &&
+          hurtbox.Owner.TryGetComponent(out Status status)) {
         status.Damage.TakeDamage(EnterDamage, true, false);
         status.Add(new SpikeEffect(this, DamagePeriod, PeriodicDamage));
       }
