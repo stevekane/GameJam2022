@@ -13,12 +13,13 @@ namespace Archero {
     void OnDeath() {
       DropCoins();
       MobManager.Instance?.Mobs.Remove(this);
-      if (MobManager.Instance?.Mobs.Count == 0)
-        GameManager.Instance.OnMobsCleared();
+      GameManager.Instance.OnMobDied();
+      Destroy(gameObject, .01f);
     }
 
     void Awake() {
       MobManager.Instance?.Mobs.Add(this);
+      Debug.Log("Mob awake");
     }
 
     void OnDestroy() {
