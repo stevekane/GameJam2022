@@ -16,6 +16,7 @@ namespace Archero {
 
     public List<Upgrade> Upgrades;
 
+    public Heart HeartPrefab;
     public Coin CoinPrefab;
     public Circle CirclePrefab;
     public Bolt BoltPrefab;
@@ -55,27 +56,28 @@ namespace Archero {
       Destroy(gameObject);
     }
 
-    bool CollectingCoins = false;
+    bool CollectingDrops = false;
     public void OnMobsCleared() {
       GlobalScope.Start(async scope => {
-        CollectingCoins = true;
+        CollectingDrops = true;
         FindObjectOfType<Door>().Open();
         await scope.Seconds(.5f);
-        var coins = FindObjectsOfType<Coin>();
-        var tasks = coins.Select(c => c.Collect(scope));
+        var tasks =
+            FindObjectsOfType<Coin>().Select(c => c.Collect(scope))
+            .Concat(FindObjectsOfType<Heart>().Select(h => h.Collect(scope)));
         await scope.AllTask(tasks.ToArray());
         await scope.Seconds(.5f);
         do {
           await scope.While(() => UpgradeUI.Instance.IsShowing);
           Player.Instance.GetComponent<Upgrades>().MaybeLevelUp();
         } while (UpgradeUI.Instance.IsShowing);
-        CollectingCoins = false;
+        CollectingDrops = false;
       });
     }
 
     public void OnRoomExited() {
       GlobalScope.Start(async scope => {
-        await scope.While(() => CollectingCoins);
+        await scope.While(() => CollectingDrops);
         if (CurrentRoom+1 < Scenes.Count) {
           var next = Scenes[CurrentRoom+1];
           SceneManager.LoadSceneAsync(next.name);
