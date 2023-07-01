@@ -12,7 +12,7 @@ namespace Archero {
     public GameObject ChoicesFrame;
     public UpgradeCardUI CardPrefab;
     public TextMeshProUGUI LevelText;
-    public bool IsShowing { get; private set; }
+    public bool IsShowing => Canvas.active;
 
     void Start() {
       Canvas.SetActive(false);
@@ -31,8 +31,6 @@ namespace Archero {
       });
       Canvas.SetActive(true);
       Invoke("FuckYouUnityYouMonumentalHeapOfFuckingGarbage", 0f);
-
-      IsShowing = true;
     }
 
     // Setting focus *sometimes* doesn't work unless we do it in this deferred function? WTF??
