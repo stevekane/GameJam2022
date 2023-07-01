@@ -19,5 +19,9 @@ namespace Archero {
       GetComponent<CharacterController>().Warp(scenePlayer.transform.position, scenePlayer.transform.rotation);
       GetComponent<PersonalCamera>().Current = Camera.main;
     }
+
+    void OnDeath() {
+      GameManager.Instance.OnPlayerDied();
+    }
   }
 }

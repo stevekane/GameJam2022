@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,8 +9,10 @@ namespace Archero {
   public class GameManager : MonoBehaviour {
     public static GameManager Instance;
 
+    public Bounds VictoryBounds;
+
     public List<SceneAsset> Scenes;
-    public int CurrentLevel => Scenes.FindIndex(s => s.name == SceneManager.GetActiveScene().name);
+    public int CurrentRoom => Scenes.FindIndex(s => s.name == SceneManager.GetActiveScene().name);
 
     public List<Upgrade> Upgrades;
 
@@ -29,11 +30,13 @@ namespace Archero {
       } else {
         Instance = this;
         this.InitComponentFromChildren(out UpgradeUI.Instance);
+        this.InitComponentFromChildren(out MessageUI.Instance);
         DontDestroyOnLoad(Instance.gameObject);
 
         GlobalScope.Start(GameMain);
       }
     }
+    void OnDestroy() => GlobalScope.Dispose();
 
     async Task GameMain(TaskScope scope) {
       await scope.Ticks(2);  // ensure player and upgradeUI have initted
@@ -45,16 +48,11 @@ namespace Archero {
       Timeval.TickEvent.Fire();
     }
 
-    public void OnLevelComplete() {
-      GlobalScope.Start(async s => {
-        await s.While(() => CollectingCoins);
-        if (CurrentLevel+1 < Scenes.Count) {
-          var next = Scenes[CurrentLevel+1];
-          SceneManager.LoadSceneAsync(next.name);
-        } else {
-          Debug.Log($"Victory!");
-        }
-      });
+    public void RestartGame() {
+      if (Player.Instance)
+        Player.Instance.gameObject.Destroy();
+      SceneManager.LoadSceneAsync(Scenes[0].name);
+      Destroy(gameObject);
     }
 
     bool CollectingCoins = false;
@@ -72,6 +70,39 @@ namespace Archero {
           Player.Instance.GetComponent<Upgrades>().MaybeLevelUp();
         } while (UpgradeUI.Instance.IsShowing);
         CollectingCoins = false;
+      });
+    }
+
+    public void OnRoomExited() {
+      GlobalScope.Start(async scope => {
+        await scope.While(() => CollectingCoins);
+        if (CurrentRoom+1 < Scenes.Count) {
+          var next = Scenes[CurrentRoom+1];
+          SceneManager.LoadSceneAsync(next.name);
+        } else {
+          Player.Instance.GetComponent<Status>().Add(new InlineEffect(s => {
+            s.CanMove = false;
+            s.CanRotate = false;
+            s.CanAttack = false;
+          }, "GameOver"));
+          for (var i = 0; i < 10; i++) {
+            var xz = new Vector3(UnityEngine.Random.Range(VictoryBounds.min.x, VictoryBounds.max.x), 0f, UnityEngine.Random.Range(VictoryBounds.min.z, VictoryBounds.max.z));
+            Coin.SpawnCoins(xz, UnityEngine.Random.Range(10, 30));
+            await scope.Seconds(UnityEngine.Random.Range(.1f, 1f));
+          }
+          MessageUI.Instance.Show("Victory!\n\nPress X to play again.", "Restart");
+          await scope.While(() => MessageUI.Instance.IsShowing);
+          RestartGame();
+        }
+      });
+    }
+
+    public void OnPlayerDied() {
+      GlobalScope.Start(async scope => {
+        await scope.Seconds(1f);
+        MessageUI.Instance.Show("You died!\n\nPress X to restart.", "Restart");
+        await scope.While(() => MessageUI.Instance.IsShowing);
+        RestartGame();
       });
     }
 

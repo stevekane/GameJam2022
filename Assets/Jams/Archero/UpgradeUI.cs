@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -8,18 +9,24 @@ namespace Archero {
   public class UpgradeUI : MonoBehaviour {
     public static UpgradeUI Instance;
 
+    public EventSource<(Upgrades, Upgrade)> OnChoose = new();
+    public EventSource OnReject = new();
+
     public GameObject Canvas;
+    public TextMeshProUGUI Heading;
+    public TextMeshProUGUI ChooseMessage;
     public GameObject ChoicesFrame;
     public UpgradeCardUI CardPrefab;
-    public TextMeshProUGUI LevelText;
-    public bool IsShowing => Canvas.active;
+    public Button RejectButton;
+    public bool IsShowing => Canvas.activeSelf;
 
     void Start() {
       Canvas.SetActive(false);
     }
 
-    public void Show(Upgrades us, Upgrade[] choices) {
-      LevelText.text = $"Level {us.CurrentLevel} in this adventure!";
+    public void Show(Upgrades us, string heading, string chooseMessage, IEnumerable<Upgrade> choices, bool isDevil = false) {
+      Heading.text = heading;
+      ChooseMessage.text = chooseMessage;
       foreach (Transform child in ChoicesFrame.transform)
         Destroy(child.gameObject);
       choices.ForEach(u => {
@@ -29,6 +36,7 @@ namespace Archero {
         var b = card.GetComponent<Button>();
         b.onClick.AddListener(() => OnChooseCard(us, u));
       });
+      RejectButton.gameObject.SetActive(isDevil);
       Canvas.SetActive(true);
       Invoke("FuckYouUnityYouMonumentalHeapOfFuckingGarbage", 0f);
     }
@@ -51,10 +59,12 @@ namespace Archero {
     }
 
     public void OnChooseCard(Upgrades us, Upgrade which) {
+      OnChoose.Fire((us, which));
       us.BuyUpgrade(which);
       Hide();
     }
     public void OnExit() {
+      OnReject.Fire();
       Hide();
     }
   }

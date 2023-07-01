@@ -41,6 +41,10 @@ namespace Archero {
       DontDestroyOnLoad(gameObject);
     }
     void FixedUpdate() {
+      if (Owner == null) {
+        Destroy(gameObject);
+        return;
+      }
       transform.position = Owner.transform.position;
     }
   }

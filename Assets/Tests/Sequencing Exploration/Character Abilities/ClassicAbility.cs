@@ -19,6 +19,10 @@ public abstract class ClassicAbility : SimpleAbility {
     Main.Listen(FireMain);
   }
 
+  void OnDestroy() {
+    Scope?.Dispose();
+  }
+
   void FireMain() {
     Scope.Run(Runner(MainAction));
   }

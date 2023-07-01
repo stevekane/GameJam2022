@@ -11,7 +11,7 @@ namespace Archero {
     }
 
     void OnTriggerEnter(Collider other) {
-      GameManager.Instance.OnLevelComplete();
+      GameManager.Instance.OnRoomExited();
     }
 
     void Start() {

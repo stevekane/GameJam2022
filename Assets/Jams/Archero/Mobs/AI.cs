@@ -30,6 +30,11 @@ namespace Archero {
       Scope.Start(Behavior);
     }
 
+    void OnDestroy() {
+      Scope.Dispose();
+    }
+
+
     async Task Idle(TaskScope scope) {
       await scope.Ticks(MoveTicks);
     }
