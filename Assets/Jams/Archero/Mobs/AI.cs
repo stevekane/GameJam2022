@@ -20,6 +20,7 @@ namespace Archero {
     TaskScope Scope;
 
     public Vector3 Velocity;
+    public Vector3 ScriptedVelocity; // MP: what's the best way to handle "extra" movement?
 
     public override void Start() {
       base.Start();
@@ -66,7 +67,7 @@ namespace Archero {
       }
     }
 
-    async Task Behavior(TaskScope scope) {
+    public virtual async Task Behavior(TaskScope scope) {
       while (true) {
         var moveBehavior = MoveStyle switch {
           MoveStyle.Wander => Wander(scope),
@@ -98,7 +99,12 @@ namespace Archero {
 
     public override void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
       base.UpdateVelocity(ref currentVelocity, deltaTime);
-      currentVelocity = Velocity;
+      if (ScriptedVelocity.sqrMagnitude > 0) {
+        currentVelocity = ScriptedVelocity;
+      } else {
+        currentVelocity = Velocity;
+      }
+      ScriptedVelocity = Vector3.zero;
     }
   }
 }
