@@ -47,16 +47,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72a05225e96b35447bf6336fafe8b419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  VictoryBounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 5.5, y: 0, z: 10.5}
   Scenes:
-  - {fileID: 102900000, guid: 8254bf5db1716ec498826d6424711728, type: 3}
-  - {fileID: 102900000, guid: 8254bf5db1716ec498826d6424711728, type: 3}
-  - {fileID: 102900000, guid: 8254bf5db1716ec498826d6424711728, type: 3}
-  - {fileID: 102900000, guid: 8254bf5db1716ec498826d6424711728, type: 3}
-  - {fileID: 102900000, guid: 8254bf5db1716ec498826d6424711728, type: 3}
-  - {fileID: 102900000, guid: 8254bf5db1716ec498826d6424711728, type: 3}
-  - {fileID: 102900000, guid: 8254bf5db1716ec498826d6424711728, type: 3}
-  - {fileID: 102900000, guid: 8254bf5db1716ec498826d6424711728, type: 3}
-  - {fileID: 102900000, guid: 8254bf5db1716ec498826d6424711728, type: 3}
   - {fileID: 102900000, guid: 8254bf5db1716ec498826d6424711728, type: 3}
   Upgrades:
   - {fileID: 11400000, guid: 515149271a4838b41a533923f2110c6a, type: 2}
@@ -210,9 +204,21 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -20
       objectReference: {fileID: 0}
+    - target: {fileID: 1165495613213540750, guid: fc5ac976a1d067e49b987aa1dda68b06, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 5234444969386886809}
+    - target: {fileID: 1165495613213540750, guid: fc5ac976a1d067e49b987aa1dda68b06, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Archero.MessageUI, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 1329932565274039127, guid: fc5ac976a1d067e49b987aa1dda68b06, type: 3}
       propertyPath: m_Name
       value: Accept
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329932565274039127, guid: fc5ac976a1d067e49b987aa1dda68b06, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2490716583543949868, guid: fc5ac976a1d067e49b987aa1dda68b06, type: 3}
       propertyPath: m_AnchorMax.y
@@ -221,6 +227,10 @@ PrefabInstance:
     - target: {fileID: 2490716583543949868, guid: fc5ac976a1d067e49b987aa1dda68b06, type: 3}
       propertyPath: m_AnchorMin.y
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2490716583543949868, guid: fc5ac976a1d067e49b987aa1dda68b06, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 600
       objectReference: {fileID: 0}
     - target: {fileID: 2490716583543949868, guid: fc5ac976a1d067e49b987aa1dda68b06, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -298,12 +308,40 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5819584257069029980, guid: fc5ac976a1d067e49b987aa1dda68b06, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5819584257069029980, guid: fc5ac976a1d067e49b987aa1dda68b06, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5819584257069029980, guid: fc5ac976a1d067e49b987aa1dda68b06, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5819584257069029980, guid: fc5ac976a1d067e49b987aa1dda68b06, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5819584257069029980, guid: fc5ac976a1d067e49b987aa1dda68b06, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5819584257069029980, guid: fc5ac976a1d067e49b987aa1dda68b06, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -118
+      objectReference: {fileID: 0}
     - target: {fileID: 6715388180392011480, guid: fc5ac976a1d067e49b987aa1dda68b06, type: 3}
       propertyPath: m_text
       value: 'You died!
 
 
         Press X to restart'
+      objectReference: {fileID: 0}
+    - target: {fileID: 6715388180392011480, guid: fc5ac976a1d067e49b987aa1dda68b06, type: 3}
+      propertyPath: m_VerticalAlignment
+      value: 512
       objectReference: {fileID: 0}
     - target: {fileID: 7775517852096907039, guid: fc5ac976a1d067e49b987aa1dda68b06, type: 3}
       propertyPath: m_text
