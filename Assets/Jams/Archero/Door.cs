@@ -11,6 +11,10 @@ namespace Archero {
     void Awake() {
       if (OpenOnAwake)
         Open();
+      DoorTrigger.OnTriggerEnterSource.Listen(OnTriggerEnter);
+    }
+
+    void Start() {
       RoomNumber.text = GameManager.Instance.CurrentRoom.ToString();
     }
 
@@ -21,10 +25,6 @@ namespace Archero {
 
     void OnTriggerEnter(Collider other) {
       GameManager.Instance.OnRoomExited();
-    }
-
-    void Start() {
-      DoorTrigger.OnTriggerEnterSource.Listen(OnTriggerEnter);
     }
   }
 }
