@@ -16,7 +16,7 @@ namespace Archero {
       var playerAt = Player.Instance.GetComponent<Attributes>();
       var dropRate = playerAt.GetValue(AttributeTag.StrongHeart, GameManager.Instance.HeartPrefab.DropRate);
       var roll = dropRate > Random.Range(0, 1f);
-      Debug.Log($"Drop rate {dropRate} => {roll}");
+      // Debug.Log($"Drop rate {dropRate} => {roll}");
       if (roll)
         Instantiate(GameManager.Instance.HeartPrefab, position, Quaternion.identity);
     }
@@ -51,7 +51,7 @@ namespace Archero {
     void OnTriggerEnter(Collider other) {
       if (other.GetComponent<Player>() && other.TryGetComponent(out Damageable d)) {
         var frac = d.GetComponent<Attributes>().GetValue(AttributeTag.StrongHeart, HealFraction);
-        Debug.Log($"Would heal for {frac}");
+        // Debug.Log($"Would heal for {frac}");
         d.Heal(Mathf.RoundToInt(frac * d.MaxHealth));
         Destroy(gameObject);
       }
