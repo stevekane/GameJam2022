@@ -27,7 +27,11 @@ namespace Archero {
       foreach (var ability in AbilityManager.Abilities)
         if (ability.IsRunning)
           valid = valid && ability.IsColliderValidForCollisions(coll);
-      return valid;
+      var tag = coll.tag;
+      var attributes = GetComponent<Attributes>();
+      var isWallWalkable = attributes.GetValue(AttributeTag.WallWalk, 0) > 0 && tag == "WallWalkable";
+      var isWaterWalkable = attributes.GetValue(AttributeTag.WaterWalk, 0) > 0 && tag == "WaterWalkable";
+      return valid && !(isWallWalkable || isWaterWalkable);
     }
 
     public virtual void OnDiscreteCollisionDetected(Collider hitCollider) {
