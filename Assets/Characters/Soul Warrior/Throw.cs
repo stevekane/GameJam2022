@@ -4,7 +4,7 @@ using UnityEngine;
 public class Throw : Ability {
   [SerializeField] AttributeModifier MoveSpeedModifier = AttributeModifier.TimesOne;
   [SerializeField] AnimationJobConfig Animation;
-  [SerializeField] Timeval Windup = Timeval.FromAnimFrames(20, 60);
+  [SerializeField] Timeval Windup = Timeval.FromTicks(20);
   [SerializeField] AvatarBone Spawn;
   [SerializeField] GameObject ChannelVFX;
   [SerializeField] AudioSource ChannelAudioSource;
@@ -29,7 +29,7 @@ public class Throw : Ability {
       VFXManager.Instance.TrySpawnWithParent(ChannelVFX, SpawnTransform, Windup.Seconds);
       ChannelAudioSource.Play();
       var animation = AnimationDriver.Play(scope, Animation);
-      await animation.WaitFrame(Windup.AnimFrames)(scope);
+      await animation.WaitFrame(Windup.Ticks)(scope);
       var dir = (Target ? AbilityManager.transform.position.TryGetDirection(Target.position) : null) ?? AbilityManager.transform.forward;
       var rotation = Quaternion.LookRotation(dir);
       var projectile = Instantiate(ProjectilePrefab, SpawnTransform.position, rotation);

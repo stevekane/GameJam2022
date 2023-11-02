@@ -10,20 +10,26 @@ public class TaskScopeTests : MonoBehaviour {
     public TestFunc Test;
     public string ExpectedOutput;
 
-    public async Task Run() {
+    public async Task Run(TaskScope scope) {
       //Debug.Log($"Test {Name} running...");
-      using TaskScope scope = new();
-      var output = await Test(scope);
+      var child = new TaskScope(scope);
+      var output = await Test(child);
       if (output != ExpectedOutput) {
         Debug.LogError($"Test {Name} FAILED:\n\tactual:\t{output}\n\texpect:\t{ExpectedOutput}");
       }
     }
   }
 
-  async void Start() {
+  TaskScope Scope = new();
+  void Start() {
+    Scope.Start(StartTest);
+  }
+
+  async Task StartTest(TaskScope scope) {
     Debug.Log($"Running {Tests.Length} tests...");
     foreach (var t in Tests) {
-      await t.Run();
+      Debug.Log($"Test {t.Name}...");
+      await t.Run(scope);
     }
     Debug.Log("Finished");
   }
@@ -39,6 +45,46 @@ public class TaskScopeTests : MonoBehaviour {
     },
 
     new() {
+      Name = "multitick",
+      Test = async (TaskScope main) => {
+        var output = "";
+        Timeval.TickCount = 0;
+        await main.All(
+          async (child) => {
+            try {
+              output += $"child1 {Timeval.TickCount};";
+              await child.Tick();
+            } finally {
+              output += $"child1 finally {Timeval.TickCount} {TaskScheduler.Current == TaskManager.Scheduler};";
+            }
+          },
+          async (child) => {
+            try {
+              output += $"child2 {Timeval.TickCount};";
+              await child.Tick();
+            } finally {
+              output += $"child2 finally {Timeval.TickCount} {TaskScheduler.Current == TaskManager.Scheduler};";
+            }
+          },
+          async (child) => {
+            try {
+              output += $"child3 {Timeval.TickCount};";
+              await child.Tick();
+              output += $"child3 {Timeval.TickCount};";
+              await child.Tick();
+            } finally {
+              output += $"child3 finally {Timeval.TickCount} {TaskScheduler.Current == TaskManager.Scheduler};";
+            }
+          }
+        );
+        await main.Tick();
+        output += $"end {Timeval.TickCount}";
+        return output;
+      },
+      ExpectedOutput = "child1 0;child2 0;child3 0;child1 finally 1 True;child2 finally 1 True;child3 1;child3 finally 2 True;end 3"
+    },
+
+    new() {
       Name = "cancel",
       Test = async (TaskScope main) => {
         var output = "";
@@ -51,7 +97,7 @@ public class TaskScopeTests : MonoBehaviour {
               output += "before Tick;";
               await main.Tick();
               output += "after Tick;";
-            } catch {
+            } catch (OperationCanceledException) {
               output += "exception;";
             } finally {
               output += "finally;";
@@ -86,7 +132,7 @@ public class TaskScopeTests : MonoBehaviour {
               output += $"child2 cancelling {Timeval.TickCount};";
               child.Cancel();
               output += $"child2 awaiting {Timeval.TickCount};";
-              await child.Ticks(1);
+              await child.Tick();
               output += $"child2 notreached;";
             } finally {
               output += $"child2 finally {Timeval.TickCount};";
@@ -97,7 +143,7 @@ public class TaskScopeTests : MonoBehaviour {
         output += $"end {Timeval.TickCount}";
         return output;
       },
-      ExpectedOutput = "child1 0;child2 start 0;child2 cancelling 1;child1 finally 1;child2 awaiting 1;child2 finally 1;end 2"
+      ExpectedOutput = "child1 0;child2 start 0;child2 cancelling 1;child2 awaiting 1;child2 finally 1;child1 finally 2;end 2"
     },
 
     new() {
@@ -320,70 +366,6 @@ public class TaskScopeTests : MonoBehaviour {
         return output;
       },
       ExpectedOutput = "cool;end"
-    },
-    new() {
-      Name = "listen",
-      Test = async (TaskScope main) => {
-        var output = "";
-        EventSource evt = new();
-        await main.All(
-          async (child) => {
-            await child.ListenFor(evt);
-            output += "received;";
-          },
-          async (child) => {
-            await child.Millis(16*1);
-            evt.Fire();
-            output += "fired;";
-          });
-        output += "end";
-        return output;
-      },
-      ExpectedOutput = "received;fired;end"
-    },
-    new() {
-      Name = "listenValue",
-      Test = async (TaskScope main) => {
-        var output = "";
-        EventSource<string> evt = new();
-        await main.All(
-          async (child) => {
-            var result = await child.ListenFor(evt);
-            output += $"received {result};";
-          },
-          async (child) => {
-            await child.Millis(16*1);
-            evt.Fire("foo");
-            output += "fired;";
-          });
-        output += "end";
-        return output;
-      },
-      ExpectedOutput = "received foo;fired;end"
-    },
-    new() {
-      Name = "listenAll",
-      Test = async (TaskScope main) => {
-        var output = "";
-        EventSource<string> evt = new();
-        await main.All(
-          async (child) => {
-            var results = new string[16];
-            var count = await child.ListenForAll(evt, results);
-            output += $"received {string.Join(",", results.Take(count))};";
-          },
-          async (child) => {
-            evt.Fire("1");
-            evt.Fire("2");
-            evt.Fire("3");
-            await child.Millis(16);
-            evt.Fire("4");
-            output += "fired;";
-          });
-        output += "end";
-        return output;
-      },
-      ExpectedOutput = "received 1,2,3;fired;end"
     },
     new() {
       Name = "exceptionsInAll",

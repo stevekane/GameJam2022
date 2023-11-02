@@ -47,7 +47,7 @@ public class Damage : MonoBehaviour {
     Vibrator = GetComponent<Vibrator>();
   }
 
-  static readonly Timeval RecoilDuration = Timeval.FromAnimFrames(12, 60);
+  static readonly Timeval RecoilDuration = Timeval.FromTicks(12);
   static readonly float MinKnockbackForFallen = 20f;
   void OnHurt(HitParams hitParams) {
     AddPoints(hitParams.Damage);

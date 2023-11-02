@@ -20,6 +20,5 @@ public class FixedFrame : MonoBehaviour {
     Tick++;
     TickEvent.Fire();
     Timeval.TickCount = Tick;
-    Timeval.TickEvent.Fire();
   }
 }

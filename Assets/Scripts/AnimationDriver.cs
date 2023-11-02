@@ -429,14 +429,15 @@ public class AnimationDriver : MonoBehaviour {
   public AnimationTask Play(TaskScope scope, AnimationJobConfig animation) {
     var task = new AnimationTask(this, Graph, animation);
     task.Start();
-    _ = task.Run(scope);
+    // TODO(MP): Figure out what we should really be doing here.
+    ((TaskRunner)TaskScheduler.Current).PostTask(task.Run);
     return task;
   }
 
   public TimelineTask PlayTimeline(TaskScope scope, TimelineTaskConfig config) {
     var task = new TimelineTask(this, Graph, config);
     task.Start();
-    _ = task.Run(scope);
+    ((TaskRunner)TaskScheduler.Current).PostTask(task.Run);
     return task;
   }
 

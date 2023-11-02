@@ -11,7 +11,7 @@ public class Jump : Ability {
   public AnimationJobConfig WallJumpAnimation;
   public AudioClip LaunchSFX;
   public GameObject LaunchVFX;
-  public Timeval CoyoteTime = Timeval.FromAnimFrames(6, 60);
+  public Timeval CoyoteTime = Timeval.FromTicks(6);
 
   bool Holding = true;
   int AirJumpsRemaining = 1;
@@ -61,7 +61,8 @@ public class Jump : Ability {
     return null;
   }
 
-  void FixedUpdate() {
+  protected override void FixedUpdate() {
+    base.FixedUpdate();
     if (Status.IsGrounded) {
       AirJumpsRemaining = 1;
       TicksSinceGrounded = 0;

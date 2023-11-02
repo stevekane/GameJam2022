@@ -47,7 +47,8 @@ public class Grapple : Ability {
     s.CanMove = false;
   }, "Throw and pull");
 
-  void FixedUpdate() {
+  protected override void FixedUpdate() {
+    base.FixedUpdate();
     var aim = AbilityManager.GetAxis(AxisTag.ReallyAim);
     var aiming = aim.XZ.sqrMagnitude > 0;
     var direction = aiming ? aim.XZ : transform.forward.XZ();

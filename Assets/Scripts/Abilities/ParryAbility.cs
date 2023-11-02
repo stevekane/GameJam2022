@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ParryAbility : Ability {
   [SerializeField] Hurtbox Hurtbox;
-  [SerializeField] Timeval BlockDuration = Timeval.FromAnimFrames(15, 30);
+  [SerializeField] Timeval BlockDuration = Timeval.FromTicks(15);
   [SerializeField] AttackAbility RiposteAbility;
 
   public static InlineEffect Invulnerable { get => new(s => {

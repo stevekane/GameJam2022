@@ -6,8 +6,8 @@ using UnityEngine;
 public class InactiveAttackPhase {
   int Index;
   Animator Animator;
-  public Timeval Duration = Timeval.FromMillis(0, 30);
-  public Timeval ClipDuration = Timeval.FromMillis(0, 30);
+  public Timeval Duration = Timeval.FromMillis(0);
+  public Timeval ClipDuration = Timeval.FromMillis(0);
   public async Task Start(TaskScope scope, Animator animator, int index) {
     Animator = animator;
     Index = index;

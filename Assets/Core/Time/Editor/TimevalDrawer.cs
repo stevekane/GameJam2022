@@ -12,21 +12,16 @@ public class TimevalDrawer : PropertyDrawer {
 
     EditorGUI.BeginChangeCheck();
     var millisProp = property.FindPropertyRelative("Millis");
-    var fpsProp = property.FindPropertyRelative("FramesPerSecond");
-    var timeval = Timeval.FromMillis(millisProp.floatValue, fpsProp.intValue);
+    var timeval = Timeval.FromMillis(millisProp.floatValue);
 
-    p.width /= 2;
-    var labels = new[] { new GUIContent("Frames"), new GUIContent("fps") };
+    //p.width /= 2;
+    var labels = new[] { new GUIContent("Seconds") };
     EditorGUIUtility.labelWidth = EditorStyles.label.CalcSize(labels[0]).x;
-    var mewFrames = EditorGUI.IntField(p, labels[0], timeval.AnimFrames);
-    p.x += p.width;
-    EditorGUIUtility.labelWidth = EditorStyles.label.CalcSize(labels[1]).x;
-    var newFps = EditorGUI.IntField(p, labels[1], fpsProp.intValue);
+    var newSeconds = EditorGUI.FloatField(p, labels[0], timeval.Seconds);
 
     if (EditorGUI.EndChangeCheck()) {
-      timeval = Timeval.FromAnimFrames(mewFrames, newFps);
+      timeval = Timeval.FromSeconds(newSeconds);
       millisProp.floatValue = timeval.Millis;
-      fpsProp.intValue = timeval.FramesPerSecond;
     }
 
     EditorGUI.indentLevel = indent;

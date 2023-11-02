@@ -30,7 +30,7 @@ namespace PigMoss {
     public override async Task MainAction(TaskScope scope) {
       try {
         var animation = AnimationDriver.Play(scope, new() { Clip = Clip });  // TODO: FIXME!
-        var windup = animation.WaitFrame(ActiveFrameStart.AnimFrames);
+        var windup = animation.WaitFrame(ActiveFrameStart.Ticks);
         var lookAt = Waiter.Repeat(Mover.TryLookAt, BlackBoard.Target);
         await scope.Any(windup, lookAt);
         var slashPosition = AbilityManager.transform.position;
@@ -39,7 +39,7 @@ namespace PigMoss {
         VFXManager.Instance.TrySpawn2DEffect(SlashVFX, slashPosition, slashRotation);
         Collider.enabled = true;
         var contact = Waiter.ListenFor(Contact.OnTriggerStaySource);
-        var endActive = animation.WaitFrame(ActiveFrameEnd.AnimFrames);
+        var endActive = animation.WaitFrame(ActiveFrameEnd.Ticks);
         var activeOutcome = await scope.Any(contact, Waiter.Return<Collider>(endActive, null));
         if (activeOutcome != null && activeOutcome.TryGetComponent(out Hurtbox hurtbox)) {
           hurtbox.TryAttack(new HitParams(HitConfig, Attributes));

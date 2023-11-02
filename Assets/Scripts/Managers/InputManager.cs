@@ -59,7 +59,7 @@ public class AxisState {
 
 [DefaultExecutionOrder(ScriptExecutionGroups.Input)]
 public class InputManager : MonoBehaviour {
-  public Timeval BufferDuration = Timeval.FromAnimFrames(6,60);
+  public Timeval BufferDuration = Timeval.FromTicks(6);
   public float StickDeadZone;
   bool InputEnabled = true;
   Dictionary<(ButtonCode, ButtonPressType), int> Buffer = new();

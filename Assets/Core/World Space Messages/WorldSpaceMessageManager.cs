@@ -1,23 +1,21 @@
 using UnityEngine;
 
-public class WorldSpaceMessageManager : MonoBehaviour {
-  public static WorldSpaceMessageManager Instance;
-
+public class WorldSpaceMessageManager : SingletonBehavior<WorldSpaceMessageManager> {
   [SerializeField] WorldSpaceMessage Prefab;
-
-  void Awake() {
-    Instance = this;
-  }
-
-  void OnDestroy() {
-    Instance = null;
-  }
 
   public WorldSpaceMessage SpawnMessage(string message, Vector3 position, float lifetime = -1f) {
     var worldSpaceMessage = Instantiate(Prefab, position, Quaternion.identity, transform);
     worldSpaceMessage.Message = message;
     if (lifetime > 0f)
-      Destroy(worldSpaceMessage, lifetime);
+      Destroy(worldSpaceMessage.gameObject, lifetime);
+    return worldSpaceMessage;
+  }
+
+  public WorldSpaceMessage SpawnMessage(WorldSpaceMessage prefab, string message, Vector3 position, float lifetime = -1f) {
+    var worldSpaceMessage = Instantiate(prefab, position, Quaternion.identity, transform);
+    worldSpaceMessage.Message = message;
+    if (lifetime > 0f)
+      Destroy(worldSpaceMessage.gameObject, lifetime);
     return worldSpaceMessage;
   }
 }

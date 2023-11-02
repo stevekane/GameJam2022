@@ -1,9 +1,9 @@
+using System;
 using Cinemachine;
 using UnityEngine;
 
 public class CameraShaker : CinemachineExtension {
-  [SerializeField]
-  CameraConfig Config;
+  [SerializeField] CameraConfig Config;
   CinemachineVirtualCamera TargetCamera;
   CinemachineBasicMultiChannelPerlin Noise;
 

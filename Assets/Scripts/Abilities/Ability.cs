@@ -18,6 +18,7 @@ public class TriggerCondition {
 [DefaultExecutionOrder(ScriptExecutionGroups.Ability)]
 public abstract class Ability : MonoBehaviour {
   public Character Character { get; set; }
+  protected TaskRunner TaskRunner = new();
   public AbilityManager AbilityManager => Character?.AbilityManager;
   public AvatarAttacher AvatarAttacher => Character?.AvatarAttacher;
   public AnimationDriver AnimationDriver => Character?.AnimationDriver;
@@ -27,7 +28,6 @@ public abstract class Ability : MonoBehaviour {
   public Mover Mover => Character?.Mover;
   public TriggerCondition TriggerCondition = new();
   [HideInInspector] protected AbilityTag Tags;  // Inherited from the Trigger when started
-  TaskScope MainScope = new();
   List<AbilityMethod> ActiveTasks = new();  // TODO(Task): could just be a refcount instead?
 
   public virtual AbilityTag ActiveTags => Tags;
@@ -36,9 +36,9 @@ public abstract class Ability : MonoBehaviour {
   public virtual HitConfig HitConfigData => null;
 
   public virtual bool CanStart(AbilityMethod func) => true;
-  public void Run(AbilityMethod func) => Run(MainScope, func);
-  public Task Run(TaskScope scope, AbilityMethod func) => TaskRunner(scope, func);
-  async Task TaskRunner(TaskScope scope, AbilityMethod func) {
+  public void Run(AbilityMethod func) => TaskRunner.RunTask(s => Runner(s, func));
+  public Task Run(TaskScope scope, AbilityMethod func) => Runner(scope, func);
+  async Task Runner(TaskScope scope, AbilityMethod func) {
     try {
       ActiveTasks.Add(func);
       var trigger = GetTriggerCondition(func);
@@ -75,10 +75,15 @@ public abstract class Ability : MonoBehaviour {
   // TODO(HACK): InteractAbility needs to override this to provide the Release action with the Interact tag.
   public virtual TriggerCondition GetTriggerCondition(AbilityMethod method) =>
       method == MainAction ? TriggerCondition : TriggerCondition.Empty;
+
   public void Stop() {
     Tags = 0;
-    MainScope.Dispose();
-    MainScope = new();
+    TaskRunner.StopAllTasks();
   }
-  public void OnDestroy() => Stop();
+  protected virtual void OnDestroy() {
+    TaskRunner.Dispose();
+  }
+  protected virtual void FixedUpdate() {
+    TaskRunner.FixedUpdate();
+  }
 }

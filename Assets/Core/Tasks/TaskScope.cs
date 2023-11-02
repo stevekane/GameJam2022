@@ -41,18 +41,20 @@ public class TaskScope : IDisposable {
     ThrowIfCancelled();
     return task;
   }
-  public void Start(TaskFunc f) {
+  public void Start(TaskFunc f, TaskScheduler scheduler = null) {
     ThrowIfCancelled();
     TaskScope scope = new(this);
     var task = new Task(async () => {
       try {
         await f(scope);
       } catch (OperationCanceledException) {
+      } catch (Exception e) {
+        Debug.LogException(e);
       } finally {
         scope.Dispose();
       }
     });
-    task.Start(TaskScheduler.FromCurrentSynchronizationContext());
+    task.Start(scheduler ?? TaskManager.Scheduler);
   }
   // Fiber adapter.
   public async Task RunFiber(IEnumerator routine) {
@@ -71,18 +73,26 @@ public class TaskScope : IDisposable {
     await Task.Yield();
     ThrowIfCancelled();
   }
-  // TODO: This is apparently very slow. Somehow, even sharing a CancellationToken for the next tick across
-  // all TaskScopes does not fix it. Task.Delay(x, token) is slow if one `token` is created each frame...
-  public Task Tick() => ListenFor(Timeval.TickEvent);
-  public Task TickTime() => Seconds(Time.fixedDeltaTime);
+  public async Task Tick() {
+    ThrowIfCancelled();
+    await ((TaskRunner)TaskScheduler.Current).WaitForFixedUpdate();
+    ThrowIfCancelled();
+  }
   public async Task Ticks(int ticks) {
     for (int i = 0; i < ticks; i++)
       await Tick();
   }
-  public Task Seconds(float seconds) => Task.Delay((int)(seconds * 1000), Source.Token);
-  public Task Millis(int ms) => Task.Delay(ms, Source.Token);
+  public Task Seconds(float seconds) => Ticks((int)(seconds * 1000));
+  public Task Millis(int ms) => Ticks(ms);
+  public Task Delay(Timeval t) => Ticks(t.Ticks);
+  // N.B. This uses raw Task.Delay because this only and ever stands for "wait indefinetly"
   public Task Forever() => Task.Delay(-1, Source.Token);
-  public Task Delay(Timeval t) => Millis((int)t.Millis);
+  public async Task ForDuration(Timeval t, Action<float> f) {
+    for (int i = 0; i < t.Ticks; i++) {
+      f((float)i / t.Ticks);
+      await Tick();
+    }
+  }
 
   // Conditional control flow.
   public async Task While(Func<bool> pred) {
@@ -240,6 +250,7 @@ public static class Waiter {
   public static TaskFunc Repeat<T>(Action<T> f, T arg) => s => s.Repeat(() => f(arg));
   public static TaskFunc Repeat(TaskFunc f) => s => s.Repeat(f);
   public static TaskFunc Repeat(int n, TaskFunc f) => s => s.Repeat(n, f);
+  public static TaskFunc Repeat(int n, Action f) => s => s.Repeat(n, f);
   public static TaskFunc Any(params TaskFunc[] fs) => s => s.Any(fs);
   public static TaskFunc All(params TaskFunc[] fs) => s => s.All(fs);
   public static TaskFunc ListenFor(IEventSource evt) => s => s.ListenFor(evt);

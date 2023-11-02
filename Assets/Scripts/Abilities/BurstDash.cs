@@ -85,7 +85,8 @@ public class BurstDash : Ability {
     await scope.Forever();
   }
 
-  void FixedUpdate() {
+  protected override void FixedUpdate() {
+    base.FixedUpdate();
     if (Status.IsGrounded)
       AirDashRemaining = 1;
   }

@@ -77,7 +77,8 @@ public class InteractAbility : Ability {
   int GetSelected() => Menu.GetSelectedFromAim(AbilityManager.GetAxis(AxisTag.Move).XZ, Choices.Length);
 
   float InteractDist = 1f;
-  void FixedUpdate() {
+  protected override void FixedUpdate() {
+    base.FixedUpdate();
     var couldInteract = InteractTarget != null;
     var obj = BuildGrid.GetCellContents(Character.transform.position + Character.transform.forward*InteractDist);
     if (AbilityManager.Running.Any(a => a != this && a.ActiveTags.HasAllFlags(AbilityTag.OnlyOne))) {

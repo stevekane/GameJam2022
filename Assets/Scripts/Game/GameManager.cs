@@ -58,7 +58,6 @@ public class GameManager : MonoBehaviour {
 
   void FixedUpdate() {
     Timeval.TickCount++;
-    Timeval.TickEvent.Fire();
   }
 
   TaskFunc EncounterDefeated(Encounter encounter) => async (TaskScope scope) => {
