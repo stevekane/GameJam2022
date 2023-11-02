@@ -5,7 +5,7 @@ public class HitboxClipBehavior : TaskBehavior {
   public HitboxParams HitboxParams;
 
   public override void Setup(Playable playable) {
-    var hitbox = (Hitbox)UserData;
+    var hitbox = (HitboxSteve)UserData;
     if (!hitbox)
       return;
     hitbox.HitboxParams = HitboxParams;
@@ -15,7 +15,7 @@ public class HitboxClipBehavior : TaskBehavior {
   }
 
   public override void Cleanup(Playable playable) {
-    var hitbox = (Hitbox)UserData;
+    var hitbox = (HitboxSteve)UserData;
     if (!hitbox)
       return;
     hitbox.Collider.enabled = false;

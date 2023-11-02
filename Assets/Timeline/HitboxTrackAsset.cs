@@ -3,10 +3,10 @@ using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
 [TrackClipType(typeof(HitboxClipAsset))]
-[TrackBindingType(typeof(Hitbox))]
+[TrackBindingType(typeof(HitboxSteve))]
 public class HitboxTrackAsset : TrackAsset {
   public override void GatherProperties(PlayableDirector director, IPropertyCollector driver) {
-    var hitbox = (Hitbox)director.GetGenericBinding(this);
+    var hitbox = (HitboxSteve)director.GetGenericBinding(this);
     if (!hitbox)
       return;
     var collider = hitbox.Collider;
@@ -14,7 +14,7 @@ public class HitboxTrackAsset : TrackAsset {
       Debug.LogError($"No collider found on hitbox", hitbox);
       return;
     }
-    driver.AddFromName<Hitbox>(hitbox.gameObject, "HitboxParams");
+    driver.AddFromName<HitboxSteve>(hitbox.gameObject, "HitboxParams");
     driver.AddFromComponent(collider.gameObject, collider);
   }
 }
