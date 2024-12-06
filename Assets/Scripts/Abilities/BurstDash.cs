@@ -65,10 +65,12 @@ public class BurstDash : Ability {
     var targetDir = desiredDir.TryGetDirection() ?? dir;
     dir = Vector3.RotateTowards(dir, targetDir.normalized, TurnSpeed/360f, 0f);
     Status.transform.forward = dir;
-    impulse *= Mathf.Exp(-Time.fixedDeltaTime * Drag);
+    impulse *= .95f;
+    //impulse *= Mathf.Exp(-Time.fixedDeltaTime * Drag);
     if (impulse < MinImpulse)
       scope.Cancel();
     Mover.Move(impulse * desiredSpeed * Time.fixedDeltaTime * dir);
+    Debug.Log($"impulse {impulse}");
     await scope.Tick();
   };
 

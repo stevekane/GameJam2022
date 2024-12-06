@@ -25,13 +25,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 335112220}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 2.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 368515177}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &335112223
 MonoBehaviour:
@@ -90,6 +90,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 368515176}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -97,7 +98,6 @@ Transform:
   m_Children:
   - {fileID: 335112221}
   m_Father: {fileID: 960416853382759760}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &368515178
 MonoBehaviour:
@@ -131,13 +131,10 @@ MonoBehaviour:
     CameraShakeStrength: 1
     HitStopDuration:
       Millis: 500
-      FramesPerSecond: 30
     StunDuration:
       Millis: 500
-      FramesPerSecond: 30
     SlowFallDuration:
       Millis: 0
-      FramesPerSecond: 30
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -164,20 +161,15 @@ MonoBehaviour:
     m_RotationOrder: 4
   ChargeMaxDuration:
     Millis: 1000
-    FramesPerSecond: 60
   AttackAnimation:
     Clip: {fileID: 7400000, guid: 3419224fa962de8459538d648895227e, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
     Speed: 1
     PhaseDurations:
     - Millis: 300
-      FramesPerSecond: 60
     - Millis: 100
-      FramesPerSecond: 60
     - Millis: 366.66656
-      FramesPerSecond: 60
     - Millis: 366.6668
-      FramesPerSecond: 60
     BlendInFraction: 0
     BlendOutFraction: 0
   Hitbox: {fileID: 335112223}
@@ -209,13 +201,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 478649686}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 960416853382759760}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &478649688
 MonoBehaviour:
@@ -234,27 +226,31 @@ MonoBehaviour:
     RequiredOwnerTags: 0
     EnergyCost: 0
   Speed: 40
+  WallJumpHorizontalSpeed: 30
   Drag: 5
   MinDuration:
     Millis: 33.333332
-    FramesPerSecond: 30
   MaxDuration:
     Millis: 200
-    FramesPerSecond: 30
   Animation:
     Clip: {fileID: 7400000, guid: 2a6b2e49b8c217e4c8ccc212650f9ac5, type: 2}
     Mask: {fileID: 0}
     Speed: 1
     PhaseDurations:
     - Millis: 33.333336
-      FramesPerSecond: 60
+    BlendInFraction: 0
+    BlendOutFraction: 0
+  WallJumpAnimation:
+    Clip: {fileID: 0}
+    Mask: {fileID: 0}
+    Speed: 1
+    PhaseDurations: []
     BlendInFraction: 0
     BlendOutFraction: 0
   LaunchSFX: {fileID: 8300000, guid: 006a7e9d1c0e1234f89c4f6957918bf5, type: 3}
   LaunchVFX: {fileID: 100000, guid: e53da0fb627b93d419d10d2f7be0ee52, type: 3}
   CoyoteTime:
     Millis: 100
-    FramesPerSecond: 60
 --- !u!1 &1974679389
 GameObject:
   m_ObjectHideFlags: 0
@@ -279,13 +275,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1974679389}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 960416853382759760}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1974679391
 MonoBehaviour:
@@ -299,7 +295,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a72310bdd2a379942a1c3610f4d7c3b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TriggerConditions: []
+  TriggerCondition:
+    Tags: 0
+    RequiredOwnerTags: 0
+    EnergyCost: 0
   Index: 1
   BlockAnimation:
     Clip: {fileID: 7400000, guid: bb232cefdc4a76c4cb516b8ef26d5c05, type: 2}
@@ -307,9 +306,7 @@ MonoBehaviour:
     Speed: 1
     PhaseDurations:
     - Millis: 16.666666
-      FramesPerSecond: 60
     - Millis: 133.33333
-      FramesPerSecond: 60
     BlendInFraction: 0.423
     BlendOutFraction: 0.446
   Shield: {fileID: 268572201568636213}
@@ -337,13 +334,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5297261439439992158}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7826921793340544258}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!137 &8415393213356043080
 SkinnedMeshRenderer:
@@ -559,7 +556,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf2d72049549d814e9d7e292cfea472c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HumanName: LeftHand
+  Bone: 13
 --- !u!4 &8236355917067254139 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8236355918522095634, guid: bae48a370600d8a4e998c51287d52193, type: 3}
@@ -654,7 +651,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf2d72049549d814e9d7e292cfea472c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HumanName: RightHand
+  Bone: 14
 --- !u!4 &4582690096690237 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4582690453958646, guid: 39e0fb4b243ffb645a622d1945004ee5, type: 3}
@@ -684,9 +681,21 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 649677099754309205, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
+      propertyPath: Bone
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 3638060651688812906, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
+      propertyPath: Bone
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 3639504942597343017, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_VersionIndex
       value: 269
+      objectReference: {fileID: 0}
+    - target: {fileID: 3690112119114351915, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
+      propertyPath: Bone
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 4220133813938994128, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
       propertyPath: m_RootOrder
@@ -904,7 +913,6 @@ MonoBehaviour:
   RepositionDistance: 4
   RepositionDelay:
     Millis: 0
-    FramesPerSecond: 60
   RepositionBehavior: 0
   TelegraphBehavior: 1
   BlockRange: 10
@@ -912,7 +920,6 @@ MonoBehaviour:
   MainAttack: {fileID: 368515178}
   AttackDelay:
     Millis: 2000
-    FramesPerSecond: 60
 --- !u!4 &960416853382759760 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4220133813289122912, guid: 9c447f3ecb4e2854abc67c1cf0421a95, type: 3}
