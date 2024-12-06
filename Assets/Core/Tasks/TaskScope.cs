@@ -82,8 +82,8 @@ public class TaskScope : IDisposable {
     for (int i = 0; i < ticks; i++)
       await Tick();
   }
-  public Task Seconds(float seconds) => Ticks((int)(seconds * 1000));
-  public Task Millis(int ms) => Ticks(ms);
+  public Task Seconds(float seconds) => Delay(Timeval.FromSeconds(seconds * 1000));
+  public Task Millis(int ms) => Delay(Timeval.FromMillis(ms));
   public Task Delay(Timeval t) => Ticks(t.Ticks);
   // N.B. This uses raw Task.Delay because this only and ever stands for "wait indefinetly"
   public Task Forever() => Task.Delay(-1, Source.Token);

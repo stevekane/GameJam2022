@@ -61,6 +61,7 @@ public class GameManager : MonoBehaviour {
   }
 
   TaskFunc EncounterDefeated(Encounter encounter) => async (TaskScope scope) => {
+    await scope.Millis(2000);
     await encounter.Run(scope);
   };
 
@@ -136,7 +137,7 @@ public class GameManager : MonoBehaviour {
     SaveData.SaveToFile(0);
 
     Destroy(Player.gameObject);
-    await scope.Millis(3000);
+    await scope.Millis(2000);
 
     await ReloadScene(scope);
   }
