@@ -22,7 +22,7 @@ public class ParryAbility : Ability {
         var onHurt = Waiter.ListenFor(Hurtbox.OnHurt);
         var hurt = await scope.Any(onHurt, Waiter.Return<HitParams>(Waiter.Delay(BlockDuration)), Waiter.Return<HitParams>(ListenFor(MainRelease)));
         if (hurt != null)
-          AbilityManager.MainScope.Start(Riposte);
+          AbilityManager.TaskRunner.RunTask(Riposte);
       }
     } finally {
       AnimationDriver.Animator.SetBool("Blocking", false);

@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Teleport : Ability {
   [SerializeField] AnimationJobConfig Animation;
@@ -11,6 +12,7 @@ public class Teleport : Ability {
   [SerializeField] AudioClip InSFX;
   [SerializeField] GameObject InVFX;
   [SerializeField] Vector3 VFXOffset;
+  [SerializeField] float Distance;
 
   public Vector3 Destination { get; set; }
 
@@ -22,6 +24,10 @@ public class Teleport : Ability {
   }, "Teleport Windup");
 
   public override async Task MainAction(TaskScope scope) {
+    await scope.Any(ListenFor(MainRelease));
+    var dir = AbilityManager.GetAxis(AxisTag.Move).XZ.TryGetDirection();
+    if (!dir.HasValue)
+      return;
     using var effect = Status.Add(TeleportEffect);
     var animationJob = AnimationDriver.Play(scope, Animation);
     VFXManager.Instance.TrySpawnWithParent(ChannelVFX, FXTransform.Transform, Animation.Clip.length);
@@ -31,7 +37,9 @@ public class Teleport : Ability {
     SFXManager.Instance.TryPlayOneShot(InSFX);
     VFXManager.Instance.TrySpawnEffect(InVFX, Destination+VFXOffset);
     Flash.Run();
+    Destination = transform.position + dir.Value*Distance;
     Mover.Teleport(Destination);
     await scope.Tick(); // Important: Nothing should happen on this frame once the teleport concludes
   }
+  public override Task MainRelease(TaskScope scope) => null;
 }

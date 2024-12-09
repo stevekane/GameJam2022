@@ -46,7 +46,7 @@ public class AIMover : MonoBehaviour {
     if (NavMeshAgent.isOnOffMeshLink && Status.CanMove) {
       if (!TraversingLink) {
         TraversingLink = true;
-        AbilityManager.MainScope.Start(TraverseOffLink);
+        AbilityManager.TaskRunner.RunTask(TraverseOffLink);
       }
     } else {
       NavMeshAgent.nextPosition = transform.position;

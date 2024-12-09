@@ -231,8 +231,8 @@ public class FallenEffect : StatusEffect {
       Recovering = true;
       if (Status.IsGrounded)
         await Status.AnimationDriver.Play(scope, RecoveryAnimation).WaitDone(scope);
-      Status.Remove(this);
     } finally {
+      Status.Remove(this);
       Recovering = false;
     }
   }

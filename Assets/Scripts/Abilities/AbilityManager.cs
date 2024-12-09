@@ -12,7 +12,8 @@ public enum AxisTag {
 public class AbilityManager : MonoBehaviour {
   [HideInInspector] public Ability[] Abilities;
   public Optional<Energy> Energy;
-  public TaskScope MainScope = new();
+  //public TaskScope MainScope = new();
+  public TaskRunner TaskRunner = new();
 
   public IEnumerable<Ability> Running => Abilities.Where(a => a.IsRunning);
 
@@ -55,7 +56,8 @@ public class AbilityManager : MonoBehaviour {
   public bool TryInvoke(AbilityMethod method) {
     if (Status.IsFallen) {
       if (Status.Get<FallenEffect>() is var fallen && fallen != null)
-        _ = fallen.RecoverySequence(MainScope);
+        TaskRunner.RunTask(fallen.RecoverySequence);
+        //_ = fallen.RecoverySequence(MainScope);
       return false;
     }
     if (CanInvoke(method) is var can && can)
@@ -113,10 +115,12 @@ public class AbilityManager : MonoBehaviour {
   void OnDestroy() {
     Abilities.ForEach(a => a.Stop());
     Abilities.ForEach(a => a.Character = null);
-    MainScope.Dispose();
+    //MainScope.Dispose();
+    TaskRunner.Dispose();
   }
   void FixedUpdate() {
     if (Status.IsHurt)
       InterruptAbilities();
+    TaskRunner.FixedUpdate();
   }
 }

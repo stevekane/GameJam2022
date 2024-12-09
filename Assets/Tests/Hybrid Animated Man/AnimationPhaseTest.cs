@@ -21,8 +21,8 @@ public class AnimationPhaseTest : Ability {
   }
   public async Task One(TaskScope scope) {
     try {
-      if (Animation == null)
-        Animation = AnimationDriver.Play(AbilityManager.MainScope, AnimationConfig);
+      //if (Animation == null)
+      //  Animation = AnimationDriver.Play(AbilityManager.MainScope, AnimationConfig);
       if (Phase > AnimationConfig.Clip.events.Length) {
         Debug.Log($"Animation done");
         Animation.Stop();
