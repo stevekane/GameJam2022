@@ -24,7 +24,7 @@ public class TimelineTaskConfigConfigDrawer : PropertyDrawer {
       .ToArray();
     var missingTrack = false;
     for (int i = 0; i < realBindings.Length; i++) {
-      var configIdx = Array.FindIndex(config.Bindings, c => c.Track?.GetInstanceID() == realBindings[i].Track.GetInstanceID());
+      var configIdx = Array.FindIndex(config.Bindings, c => c.Track?.GetEntityId() == realBindings[i].Track.GetEntityId());
       if (configIdx != -1) {
         realBindings[i].Binding = config.Bindings[configIdx].Binding;
       } else {

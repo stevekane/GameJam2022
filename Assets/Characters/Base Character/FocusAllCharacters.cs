@@ -10,8 +10,8 @@ public class FocusAllCharacters : MonoBehaviour {
     var targets = FindObjectsOfType<AbilityManager>();
     targetGroup.m_Targets =
       targets.Select(t => new Unity.Cinemachine.CinemachineTargetGroup.Target() {
-        target = t.transform,
-        weight = 1
+        Object = t.transform,
+        Weight = 1
       })
       .ToArray();
   }

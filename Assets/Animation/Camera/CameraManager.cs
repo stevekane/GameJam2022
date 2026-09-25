@@ -26,22 +26,22 @@ public class CameraManager : MonoBehaviour {
   }
 
   void Update() {
-    var targetCount = TargetGroup.m_Targets.Length;
+    var targetCount = TargetGroup.Targets.Count;
     for (var i = targetCount-1; i >= 0; i--) {
-      var target = TargetGroup.m_Targets[i];
-      if (target.target == null) {
-        TargetGroup.RemoveMember(target.target);
+      var target = TargetGroup.Targets[i];
+      if (target.Object == null) {
+        TargetGroup.RemoveMember(target.Object);
       } else {
-        if (target.target.CompareTag(GhostTagName)) {
-          if (target.weight <= 0) {
-            TargetGroup.RemoveMember(target.target);
+        if (target.Object.CompareTag(GhostTagName)) {
+          if (target.Weight <= 0) {
+            TargetGroup.RemoveMember(target.Object);
           } else {
-            target.weight = Mathf.MoveTowards(target.weight, 0, Time.deltaTime * WeightPerSecond);
-            TargetGroup.m_Targets[i] = target;
+            target.Weight = Mathf.MoveTowards(target.Weight, 0, Time.deltaTime * WeightPerSecond);
+            TargetGroup.Targets[i] = target;
           }
         } else {
-          target.weight = Mathf.MoveTowards(target.weight, 1, Time.deltaTime * WeightPerSecond);
-          TargetGroup.m_Targets[i] = target;
+          target.Weight = Mathf.MoveTowards(target.Weight, 1, Time.deltaTime * WeightPerSecond);
+          TargetGroup.Targets[i] = target;
         }
       }
     }

@@ -495,7 +495,7 @@ public class AnimationDriver : MonoBehaviour {
   }
 
   PlayableOutput ObjectPlayableOutput(PlayableGraph graph, TrackAsset track, TimelineTaskConfig config) {
-    var binding = config.Bindings.FirstOrDefault(b => b.Track.GetInstanceID() == track.GetInstanceID());
+    var binding = config.Bindings.FirstOrDefault(b => b.Track.GetEntityId() == track.GetEntityId());
     return ObjectPlayableOutputObj(graph, track, binding.Binding);
   }
 
