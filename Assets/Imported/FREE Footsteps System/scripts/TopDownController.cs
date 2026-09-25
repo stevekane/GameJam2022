@@ -58,8 +58,8 @@ namespace Footsteps {
 
 		void MoveCharacter() {
 			Vector3 velocity = thisTransform.forward * moveSpeed * jogSpeed;
-			velocity.y = thisRigidbody.velocity.y;
-			thisRigidbody.velocity = velocity;
+			velocity.y = thisRigidbody.linearVelocity.y;
+			thisRigidbody.linearVelocity = velocity;
 		}
 
 		void RotateCharacter() {

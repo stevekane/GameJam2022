@@ -237,7 +237,7 @@ public class FootBaseAsset : ScriptableObject {
     try {
       var animator = model.GetComponent<Animator>();
       animator.applyRootMotion = false;
-      animator.updateMode = AnimatorUpdateMode.AnimatePhysics;
+      animator.updateMode = AnimatorUpdateMode.Fixed;
       animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
       var leftHeel = animator.GetBoneTransform(HumanBodyBones.LeftFoot);
       var leftToe = animator.GetBoneTransform(HumanBodyBones.LeftToes);

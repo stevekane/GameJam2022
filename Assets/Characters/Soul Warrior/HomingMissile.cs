@@ -16,7 +16,7 @@ public class HomingMissile : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    Rigidbody.velocity = transform.forward * Speed;
+    Rigidbody.linearVelocity = transform.forward * Speed;
   }
 
   void Explode() {

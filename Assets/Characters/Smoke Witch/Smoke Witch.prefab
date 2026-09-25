@@ -24,13 +24,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 39944108}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6324507690139943610}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &39944110
 MonoBehaviour:
@@ -52,7 +52,6 @@ MonoBehaviour:
     DesiredDistance: 4
     Cooldown:
       Millis: 333.33334
-      FramesPerSecond: 60
   Setup:
     CancelIfDistanceExceeds: 12
     Sequence:
@@ -91,6 +90,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 67708488}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.099999905, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -99,7 +99,6 @@ Transform:
   - {fileID: 350432782}
   - {fileID: 801026773}
   m_Father: {fileID: 1695491031}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &67708490
 MonoBehaviour:
@@ -113,7 +112,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a37b963004c28f4facd7211d042f0ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TriggerConditions: []
+  TriggerCondition:
+    Tags: 0
+    RequiredOwnerTags: 0
+    EnergyCost: 0
   Chargeable: 0
   InPlace: 0
   RecoveryCancelable: 1
@@ -130,13 +132,10 @@ MonoBehaviour:
     CameraShakeStrength: 1
     HitStopDuration:
       Millis: 200
-      FramesPerSecond: 60
     StunDuration:
       Millis: 166.66667
-      FramesPerSecond: 60
     SlowFallDuration:
       Millis: 0
-      FramesPerSecond: 60
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -163,20 +162,15 @@ MonoBehaviour:
     m_RotationOrder: 4
   ChargeMaxDuration:
     Millis: 1000
-    FramesPerSecond: 60
   AttackAnimation:
     Clip: {fileID: 7400000, guid: 3766ebf57fae5ea49859605838dce4d3, type: 2}
     Mask: {fileID: 0}
     Speed: 1
     PhaseDurations:
     - Millis: 83.333336
-      FramesPerSecond: 60
     - Millis: 66.666664
-      FramesPerSecond: 60
     - Millis: 100
-      FramesPerSecond: 60
     - Millis: 366.66666
-      FramesPerSecond: 60
     BlendInFraction: 0.1
     BlendOutFraction: 0.1
   Hitbox: {fileID: 350432784}
@@ -211,13 +205,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 70856358}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 960416853382759760}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &70856360
 MonoBehaviour:
@@ -240,17 +234,14 @@ MonoBehaviour:
   TurnSpeed: 30
   DashDuration:
     Millis: 166.66667
-    FramesPerSecond: 60
   ResidualImagePeriod:
     Millis: 50
-    FramesPerSecond: 60
   Animation:
     Clip: {fileID: 7400000, guid: 10c638eb3be7fba4ca0ac3ca09c7ba41, type: 2}
     Mask: {fileID: 0}
     Speed: 1
     PhaseDurations:
     - Millis: 333.33334
-      FramesPerSecond: 60
     BlendInFraction: 0.05
     BlendOutFraction: 0.15
   LaunchSFX: {fileID: 8300000, guid: 10c28a03acd49694e8db907df2dd45f9, type: 3}
@@ -378,13 +369,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 111269087}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 2.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2136314948}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &111269090
 MonoBehaviour:
@@ -447,13 +438,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 147474733}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 960416853382759760}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &147474739
 MonoBehaviour:
@@ -476,20 +467,16 @@ MonoBehaviour:
   TurnSpeed: 30
   WindupDuration:
     Millis: 200
-    FramesPerSecond: 60
   DashDuration:
     Millis: 1000
-    FramesPerSecond: 60
   ResidualImagePeriod:
     Millis: 50
-    FramesPerSecond: 60
   Animation:
     Clip: {fileID: 7400000, guid: 10c638eb3be7fba4ca0ac3ca09c7ba41, type: 2}
     Mask: {fileID: 0}
     Speed: 1
     PhaseDurations:
     - Millis: 333.33334
-      FramesPerSecond: 60
     BlendInFraction: 0.05
     BlendOutFraction: 0.15
   WindupVFX: {fileID: 100000, guid: 8e1cc1159f4685849b83dd03cfbefb16, type: 3}
@@ -608,19 +595,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc88e8080d06e8a4aac5f231cd5e357d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TriggerConditions: []
+  TriggerCondition:
+    Tags: 0
+    RequiredOwnerTags: 0
+    EnergyCost: 0
   MaxMoveSpeed: 120
   MinMoveSpeed: 60
   TurnSpeed: 60
   WindupDuration:
     Millis: 200
-    FramesPerSecond: 60
   DashDuration:
     Millis: 300
-    FramesPerSecond: 60
   ResidualImagePeriod:
     Millis: 50
-    FramesPerSecond: 60
   Animation:
     Clip: {fileID: 0}
     Mask: {fileID: 0}
@@ -661,13 +648,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 350432781}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 2.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 67708489}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &350432784
 MonoBehaviour:
@@ -726,13 +713,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 478649686}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 960416853382759760}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &478649688
 MonoBehaviour:
@@ -750,28 +737,32 @@ MonoBehaviour:
     Tags: 49
     RequiredOwnerTags: 0
     EnergyCost: 0
-  Speed: 60
+  Speed: 120
+  WallJumpHorizontalSpeed: 30
   Drag: 5
   MinDuration:
     Millis: 33.333332
-    FramesPerSecond: 30
   MaxDuration:
     Millis: 200
-    FramesPerSecond: 30
   Animation:
     Clip: {fileID: 7400000, guid: 2a6b2e49b8c217e4c8ccc212650f9ac5, type: 2}
     Mask: {fileID: 0}
     Speed: 1
     PhaseDurations:
     - Millis: 33.333336
-      FramesPerSecond: 60
+    BlendInFraction: 0
+    BlendOutFraction: 0
+  WallJumpAnimation:
+    Clip: {fileID: 0}
+    Mask: {fileID: 0}
+    Speed: 1
+    PhaseDurations: []
     BlendInFraction: 0
     BlendOutFraction: 0
   LaunchSFX: {fileID: 8300000, guid: 006a7e9d1c0e1234f89c4f6957918bf5, type: 3}
   LaunchVFX: {fileID: 100000, guid: e53da0fb627b93d419d10d2f7be0ee52, type: 3}
   CoyoteTime:
     Millis: 166.66667
-    FramesPerSecond: 60
 --- !u!1 &516949690
 GameObject:
   m_ObjectHideFlags: 0
@@ -797,13 +788,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 516949690}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 960416853382759760}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &516949693
 MonoBehaviour:
@@ -830,12 +821,10 @@ MonoBehaviour:
     Speed: 1
     PhaseDurations:
     - Millis: 1000
-      FramesPerSecond: 60
     BlendInFraction: 0.15
     BlendOutFraction: 0.15
   Windup:
     Millis: 333.33334
-    FramesPerSecond: 60
   Spawn: 13
   ChannelVFX: {fileID: 516949690}
   ChannelAudioSource: {fileID: 516949692}
@@ -855,13 +844,10 @@ MonoBehaviour:
     CameraShakeStrength: 3
     HitStopDuration:
       Millis: 100
-      FramesPerSecond: 60
     StunDuration:
       Millis: 500
-      FramesPerSecond: 60
     SlowFallDuration:
       Millis: 0
-      FramesPerSecond: 60
 --- !u!82 &516949692
 AudioSource:
   m_ObjectHideFlags: 0
@@ -983,13 +969,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 598770619}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -0.72, z: 2.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 774783623}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &598770622
 MonoBehaviour:
@@ -1048,6 +1034,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 652589411}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -1055,7 +1042,6 @@ Transform:
   m_Children:
   - {fileID: 7788645468223937035}
   m_Father: {fileID: 960416853382759760}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &652589413
 MonoBehaviour:
@@ -1089,13 +1075,10 @@ MonoBehaviour:
     CameraShakeStrength: 1
     HitStopDuration:
       Millis: 500
-      FramesPerSecond: 30
     StunDuration:
       Millis: 666.6667
-      FramesPerSecond: 30
     SlowFallDuration:
       Millis: 0
-      FramesPerSecond: 30
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -1122,20 +1105,15 @@ MonoBehaviour:
     m_RotationOrder: 4
   ChargeMaxDuration:
     Millis: 1000
-    FramesPerSecond: 60
   AttackAnimation:
     Clip: {fileID: 7400000, guid: 3419224fa962de8459538d648895227e, type: 2}
     Mask: {fileID: 31900000, guid: 6735b5a1bf5e3984a90fcb897a8547e9, type: 2}
     Speed: 1
     PhaseDurations:
     - Millis: 400
-      FramesPerSecond: 60
     - Millis: 133.33333
-      FramesPerSecond: 60
     - Millis: 366.66666
-      FramesPerSecond: 60
     - Millis: 400
-      FramesPerSecond: 60
     BlendInFraction: 0.1
     BlendOutFraction: 0.1
   Hitbox: {fileID: 8746232633268447233}
@@ -1167,13 +1145,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 726705607}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2095808994}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &726705609
 LineRenderer:
@@ -1303,6 +1281,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 774783622}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -1310,7 +1289,6 @@ Transform:
   m_Children:
   - {fileID: 598770620}
   m_Father: {fileID: 960416853382759760}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &774783624
 MonoBehaviour:
@@ -1344,13 +1322,10 @@ MonoBehaviour:
     CameraShakeStrength: 8
     HitStopDuration:
       Millis: 400
-      FramesPerSecond: 30
     StunDuration:
       Millis: 500
-      FramesPerSecond: 30
     SlowFallDuration:
       Millis: 0
-      FramesPerSecond: 30
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -1377,20 +1352,15 @@ MonoBehaviour:
     m_RotationOrder: 4
   ChargeMaxDuration:
     Millis: 1000
-    FramesPerSecond: 60
   AttackAnimation:
     Clip: {fileID: 7400000, guid: f190d813cf4ee50499abc916c88f5fd9, type: 2}
     Mask: {fileID: 0}
     Speed: 1
     PhaseDurations:
     - Millis: 250
-      FramesPerSecond: 60
     - Millis: 33.333332
-      FramesPerSecond: 60
     - Millis: 250
-      FramesPerSecond: 60
     - Millis: 0
-      FramesPerSecond: 60
     BlendInFraction: 0
     BlendOutFraction: 0
   Hitbox: {fileID: 598770622}
@@ -1424,13 +1394,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 801026772}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 2.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 67708489}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &801026776
 BoxCollider:
@@ -1518,13 +1488,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1066501924}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2095808994}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &1066501926
 AudioSource:
@@ -1646,6 +1616,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1161071229}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.099999905, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -1654,7 +1625,6 @@ Transform:
   - {fileID: 1295759402}
   - {fileID: 994835862192095354}
   m_Father: {fileID: 1695491031}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1161071231
 MonoBehaviour:
@@ -1668,7 +1638,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a37b963004c28f4facd7211d042f0ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TriggerConditions: []
+  TriggerCondition:
+    Tags: 0
+    RequiredOwnerTags: 0
+    EnergyCost: 0
   Chargeable: 0
   InPlace: 0
   RecoveryCancelable: 1
@@ -1685,13 +1658,10 @@ MonoBehaviour:
     CameraShakeStrength: 1
     HitStopDuration:
       Millis: 200
-      FramesPerSecond: 60
     StunDuration:
       Millis: 166.66667
-      FramesPerSecond: 60
     SlowFallDuration:
       Millis: 0
-      FramesPerSecond: 60
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -1718,20 +1688,15 @@ MonoBehaviour:
     m_RotationOrder: 4
   ChargeMaxDuration:
     Millis: 1000
-    FramesPerSecond: 60
   AttackAnimation:
     Clip: {fileID: 7400000, guid: f57b3d85cf5b26f4f8132ba301a25dcc, type: 2}
     Mask: {fileID: 0}
     Speed: 1
     PhaseDurations:
     - Millis: 83.333336
-      FramesPerSecond: 60
     - Millis: 66.666664
-      FramesPerSecond: 60
     - Millis: 100
-      FramesPerSecond: 60
     - Millis: 383.33334
-      FramesPerSecond: 60
     BlendInFraction: 0.1
     BlendOutFraction: 0.1
   Hitbox: {fileID: 1295759404}
@@ -1764,13 +1729,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1295759401}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 2.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1161071230}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1295759404
 MonoBehaviour:
@@ -1829,13 +1794,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1337862621}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1722554550}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1337862623
 MonoBehaviour:
@@ -1875,13 +1840,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1388018982}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1637902579}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1388018985
 MonoBehaviour:
@@ -1940,6 +1905,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1637902578}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -1947,7 +1913,6 @@ Transform:
   m_Children:
   - {fileID: 1388018983}
   m_Father: {fileID: 960416853382759760}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1637902580
 MonoBehaviour:
@@ -1979,26 +1944,19 @@ MonoBehaviour:
     CameraShakeStrength: 1
     HitStopDuration:
       Millis: 300
-      FramesPerSecond: 30
     StunDuration:
       Millis: 500
-      FramesPerSecond: 30
     SlowFallDuration:
       Millis: 0
-      FramesPerSecond: 30
   AnimationConfig:
     Clip: {fileID: 7400000, guid: b0637973c7ede3f41bbd02cca7c60b5d, type: 2}
     Mask: {fileID: 0}
     Speed: 1
     PhaseDurations:
     - Millis: 500
-      FramesPerSecond: 60
     - Millis: 183.33336
-      FramesPerSecond: 60
     - Millis: 50
-      FramesPerSecond: 60
     - Millis: 166.66667
-      FramesPerSecond: 60
     BlendInFraction: 0
     BlendOutFraction: 0
   WindupVFXAttachment:
@@ -2036,13 +1994,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1645260495}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2095808994}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &1645260497
 AudioSource:
@@ -2164,6 +2122,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1695491030}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -2172,7 +2131,6 @@ Transform:
   - {fileID: 67708489}
   - {fileID: 1161071230}
   m_Father: {fileID: 960416853382759760}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1695491032
 MonoBehaviour:
@@ -2216,6 +2174,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1722554549}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -2225,7 +2184,6 @@ Transform:
   - {fileID: 1337862622}
   - {fileID: 1954696643}
   m_Father: {fileID: 6324507690139943610}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1822370309
 GameObject:
@@ -2251,13 +2209,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1822370309}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1722554550}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1822370311
 MonoBehaviour:
@@ -2273,7 +2231,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Delay:
     Millis: 666.6667
-    FramesPerSecond: 60
 --- !u!1 &1954696642
 GameObject:
   m_ObjectHideFlags: 0
@@ -2298,13 +2255,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1954696642}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1722554550}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1954696644
 MonoBehaviour:
@@ -2344,6 +2301,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2095808993}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -2353,7 +2311,6 @@ Transform:
   - {fileID: 1066501925}
   - {fileID: 726705608}
   m_Father: {fileID: 960416853382759760}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2095808996
 MonoBehaviour:
@@ -2377,25 +2334,19 @@ MonoBehaviour:
   Animator: {fileID: 0}
   AimLocalTimeDilation: 0.6
   PullSpeed: 80
-  TurnSpeed: 360
   RotationSpeed: 180
   VaultSpeedMultiplier: 0.75
   VaultDrag: 2
   WindupDuration:
     Millis: 200
-    FramesPerSecond: 60
   ThrowDuration:
     Millis: 200
-    FramesPerSecond: 60
   HangDuration:
     Millis: 200
-    FramesPerSecond: 60
   HoldDuration:
     Millis: 0
-    FramesPerSecond: 60
   VaultDuration:
     Millis: 250
-    FramesPerSecond: 60
   PullLoop: {fileID: 1645260497}
   ClipSource: {fileID: 1066501926}
   ThrowClip: {fileID: 8300000, guid: 10c28a03acd49694e8db907df2dd45f9, type: 3}
@@ -2532,6 +2483,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2136314947}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -2539,7 +2491,6 @@ Transform:
   m_Children:
   - {fileID: 111269088}
   m_Father: {fileID: 960416853382759760}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2136314949
 MonoBehaviour:
@@ -2573,13 +2524,10 @@ MonoBehaviour:
     CameraShakeStrength: 4
     HitStopDuration:
       Millis: 200
-      FramesPerSecond: 30
     StunDuration:
       Millis: 1000
-      FramesPerSecond: 30
     SlowFallDuration:
       Millis: 0
-      FramesPerSecond: 30
   ChargeScaling:
     serializedVersion: 2
     m_Curve:
@@ -2606,20 +2554,15 @@ MonoBehaviour:
     m_RotationOrder: 4
   ChargeMaxDuration:
     Millis: 1000
-    FramesPerSecond: 60
   AttackAnimation:
     Clip: {fileID: 7400000, guid: 920604ccaa2bbd44699d794e933f46a7, type: 2}
     Mask: {fileID: 0}
     Speed: 1
     PhaseDurations:
     - Millis: 233.33333
-      FramesPerSecond: 60
     - Millis: 100
-      FramesPerSecond: 60
     - Millis: 133.33333
-      FramesPerSecond: 60
     - Millis: 533.3333
-      FramesPerSecond: 60
     BlendInFraction: 0.1
     BlendOutFraction: 0.1
   Hitbox: {fileID: 111269090}
@@ -2651,13 +2594,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 162832780158710387}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6324507690139943610}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7530559780394022775
 MonoBehaviour:
@@ -2679,7 +2622,6 @@ MonoBehaviour:
     DesiredDistance: 4
     Cooldown:
       Millis: 333.33334
-      FramesPerSecond: 60
   Setup:
     CancelIfDistanceExceeds: 10
     Sequence:
@@ -2721,13 +2663,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1358191100026265751}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.5999999, y: 1.5999999, z: 1.5999999}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7826921793340544258}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!137 &6915006016020096804
 SkinnedMeshRenderer:
@@ -2857,13 +2799,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3473177955565000925}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 2.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1161071230}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &3925647750588721270
 BoxCollider:
@@ -2952,13 +2894,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3506327022859998107}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: 2.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 652589412}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8746232633268447233
 MonoBehaviour:
@@ -3017,13 +2959,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4330326262626484434}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6324507690139943610}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &9091395526532877335
 MonoBehaviour:
@@ -3045,7 +2987,6 @@ MonoBehaviour:
     DesiredDistance: 4
     Cooldown:
       Millis: 1
-      FramesPerSecond: 60
   Setup:
     CancelIfDistanceExceeds: 12
     Sequence:
@@ -3081,6 +3022,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4769835632487305215}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -3092,7 +3034,6 @@ Transform:
   - {fileID: 3782387366137317075}
   - {fileID: 1722554550}
   m_Father: {fileID: 960416853277623008}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6808989865505306388
 GameObject:
@@ -3118,13 +3059,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6808989865505306388}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6324507690139943610}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5963635189694271168
 MonoBehaviour:
@@ -3146,7 +3087,6 @@ MonoBehaviour:
     DesiredDistance: 1000
     Cooldown:
       Millis: 1
-      FramesPerSecond: 60
   Setup:
     CancelIfDistanceExceeds: 1000
     Sequence:
@@ -3237,7 +3177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf2d72049549d814e9d7e292cfea472c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HumanName: RightHand
+  Bone: 0
 --- !u!4 &4170916853411616 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4170917173237604, guid: 77b19eccec82c1b4686ead7ab56da65b, type: 3}
@@ -3827,7 +3767,6 @@ MonoBehaviour:
   DefensiveRange: 8
   AttackCooldown:
     Millis: 1333.3334
-    FramesPerSecond: 60
   GroundLightAttack: {fileID: 1695491032}
   GroundHeavyAttack: {fileID: 652589413}
   GroundLauncherAttack: {fileID: 2136314949}

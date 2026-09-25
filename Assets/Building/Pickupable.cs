@@ -16,7 +16,7 @@ public class Pickupable : MonoBehaviour {
     var accel = 20f;
     var rb = GetComponent<Rigidbody>();
     rb.isKinematic = true;
-    rb.velocity = Vector3.zero;
+    rb.linearVelocity = Vector3.zero;
     while (true) {
       var delta = pickupper.transform.position - transform.position;
       if (delta.sqrMagnitude < speed * Time.fixedDeltaTime)

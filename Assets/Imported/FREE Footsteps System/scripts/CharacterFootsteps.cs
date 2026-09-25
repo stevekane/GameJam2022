@@ -86,7 +86,7 @@ namespace Footsteps {
 			CheckGround();
 
 			if(triggeredBy == TriggeredBy.TRAVELED_DISTANCE) {
-				float speed = (characterController ? characterController.velocity : characterRigidbody.velocity).magnitude;
+				float speed = (characterController ? characterController.velocity : characterRigidbody.linearVelocity).magnitude;
 
 				if(isGrounded) {
 					// Advance the step cycle only if the character is grounded.

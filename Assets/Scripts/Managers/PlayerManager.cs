@@ -19,7 +19,7 @@ public class PlayerManager : MonoBehaviour {
   public void RegisterPlayer(Player player) {
     if (PlayerGamepads.Count == 0) {
       // Special case - first player doesn't need to press Start.
-      InitPlayer(player, Gamepad.all.FirstOrDefault(g => g.name.Contains("DualShock")));
+      InitPlayer(player, Gamepad.all.FirstOrDefault(g => g.name.Contains("DualShock") || g.name.Contains("Pro")));
     }
     // Otherwise, PlayerPressedStart will call InitPlayer with the proper device.
   }
@@ -39,9 +39,11 @@ public class PlayerManager : MonoBehaviour {
     player.GetComponent<Team>().ID = teamID;
     if (device != null) {
       // Special case - first player gets mouse/keyboard.
+      Debug.Log($"player ${teamID} is assigned device ${device.name} ${device.deviceId}");
       player.GetComponent<InputManager>().AssignDevices(
         teamID == 0 ? new InputDevice[] { device, Keyboard.current, Mouse.current } : new InputDevice[] { device });
     }
     PlayerGamepads[player] = device;
+    Debug.Log($"InitPlayer ${teamID}, ${device}");
   }
 }

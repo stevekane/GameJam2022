@@ -27,7 +27,7 @@ public class Coin : MonoBehaviour {
     var impulse = new Vector3(Random.Range(-1f, 1f), 5f, Random.Range(-1f, 1f)).normalized * BurstForce;
     rb.AddForce(impulse, ForceMode.Impulse);
     yield return new WaitForFixedUpdate();
-    var velocity = rb.velocity;
+    var velocity = rb.linearVelocity;
     // Why do I have to manually simulate gravity? AddForce does not work right
     while (velocity.y > 0f || transform.position.y > .01f) {
       velocity.y += Time.fixedDeltaTime * Gravity;

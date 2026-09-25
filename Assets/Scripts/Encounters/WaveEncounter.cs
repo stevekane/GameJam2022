@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class WaveEncounter : Encounter {
   public List<SpawnWave> Waves;
+  public Transform Victory;
+
+  public void Start() {
+    Victory.gameObject.SetActive(false);
+  }
 
   public override async Task Run(TaskScope scope) {
     for (int wave = 0; wave < Waves.Count; wave++) {
@@ -12,5 +17,8 @@ public class WaveEncounter : Encounter {
       await scope.Ticks(100);
       await scope.Until(() => MobManager.Instance.Mobs.Count <= 0);
     }
+    Victory.gameObject.SetActive(true);
+    await scope.Until(() => Victory == null);
+    await scope.Seconds(.1f);
   }
 }
