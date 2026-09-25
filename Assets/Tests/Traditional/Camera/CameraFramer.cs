@@ -1,9 +1,9 @@
-using Cinemachine;
+
 using UnityEngine;
 
 namespace Traditional {
     public class CameraFramer : MonoBehaviour {
-    [SerializeField] CinemachineTargetGroup Group;
+    [SerializeField] Unity.Cinemachine.CinemachineTargetGroup Group;
     [SerializeField] string Tag;
 
     void OnTriggerEnter(Collider c) {

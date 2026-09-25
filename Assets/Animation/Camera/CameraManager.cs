@@ -1,4 +1,4 @@
-using Cinemachine;
+
 using UnityEngine;
 
 public class CameraManager : MonoBehaviour {
@@ -6,7 +6,7 @@ public class CameraManager : MonoBehaviour {
 
   [SerializeField] string GhostTagName = "CameraGhost";
   [SerializeField] float WeightPerSecond = 1;
-  [SerializeField] CinemachineTargetGroup TargetGroup;
+  [SerializeField] Unity.Cinemachine.CinemachineTargetGroup TargetGroup;
 
   public void AddTarget(CameraSubject subject) {
     if (TargetGroup.FindMember(subject.transform) < 0) {

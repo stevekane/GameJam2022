@@ -1,4 +1,4 @@
-using Cinemachine;
+
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -6,10 +6,10 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class FocusAllCharacters : MonoBehaviour {
   void Update() {
-    var targetGroup = GetComponent<CinemachineTargetGroup>();
+    var targetGroup = GetComponent<Unity.Cinemachine.CinemachineTargetGroup>();
     var targets = FindObjectsOfType<AbilityManager>();
     targetGroup.m_Targets =
-      targets.Select(t => new CinemachineTargetGroup.Target() {
+      targets.Select(t => new Unity.Cinemachine.CinemachineTargetGroup.Target() {
         target = t.transform,
         weight = 1
       })

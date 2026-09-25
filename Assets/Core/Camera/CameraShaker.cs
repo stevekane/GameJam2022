@@ -1,11 +1,11 @@
 using System;
-using Cinemachine;
+
 using UnityEngine;
 
-public class CameraShaker : CinemachineExtension {
+public class CameraShaker : Unity.Cinemachine.CinemachineExtension {
   [SerializeField] CameraConfig Config;
-  CinemachineVirtualCamera TargetCamera;
-  CinemachineBasicMultiChannelPerlin Noise;
+  Unity.Cinemachine.CinemachineVirtualCamera TargetCamera;
+  Unity.Cinemachine.CinemachineBasicMultiChannelPerlin Noise;
 
   public static CameraShaker Instance;
 
@@ -20,11 +20,11 @@ public class CameraShaker : CinemachineExtension {
 
   protected override void ConnectToVcam(bool connect) {
     base.ConnectToVcam(connect);
-    TargetCamera = VirtualCamera as CinemachineVirtualCamera;
-    Noise = TargetCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+    TargetCamera = VirtualCamera as Unity.Cinemachine.CinemachineVirtualCamera;
+    Noise = TargetCamera.GetCinemachineComponent<Unity.Cinemachine.CinemachineBasicMultiChannelPerlin>();
   }
 
-  protected override void PostPipelineStageCallback(CinemachineVirtualCameraBase vcam, CinemachineCore.Stage stage, ref CameraState state, float dt) {
+  protected override void PostPipelineStageCallback(Unity.Cinemachine.CinemachineVirtualCameraBase vcam, Unity.Cinemachine.CinemachineCore.Stage stage, ref Unity.Cinemachine.CameraState state, float dt) {
     Noise.m_AmplitudeGain = Mathf.Lerp(0, Noise.m_AmplitudeGain, Mathf.Exp(dt*Config.SHAKE_DECAY_EPSILON));
   }
 }
